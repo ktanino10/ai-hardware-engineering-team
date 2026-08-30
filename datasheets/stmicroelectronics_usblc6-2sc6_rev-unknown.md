@@ -8,7 +8,7 @@
 - **Official URL**: https://www.st.com/resource/en/datasheet/usblc6-2sc6.pdf (manufacturer-hosted datasheet PDF, surfaced directly in this session's research)
 - **Retrieved Date**: 2026-08-31
 - **Local cache note**: not committed; content verified via live web search this session (part identity, key electrical specs, and pinout/topology each cross-checked across ≥2 independent sources — components101.com, speed-up.ai schematic/layout guide, and the manufacturer's own datasheet URL surfaced by search).
-- **Used for Evidence IDs**: DS-PROT-001, DS-PROT-002
+- **Used for Evidence IDs**: DS-PROT-001, DS-PROT-002, DS-PROT-003 (added by the Hardware Lead during Design Complete Gate traceability closeout, 2026-09-03 — confirms −40 to +125 °C junction operating temperature range against REQ-201)
 
 ## Why this part
 
