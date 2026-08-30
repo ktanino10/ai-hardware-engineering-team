@@ -1,6 +1,6 @@
 # Requirements
 
-Status: DRAFT — not yet approved by the human Product Owner / Chief Engineer.
+Status: **APPROVED** (2026-08-30, human Chief Engineer, via ask_user "Approve all three as recommended" at the Component Selection checkpoint — see §10 Approval and `validation/change-log.md`). All 4 Open Questions in §9 were answered as-proposed; see §10a.
 
 Produced by `.github/skills/requirements-engineering/SKILL.md`. Every requirement
 below has a stable ID referenced by `requirements/traceability-matrix.md`.
@@ -137,7 +137,7 @@ mark it `Withdrawn` instead, so history stays intact.
   Mechanical, or should form factor be left fully open for those specialists
   to decide organically once parts are chosen?
 
-## 10a. Human Answers (recorded)
+## 9a. Human Answers (recorded)
 
 All four Open Questions above were answered by the human on the first pass
 of this design cycle, before the accidental worktree deletion described in
@@ -151,4 +151,4 @@ rewrite.
 
 | Role | Name | Date | Decision |
 |---|---|---|---|
-| Chief Engineer (Human) | | | Pending |
+| Chief Engineer (Human) | Human Chief Engineer (via creator/"General Chat" session) | 2026-08-30 | **Approved** — requirements confirmed final; proceed to Component Selection |
