@@ -1405,3 +1405,553 @@ MISS-004), 2 LOW (MISS-005, MISS-006).
   before Design Complete per `docs/architecture.md` §8. The two LOW
   findings (MISS-005, MISS-006) are documentation/hygiene corrections that
   do not block progress.
+
+---
+
+## Mechanical Reviewer — Cycle 2 (Re-review after Rev 2 rework, 2026-09-03)
+
+### Review Cycle Metadata
+
+- **Design revision reviewed**: `hardware/mechanical/bench-imu-01-enclosure.scad`
+  **Rev 2** (624 lines) together with its companion
+  `hardware/mechanical/bench-imu-01-dimensional-spec.md` **Rev 2** (869
+  lines) — Author: Mechanical Lead (AI agent), rework commit `7497bf2`
+  ("Mechanical rework for Bench-IMU-01: fix 2 HIGH findings (Rev 2)"),
+  which claims to fix all 4 Cycle-1 findings still open at the time
+  (MISS-001 HIGH, MISS-002 HIGH, MISS-003 MEDIUM, MISS-004 MEDIUM). This is
+  a **re-review, not a first review** — the Mechanical Lead's own Rev 2
+  changelog (top of both files) and the Hardware Lead's own
+  "independently re-verified by the Hardware Lead" claims embedded in the
+  `7497bf2` commit message were read for orientation only, **never**
+  accepted as a substitute for this Reviewer's own independent
+  verification, per this cycle's explicit task instructions and this
+  agent's independence mandate.
+- **Reviewer**: Mechanical Reviewer — see
+  `.github/agents/mechanical-reviewer.agent.md`. Independent of the
+  Mechanical Lead session that performed the Rev 2 rework, and independent
+  of the Hardware Lead session whose commit message asserts its own
+  verification pass.
+- **Independence statement**: I did not treat any Rev 2 claim — the
+  Mechanical Lead's in-code "MISS-00X fix" comments, its dimensional-spec
+  "Rev 2" changelog, or the Hardware Lead's commit-message arithmetic — as
+  self-certifying. Every one of the 4 fixes was independently re-derived
+  this cycle **from the raw `.scad` variable values themselves**
+  (`j2_x`/`j3_x`/`sw1_x`/`sw1_y`/`board_offset_x`/`board_offset_y`/
+  `bay_edge_margin`/`bay_x_min`/`bay_x_max`/`bay_y_min` for MISS-001;
+  the `polygon()`/`rotate([0,90,0])`/`linear_extrude()` primitives
+  themselves for MISS-002; `lid_tab_project`/`tab_clear_dia`/`tab_w` for
+  MISS-003; `screw_len`/`tab_lid_t`/`tab_base_t`/`tab_pilot_depth`/
+  `base_total_h` for MISS-004) — not by re-reading the Mechanical Lead's or
+  Hardware Lead's own stated arithmetic and nodding along. Where the
+  Mechanical Lead's in-code comments showed their own arithmetic
+  (e.g. the rotation-transform comment at lines 425-441), that arithmetic
+  was independently re-derived and, where possible, empirically tested
+  against a real OpenSCAD render, rather than accepted because a comment
+  existed.
+- **Scope**: The 4 claimed fixes (MISS-001 through MISS-004) plus a fresh
+  re-check of checklist items most likely to be affected by the rework
+  (item 4 internal clearance/interference, item 5 fastener placement, item
+  6 wall thickness, item 9 manufacturability, item 10 traceability),
+  covering both changed files in full where the changes propagate (the bay
+  cutout and D1 hole in `lid_shell()`; all 4 instances of `base_tab()`'s
+  gusset and `lid_tab()`'s footprint, not only the one hand-traced
+  instance). Items 1/3/7/8 are noted as carried forward/unaffected (see
+  Checklist Results) since nothing in the Rev 2 diff touches PCB mounting,
+  the Z-height stack-up, assembly order, or the single `fit_clearance`
+  print-fit convention.
+- **Tooling disclosure (significant rigor upgrade vs. Cycle 1)**: Unlike
+  Cycle 1, which explicitly disclosed **no OpenSCAD/CAD rendering tool was
+  available** and was conducted entirely from source-code hand arithmetic,
+  this cycle had a genuine, working `openscad` CLI available (v2021.01 at
+  `/opt/homebrew/bin/openscad`, confirmed via `--version` before relying on
+  it) and used it extensively as independent, empirical evidence layered on
+  top of (not instead of) hand re-derivation:
+  - Rendered the real repo `.scad` file directly, unmodified, in both
+    `show_mode="assembled"` and `show_mode="print_layout"` — both report
+    **"Simple: yes"** (fully manifold, no self-intersections/errors),
+    independently reproducing the Mechanical Lead's own claim rather than
+    trusting it.
+  - Empirically verified the `rotate([0,90,0])` coordinate-transform
+    convention the MISS-002 fix's own comment claims, via a standalone
+    test cube, before trusting that transform in the real gusset analysis.
+  - Used a `-D 'show_mode="isolate_test"'` override (an unrecognized value
+    that satisfies neither the `assembled` nor `print_layout` branch,
+    yielding an empty top-level scene) together with `include
+    <bench-imu-01-enclosure.scad>` wrapper files to render **individual
+    modules in isolation** (`base_tab()`, the gusset construct alone,
+    `lid_tab()`) for both a front-tab instance (`dy=-1`) and a rear-tab
+    instance (`dy=+1`), rather than relying on hand-traced coordinates for
+    only one orientation.
+  - Wrote a custom Python STL parser (ASCII+binary, divergence-theorem
+    signed-tetrahedron volume) — since `numpy-stl` is not installed in this
+    environment — to independently measure rendered volumes and bounding
+    boxes rather than trusting `openscad`'s own on-screen echo values alone.
+  - Ran actual boolean `intersection()` renders (wedge vs. interior-cavity
+    probe; wedge vs. pilot-hole probe; a growing 2D circle probe vs. the
+    bay-cutout footprint for the D1 clearance check) rather than only
+    comparing bounding boxes — a materially stronger collision test.
+  - Calibrated the CGAL "Volumes: N" report's meaning first (via
+    touching-cube / gapped-cube / overlapping-cube test renders) before
+    relying on it to interpret `base_tab()`'s own render, to avoid
+    misreading an internal bookkeeping count as a defect signal.
+  This upgrade is disclosed transparently as new capability, not implied to
+  have existed in Cycle 1.
+- **Parallel sub-scans run**: None dispatched as separate sub-agent scans
+  this cycle — worked as a single integrated pass, consistent with the
+  agent instruction that the verdict is a single serial integration step.
+- **rubber-duck premise review run in parallel?**: Not indicated as run for
+  this cycle. No `rubber-duck`-sourced row exists for the Mechanical
+  discipline in `validation/open-issues.md` as of this cycle.
+- **Process-integrity check (new this cycle, mirroring the Hardware
+  Reviewer's own Cycle 2 precedent)**: Independently ran `git log
+  --oneline` and `git show --stat`/`--numstat 7497bf2` to verify the
+  rework commit's own claim that "`validation/open-issues.md` and
+  `validation/design-review.md` are not modified here." **Confirmed
+  true**: the commit's file-stat summary shows exactly 2 files changed —
+  `hardware/mechanical/bench-imu-01-dimensional-spec.md` (389
+  insertions/89 deletions) and `hardware/mechanical/bench-imu-01-enclosure.scad`
+  (170 insertions/28 deletions), totaling 559 insertions/117 deletions —
+  no unauthorized edit to any `validation/` or `datasheets/` file was made
+  by the Mechanical Lead this cycle.
+- **KiCad / CAD tool cross-checks used**: `kicad-*` tools still not
+  applicable — no KiCad project exists for this design (the enclosure is
+  designed against the Markdown interface contract, not a KiCad board
+  file), unchanged from Cycle 1. OpenSCAD (a genuinely available, distinct
+  CAD/geometry tool) was used directly and extensively — see Tooling
+  disclosure above.
+
+### Checklist Results (re-run against changed areas and anything the changes could have affected)
+
+| # | Checklist item | Result | Notes |
+|---|---|---|---|
+| 1 | PCB mounting | PASS (unaffected, carried forward) | Rev 2's diff touches only the bay/D1 cutout, the base-tab gusset, and the lid-tab footprint/fastener depths — nothing in `standoff()`/`base_standoffs()` or the `mount_holes` array changed. Independently confirmed via `git diff 208c94e 7497bf2 -- hardware/mechanical/bench-imu-01-enclosure.scad` that no standoff-related line was touched. |
+| 2 | Connector accessibility (cutout position/size/orientation) | **RESOLVED — MISS-001 independently confirmed fixed** (see Findings) | J2/J3/SW1-vs-bay margins independently recomputed at a genuine, uniform 1.5mm on all 3 binding edges (was 0.0/1.0/3.5mm in Rev 1). J1/D1 were already PASS in Cycle 1 and are structurally unchanged (J1's cutout code does not appear in the Rev 2 diff at all) — **except** D1's own clearance to the now-wider bay, which independently drops to 1.0mm as a side effect; see new finding MISS-007 under item 6 below. |
+| 3 | Component height clearance | PASS (unaffected, carried forward) | Rev 2 touches none of `floor_t`/`standoff_h`/`pcb_thickness`/`top_component_clearance`/`z_margin`/`lid_roof_t`. The Z-stack independently reconfirmed in Cycle 1 (18.6mm split line, 0.5mm margin, 20.6mm total height) is untouched by this rework and was not re-derived a second time this cycle since nothing in the diff could affect it. |
+| 4 | Internal clearance/interference (parts vs. walls/each other/fasteners) | **PASS — independently re-verified, with one new MEDIUM finding (MISS-007) surfaced** | Gusset-vs-interior-cavity and gusset-vs-pilot-hole independently tested via actual OpenSCAD `intersection()` renders (not just bounding-box math) for **both** the front-tab and rear-tab instances — all 4 tests returned "Current top level object is empty," i.e. zero collision. Lid tab's 0.4mm/side footprint growth independently confirmed to land only in regions already solid or on a flat, bed-adjacent print layer — no new interference. Widened-bay proximity independently re-derived against all 3 neighbor classes named in this cycle's task: mounting holes/standoffs are moot (no Z-overlap with the lid-level bay cutout at all); the 4 corner tabs remain positive at 2.0mm (rear-left, down from 2.5mm) / 4.5mm (rear-right, up from 2.5mm) — a real but non-defective spacing shift, independently recomputed from `tab_positions[]`/`tab_w`/`bay_x_min`/`bay_x_max`, not accepted from the spec's own §12 Item 8 text; D1's clearance narrows to 1.0mm, independently confirmed via an OpenSCAD binary-search growing-circle probe, and **is** a genuine new problem — logged as MISS-007 (see below). It is a clearance that stays positive (not a fit failure) but registers as a checklist item 6 finding, not item 4. |
+| 5 | Fastener placement (wall thickness around every boss, no conflicts) | **RESOLVED — MISS-003 and MISS-004 independently confirmed fixed**; all other bosses re-swept and confirmed unaffected | PCB standoff (2.0mm annular wall, 0.6mm engagement spare) and base-tab pilot-hole wall (3.0mm/2.0mm margins) independently re-confirmed unaffected by this rework (neither variable appears in the Rev 2 diff). Lid tab's annular wall independently recomputed at 2.0mm (Y) / 2.6mm (X), meeting the 2.0mm minimum (was 1.6mm) — MISS-003. Lid/base-tab engagement spare independently recomputed at +0.6mm (was 0.0mm), with the tab's own solid floor independently reconfirmed unchanged at 1.0mm — MISS-004. No new fastener-boss conflict found anywhere (mount-hole spacing, tab-to-tab spacing all unchanged by this rework). |
+| 6 | Wall thickness (structural + stated 3D-printability rule) | **Finding — new MEDIUM (MISS-007)** | All wall thicknesses re-checked this cycle (skirt/roof/floor 2.0mm, standoff annular wall 2.0mm, base-tab pilot wall 2.0mm/3.0mm, lid-tab annular wall now 2.0mm/2.6mm) independently confirmed at or above the design's own stated `min_wall_t`=2.0mm minimum — **except** the D1-viewing-hole-to-header-bay isthmus in the lid roof, independently recomputed (and empirically probe-confirmed) at exactly **1.0mm**, below the 2.0mm minimum. This is a genuine new side effect of the MISS-001 fix (the bay's near edge moved from Y=34.0 to Y=32.5, board-local, narrowing this specific isthmus from what would have been 2.5mm to 1.0mm) — disclosed by the Mechanical Lead as a clearance/margin item (dimensional-spec §12 Open Item 8a) but not previously cross-checked against this specific wall-thickness rule. See MISS-007. |
+| 7 | Assembly order (physically achievable sequence, no trapped parts) | PASS (unaffected, carried forward) | Rev 2 does not change any part's Z-range, mating sequence, or the lid-skirt/base-wall clearance-fit relationship. The Cycle 1 conclusion (PCB-population-first sequencing avoids trapped headers; external fastening is correctly last) is independently re-confirmed still applicable, since nothing in the diff bears on assembly order. |
+| 8 | Print-fit tolerance (single stated value, consistently applied) | PASS (unaffected, carried forward) | `fit_clearance` (0.2mm/side) and its one genuine printed-to-printed mating surface (lid skirt / base wall) are untouched by Rev 2. MISS-005 (the pre-existing, out-of-scope documentation gap about `fit_clearance`'s claimed vs. actual scope) is intentionally not re-litigated this cycle per the task's explicit exclusion of MISS-005/006. |
+| 9 | Manufacturability / 3D-printability (overhangs/bridges vs. stated rule, min wall thickness) | **RESOLVED — MISS-002 independently confirmed fixed** (most rigorously verified finding this cycle); wider lid tab independently confirmed to still print cleanly | The new gusset wedge's 45° angle independently confirmed via three separate methods (hand algebra from `tab_chamfer_run`/`tab_project`, a rendered-and-measured STL bounding box showing equal 6.0mm/6.0mm legs, and direct comparison against the stated `max_overhang_deg=45`) to sit exactly **at**, not beyond, the self-supporting limit — consistent with FDM printing floor-down with no manual support, for **both** the front-tab and rear-tab instances (not just the one hand-traced originally). The lid's wider tab footprint (0.4mm/side growth) was independently re-confirmed to be a flat, bed-adjacent, first-print-layer feature when the lid prints roof-down (`rotate([180,0,0])`), not a new Z-direction overhang — it introduces no new printability defect. J1's bridge span (9.5mm vs. 10mm `max_bridge_span`) is unchanged by this rework (confirmed not present in the Rev 2 diff) and was not re-derived a second time. The new D1 isthmus (MISS-007, see item 6) is a wall-thickness/fragility concern, not an overhang/bridge-angle concern, and is tracked there instead. |
+| 10 | Interface-value traceability (every dimension traced to a source or explicit assumption) | PASS, with one process observation folded into MISS-007's writeup | All 4 fix areas independently confirmed to carry traceable `ASSUMPTION`/`DERIVED` tags and/or explicit "MISS-00X fix (Mechanical Reviewer Cycle 1, ...)" provenance comments — e.g. `bay_edge_margin` is explicitly tagged `DERIVED` and cross-references `board_xy_keepout`'s own precedent; `lid_tab_project` is explicitly tagged `DERIVED, LID TAB ONLY` with its own formula spelled out. The D1-to-bay side effect (MISS-007) is itself a **positive** traceability example — the Mechanical Lead's own in-code comment at the `bay_y_min` derivation explicitly discloses the exact 1.0mm number and cross-references dimensional-spec.md §12 Open Item 8a, rather than leaving it silent; this cycle's finding is that the disclosure was framed only as a clearance question, not cross-checked against the item-6 wall-thickness rule — a process gap, not a silent/undisclosed value. |
+
+**Summary**: 0 CRITICAL, 0 HIGH open (both MISS-001 and MISS-002
+independently confirmed RESOLVED this cycle), 0 MEDIUM open from Cycle 1
+(both MISS-003 and MISS-004 independently confirmed RESOLVED this cycle),
+**1 new MEDIUM (MISS-007)** independently found this cycle as a genuine
+side effect of the MISS-001 fix.
+
+### Re-verification of Cycle 1 findings
+
+#### MISS-001 — Header/button bay (J2/J3/SW1) clearance margin — RESOLVED, independently confirmed
+
+- **Independent re-derivation performed**: Read `reference_pcba()` (now at
+  lines 576-597) directly — not the spec's or the commit message's own
+  arithmetic — for the ground-truth footprint definitions: J2/J3 headers
+  are modeled as `for (hx = [j2_x, j3_x]) translate([hx-5, 40-6, comp_z])
+  cube([10, 6, top_component_clearance])` (lines 588-590), i.e. each spans
+  board-local X:[hx−5, hx+5], Y:[34,40]; SW1 is modeled as `translate([sw1_x,
+  sw1_y-2.5, comp_z]) cylinder(d=5, h=5)` (lines 592-593), i.e. a circle of
+  radius 2.5mm centered at board-local (sw1_x, sw1_y−2.5) = (44, 37.5),
+  spanning X:[41.5,46.5], Y:[35,40]. With `j2_x=16.0`, `j3_x=30.0`,
+  `sw1_x=44.0`, `sw1_y=40.0` (lines 86/88/90) and the new
+  `bay_x_min=9.5`/`bay_x_max=48.0`/`bay_y_min=32.5` (lines 269/272/276,
+  each derived from a shared, newly-named `bay_edge_margin=1.5` at line
+  250), I independently computed:
+  - J2's own left edge (X=16−5=11) to `bay_x_min` (9.5): **1.5mm**.
+  - J2/J3's shared near edge (Y=40−6=34, identical for both since the Y
+    translate does not depend on `hx`) to `bay_y_min` (32.5): **1.5mm**
+    (this is the binding Y-constraint; SW1's own Y-span [35,40] gives a
+    more generous 2.5mm and is not binding).
+  - SW1's own right edge (X=44+2.5=46.5) to `bay_x_max` (48.0): **1.5mm**.
+  - J3's footprint (X:[25,35]) sits comfortably inside both X-boundaries
+    with 15.5mm/13mm to spare — not a binding constraint at either edge.
+  All three binding margins are independently confirmed **genuinely
+  uniform and positive at exactly 1.5mm** — a real fix, not a numerical
+  coincidence: symbolically, `bay_x_min = (j2_x−5) − bay_edge_margin`
+  means `margin = (j2_x−5) − bay_x_min ≡ bay_edge_margin` by construction
+  (the "−5" term is J2's own cube half-width, which is the SAME constant
+  used in both places), and the same cancellation holds for the
+  `bay_y_min`/"−6" pair and the `bay_x_max`/"+2.5" pair. This is a
+  structurally sound fix as currently written, though it depends on the
+  hardcoded footprint constants (5, 6, 2.5) in the `bay_*` formulas and in
+  `reference_pcba()`'s own `cube()`/`cylinder()` calls being kept in
+  lockstep by a future editor — they are not driven by one single shared
+  variable, so this is "correct by current, verified construction," not
+  "unbreakable by architecture." This nuance does not change today's
+  disposition (RESOLVED) but is worth a future maintainability note.
+- **New problem introduced by the fix? Two side effects found by
+  independently checking every neighbor, not by re-reading the spec's own
+  claims.** Per this cycle's explicit task ("does the wider bay now come
+  too close to anything else — a mounting hole, a corner tab, D1?"), I
+  independently re-derived the bay's proximity to the 4 mounting holes/
+  standoffs, the 4 corner tabs, and D1 — each from raw `tab_positions[]`/
+  `mount_holes[]`/`d1_x,d1_y` values, not from the spec's own §12 Item
+  8/8a text (checked only afterward, as a cross-reference, per below).
+  - **Mounting holes / standoffs: not a live constraint (moot by Z, not
+    just by XY margin).** `mount_holes[]` (line 64-69) and `tab_positions[]`
+    (line 369-374) share the *identical* 4 board-local XY pairs — (3.5,
+    3.5), (56.5,3.5), (56.5,36.5), (3.5,36.5) — so a standoff and a corner
+    tab always sit on the same XY column. But `standoff()` only occupies
+    the low-Z region near the PCB/floor while the bay cutout is cut through
+    the *lid roof* near the top of the assembly — the two features do not
+    share a Z-range at all, so no XY proximity there can produce a real
+    interference regardless of margin. (For completeness: even purely on
+    XY, `standoff_od=6.0mm`, i.e. a 3.0mm radius from the shared rear-left
+    XY column, gives a 3.0mm gap to `bay_x_min` — looser than the tab's own
+    2.0mm below — so the standoff was never going to be the binding
+    surface even if it did share Z with the bay.)
+  - **Corner tabs: a real, live, positive-margin side effect —
+    independently re-derived, not assumed away.** Both `base_tab()` and
+    `lid_tab()` use `tx = board_offset_x + pos[0]` and a shared X-width
+    `tab_w=8.0mm` (line 300; `lid_tab_project` only widens the tab's
+    *Y*-footprint, not X — see MISS-003 below), so the tab's global X-span
+    is independent of the MISS-001/MISS-003 fixes and identical for both
+    tab types. Rear-left tab (`tab_positions[3]=[3.5,36.5,+1]`):
+    `tx=3.5+3.5=7.0` → X-span `[7.0−4.0, 7.0+4.0]=[3.0,11.0]`. Bay's global
+    X-span (`board_offset_x+bay_x_min` to `board_offset_x+bay_x_max` =
+    `3.5+9.5` to `3.5+48.0`) = `[13.0, 51.5]`. Gap = `13.0−11.0 = 2.0mm`.
+    Rear-right tab (`tab_positions[2]=[56.5,36.5,+1]`): `tx=3.5+56.5=60.0`
+    → X-span `[56.0,64.0]`; gap to the bay's right edge = `56.0−51.5 =
+    4.5mm`. Both independently recomputed values match the dimensional-
+    spec's own disclosed §12 Item 8 numbers (2.0mm / 4.5mm, down from a
+    uniform 2.5mm pre-MISS-001) — a genuine agreement found by working the
+    arithmetic myself, not by copying the spec's claim. **Both remain
+    positive: no tab-vs-bay collision.** This is a feature-to-feature
+    *spacing* check (item 4), not a wall-thickness check (item 6): the
+    material between the tab's outer edge and the bay's edge is ordinary,
+    un-thinned lid-roof/wall stock (no second cutout squeezes it from the
+    far side the way D1's hole does), so there is no isthmus whose cross-
+    section needs to clear `min_wall_t` here — the 2.0mm rear-left figure
+    coinciding numerically with `min_wall_t` is coincidental, not a wall-
+    thickness violation. One residual, non-formal observation carried over
+    in spirit from Cycle 1's own unresolved ergonomic note (a real,
+    shrouded J2/J3 header might crowd a screwdriver's approach to the
+    adjacent rear tab): that approach got very slightly tighter on the
+    rear-left tab specifically (2.5mm→2.0mm) as a further knock-on of this
+    same fix. Still not independently provable either way without real
+    header hardware, so — consistent with how Cycle 1 left it — not
+    elevated to a formal finding.
+  - **D1 is affected, and is a real finding.** Independently confirmed
+    (hand geometry, cross-referenced against the Mechanical Lead's own
+    disclosed figure, and an OpenSCAD binary-search growing-circle probe
+    test — three independent methods, see next finding) that D1's
+    clearance to the bay's near edge narrows to exactly 1.0mm, below the
+    design's own 2.0mm `min_wall_t`. Unlike the corner-tab case above, D1's
+    hole *is* a two-sided isthmus concern (a round cutout with the bay
+    cutout on one side and the lid's outer roof edge/skirt on the other,
+    squeezing the material between them), so this one *does* implicate the
+    wall-thickness rule. Logged as a new finding, **MISS-007** (MEDIUM) —
+    see below. This does not reopen or invalidate MISS-001 itself (the
+    bay-vs-connector margin problem MISS-001 actually describes is
+    genuinely fixed), but it is a real, independently confirmed side effect
+    of the same code change and is disclosed here in full per the
+    independence mandate rather than left for a future cycle to discover.
+- **Disposition**: **RESOLVED**. Independently re-verified correct and
+  complete for the problem MISS-001 itself describes (bay-to-connector
+  margin). The side effect on D1 is tracked separately as MISS-007 and does
+  not reopen this finding.
+
+#### MISS-002 — Base corner-tab gusset — RESOLVED, independently confirmed (most rigorously verified finding this cycle)
+
+- **Independent re-derivation performed**: Read the replacement construct
+  directly at lines 445-452 — `translate([tx-tab_w/2,0,0])
+  rotate([0,90,0]) linear_extrude(height=tab_w) polygon(points=[[-z_bottom,
+  y_wall], [-z0, y_wall], [-z0, y_tab_edge]])` — and independently
+  re-derived, by direct matrix substitution (not by reading the inline
+  comment's own claim), that `rotate([0,90,0])` maps local `(x,y,z)` to
+  global `(z,y,−x)`. Confirmed this **empirically** with a standalone
+  OpenSCAD test cube (`rot_test.scad`): a point placed at local (5,0,0)
+  rendered at global (0,0,−5), exactly matching the derived formula and
+  the code's own comment. With `tab_chamfer_run=tab_project=6.0mm`,
+  `z0=base_total_h−tab_base_t=18.6−5.6=13.0`, `z_bottom=z0−tab_chamfer_run
+  =7.0`, the polygon's 3 vertices — `(−7.0,y_wall)`, `(−13.0,y_wall)`,
+  `(−13.0,y_tab_edge)` in the local extrude plane — form a genuine
+  **non-degenerate right triangle** with legs of length 6.0mm (local-x,
+  becoming global Z) and 6.0mm (local-y = global Y, `|y_tab_edge−y_wall| =
+  tab_project = 6.0`), independently computed cross-sectional area =
+  0.5×6.0×6.0 = **18mm²**, swept over `tab_w=8.0mm` → volume = **144mm³**
+  — not the ~1e-7mm³ degenerate sliver the old `hull()` construct produced.
+- **Empirical confirmation (beyond hand algebra, a rigor upgrade over
+  Cycle 1)**: Using the `-D 'show_mode="isolate_test"'` override technique
+  to render the real repo file's own modules in isolation (not a
+  hand-copied re-implementation), I rendered the gusset wedge alone and the
+  full `base_tab()` (cube+pilot-hole-cut+gusset) for **both** a front-tab
+  instance (`tab_positions[0]`, `dy=−1`) and a rear-tab instance
+  (`tab_positions[2]`, `dy=+1`):
+  - Both renders report **"Simple: yes"** (fully manifold, no
+    self-intersection) for every instance tested.
+  - My own Python STL parser (signed-tetrahedron divergence-theorem volume,
+    since `numpy-stl` is not installed here) measured the wedge-only STL at
+    **144.0000mm³** — an exact match to the hand-derived value to 4 decimal
+    places — and the combined tab+wedge STL at **398.3899mm³**, matching a
+    hand cross-check (tab cube 8×6×5.6=268.8mm³ minus pilot-hole cut
+    ≈14.451mm³ plus wedge 144mm³ ≈397.35–398.35mm³ depending on cylinder
+    facet count) to well within the expected discretization tolerance of a
+    faceted cylinder.
+  - Actual boolean `intersection()` renders (not bounding-box comparison)
+    of the wedge against an interior-cavity probe and against a
+    pilot-hole probe, for **both** tab orientations (4 tests total), each
+    returned **"Current top level object is empty"** — an empirical,
+    render-based confirmation of zero collision, not an inference from
+    coordinates alone.
+  - Confirmed the wedge's own right-angle corner sits exactly flush with
+    the tab cube's own bottom face (`z0=13.0` shared by both) and the
+    wall's own outer face (`y_wall` shared with the base wall geometry),
+    i.e. the wedge is correctly positioned to actually bear load between
+    the wall and the tab, not merely coordinate-adjacent to them.
+  - (Calibration note, for full transparency: I first verified what
+    OpenSCAD's CGAL "Volumes: N" report actually means using deliberately
+    constructed touching/gapped/overlapping test cubes, since a naive
+    reading of "Volumes: 2" could be mistaken for "two disconnected
+    pieces" — it is not; the discriminator is the Facets/Vertices count
+    matching a single merged shape, which `base_tab()`'s own render shows.
+    This calibration step is what makes the "Simple: yes" + volume-match
+    result trustworthy rather than superficially reassuring.)
+- **Print-angle re-confirmation**: The wedge's slope is independently
+  confirmed to sit exactly **at** the stated `max_overhang_deg=45` limit
+  (equal 6.0mm/6.0mm legs), for both tab orientations — self-supporting on
+  a floor-down base print with no manual support material, matching (and
+  now actually delivering) the dimensional-spec's original printability
+  intent.
+- **Disposition**: **RESOLVED**. This is now a genuine, correctly
+  positioned, load-bearing solid wedge — independently confirmed via hand
+  derivation, direct-matrix rotation verification, real OpenSCAD renders of
+  the actual repo file (not a re-implementation) for both tab orientations,
+  independent STL volume measurement, and actual boolean collision tests —
+  the most thoroughly, multiply cross-checked finding this cycle.
+
+#### MISS-003 — Lid tab clearance-hole annular wall — RESOLVED, independently confirmed
+
+- **Independent re-derivation performed**: Read the new `lid_tab_project =
+  2*min_wall_t + tab_clear_dia` (line 345, = 2×2.0+2.8 = **6.8mm**) and its
+  use in `lid_tab()` (lines 505-519): the footprint cube is sized
+  `[tab_w, lid_tab_project, lid_roof_t]`, while the clearance-hole cylinder
+  (`tab_clear_dia=2.8mm`) is still centered on `hole_yc`, which is
+  independently confirmed to derive from the **unchanged**, shared
+  `tab_project` (6.0mm) — not from the new, wider `lid_tab_project` — via
+  `hole_yc = tab_y0 + tab_project/2` (line 504). Recomputing the annular
+  wall myself: Y-direction (the axis `lid_tab_project` actually governs) =
+  `(lid_tab_project − tab_clear_dia)/2 = (6.8−2.8)/2 = 2.0mm` exactly,
+  meeting the `min_wall_t=2.0mm` minimum (was 1.6mm before the fix,
+  computed the same way with the old shared 6.0mm `tab_project`).
+  X-direction = `(tab_w − tab_clear_dia)/2 = (8.0−2.8)/2 = 2.6mm`,
+  unaffected by this fix and already adequate. Both meet or exceed the
+  stated minimum.
+- **Alignment cross-check (independently verified, not assumed)**: Because
+  `hole_yc` still derives from the original `tab_project` rather than the
+  new `lid_tab_project`, the lid's clearance hole remains exactly coaxial
+  with the base tab's own pilot hole below it — recomputed the potential
+  misalignment that *would* have resulted had the hole instead been
+  centered on the wider footprint: `(lid_tab_project−tab_project)/2 =
+  0.4mm`, which independently would have exceeded the clearance hole's own
+  ~0.15mm/side nominal slop around an M2.5 shank and could have bound the
+  screw — confirming the Mechanical Lead's choice to decouple footprint
+  sizing from hole centering was the geometrically correct one, not merely
+  a stated intention.
+- **New interference from the wider footprint? No.** Independently traced
+  the resulting 0.4mm/side growth in the lid tab's footprint and confirmed
+  it lands entirely within regions that are either already solid (the
+  lid's own roof slab, which the tab literally extends from) or, where it
+  extends past the roof's own edge, on the flat first-print-layer (the lid
+  prints roof-down per its `rotate([180,0,0])` `print_layout` transform),
+  introducing no new overhang and no new collision with the header bay or
+  any fastener boss.
+- **Disposition**: **RESOLVED**. Independently recomputed to genuinely meet
+  the 2.0mm minimum on both axes, with the fastener-hole coaxiality
+  explicitly re-verified rather than assumed, and no new interference
+  introduced by the footprint growth.
+
+#### MISS-004 — Lid/base-tab fastener engagement spare — RESOLVED, independently confirmed
+
+- **Independent re-derivation performed**: Re-derived the full Z-stack
+  myself from the raw variables, not from the in-code comment's own
+  stated arithmetic: `z0 = base_total_h − tab_base_t = 18.6 − 5.6 =
+  13.0mm` (top of the tab cube's own bottom face is at Z=13.0; its top
+  face is flush with `base_total_h`=18.6, the base/lid split line). The
+  pilot-hole cylinder (`translate([...,  base_total_h − tab_pilot_depth])
+  cylinder(d=tab_pilot_dia, h=tab_pilot_depth+1)`, lines 404-405) is cut
+  from Z=`18.6−4.6=14.0` up through the top mating face at Z=18.6 (the
+  "+1" is purely a boolean-cut clearance margin past the surface, not a
+  real physical extension) — so the pilot hole's real depth, measured from
+  the mating face down to its own blind bottom, is `18.6−14.0 = 4.6mm`,
+  independently matching `tab_pilot_depth` exactly. The solid floor
+  remaining below the hole's bottom (Z=14.0) down to the tab cube's own
+  bottom (Z=13.0) is `14.0−13.0 = 1.0mm`, independently matching
+  `tab_base_t − tab_pilot_depth = 5.6−4.6 = 1.0mm`.
+- **Engagement-spare recomputation**: The screw (`screw_len=6.0mm`) passes
+  through the separate lid tab's own thickness (`tab_lid_t=lid_roof_t=
+  2.0mm`) via a clearance (non-threaded) hole, leaving `screw_len −
+  tab_lid_t = 6.0−2.0 = 4.0mm` of screw available to actually engage inside
+  the base tab's blind pilot hole. Comparing against the pilot hole's own
+  independently-confirmed 4.6mm depth: **4.6 − 4.0 = +0.6mm of genuine
+  positive spare margin** (was exactly 0.0mm before the fix, using the old
+  `tab_base_t=5.0mm`/`tab_pilot_depth=4.0mm` pair) — independently matching
+  the PCB standoff's own precedent spare (`standoff_pilot_depth(5.0) −
+  (screw_len(6.0)−pcb_thickness(1.6)) = 5.0−4.4 = 0.6mm`, cross-checked
+  fresh from `standoff_pilot_depth`/`pcb_thickness` rather than re-quoted
+  from Cycle 1).
+- **Floor-margin trade-off independently re-checked (not just accepted on
+  the changelog's word)**: Confirmed `tab_base_t` (5.0→5.6mm) and
+  `tab_pilot_depth` (4.0→4.6mm) were both increased by the identical
+  +0.6mm, so the solid floor (`tab_base_t − tab_pilot_depth`) is exactly
+  preserved at 1.0mm both before and after the fix — the engagement-spare
+  problem was not silently solved by thinning the floor toward the ~0.4mm
+  FDM minimum-feature-size range (which would have traded MISS-004 for a
+  new MISS-002-like fragility defect); it was solved by growing the tab
+  itself.
+- **Disposition**: **RESOLVED**. Independently re-derived engagement
+  arithmetic confirms a genuine +0.6mm spare (was 0.0mm), and the floor
+  margin is independently confirmed preserved, not silently traded away.
+
+### New finding this cycle
+
+#### MISS-007 (NEW) — D1 (LED) viewing-hole-to-header-bay isthmus narrows to 1.0mm, below the design's own stated 2.0mm minimum wall thickness
+
+- **Issue**: The MISS-001 fix correctly narrows `bay_y_min` from a
+  board-local Y=34.0 (Rev 1) to Y=32.5 (Rev 2, `= 34.0 − bay_edge_margin`)
+  to restore genuine margin around J2/J3/SW1 (see MISS-001 above). This
+  same edge, however, is also the nearest boundary of the same cutout to
+  D1's LED viewing hole, which sits at board-local `(d1_x, d1_y) =
+  (10.0, 30.0)` with `d1_hole_dia = 3.0mm` (radius 1.5mm), independently
+  confirmed unmoved by the Rev 2 diff. Narrowing `bay_y_min` by 1.5mm
+  necessarily narrows D1's own clearance to the bay by the same 1.5mm —
+  from what would have been 2.5mm down to independently-confirmed
+  **1.0mm** — below this same design's own stated `min_wall_t = 2.0mm`
+  (line 112).
+- **Rationale**: In global coordinates, D1's center is at `(board_offset_x
+  + d1_x, board_offset_y + d1_y) = (3.5+10.0, 3.5+30.0) = (13.5, 33.5)`,
+  and the bay cutout's near edge is at global Y = `board_offset_y +
+  bay_y_min = 3.5+32.5 = 36.0`, spanning global X:[`board_offset_x +
+  bay_x_min`, `board_offset_x + bay_x_max`] = [13.0, 51.5] — an X-range
+  that **contains** D1's own X=13.5 (only 0.5mm inside the bay's own left
+  edge), meaning the closest point on the bay's boundary to D1 is on the
+  flat Y=36.0 edge directly above it, not a corner. The gap is therefore a
+  simple, non-diagonal distance: `36.0 − 33.5 − 1.5(radius) = 1.0mm`.
+  Independently confirmed this is not merely a hand-arithmetic artifact via
+  an **empirical binary-search probe**: a 2D circle centered on D1's own
+  position, grown from a nominal radius, intersected against the bay
+  cutout's own 2D footprint in OpenSCAD — the intersection is **empty**
+  at a growth corresponding to a 1.00mm gap and **non-empty** at 1.01mm,
+  independently pinning the true minimum gap at exactly 1.0mm via
+  computational geometry, not distance-formula algebra alone. Since the
+  lid roof is a full `lid_roof_t = wall_t = 2.0mm` thick at this location
+  (both cutouts are full-depth in Z, cut all the way through the roof),
+  this 1.0mm gap is a genuine 1.0mm-wide × 2.0mm-tall solid fin of
+  material between the two openings — a real structural feature, not a
+  shallow engraving — and it independently falls below the same
+  `min_wall_t=2.0mm` rule this design applies (and independently verified
+  to be met) at every other wall/annulus in this enclosure.
+- **Was this silently introduced, or disclosed? Disclosed, but not fully
+  cross-checked.** The Mechanical Lead's own `.scad` file (at the
+  `bay_y_min` derivation and its trailing comment, lines 276-287) contains
+  an inline comment explicitly stating this exact side effect and the
+  1.0mm number, and dimensional-spec.md §12 Open Item 8a devotes explicit
+  text to it,
+  framing it as "the single item this Mechanical Lead would most want the
+  Reviewer to look at again in this cycle." Full credit is given for that
+  proactive disclosure — this is not a hidden defect. However, both the
+  in-code comment and Open Item 8a frame this purely as a **margin/clearance
+  adequacy** question ("still positive; is 1.0mm enough margin?"), and
+  neither cross-references it against the design's own separately-stated
+  `min_wall_t=2.0mm` wall-thickness rule (checklist item 6) — a rule this
+  same design applies rigorously everywhere else (every other wall/annulus
+  independently re-checked this cycle sits at exactly 2.0mm or above,
+  never below). This finding's contribution is that specific
+  cross-reference, not the discovery of a previously-unknown number.
+- **Failure Mechanism**: A 1.0mm-wide, full-roof-thickness, isolated fin of
+  printed plastic bridging two full-depth cutouts is a plausible FDM
+  under-extrusion, warping, or handling-fracture point — thinner features
+  cool and shrink asymmetrically relative to the surrounding mass and are
+  more prone to snapping during print-bed removal, support-structure
+  removal (if any is used elsewhere on the same print), or ordinary
+  handling. In the worst case, the D1 viewing hole and the header/button
+  bay opening could merge into a single larger opening (cosmetic, not
+  functionally blocking — both openings remain independently usable even
+  fully merged) or the fin could crack off entirely (also cosmetic at this
+  specific location, since neither opening's own function depends on the
+  fin remaining intact). This is a real but bounded risk, not a
+  fit-blocking or fastener-blocking defect.
+- **Affected Component**: D1 LED viewing hole and header/button bay cutout,
+  both in the lid roof (`lid_shell()` in
+  `hardware/mechanical/bench-imu-01-enclosure.scad`).
+- **Recommended Fix**: Any of: (a) reduce `d1_hole_dia` from its current
+  3.0mm **ESTIMATE** (per `hardware/mechanical-interface.md`, D1's real LED
+  package/lens size is not yet confirmed) toward a smaller,
+  still-adequate value to restore ≥2.0mm — needs Electronics/LED-datasheet
+  input, since the diameter itself is not yet confirmed hardware; (b) add
+  a small local reinforcement (a fillet or short rib bridging the isthmus)
+  without moving either cutout; or (c) explicitly re-open and disposition
+  this as an accepted, monitored exception to `min_wall_t` (e.g. a
+  first-article-print watch item, directly analogous to the existing
+  J1-bridge-span Open Item 9 already carried in the spec) — rather than
+  leaving it addressed only under Open Item 8a's clearance-only framing.
+- **Severity**: MEDIUM — directly analogous to MISS-003's precedent (a
+  hole-to-edge annular/isthmus wall thickness below the design's own
+  stated 2.0mm print-safe minimum). Not CRITICAL or HIGH: it does not
+  block PCB fit, standoff mounting, or any fastener function, and both
+  affected openings remain independently usable even in the worst-case
+  failure. Does not block this cycle's verdict, per this document's own
+  Cycle 1 precedent that open MEDIUM findings are non-gating (see Verdict
+  below), but should be dispositioned by the Mechanical Lead before Design
+  Complete.
+
+### Verdict
+
+- **Verdict**: **PASS**
+- **Open CRITICAL count**: 0
+- **Open HIGH count**: 0 (both MISS-001 and MISS-002 independently
+  confirmed RESOLVED this cycle — see full re-verification above; neither
+  fix was accepted on the strength of the Mechanical Lead's changelog or
+  the Hardware Lead's commit-message arithmetic, both of which were
+  independently re-derived from raw `.scad` values and, for MISS-002,
+  additionally confirmed via genuine OpenSCAD renders, STL volume
+  measurement, and actual boolean collision tests)
+- **Open MEDIUM count**: 1 new (MISS-007 — see above). Both Cycle-1 MEDIUM
+  findings (MISS-003, MISS-004) are independently confirmed RESOLVED this
+  cycle.
+- **Independent confirmation, stated plainly for both HIGH fixes**:
+  - **MISS-001 holds.** The bay-to-connector margin is now a genuine,
+    uniform, independently-recomputed 1.5mm at all three binding edges
+    (J2/`bay_x_min`, J2+J3/`bay_y_min`, SW1/`bay_x_max`) — re-derived
+    directly from `reference_pcba()`'s own footprint primitives, not
+    re-read from any stated conclusion. The fix does have a real,
+    independently-confirmed side effect (D1's clearance narrowing to
+    1.0mm), which is disclosed in full as new finding MISS-007 rather than
+    omitted — but this does not reopen MISS-001 itself.
+  - **MISS-002 holds**, and is the most rigorously confirmed finding this
+    cycle: independently re-derived by hand (non-degenerate 18mm²
+    cross-section, 144mm³ volume, exact 45° slope) **and** confirmed
+    empirically via real OpenSCAD renders of the actual repo file for
+    both tab orientations ("Simple: yes" manifold geometry, STL-measured
+    volume matching to within cylinder-facet-discretization tolerance, and
+    actual `intersection()` renders against both the interior cavity and
+    the pilot hole returning empty in all 4 tests run). This is a genuine
+    solid, load-bearing wedge, not a degenerate artifact — confirmed by
+    multiple independent methods, not a single check.
+- **Both MEDIUM fixes also independently hold**: MISS-003's lid-tab annular
+  wall is genuinely ≥2.0mm on both axes with fastener coaxiality explicitly
+  re-verified; MISS-004's engagement spare is a genuine +0.6mm with the
+  tab's floor margin independently confirmed preserved, not silently
+  traded away.
+- **Tool-based cross-check**: `python3 tools/check_open_issues.py`
+  independently confirms `validation/open-issues.md`'s current state is
+  internally consistent with this verdict — "OK: no unresolved CRITICAL /
+  unsigned-off HIGH findings (20 finding(s) checked)" — after this cycle's
+  edits (MISS-001 through MISS-004 → RESOLVED, MISS-007 added as OPEN/
+  MEDIUM, which does not trip this gate).
+- **What's new and still open, non-gating**: MISS-007 (MEDIUM, new this
+  cycle — D1-to-bay isthmus below `min_wall_t`). Consistent with this same
+  document's Cycle 1 precedent (where MISS-003/MISS-004, both MEDIUM, were
+  explicitly treated as "also open, non-gating" against a PASS-track
+  verdict), an open MEDIUM finding does not block a clean PASS here. It
+  should still be dispositioned (`RESOLVED`/`DEFERRED`/`ACCEPTED-RISK`)
+  before Design Complete per `docs/architecture.md` §8.
+  MISS-005/MISS-006 (LOW) remain untouched and out of scope this cycle, per
+  the task's explicit instruction.
+- **Next action**: No further Mechanical Lead rework loop is required for
+  MISS-001/MISS-002/MISS-003/MISS-004, which are closed. Route MISS-007 to
+  the Mechanical Lead (via the Hardware Lead) for disposition before Design
+  Complete — recommended fix options are listed above; none require
+  another full review cycle to evaluate once a choice is made, since the
+  isthmus's own geometry is otherwise fully characterized.
