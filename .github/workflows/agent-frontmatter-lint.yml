@@ -1,0 +1,38 @@
+name: Agent Frontmatter Lint
+
+# Guards against a repeat of the mistakes fixed by hand in PR #2 and PR #3:
+# every .github/agents/*.agent.md must have a non-empty `description`, and
+# every .github/skills/*/SKILL.md must have a non-empty `name` (matching its
+# directory) + `description`. See tools/check_agent_frontmatter.py.
+#
+# This is a separate workflow from hardware-gate.yml on purpose -- it is a
+# repo-hygiene guard covering every discipline's agents/skills equally, not
+# part of the Design Complete gate logic.
+
+on:
+  pull_request:
+    paths:
+      - ".github/agents/**"
+      - ".github/skills/**"
+      - "tools/check_agent_frontmatter.py"
+  push:
+    branches: [main]
+    paths:
+      - ".github/agents/**"
+      - ".github/skills/**"
+      - "tools/check_agent_frontmatter.py"
+  workflow_dispatch: {}
+
+jobs:
+  frontmatter-lint:
+    name: Check agent/skill frontmatter
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Install PyYAML
+        run: pip install pyyaml
+      - name: Run frontmatter lint
+        run: python3 tools/check_agent_frontmatter.py

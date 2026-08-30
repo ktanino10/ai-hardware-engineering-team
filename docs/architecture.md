@@ -35,6 +35,10 @@ flowchart TD
     REV -- "no open CRITICAL" --> VAL["Validation"]
     VAL -- "issue found" --> CIR
     VAL --> GATE{"Design Complete\nGate (see §6)"}
+    CIR -- "stable board outline\n(hardware/mechanical-interface.md)" --> ML["Mechanical Lead"]
+    ML --> MREV["Mechanical Reviewer\n(independent)"]
+    MREV -- "CRITICAL / HIGH finding" --> ML
+    MREV -- "no open CRITICAL" --> GATE
     GATE -- "not met" --> L
     GATE -- "met" --> H
 ```
@@ -42,7 +46,14 @@ flowchart TD
 Loop-back rule: any **CRITICAL** or **HIGH** finding from the Hardware Reviewer
 sends the design back to the Circuit Engineer for a fix, followed by a
 **re-review** (not a rubber stamp — the Reviewer re-runs the full checklist
-against the changed area and any area the change could have affected).
+against the changed area and any area the change could have affected). The
+same loop-back rule applies to the Mechanical Lead / Mechanical Reviewer pair,
+added in Phase 1 (§3, §5.3, `docs/architecture-evolution.md` §27) — Mechanical
+Design can start once Circuit Design has produced a stable board outline (it
+does not need to wait for the Electronics-side Design Complete Gate to pass
+first, since board geometry is independent of later electrical-only fixes),
+and both disciplines' findings feed the **same** Design Complete Gate because
+both write to the same `validation/open-issues.md` (§8).
 
 ## 3. Agents (MVP)
 
@@ -52,11 +63,22 @@ against the changed area and any area the change could have affected).
 | **Component Engineer** | Candidate sourcing (≥3 when feasible), datasheet-grounded comparison, EOL/availability/ecosystem evaluation, recommendation | Final schematic topology |
 | **Circuit Engineer** | Schematic design from approved parts + datasheets, design rationale log | Marking own work reviewed/complete |
 | **Hardware Reviewer** | Independent, adversarial review; severity-classified findings | Fixing the design itself |
+| **Mechanical Lead** *(Phase 1)* | Enclosure/mechanical design from `hardware/mechanical-interface.md`, sole owner of the mechanical geometry state, design rationale log | Marking own work reviewed/complete; editing Electronics artifacts |
+| **Mechanical Reviewer** *(Phase 1)* | Independent, adversarial mechanical review; severity-classified findings (shares `validation/open-issues.md` with Hardware Reviewer) | Fixing the design itself |
+
+The Mechanical Lead / Mechanical Reviewer pair was added in Phase 1 of the
+multidisciplinary evolution (`docs/architecture-evolution.md` §7, §10, §27);
+the original 4 agents above are unchanged. Hardware Lead orchestrates across
+both disciplines today (§10, §5.3) — a separate "System Lead" role remains
+premature until a third discipline exists (`docs/architecture-evolution.md`
+§7).
 
 Full role specs: `.github/agents/hardware-lead.agent.md`,
 `.github/agents/component-engineer.agent.md`,
 `.github/agents/circuit-engineer.agent.md`,
-`.github/agents/hardware-reviewer.agent.md`. These are real GitHub Copilot
+`.github/agents/hardware-reviewer.agent.md`,
+`.github/agents/mechanical-lead.agent.md`,
+`.github/agents/mechanical-reviewer.agent.md`. These are real GitHub Copilot
 custom agent profiles (per
 [docs.github.com/en/copilot/reference/custom-agents-configuration](https://docs.github.com/en/copilot/reference/custom-agents-configuration)),
 each with a required `description` field, so they are selectable directly
@@ -128,6 +150,29 @@ this repository can guarantee for every user)
 **Not available today:** ERC (schematic-level electrical rule check) has no
 dedicated tool in this toolset yet. Treat ERC as Future Integration (§13) until
 such a tool exists — do not claim ERC coverage.
+
+### 5.3 Mechanical tooling (Phase 1)
+
+No CAD/3D modeling MCP tool is connected in this environment — **verified**,
+not assumed: a live connection check against the only 3D-capable tool surface
+present in this session's toolset (`blender-get_addon_status`) returned
+"Could not connect to Blender." No local `openscad`/`freecad` binary or
+`cadquery`/`solid`/`build123d` Python library is installed either. Until a
+working CAD/3D tool is verified connected in a future session:
+
+- The **Mechanical Lead** produces text/parametric output only: an
+  OpenSCAD-syntax `.scad` file (every dimension a named variable) plus a
+  structured dimensional-spec Markdown table, per
+  `.github/agents/mechanical-lead.agent.md` and
+  `hardware/mechanical/README.md`.
+- Do not claim a rendered preview, an STL export, or an automated fit-check
+  exists — see §13 (Future Integration) for the tracked row.
+- The Mechanical Lead does use the *existing*, already-documented read-only
+  KiCad tools (§5.2: `get_project_structure`, `extract_project_netlist`,
+  `analyze_bom`, `generate_pcb_thumbnail`/`generate_project_thumbnail`) to
+  populate `hardware/mechanical-interface.md` from an existing KiCad project
+  when one exists — this is reuse of an already-verified tool surface, not a
+  new capability claim.
 
 ## 6. Evidence Model
 
@@ -275,6 +320,9 @@ required:
 - Major BOM changes
 - Before PCB fabrication
 - Before first power-on of real hardware (see `validation/bring-up-procedure.md`)
+- Before mechanical fabrication (3D printing/machining) of an enclosure or
+  mechanical part — mirrors the "before PCB fabrication" gate, extended to
+  the Mechanical discipline (Phase 1)
 
 ## 11. Benchmark Project & Roadmap
 
@@ -315,6 +363,7 @@ tools/servers exist)
 | SPICE (simulation, parameter sweep, stability/power analysis) | Not available | No SPICE MCP tool exists in this toolset today |
 | Component database / parts availability MCP | Not available | Evaluate when such a tool is actually connected |
 | Test equipment MCP (bench instruments) | Not available | Relevant once `validation/bring-up-procedure.md` moves to instrumented bench testing |
+| CAD/3D modeling tool (e.g. Blender or a parametric CAD/OpenSCAD engine) | Not available — **verified**, not assumed | A live connection check (`blender-get_addon_status`) failed ("Could not connect to Blender"); no local `openscad`/`freecad` binary or `cadquery`/`solid`/`build123d` Python library is installed either. Mechanical Lead produces text/parametric output only until a working tool is verified connected (§5.3) |
 
 Never implement code/process that assumes any of the above exists. When one
 becomes available, move its row out of this table and into §5.
@@ -345,16 +394,21 @@ methodology and metrics.
 
 ```
 .github/copilot-instructions.md            Repo-wide Copilot operating rules
-.github/agents/*.agent.md                  Custom agent profiles for the 4 MVP agents (name+description frontmatter)
+.github/agents/*.agent.md                  Custom agent profiles (name+description frontmatter):
+                                              4 Electronics MVP agents + 2 Mechanical agents (Phase 1)
 .github/skills/*/SKILL.md                  Agent skill profiles (name+description frontmatter):
   requirements-engineering/SKILL.md
   component-selection/SKILL.md
   datasheet-analysis/SKILL.md
   schematic-design/SKILL.md
   hardware-review/SKILL.md
-.github/instructions/*.instructions.md     Path-scoped rules (datasheets/, hardware+bom/, validation/)
+  enclosure-design/SKILL.md                Mechanical Lead's procedure (Phase 1)
+  mechanical-review/SKILL.md                Mechanical Reviewer's procedure (Phase 1)
+.github/instructions/*.instructions.md     Path-scoped rules (datasheets/, hardware+bom/, validation/,
+                                              hardware/mechanical/+mechanical-interface.md — Phase 1)
 .github/prompts/*.prompt.md                Reusable slash-command-style prompts
 .github/workflows/hardware-gate.yml        CI gate: blocks unresolved CRITICAL/HIGH
+.github/workflows/agent-frontmatter-lint.yml  CI lint: agent/skill required frontmatter (Phase 1)
 .github/CODEOWNERS                         Required human review on safety-critical paths
 
 
@@ -370,12 +424,14 @@ hardware/
   schematic/README.md
   pcb/README.md
   power-budget.md                          System power budget
+  mechanical-interface.md                  Electronics -> Mechanical interface contract (Phase 1)
+  mechanical/README.md                     Mechanical design artifacts (Phase 1, text/parametric only)
 
 bom/component-selection.md                 Candidate comparison template
 
 validation/
-  design-review.md                         Per-cycle review report template
-  open-issues.md                           Living finding backlog (CI-checked)
+  design-review.md                         Per-cycle review report template (Hardware or Mechanical Reviewer)
+  open-issues.md                           Living finding backlog (CI-checked; shared across disciplines)
   fmea.md                                  Systemic risk register
   change-log.md                           ECO / hardware change history
   change-impact-matrix.md                 Cross-domain change impact template
@@ -384,8 +440,10 @@ validation/
 docs/
   architecture.md                          This document
   workflow.md                              End-to-end workflow + gates
+  architecture-evolution.md                Multidisciplinary evolution proposal + Phase 1 status
   evaluation.md                            Single vs multi-agent metrics
   commands/make-circuit.md                 Standard kickoff prompt for a new design cycle
 
 tools/check_open_issues.py                 CI gate parser for open-issues.md
+tools/check_agent_frontmatter.py           CI lint for agent/skill frontmatter (Phase 1)
 ```

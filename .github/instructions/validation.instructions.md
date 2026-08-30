@@ -18,9 +18,12 @@ applyTo: 'validation/**'
   `.github/workflows/hardware-gate.yml` parse it as a Markdown table, and a
   changed header will break the CI gate silently.
 - `Source` column in `open-issues.md` must be one of `hardware-reviewer`,
-  `rubber-duck`, or `human` — never merge a `rubber-duck` premise-review
-  finding into a `hardware-reviewer` checklist finding or vice versa
-  (`docs/architecture.md` §5.1).
+  `mechanical-reviewer`, `rubber-duck`, or `human` — never merge a
+  `rubber-duck` premise-review finding into a `hardware-reviewer`/
+  `mechanical-reviewer` checklist finding or vice versa, and never merge
+  `hardware-reviewer` and `mechanical-reviewer` findings into each other
+  either (`docs/architecture.md` §5.1, extended to a third lens for the
+  Mechanical discipline — `docs/architecture-evolution.md` §31).
 - `validation/fmea.md` uses a different scoring scale (RPN =
   Severity×Occurrence×Detection, 1–10 each) than Reviewer findings — do not
   reuse CRITICAL/HIGH/MEDIUM/LOW there.
