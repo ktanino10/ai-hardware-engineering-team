@@ -8,4 +8,4 @@
 - **Official URL**: https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmi270-ds000.pdf (manufacturer's own datasheet PDF; product/electrical-summary page also directly fetched this session at https://www.bosch-sensortec.com/products/motion-sensors/imus/bmi270/)
 - **Retrieved Date**: 2026-08-30
 - **Local cache note**: not committed; content verified via live web search this session, cross-checked across ≥2 independent sources per critical fact
-- **Used for Evidence IDs**: DS-IMU-001 through DS-IMU-017, DS-IMU-070
+- **Used for Evidence IDs**: DS-IMU-001 through DS-IMU-017, DS-IMU-070, DS-IMU-074, DS-IMU-075, DS-IMU-076, DS-IMU-077 (the last four added during Bench-IMU-01 schematic design, 2026-08-31 — VDD/VDDIO decoupling recommendation, CSB mode-select tie-off, SDO address-select tie-off, and the 14-pin LGA pin function table)

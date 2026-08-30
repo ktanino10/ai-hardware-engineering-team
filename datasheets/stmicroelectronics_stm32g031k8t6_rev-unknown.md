@@ -8,4 +8,4 @@
 - **Official URL**: https://www.st.com/resource/en/datasheet/stm32g031k8.pdf (manufacturer-hosted datasheet PDF); cross-referenced against https://www.st.com/en/microcontrollers-microprocessors/stm32g031k8.html (manufacturer product page)
 - **Retrieved Date**: 2026-08-30
 - **Local cache note**: not committed; content verified via live web search this session, cross-checked across ≥2 independent sources per critical fact (ST's own product/datasheet pages + 2 independent mirror sites for the VDD AMR/ROC figures, Table 6 and Table 18 references)
-- **Used for Evidence IDs**: DS-MCU-012, DS-MCU-013, DS-MCU-014, DS-MCU-015, DS-MCU-016, DS-MCU-017, DS-MCU-018, DS-MCU-019, DS-MCU-020, DS-MCU-021
+- **Used for Evidence IDs**: DS-MCU-012, DS-MCU-013, DS-MCU-014, DS-MCU-015, DS-MCU-016, DS-MCU-017, DS-MCU-018, DS-MCU-019, DS-MCU-020, DS-MCU-021, DS-MCU-044, DS-MCU-045, DS-MCU-046, DS-MCU-047, DS-MCU-048, DS-MCU-049 (the last six added during Bench-IMU-01 schematic design, 2026-08-31 — BOOT0/nBOOT_SEL behavior, LQFP32 pinout/VDD-VSS-VDDA-VBAT count, NRST recommended circuit, LQFP-32 package height, and the BOOT0/PB8 pin-bonding UNKNOWN)
