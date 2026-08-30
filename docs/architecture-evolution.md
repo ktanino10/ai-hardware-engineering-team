@@ -125,10 +125,10 @@ conflict-resolution process `[repo: workflow.md §3]`.
 
 | Discipline | Status | Notes |
 |---|---|---|
-| System / Orchestrator | **[PRESERVE, renamed conceptually later]** | Already played by Hardware Lead at Electronics scope `[repo: hardware-lead.agent.md]`. Do not split into a separate "System Lead" until a second discipline (Mechanical) actually exists to orchestrate across — premature now `[req §5, §24]`. |
+| System / Orchestrator | **[PRESERVE, renamed conceptually later]** | Still played by Hardware Lead, now across both disciplines `[repo: hardware-lead.agent.md — unedited; orchestration guidance lives in docs/architecture.md §3/§5.3, docs/workflow.md Phase 8-10]`. Still no separate "System Lead" — two disciplines exist now but a rename remains premature until a third does `[req §5, §24]`. |
 | Electrical & Electronics | **[PRESERVE]** | Existing 4-agent team, unchanged. |
-| Mechanical | **[ADD NOW — plan only, §12–13]** | First new discipline, Phase 1. |
-| Independent Reviewer | **[PRESERVE + extend later]** | Existing Hardware Reviewer pattern reused for Mechanical (§13). |
+| Mechanical | **[IMPLEMENTED — Phase 1, see §31]** | First new discipline. Shipped: `mechanical-lead`/`mechanical-reviewer` agents, `enclosure-design`/`mechanical-review` skills, `hardware/mechanical-interface.md`. |
+| Independent Reviewer | **[PRESERVE + extended]** | Existing Hardware Reviewer pattern reused for Mechanical (§13, §31) — Mechanical Reviewer is now real, sharing `validation/open-issues.md`. |
 | Control / Embedded | **[DEFER]** | §11. |
 | Integration / Test | **[DEFER]** | §11. |
 | Software/AI, Advanced Concepts, Procurement, Simulation, Visualization | **[CONSIDER LATER / DEFER]** | Only if real projects justify them `[req §5]`; see §16–21. |
@@ -169,7 +169,7 @@ be evaluated empirically once there is more than one completed design
 cycle to compare — using the metrics already defined in
 `docs/evaluation.md`, not new ones.
 
-## 10. Mechanical Domain `[ADD NOW — plan only]`
+## 10. Mechanical Domain `[IMPLEMENTED — Phase 1, see §31]`
 
 Full concept list from the request `[req §7]`: spatial layout, enclosure,
 mechanism, assembly, geometry, mounting, fasteners, clearances, tolerance,
@@ -183,8 +183,17 @@ interference, manufacturing constraints, material selection,
   component-height clearance, wall thickness, fastener placement, basic
   manufacturability. The rest of the list is **[CONSIDER LATER]**, added
   only when a real project needs it.
-- No Mechanical agent/skill is created by this document — this section
-  only fixes the target name/scope for Phase 1 approval.
+- **Status update (Phase 1 implemented, §31)**: `.github/agents/
+  mechanical-lead.agent.md` (the single geometry-state owner, per the
+  bullet above) + `.github/skills/enclosure-design/SKILL.md` (its
+  procedure, bundling the Phase 1 subset above into one skill) now exist.
+  A second agent, **Mechanical Reviewer** (`.github/agents/
+  mechanical-reviewer.agent.md` + `.github/skills/mechanical-review/SKILL.md`),
+  was also added — this is not "multiple independent mechanical agents
+  corrupting the same model" (still avoided: only the Lead owns geometry),
+  it mirrors the *already-approved* Circuit-Engineer/Hardware-Reviewer
+  2-agent split (design + independent adversarial review), consistent with
+  this table's own "Independent Reviewer" row (§7) and §27 item 3.
 
 ## 11. Future Control / Embedded Domain `[DEFER]`
 
@@ -233,10 +242,13 @@ needed): thermal zones, antenna keep-out, STEP/neutral 3D model reference,
 center of mass, battery wiring requirements, complex keep-out zones,
 detailed cable-exit geometry.
 
-Proposed artifact (Phase 1, not created now): `hardware/mechanical-interface.md`,
+Implemented (Phase 1, see §31): `hardware/mechanical-interface.md`,
 reusing the existing `Parameter | Value | Unit | Source` table convention
-plus an explicit `Confidence` / `Assumption` column. **Classification:
-ADDITIVE** (new file only).
+plus explicit `Confidence` and `Assumption / Notes` columns (four labels:
+`CONFIRMED`/`ASSUMPTION`/`ESTIMATE`/`UNKNOWN` —
+`.github/instructions/mechanical-design.instructions.md`). **Classification:
+ADDITIVE** (new file only). Template only — no real project has been run
+through this repo's cycle yet, so all rows are still blank (§27 item 5).
 
 ## 14. Tool / Model Independence
 
@@ -396,6 +408,15 @@ information?"* `[req §9]` This is the Phase 1 pass/fail criterion, judged
 by the human Chief Engineer, not by AI self-assessment — consistent with
 existing independent-review + HITL principles.
 
+**Status (Phase 1 PR, §31)**: the agents/skills/interface/docs needed to run
+this benchmark now exist. Actually *running* it — producing a real, judged
+enclosure for a real MCU+IMU+Power project — is **not done in this PR**: no
+real project has entered this repo's design cycle yet (`requirements/
+requirements.md` and `bom/component-selection.md` are still blank
+templates), and running the benchmark would require the Electronics cycle to
+run first, which is outside this PR's "Mechanical only" scope. Flagged as
+the natural next PR/session (§27 item 5).
+
 ## 25. Risks
 
 - **Scope creep** from 29 topics — mitigated by the STOP CONDITION and the
@@ -419,30 +440,48 @@ system · visualization/animation tooling · Value Engineering skills (until
 Test agent · Issue-form templates · Dependabot (until a dependency
 manifest exists) · repository rename.
 
-## 27. Phase 1 Implementation Plan (proposed only — not executed)
+## 27. Phase 1 Implementation Plan (implemented — see §31)
 
-`[req §27]`. Scope, pending human approval:
+`[req §27]`. Scope, as approved by the human and implemented in this PR:
 
-1. Preserve current Electronics team — no code change.
-2. Add minimum Mechanical capability as **Skills** under one proposed
-   **Mechanical Lead** agent (§10). If, at Phase-1-kickoff time, no CAD MCP
-   tool is verified connected, the Mechanical Lead should produce
-   text/parametric output (e.g. an OpenSCAD-style script) rather than
-   block on unverified tooling — decide the concrete mechanism when Phase
-   1 actually starts, not speculatively now `[req §11, §24]`.
-3. Add a proposed **Mechanical Reviewer** agent, independent from the
-   Mechanical Lead, mirroring the existing Hardware Reviewer pattern
-   (§7 discipline table).
-4. Define `hardware/mechanical-interface.md` (§13).
-5. Continue the existing MCU+IMU+Power benchmark through to a real
-   enclosure (§24), judged against the 9-point checklist in §24.
-6. Explicitly out of scope for Phase 1: Control/Embedded, Procurement
-   automation, Simulation, Visualization, Digital Twin, model routing,
-   repository rename, multiple Mechanical sub-agents.
+1. ✅ **Done.** Preserve current Electronics team — no code change (verified:
+   `git diff` confirms the 4 existing agent files, 5 existing skill files,
+   `.github/instructions/{hardware-design,datasheets}.instructions.md`,
+   `.github/workflows/hardware-gate.yml`, `tools/check_open_issues.py`,
+   `datasheets/**`, `requirements/**`, `bom/component-selection.md`,
+   `hardware/{power-budget.md,schematic/README.md,pcb/README.md}`,
+   `validation/{fmea.md,change-log.md,change-impact-matrix.md,
+   bring-up-procedure.md}` are all byte-identical to before this PR).
+2. ✅ **Done.** Added Mechanical capability as **Skills** under one
+   **Mechanical Lead** agent (§10): `.github/agents/mechanical-lead.agent.md`
+   + `.github/skills/enclosure-design/SKILL.md`. No CAD MCP tool was found
+   verified-connected at Phase-1-implementation time (checked, not assumed —
+   see §31), so the Mechanical Lead produces text/parametric output (an
+   OpenSCAD-style script + a dimensional-spec table), exactly the fallback
+   this item anticipated `[req §11, §24]`.
+3. ✅ **Done.** Added **Mechanical Reviewer** agent, independent from the
+   Mechanical Lead, mirroring the existing Hardware Reviewer pattern (§7
+   discipline table): `.github/agents/mechanical-reviewer.agent.md` +
+   `.github/skills/mechanical-review/SKILL.md`.
+4. ✅ **Done.** Defined `hardware/mechanical-interface.md` (§13) — template
+   only, no live project data (see item 5).
+5. ⏳ **Not done in this PR — flagged follow-up.** Continuing the existing
+   MCU+IMU+Power benchmark through to a real enclosure (§24), judged against
+   the 9-point checklist in §24, requires a real Electronics design cycle to
+   have run first (`requirements/requirements.md` is still a blank
+   template), which is outside this PR's "Mechanical only" scope.
+6. Explicitly out of scope for Phase 1 (unchanged, still deferred): Control/
+   Embedded, Procurement automation, Simulation, Visualization, Digital
+   Twin, model routing, repository rename, multiple Mechanical sub-agents
+   (only 2 Mechanical agents exist: Lead + Reviewer, the same 2-agent
+   design+independent-review shape as Electronics' Circuit Engineer +
+   Hardware Reviewer).
 
-This plan is **not executed by this document**. Per the STOP CONDITION and
-the requester's own addendum, it awaits an independent audit and explicit
-human approval before any file in items 1–5 is created.
+Items 1-4 were implemented in this PR; per the STOP CONDITION and the
+requester's own addendum, it still awaits an independent audit and explicit
+human approval before merge (not before creation — the files already exist,
+open for review, exactly as the requester's process for this document itself
+anticipated).
 
 ## 28. Change Classification
 
@@ -450,8 +489,10 @@ human approval before any file in items 1–5 is created.
 |---|---|---|
 | This document | ADDITIVE | New file; no existing file modified |
 | Repo-level mission (§5) | ADDITIVE | `architecture.md` §1 unchanged |
-| Mechanical Lead + Mechanical Reviewer (Phase 1, unimplemented) | ADDITIVE | New agents; nothing removed/renamed |
-| `hardware/mechanical-interface.md` (Phase 1, unimplemented) | ADDITIVE | New file |
+| Mechanical Lead + Mechanical Reviewer (Phase 1, **implemented**, §31) | ADDITIVE | New agents; nothing removed/renamed |
+| `hardware/mechanical-interface.md` (Phase 1, **implemented**, §31) | ADDITIVE | New file |
+| `docs/architecture.md` / `docs/workflow.md` Phase 1 updates (§31) | ADDITIVE | New diagram nodes/rows/sections/phases only; no existing section renumbered or reworded |
+| Small shared-file edits: `validation.instructions.md`, `validation/open-issues.md`, `validation/design-review.md`, `.github/CODEOWNERS`, `.github/copilot-instructions.md` (§31) | ADDITIVE / BACKWARD_COMPATIBLE | Extend an enum/placeholder/list; no existing row/rule/table schema removed or changed |
 | Maker Mode documentation (§22, unimplemented) | ADDITIVE | New optional path; Rigorous Mode unchanged |
 | Tool adapter layer | NOT PROPOSED NOW | Deferred to §14's trigger condition |
 | Repository rename | BREAKING, if ever done | Recommended DEFERRED (§23) |
@@ -474,9 +515,11 @@ human approval before any file in items 1–5 is created.
 5. **AI models replaceable without losing project knowledge?** Yes — no
    agent pins a model; all durable knowledge is file-based (§14, §12).
 6. **Can Electronics communicate enough to Mechanical?** Yes for the
-   stated benchmark — minimum field set defined (§13).
-7. **Can Mechanical exceed "a box with holes"?** That is the explicit
-   Phase 1 pass bar (§24).
+   stated benchmark — minimum field set defined and now implemented as
+   `hardware/mechanical-interface.md` (§13, §31).
+7. **Can Mechanical exceed "a box with holes"?** That was the explicit
+   Phase 1 pass bar (§24); the agents/skills/checklist needed to attempt it
+   are implemented (§31) — the benchmark run itself is a flagged follow-up.
 8. **Can future Control/Firmware fit naturally?** Yes — reserved,
    unblocked (§11).
 9. **Can future visualization fit naturally?** Yes in principle, unbuilt,
@@ -493,9 +536,9 @@ human approval before any file in items 1–5 is created.
     is proposed (§4, §22).
 14. **Future ideas clearly separated from current implementation?** Yes —
     every section is explicitly tagged (§26 consolidates).
-15. **Does Phase 1 result in a real, testable workflow?** Yes, once
-    approved and implemented (§27), with a concrete pass/fail benchmark
-    (§24).
+15. **Does Phase 1 result in a real, testable workflow?** Yes — implemented
+    (§27, §31), with a concrete pass/fail benchmark defined (§24); running
+    that benchmark to a judged result is the flagged follow-up (§27 item 5).
 
 ## 30. STOP Confirmation
 
@@ -504,3 +547,69 @@ No agent, skill, instruction, or workflow was created or modified; the
 repository was not renamed; no MCP, CAD, Mechanical, Procurement, Digital
 Twin/XR, or model-routing capability was implemented. Awaiting independent
 audit and explicit human approval before Phase 1 (§27) begins.
+
+*(This section is preserved verbatim as the historical record of this
+document's original, plan-only state. See §31 immediately below for what
+actually changed once Phase 1 was approved and implemented.)*
+
+## 31. Phase 1 Implementation Status (Addendum)
+
+Added when Phase 1 (Mechanical) was actually implemented, in a separate PR
+from this document's original merge — kept as an addendum rather than
+rewriting §30 above, to preserve the audit trail of what this document said
+*before* approval vs. what is true *after* implementation.
+
+- **Human approval**: given, scoped explicitly to Mechanical only (per the
+  kickoff instructions for that PR) — Control/Embedded, Procurement,
+  Simulation, Visualization, Value Engineering, Advanced Concepts, Digital
+  Twin/XR remain exactly as documented above (deferred), untouched.
+- **Implemented**: §27 items 1-4 — see the ✅ markers in §27, and the status
+  updates inline in §7, §10, §13, §28, §29.
+- **Not implemented / flagged follow-up**: §27 item 5 (running the
+  MCU+IMU+Power benchmark through to a real, judged enclosure) — no real
+  project has entered this repository's design cycle yet.
+- **Verified, not assumed, during implementation**: (a) the GitHub custom
+  agent (`.github/agents/*.agent.md`, required `description`) and agent
+  skill (`.github/skills/<name>/SKILL.md`, required `name`+`description`)
+  specs were re-checked directly against current GitHub documentation — both
+  unchanged since PR #2/#3, no third "fix the spec" round was needed; (b) no
+  CAD/3D modeling tool is connected in this environment — a live connection
+  check (`blender-get_addon_status`) failed ("Could not connect to
+  Blender"), and no local `openscad`/`freecad` binary or
+  `cadquery`/`solid`/`build123d` Python library is installed; see
+  `docs/architecture.md` §5.3/§13 for where this is now tracked as Future
+  Integration.
+- **Files added**: `.github/agents/{mechanical-lead,mechanical-reviewer}.agent.md`,
+  `.github/skills/{enclosure-design,mechanical-review}/SKILL.md`,
+  `.github/instructions/mechanical-design.instructions.md`,
+  `hardware/mechanical-interface.md`, `hardware/mechanical/README.md`, plus a
+  separable repo-hygiene addition (not Mechanical-specific — guards every
+  discipline's agents/skills equally): `tools/check_agent_frontmatter.py` +
+  `.github/workflows/agent-frontmatter-lint.yml`, a permanent CI check that
+  every `.agent.md` has a `description` and every `SKILL.md` has a matching
+  `name`+`description`, so a third "wrong spec" round (after PR #2/#3) can't
+  happen silently again.
+- **Files edited, additively only** (nothing existing removed/reworded, no
+  section renumbered): `docs/architecture.md` (§2, §3, new §5.3, §10, §13,
+  §16), `docs/workflow.md` (§1 diagram, new Phase 8-10 under existing §2,
+  §4, §5), `docs/architecture-evolution.md` (this document — §7, §10, §13,
+  §24, §27, §28, §29), `.github/copilot-instructions.md` (Roles section),
+  `.github/CODEOWNERS` (one line), `.github/instructions/
+  validation.instructions.md` and `validation/{open-issues.md,
+  design-review.md}` (extending the `Source` enum / genericizing two
+  template lines — table headers/schemas unchanged, so
+  `tools/check_open_issues.py` needed no change and still passes).
+- **Confirmed untouched** (verified via `git diff` before opening the PR):
+  all 4 existing `.github/agents/*.agent.md` files (including
+  `hardware-lead.agent.md`, by explicit human confirmation during planning
+  — Hardware Lead's cross-discipline orchestration is documented entirely in
+  `docs/architecture.md`/`docs/workflow.md`, which it already treats as
+  canonical), all 5 existing `SKILL.md` files,
+  `.github/instructions/{hardware-design,datasheets}.instructions.md`,
+  `.github/workflows/hardware-gate.yml`, `tools/check_open_issues.py`,
+  `datasheets/**`, `requirements/**`, `bom/component-selection.md`,
+  `hardware/{power-budget.md,schematic/README.md,pcb/README.md}`,
+  `validation/{fmea.md,change-log.md,change-impact-matrix.md,
+  bring-up-procedure.md}`, `docs/evaluation.md`.
+- **Status**: implemented, PR opened, awaiting independent audit before
+  merge — same process this document itself went through.

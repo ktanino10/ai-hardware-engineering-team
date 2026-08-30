@@ -1,8 +1,10 @@
 # Open Issues — Living Finding Backlog
 
-This is the single persistent backlog of Hardware Reviewer and `rubber-duck`
-findings across all review cycles. `validation/design-review.md` is the
-per-cycle report; this file is what actually gates Design Complete
+This is the single persistent backlog of Hardware Reviewer, Mechanical
+Reviewer (Phase 1 — `docs/architecture-evolution.md` §31), and `rubber-duck`
+findings across all review cycles — one shared backlog across disciplines,
+not one per discipline. `validation/design-review.md` is the per-cycle
+report; this file is what actually gates Design Complete
 (`docs/architecture.md` §8) and what CI checks
 (`.github/workflows/hardware-gate.yml` + `tools/check_open_issues.py`).
 
@@ -32,9 +34,11 @@ hard-code day counts.)*
   disposition (`RESOLVED` / `DEFERRED` / `ACCEPTED-RISK`) before archiving a
   revision.
 - `Source` distinguishes which review lens found it: `hardware-reviewer`
-  (checklist/failure-mode review) vs. `rubber-duck` (premise/assumption
-  review) — see `docs/architecture.md` §5.1. Never merge/relabel one as the
-  other.
+  (Electronics checklist/failure-mode review), `mechanical-reviewer`
+  (Mechanical checklist/failure-mode review, Phase 1 —
+  `docs/architecture-evolution.md` §31), or `rubber-duck` (premise/
+  assumption review) — see `docs/architecture.md` §5.1. Never merge/relabel
+  one as another.
 
 ## Backlog
 

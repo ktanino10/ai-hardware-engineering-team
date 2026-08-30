@@ -78,3 +78,16 @@ or manages a workflow automatically.
   `hardware/power-budget.md` must be updated and re-checked against supply
   capability as part of Circuit Design, and that this likely qualifies as a
   "major BOM change" / architecture decision HITL gate.
+- **Continuing into Mechanical Design once Electronics has a stable board
+  outline** (Phase 1 of the multidisciplinary evolution —
+  `docs/architecture-evolution.md` §31; `docs/workflow.md` Phase 8-10): once
+  Circuit Design has fixed the board outline, mounting holes, component
+  heights, and connector layout (this does not require the full Electronics
+  Design Complete Gate to have passed first), add to the kickoff: "Once the
+  board outline is stable, have the Mechanical Lead populate
+  `hardware/mechanical-interface.md` and design an enclosure
+  (`.github/agents/mechanical-lead.agent.md`), then get an independent
+  Mechanical Reviewer pass (`.github/agents/mechanical-reviewer.agent.md`)
+  before Design Complete — no CAD tool is connected in this environment, so
+  expect text/parametric output (an OpenSCAD-style script + a dimensional
+  spec table), not a rendered model."

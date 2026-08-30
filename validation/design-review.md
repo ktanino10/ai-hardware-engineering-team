@@ -1,14 +1,15 @@
 # Design Review — Cycle Report Template
 
-One instance of this report per Hardware Reviewer cycle (initial review or
+One instance of this report per Hardware Reviewer **or Mechanical Reviewer**
+(Phase 1 — `docs/architecture-evolution.md` §31) cycle (initial review or
 a re-review after loop-back). Copy this template into a dated entry (or a
 new file per cycle, e.g. `validation/design-review-2026-01-01.md`, linked
 from here) — do not overwrite a previous cycle's report.
 
 ## Review Cycle Metadata
 
-- **Design revision reviewed**: `<hardware/schematic ref + revision>`
-- **Reviewer**: Hardware Reviewer (independent — see `.github/agents/hardware-reviewer.agent.md`)
+- **Design revision reviewed**: `<hardware/schematic ref + revision, or hardware/mechanical enclosure ref + revision>`
+- **Reviewer**: `<Hardware Reviewer — see .github/agents/hardware-reviewer.agent.md — or Mechanical Reviewer — see .github/agents/mechanical-reviewer.agent.md — independent either way>`
 - **Independence statement**: I did not author this design. Findings below
   were derived by re-checking each item directly against the datasheet /
   Evidence ID, not by trusting the Circuit Engineer's stated rationale.
@@ -19,7 +20,10 @@ from here) — do not overwrite a previous cycle's report.
 
 ## Checklist Results
 
-Full checklist per `.github/skills/hardware-review/SKILL.md`:
+Full checklist per `.github/skills/hardware-review/SKILL.md` (for a
+**Mechanical Reviewer** cycle, use the 10-item checklist in
+`.github/skills/mechanical-review/SKILL.md` instead and adjust the rows
+below accordingly — Phase 1, `docs/architecture-evolution.md` §31):
 
 | # | Checklist item | Result | Notes |
 |---|---|---|---|

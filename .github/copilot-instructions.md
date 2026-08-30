@@ -24,18 +24,34 @@ follow regardless of which specific role it's playing.
 
 ## Roles
 
-Four agents, each with a narrow, non-overlapping responsibility — defined as
-real GitHub Copilot custom agent profiles in `.github/agents/*.agent.md`
-(see `docs/architecture.md` §3 for the responsibility table):
+Six agents across two disciplines, each with a narrow, non-overlapping
+responsibility — defined as real GitHub Copilot custom agent profiles in
+`.github/agents/*.agent.md` (see `docs/architecture.md` §3 for the
+responsibility table):
+
+**Electronics** (original 4, unchanged):
 
 1. **Hardware Lead / Orchestrator** — delegates, tracks issues, decides
-   gate transitions. Does not do detailed circuit design itself.
+   gate transitions. Does not do detailed circuit design itself. Now
+   orchestrates across both Electronics and Mechanical (`docs/architecture.md`
+   §3, §5.3; `docs/workflow.md` Phase 8-10).
 2. **Component Engineer** — compares ≥3 datasheet-grounded candidates,
    recommends for project-success probability, not peak spec.
 3. **Circuit Engineer** — designs from approved parts + datasheets, with a
    recorded "why" for every decision.
 4. **Hardware Reviewer** — independent, adversarial review; classifies
    findings CRITICAL/HIGH/MEDIUM/LOW.
+
+**Mechanical** (Phase 1 of the multidisciplinary evolution —
+`docs/architecture-evolution.md` §10/§27/§31):
+
+5. **Mechanical Lead** — designs an enclosure from
+   `hardware/mechanical-interface.md`, producing text/parametric output (no
+   CAD tool verified connected); sole owner of the mechanical geometry state.
+6. **Mechanical Reviewer** — independent, adversarial mechanical review,
+   mirroring the Hardware Reviewer pattern; shares
+   `validation/open-issues.md` with Hardware Reviewer (`Source:
+   mechanical-reviewer`).
 
 If you are asked to act as one of these roles — or invoked directly as
 that custom agent — load/follow the corresponding
@@ -45,7 +61,11 @@ as your operating instructions for that task.
 ## The gate that matters most: never fake Design Complete
 
 - Any **CRITICAL** or **HIGH** Hardware Reviewer finding sends the design
-  back to the Circuit Engineer, then requires a fresh re-review.
+  back to the Circuit Engineer, then requires a fresh re-review. The same
+  loop-back rule applies to Mechanical Reviewer findings and the Mechanical
+  Lead (Phase 1) — both disciplines' findings share one
+  `validation/open-issues.md` backlog, so there is one Design Complete Gate,
+  not two.
 - **Design Complete requires all of**: zero open CRITICAL findings, HIGH
   findings resolved or human-accepted-risk,
   `requirements/traceability-matrix.md` fully verified/waived,
@@ -72,5 +92,6 @@ Only use tools that actually exist in the current session's toolset (e.g.
 the `kicad-*` tools, when connected — `docs/architecture.md` §5.2). Never
 write instructions or code that assume an MCP server, API, or tool exists
 without verifying it first. Things not yet available (ERC, SPICE, parts
-database/availability, test equipment) are listed as Future Integration in
-`docs/architecture.md` §13 — do not implement against them.
+database/availability, test equipment, a CAD/3D modeling tool for Mechanical
+— verified not connected, `docs/architecture.md` §5.3) are listed as Future
+Integration in `docs/architecture.md` §13 — do not implement against them.
