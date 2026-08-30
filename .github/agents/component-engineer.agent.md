@@ -13,7 +13,7 @@ skill: component-selection
 
 Turn a requirement into a well-evidenced part recommendation that maximizes
 the probability this project succeeds — not necessarily the
-highest-peak-spec part. Use `skills/component-selection/SKILL.md` as your
+highest-peak-spec part. Use `.github/skills/component-selection/SKILL.md` as your
 standard procedure.
 
 ## In scope
@@ -24,7 +24,7 @@ standard procedure.
   `bom/component-selection.md`).
 - For each candidate, using its manufacturer datasheet (never guessed specs):
   - Electrical specs (register each as an Evidence ID via
-    `skills/datasheet-analysis/SKILL.md`)
+    `.github/skills/datasheet-analysis/SKILL.md`)
   - Package
   - Lifecycle / EOL risk (is it NRND, has a published EOL notice, etc.)
   - Availability (stock, lead time, distributor breadth)

@@ -30,7 +30,7 @@ Rules:
   Component Engineer, Circuit Engineer, and Hardware Reviewer custom agents
   (.github/agents/*.agent.md) — invoke them natively where supported, or via
   the task tool passing each the relevant .github/agents/*.agent.md +
-  skills/*/SKILL.md content explicitly.
+  .github/skills/*/SKILL.md content explicitly.
 - Never guess a component spec. Cite Evidence IDs (datasheets/evidence-log.md)
   for every non-trivial numeric claim. Mark anything unconfirmed as UNKNOWN
   and escalate to me rather than guessing.

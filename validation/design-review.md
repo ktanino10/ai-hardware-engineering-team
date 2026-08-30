@@ -19,7 +19,7 @@ from here) — do not overwrite a previous cycle's report.
 
 ## Checklist Results
 
-Full checklist per `skills/hardware-review/SKILL.md`:
+Full checklist per `.github/skills/hardware-review/SKILL.md`:
 
 | # | Checklist item | Result | Notes |
 |---|---|---|---|

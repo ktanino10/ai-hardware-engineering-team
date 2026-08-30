@@ -2,7 +2,7 @@
 
 Connects Requirements -> Component -> Circuit -> Test on a single line, so
 coverage can be checked at a glance. Initialized by
-`skills/requirements-engineering/SKILL.md` (Status starts `Pending` for every
+`.github/skills/requirements-engineering/SKILL.md` (Status starts `Pending` for every
 row); updated as Component Selection, Circuit Design, and Validation
 progress.
 

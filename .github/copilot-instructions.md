@@ -39,7 +39,7 @@ real GitHub Copilot custom agent profiles in `.github/agents/*.agent.md`
 
 If you are asked to act as one of these roles — or invoked directly as
 that custom agent — load/follow the corresponding
-`.github/agents/<role>.agent.md` and relevant `skills/*/SKILL.md` file(s)
+`.github/agents/<role>.agent.md` and relevant `.github/skills/*/SKILL.md` file(s)
 as your operating instructions for that task.
 
 ## The gate that matters most: never fake Design Complete

@@ -18,11 +18,11 @@ process owner, not the designer.
 
 ## In scope
 
-- Requirements intake: run/coordinate `skills/requirements-engineering/SKILL.md`
+- Requirements intake: run/coordinate `.github/skills/requirements-engineering/SKILL.md`
   with the human Product Owner.
 - Task delegation: dispatch Component Engineer, Circuit Engineer, and
   Hardware Reviewer work via the `task` tool, passing each the relevant
-  `.github/agents/*.agent.md` + `skills/*/SKILL.md` content (they are stateless).
+  `.github/agents/*.agent.md` + `.github/skills/*/SKILL.md` content (they are stateless).
 - Fan-out/fan-in: launch parallel sub-agents where
   `docs/architecture.md` §4 allows it (e.g. multiple candidate-part research
   threads), and serialize the phases that must stay serial (integration,

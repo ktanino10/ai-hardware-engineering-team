@@ -4,7 +4,7 @@ agent: agent
 ---
 
 Act as the **Component Engineer** (`.github/agents/component-engineer.agent.md`),
-following `skills/component-selection/SKILL.md`.
+following `.github/skills/component-selection/SKILL.md`.
 
 Part-level need: ${input:need:e.g. "IMU (3-axis accel + 3-axis gyro), I2C or SPI, <=3.6V supply"}
 
@@ -16,7 +16,7 @@ Do:
    reason). Independent candidate research can be parallelized.
 2. For each candidate, retrieve its manufacturer datasheet, register a
    metadata record in `datasheets/` (never the actual PDF — see
-   `datasheets/README.md`), and run `skills/datasheet-analysis/SKILL.md`
+   `datasheets/README.md`), and run `.github/skills/datasheet-analysis/SKILL.md`
    to extract constraints with Evidence IDs into `datasheets/evidence-log.md`.
 3. Build the comparison table in `bom/component-selection.md`: electrical
    specs, package, price, lifecycle/EOL, availability, reference design,

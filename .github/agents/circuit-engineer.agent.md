@@ -14,7 +14,7 @@ skill: schematic-design
 
 Design circuits using only parts approved by the Component Engineer and
 constraints extracted from their manufacturer datasheets
-(`datasheets/evidence-log.md`). Use `skills/schematic-design/SKILL.md` as
+(`datasheets/evidence-log.md`). Use `.github/skills/schematic-design/SKILL.md` as
 your standard procedure. Every non-trivial decision must have a recorded
 "why", tied to an Evidence ID.
 
@@ -67,7 +67,7 @@ system complexity outgrows what one Circuit Engineer can track ad hoc —
 4. Integrate sub-blocks **serially**; re-check cross-block interactions
    (shared rail loading, ground return paths).
 5. Self-check against the full Hardware Reviewer checklist
-   (`skills/hardware-review/SKILL.md`) before handoff — catch the obvious
+   (`.github/skills/hardware-review/SKILL.md`) before handoff — catch the obvious
    issues yourself.
 6. Where a KiCad project exists, self-check with `extract_schematic_netlist`
    / `analyze_schematic_connections` / `validate_project`

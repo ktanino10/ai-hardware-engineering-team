@@ -3,7 +3,7 @@ description: 'Extract design constraints from a specific datasheet into the stan
 agent: agent
 ---
 
-Act as an operator of `skills/datasheet-analysis/SKILL.md`.
+Act as an operator of `.github/skills/datasheet-analysis/SKILL.md`.
 
 Datasheet / part: ${input:part:e.g. "STMicroelectronics STM32F103C8T6, Rev 14"}
 
