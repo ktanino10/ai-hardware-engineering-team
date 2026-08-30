@@ -1,6 +1,60 @@
 # Bench-IMU-01 — Schematic-Equivalent Design Document
 
-**Author**: Circuit Engineer (AI agent) · **Date**: 2026-08-31 · **Status**: Design complete, self-checked, pending independent Hardware Reviewer pass (mandatory, not yet performed — see `.github/agents/circuit-engineer.agent.md` "Out of scope")
+**Author**: Circuit Engineer (AI agent) · **Date**: 2026-08-31, revised 2026-09-01 · **Status**: **Revised (Rev 2)** — 3 HIGH findings from Hardware Reviewer Cycle 1 fixed, 2 additional corrections folded in; self-checked against the affected items; **ready for Hardware Reviewer re-review** (not a first review — see `validation/design-review.md` for Cycle 1's full findings and its Addendum)
+
+## Revision changelog
+
+**Rev 2 (2026-09-01)** — Circuit Engineer rework addressing
+`validation/design-review.md` Cycle 1 findings, per
+`.github/agents/circuit-engineer.agent.md` ("When you receive Hardware
+Reviewer findings... address every CRITICAL and HIGH finding explicitly").
+Only this document was modified; `validation/open-issues.md`,
+`validation/design-review.md`, and `datasheets/evidence-log.md` are owned
+by the Hardware Reviewer / Hardware Lead and are not touched here.
+
+- **ISS-011 (HIGH, fixed)** — The IMU I2C bus on MCU pins PB10/PB11 was
+  mislabeled "I2C1" throughout this document. Independent research
+  (Hardware Lead, this cycle, DS-MCU-052/053) confirmed PB10/PB11 are
+  actually this part's **I2C2** alternate function. Every reference
+  (§2.3, §5.2, §5.3, §6, §11, §12, §14, §16) is corrected I2C1→I2C2. No
+  PCB/wiring change — pins are physically unchanged; only the
+  peripheral-instance label and the firmware target change. **I2C1 is
+  now recorded as entirely free** (a genuine peripheral-margin
+  improvement, not a regression).
+- **ISS-001 (HIGH, fixed)** — The LDO (U3) EN pin connection was hedged
+  ("if the exact package variant... has an active EN pin..."). Independent
+  research (Hardware Lead, this cycle, TI SBVS320D Rev D) confirmed EN
+  (pin 3, DBV package) is mandatory on every package variant, with no
+  internal bias. §3.4 and §12 now state a firm, unconditional EN→VIN tie
+  as a committed design decision, with a new explicit `EN_VIN` net.
+- **ISS-002 (HIGH, addressed)** — The design's own arithmetic against
+  REQ-101 was correct, but Independent Review found the real-world USB-C
+  vSafe5V ceiling (4.75–5.5V) is wider than REQ-101's stated band
+  (4.75–5.25V), leaving effectively zero margin against the LDO's 5.5V
+  Recommended Operating Condition ceiling (though 0.5V/9% of real headroom
+  remains under its 6.0V Absolute Maximum Rating — not a damage risk). New
+  §3.5 analyzes this explicitly and **recommends an ACCEPTED-RISK
+  disposition** (with a component-change flag as the alternative) for the
+  Hardware Lead to route to the human Chief Engineer per
+  `docs/architecture.md` §8. This finding is **not** closed by this
+  document — the disposition decision is the Hardware Lead's/human Chief
+  Engineer's to make.
+- **ISS-006 (MEDIUM, corrected)** — §4.1/§4.2's BOOT0 discussion is
+  corrected: BOOT0 is muxed onto **PA14** (already this design's SWCLK
+  pin), not PB8. PB8 does physically exist on this package (contra this
+  document's original §4.1/§16 claim) but its real function is an
+  alternate I2C1_SCL pin (DS-MCU-053), unrelated to BOOT0. The design's
+  final decision (no physical BOOT0 circuit, rely on the nBOOT_SEL
+  default) is unchanged — only the reasoning is corrected.
+- **ISS-010 (LOW, corrected)** — The MCU VDD Absolute Maximum Rating lower
+  bound, previously UNKNOWN, is now resolved at **−0.3V** (confirmed by
+  the Hardware Reviewer against ST DS12992 Rev4 Table 18). §1/§16 updated.
+- **Out of scope this revision (unchanged, left for a later disposition
+  pass)**: ISS-004, ISS-005, ISS-007, ISS-008, ISS-009. Not marked
+  resolved; not touched beyond what already existed.
+- **Self-check**: re-run against Hardware Reviewer checklist items 1, 2,
+  6, 7, 13, and 16 (§15) — items 6/7/13 map most directly onto ISS-001/
+  ISS-011/ISS-006; items 1/2 onto ISS-002/ISS-010.
 
 ## 0. Tooling honesty statement
 
@@ -58,15 +112,16 @@ candidate comparisons live in `bom/component-selection.md` and are not
 repeated here except where a specific cited number (e.g. the LDO thermal
 estimate) is directly reused.
 
-**Carried-forward open item from `bom/component-selection.md`**: the
-STM32G031K8T6 VDD Absolute Maximum Rating **lower bound** was never
-confirmed (only the 4.0V upper bound is confirmed, DS-MCU-012). This
-session's research did not resolve it either — it remains UNKNOWN (see
-§16). It does not block this design because the chosen operating point,
-3.3V, sits deep inside the confirmed Recommended Operating Condition
-(1.7–3.6V, DS-MCU-013), which is by construction a subset of the
-Absolute Maximum range — so the missing AMR lower bound cannot plausibly
-be violated by a 3.3V design.
+**RESOLVED this revision (ISS-010)** — the STM32G031K8T6 VDD Absolute
+Maximum Rating **lower bound**, carried forward from
+`bom/component-selection.md` as unconfirmed, is now confirmed at
+**−0.3V** (upper bound remains 4.0V, DS-MCU-012), independently verified
+by the Hardware Reviewer this cycle directly against ST's primary
+datasheet (DS12992 Rev4, Table 18) — see §16 item 2. Full AMR is
+therefore **−0.3V to +4.0V**. The chosen operating point, 3.3V, sits
+deep inside both the confirmed Recommended Operating Condition
+(1.7–3.6V, DS-MCU-013) and the now-fully-confirmed AMR — no violation in
+either direction, and this is no longer an open gap.
 
 ## 2. Shared resources — fixed first, serially (per SKILL.md step 1)
 
@@ -108,20 +163,27 @@ rework/conflicts across blocks:
 | Function | MCU pin | Confidence |
 |---|---|---|
 | SWDIO | PA13 | HIGH — dedicated STM32 debug pin, not an alternate function |
-| SWCLK | PA14 | HIGH — dedicated STM32 debug pin, not an alternate function |
-| I2C1 SCL | PB10 | MODERATE — standard STM32G0 I2C1 AF mapping; not individually re-verified against the exact AF table this session (see §16) |
-| I2C1 SDA | PB11 | MODERATE — as above |
+| SWCLK | PA14 | HIGH — dedicated STM32 debug pin, not an alternate function; also this MCU sub-family's BOOT0 boot-mode-select mux pin — corrected this revision, see §4.2 (ISS-006) |
+| I2C2 SCL | PB10 | HIGH — **corrected this revision (ISS-011)**: independently confirmed against the primary AF table (DS-MCU-052, ST DS12992 Rev4 Table 16) that PB10/PB11 map to I2C2, not I2C1 as this document originally (incorrectly) stated |
+| I2C2 SDA | PB11 | HIGH — as above |
 | USART2 TX | PA2 | MODERATE-HIGH — very common STM32 USART2 mapping; not individually re-verified against the exact AF table this session (see §16) |
 | USART2 RX | PA3 | MODERATE-HIGH — as above |
 | Status LED drive | PA5 | ASSUMPTION — arbitrary free GPIO choice (also the conventional "Nucleo LED" pin on many ST boards), no AF conflict since it's used as plain GPIO output |
 | NRST | NRST (pin 4) | HIGH — dedicated reset pin |
-| BOOT0 | not populated this cycle | see §4.4 / §16 — genuinely UNKNOWN whether even bonded out on this package |
+| BOOT0 | not populated this cycle | see §4.2/§4.4/§16 — **corrected this revision (ISS-006)**: BOOT0 is muxed onto PA14 (already committed to SWCLK above), not PB8; PB8 does physically exist on this package but its function is unrelated (alternate I2C1_SCL) |
 
 This leaves **USART1 and LPUART1 both free** (only USART2 is used) —
 satisfies the Component Engineer's own note that one of the MCU's 2 UART
 peripherals should remain genuinely free (only 1 of 2 committed here,
 comfortably; actually both USART1 and LPUART1 remain free since USART2 is
-the one consumed — even better margin than "one free" required).
+the one consumed — even better margin than "one free" required). **Also,
+new this revision (ISS-011)**: since the IMU bus correctly occupies I2C2
+(not I2C1 as originally labeled), **I2C1 is now recorded as entirely
+free** as well — both of PB10/PB11's I2C1-sibling pin pairs (PB6/PB7
+primary AF, PB8/PB9 secondary AF, DS-MCU-053) remain unused. This is a
+genuine improvement in peripheral margin versus this document's original,
+mistaken understanding — not a regression. See §11 for the full free-GPIO
+inventory.
 
 ## 3. Block 1 — Power input + regulation
 
@@ -214,23 +276,128 @@ decoupling) → 3V3 rail. Both values are the **minimum** ceramic values
 from TI's own reference application circuit for this exact part
 (datasheet SLVSDV4) — DS-PWR reference-circuit evidence already cited in
 `bom/component-selection.md`'s Power Regulator section, reused verbatim
-here, no deviation. U3's EN pin (if present on this specific
-variant/package — the "fixed 3.3V, no adjustable EN function needed"
-variant is assumed per the approved part's own fixed-output selection) is
-tied to enable-always per the standard reference circuit; if the exact
-TLV75533 package variant used here has an active EN pin requiring a
-level, tie it to VIN directly (always-enabled) — **flagged as a
-minor implementation detail to confirm against the literal pinout
-diagram** at layout time, not expected to change any electrical
-conclusion in this document.
+here, no deviation.
+
+**EN pin — fixed this revision, no longer hedged (ISS-001)**: U3's EN pin
+(pin 3 on the ordered DBV/SOT-23-5 package) is **firmly and
+unconditionally tied directly to VIN (U3 pin 2)** — always-enabled, per
+TI's own recommended connection for an always-on application, which
+matches this design's use case exactly. This is now an explicit net in
+the net list (§12, `EN_VIN`) and parts-list note (§13), not a
+layout-time judgment call.
+
+This replaces this document's original hedge: *"U3's EN pin (if present
+on this specific variant/package...) is tied to enable-always per the
+standard reference circuit; if the exact TLV75533 package variant used
+here has an active EN pin requiring a level, tie it to VIN directly...
+flagged as a minor implementation detail to confirm against the literal
+pinout diagram at layout time."* Independent research (Hardware Lead,
+this cycle, TI SBVS320D Rev D §4 Table 4-1 pin description, §5.5
+Application Information, §6.4 typical application) confirms:
+
+- EN is a **mandatory** pin present on **every** package variant of this
+  part family (DQN pin 3, DBV pin 3, DYD pin 3, DRV pin 4 — there is no
+  "no-EN"/EN-less variant of this device). The original hedge's premise
+  ("if the exact... variant... has an active EN pin") was not actually a
+  live possibility — every ordering-option variant has one.
+- The EN pin has **no internal pull-up or pull-down bias** — only
+  high-impedance leakage (I_EN ≈ 10nA at EN = 5.5V). The datasheet's only
+  internal "pulldown resistance" specification (≈120Ω) is the *output*
+  discharge switch engaged while the device is disabled, not an EN-pin
+  bias network, and must not be confused with one.
+- A genuinely floating EN pin therefore leaves the enable state
+  undefined: the rail could fail to enable at all (a dead board at
+  bring-up, easily misdiagnosed as a different fault), or sit in the
+  undefined 0.3–1.0V threshold gray zone and chatter/misbehave from
+  coupled digital-switching noise on the board. This is real, undefined
+  behavior — not a theoretical nitpick.
+
+Tying EN→VIN removes this ambiguity entirely, at **zero component cost**
+(one additional trace/via, no resistor, no new part). No other electrical
+conclusion elsewhere in this document changes as a result — enable-always
+was already the design's intended behavior; it is now a firmly committed
+net rather than a deferred, hedged assumption.
 
 AMR/ROC check: U3 Vin = 5.0V nominal (4.75–5.25V per REQ-101) is within
 AMR 6.0V (DS-PWR-002) with 0.75–1.25V margin, and within ROC 1.45–5.5V
 (same evidence) — but the **top of the USB tolerance band (5.25V) leaves
 only ~0.25V of headroom under the 5.5V ROC ceiling**, tighter than the AMR
 margin. This is noted explicitly as a real, if small, margin consideration
-rather than glossed over — it does not exceed any limit, but it is the
-tightest margin anywhere in this design (see §16 and self-check §15 item 1).
+rather than glossed over — it does not exceed any limit against REQ-101's
+own stated band. **§3.5 below addresses why this margin is actually
+tighter still against the real-world USB-C spec, with this revision's
+explicit disposition of that gap (ISS-002) — this is no longer left as a
+silent flag.**
+
+### 3.5 LDO input-voltage margin disposition: the real-world USB-C vSafe5V ceiling (ISS-002, new this revision)
+
+**This entire subsection is new this revision.** §3.4's AMR/ROC check
+above is arithmetically correct against REQ-101's own stated figure
+(4.75–5.25V), but Independent Review found that REQ-101's figure does not
+capture the actual governing specification for the connector this design
+uses.
+
+**The gap**: independent research (Hardware Lead, this cycle) established
+that the real-world input voltage a spec-compliant USB-C/USB-PD source is
+permitted to present — the governing "vSafe5V" range defined by the
+USB-IF — is **4.75V to 5.5V**, wider than REQ-101's stated 4.75–5.25V
+legacy-USB tolerance band. At that wider, genuinely spec-compliant
+worst-case ceiling (5.5V), margin against the LDO's own 5.5V Recommended
+Operating Condition maximum (DS-PWR-002) is **effectively zero** — not
+the ≈0.25V §3.4 computes against REQ-101's narrower figure. A real,
+fully-compliant USB-C charger could legitimately present a Vin at which
+this design's own arithmetic no longer shows headroom.
+
+**Why this is not a damage/safety risk**: even at the worst-case, fully
+spec-compliant 5.5V input, the LDO still sits a full 0.5V (≈9%) under its
+6.0V Absolute Maximum Rating (DS-PWR-002) — real headroom remains, and no
+component damage is expected at 5.5V. Exceeding a Recommended Operating
+Condition (as opposed to an Absolute Maximum Rating) is, per TI's own
+datasheet convention, a "may not meet all specified electrical
+characteristics" caveat, not a "may be damaged" one — i.e. the practical
+worst case here is a regulator that is still safe but may not be fully
+within its datasheet-guaranteed output tolerance/PSRR/dropout
+specification at that exact instant, not a burnt part.
+
+**My disposition recommendation**: I recommend **(a) ACCEPTED-RISK**,
+routed by the Hardware Lead to the human Chief Engineer for the named
+sign-off `docs/architecture.md` §8 requires ("HIGH findings may become
+ACCEPTED-RISK only with named human sign-off"), for these reasons:
+
+- The failure mode at the true worst case is a soft, bounded
+  regulation-margin concern (possible minor output-tolerance/PSRR/dropout
+  degradation at an edge-case input voltage that most real chargers won't
+  actually reach in practice), not a hard functional or safety failure —
+  the 6.0V AMR headroom means there is no damage risk to disposition
+  around.
+- This is explicitly a bench/prototype design (REQ-502: "paper/document
+  design exercise this cycle, not a production schedule"), where a
+  narrow, well-understood, bounded edge-case risk is a reasonable
+  engineering trade rather than a reason to force a part change.
+- The alternative — swapping the LDO — is not something I can decide or
+  execute unilaterally regardless of my own judgment here (per my own
+  agent instructions' "Out of scope": part selection is the Component
+  Engineer's call, routed through the Hardware Lead, not mine to make
+  even when I've identified a part-level concern during design).
+
+**Option (b), noted but not chosen**: if the Hardware Lead judges the
+margin unacceptable even as a bounded, non-damage risk (e.g. because this
+design is expected to graduate beyond a bench prototype, where "may not
+meet all specified electrical characteristics" at the input rail becomes
+a real functional-reliability concern rather than an academic one), I
+flag — without unilaterally implementing — that the Component Engineer
+could be asked to evaluate an alternate LDO with a wider Vin ROC ceiling
+(e.g. a part rated to 5.5V ROC with more headroom, or one rated well
+above 5.5V/6.0V entirely) as a drop-in-footprint or near-drop-in
+replacement. I have not selected or proposed a specific alternate part
+number — that evaluation is the Component Engineer's, not mine, per my
+own agent instructions.
+
+**This finding is not closed by this document.** Per `docs/architecture.md`
+§8, I cannot self-resolve a HIGH finding into ACCEPTED-RISK — I can only
+recommend a disposition with reasoning and hand the routing decision to
+the Hardware Lead (and, for ACCEPTED-RISK specifically, the human Chief
+Engineer). See §16 item 10 for the tracked disposition-pending record.
 
 ## 4. Block 2 — MCU periphery
 
@@ -260,11 +427,48 @@ some larger STM32 packages (with 4+ VDD pins) would need. This was
 verified rather than assumed generically, per the design task's explicit
 instruction.
 
+**Correction this revision (ISS-006)**: the pin-count table above (from
+DS-MCU-046, distributor/aggregator sources) does **not** list a PB8/PB9
+pin, which this document originally read as evidence that PB8 is not
+bonded out on this package at all (see the original §4.2 reasoning this
+replaces, below). Independent research (Hardware Lead, this cycle,
+DS-MCU-051) found this premise was wrong: **PB8 does physically exist**
+on this package, corroborated across the sources checked this cycle,
+correcting the §4.1/§16 UNKNOWN this document originally carried on that
+specific point. (PB8's *exact pin number* within the ranges above was not
+independently re-resolved to full certainty against the primary ST PDF —
+a residual, non-blocking pin-numbering detail carried forward at §16 item
+1/§11, not a re-opening of the VDD/VSS decoupling analysis above, which is
+unaffected either way.) PB8's real function turns out to be an alternate
+I2C1_SCL mapping (DS-MCU-053), not BOOT0 — see §4.2 immediately below for
+the corrected BOOT0 picture.
+
 ### 4.2 BOOT0 / nBOOT_SEL handling
 
 This required real web research since STM32 boot-mode conventions differ
 materially across families (STM32F1-era generic conventions do **not**
 carry over to STM32G0).
+
+**Corrected this revision (ISS-006)** — this subsection's original
+reasoning had a factual error at its premise (see the changelog at the
+top of this document): it assumed BOOT0 was multiplexed with PB8 and,
+finding no PB8 in this design's pin-count research, concluded the whole
+BOOT0-pin question might be moot for this exact part. Independent
+research (Hardware Lead, this cycle, DS-MCU-050/051, corroborated by
+RM0454 and ST Community references) corrects this on two independent
+points at once:
+
+- **BOOT0 is actually multiplexed onto PA14** on this STM32G0x0
+  sub-family — not PB8. PA14 is already committed in this design as the
+  SWD **SWCLK** pin (§2.3, §4.4).
+- **PB8 does physically exist** on this package after all (DS-MCU-051,
+  corroborated §4.1 above) — but its real alternate function is
+  **I2C1_SCL** (secondary AF mapping, DS-MCU-053), entirely unrelated to
+  boot-mode selection. The original UNKNOWN about whether PB8 was even
+  bonded out is now resolved (it is); it was simply never the BOOT0 pin
+  to begin with.
+
+The facts that remain unchanged from the original analysis:
 
 - **nBOOT_SEL option byte factory default = 1** (DS-MCU-044, MODERATE
   confidence — corroborated by 2 independent community sources, a Stack
@@ -277,35 +481,37 @@ carry over to STM32G0).
   option-byte-driven, not physical-pin-driven, by default. This is a
   materially different scheme from STM32F1, where the BOOT0 pin's level
   is sampled directly at every reset.
-- **BOOT0 is multiplexed with GPIO PB8** on STM32G0 parts where PB8 is
-  bonded out (DS-MCU-045, HIGHER confidence — 5 independent sources
-  converge on this, generically for the G0 family / cited example
-  STM32G071).
-- **Unresolved discrepancy, flagged as UNKNOWN (DS-MCU-049)**: this
-  design's own LQFP-32 pinout research (DS-MCU-046, §4.1 above) does
-  **not** show a PB8 pin anywhere in the 32-pin package's pin list (it
-  shows PB0,1,2,3,4,5,10,11 but no PB6/PB7/PB8/PB9). If accurate, this
-  would mean the BOOT0-shared GPIO is **not even bonded out on this
-  specific 32-pin package**, making the whole BOOT0-pin question moot for
-  this exact part — the option byte would be the *only* boot-mode control
-  mechanism that physically exists on this device, independent of
-  whatever the generic G0-family PB8 guidance says for larger packages.
-  However, this conclusion rests on a distributor-sourced pin table, not
-  the primary ST datasheet pin table, so it is presented as
-  best-current-understanding with residual uncertainty, not a fully
-  closed item.
 
-**Design decision**: **no physical BOOT0 pull-down resistor or header is
-populated this cycle.** The design relies entirely on the nBOOT_SEL=1
-factory default (boot from Flash unconditionally); the SWD header (§4.4)
-remains the primary and sufficient programming/debug path, already
-required independently by REQ-002/REQ-107. This is an explicit
+**What this correction actually changes**: with BOOT0 now correctly
+understood to sit on PA14 (not PB8), a dedicated physical BOOT0 circuit
+was **never actually possible** on this design's pin allocation in the
+first place — PA14 was committed to SWCLK before BOOT0's real location was
+even known (§2.3, step 2 of `SKILL.md`'s "fix shared resources serially
+first"), so there was no scenario in which a separate BOOT0 pull
+circuit could have been added without giving up SWCLK. This is a
+materially more complete justification than the original (mistaken)
+"PB8 might not exist" reasoning, though it does **not** change the design
+decision itself.
+
+**No brick risk**: independently reconfirmed this cycle that SWD-based
+recovery/reprogramming remains available **regardless of `nBOOT_SEL`'s
+actual value** — the Cortex-M0+ debug port is independent of the
+application boot-mode sequence, so even if the factory default assumption
+above turns out wrong at bring-up, the board is recoverable via the
+already-present SWD header (§4.4) without any additional hardware.
+
+**Design decision (unchanged)**: **no physical BOOT0 pull-down resistor or
+header is populated this cycle.** The design relies entirely on the
+nBOOT_SEL=1 factory default (boot from Flash unconditionally); the SWD
+header (§4.4) remains the primary and sufficient programming/debug path,
+already required independently by REQ-002/REQ-107. This is an explicit
 scope-limiting decision flagged to the Hardware Lead/Hardware Reviewer
 (§16), not a silent omission — if a future firmware bring-up session
 discovers the factory default is not what was assumed, or that
 nBOOT_SEL needs to be reprogrammed via SWD (which is itself possible using
-only the already-present SWD header, without any extra hardware), that is
-recoverable without a board re-spin.
+only the already-present SWD header, without any extra hardware, and
+carries no brick risk per the point above), that is recoverable without a
+board re-spin.
 
 ### 4.3 NRST decoupling + optional manual reset button (REQ-004, Could)
 
@@ -384,7 +590,10 @@ unexpectedly long traces), the resistor value should drop to 3.3kΩ or
 2.2kΩ at layout time. This is flagged as a layout-stage confirmation
 item, not a currently-known problem.
 
-Both the STM32G031 (I2C1, Fast-mode Plus capable up to 1Mbit/s, DS-MCU-017)
+Both the STM32G031 (**I2C2** — corrected this revision, ISS-011, was
+mislabeled I2C1; Fast-mode Plus capable up to 1Mbit/s per DS-MCU-017,
+which describes the part's 2×I2C peripheral count/capability generically
+and applies equally to either instance since both are the same IP block)
 and the BMI270 (I2C, Fast-mode Plus capable up to 1MHz, DS-IMU-007)
 support Fast-mode Plus, which structurally exceeds the sink-current
 capability needed for plain Fast-mode — so no per-pin current concern on
@@ -409,8 +618,8 @@ own datasheet PDF via this session's search):
 | 10 | OCSB (aux SPI CS) | NC — aux sensor interface unused |
 | 11 | OSDO (aux SPI SDO) | NC — aux sensor interface unused |
 | 12 | CSB | **→ VDDIO** (selects I2C mode — DS-IMU-075; tying to GND or toggling would select SPI instead) |
-| 13 | SCx (SCL/SCLK) | **I2C1 SCL** (MCU PB10), pulled up by R3 |
-| 14 | SDx (SDA/SDI) | **I2C1 SDA** (MCU PB11), pulled up by R4 |
+| 13 | SCx (SCL/SCLK) | **I2C2 SCL** (MCU PB10), pulled up by R3 — corrected this revision, ISS-011 (was mislabeled I2C1 SCL) |
+| 14 | SDx (SDA/SDI) | **I2C2 SDA** (MCU PB11), pulled up by R4 — corrected this revision, ISS-011 (was mislabeled I2C1 SDA) |
 
 **INT1/INT2 deliberately left NC** — this design uses **I2C polling**
 (host reads new data on a timer), not interrupt-driven acquisition. This
@@ -450,7 +659,12 @@ This exceeds the Component Engineer's own note that "one" UART peripheral
 should remain genuinely free (both of the *other* two remain free here,
 since USART2 is the *only* one consumed of the MCU's 2 USART + 1 LPUART
 complement — "2 UARTs" in the approved-part description already accounted
-for USART2 as the consumed one).
+for USART2 as the consumed one). Similarly, on the I2C side (§5): **I2C1
+is now entirely free**, new this revision — the IMU bus correctly uses
+I2C2 (PB10/PB11), not I2C1 as this document originally (incorrectly)
+labeled it (ISS-011, see the changelog at the top of this document and
+§11). This is a genuine peripheral-margin improvement versus this
+document's original, mistaken understanding, not a regression.
 
 No external crystal is populated — the MCU runs off its internal
 HSI16+PLL clock. UART bit-time tolerance at typical baud rates (e.g.
@@ -538,10 +752,15 @@ clearance requirement smaller than a Micro-USB-B design would have.
 
 ## 11. Full MCU pin-assignment table (STM32G031K8T6, LQFP-32)
 
-Power/reset pins per DS-MCU-046 (MODERATE confidence, see §4.1); GPIO
-alternate-function assignments per §2.3 (MODERATE/MODERATE-HIGH
-confidence, standard STM32 conventions, not individually re-pulled from
-the exact AF table this session — see §16).
+Power/reset pins per DS-MCU-046/051 (MODERATE confidence overall pin
+count and numbering; **PB8's existence specifically is now confirmed**,
+corrected this revision, ISS-006 — see §4.1). GPIO alternate-function
+assignments per §2.3: **I2C2 (PB10/PB11) is now HIGH confidence**,
+corrected this revision and independently confirmed against the primary
+AF table (DS-MCU-052, ISS-011); USART2 (PA2/PA3) remains MODERATE-HIGH
+confidence, standard STM32 convention, not individually re-pulled from
+the exact AF table this session — unchanged this revision, out of scope,
+see §16.
 
 | Pin # | Name | Function in this design | Notes |
 |---|---|---|---|
@@ -552,31 +771,51 @@ the exact AF table this session — see §16).
 | 6–15 | PA0–PA9 (GPIO, selected used below) | PA2=USART2_TX, PA3=USART2_RX, PA5=LED drive; others free | §2.3, §6, §7 |
 | 16 | VSS | GND | Power pin |
 | 17 | VDD | 3V3 (via C3) | §4.1 |
-| 18–25 | PA10–PA15, PB0–PB1 (selected used below) | PA13=SWDIO, PA14=SWCLK; others free | §4.4 |
-| 26–31 | PB2–PB5, PB10, PB11 (selected used below) | PB10=I2C1_SCL, PB11=I2C1_SDA; others free | §5.3 |
+| 18–25 | PA10–PA15, PB0–PB1 (selected used below) | PA13=SWDIO, PA14=SWCLK (also this sub-family's BOOT0 mux pin, corrected this revision — ISS-006, §4.2); others free | §4.4 |
+| 26–31 | PB2–PB5, PB10, PB11 (selected used below) | PB10=**I2C2**_SCL, PB11=**I2C2**_SDA — corrected this revision, ISS-011 (was labeled I2C1); others free | §5.3 |
 | 32 | VBAT | 3V3 (direct tie) | §4.1 |
+
+**PB8/PB9 note (new this revision, ISS-006)**: PB8 and PB9 are now
+confirmed to physically exist on this package (DS-MCU-051/053) but are
+not shown as a distinct row above — their exact pin numbers were not
+independently re-resolved against the primary ST datasheet this session
+(a residual, non-blocking pin-numbering uncertainty, §16 item 1); they
+fall somewhere within the ranges already listed and are counted in the
+free-GPIO inventory below. Their real function is the secondary AF6
+mapping for **I2C1_SCL/I2C1_SDA** respectively (DS-MCU-053) — unrelated
+to BOOT0, which this document originally (incorrectly) suspected.
 
 Full free-GPIO inventory after this design's allocation (for the
 Mechanical/future-firmware team's reference, not individually itemized
 above): PA0, PA1, PA4, PA6, PA7, PA8, PA9, PA10, PA11, PA12, PA15, PB0,
-PB1, PB2, PB3, PB4, PB5 — 17 GPIOs remain completely free, including both
-free UART peripherals (USART1, LPUART1) and SPI1/SPI2 (unused this
-cycle since I2C was chosen for the IMU, §5.1).
+PB1, PB2, PB3, PB4, PB5 — 17 GPIOs remain completely free, **plus PB8 and
+PB9, now confirmed to exist (corrected this revision, ISS-006/DS-MCU-051
+— exact pin numbers not independently re-resolved this session, §16 item
+1)**, bringing the free-GPIO count to **19**. This includes both free
+UART peripherals (USART1, LPUART1), SPI1/SPI2 (unused this cycle since
+I2C was chosen for the IMU, §5.1), and — **new this revision (ISS-011)**
+— **I2C1 in its entirety** (PB6/PB7 primary AF mapping, or PB8/PB9
+secondary AF mapping, DS-MCU-053), since the IMU bus is now correctly
+understood to occupy I2C2 (PB10/PB11), not I2C1 as this document
+originally, mistakenly, labeled it. This is a genuine improvement in
+peripheral margin versus this document's original understanding — not a
+regression.
 
 ## 12. Net list summary (net-by-net)
 
 | Net | Connects |
 |---|---|
-| VBUS_5V | J1 (USB-C VBUS contact) → U4 pin 5 (VBUS) → C1 → U3 IN |
+| VBUS_5V | J1 (USB-C VBUS contact) → U4 pin 5 (VBUS) → C1 → U3 IN(pin2) |
+| **EN_VIN** *(new this revision, ISS-001)* | **U3 EN(pin3) → U3 IN(pin2)** — firm, unconditional direct tie (always-enabled per TI's own recommended connection, §3.4); electrically the same node as VBUS_5V at U3's IN pin, broken out as its own named net for traceability since this connection was previously hedged/unconfirmed rather than firmly committed |
 | CC1 | J1 CC1 contact → R1 (5.1kΩ) → GND |
 | CC2 | J1 CC2 contact → R2 (5.1kΩ) → GND |
 | 3V3 | U3 OUT → C2 → U1 VDD(pin17)/VDDA(pin5, via C4)/VBAT(pin32) → U2 VDD(pin8, via C6)/VDDIO(pin5, via C7) → R3/R4 (I2C pull-ups) → R5 (LED resistor) → J2 pin "3V3" → J3 pin "VDD" |
 | GND | U1 VSS(pins1,16) → U2 GND(pin7)/GNDIO(pin6) → U3 GND → U4 GND(pin2) → R1/R2 return → C1–C9 return sides → D1 cathode (via R5) → SW1 one leg → J1 shell/GND contact → J2 pin "GND" → J3 pin "GND" |
 | NRST | U1 NRST(pin4) → C5 → GND; also → SW1 → GND (momentary) |
 | SWDIO | U1 PA13(pin?) → J3 pin "SWDIO" |
-| SWCLK | U1 PA14(pin?) → J3 pin "SWCLK" |
-| I2C1_SCL | U1 PB10 → R3 (pull-up to 3V3) → U2 SCx(pin13) |
-| I2C1_SDA | U1 PB11 → R4 (pull-up to 3V3) → U2 SDx(pin14) |
+| SWCLK | U1 PA14(pin?) → J3 pin "SWCLK" (PA14 also carries this sub-family's BOOT0 mux function — corrected this revision, ISS-006, §4.2; no separate BOOT0 net exists, see §13) |
+| **I2C2_SCL** *(corrected this revision, ISS-011 — was named I2C1_SCL)* | U1 PB10 → R3 (pull-up to 3V3) → U2 SCx(pin13) |
+| **I2C2_SDA** *(corrected this revision, ISS-011 — was named I2C1_SDA)* | U1 PB11 → R4 (pull-up to 3V3) → U2 SDx(pin14) |
 | IMU_CSB | U2 CSB(pin12) → VDDIO (tied, selects I2C mode) |
 | IMU_SDO | U2 SDO(pin1) → GND (tied, selects address 0x68) |
 | UART_TX | U1 PA2 (USART2_TX) → J2 pin "TX" |
@@ -592,7 +831,7 @@ cycle since I2C was chosen for the IMU, §5.1).
 |---|---|---|
 | U1 | STMicroelectronics STM32G031K8T6 | MCU, LQFP-32 |
 | U2 | Bosch Sensortec BMI270 | IMU, LGA-14 |
-| U3 | Texas Instruments TLV75533PDBVR | LDO, SOT-23-5, 3.3V fixed |
+| U3 | Texas Instruments TLV75533PDBVR | LDO, SOT-23-5, 3.3V fixed; EN (pin 3) tied directly to VIN (pin 2) — firm this revision, §3.4/ISS-001 |
 | U4 | STMicroelectronics USBLC6-2SC6 | ESD protection, SOT-23-6 |
 | J1 | USB-C receptacle | MPN not formally selected; illustrative real part GCT USB4125/4105 family used for height estimate only (§10) |
 | J2 | 4-pin header | UART: TX/RX/GND/3V3 (REQ-106) |
@@ -600,7 +839,7 @@ cycle since I2C was chosen for the IMU, §5.1).
 | SW1 | Momentary pushbutton, N.O. | Manual reset (REQ-004, Could) |
 | D1 | Generic indicator LED | MPN not selected; Vf≈2.0V assumed |
 | R1, R2 | 5.1kΩ | USB-C CC1/CC2 pull-downs (DS-CONN-001) |
-| R3, R4 | 4.7kΩ | I2C SCL/SDA pull-ups (§5.2) |
+| R3, R4 | 4.7kΩ | I2C SCL/SDA pull-ups (§5.2) — now correctly understood as the I2C2 bus, ISS-011 |
 | R5 | 330Ω | LED current-limit resistor |
 | C1 | 1µF ceramic | LDO input decoupling (min per TI ref circuit) |
 | C2 | 0.47µF ceramic | LDO output decoupling (min per TI ref circuit) |
@@ -614,7 +853,9 @@ cycle since I2C was chosen for the IMU, §5.1).
 | MH1–MH4 | Mounting holes | M2.5, ×4, see §10 |
 
 **No BOOT0 pull-down resistor or header is included** — deliberate
-decision, §4.2.
+decision, §4.2 (reasoning corrected this revision, ISS-006: BOOT0 is
+muxed onto PA14/SWCLK, not PB8 as originally written; the design decision
+itself is unchanged).
 
 ## 14. Mandatory 18-item checklist walkthrough (my own agent instructions)
 
@@ -622,18 +863,26 @@ Every item addressed explicitly; each either cites an Evidence ID/REQ-ID
 or states a clear ASSUMPTION/UNKNOWN, per the design task's instruction
 not to skip any.
 
-1. **Supply Voltage** — 5V USB VBUS (REQ-101, 4.75–5.25V) → 3.3V regulated
-   (DS-PWR-003). See §2.1, §3.4.
+1. **Supply Voltage** — 5V USB VBUS (REQ-101, 4.75–5.25V; real-world
+   USB-C vSafe5V ceiling up to 5.5V per independent research this
+   revision, ISS-002) → 3.3V regulated (DS-PWR-003). See §2.1, §3.4/§3.5
+   (§3.5 now carries an explicit disposition recommendation for the
+   vSafe5V margin question, not a silent gap).
 2. **Logic Voltage** — single 3.3V logic throughout (REQ-102); no level
    shifting anywhere. See §2.1.
-3. **Absolute Maximum Ratings** — MCU VDD AMR upper 4.0V confirmed
-   (DS-MCU-012, lower bound UNKNOWN, carried forward, §1); IMU VDD/VDDIO
+3. **Absolute Maximum Ratings** — MCU VDD AMR **−0.3V to 4.0V** (DS-MCU-012,
+   lower bound resolved this revision — ISS-010, §1); IMU VDD/VDDIO
    AMR −0.3…+3.6V (DS-IMU-004); LDO Vin AMR 6.0V (DS-PWR-002). All
-   satisfied at the 3.3V/5V operating points used (§3.4, §5.4).
+   satisfied at the 3.3V/5V operating points used (§3.4, §5.4), including
+   at the real-world worst-case 5.5V USB-C input (§3.5) — 0.5V/9%
+   headroom remains even there.
 4. **Recommended Operating Conditions** — MCU VDD ROC 1.7–3.6V
    (DS-MCU-013); IMU VDD/VDDIO ROC 1.71–3.6V/1.2–3.6V; LDO Vin ROC
-   1.45–5.5V (DS-PWR-002, tight top-end margin flagged §3.4/§16). All
-   satisfied.
+   1.45–5.5V (DS-PWR-002; top-end margin against the real-world USB-C
+   vSafe5V ceiling is effectively zero — addressed explicitly this
+   revision with a recommended ACCEPTED-RISK disposition, §3.5, ISS-002,
+   not left as a silent flag). All satisfied against REQ-101's own stated
+   band; §3.5 documents the residual real-world-spec margin question.
 5. **Current (per-pin and total)** — full computation in
    `hardware/power-budget.md`: ≈16.2mA worst-case / ≈7.0mA typical on the
    3V3 rail vs. 300mA (REQ-103) and 500mA (DS-PWR-003) ceilings — ≈95–97%
@@ -650,9 +899,14 @@ not to skip any.
    C1(in)/C2(out); NRST: C5. All per each part's own recommended values
    (§4.1, §4.3, §3.4, §5.3).
 8. **Pull-up/Pull-down** — I2C: R3/R4=4.7kΩ, sized per NXP UM10204
-   (DS-IFACE-001, §5.2); USB-C CC: R1/R2=5.1kΩ per USB-IF spec
-   (DS-CONN-001, §3.1); BOOT0: none populated, see §4.2/§16; NRST: internal
-   pull-up only, per AN5096 (DS-MCU-047, §4.3).
+   (DS-IFACE-001, §5.2), on what is now correctly labeled the I2C2 bus
+   (corrected this revision, ISS-011); USB-C CC: R1/R2=5.1kΩ per USB-IF spec
+   (DS-CONN-001, §3.1); BOOT0: none populated, see §4.2/§16 (reasoning
+   corrected this revision, ISS-006: BOOT0 is on PA14, not PB8); NRST: internal
+   pull-up only, per AN5096 (DS-MCU-047, §4.3). Separately, not a
+   resistor pull but the same "under-specified pin" category: LDO EN is
+   now a firm direct tie to VIN rather than a hedge — see item 17 below
+   and §3.4 (ISS-001).
 9. **Protection** — ESD/transient: USBLC6-2SC6 (DS-PROT-001/002, §3.2);
    reverse-voltage: mechanically-keyed connector, no series diode
    (§3.3, flagged for Hardware Reviewer); overcurrent: none added — no
@@ -678,14 +932,27 @@ not to skip any.
     UART: no fixed clock requirement beyond internal-oscillator baud-rate
     tolerance (§6), judged adequate for a point-to-point link at typical
     baud rates.
-13. **MCU pin function** — full pin table in §11; BOOT0/boot-strap pin
-    handling in §4.2 (flagged UNKNOWN re: physical bonding on this exact
-    package); SWD dedicated pins (PA13/PA14) confirmed HIGH confidence;
-    I2C/UART alternate-function assignments flagged MODERATE/MODERATE-HIGH
-    confidence pending AF-table re-verification (§16).
+13. **MCU pin function** — **re-checked this revision (ISS-011, ISS-006)**.
+    Full pin table in §11, now correctly showing **I2C2** (not I2C1) on
+    PB10/PB11 — independently confirmed via ST's primary AF table
+    (DS-MCU-052, ST DS12992 Rev4 Table 16), upgraded from MODERATE to HIGH
+    confidence for this specific pin pair. BOOT0/boot-strap pin handling
+    in §4.2 corrected: BOOT0 is muxed onto **PA14** (shared with SWCLK),
+    not PB8; PB8 does physically exist on this package (DS-MCU-051) but
+    its function is I2C1_SCL (DS-MCU-053), unrelated to BOOT0 — the
+    physical-bonding UNKNOWN that previously blocked this item is
+    resolved (PB8 exists), though the nBOOT_SEL factory-default value
+    itself remains community-sourced only, tracked as a residual bring-up
+    verification item, not a pin-function unknown (§16). SWD dedicated
+    pins (PA13/PA14) remain confirmed HIGH confidence, noting PA14's dual
+    SWCLK/BOOT0-mux role explicitly. USART2 alternate-function assignment
+    (PA2/PA3) remains MODERATE-HIGH confidence pending AF-table
+    re-verification — unchanged this revision, out of scope for this
+    cycle's HIGH-finding rework (§16).
 14. **Interfaces (I2C/SPI/UART per each datasheet's recommended
     application circuit)** — I2C: BMI270's own recommended schematic
-    followed exactly for decoupling/mode-select pins (§5.3, DS-IMU-074/075/076);
+    followed exactly for decoupling/mode-select pins (§5.3, DS-IMU-074/075/076)
+    — the MCU-side peripheral is **I2C2**, corrected this revision, ISS-011;
     UART: standard MCU USART2 mapping, no deviation from any datasheet
     recommendation since UART wiring is header-defined, not
     datasheet-constrained; SPI: not used (I2C chosen, §5.1).
@@ -702,12 +969,16 @@ not to skip any.
     Component Engineer's own LDO-vs-switching trade-off discussion in
     `bom/component-selection.md`).
 17. **Recommended Application Circuit** — LDO: followed exactly, no
-    deviation (§3.4). IMU: followed almost exactly; INT1/INT2 left NC is
+    deviation, **including EN→VIN, fixed firmly this revision (§3.4,
+    ISS-001)** — previously a hedged connection, now a firm commitment
+    matching TI's own always-enabled reference circuit exactly. IMU:
+    followed almost exactly; INT1/INT2 left NC is
     a deliberate, logged deviation (polling instead of interrupt-driven,
     §5.3). MCU: no external crystal populated is a deliberate, logged
     deviation from a "full" application circuit that might include one
-    (§6); no physical BOOT0 circuit is a deliberate, logged deviation/scope
-    decision (§4.2). ESD IC: D+/D− channels left unpopulated is a
+    (§6); no physical BOOT0 circuit is a deliberate, logged
+    deviation/scope decision (§4.2, reasoning corrected this revision —
+    ISS-006). ESD IC: D+/D− channels left unpopulated is a
     deliberate, logged deviation from the part's full 4-line typical
     application (§3.2).
 18. **Mechanical/Thermal co-design** — explicitly **N/A**, §9 (REQ-202, no
@@ -721,14 +992,25 @@ independent Hardware Reviewer pass (`.github/agents/circuit-engineer.agent.md`
 review is mandatory regardless of how confident you are"). Intent: catch
 the obvious issues myself before handoff.
 
-1. **Voltage violation** — Not found. All operating points sit inside
-   each part's own ROC (§14 items 3–4). The tightest margin in the whole
-   design is the LDO's Vin ROC top-end (5.25V actual vs. 5.5V ceiling,
-   ≈0.25V/4.5% headroom, §3.4) — small but not a violation.
-2. **Absolute Maximum Rating violation** — Not found, with one caveat:
-   MCU VDD AMR lower bound is UNKNOWN (never independently confirmed, §1) —
-   cannot fully close this item for that one specific parameter, though
-   the risk is judged low since 3.3V sits deep inside the confirmed ROC.
+1. **Voltage violation** — Not found against each part's own ROC (§14
+   items 3–4). The tightest margin in the whole design is the LDO's Vin
+   ROC top-end: against REQ-101's own stated 4.75–5.25V band this was
+   ≈0.25V/4.5% headroom, but **corrected this revision (ISS-002)** — the
+   real-world USB-C/USB-PD vSafe5V ceiling is actually up to 5.5V, i.e.
+   effectively **zero margin** against the LDO's 5.5V ROC ceiling at a
+   legitimate worst-case input. This is not classified as a "voltage
+   violation" against the LDO's ROC in the sense of exceeding it (5.5V in
+   = 5.5V ROC ceiling, not exceeding it), but the margin is thin enough
+   that it is called out explicitly with its own disposition in §3.5
+   rather than being silently accepted — see §16 item 10.
+2. **Absolute Maximum Rating violation** — Not found. **Resolved this
+   revision (ISS-010)**: MCU VDD AMR lower bound is now confirmed at
+   −0.3V (Hardware Reviewer verification against ST DS12992 Rev4 Table
+   18, §1) — the previous UNKNOWN that partially blocked this item is
+   closed. Separately, re-verified against §3.5's ISS-002 finding: even
+   at the real-world worst-case 5.5V LDO input, the LDO's 6.0V Vin AMR is
+   not violated (0.5V/9% headroom remains) — this is a ROC-margin
+   question (item 1 above), not an AMR violation.
 3. **Current limit** — Not found. ≈16.2mA worst-case vs. 500mA LDO rating
    and 300mA REQ-103 ceiling — no pin or rail is anywhere near a limit
    (§14 item 5, `hardware/power-budget.md`).
@@ -737,7 +1019,17 @@ the obvious issues myself before handoff.
 5. **Missing decoupling capacitor** — Not found. Every VDD/VDDA/VBAT/VDDIO
    pin has its own cap per the relevant datasheet's own recommendation
    (§14 item 7).
-6. **Floating pin** — Reviewed pin-by-pin: all IMU pins are either wired
+6. **Floating pin** — **Corrected/resolved this revision for the LDO EN
+   pin (ISS-001)**: the LDO's EN (pin 3) previously carried a hedge
+   ("if the exact package variant... requires a level, tie it to VIN...
+   flagged as a minor implementation detail to confirm... at layout
+   time") which was, on reflection, exactly the kind of unconfirmed
+   floating-pin risk this checklist item exists to catch — EN has no
+   internal pull-up/pull-down (TI SBVS320D, §3.4) and a genuinely
+   floating EN produces undefined output behavior. This is now a firm,
+   unconditional direct tie to VIN (§3.4, §12 `EN_VIN` net) — resolved,
+   not merely mitigated. IMU pins: reviewed pin-by-pin as before — all
+   IMU pins are either wired
    to a net or deliberately tied off (CSB→VDDIO, SDO→GND) except INT1,
    INT2, and the aux-interface pins (ASDx/ASCx/OCSB/OSDO), which are left
    genuinely NC — this is a **deliberate, logged decision** (§5.3), not an
@@ -755,12 +1047,19 @@ the obvious issues myself before handoff.
    diode inputs with no signal to protect, not floating in the
    "unintended" sense the checklist targets.
 7. **Incorrect pull-up/pull-down** — Not found on I2C (§5.2, sized via a
-   real formula, not assumed) or USB-C CC (§3.1, spec-fixed value). BOOT0
-   pull-down deliberately omitted — logged as a scope decision (§4.2), not
+   real formula, not assumed, now correctly labeled as the I2C2 bus,
+   ISS-011) or USB-C CC (§3.1, spec-fixed value). BOOT0
+   pull-down deliberately omitted — logged as a scope decision (§4.2,
+   **reasoning corrected this revision, ISS-006**: BOOT0 is muxed onto
+   PA14/SWCLK, not PB8; the design decision to omit a physical BOOT0
+   circuit and rely on nBOOT_SEL's factory default is unchanged, only the
+   pin-identity reasoning behind it is now accurate), not
    an oversight, but flagged again here since "incorrect
    pull-up/pull-down" could arguably be read to include "missing one that
    should exist" — my own position is that it's not missing (relies on
-   nBOOT_SEL default instead), but this is exactly the kind of judgment
+   nBOOT_SEL default instead, and §4.2 now also notes this carries no
+   brick risk since SWD recovery is independent of nBOOT_SEL state), but
+   this is exactly the kind of judgment
    call an independent reviewer should re-examine (§16).
 8. **Logic voltage mismatch** — Not found. Single 3.3V logic throughout,
    no mismatched-voltage interface anywhere (§14 item 2).
@@ -793,11 +1092,13 @@ the obvious issues myself before handoff.
 16. **Datasheet recommendation violation** — All four parts' own
     recommended application circuits were followed, with every deviation
     explicitly logged and justified (§14 item 17 lists all four:
-    LDO=none, IMU=INT1/INT2 NC, MCU=no crystal/no BOOT0 circuit, ESD
+    LDO=none — **now including the EN→VIN tie fixed firmly this
+    revision, ISS-001**, IMU=INT1/INT2 NC, MCU=no crystal/no BOOT0
+    circuit (reasoning corrected, ISS-006), ESD
     IC=D+/D− NC). No unlogged/silent deviation identified in this
     self-check.
 
-**Self-check summary**: no CRITICAL or HIGH-severity issue identified by
+**Self-check summary (Cycle 1, original)**: no CRITICAL or HIGH-severity issue identified by
 my own pass. Several items carry an explicit residual flag for the
 independent Hardware Reviewer to re-examine with fresh eyes (item 2's AMR
 lower-bound UNKNOWN, item 6's IMU floating-pin judgment call, item 7's
@@ -806,45 +1107,112 @@ BOOT0-pull-down scope decision, item 9's I2C capacitance sensitivity, item
 precisely so the Hardware Reviewer knows where to look first, not because
 I believe them to be actual defects.
 
+**Re-self-check after Rev 2 fixes (this revision)**: focused re-check of
+items most relevant to the three HIGH findings and the two folded-in
+corrections, per my own agent instructions' handoff requirement —
+
+- **Item 1 (Voltage) / Item 2 (AMR)** — ISS-010's AMR lower-bound UNKNOWN
+  is closed. ISS-002's ROC-margin question is not silently left open: it
+  now has an explicit disposition and recommendation in §3.5 (my
+  recommendation: ACCEPTED-RISK, routed to the human Chief Engineer per
+  `docs/architecture.md` §8 — see the handoff summary). I am not
+  declaring ISS-002 resolved myself; that requires the named human
+  sign-off the architecture doc specifies.
+- **Item 6 (Floating pin)** — ISS-001's LDO EN pin is resolved: firm
+  direct tie to VIN, no remaining hedge, matches TI's own recommended
+  always-enabled connection exactly.
+- **Item 7 (Incorrect pull-up/pull-down)** — ISS-006's BOOT0 reasoning is
+  corrected (PA14, not PB8); the underlying design decision (no physical
+  BOOT0 circuit) was already sound and remains unchanged — only the
+  justification is now accurate. This item's residual flag (worth
+  independent re-examination) still stands, unrelated to the correction.
+- **Item 13 equivalent, §14 item 13 (MCU pin function)** — ISS-011's
+  I2C1→I2C2 mislabeling is corrected everywhere I have found it
+  (§2.3, §5.2, §5.3, §6, §11, §12, §13, §14); confidence for this
+  specific pin pair upgraded to HIGH.
+- **Item 16 (Datasheet recommendation violation)** — LDO recommended
+  circuit is now followed exactly with no remaining hedge (EN→VIN firm).
+
+No new CRITICAL or HIGH-severity issue was introduced by these fixes
+themselves (verified: no new floating pin, no new AMR/ROC excursion, no
+pin-table/net-list inconsistency found on this pass — see also the final
+cross-section consistency check noted in the changelog at the top of
+this document). ISS-002 remains, by design, an item for Hardware
+Lead/Chief Engineer disposition rather than something I can close
+unilaterally.
+
 ## 16. Open UNKNOWNs (for Hardware Lead / Hardware Reviewer)
+
+**Annotation convention (new this revision)**: items below are annotated
+**RESOLVED**/**CORRECTED** in place where this revision's rework closed
+them, rather than being deleted or renumbered — this preserves external
+cross-references that already cite specific item numbers (e.g.
+`validation/design-review.md`'s "§16 UNKNOWN #2" and "§4.1/§16 UNKNOWN
+#1"). A new item 10 is appended (not inserted) for the one finding
+(ISS-002) that is a **known fact pending a disposition decision**, a
+different category from the other items' original "unconfirmed fact"
+framing.
 
 In priority order:
 
-1. **BOOT0/PB8 pin-bonding status on the exact STM32G031K8T6 LQFP-32
-   package is UNKNOWN** (DS-MCU-049). My own pin-count research
+1. **BOOT0/PB8 pin-bonding status — CORRECTED this revision (ISS-006).**
+   Originally: "BOOT0/PB8 pin-bonding status on the exact STM32G031K8T6
+   LQFP-32 package is UNKNOWN (DS-MCU-049). My own pin-count research
    (DS-MCU-046) does not show a PB8 pin in this package's pin list at
-   all, which — if accurate — would mean the whole BOOT0-pin question is
-   moot for this exact part (option byte `nBOOT_SEL` would be the only
-   boot-mode control mechanism that physically exists). This was not
-   resolved against the primary ST datasheet PDF this session (only
-   distributor/aggregator mirrors). **Design decision taken despite this
-   UNKNOWN**: no physical BOOT0 circuit populated, relying on the
-   nBOOT_SEL=1 factory default (DS-MCU-044, itself only MODERATE
-   confidence). Recommend the Hardware Reviewer (or a future session with
-   access to the raw ST RM0454/datasheet PDF) re-verify both the pin-bonding
-   question and the nBOOT_SEL default before this design is considered
-   final for fabrication (not a blocker for this paper-design cycle,
-   REQ-502).
-2. **STM32G031K8T6 VDD Absolute Maximum Rating lower bound is UNKNOWN**
-   (carried forward from `bom/component-selection.md`, not resolved this
-   session either, DS-MCU-012 only confirms the 4.0V upper bound). Low
-   practical risk (3.3V sits deep inside the confirmed ROC) but formally
-   still an open gap.
+   all..." **This is now corrected, not merely re-flagged**: independent
+   research this cycle (Hardware Lead, DS-MCU-051/053) confirms PB8
+   *does* physically exist on this package, **and** confirms BOOT0 is not
+   muxed onto PB8 at all — BOOT0 is muxed onto **PA14** (already this
+   design's SWCLK pin, §4.2/§4.4), while PB8's real function is the
+   secondary AF6 mapping for I2C1_SCL (DS-MCU-053). The original "PB8
+   doesn't exist, so the BOOT0 question is moot" reasoning was simply
+   wrong on both counts — PB8 exists, and it was never the BOOT0 pin to
+   begin with. **Residual, non-blocking**: PB8/PB9's *exact pin numbers*
+   within the LQFP-32 package were not independently re-resolved against
+   the primary ST datasheet this session (they fall within the ranges
+   already listed in §11); this does not affect the design decision below.
+   **Design decision (unchanged)**: no physical BOOT0 circuit populated,
+   relying on the nBOOT_SEL=1 factory default (DS-MCU-044, MODERATE
+   confidence, still not independently re-verified this session) — this
+   decision was always correct, now for the accurate reason. §4.2 also
+   newly notes there is no brick risk from this either way, since SWD
+   recovery does not depend on nBOOT_SEL state. Recommend the Hardware
+   Reviewer (or a future session with access to the raw ST RM0454/datasheet
+   PDF) still re-verify the nBOOT_SEL default value itself before this
+   design is considered final for fabrication (not a blocker for this
+   paper-design cycle, REQ-502).
+2. **STM32G031K8T6 VDD Absolute Maximum Rating lower bound — RESOLVED
+   this revision (ISS-010).** Originally UNKNOWN (carried forward from
+   `bom/component-selection.md`, DS-MCU-012 only confirmed the 4.0V upper
+   bound). **Now resolved**: the Hardware Reviewer independently verified
+   the lower bound at **−0.3V** against ST DS12992 Rev4 Table 18 — see
+   §1. No remaining gap on this item.
 3. **STM32G031K8T6 VDD/VSS exact pin count has a moderate-confidence
    discrepancy across sources** (DS-MCU-046: 1 VDD/2 VSS from 3
    converging distributor sources vs. a separate lower-detail source
    claiming 1 VDD/1 VSS). VDD=1 is corroborated by both, so the
    decoupling plan (§4.1) is unaffected regardless of which VSS count is
    correct — flagged for completeness, not because it changes any design
-   decision.
-4. **I2C1/USART2 alternate-function pin assignments (PB10/PB11 for I2C1
-   SCL/SDA; PA2/PA3 for USART2 TX/RX) were not individually re-verified
-   against the exact STM32G031K8T6 alternate-function table this
-   session** — these are very standard STM32 conventions (MODERATE /
-   MODERATE-HIGH confidence per §2.3) but should be confirmed against
+   decision. **Unchanged this revision** — out of scope, not one of this
+   cycle's HIGH findings or folded-in corrections.
+4. **I2C1/USART2 alternate-function pin assignments — PARTIALLY RESOLVED
+   this revision.** Originally: "PB10/PB11 for I2C1 SCL/SDA; PA2/PA3 for
+   USART2 TX/RX were not individually re-verified against the exact
+   STM32G031K8T6 alternate-function table this session... MODERATE /
+   MODERATE-HIGH confidence." **The PB10/PB11 portion is now resolved,
+   and it was a real mislabeling, not just an unverified assumption**:
+   independent research this cycle (Hardware Lead, DS-MCU-052, ST
+   DS12992 Rev4 Table 16) confirms PB10/PB11 map to **I2C2**, not I2C1
+   (ISS-011) — corrected throughout this document (§2.3, §5.2, §5.3, §6,
+   §11, §12, §13, §14), now HIGH confidence. Credit: Hardware Lead's
+   independent re-verification resolved a genuine defect in this
+   document, not merely a documentation gap. **The USART2 (PA2/PA3)
+   portion remains open, unchanged this revision** — still
+   MODERATE-HIGH confidence, standard STM32 convention, not individually
+   re-pulled from the exact AF table; should still be confirmed against
    the real AF table (or via STM32CubeMX) before committing to a PCB
-   layout. Low risk of being wrong given how conventional these mappings
-   are across the STM32 family, but not yet a closed item.
+   layout. Low risk of being wrong given how conventional this mapping
+   is, but not yet a closed item.
 5. **BMI270 floating/NC pin guidance (INT1, INT2, ASDx, ASCx, OCSB, OSDO)
    was not independently re-verified against the BMI270 datasheet's own
    explicit floating-pin recommendations this session** — I assumed
@@ -852,28 +1220,59 @@ In priority order:
    (aux-interface, interrupts) is software-disabled, consistent with
    common practice for this class of part, but this specific claim
    should get a fresh look from the Hardware Reviewer (flagged explicitly
-   in my own self-check, §15 item 6).
+   in my own self-check, §15 item 6). **Unchanged this revision** — out
+   of scope, not one of this cycle's HIGH findings or folded-in
+   corrections.
 6. **Whether "reverse-polarity protection" in REQ-402 is satisfied by a
    mechanically-keyed connector alone, or was intended to require a
    discrete series diode regardless**, is a judgment call I made (§3.3)
    that the Hardware Reviewer or Hardware Lead may want to weigh in on —
-   not a factual UNKNOWN so much as an interpretive one.
+   not a factual UNKNOWN so much as an interpretive one. **Unchanged
+   this revision** — relates to ISS-004/ISS-012, explicitly out of scope
+   for this cycle (Hardware Lead will route separately).
 7. **Onboard overcurrent protection (e.g. a resettable PTC fuse on
    VBUS) was judged unnecessary** and not added, reasoning that USB
    hosts/hubs already provide upstream overcurrent protection — this
    judgment was not independently re-verified against any specific
    host-side spec this session (§14 item 9), flagged for the Hardware
-   Reviewer.
+   Reviewer. **Unchanged this revision** — relates to ISS-005, explicitly
+   out of scope for this cycle.
 8. **J1's exact USB-C receptacle MPN, and D1's exact LED MPN, are not
    formally selected this cycle** — both are placeholders (illustrative
    real parts cited only for the board-geometry height estimate and the
    LED forward-voltage assumption, respectively). Selecting exact MPNs is
-   a follow-on BOM task, not blocking this design document.
-9. **U3's exact EN-pin behavior on this specific TLV75533PDBVR
-   package/variant was not re-confirmed against the literal pinout
-   diagram this session** (§3.4) — assumed tied to always-enabled per the
-   standard reference circuit; low-risk, flagged for layout-stage
-   confirmation.
+   a follow-on BOM task, not blocking this design document. **Unchanged
+   this revision** — out of scope, not one of this cycle's HIGH findings.
+9. **U3's exact EN-pin behavior — RESOLVED this revision (ISS-001).**
+   Originally: "not re-confirmed against the literal pinout diagram this
+   session... assumed tied to always-enabled per the standard reference
+   circuit; low-risk, flagged for layout-stage confirmation." **Now
+   resolved, and firmly**: independent research this cycle (Hardware
+   Lead, TI SBVS320D Rev D §4/§5.5/§6.4) confirms the TLV75533PDBVR's
+   5-pin SOT-23-5 (DBV) package EN pin (pin 3) is mandatory (present on
+   every package variant) with no internal pull-up/pull-down — a
+   genuinely floating EN would produce undefined behavior. This design
+   now implements a firm, unconditional direct tie from EN (pin 3) to
+   VIN (pin 2), matching TI's own recommended always-enabled connection
+   exactly (§3.4, §12 `EN_VIN` net, §13 parts list). No remaining hedge
+   or layout-stage confirmation needed on this point.
+10. **ISS-002 — LDO input-voltage margin against the real-world USB-C
+    vSafe5V ceiling: known facts, pending Hardware Lead/Chief Engineer
+    disposition (new this revision, not an "unconfirmed fact" UNKNOWN
+    like the items above — the facts themselves are settled).** The real
+    USB-C/USB-PD vSafe5V ceiling is 4.75–5.5V (wider than REQ-101's
+    stated 4.75–5.25V), leaving effectively zero margin against the
+    TLV75533PDBVR's 5.5V Vin Recommended Operating Condition ceiling at a
+    legitimate worst-case input — though the LDO's 6.0V Absolute Maximum
+    Rating still provides real headroom (0.5V/9%) even at 5.5V, so this
+    is a regulation-margin concern, not a damage risk. Full disposition
+    discussion and my own recommendation (ACCEPTED-RISK, per
+    `docs/architecture.md` §8, requiring named human Chief Engineer
+    sign-off — with option (b), an alternate-LDO evaluation, noted but
+    not chosen) is in the new §3.5. **This item is explicitly not closed
+    by this document** — it requires the Hardware Lead to route it for
+    the human sign-off the architecture doc specifies before it can be
+    marked resolved or accepted.
 
 ## 17. Power budget (summary — full detail in `hardware/power-budget.md`)
 
@@ -896,24 +1295,65 @@ In priority order:
 
 ## 18. Handoff (per `.github/agents/circuit-engineer.agent.md`)
 
-**To**: Hardware Reviewer, via Hardware Lead.
+**This is a re-handoff after Cycle 1's Hardware Reviewer findings — not a
+first handoff.** See the Revision changelog at the top of this document
+for the full list of what changed this cycle.
+
+**To**: Hardware Reviewer, via Hardware Lead, for a **fresh re-review**
+(not a first review) — per `.github/skills/hardware-review/SKILL.md`'s
+guidance that a re-review after a fix means re-running the checklist
+against the changed areas, this handoff calls out exactly which areas
+changed so the re-review can focus there (§2.3, §3.4, §3.5 [new], §4.1,
+§4.2, §5.2, §5.3, §6, §11, §12, §13, §14, §15, §16 — see changelog).
 
 **Artifacts**:
-- This document (`hardware/schematic/bench-imu-01-design.md`) — schematic
-  artifact + design rationale log + self-check results, combined.
-- `hardware/power-budget.md` — updated with real per-subsystem numbers.
-- `datasheets/evidence-log.md` — 17 new Evidence ID rows appended
-  (DS-MCU-044–049, DS-IMU-074–077, DS-PWR-046, DS-PROT-001–002,
-  DS-CONN-001–004, DS-IFACE-001).
-- 7 new datasheet metadata records created (USBLC6-2SC6, JEDEC package
-  outline standards, NXP UM10204, USB-IF Type-C spec, GCT USB4125, GCT
-  USB3140, ST NUCLEO-G031K8/UM2324) — see `datasheets/` directory.
-- Open `UNKNOWN`s: §16 above (9 items, in priority order).
+- This document (`hardware/schematic/bench-imu-01-design.md`), revised —
+  schematic artifact + design rationale log + self-check results
+  (including the new "Re-self-check after Rev 2 fixes" pass, §15),
+  combined.
+- `hardware/power-budget.md` — **unchanged this cycle**; none of this
+  revision's fixes (I2C relabeling, EN pin firm tie, vSafe5V disposition,
+  BOOT0/PA14 correction, VDD AMR resolution) alter any current/power
+  number.
+- `datasheets/evidence-log.md` — Cycle 1 originally added 17 Evidence ID
+  rows (DS-MCU-044–049, DS-IMU-074–077, DS-PWR-046, DS-PROT-001–002,
+  DS-CONN-001–004, DS-IFACE-001) plus 7 new datasheet metadata records
+  (USBLC6-2SC6, JEDEC package outline standards, NXP UM10204, USB-IF
+  Type-C spec, GCT USB4125, GCT USB3140, ST NUCLEO-G031K8/UM2324) — see
+  `datasheets/` directory; that history is unchanged. **Unchanged by me
+  this cycle**: the Hardware Lead already appended the DS-MCU-050–053
+  corrections (independent re-verification of ISS-006/ISS-011) per
+  `validation/change-log.md` ECO-002, which this revision cites directly
+  throughout.
+- Open `UNKNOWN`s: §16 above — **4 of 9 original items resolved/corrected
+  this cycle** (item 1 BOOT0/PB8 corrected — ISS-006; item 2 VDD AMR
+  lower bound resolved — ISS-010; item 4 partially resolved, I2C portion
+  only — ISS-011; item 9 EN-pin behavior resolved — ISS-001), **5 items
+  unchanged and still open** (items 3, 5, 6, 7, 8 — all explicitly out of
+  scope for this cycle), **plus 1 new item appended** (item 10, ISS-002's
+  disposition — a known-facts-pending-decision record, not a fresh
+  unconfirmed-fact UNKNOWN).
+
+**On ISS-002 specifically**: I have not self-declared this resolved or
+accepted anywhere in this document. §3.5 states my own engineering
+recommendation (ACCEPTED-RISK) with reasoning, but per
+`docs/architecture.md` §8, a HIGH finding may only become ACCEPTED-RISK
+with named human Chief Engineer sign-off — that sign-off has not
+happened, and is not mine to grant. I am asking the Hardware Lead to
+route this finding for that decision (or, if the Hardware Lead judges a
+component change is warranted instead, to route it to the Component
+Engineer for an alternate-LDO evaluation — I have flagged but not chosen
+between these two paths, consistent with my own agent instructions'
+"Out of scope" constraint against unilaterally re-selecting a part).
 
 No KiCad project exists to run `extract_schematic_netlist` /
 `analyze_schematic_connections` / `validate_project` against (§0) — this
-document is the self-check substitute for this cycle.
+document is the self-check substitute for this cycle, as it was for
+Cycle 1.
 
 I have not declared this design "reviewed" or "complete" anywhere in this
 document — per my own agent instructions, that determination is the
-Hardware Reviewer's alone to make.
+Hardware Reviewer's alone to make. I am also not marking ISS-004,
+ISS-005, ISS-007, ISS-008, or ISS-009 resolved, touched, or in any way
+addressed by this revision — those remain for a later disposition pass,
+per the Hardware Lead's own scoping of this cycle's work.
