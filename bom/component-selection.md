@@ -4,41 +4,423 @@ Produced by `.github/skills/component-selection/SKILL.md`. One section per
 part-level need. Compare **at least 3 candidates** when feasible; if fewer,
 state why explicitly.
 
-## `<Part-level need, e.g. "IMU (3-axis accel + 3-axis gyro)">`
+## MCU
 
-- **Driving requirement(s)**: `<REQ-IDs from requirements/requirements.md>`
-- **Constraints**: `<cost ceiling, temperature range, size, volume, schedule>`
+- **Driving requirement(s)**: REQ-001 (≥100 Hz IMU ODR forwarding), REQ-002/107
+  (hardware debug/programming interface), REQ-101 (USB 5 V input, 4.75–5.25 V),
+  REQ-102 (single 3.3 V logic rail), REQ-103 (≤300 mA @ 3.3 V system budget —
+  MCU is one load among several), REQ-104 (I2C or SPI to IMU), REQ-105 (USB
+  power-only, no data/enumeration used), REQ-106 (4-pin UART header for host
+  comms), REQ-006 (no wireless functionality actually implemented even if
+  silicon has it), REQ-201 (0–40 °C ambient), REQ-301/302 (single 2-layer PCB,
+  ≤60×40 mm target), REQ-501 (whole-board BOM ≤~$15 USD, soft).
+- **Constraints**: single 3.3 V rail (no level-shifter budget); small-batch/
+  hand-assembly-plausible package strongly preferred; low-volume pricing
+  (qty 1 / qty 100); no wireless functionality to be used even if present on
+  the silicon.
 
 ### Candidate Comparison
 
-| | Candidate A | Candidate B | Candidate C |
-|---|---|---|---|
-| Manufacturer | | | |
-| Part Number | | | |
-| Key Electrical Spec 1 (Min/Typ/Max/Unit/Source) | | | |
-| Key Electrical Spec 2 (Min/Typ/Max/Unit/Source) | | | |
-| Package | | | |
-| Price @ Qty `<N>` | | | |
-| Lifecycle / EOL status | `<Active/NRND/EOL-announced/UNKNOWN>` | | |
-| Availability (stock / lead time) | | | |
-| Reference design available? | `<Y/N + link>` | | |
-| SDK / sample code / docs ecosystem | `<rating + notes>` | | |
-| Known risks | | | |
+*(4 candidates compared — exceeds the ≥3 minimum, no sole-source
+justification needed.)*
 
-*(If fewer than 3 candidates were compared, explain why here — e.g. genuine
-sole-source part.)*
+| Parameter | Candidate A — Raspberry Pi RP2040 | Candidate B — STMicroelectronics STM32G031K8T6 | Candidate C — Espressif ESP32-C3 | Candidate D — Nordic Semiconductor nRF52840 |
+|---|---|---|---|---|
+| Manufacturer | Raspberry Pi Ltd | STMicroelectronics | Espressif Systems | Nordic Semiconductor ASA |
+| Part Number | RP2040 (QFN-56 bare die; practical form is the Raspberry Pi Pico module) | STM32G031K8T6 (LQFP-32) | ESP32-C3 (QFN-32-EP, base/bare-die SKU) | NRF52840-QIAA-R (aQFN-73) |
+| Core / architecture | Dual-core Arm Cortex-M0+, up to 133 MHz [DS-MCU-004] | Arm Cortex-M0+, up to 64 MHz [DS-MCU-014] | Single-core RISC-V (RV32IMC), up to 160 MHz [DS-MCU-024] | Arm Cortex-M4F (FPU), up to 64 MHz, + separate BLE/802.15.4 radio co-processor [DS-MCU-039] |
+| Supply Voltage — Absolute Maximum Rating | IOVDD −0.3 to +3.63 V [DS-MCU-001] | VDD 4.0 V (upper bound only — lower bound `UNKNOWN`, not independently re-confirmed) [DS-MCU-012] | VDD 3.6 V — **same value as ROC max, zero overshoot margin** [DS-MCU-022] | VDD −0.3 to +3.9 V [DS-MCU-033] |
+| Supply Voltage — Recommended Operating Condition | IOVDD 1.8–3.3 V; DVDD (core) generated on-chip from IOVDD, nominal ~1.1 V, no external regulation needed [DS-MCU-002], [DS-MCU-003] | VDD 1.7–3.6 V [DS-MCU-013] | VDD 3.0–3.6 V, typical 3.3 V [DS-MCU-023] | VDD 1.7–3.6 V, nominal 3.0 V in datasheet; separate VDDH pin (2.5–5.5 V) exists for direct-USB power, unused in this design [DS-MCU-034], [DS-MCU-035] |
+| Current Consumption (test condition) | ~5.1 mA @48 MHz / ~13.7 mA @133 MHz, both cores active, FFT from SRAM, IOVDD=3.3 V, ~25 °C — rail/domain figure flagged for re-verification before power-budget lock, does not change this recommendation [DS-MCU-004] | ~2.1 mA @16 MHz / ~6.4–10.2 mA @64 MHz, VDD=3.0 V, Ta=25 °C, code from Flash, peripherals disabled [DS-MCU-014] | ~20–30 mA CPU-active, radio off, @160 MHz/3.3 V/~25 °C; light sleep ~1.2 mA [DS-MCU-024] | ~52 µA/MHz CoreMark-from-flash, VDD=3.0 V, ~25 °C, DC-DC enabled → ≈3.3 mA @64 MHz [DS-MCU-039] |
+| Package | QFN-56, 7×7 mm, 0.4 mm pitch, bare die — not hand-solder-practical; Pico module (castellated, ~21×51 mm) is the practical hand-solderable path but eats ~35% of the REQ-302 footprint target [DS-MCU-005] | LQFP-32, 7×7 mm, 0.8 mm pitch — hand-solderable, no BGA in family [DS-MCU-015] | QFN-32-EP, 5×5 mm, 0.45 mm pitch, exposed pad — reflow-only; ESP32-C3-MINI-1 module is castellated/hand-solderable (+$1–2) [DS-MCU-025] | aQFN-73, 7×7 mm, dual-row, 0.4 mm pitch — **no leaded/LQFP package exists in this family at all**; not practical for hand-soldering [DS-MCU-036] |
+| On-chip memory / peripherals | Zero on-chip flash — **requires an external QSPI NOR flash IC** (extra BOM line + 6-pin routing); 264 KB SRAM; 2×I2C, 2×SPI, 2×UART, SWD debug, native USB 1.1 host+device (present, unused), 8×PIO [DS-MCU-006], [DS-MCU-007] | Fully self-contained: 64 KB Flash + 8 KB SRAM on-chip; 2×I2C (FM+, 1 Mbit/s), 2×SPI (32 Mbit/s), 2×UART (1 USART+1 LPUART), SWD+JTAG debug, no native USB [DS-MCU-016], [DS-MCU-017] | Base/bare SKU has no embedded flash (external SPI-NOR needed, or must deliberately choose an embedded-flash SKU e.g. ESP32-C3FH4); **exactly 1 general-purpose I2C controller (zero margin)**, 1–2×SPI, 2×UART, JTAG via GPIO or USB-Serial/JTAG bridge (debug-only, not general USB device) [DS-MCU-026], [DS-MCU-027], [DS-MCU-028] | Fully self-contained: 1 MB Flash + 256 KB RAM on-chip; 2×I2C(TWI), 3×SPI (incl. 1×QSPI), 2×UARTE, SWD only (no JTAG), native USB 2.0 FS device (present, unused) [DS-MCU-037], [DS-MCU-038] |
+| Price @ Qty 1 / Qty 100 (USD) | DigiKey $2.10/$1.67; LCSC $0.993/$0.764 — bare chip only, excludes mandatory external flash IC [DS-MCU-008] | DigiKey $2.53–2.83; Mouser $2.83 (qty1) — cheapest **all-in** cost of the non-radio candidates once RP2040's/ESP32-C3's external flash is priced back in [DS-MCU-018] | Mouser/DigiKey $1.07; LCSC $1.23 (qty1) — base SKU; embedded-flash SKU price not independently pulled [DS-MCU-029] | Mouser $7.20; DigiKey $6.62 (qty1) — **3–6× the cost of the other 3**, driven entirely by an unused BLE/802.15.4 radio complex; could alone consume ~45% of the REQ-501 $15 soft target [DS-MCU-040] |
+| Lifecycle / EOL status | Active — Raspberry Pi's own published commitment: production until at least January 2041 [DS-MCU-009] | Active — ST PCNs extending into 2025–2026 indicate ongoing production [DS-MCU-019] | Active, no EOL notice found [DS-MCU-030] | Active — Nordic's current flagship BLE/Thread/Zigbee/Matter part [DS-MCU-041] |
+| Reference design available? | Y — Raspberry Pi Pico, official $4 dev board, SWD header, USB connector, castellated pads [DS-MCU-010] | Y — NUCLEO-G031K8, official ST eval board (~$13), onboard ST-LINK/V2 SWD debugger [DS-MCU-020] | Y — ESP32-C3-DevKitM-1/DevKitC-02 official boards; Seeed XIAO ESP32C3, SparkFun Pro Micro ESP32-C3 third-party [DS-MCU-031] | Y — nRF52840-DK (~$40–50, onboard J-Link SWD); nRF52840 Dongle (~$10) [DS-MCU-042] |
+| SDK / sample code / docs ecosystem | Official C/C++ SDK (CMake), most-complete MicroPython port, CircuitPython, mature Arduino-Pico community core, Zephyr support; extremely large/active hobbyist community, excellent official docs [DS-MCU-011] | STM32CubeG0 official HAL/LL + STM32CubeIDE (free), STM32Duino Arduino core, PlatformIO, full Zephyr support (ST is a top-tier Zephyr contributor, 220+ boards); large, mature professional ecosystem [DS-MCU-021] | ESP-IDF (official, FreeRTOS-based, mature), Arduino-ESP32 (official), MicroPython, Zephyr support; extremely large IoT/maker community, but much of its size is radio/IoT-specific and not relevant to a non-radio board [DS-MCU-032] | nRF Connect SDK (Zephyr-based, official, mature), legacy nRF5 SDK, arduino-nRF5 community core, Adafruit Bluefruit line; Nordic is a primary Zephyr upstream contributor; strong professional/BLE community, thinner hobbyist/Arduino community than A/C [DS-MCU-043] |
+| Known risks | Zero on-chip flash under any configuration is a real BOM/routing-complexity risk not present in the original research brief; the practical low-volume implementation path (the Pico module) trades footprint budget (REQ-302) for assembly safety. | STM32G031K8T6 VDD Absolute Maximum Rating's exact lower bound is `UNKNOWN` this pass (only the 4.0 V upper bound independently re-confirmed) — flag for Circuit Engineer's Phase 3 datasheet-verification pass, do not assume −0.3 V by convention. | Genuine peripheral-margin risk: exactly 1 general-purpose I2C bus with zero headroom for a future 2nd I2C device. Mandatory, easy-to-miss SKU decision (embedded-flash vs. base/bare die) must be made explicit at BOM-lock. | Flagged high-risk for cost and package fit specifically for this project: no hand-solderable package exists in the family at all, and its price alone could consume ~45% of the soft $15 whole-board BOM target, entirely to pay for a radio complex REQ-006 prohibits using. |
+
+### Cross-check note — flagged discrepancy (not silently resolved)
+
+A supplementary Component Engineer verification pass on RP2040 current
+consumption surfaced a possible reading different from the original research
+figure: the original figure (used above, DS-MCU-004, ~13.7 mA @133 MHz) is
+the total drawn from the 3.3 V IOVDD input rail; a second independent pass
+surfaced ~23–25 mA typical on the internal 1.1 V DVDD core domain alone
+(a different, lower-voltage rail generated on-chip from IOVDD), with a
+board-level "practical total" estimate of ~30–35 mA for a Pico board. These
+are plausibly not contradictory (DVDD is stepped down on-chip from IOVDD, so
+a ~25 mA load at 1.1 V could reasonably correspond to roughly ~10–13 mA drawn
+from the 3.3 V input) but this reconciliation was **not independently
+re-verified against the primary datasheet table this session** — it is the
+Component Engineer's own plausibility reasoning, not a re-verified fact.
+**Action requested**: Circuit Engineer should re-pull the exact IOVDD-input-
+referenced row directly from RP2040 datasheet Table 627 (§5.5) before
+finalizing `hardware/power-budget.md`. **Does not change this
+recommendation**: even the higher end of the range (~35 mA) is ~11.7% of the
+REQ-103 300 mA budget, comfortable regardless of which figure is exact.
 
 ### Recommendation
 
-- **Recommended candidate**: `<A/B/C>`
-- **Rationale**: `<why this maximizes project success probability, not just peak spec>`
-- **Trade-offs accepted**: `<what was given up vs. the alternatives>`
-- **Open `UNKNOWN`s**: `<anything not yet confirmed from a primary source>`
+- **Recommended candidate**: **B — STMicroelectronics STM32G031K8T6** (LQFP-32).
+- **Rationale** (success probability for *this* design, not peak spec):
+  1. Fully satisfies every driving requirement with comfortable margin —
+     2×I2C/2×SPI (REQ-104), 2×UART with one genuinely free (REQ-106), SWD
+     debug matching REQ-107's own literal example (REQ-002/107) — no
+     peripheral-margin risk at all, unlike Candidate C.
+  2. Fully self-contained (64 KB flash + 8 KB SRAM on-chip) — the simplest
+     BOM/routing story of the 4, directly supporting REQ-301/302 (single
+     2-layer, ≤60×40 mm) and REQ-501 (~$15 BOM) by avoiding an entire extra
+     component category (external flash IC) that both RP2040 and ESP32-C3's
+     base SKU require.
+  3. LQFP-32 is the most assembly-practical package of the 4 for a
+     small-batch, hand-assembled first design cycle — no bare-die-vs-module
+     trade-off (RP2040, ESP32-C3), no leaded-package-doesn't-exist problem
+     (nRF52840).
+  4. Widest AMR–ROC voltage margin of the 4 (4.0 V AMR vs. 3.6 V ROC
+     ceiling) — most forgiving of real-world 3.3 V rail behavior from a
+     USB-derived supply (REQ-101/102).
+  5. No radio silicon at all — the cleanest possible fit to REQ-006, with
+     zero "paid-for-but-unused" capability, unlike Candidates C and D.
+  6. Mature, professional-grade ecosystem (STM32CubeIDE/HAL, Zephyr,
+     STM32Duino, PlatformIO) with a cheap ($13), genuinely working official
+     reference design (NUCLEO-G031K8) — de-risks bring-up for this
+     repository's first-ever end-to-end design cycle.
+  7. Mid-pack quoted price ($2.53–2.83 @qty1) is actually the cheapest
+     **all-in ("subsystem") cost** of the non-radio candidates once RP2040's
+     and (base-SKU) ESP32-C3's mandatory external flash IC is counted back
+     in.
+  8. Active lifecycle with ongoing ST PCN activity; mainstream ST
+     General-Purpose family with a long track record of multi-decade
+     support for this MCU class.
+- **Trade-offs accepted**:
+  - RP2040's larger hobbyist/maker mindshare, dual-core, and PIO peripheral —
+    no requirement calls for bit-banged custom peripherals or dual-core
+    parallelism, and a single Cortex-M0+ @64 MHz has wide margin against
+    REQ-001's ≥100 Hz IMU sample-rate floor plus UART forwarding.
+  - Any path to onboard Wi-Fi/BLE (only C/D have this) — explicitly
+    acceptable: REQ-006 forbids using it this cycle, and any future wireless
+    need is its own architecture decision / fresh HITL-gated cycle, not
+    something to pre-solve by over-provisioning today's MCU choice.
+  - RP2040's raw distributor-price floor on the bare chip — largely illusory
+    once its mandatory external flash IC is priced in.
+  - Slightly less "future-roadmap ecosystem breadth" than RP2040's
+    MicroPython-level rapid-prototyping story — partially offset by STM32's
+    own motor-control-oriented adjacent families being arguably a better fit
+    for the roadmap's later motor-driver/attitude-control stages, though this
+    is the Component Engineer's own judgment call, offered for the Hardware
+    Lead/human to weigh, not asserted as settled.
+- **Open `UNKNOWN`s**:
+  1. STM32G031K8T6 VDD Absolute Maximum Rating's exact lower bound — only the
+     4.0 V upper bound independently re-confirmed this session; re-confirm at
+     Circuit Engineer's Phase 3 datasheet-verification stage, do not assume
+     −0.3 V by convention.
+  2. RP2040 current-consumption rail/domain ambiguity (see Cross-check note
+     above) — resolve before `hardware/power-budget.md` is finalized.
+  3. Live distributor stock quantities/lead times were not pulled for any of
+     the 4 candidates this session (only listing/price-tier data, which
+     confirms the part is actively sold, not real-time stock count) —
+     recommend a live stock check immediately before BOM lock.
+  4. ESP32-C3 embedded-flash SKU (e.g. ESP32-C3FH4) pricing not
+     independently pulled — relevant only if overridden toward Candidate C.
+  5. Exact decoupling-capacitor values/placement and crystal-vs-internal-RC
+     clocking choice for STM32G031K8T6 are correctly deferred to the Circuit
+     Engineer/schematic-design stage.
+
+### Escalation flags
+
+No candidate is disqualified outright — all 4 are electrically and
+functionally viable. Flagged explicitly rather than silently omitted:
+**nRF52840 (D)** — high-risk for cost and package fit for this specific
+project (see Known risks). **ESP32-C3 (C)** — genuine peripheral-margin risk
+(exactly 1 I2C) and a mandatory SKU decision that must not be left implicit.
+**RP2040 (A)** — BOM/routing-complexity risk (zero on-chip flash under any
+configuration).
+
+**HITL gate**: the MCU is an architecture-defining component for this entire
+board (`docs/architecture.md` §10). This recommendation is a *proposal*
+only — Circuit Engineer must not begin schematic work until Chief Engineer
+(human) approval is recorded below.
 
 ### Approval
 
 | Role | Name | Date | Decision |
 |---|---|---|---|
-| Component Engineer | | | Proposed |
-| Hardware Lead | | | |
-| Chief Engineer (Human) — required if architecture-defining/major component | | | Pending |
+| Component Engineer | Component Engineer (AI agent) | 2026-08-30 | Proposed — STM32G031K8T6 |
+| Hardware Lead | Hardware Lead (this session) | 2026-08-30 | Concur — recommend approval |
+| Chief Engineer (Human) — required if architecture-defining/major component | Human Chief Engineer | 2026-08-30 | **Approved** — "Approve all three as recommended" (Checkpoint B, recorded via ask_user; independently re-confirmed after the worktree-restore incident, see `validation/change-log.md` ECO-001) |
+
+---
+
+## IMU (3-axis accelerometer + 3-axis gyroscope)
+
+- **Driving requirement(s)**: REQ-001 (≥100 Hz ODR, 3-axis accel + 3-axis
+  gyro), REQ-102 (single 3.3 V logic rail — both VDD and VDDIO), REQ-103
+  (≤300 mA total system current budget — IMU must be a small fraction),
+  REQ-104 (I2C or SPI), REQ-201 (0–40 °C ambient), REQ-501 (~$15 soft
+  whole-board BOM target — IMU should be a modest fraction).
+- **Constraints**: single 3.3 V rail with no separate low-voltage domain
+  available for a digital-IO supply below ~3 V (rules out any candidate
+  whose VDDIO ceiling is below ~3.3 V); 14-pin LGA-class package footprint
+  strongly preferred for board-area consistency with the 3 compliant
+  candidates; low-volume/prototype-quantity pricing basis; part must be
+  realistically sourceable within the project's schedule — not merely "in
+  production" on paper.
+
+### Candidate comparison
+
+*(4 candidates compared — exceeds the ≥3 minimum; Candidate D is included
+specifically as an architecture-mismatch comparison point, not because it
+was ever a live contender once its VDDIO limitation was confirmed.)*
+
+| Parameter | Candidate A — Bosch Sensortec BMI270 | Candidate B — TDK InvenSense ICM-42688-P | Candidate C — STMicroelectronics LSM6DSOX | Candidate D — TDK InvenSense ICM-20948 *(comparison only — DISQUALIFIED)* |
+|---|---|---|---|---|
+| **Manufacturer** | Bosch Sensortec | TDK InvenSense | STMicroelectronics | TDK InvenSense |
+| **Part Number** | BMI270 | ICM-42688-P | LSM6DSOX | ICM-20948 |
+| **Type / Axes** | 6-axis (accel+gyro) | 6-axis (accel+gyro) | 6-axis (accel+gyro) | 9-axis (adds magnetometer) — **not a REQ-001 requirement** |
+| **Accelerometer FSR** | ±2 to ±16 g, programmable [DS-IMU-001] | ±2 to ±16 g, programmable [DS-IMU-018] | ±2 to ±16 g, programmable [DS-IMU-035] | `UNKNOWN` — not confirmed this session [DS-IMU-052] |
+| **Gyroscope FSR** | ±125 to ±2000 dps, 5 ranges [DS-IMU-002] | ±15.6 to ±2000 dps, 8 ranges — finest granularity [DS-IMU-019] | ±125 to ±2000 dps, 5 ranges [DS-IMU-036] | ±250 to ±2000 dps, 4 ranges [DS-IMU-053] |
+| **VDD — Recommended Operating Condition** | 1.71–3.6 V [DS-IMU-003] | 1.71–3.6 V [DS-IMU-020] | 1.71–3.6 V [DS-IMU-037] | 1.71–3.6 V [DS-IMU-055] |
+| **VDD — Absolute Maximum Rating** | −0.3 to +3.6 V [DS-IMU-004] | 3.6 V (same as ROC max) [DS-IMU-021] | 3.6 V (same as ROC max) [DS-IMU-038] | `UNKNOWN` exact ceiling beyond the 1.71–3.6 V ROC [DS-IMU-056] |
+| **VDDIO — Recommended Operating Condition** | 1.2–3.6 V — broadest floor of the 4 [DS-IMU-005] | 1.71–3.6 V (same as VDD) [DS-IMU-022] | 1.62–3.6 V [DS-IMU-039] | ⚠️ **1.71–1.95 V ONLY — INCOMPATIBLE with REQ-102's single 3.3 V rail** without added level-shifting hardware [DS-IMU-057] |
+| **VDDIO — Absolute Maximum Rating** | No separate ceiling below 3.6 V [DS-IMU-006] | No separate ceiling below 3.6 V [DS-IMU-023] | No separate ceiling below 3.6 V [DS-IMU-040] | ⚠️ **2.0 V** — a nominal 3.3 V rail exceeds this by 1.3 V (65% over Absolute Maximum); datasheet warns of **permanent damage** [DS-IMU-058] |
+| **Operating Temperature Range** | −40 °C to +85 °C [DS-IMU-070] | −40 °C to +85 °C [DS-IMU-071] | −40 °C to +85 °C [DS-IMU-072] | Likely −40 °C to +85 °C but not independently confirmed for this specific part — lower confidence [DS-IMU-073] |
+| **Digital Interface — I2C** | ≤1 MHz (FM+) [DS-IMU-007] | ≤1 MHz (FM+) [DS-IMU-024] | ≤400 kHz (FM) — slowest of the 4, still far more than sufficient [DS-IMU-041] | ≤400 kHz (FM) [DS-IMU-059] |
+| **Digital Interface — SPI** | ≤10 MHz, 3-/4-wire [DS-IMU-008] | ≤24 MHz, Mode 0/3 — fastest of the 4 [DS-IMU-025] | ≤10 MHz, 3-/4-wire [DS-IMU-042] | ≤7 MHz [DS-IMU-060] |
+| **Max ODR — Accel / Gyro** | 1600 Hz / 6400 Hz [DS-IMU-009] | 32,000 Hz / 32,000 Hz — highest of the 4 [DS-IMU-026] | 6660 Hz / 6660 Hz [DS-IMU-043] | 4500 Hz / 9000 Hz (+ Mag 100 Hz) [DS-IMU-061] |
+| **Typical Current Consumption** | 685 µA, full-performance mode, both axes active [DS-IMU-010] | 0.88 mA, Low-Noise mode, both axes active, VDD=1.8 V [DS-IMU-027] | 0.55 mA (IddHP), combo High-Performance mode; exact ODR test condition `UNKNOWN` [DS-IMU-044] | 3.11 mA full 9-axis mode; ~68.9 µA accel-only [DS-IMU-062] |
+| **Package** | 14-pin LGA, 2.5×3.0×0.83 mm [DS-IMU-011] | 14-pin LGA, 2.5×3.0×0.91 mm [DS-IMU-028] | 14-pin LGA, 2.5×3.0×0.83 mm [DS-IMU-045] | 24-pin QFN, 3.0×3.0×1.0 mm — larger footprint, more pins [DS-IMU-063] |
+| **Price @ Qty 1 / Qty 100 (USD)** | $4.23/$3.17 (DigiKey) [DS-IMU-012]; $3.71/$3.11 (Mouser) [DS-IMU-013] — cheapest of the 4 | $4.91/$3.70 (DigiKey) [DS-IMU-029]; $5.43/$3.70 (Mouser) [DS-IMU-030] — list price only, part cannot currently be bought | $5.30/~$3.99 est. (DigiKey) [DS-IMU-046]; ~$4.84/~$3.64 est. (Mouser) [DS-IMU-047] | ~$8.25/~$6.30, limited last-buy stock (DigiKey) [DS-IMU-064]; obsolete/no standard pricing (Mouser) [DS-IMU-065] — most expensive of the 4 |
+| **Lifecycle / EOL status** | Active, no EOL/NRND [DS-IMU-014] | Active/in-production per distributor listings [DS-IMU-031] | Active; used in the official Arduino Nano RP2040 Connect [DS-IMU-048] | ⚠️ **OBSOLETE / NRND** — formally marked Obsolete at both DigiKey and Mouser, last-buy inventory only [DS-IMU-066] |
+| **Availability (stock / lead time)** | High stock — 60,000+ units, no lead-time concern [DS-IMU-015] | ⚠️ **ZERO stock at both DigiKey and Mouser**, 45–54-week lead times pointing to mid/late 2027 [DS-IMU-032] | Stock on hand at DigiKey as of mid-2024; possible 24-week lead times at some inventory levels — real but materially smaller risk than B's [DS-IMU-049] | Last-buy/EOL inventory only [DS-IMU-067] |
+| **Reference design available?** | Y — SparkFun 6DoF IMU Breakout - BMI270 (Qwiic, 1.8 V and 3.3 V) [DS-IMU-016] | Y (eval-board only) — TDK QCIOT-ICM42688P; community open-hardware breakouts; no confirmed SparkFun/Adafruit breakout [DS-IMU-033] | Y — Adafruit LSM6DSOX 6 DoF Breakout ($11.95, STEMMA QT); onboard official Arduino Nano RP2040 Connect [DS-IMU-050] | Y (legacy/secondary-market only) [DS-IMU-068] |
+| **SDK / sample code / docs ecosystem** | Good — official Bosch C driver (BSD-3-Clause, GitHub, MCU-agnostic) + SparkFun Arduino library [DS-IMU-017] | Fair — community-only Arduino libraries, no first-party library found [DS-IMU-034] | **Best of the 4** — 4 distinct well-maintained Arduino libraries incl. official Arduino-brand library + official ST STM32Cube driver [DS-IMU-051] | Fair, declining — community libraries exist but investment winding down given EOL [DS-IMU-069] |
+| **Known risks** | None material for this design; broadest VDDIO floor (1.2 V) gives the most future headroom. | **Severe, real supply-chain risk** — confirmed zero stock at 2 major distributors, 45–54-week lead times into mid/late 2027. Electrically excellent and fully 3.3 V-compatible, but **not realistically sourceable on this project's timeline.** | Minor: some qty-100 pricing figures are estimates; a prior note flagged possible 24-week lead times at some inventory levels — worth a fresh stock check before BOM lock, nowhere near Candidate B's severity. | **Disqualifying, on 3 independent grounds**: (1) VDDIO 1.71–1.95 V ROC / 2.0 V AMR incompatible with REQ-102's single 3.3 V rail without added level-shifting hardware; (2) formally Obsolete/NRND at both major distributors; (3) unrequested 9-axis magnetometer adds cost/complexity with zero REQ-001 benefit. |
+
+**Note**: all 4 candidates clear REQ-001's ≥100 Hz ODR floor and REQ-103's
+current budget with very large margin — these were never differentiators.
+The real differentiators were VDDIO/rail compatibility (REQ-102),
+lifecycle/availability, cost, and ecosystem maturity.
+
+### Success-probability ranking
+
+| Rank | Candidate | Verdict |
+|---|---|---|
+| 1 | **BMI270 (A)** | Best overall success probability: fully compliant, cheapest, cleanest/freshest confirmed stock, official cross-platform driver, broadest VDDIO floor. No risk flags. |
+| 2 | **LSM6DSOX (C)** | Equally requirement-compliant; most mature multi-library ecosystem and proven in a shipping Arduino product; slightly higher cost and a slower (but still sufficient) I2C bus; stock data slightly older/less clean than A's. Designated fallback / second-source. |
+| 3 (not recommended) | **ICM-42688-P (B)** | Best raw electrical specs of the 4, but confirmed zero stock at both DigiKey and Mouser, 45–54-week lead times pointing to mid/late 2027 availability — a severe, real, demand-driven shortage, not a footnote. |
+| 4 (rejected) | **ICM-20948 (D)** | VDDIO incompatible with the single 3.3 V rail; formally Obsolete/NRND; unrequested 9-axis magnetometer adds cost/complexity for no REQ-001 benefit. Not a viable candidate for a new design. |
+
+### Recommendation
+
+- **Recommended candidate**: **A — Bosch Sensortec BMI270**, with **C —
+  STMicroelectronics LSM6DSOX** explicitly designated as the fallback /
+  second-source candidate.
+- **Rationale**: BMI270 satisfies every driving requirement (REQ-001, 102,
+  103, 104, 201) with comfortable margin, is the cheapest of the 4
+  candidates, has the cleanest and most current stock confirmation
+  (60,000+ units, no caveats), and its ecosystem centers on an official
+  Bosch-maintained, BSD-3-Clause, MCU-agnostic C driver — not tied to any one
+  MCU family, which matters since MCU selection happened in a parallel,
+  independent Component Engineer call this same cycle. Its VDDIO floor
+  (1.2 V) is also the broadest of the 4, giving the most headroom if a
+  future revision ever needed a lower logic-level domain. LSM6DSOX is an
+  extremely close second — named as the explicit fallback so the Hardware
+  Lead has a pre-vetted, fully-compliant second source if BMI270's currently
+  healthy stock picture ever changes before layout, a prudent practice given
+  how badly two of the other three candidates in this exact comparison were
+  bitten by supply issues.
+- **Trade-offs accepted**:
+  - Giving up ICM-42688-P's substantially higher max ODR (32 kHz vs.
+    1.6/6.4 kHz), finer gyro FSR granularity, and faster SPI — none of which
+    REQ-001 (≥100 Hz) requires; a deliberate peak-spec-for-success-
+    probability trade in exchange for a part that can actually be bought and
+    delivered on a normal schedule instead of ~a year from now.
+  - Giving up LSM6DSOX's broader multi-library ecosystem maturity and real-
+    product track record in exchange for BMI270's slightly lower price and
+    cleaner/fresher stock data — a close call, which is exactly why LSM6DSOX
+    is retained as the named fallback rather than dropped.
+  - BMI270's I2C is faster than LSM6DSOX's (1 MHz vs. 400 kHz) — a minor
+    incidental win, not a driver of the recommendation.
+- **Open `UNKNOWN`s** (carried forward explicitly):
+  1. ICM-20948 accelerometer FSR and VDD Absolute Maximum Rating exact
+     ceiling — genuinely unconfirmed; moot given disqualification.
+  2. ICM-20948's VDDIO Absolute Maximum Rating of 2.0 V is sourced from a
+     single datasheet-aggregator page (not independently cross-checked
+     against a second raw-datasheet mirror) — carries slightly lower
+     individual confidence than the directly manufacturer-quoted 1.71–1.95 V
+     Recommended Operating Condition figure, though both agree on the same
+     disqualifying conclusion.
+  3. LSM6DSOX's typical current-consumption figure (0.55 mA) has its
+     Vdd/temperature test condition confirmed (1.8 V/25 °C) but not its ODR
+     — genuinely unresolved.
+  4. LSM6DSOX qty-100 pricing at both DigiKey and Mouser are estimates, not
+     confirmed break prices — worth a fresh distributor check before BOM
+     lock.
+  5. LSM6DSOX current stock levels are a mid-2024-dated data point, not
+     re-checked this session — a fresh stock check is recommended before
+     final BOM lock even though no red flag was found.
+
+### Escalation flags
+
+1. **Candidate D (ICM-20948) is formally recommended for rejection**, on
+   three independent, compounding grounds: VDDIO incompatibility (confirmed
+   via a direct manufacturer-datasheet quote, cross-checked across 3
+   independent sources), formal Obsolete/NRND status, and an unrequested
+   9-axis magnetometer.
+2. **Candidate B (ICM-42688-P) carries a severe, real availability risk**
+   weighed heavily against recommending it as primary despite the best raw
+   electrical specs in the comparison — confirmed zero stock, 45–54-week
+   lead times into mid/late 2027.
+
+**HITL gate**: IMU selection is a major/architecture-defining component
+decision per `docs/architecture.md` §10 — Chief Engineer (human) sign-off is
+required before the Circuit Engineer begins schematic work against it.
+
+### Approval
+
+| Role | Name | Date | Decision |
+|---|---|---|---|
+| Component Engineer | Component Engineer (AI agent) | 2026-08-30 | Proposed — BMI270 (fallback: LSM6DSOX) |
+| Hardware Lead | Hardware Lead (this session) | 2026-08-30 | Concur — recommend approval |
+| Chief Engineer (Human) — required if architecture-defining/major component | Human Chief Engineer | 2026-08-30 | **Approved** — "Approve all three as recommended" (Checkpoint B, recorded via ask_user; independently re-confirmed after the worktree-restore incident, see `validation/change-log.md` ECO-001) |
+
+---
+
+## Power Regulator (5V USB to 3.3V rail)
+
+- **Driving requirement(s)**: REQ-101 (USB 5 V input, 4.75–5.25 V tolerance),
+  REQ-102 (single 3.3 V logic rail), REQ-103 (≤300 mA @ 3.3 V system budget —
+  regulator selected with real margin above this, not at the edge), REQ-201
+  (0–40 °C ambient — thermal margin checked at 40 °C worst case), REQ-402
+  (USB port transient/ESD/reverse-polarity protection — separate circuitry
+  from the regulator; built-in regulator protection noted where evidenced),
+  REQ-501 (≤~$15 total BOM, soft — regulator should be a small fraction).
+- **Constraints**: USB 5 V bus power only (human-fixed constraint); fixed
+  3.3 V output, no adjustable/resistor-divider topology needed; indoor
+  desk/lab ambient 0–40 °C, no vibration/shock; low-volume/prototype
+  quantities; single 2-layer PCB, ≤60×40 mm footprint target — informs
+  package/hand-assembly weighting; paper design exercise this cycle, no
+  physical build/power-on this session.
+
+### Candidate Comparison
+
+*(4 candidates compared — exceeds the ≥3 minimum; no sole-source
+justification needed.)*
+
+| Parameter | Candidate A — TI TLV75533PDBVR (LDO) | Candidate B — Microchip MCP1700T-3302E/TT (LDO) — ⚠ DISQUALIFIED | Candidate C — Generic/Multi-Source AMS1117-3.3 (LDO) — ⚠ HIGH RISK | Candidate D — TI TPS62082DSGR (Sync. Buck) |
+|---|---|---|---|---|
+| Manufacturer | Texas Instruments | Microchip Technology | Multi-source / generic (originally Advanced Monolithic Systems; also produced by UMW, Shenzhen Slkormicro, GOODWORK, unbranded sources) | Texas Instruments |
+| Part Number | TLV75533PDBVR | MCP1700T-3302E/TT | AMS1117-3.3 (no single canonical manufacturer) | TPS62082DSGR |
+| Topology | Linear LDO | Linear LDO | Linear LDO | Synchronous step-down (buck), TI DCS-Control, ~2 MHz [DS-PWR-035] |
+| Output Voltage Accuracy | ±1% @ TJ=85°C [DS-PWR-001] | Typ ±0.4% @25°C; Max ±3% over −40 to +125°C [DS-PWR-012] | ~±3% (3.201–3.399V across temp) [DS-PWR-024] | `UNKNOWN` — exact tolerance % not confirmed this session; no value assumed |
+| Input Voltage — Absolute Maximum Rating | 6.0 V [DS-PWR-002] | 6.0 V [DS-PWR-013] | 15 V per original AMS datasheet; clone variants may state a different (often lower) figure [DS-PWR-025] | −0.3 V to 7 V [DS-PWR-036] |
+| Input Voltage — Recommended Operating Condition | 1.45–5.5 V [DS-PWR-002] | 2.3–6.0 V [DS-PWR-013] — **ROC max exactly equals AMR max, zero buffer** | Cited up to 12 V for sustained operation [DS-PWR-025] | 2.3–6.0 V [DS-PWR-036] — 1 V buffer to AMR max |
+| USB range (4.75–5.25V, REQ-101) fit | ✅ Comfortably within ROC, well under AMR | ✅ Within ROC/AMR but zero-buffer ceiling | ✅ Within either cited interpretation | ✅ Comfortably within ROC, well under AMR |
+| Max Rated Output Current | 500 mA [DS-PWR-003] | **250 mA** [DS-PWR-014] | 1 A (thermal-limited in practice) [DS-PWR-026] | 1.2 A [DS-PWR-037] |
+| Current margin vs. REQ-103 (300 mA) | 500÷300 = 1.67× headroom (60% of rated max used) | **250 mA < 300 mA budget — DISQUALIFYING** | 1000÷300 = 3.33× headroom (30% used) | 1200÷300 = 4× headroom (25% used) |
+| Dropout Voltage @ rated Iout, Vout=3.3V | Typ 220 mV/Max 238 mV @ 500 mA [DS-PWR-004]; at Vin=4.75V/3.3V out, headroom ≈1.45V | Typ 178 mV/Max 350 mV @ 250 mA, TA=25°C [DS-PWR-015] | Typ 1.1V/Max 1.3V @ 0.8A [DS-PWR-027] — notably higher than A/B, still ample headroom | N/A — synchronous buck; dropout not the relevant spec [DS-PWR-035] |
+| Efficiency @ ~1A load, 5V→3.3V | N/A — linear LDO; theoretical max ≈ Vout/Vin ≈ 66% | N/A (same) | N/A (same) | ~94% typical @ 1A load [DS-PWR-038] |
+| Quiescent Current Iq | 25 µA typ, no-load, Vin=3.6V [DS-PWR-005] | 1.6 µA typ/4.0 µA max, no-load, Vin=5.0V [DS-PWR-016] — lowest of all 4, secondary to disqualification | 5 mA typ/11 mA max, no-load [DS-PWR-028] — dramatically higher than A/B | 6.5 µA typical, Snooze/light-load PFM [DS-PWR-039] |
+| Package | SOT-23-5 [DS-PWR-006] | SOT-23-3, no exposed pad [DS-PWR-017] | SOT-223-3, no exposed pad [DS-PWR-029] | 8-WSON 2×2mm, exposed thermal pad [DS-PWR-040] |
+| Package θJA | 60.3°C/W, standard PCB, no copper pour [DS-PWR-006] | ≈336°C/W (no exposed pad) [DS-PWR-017] | ≈90°C/W bare PCB; 55–80°C/W with copper pour [DS-PWR-029] | ≈60°C/W, standard 2-layer PCB [DS-PWR-040] |
+| Junction Temp Absolute Max Rating | 150°C [DS-PWR-007] | 125°C [DS-PWR-018] | ≈165°C (thermal shutdown threshold) [DS-PWR-030] | `UNKNOWN` — not confirmed this session |
+| Derived Thermal Margin @ TA=40°C, 300 mA load | Max PD budget=(150−40)/60.3≈1.82W. Actual PD=510mW. Est. TJ≈**71°C** — ~79°C headroom [DS-PWR-008] | Max PD budget=(125−40)/336≈253mW. Actual PD at rated 250mA=425mW — **exceeds budget even at rated current** [DS-PWR-019] | PD@300mA=510mW. Est. TJ≈**86°C** — numerically within limits, but thermal-shutdown reliability itself subject to clone risk [DS-PWR-031] | Est. loss≈63mW at 300mA/990mW output; est. TJ≈**44°C** — far cooler than any LDO, but cannot express as %-of-budget since TJmax `UNKNOWN` [DS-PWR-041] |
+| Regulator's own built-in protection (context for REQ-402) | `UNKNOWN` this session — REQ-402's USB-port protection remains separate Circuit-Engineer-owned circuitry regardless | `UNKNOWN` — same caveat | Thermal shutdown ≈165°C evidenced, but reliability subject to clone risk | `UNKNOWN` — same caveat |
+| Hand-Assembly / Package Solderability | Standard leaded SMD, hand-solderable [DS-PWR-006] | Standard leaded SMD, hand-solderable [DS-PWR-017] | Larger leaded SMD, easy hand assembly [DS-PWR-029] | **Exposed thermal pad CANNOT be reliably hand-soldered — requires reflow/hot-air/hot-plate** [DS-PWR-042] |
+| Multi-Source / Clone Risk | Low — genuine single-source TI part [DS-PWR-010] | Low — genuine single-source Microchip part [DS-PWR-021] | **HIGH — produced/marked by dozens of manufacturers under identical marking; documented variance in silicon quality, dropout, thermal-shutdown reliability, and max Vin rating** [DS-PWR-023] | Low — genuine single-source TI part [DS-PWR-044] |
+| Price @ Qty 1 / Qty 100 (USD) | $0.45/$0.2396 (DigiKey); $0.42/$0.226 (Mouser) [DS-PWR-009] | $0.38–0.51/~$0.39 (DigiKey); $0.51/$0.398 (Mouser) [DS-PWR-020] | ~$0.30/~$0.16 (DigiKey, UMW brand); gray-market as low as $0.02–0.04, not recommended [DS-PWR-032] | $1.76/$1.04 (DigiKey and Mouser both) [DS-PWR-043] |
+| % of REQ-501 ≤~$15 soft BOM target (qty100) | ≈1.5–1.6% | ≈2.6% (moot — disqualified) | ≈1.1% (genuine risk aside) | ≈6.9% (qty1: ≈11.7%) |
+| Lifecycle / EOL status | Active [DS-PWR-010] | Active (Octopart projects through ~2034) [DS-PWR-021] | Active as a commodity item; clone/quality-consistency risk is the dominant concern [DS-PWR-033] | Active [DS-PWR-044] |
+| Reference design available? | Y — TI SLVSDV4, ceramic-only (CIN=1µF, COUT=0.47µF min) [DS-PWR-011] | Y — simplest possible LDO circuit (CIN/COUT=1.0µF ceramic each) [DS-PWR-022] | Y, but requires a 22µF solid tantalum (or equivalent low-ESR ceramic) output cap [DS-PWR-034] | Y — TI SLVSB80, formal EVM with BOM/layout files [DS-PWR-045] |
+| SDK / sample code / docs ecosystem | Excellent — clearly separates AMR/ROC, load/line regulation + PSRR curves [DS-PWR-011] | Very clean, but oriented around battery/wearable use cases [DS-PWR-022] | Variable/inconsistent between clone-manufacturer datasheets [DS-PWR-034] | Excellent — efficiency curves, WEBENCH-compatible design tool [DS-PWR-045] |
+| Known risks | Low overall risk; minor open item on the 1.45V ROC minimum's exact basis (does not affect recommendation). | **DISQUALIFIED**: 250 mA rated max < REQ-103's 300 mA budget; own package thermal budget exceeded even at rated 250 mA. | **HIGH RISK — not recommended despite adequate raw specs.** Multi-manufacturer/clone market means the part that actually ships on a PO is not guaranteed to match the datasheet read. | Low electrical/technical risk but real DFM risk: WSON pad requires reflow/hot-air, incompatible with hand-iron assembly. ~4× unit price of the LDO alternatives. |
+
+### Recommendation
+
+- **Recommended candidate**: **A — Texas Instruments TLV75533PDBVR**.
+- **Rationale** (success probability first, peak spec second): meets every
+  driving requirement with real, quantified margin — REQ-101 (ROC/AMR both
+  clear USB's 4.75–5.25 V with buffer), REQ-102 (fixed 3.3 V output, no
+  resistor divider to get wrong), REQ-103 (500 mA rated ÷ 300 mA budget =
+  1.67× headroom), REQ-201 (thermal margin computed explicitly at TA=40°C:
+  estimated TJ≈71°C vs. 150°C max, ~79°C of headroom on a bare PCB with no
+  copper-pour improvement). Proven, simple reference design using
+  ceramic-only capacitors — no exotic tantalum dependency (unlike Candidate
+  C). Genuine single-source TI part with confirmed Active lifecycle. SOT-23-5
+  is trivially hand-solderable with a standard iron — no reflow/hot-air
+  dependency (unlike Candidate D's WSON pad), which matters concretely since
+  this project's physical build happens later, under assembly
+  equipment/method not yet controlled for. Price (~1.5–3% of the REQ-501
+  target) is a small fraction as expected of a supporting component.
+  Simplicity is a genuine engineering virtue here, not just a fallback: an
+  LDO has fewer component types (no inductor), no switching-noise/EMI
+  concern to manage near a sensitive 6-axis IMU's ADC. Because this is
+  USB-powered (not battery/efficiency-constrained), a buck converter's
+  efficiency advantage solves a problem this project doesn't have.
+  REQ-402 note: none of the 4 candidates' regulator ICs have a *confirmed*
+  built-in ESD/transient/reverse-polarity protection feature relevant to the
+  USB connector itself — this remains a separate Circuit-Engineer-owned
+  protection network (e.g. TVS diode) regardless of which regulator is
+  chosen; not a point against Candidate A specifically.
+- **Trade-offs accepted**:
+  - *vs. Candidate B (MCP1700)*: gives up B's much lower Iq — not a real
+    trade-off since B is independently disqualified on two grounds (current
+    rating below budget, own thermal budget exceeded at rated current).
+  - *vs. Candidate C (AMS1117-3.3)*: gives up a marginally lower qty-100 unit
+    price (~$0.07/unit, under 0.5% of the whole-board target) and a higher
+    absolute current headroom — in exchange for eliminating a documented
+    clone/counterfeit/quality-consistency risk entirely and avoiding an added
+    tantalum-class output cap. Building this repo's first real design-cycle
+    power rail on a part whose actual shipped silicon varies by reel is a
+    bad trade against a savings that doesn't meaningfully move the ≤$15
+    target.
+  - *vs. Candidate D (TPS62082)*: gives up substantially better efficiency
+    (~94% vs. an LDO's ~66% theoretical ceiling) and a larger absolute
+    thermal cushion — in exchange for ~4× lower unit price, avoiding the
+    WSON exposed-pad package's reflow/hot-air assembly requirement (a real
+    DFM risk given the physical build happens later, under conditions not
+    yet controlled for), avoiding an inductor and its associated EMI/layout
+    considerations near a sensitive 6-axis IMU, and avoiding two open
+    UNKNOWNs (exact output accuracy, TJ max). Candidate A already clears its
+    own thermal budget with ~79°C of headroom using the simpler, cheaper,
+    easier-to-assemble part.
+- **Open `UNKNOWN`s**:
+  - Candidate D's exact output voltage accuracy tolerance and TJ max — not
+    confirmed this session; closing this gap is a prerequisite before D
+    could be seriously re-considered on thermal grounds.
+  - Candidate A's Vin ROC minimum (1.45 V) not independently re-confirmed
+    against the literal TI PDF table (only a mirror site cross-checked) —
+    does not change the recommendation (USB's 4.75 V floor clears either
+    interpretation).
+  - Exact stock quantity/lead time for all 4 candidates not confirmed
+    numerically this session (only qty1/qty100 pricing-tier listings).
+  - Built-in overcurrent/thermal-shutdown protection: only Candidate C had an
+    explicit thermal-shutdown-threshold figure surfaced; no equivalent
+    confirmation found for A, B, or D.
+
+### Escalation flags
+
+1. **Candidate B (MCP1700T-3302E/TT) is explicitly DISQUALIFIED** — 250 mA
+   rated max output current is below REQ-103's 300 mA system budget, and its
+   own package thermal budget is exceeded by actual dissipation even at its
+   own rated 250 mA at TA=40°C ambient. Two independent, quantified
+   disqualifiers.
+2. **Candidate C (AMS1117-3.3) is flagged HIGH RISK** on clone/manufacturing-
+   consistency grounds, weighing heavily against recommending it despite raw
+   specs that look adequate on paper.
+3. **HITL-gate judgment call**: a 5V→3.3V regulator selection is not
+   architecture-defining in the way an MCU/IMU silicon choice is (it does
+   not constrain firmware, interfaces, or the digital design) — standard
+   Hardware Lead review is likely sufficient without a separate Chief
+   Engineer sign-off, but this is the Hardware Lead's call to make per
+   `docs/architecture.md` §10, not the Component Engineer's to unilaterally
+   decide.
+
+### Approval
+
+| Role | Name | Date | Decision |
+|---|---|---|---|
+| Component Engineer | Component Engineer (AI agent) | 2026-08-30 | Proposed — TLV75533PDBVR |
+| Hardware Lead | Hardware Lead (this session) | 2026-08-30 | Concur — recommend approval; not treated as requiring separate Chief Engineer sign-off per Escalation flag 3, but reported alongside MCU/IMU per the human's explicit "report all three" instruction |
+| Chief Engineer (Human) — required if architecture-defining/major component | Human Chief Engineer | 2026-08-30 | **Approved** — "Approve all three as recommended" (Checkpoint B, recorded via ask_user; independently re-confirmed after the worktree-restore incident, see `validation/change-log.md` ECO-001) |
