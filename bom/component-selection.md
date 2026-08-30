@@ -1,6 +1,6 @@
 # Component Selection
 
-Produced by `skills/component-selection/SKILL.md`. One section per
+Produced by `.github/skills/component-selection/SKILL.md`. One section per
 part-level need. Compare **at least 3 candidates** when feasible; if fewer,
 state why explicitly.
 

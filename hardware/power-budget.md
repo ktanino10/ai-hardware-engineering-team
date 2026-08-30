@@ -2,7 +2,7 @@
 
 Aggregates every subsystem's current/power draw against the supply's
 capability, per rail, with margin. Maintained by the Circuit Engineer as
-part of `skills/schematic-design/SKILL.md` (MVP); a future **Power Engineer**
+part of `.github/skills/schematic-design/SKILL.md` (MVP); a future **Power Engineer**
 role formally owns this once complexity grows past the benchmark
 (`docs/architecture.md` §12/§14).
 

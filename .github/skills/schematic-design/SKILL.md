@@ -1,3 +1,8 @@
+---
+name: schematic-design
+description: Standard procedure for designing a schematic from Component-Engineer-approved parts, datasheet-extracted constraints, and manufacturer reference designs, with rationale recorded for each design decision. Use this whenever designing or revising a circuit schematic.
+---
+
 # Skill: Schematic Design
 
 ## Purpose
@@ -9,7 +14,7 @@ defensible schematic, with every decision's "why" recorded.
 ## Preconditions
 
 - Parts are approved (`bom/component-selection.md`).
-- `skills/datasheet-analysis/SKILL.md` has been run for each part in use;
+- `.github/skills/datasheet-analysis/SKILL.md` has been run for each part in use;
   relevant parameters have Evidence IDs (or are explicitly `UNKNOWN`, in
   which case escalate before relying on them).
 
@@ -36,7 +41,7 @@ defensible schematic, with every decision's "why" recorded.
    shared rail loading (does the combined draw still fit the supply's
    budget?), ground return paths, any timing dependency across blocks.
 6. **Self-check against the Hardware Reviewer's checklist**
-   (`skills/hardware-review/SKILL.md`) before handing off — the goal is to
+   (`.github/skills/hardware-review/SKILL.md`) before handing off — the goal is to
    catch the obvious issues yourself so independent review finds the
    subtler ones, not to skip review.
 7. **Where a KiCad project exists**, self-check with

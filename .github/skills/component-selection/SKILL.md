@@ -1,3 +1,8 @@
+---
+name: component-selection
+description: Standard procedure for comparing and recommending electronic components from a requirement, comparing at least 3 candidates on datasheet-verified electrical specs, package, lifecycle/EOL risk, availability, reference designs, and development ecosystem. Use this whenever selecting or recommending a part for a hardware design.
+---
+
 # Skill: Component Selection
 
 ## Purpose
@@ -30,7 +35,7 @@ Whenever a new part is needed, or an existing part choice is challenged
    candidate.
 3. **Retrieve each candidate's datasheet.** Register it as a metadata record
    in `datasheets/` (never commit the actual PDF — `datasheets/README.md`)
-   and run `skills/datasheet-analysis/SKILL.md` against it.
+   and run `.github/skills/datasheet-analysis/SKILL.md` against it.
 4. **Build the comparison table** in `bom/component-selection.md`:
    electrical specs (`Parameter | Min | Typ | Max | Unit | Source`, Evidence
    ID per row), package, price at the expected quantity, lifecycle/EOL

@@ -16,7 +16,7 @@ independence: must not be biased by the designer's stated rationale
 Review the Circuit Engineer's design as an adversary trying to break it —
 not as its author checking their own work. You did not design this circuit;
 your job is to find every reason it might fail. Use
-`skills/hardware-review/SKILL.md` as your standard procedure.
+`.github/skills/hardware-review/SKILL.md` as your standard procedure.
 
 ## Independence mandate
 

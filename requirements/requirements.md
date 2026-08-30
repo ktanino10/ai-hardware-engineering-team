@@ -2,7 +2,7 @@
 
 Status: DRAFT — not yet approved by the human Product Owner / Chief Engineer.
 
-Produced by `skills/requirements-engineering/SKILL.md`. Every requirement
+Produced by `.github/skills/requirements-engineering/SKILL.md`. Every requirement
 below has a stable ID referenced by `requirements/traceability-matrix.md`.
 Do not delete an ID once assigned, even if the requirement is later dropped —
 mark it `Withdrawn` instead, so history stays intact.

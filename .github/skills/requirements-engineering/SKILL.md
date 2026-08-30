@@ -1,3 +1,8 @@
+---
+name: requirements-engineering
+description: Standard procedure for turning a rough, possibly ambiguous statement of intent into a measurable, prioritized (MoSCoW), contradiction-free requirements document, run before Component Selection. Use this whenever starting a new hardware design or when requirements are vague, incomplete, or conflicting.
+---
+
 # Skill: Requirements Engineering
 
 ## Purpose

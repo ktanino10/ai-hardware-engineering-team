@@ -1,3 +1,8 @@
+---
+name: hardware-review
+description: Checklist and failure-analysis procedure for an independent, adversarial hardware review of a schematic — voltage/current/thermal violations, missing decoupling, floating pins, pull-up/down errors, logic voltage mismatch, interface timing, power sequencing, grounding, EMI/EMC. Use this whenever reviewing a circuit design that was not authored by the reviewer.
+---
+
 # Skill: Hardware Review
 
 ## Purpose

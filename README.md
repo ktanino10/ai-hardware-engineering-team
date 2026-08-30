@@ -34,10 +34,8 @@ leaves an evidence trail a human can audit later.
 
 ```
 .github/            Copilot instructions, path-scoped rules, custom agent
-                     profiles, reusable prompts, CI gate workflow, CODEOWNERS
-skills/              Standard procedures (requirements engineering,
-                     component selection, datasheet analysis, schematic
-                     design, hardware review)
+                     profiles, agent skills, reusable prompts, CI gate
+                     workflow, CODEOWNERS
 requirements/        Requirements + requirements traceability matrix
 datasheets/          Datasheet METADATA only (never the actual copyrighted
                      files — see datasheets/README.md) + Evidence ID log

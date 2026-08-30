@@ -23,7 +23,7 @@ flowchart LR
 
 ### Phase 1 — Requirements Engineering
 - **Owner**: Hardware Lead, with the human Product Owner. Uses
-  `skills/requirements-engineering/SKILL.md`.
+  `.github/skills/requirements-engineering/SKILL.md`.
 - **Entry criteria**: A human has stated a goal/problem (even informally).
 - **Activities**: detect ambiguity, quantify (turn vague statements into
   measurable, testable requirements), prioritize (Must/Should/Could), detect
@@ -36,7 +36,7 @@ flowchart LR
 - **Parallel-safe?** No — single coherent sign-off (architecture.md §4).
 
 ### Phase 2 — Component Selection
-- **Owner**: Component Engineer. Uses `skills/component-selection/SKILL.md`.
+- **Owner**: Component Engineer. Uses `.github/skills/component-selection/SKILL.md`.
 - **Entry criteria**: Approved requirements exist for the part(s) needed.
 - **Activities**: identify candidates (≥3 when feasible — fan out with
   `explore`/`research` per candidate, architecture.md §4/§5.1), pull
@@ -52,7 +52,7 @@ flowchart LR
 
 ### Phase 3 — Datasheet Verification
 - **Owner**: Component Engineer (during selection) and Circuit Engineer
-  (before/while designing). Uses `skills/datasheet-analysis/SKILL.md`.
+  (before/while designing). Uses `.github/skills/datasheet-analysis/SKILL.md`.
 - **Entry criteria**: A datasheet has been identified for a part in active
   use.
 - **Activities**: register the datasheet in `datasheets/` (metadata record
@@ -65,7 +65,7 @@ flowchart LR
 - **Parallel-safe?** Yes, per datasheet.
 
 ### Phase 4 — Circuit Design
-- **Owner**: Circuit Engineer. Uses `skills/schematic-design/SKILL.md`.
+- **Owner**: Circuit Engineer. Uses `.github/skills/schematic-design/SKILL.md`.
 - **Entry criteria**: Parts approved (Phase 2) and datasheet constraints
   extracted (Phase 3).
 - **Activities**: fix shared resources first (rails, ground scheme, pin
@@ -81,7 +81,7 @@ flowchart LR
 ### Phase 5 — Independent Review
 - **Owner**: Hardware Reviewer (checklist) + `rubber-duck` (premise check),
   run in parallel against the same handoff. Uses
-  `skills/hardware-review/SKILL.md`.
+  `.github/skills/hardware-review/SKILL.md`.
 - **Entry criteria**: Circuit Engineer handoff received.
 - **Activities**: run the full adversarial checklist (architecture.md §7.1);
   where a KiCad project exists, cross-check with `extract_schematic_netlist`

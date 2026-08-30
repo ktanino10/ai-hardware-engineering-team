@@ -1,3 +1,8 @@
+---
+name: datasheet-analysis
+description: Standard procedure for systematically extracting design constraints from a manufacturer datasheet into a structured, citable Parameter|Min|Typ|Max|Unit|Source table, distinguishing Absolute Maximum Ratings from Recommended Operating Conditions and Typical Characteristics. Use this whenever a design decision needs a datasheet-grounded number.
+---
+
 # Skill: Datasheet Analysis
 
 ## Purpose

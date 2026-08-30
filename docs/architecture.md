@@ -67,7 +67,7 @@ programmatic invocation (e.g. `create_session`'s `agent` parameter, or the
 Invocation model: where a session's own tool surface has not been
 refreshed to expose these by name (e.g. this framework's own bootstrap
 session), the same role can still be played by loading the corresponding
-`.github/agents/<role>.agent.md` + `skills/*/SKILL.md` content explicitly
+`.github/agents/<role>.agent.md` + `.github/skills/*/SKILL.md` content explicitly
 into a `task` tool call (`agent_type: general-purpose`, or
 `explore`/`research`/`rubber-duck` where noted in §5) — the agent profile
 file is the authoritative definition of the role either way. The Hardware
@@ -105,7 +105,7 @@ first.
   gathering) — see §4.
 - `rubber-duck`: used **in addition to** (not instead of) the Hardware Reviewer.
   The Hardware Reviewer runs the physical-failure-mode checklist
-  (`skills/hardware-review/SKILL.md`). `rubber-duck` is run separately to
+  (`.github/skills/hardware-review/SKILL.md`). `rubber-duck` is run separately to
   challenge *design premises and blind spots* ("did we even ask the right
   requirement?", "what assumption is this whole approach resting on?"). Both
   feed `validation/open-issues.md`; the `Source` column distinguishes
@@ -200,7 +200,7 @@ every dependent artifact consistent.
 
 Each finding is recorded with: **Issue, Rationale, Datasheet Source (Evidence
 ID), Failure Mechanism, Affected Component, Recommended Fix, Severity**
-(exact schema in `skills/hardware-review/SKILL.md` and
+(exact schema in `.github/skills/hardware-review/SKILL.md` and
 `validation/design-review.md` / `validation/open-issues.md`).
 
 ### 7.2 FMEA risk scoring (quantitative, systemic, cross-cutting — §7.3)
@@ -296,7 +296,7 @@ required:
 - **Future role**: a dedicated **Power Engineer** (see §14) formally owns the
   system power budget and power tree/sequencing once the system grows past
   the benchmark's complexity. Until then, the Circuit Engineer maintains
-  `hardware/power-budget.md` as part of `skills/schematic-design/SKILL.md`.
+  `hardware/power-budget.md` as part of `.github/skills/schematic-design/SKILL.md`.
 - **Mechanical/Thermal co-design** is an explicit Circuit Engineer checklist
   item (see `.github/agents/circuit-engineer.agent.md`): rotating bodies (e.g. a
   reaction wheel motor) create vibration and localized heating that can
@@ -329,7 +329,7 @@ framework can add them without restructuring)
 | **Firmware Engineer** | Driver-level bring-up code, register-level configuration matching the schematic's actual pin/interface decisions | When firmware work starts in earnest |
 | **Control Engineer** | Control-loop design (e.g., attitude control loops) | At 1-axis / 3-axis attitude control roadmap stage |
 | **Test Engineer** | Owns `validation/bring-up-procedure.md` formally, designs bench test plans, HIL/environmental test plans | When bring-up moves beyond a one-off MVP bench test |
-| **Datasheet Specialist** | Advanced/high-volume operator of `skills/datasheet-analysis/SKILL.md`; owns `datasheets/evidence-log.md` quality and consistency | When datasheet volume/complexity outgrows ad hoc extraction by whichever agent needs a number |
+| **Datasheet Specialist** | Advanced/high-volume operator of `.github/skills/datasheet-analysis/SKILL.md`; owns `datasheets/evidence-log.md` quality and consistency | When datasheet volume/complexity outgrows ad hoc extraction by whichever agent needs a number |
 | **Safety/Compliance Reviewer** | Regulatory/standards review (e.g. UL/CE/FCC/EMC compliance where applicable) | When the project needs to target a regulated market or a safety-relevant certification |
 
 These are **not** created as `.github/agents/*.agent.md` files yet — introduce them
@@ -346,17 +346,17 @@ methodology and metrics.
 ```
 .github/copilot-instructions.md            Repo-wide Copilot operating rules
 .github/agents/*.agent.md                  Custom agent profiles for the 4 MVP agents (name+description frontmatter)
-.github/instructions/*.instructions.md     Path-scoped rules (datasheets/, hardware+bom/, validation/)
-.github/prompts/*.prompt.md                Reusable slash-command-style prompts
-.github/workflows/hardware-gate.yml        CI gate: blocks unresolved CRITICAL/HIGH
-.github/CODEOWNERS                         Required human review on safety-critical paths
-
-skills/
+.github/skills/*/SKILL.md                  Agent skill profiles (name+description frontmatter):
   requirements-engineering/SKILL.md
   component-selection/SKILL.md
   datasheet-analysis/SKILL.md
   schematic-design/SKILL.md
   hardware-review/SKILL.md
+.github/instructions/*.instructions.md     Path-scoped rules (datasheets/, hardware+bom/, validation/)
+.github/prompts/*.prompt.md                Reusable slash-command-style prompts
+.github/workflows/hardware-gate.yml        CI gate: blocks unresolved CRITICAL/HIGH
+.github/CODEOWNERS                         Required human review on safety-critical paths
+
 
 requirements/
   requirements.md                          Requirements template
