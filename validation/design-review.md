@@ -606,3 +606,321 @@ premise pass in parallel with the Hardware Reviewer's checklist pass adds
 real value beyond redundant checking — and why the Hardware Lead's
 mediation role (independently re-verifying disputed claims rather than
 simply picking a side) matters when two independent AI reviews disagree.
+
+## Cycle 2 — Re-review after Rev 2 rework (2026-09-01)
+
+### Review Cycle Metadata
+
+- **Design revision reviewed**: `hardware/schematic/bench-imu-01-design.md`
+  **Rev 2** (Author: Circuit Engineer (AI agent), rework commit `73215e4`
+  "Circuit rework for Bench-IMU-01: fix 3 HIGH findings (Rev 2)"), which
+  claims to fix the three Cycle-1 HIGH findings (ISS-001, ISS-002, ISS-011)
+  plus fold in the two Cycle-1 mediation corrections (ISS-006, ISS-010).
+  This is a **re-review, not a first review** — the Circuit Engineer's own
+  "Rev 2 rework" changelog (top of the design document) and its own
+  "Re-self-check after Rev 2 fixes" (§15) were read for orientation only,
+  never accepted as a substitute for independent verification.
+- **Reviewer**: Hardware Reviewer — see
+  `.github/agents/hardware-reviewer.agent.md`. Independent of the Circuit
+  Engineer session that performed the Rev 2 rework, and independent of the
+  Hardware Lead session that mediated the Cycle 1 conflict.
+- **Independence statement**: I did not treat any Rev 2 claim — the Circuit
+  Engineer's own "RESOLVED this revision" language, the Hardware Lead's
+  DS-MCU-050…053 evidence-log entries, or the Cycle 1 Addendum's mediation
+  outcome — as self-certifying. Every one of the 3 HIGH fixes and both
+  folded-in corrections was independently re-derived this cycle from
+  scratch against primary/authoritative sources, and the full document was
+  swept for consistency rather than spot-checked at the 5 named locations
+  only, per this skill's re-review rule ("re-running the checklist against
+  the changed area and anything the change could have affected — not a
+  partial spot-check"). **Methodology disclosure (important honesty note,
+  contrast with Cycle 1's stated method)**: direct PDF/HTML fetch of the
+  primary datasheets was attempted this cycle (`web_fetch`/`curl` against
+  st.com, TI, alldatasheet.com, Mouser, DigiKey, LCSC, manualslib.com) and
+  was **blocked or unusable in every case** in this sandboxed environment
+  (st.com closes the connection with an HTTP/2 protocol error even with a
+  browser-like User-Agent; alldatasheet.com's pin tables are
+  rendered-to-image, not extractable text; manualslib.com returns HTTP 403;
+  distributor "PDF" links redirect to HTML wrapper pages). I therefore
+  relied on the `web_search` tool's source-grounded synthesis as the
+  practical independent-verification method available here, and mitigated
+  the single-search-hallucination risk by cross-checking every material
+  fact (PB10/PB11=I2C2, TLV75533 EN pin/bias, USB-C vSafe5V range, TLV755P
+  Vin AMR/ROC, MCU VDD AMR lower bound, BOOT0=PA14, PB8 existence/function)
+  with **at least two independent queries**, several of which converged on
+  a specific named table/section/errata number (DS12992 Table 13/16,
+  RM0454, TI SBVS320D §4/§5.5/§6.4, errata es0487) rather than a generic
+  answer. This is a genuine independent re-derivation, not a re-citation of
+  the design doc's or evidence-log's own claims — but it is a **weaker
+  verification standard than reading the raw primary PDF directly**
+  (which Cycle 1 reported doing), and that gap is disclosed here rather
+  than papered over.
+- **Scope**: Focused re-review of the changed areas (§3.4 EN pin, §3.5 LDO
+  Vin margin/ISS-002 disposition, §4.1 VDD/decoupling + ISS-006 note, §4.2
+  BOOT0/PA14, §6 UART/I2C cross-reference, §11 pin table, §12 net list,
+  §13 parts list, §14 18-item checklist, §15 self-check/re-self-check, §16
+  UNKNOWNs items 1–4) plus a full-document consistency sweep (exhaustive
+  grep for every "I2C1"/"I2C2" occurrence — 49 total — and every
+  EN-pin/hedge-language occurrence — 37 total) to catch any leftover
+  inconsistency the targeted section re-reads might miss. `bom/component-selection.md`
+  and `requirements/requirements.md` were re-consulted only where Rev 2
+  itself cites them (e.g. REQ-101's stated band vs. the real USB-C
+  vSafe5V ceiling).
+- **Parallel sub-scans run**: None dispatched as separate sub-agent scans
+  this cycle — worked as a single integrated pass, consistent with the
+  agent instruction that the verdict is a single serial integration step
+  owned by the Hardware Reviewer. Investigation was organized around the 3
+  HIGH fixes + 2 corrections first, then a full 16-item checklist sweep of
+  everything the changes could have affected.
+- **rubber-duck premise review run in parallel?**: Not indicated as run for
+  this specific Cycle 2 pass (unlike Cycle 1, where one ran concurrently
+  and is what originally surfaced ISS-011). No `rubber-duck`-sourced row
+  was added to `validation/open-issues.md` this cycle; this report does not
+  rely on or duplicate the Cycle 1 rubber-duck findings, which are already
+  fully accounted for in the existing ISS-011/ISS-012/ISS-013 rows.
+- **KiCad tool cross-checks used**: None — still no KiCad project exists
+  for this repository (`kicad-list_projects` not re-run this cycle since
+  the design doc's own §0 tooling-honesty statement is unchanged and nothing
+  in Rev 2 claims a KiCad artifact now exists); the Markdown
+  schematic-equivalent document remains the correct artifact type to review
+  net-by-net and pin-by-pin, as in Cycle 1.
+- **Process-integrity check (new this cycle)**: Independently ran
+  `git log --oneline` and `git show --stat 73215e4` to verify the Rev 2
+  rework commit's own claim ("Only this document was modified;
+  `validation/open-issues.md`, `validation/design-review.md`, and
+  `datasheets/evidence-log.md` are owned by the Hardware Reviewer/Hardware
+  Lead and are not touched here"). **Confirmed true**: the commit's file-stat
+  summary shows exactly one file changed —
+  `hardware/schematic/bench-imu-01-design.md` (593 insertions(+), 153
+  deletions(-)) — no unauthorized edit to any validation/ or datasheets/
+  file was made by the Circuit Engineer this cycle.
+
+### Checklist Results (re-run against changed areas and anything the changes could have affected)
+
+Full checklist per `.github/skills/hardware-review/SKILL.md`, re-run this
+cycle (not a partial spot-check of only the 5 named items):
+
+| # | Checklist item | Result | Notes |
+|---|---|---|---|
+| 1 | Voltage violation | Finding (unchanged disposition, technical characterization independently reconfirmed sound) | ISS-002 — independently reconfirmed via USB-PD-spec-grounded search (vSafe5V 4.75–5.5V) and TI-datasheet-grounded search (TLV755P ROC 1.45–5.5V) that the LDO's Vin ROC top-end margin is genuinely ~0 at real-world worst-case input; not a new violation, and the §3.5 disposition recommendation is technically sound — still pending human Chief Engineer sign-off (§8), not resolvable by this review. |
+| 2 | Absolute Maximum Rating violation | Pass — no live violation found anywhere, independently reconfirmed | MCU VDD AMR lower bound (ISS-010: −0.3V, independently reconfirmed via ST DS12992 Table 18) and LDO Vin AMR (6.0V, independently reconfirmed via TI datasheet) both hold with margin even at ISS-002's real-world worst-case 5.5V input (0.5V/9% headroom remains — a ROC-ceiling thinness, not an AMR exceedance). ISS-010's *evidence-log.md housekeeping* is still incomplete (see Findings below) but this poses zero design risk. |
+| 3 | Current limit | Pass — unaffected by rework | Rework touched only §3.4/§3.5/§4.1/§4.2/§6/§11–16 text; no new current-consuming element was added. `hardware/power-budget.md` figures (≈16.2mA worst-case vs. 300–500mA ceilings) are unchanged and re-confirmed still applicable. |
+| 4 | Thermal risk | Pass — unaffected by rework | No change to load current or package; ISS-003's Cycle-1 mediation conclusion (θJA=60.3°C/W is correct for the DBV package) is unaffected by this cycle's edits and was not touched again. |
+| 5 | Missing decoupling capacitor | Pass — independently confirmed the ISS-001 fix introduces no new requirement | A direct EN-to-VIN tie (the new `EN_VIN` net) is TI's own always-enabled reference configuration and needs no additional bypass/decoupling capacitor beyond the existing C1(in)/C2(out) — independently confirmed via general LDO application-circuit practice. C3/C4/C5/C6/C7 are untouched by the rework. |
+| 6 | Floating pin | Pass — **RESOLVED this cycle (ISS-001), independently confirmed** | LDO (U3) EN pin: independently re-derived from TI's TLV755P/SBVS320D datasheet that EN (pin 3, DBV/SOT-23-5, the ordered package) is mandatory with no internal pull-up/pull-down bias — a floating EN is genuinely undefined, confirming the exact failure mechanism the finding described. Full-document grep (37 matches) confirms zero remaining hedge language anywhere (§3.4, §12, §13, §14, §15, §16 all consistent); the net is now a firm, unconditional EN→VIN tie. |
+| 7 | Incorrect pull-up/pull-down | Pass — I2C pull-ups and BOOT0 reasoning both independently reconfirmed sound | I2C R3/R4=4.7kΩ pull-ups are physically and electrically identical before/after the ISS-011 relabeling (same pins, same resistors) — independently confirmed the relabeling changed a firmware/peripheral-instance label only, not the resistor network. BOOT0 pull-down omission's *reasoning* is independently confirmed corrected (ISS-006: BOOT0 is muxed on PA14, not PB8) while the underlying no-physical-BOOT0-circuit design decision is unchanged and remains sound (PA14 is already committed to SWCLK). |
+| 8 | Logic voltage mismatch | Pass — unaffected by rework | Single 3.3V logic rail throughout; nothing in Rev 2's changes introduces or touches an interface voltage. |
+| 9 | Interface timing | Pass — independently confirmed ISS-011 has zero electrical/timing impact | The I2C1→I2C2 relabeling is a pure peripheral-instance/firmware-target correction: identical physical pins (PB10/PB11), identical pull-up resistors (R3/R4=4.7kΩ), identical bus-capacitance/rise-time sensitivity analysis in §5.2. The 400kHz Fast-mode Plus timing budget is completely unaffected — independently verified, not merely assumed, by confirming no numeric or component value in §5.2 changed between Cycle 1 and Rev 2. |
+| 10 | Power sequencing | Pass — unaffected by rework | Single-rail simultaneous power-up argument (VDD=VDDIO/VDDA/VBAT tied) is unchanged by this cycle's edits. |
+| 11 | Grounding | Pass — unaffected by rework | Single ground net/plane statement unchanged. |
+| 12 | EMI/EMC risk | Pass — unaffected by rework | REQ-401's waiver of formal EMC certification for this prototype is unchanged; no new noise source was added by the rework (EN→VIN is a DC tie, not a switching net). |
+| 13 | Motor noise | N/A — unaffected | Still no motor/rotating actuator on this board. |
+| 14 | Sensor noise | Pass (residual tracked under ISS-009, unchanged, out of scope this cycle) | LDO output cap value (0.47µF vs. TI's 1µF characterization condition) is untouched by this rework; ISS-009 remains OPEN/LOW, intentionally out of scope this cycle per the task. |
+| 15 | PCB layout concern (incl. mechanical/thermal co-design) | N/A — unaffected | Still no KiCad project/PCB layout this cycle; still no rotating body (`docs/architecture.md` §12 co-design trigger does not apply). |
+| 16 | Datasheet recommendation violation | Pass — **RESOLVED this cycle (ISS-001), ISS-006 reasoning corrected, independently confirmed** | LDO's own recommended application circuit (always-enabled EN→VIN) is now followed exactly — previously the one documented, hedged deviation. MCU's no-physical-BOOT0-circuit remains a deliberate, logged deviation, now justified for the *correct* reason (BOOT0=PA14, not PB8). No new unlogged/silent deviation found anywhere in the rework. |
+
+### Re-verification of Cycle 1 HIGH findings and folded-in corrections
+
+Each of the following was independently re-derived from primary/authoritative
+sources this cycle — not accepted on the strength of the design document's,
+evidence-log's, or Hardware Lead's own citation.
+
+#### ISS-011 (HIGH) — I2C1→I2C2 relabeling — **independently RE-CONFIRMED, fix holds up**
+
+- **Independent method**: Two separate web searches targeting the
+  STM32G031K8T6's real alternate-function table specifically (not the
+  design doc's or DS-MCU-052's citation of it), cross-checked against each
+  other.
+- **Result**: Both searches converge, citing ST's own DS12992 datasheet
+  (Table 13/16, Alternate Function tables) and the RM0454 reference manual:
+  pins **PB10/PB11 map to I2C2_SCL/I2C2_SDA via AF1**, not I2C1. The
+  STM32G031 (unlike the lower-cost STM32G030) genuinely has two separate
+  I2C peripheral instances — this is confirmed independently, not merely
+  re-cited from DS-MCU-052. No search surfaced a contradicting claim.
+- **Document consistency**: Exhaustive full-document grep for every
+  occurrence of "I2C1" (28) and "I2C2" (21) — 49 total, none missed. Every
+  single "I2C1" occurrence is correctly contextual (explaining the
+  historical mislabel, correctly stating "I2C1 is now free," or correctly
+  describing PB8's true I2C1_SCL alternate function) across §2.3, §5.2,
+  §5.3, §6, §11, §12, §13, §14, §16 — including the §6 UART section, which
+  the changelog specifically claimed was also touched, and the pin table
+  (§11), net list (§12), and checklist item 13 (§14) the task specifically
+  asked about. **No stray leftover "I2C1" label found, and "I2C1 is now
+  free" is stated correctly** (true I2C1 lives on PB6/PB7 or PB8/PB9,
+  confirmed unused elsewhere in this design).
+- **Electrical-impact check**: Independently confirmed this is purely a
+  peripheral-instance/firmware-target correction — same physical pins, same
+  R3/R4 pull-ups, same §5.2 timing analysis; zero electrical characteristic
+  changed (checklist item 9 above).
+- **Conclusion**: Fix holds up under independent re-verification.
+  `validation/open-issues.md` updated: **ISS-011 → RESOLVED** (2026-09-01).
+
+#### ISS-001 (HIGH) — LDO EN pin — **independently RE-CONFIRMED, fix holds up**
+
+- **Independent method**: Web search grounded specifically in TI's TLV755P
+  family datasheet (SBVS320D), targeting the EN pin's mandatory/optional
+  status and internal bias specifically on the DBV (SOT-23-5) package (the
+  ordered TLV75533PDBVR part), cross-checked with a second query.
+- **Result**: Confirmed EN (pin 3 on the DBV package) is a mandatory pin
+  present on every package variant of this family, with **no internal
+  pull-up or pull-down bias** — a genuinely floating EN produces
+  undefined/undetermined enable behavior. This independently reconfirms the
+  exact failure mechanism Cycle 1's ISS-001 finding described (dead board
+  or brownout/chatter risk), from the primary source, not from the design
+  doc's or Cycle-1-report's own restatement of it.
+- **Document consistency**: Full-document grep for EN-pin/hedge language
+  (37 matches) confirms the hedge ("if the exact package variant... has an
+  active EN pin requiring a level... flagged as a minor implementation
+  detail to confirm... at layout time") is **completely removed** — §3.4,
+  §12 (new `EN_VIN` net), §13, §14, §15, and §16 all now consistently state
+  a firm, unconditional EN→VIN tie with no remaining ambiguity anywhere.
+- **Side-effect check**: Independently confirmed a direct EN-to-VIN tie
+  needs no additional decoupling capacitor (checklist item 5 above) — the
+  fix introduces no new gap.
+- **Conclusion**: Fix holds up under independent re-verification.
+  `validation/open-issues.md` updated: **ISS-001 → RESOLVED** (2026-09-01).
+
+#### ISS-002 (HIGH) — LDO Vin ROC margin — **technical analysis independently RE-CONFIRMED sound; disposition correctly not self-resolved**
+
+- **Independent method**: Two separate fact checks — (a) the real-world
+  USB-C/USB-PD vSafe5V ceiling, via a search grounded in the USB-PD
+  specification (Table 7.4.3), and (b) the TLV755P family's Vin AMR/ROC
+  figures, via a search grounded in TI's own datasheet.
+- **Result**: (a) vSafe5V range = **4.75–5.5V**, confirmed independently —
+  matches §3.5's claim exactly (wider than REQ-101's stated 4.75–5.25V
+  legacy-USB figure). (b) TLV755P Vin **AMR = 6.0V**, **ROC = 1.45–5.5V**,
+  confirmed independently — matches §3.5's arithmetic exactly. This is not
+  a case of re-citing DS-PWR-002/003; both governing numbers were
+  independently re-derived from separate sources this cycle.
+- **Technical soundness assessment**: §3.5's analysis correctly
+  distinguishes two different things that are easy to conflate — an AMR
+  exceedance (real damage risk; **not applicable**, since even 5.5V-in
+  leaves 0.5V/9% margin under the 6.0V AMR) versus a ROC-ceiling
+  exceedance (per TI's own datasheet convention, a "may not meet all
+  specified electrical characteristics" caveat, not a damage risk). This
+  characterization is accurate and neither overstates the finding (by
+  implying damage risk that isn't there) nor understates it (by treating
+  the effectively-zero ROC margin as a non-issue). The recommended
+  disposition — ACCEPTED-RISK, routed to the Hardware Lead / human Chief
+  Engineer per `docs/architecture.md` §8, with a component-swap
+  alternative explicitly flagged but correctly left for the Hardware
+  Lead/Component Engineer to decide rather than self-selected by the
+  Circuit Engineer — is reasonable and appropriately scoped.
+- **Authority check**: Per `docs/architecture.md` §8 and this skill's own
+  "Out of scope" clause, the Hardware Reviewer **cannot** grant
+  ACCEPTED-RISK for a HIGH finding; only a named human Chief Engineer
+  sign-off can. Independently confirmed via `tools/check_open_issues.py`
+  that the CI gate enforces exactly this rule mechanically (a HIGH finding
+  must be `RESOLVED` or `ACCEPTED-RISK`, or the gate fails) — running the
+  gate script against the updated backlog this cycle produces exactly one
+  failure, on ISS-002, which is the correct and intended outcome right now.
+- **Conclusion**: The finding's technical characterization holds up under
+  independent re-verification and is sound; its disposition is correctly
+  *not* something this review can close. `validation/open-issues.md`
+  updated: **ISS-002 → stays OPEN** (not RESOLVED, not ACCEPTED-RISK),
+  with a note that the technical analysis is sound and the disposition is
+  pending human Chief Engineer sign-off. This is the one item preventing a
+  clean PASS this cycle.
+
+#### ISS-006 (MEDIUM) — BOOT0/PB8 correction — **independently RE-CONFIRMED, spot-check holds up**
+
+- **Independent method**: Two separate web searches for the STM32G0x0
+  sub-family's BOOT0 pin mapping, one specifically targeting the
+  STM32G031x4/x6/x8 errata sheet (es0487), which discusses PA14/BOOT0/SWCLK
+  interaction — a strong corroborating signal since it cites a real,
+  specific secondary document rather than a generic/templated answer.
+- **Result**: Confirmed **BOOT0 is muxed onto PA14** (shared with SWCLK)
+  on this sub-family, independently of PB8. Separately confirmed PB8
+  physically exists on the LQFP-32 package with real alternate function
+  **I2C1_SCL (AF6)** — unrelated to boot-mode selection. Both facts match
+  Rev 2 §4.1/§4.2/§11/§13's corrected claims.
+- **Residual honestly reproduced, not newly introduced**: PB8's *exact*
+  pin number remains genuinely ambiguous even under fresh independent
+  search — one query indicated pin 30, another indicated pin 32 (shared
+  with VBAT in that source). This is the **same ambiguity Rev 2 §16 item 3
+  already discloses**, not a new problem, and it is immaterial to this
+  design since nothing is wired to PB8 regardless of its exact pin number.
+  Independently reproducing rather than resolving this ambiguity is itself
+  a useful negative result: it confirms the design doc's own disclosed
+  uncertainty is genuine, not a cover for an unchecked claim.
+- **Conclusion**: Fix holds up under independent re-verification.
+  `validation/open-issues.md` updated: **ISS-006 → RESOLVED** (2026-09-01).
+
+#### ISS-010 (LOW) — MCU VDD AMR lower bound — **fact independently RE-CONFIRMED correct; original recommended fix found INCOMPLETE, kept OPEN**
+
+- **Independent method**: Web search targeting the STM32G031K8T6 VDD
+  Absolute Maximum Rating specifically, cross-checked against a citation of
+  ST's DS12992 Table 18.
+- **Result**: Confirmed VDD AMR = **−0.3V to +4.0V** — matches Rev 2 §1/§16
+  item 2's claim exactly. Zero design risk either way (3.3V nominal
+  operation sits deep inside both this AMR and the 1.7–3.6V ROC).
+- **A genuine independent finding this cycle, not a rubber-stamp**: ISS-010's
+  own title and Recommended Fix in `validation/open-issues.md` named a
+  specific action — *"Update DS-MCU-012 entry to VDD AMR Min −0.3V / Max
+  4.0V… mark design-doc §16 UNKNOWN #2 resolved."* Checking
+  `datasheets/evidence-log.md` directly (not just the design doc's
+  restatement of it) shows only the **second half** was ever done: the
+  design doc's own §1/§16 UNKNOWN tracker is correctly closed with a fresh
+  direct citation, but **the DS-MCU-012 row's own Value column still
+  literally reads "UNKNOWN"** as of this cycle — it was never edited. This
+  is consistent with (not a fault of) the Rev 2 rework, since the Circuit
+  Engineer's own changelog explicitly states it does not touch
+  `datasheets/evidence-log.md` (that file is owned by the Hardware
+  Reviewer/Hardware Lead) — but nobody closed this specific loop before
+  now.
+- **Conclusion**: The underlying engineering fact is correct and poses no
+  risk, so this is not a design defect — but the originally-recommended fix
+  was only partially executed, so declaring it fully `RESOLVED` would
+  overstate what actually happened. `validation/open-issues.md` updated:
+  **ISS-010 → kept OPEN** (LOW, non-gating — does not affect the CI gate or
+  the verdict below) with a note explaining the fact/fix distinction and
+  recommending a trivial follow-up edit to `datasheets/evidence-log.md`'s
+  DS-MCU-012 row in a future pass (out of this cycle's two-file output
+  scope).
+
+### New/residual observations this cycle
+
+No new CRITICAL, HIGH, or MEDIUM finding was introduced by the Rev 2 rework
+itself — independently checked via the full 16-item re-run above, the
+process-integrity git check, and the exhaustive I2C1/I2C2 and EN-pin/hedge
+greps. The only new item surfaced this cycle is the ISS-010
+evidence-log.md housekeeping gap described above, which is LOW severity,
+non-gating, and already folded into ISS-010's own backlog row rather than
+opened as a new ID (consistent with this cycle's tightly-scoped
+`validation/open-issues.md` edit list).
+
+### Verdict
+
+- **Verdict**: **CONDITIONAL** (not a clean PASS)
+- **Open CRITICAL count**: 0
+- **Open HIGH count**: 1 (ISS-002 only — ISS-001 and ISS-011 are now
+  independently confirmed RESOLVED)
+- **What's blocking a clean PASS, precisely**: ISS-002 alone. Its technical
+  characterization is independently confirmed sound and its recommended
+  disposition (ACCEPTED-RISK) is reasonable — but per `docs/architecture.md`
+  §8, only a named human Chief Engineer can actually grant ACCEPTED-RISK
+  for a HIGH finding, and I do not have that authority. This is not
+  "further engineering work" pending — the engineering analysis is done and
+  independently checked out. What remains is a **human sign-off decision**
+  (accept the thin ROC margin for this bench-use context, or ask the
+  Component Engineer for an LDO with a higher Vin ROC ceiling), which
+  belongs with the Hardware Lead/Chief Engineer, not with another circuit
+  rework loop.
+- **What independently checks out (no further engineering action needed)**:
+  ISS-011 (I2C1→I2C2 relabeling), ISS-001 (LDO EN pin), ISS-006
+  (BOOT0/PA14 + PB8/I2C1_SCL correction) all independently re-verified
+  fixed against primary/authoritative sources, with full-document
+  consistency confirmed by exhaustive grep, not spot-check. ISS-010's
+  underlying fact also independently checks out, though its evidence-log.md
+  paperwork is a trivial, non-blocking loose end (see above).
+- **Next action**: Route ISS-002 to the Hardware Lead for the human Chief
+  Engineer ACCEPTED-RISK decision (or a Component-Engineer-driven LDO
+  swap, if that path is preferred) per `docs/architecture.md` §8 — **no
+  further Circuit Engineer rework loop is required** for ISS-001/ISS-006/
+  ISS-011, which are closed. `tools/check_open_issues.py` independently
+  confirms this cycle's backlog state is internally consistent: it fails
+  on exactly one violation (ISS-002, HIGH, neither RESOLVED nor
+  ACCEPTED-RISK) and no others, which is the intended, correct gate
+  behavior right now. A trivial, non-blocking housekeeping item
+  (`datasheets/evidence-log.md` DS-MCU-012 Value column) remains for a
+  future pass but does not affect this verdict.
