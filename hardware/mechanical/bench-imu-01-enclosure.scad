@@ -152,10 +152,13 @@ standoff_pilot_depth = 5.0; // mm, blind. ASSUMPTION: leaves 1.0mm of solid
 //     simplicity, verified by stack-up arithmetic in the spec file) ---
 screw_len = 6.0; // mm (M2.5 self-tapping/thread-forming). ASSUMPTION.
                  // PCB standoffs: passes through pcb_thickness (1.6mm) and
-                 // engages ~4.4mm of the 5.0mm pilot depth.
+                 // engages ~4.4mm of the 5.0mm pilot depth (0.6mm spare).
                  // Lid tabs: passes through the lid tab's clearance
                  // thickness (2.0mm) and engages 4.0mm of the base tab's
-                 // 4.0mm pilot depth (see tab_pilot_depth below).
+                 // 4.6mm pilot depth (0.6mm spare -- MISS-004 fix,
+                 // Mechanical Reviewer Cycle 1: was a 4.0mm pilot depth
+                 // giving ZERO spare here, unlike the standoff's own
+                 // deliberate 0.6mm; see tab_pilot_depth below).
 
 // --- Vertical (Z) stack -- DERIVED unless noted ---
 z_margin = 0.5; // mm. ASSUMPTION: extra robustness margin ABOVE the
@@ -230,12 +233,58 @@ j1_cut_z = standoff_h; // mm, bottom edge of cutout, referenced to the
 //     print simplicity (avoids a thin bridged strip at the back edge) and
 //     because it matches real cable-dressing needs (a debug cable can
 //     exit up or backward through the open notch). ---
-bay_x_min = 10.0; // mm, board-local X. ESTIMATE: J2 (x=16) margin - 6mm.
-bay_x_max = 50.0; // mm, board-local X. ESTIMATE: SW1 (x=44) margin + 6mm.
-bay_y_min = 34.0; // mm, board-local Y. ESTIMATE: 6mm header/switch
-                   // footprint-depth allowance in from the board's Y=40
-                   // edge (the bay's other, open, edge is that same
-                   // board/enclosure edge itself).
+// MISS-001 correction (Mechanical Reviewer Cycle 1, HIGH; fixed in this
+// revision). The values below used to be sized from J2/J3/SW1's CENTERLINE
+// board-local positions (e.g. "J2 (x=16) margin - 6mm") while the comments
+// claimed a ~6mm margin -- but reference_pcba() below (the same file's own
+// visual-reference geometry) already commits to real footprint EDGES for
+// these same parts (10mm-wide x 6mm-deep boxes for J2/J3, a dia-5 cylinder
+// for SW1). Measured correctly edge-to-edge against those already-committed
+// footprints, the real margin the old numbers produced was only
+// 0.0/1.0/3.5mm, not 6mm -- an artifact of measuring from the wrong
+// reference point (centerline/point, not edge), independently re-derived by
+// the Mechanical Reviewer directly from these raw values. Recomputed here
+// from each connector's REAL footprint edge (reusing reference_pcba()'s own
+// numbers -- 5mm header half-width, 2.5mm SW1 radius -- not new ones), plus
+// one single, named, consistently-applied margin (bay_edge_margin below).
+bay_edge_margin = board_xy_keepout; // mm = 1.5. DERIVED: reuses
+                    // board_xy_keepout's own value AND rationale ("generous
+                    // drop-in/assembly and robustness margin for
+                    // unconfirmed real hardware, not a tight mating
+                    // tolerance" -- see board_xy_keepout above) rather than
+                    // inventing a new constant, since J2/J3/SW1's exact
+                    // packages are themselves still-unconfirmed ESTIMATEs
+                    // (interface file Open Items). 1.5mm is also the
+                    // LARGEST value that keeps BOTH of this margin's
+                    // competing clearances positive: the bay-to-rear-tab
+                    // gap on the X sides (only 3.5mm total budget on the
+                    // tightest, left side) and the bay-to-D1-hole gap on
+                    // the Y side (only 2.5mm total budget) -- see
+                    // dimensional-spec.md Sec 6/7 for the full budget
+                    // arithmetic. The originally-intended "6mm" margin is
+                    // NOT geometrically achievable at all once measured
+                    // from real edges: it would collide with the rear-left
+                    // tab outright (needs 3.5mm+6mm=9.5mm of budget where
+                    // only 3.5mm exists).
+bay_x_min = (j2_x - 5) - bay_edge_margin; // = 11.0 - 1.5 = 9.5mm, board-local
+                    // X. (j2_x - 5) is J2's real left footprint edge, per
+                    // reference_pcba()'s `hx - 5` (10mm-wide header box).
+bay_x_max = (sw1_x + 2.5) + bay_edge_margin; // = 46.5 + 1.5 = 48.0mm,
+                    // board-local X. (sw1_x + 2.5) is SW1's real right
+                    // footprint edge, per reference_pcba()'s dia-5 (radius
+                    // 2.5) cylinder centered on sw1_x.
+bay_y_min = (40 - 6) - bay_edge_margin; // = 34.0 - 1.5 = 32.5mm, board-local
+                    // Y. (40 - 6) is J2/J3's real footprint Y-min edge, per
+                    // reference_pcba()'s own `40 - 6` expression for the
+                    // same header boxes -- this is the binding (smaller)
+                    // constraint vs. SW1's own footprint Y-min (35.0, from
+                    // its center sw1_y-2.5=37.5 minus radius 2.5). SIDE
+                    // EFFECT (disclosed, not silently accepted): shrinking
+                    // this from the old 34.0 to 32.5 narrows the
+                    // D1-viewing-hole-to-bay clearance from 2.5mm to
+                    // 1.0mm -- still positive; re-verified in
+                    // dimensional-spec.md Sec 7 and flagged in Sec 12 Open
+                    // Item #8.
 
 // --- D1 LED viewing hole, through the lid roof only. Purpose: FUNCTIONAL
 //     ACCESS (visibility) -- a solid lid would hide the LED entirely. ---
@@ -250,17 +299,54 @@ d1_hole_dia = 3.0; // mm. ESTIMATE: small viewing hole, no light-pipe
 //     PCB-colliding. ---
 tab_w             = 8.0; // mm, along the wall. ASSUMPTION.
 tab_project       = 6.0; // mm, beyond the main wall's outer face. ASSUMPTION.
-tab_base_t        = 5.0; // mm, base-side tab thickness. ASSUMPTION -- sized
-                          // to give a 4.0mm pilot depth (below) with a
-                          // 1.0mm solid floor remaining.
-tab_pilot_depth   = 4.0; // mm, blind. ASSUMPTION (see screw_len note above
-                          // for the full engagement arithmetic).
+tab_base_t        = 5.6; // mm, base-side tab thickness. ASSUMPTION -- sized
+                          // to give a 4.6mm pilot depth (below) with a
+                          // 1.0mm solid floor remaining. MISS-004 fix
+                          // (Mechanical Reviewer Cycle 1, MEDIUM): was 5.0mm
+                          // (paired with a 4.0mm pilot depth, giving ZERO
+                          // engagement spare -- see tab_pilot_depth below).
+                          // Increased by the same +0.6mm as tab_pilot_depth
+                          // so the 1.0mm solid floor is preserved exactly,
+                          // rather than only deepening the pilot hole (which
+                          // would have thinned the floor to 0.4mm -- close
+                          // to the ~0.4-0.8mm FDM minimum-feature-size range
+                          // this same reviewer cycle flagged in MISS-002,
+                          // i.e. would risk trading one marginal defect for
+                          // another).
+tab_pilot_depth   = 4.6; // mm, blind. ASSUMPTION (see screw_len note above
+                          // for the full engagement arithmetic). MISS-004
+                          // fix: was 4.0mm, exactly equal to the 4.0mm of
+                          // engagement (screw_len - tab_lid_t = 6.0 - 2.0),
+                          // leaving ZERO spare margin -- unlike the PCB
+                          // standoff's own deliberate 0.6mm spare
+                          // (standoff_pilot_depth 5.0mm vs. 4.4mm engaged).
+                          // Deepened by +0.6mm to restore that SAME 0.6mm
+                          // spare here too (4.6 - 4.0 = 0.6mm), for
+                          // consistency with the standoff's own precedent.
 tab_lid_t         = lid_roof_t; // mm. Lid-side tab thickness = lid_roof_t
                                  // -- the lid tab is a literal lateral
                                  // extension of the roof at 4 XY spots.
 tab_clear_dia     = 2.8; // mm, lid tab through-hole. ASSUMPTION: same
                           // clearance-hole convention as the PCB mounting
                           // holes.
+// MISS-003 fix (Mechanical Reviewer Cycle 1, MEDIUM): the LID tab's
+// clearance-hole annular wall, if sized with the shared tab_project like
+// the base tab, computes to only (tab_project - tab_clear_dia)/2 =
+// (6.0-2.8)/2 = 1.6mm -- below min_wall_t (2.0mm). The BASE tab's own
+// equivalent calculation, (tab_project - tab_pilot_dia)/2 = (6.0-2.0)/2 =
+// 2.0mm exactly, already sits right at the floor and does NOT need to
+// change -- it uses the smaller 2.0mm pilot hole, not the lid's larger
+// 2.8mm clearance hole. This is therefore a LID-side-only override; tab_w
+// and the base tab are untouched (tab_w's own (8.0-2.8)/2=2.6mm margin was
+// already fine). See lid_tab() below: the clearance hole is kept centered
+// on the SAME fastener axis the base tab's pilot hole uses (computed from
+// the shared tab_project, unchanged) -- only the surrounding footprint
+// material grows via lid_tab_project, so the two holes stay coaxial.
+lid_tab_project = 2*min_wall_t + tab_clear_dia; // mm = 6.8. DERIVED, LID
+                    // TAB ONLY: sized so (lid_tab_project - tab_clear_dia)/2
+                    // = min_wall_t exactly (2.0mm), mirroring the base tab's
+                    // own "exactly at the floor" precedent rather than
+                    // inventing a different margin convention.
 tab_pilot_dia     = standoff_pilot_dia; // mm, base tab pilot hole -- same
                                          // M2.5 self-tap pilot as the
                                          // standoffs (BOM simplicity).
@@ -318,20 +404,52 @@ module base_tab(pos) {
         translate([tx, tab_y0 + tab_project/2, base_total_h - tab_pilot_depth])
             cylinder(d = tab_pilot_dia, h = tab_pilot_depth + 1);
     }
-    // 45-deg self-supporting chamfer/gusset under the tab (see rationale
-    // at tab_chamfer_run above). Modeled as a hull() between two thin
-    // slivers -- a reasonable approximation of a wedge gusset; a human
-    // reviewing this in an actual OpenSCAD session should feel free to
-    // refine the exact profile, this is not a load-bearing dimension.
+    // 45-deg self-supporting chamfer/gusset under the tab (see rationale at
+    // tab_chamfer_run above). MISS-002 fix (Mechanical Reviewer Cycle 1,
+    // HIGH): this used to be a hull() of two 0.01mm-thin cubes, which the
+    // Mechanical Reviewer correctly identified as a geometrically
+    // degenerate sliver -- a hull() of two near-zero-area cross-sections
+    // produces an infinitesimally thin diagonal FIN swept between the two
+    // points, not a solid triangular wedge with real cross-sectional area
+    // at every point along its span, and its ~0.01mm thickness is far below
+    // any FDM printer's minimum feature size (commonly ~0.4-0.8mm). Fixed
+    // here with a GENUINE solid right-triangle prism: a linear_extrude() of
+    // a right-triangle polygon(), swept along tab_w, with real rise
+    // (tab_chamfer_run, 6.0mm) and run (tab_project, 6.0mm) legs -- equal
+    // legs give an exact 45-deg hypotenuse, matching max_overhang_deg, and
+    // its cross-section is a real, non-degenerate triangle at every point
+    // along the tab_w sweep (area = 0.5 * 6.0 * 6.0 = 18mm^2; swept over
+    // tab_w=8.0mm => volume = 144mm^3 -- a genuine load-bearing wedge, not
+    // a ~1e-7mm^3 mathematical artifact).
+    //
+    // Coordinate transform: the triangle is drawn in a LOCAL (x,y) plane
+    // with x representing (the negative of) global Z and y representing
+    // global Y directly, then linear_extrude()'d along local z and finally
+    // rotate([0,90,0])'d into place. rotate([0,90,0]) maps local (x,y,z) ->
+    // global (z,y,-x) [Ry(90): x'=x*cos90+z*sin90=z, y'=y,
+    // z'=-x*sin90+z*cos90=-x] -- so: local z (the extrusion/height axis)
+    // becomes global X (the tab_w sweep direction, positioned by the
+    // outer translate() below); local y is unchanged and becomes global Y
+    // directly (so each polygon point's 2nd coordinate is simply the real
+    // Y value, y_wall or y_tab_edge); and global Z = -(local x), so each
+    // point's 1st coordinate must be the NEGATIVE of the desired global Z
+    // (-z_bottom, -z0). The resulting triangle has its right angle at
+    // (y_wall, z0) -- flush with, and coincident to, the tab cube's own
+    // bottom face above -- tapering to a knife edge at (y_tab_edge, z0)
+    // and dropping vertically to (y_wall, z_bottom) at the wall face,
+    // exactly the standard self-supporting 45-deg gusset profile: full
+    // height at the wall, zero height at the tab's outer edge.
     y_wall     = (dy < 0) ? 0 : base_outer_y;
     y_tab_edge = (dy < 0) ? -tab_project : base_outer_y + tab_project;
     z_bottom   = z0 - tab_chamfer_run;
-    hull() {
-        translate([tx - tab_w/2, y_wall, z_bottom])
-            cube([tab_w, 0.01, 0.01]);
-        translate([tx - tab_w/2, y_tab_edge, z0])
-            cube([tab_w, 0.01, 0.01]);
-    }
+    translate([tx - tab_w/2, 0, 0])
+        rotate([0, 90, 0])
+            linear_extrude(height = tab_w)
+                polygon(points = [
+                    [-z_bottom, y_wall],
+                    [-z0,       y_wall],
+                    [-z0,       y_tab_edge],
+                ]);
 }
 
 module base_tabs() {
@@ -371,11 +489,35 @@ module lid_tab(pos) {
     // roof, i.e. it is a lateral extension of the roof at 4 XY spots.
     tx = board_offset_x + pos[0];
     dy = pos[2];
-    tab_y0 = (dy < 0) ? -tab_project : base_outer_y;
+    // MISS-003 fix (Mechanical Reviewer Cycle 1, MEDIUM): the fastener axis
+    // (hole_yc) is computed from the SHARED, UNCHANGED tab_project -- the
+    // exact same formula the base tab itself uses for its own pilot hole --
+    // so the lid's clearance hole stays perfectly coaxial with the base
+    // tab's pilot hole beneath it. lid_tab_project (wider than tab_project,
+    // see its own definition above) is used ONLY to size the surrounding
+    // footprint material, not to reposition the hole -- if the hole center
+    // were instead computed from lid_tab_project, it would shift by
+    // (lid_tab_project-tab_project)/2 = 0.4mm off-axis from the base tab's
+    // pilot hole, which would meaningfully exceed the clearance hole's own
+    // ~0.15mm/side slop around an M2.5 shank and could bind the screw.
+    tab_y0  = (dy < 0) ? -tab_project : base_outer_y;
+    hole_yc = tab_y0 + tab_project/2;
+    // Footprint cube: sized with the WIDER lid_tab_project (restores
+    // >=2.0mm annular wall around the larger 2.8mm clearance hole, vs. only
+    // 1.6mm with the shared tab_project), centered symmetrically on the
+    // fixed hole_yc above -- this grows the lid tab's footprint by
+    // (lid_tab_project-tab_project)/2 = 0.4mm on each side beyond the base
+    // tab's own footprint. That symmetric growth is harmless: it is all
+    // still the single lid part (self-overlap with the lid's own skirt
+    // geometry, where present, simply unions together), and fastening only
+    // requires the two parts' HOLES to be coaxial, not their outer
+    // silhouettes to match -- a lid tab very slightly larger than the base
+    // tab it mates to is a cosmetic-only difference, not a fit defect.
+    cube_y0 = hole_yc - lid_tab_project/2;
     difference() {
-        translate([tx - tab_w/2, tab_y0, lid_lip_h])
-            cube([tab_w, tab_project, lid_roof_t]);
-        translate([tx, tab_y0 + tab_project/2, lid_lip_h - 1])
+        translate([tx - tab_w/2, cube_y0, lid_lip_h])
+            cube([tab_w, lid_tab_project, lid_roof_t]);
+        translate([tx, hole_yc, lid_lip_h - 1])
             cylinder(d = tab_clear_dia, h = lid_roof_t + 2);
     }
 }
