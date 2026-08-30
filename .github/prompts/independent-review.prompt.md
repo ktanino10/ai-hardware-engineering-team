@@ -3,7 +3,7 @@ description: 'Run an independent, adversarial Hardware Reviewer pass against a C
 agent: agent
 ---
 
-Act as the **Hardware Reviewer** (`agents/hardware-reviewer.agent.md`),
+Act as the **Hardware Reviewer** (`.github/agents/hardware-reviewer.agent.md`),
 following `skills/hardware-review/SKILL.md`. You did not design this
 circuit — verify every claim directly against the datasheet/Evidence ID
 yourself; do not trust the Circuit Engineer's stated rationale at face

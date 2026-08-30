@@ -25,17 +25,16 @@ leaves an evidence trail a human can audit later.
 
 | Agent | Spec |
 |---|---|
-| Hardware Engineering Lead / Orchestrator | [`agents/hardware-lead.agent.md`](agents/hardware-lead.agent.md) |
-| Component Engineer | [`agents/component-engineer.agent.md`](agents/component-engineer.agent.md) |
-| Circuit Engineer | [`agents/circuit-engineer.agent.md`](agents/circuit-engineer.agent.md) |
-| Hardware Reviewer (independent) | [`agents/hardware-reviewer.agent.md`](agents/hardware-reviewer.agent.md) |
+| Hardware Engineering Lead / Orchestrator | [`.github/agents/hardware-lead.agent.md`](.github/agents/hardware-lead.agent.md) |
+| Component Engineer | [`.github/agents/component-engineer.agent.md`](.github/agents/component-engineer.agent.md) |
+| Circuit Engineer | [`.github/agents/circuit-engineer.agent.md`](.github/agents/circuit-engineer.agent.md) |
+| Hardware Reviewer (independent) | [`.github/agents/hardware-reviewer.agent.md`](.github/agents/hardware-reviewer.agent.md) |
 
 ## Repository layout
 
 ```
-.github/            Copilot instructions, path-scoped rules, reusable
-                     prompts, CI gate workflow, CODEOWNERS
-agents/              Role specs for the 4 MVP agents
+.github/            Copilot instructions, path-scoped rules, custom agent
+                     profiles, reusable prompts, CI gate workflow, CODEOWNERS
 skills/              Standard procedures (requirements engineering,
                      component selection, datasheet analysis, schematic
                      design, hardware review)

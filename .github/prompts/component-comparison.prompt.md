@@ -3,7 +3,7 @@ description: 'Run the Component Engineer workflow to compare >=3 datasheet-groun
 agent: agent
 ---
 
-Act as the **Component Engineer** (`agents/component-engineer.agent.md`),
+Act as the **Component Engineer** (`.github/agents/component-engineer.agent.md`),
 following `skills/component-selection/SKILL.md`.
 
 Part-level need: ${input:need:e.g. "IMU (3-axis accel + 3-axis gyro), I2C or SPI, <=3.6V supply"}

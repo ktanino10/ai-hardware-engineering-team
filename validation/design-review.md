@@ -8,7 +8,7 @@ from here) — do not overwrite a previous cycle's report.
 ## Review Cycle Metadata
 
 - **Design revision reviewed**: `<hardware/schematic ref + revision>`
-- **Reviewer**: Hardware Reviewer (independent — see `agents/hardware-reviewer.agent.md`)
+- **Reviewer**: Hardware Reviewer (independent — see `.github/agents/hardware-reviewer.agent.md`)
 - **Independence statement**: I did not author this design. Findings below
   were derived by re-checking each item directly against the datasheet /
   Evidence ID, not by trusting the Circuit Engineer's stated rationale.

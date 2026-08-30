@@ -53,15 +53,27 @@ against the changed area and any area the change could have affected).
 | **Circuit Engineer** | Schematic design from approved parts + datasheets, design rationale log | Marking own work reviewed/complete |
 | **Hardware Reviewer** | Independent, adversarial review; severity-classified findings | Fixing the design itself |
 
-Full role specs: `agents/hardware-lead.agent.md`, `agents/component-engineer.agent.md`,
-`agents/circuit-engineer.agent.md`, `agents/hardware-reviewer.agent.md`.
+Full role specs: `.github/agents/hardware-lead.agent.md`,
+`.github/agents/component-engineer.agent.md`,
+`.github/agents/circuit-engineer.agent.md`,
+`.github/agents/hardware-reviewer.agent.md`. These are real GitHub Copilot
+custom agent profiles (per
+[docs.github.com/en/copilot/reference/custom-agents-configuration](https://docs.github.com/en/copilot/reference/custom-agents-configuration)),
+each with a required `description` field, so they are selectable directly
+wherever the running surface supports the Copilot custom agent picker or
+programmatic invocation (e.g. `create_session`'s `agent` parameter, or the
+`agent`/`custom-agent` tool alias from another agent's `tools` list).
 
-Invocation model in this environment: the Hardware Lead role is played by the
-primary Copilot session itself (guided by `.github/copilot-instructions.md` +
-`agents/hardware-lead.agent.md`). The other three agents are invoked via the
-`task` tool (`agent_type: general-purpose`, or `explore`/`research`/`rubber-duck`
-where noted in §5) with the relevant `agents/*.agent.md` and `skills/*/SKILL.md`
-content passed into the prompt explicitly, since sub-agents are stateless.
+Invocation model: where a session's own tool surface has not been
+refreshed to expose these by name (e.g. this framework's own bootstrap
+session), the same role can still be played by loading the corresponding
+`.github/agents/<role>.agent.md` + `skills/*/SKILL.md` content explicitly
+into a `task` tool call (`agent_type: general-purpose`, or
+`explore`/`research`/`rubber-duck` where noted in §5) — the agent profile
+file is the authoritative definition of the role either way. The Hardware
+Lead role defaults to being played by the primary Copilot session itself,
+guided by `.github/copilot-instructions.md` +
+`.github/agents/hardware-lead.agent.md`.
 
 ## 4. Parallel Execution ("Fleet") Policy
 
@@ -286,7 +298,7 @@ required:
   the benchmark's complexity. Until then, the Circuit Engineer maintains
   `hardware/power-budget.md` as part of `skills/schematic-design/SKILL.md`.
 - **Mechanical/Thermal co-design** is an explicit Circuit Engineer checklist
-  item (see `agents/circuit-engineer.agent.md`): rotating bodies (e.g. a
+  item (see `.github/agents/circuit-engineer.agent.md`): rotating bodies (e.g. a
   reaction wheel motor) create vibration and localized heating that can
   propagate into the PCB — vibration-induced mechanical stress on solder
   joints/connectors, and thermal gradients that matter especially for
@@ -320,7 +332,7 @@ framework can add them without restructuring)
 | **Datasheet Specialist** | Advanced/high-volume operator of `skills/datasheet-analysis/SKILL.md`; owns `datasheets/evidence-log.md` quality and consistency | When datasheet volume/complexity outgrows ad hoc extraction by whichever agent needs a number |
 | **Safety/Compliance Reviewer** | Regulatory/standards review (e.g. UL/CE/FCC/EMC compliance where applicable) | When the project needs to target a regulated market or a safety-relevant certification |
 
-These are **not** created as `agents/*.agent.md` files yet — introduce them
+These are **not** created as `.github/agents/*.agent.md` files yet — introduce them
 only when the trigger condition is met, to avoid role/file proliferation
 ahead of actual need.
 
@@ -333,12 +345,11 @@ methodology and metrics.
 
 ```
 .github/copilot-instructions.md            Repo-wide Copilot operating rules
+.github/agents/*.agent.md                  Custom agent profiles for the 4 MVP agents (name+description frontmatter)
 .github/instructions/*.instructions.md     Path-scoped rules (datasheets/, hardware+bom/, validation/)
 .github/prompts/*.prompt.md                Reusable slash-command-style prompts
 .github/workflows/hardware-gate.yml        CI gate: blocks unresolved CRITICAL/HIGH
 .github/CODEOWNERS                         Required human review on safety-critical paths
-
-agents/*.agent.md                          Role specs for the 4 MVP agents
 
 skills/
   requirements-engineering/SKILL.md

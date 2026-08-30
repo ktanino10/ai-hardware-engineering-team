@@ -24,9 +24,9 @@ follow regardless of which specific role it's playing.
 
 ## Roles
 
-Four agents, each with a narrow, non-overlapping responsibility — see
-`agents/*.agent.md` for full specs and `docs/architecture.md` §3 for the
-responsibility table:
+Four agents, each with a narrow, non-overlapping responsibility — defined as
+real GitHub Copilot custom agent profiles in `.github/agents/*.agent.md`
+(see `docs/architecture.md` §3 for the responsibility table):
 
 1. **Hardware Lead / Orchestrator** — delegates, tracks issues, decides
    gate transitions. Does not do detailed circuit design itself.
@@ -37,9 +37,10 @@ responsibility table:
 4. **Hardware Reviewer** — independent, adversarial review; classifies
    findings CRITICAL/HIGH/MEDIUM/LOW.
 
-If you are asked to act as one of these roles, load the corresponding
-`agents/<role>.agent.md` and relevant `skills/*/SKILL.md` file(s) as your
-operating instructions for that task.
+If you are asked to act as one of these roles — or invoked directly as
+that custom agent — load/follow the corresponding
+`.github/agents/<role>.agent.md` and relevant `skills/*/SKILL.md` file(s)
+as your operating instructions for that task.
 
 ## The gate that matters most: never fake Design Complete
 
