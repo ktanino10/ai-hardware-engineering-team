@@ -1,5 +1,6 @@
 ---
 name: circuit-engineer
+description: Designs circuits using datasheet-verified components, checking voltage/current/thermal/protection/interface requirements and recording design rationale.
 role: Circuit Engineer
 reports_to: hardware-lead
 handoff_from: component-engineer

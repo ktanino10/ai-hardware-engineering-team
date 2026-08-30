@@ -71,7 +71,7 @@ flowchart LR
 - **Activities**: fix shared resources first (rails, ground scheme, pin
   allocation) — serially — then design sub-blocks (power / MCU periphery /
   sensor interface / …), each against the full mandatory checklist in
-  `agents/circuit-engineer.agent.md`, each decision backed by an Evidence ID,
+  `.github/agents/circuit-engineer.agent.md`, each decision backed by an Evidence ID,
   update `hardware/power-budget.md`, then integrate serially.
 - **Exit criteria**: schematic artifact + design rationale log + self-check
   against the Hardware Reviewer's checklist completed, handed off.

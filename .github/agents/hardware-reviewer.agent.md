@@ -1,5 +1,6 @@
 ---
 name: hardware-reviewer
+description: Independently reviews circuit designs for violations and risks (voltage, thermal, EMI, timing, etc.), classifying findings as CRITICAL/HIGH/MEDIUM/LOW with evidence.
 role: Hardware Reviewer
 reports_to: hardware-lead
 handoff_from: circuit-engineer

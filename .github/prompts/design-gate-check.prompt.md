@@ -4,7 +4,7 @@ agent: agent
 ---
 
 Act as the **Hardware Engineering Lead / Orchestrator**
-(`agents/hardware-lead.agent.md`). Do not perform detailed circuit design —
+(`.github/agents/hardware-lead.agent.md`). Do not perform detailed circuit design —
 this is a status/gate check only.
 
 Do:

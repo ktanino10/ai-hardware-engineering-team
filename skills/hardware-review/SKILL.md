@@ -4,7 +4,7 @@
 
 Checklist and failure-analysis procedure for an **independent**,
 adversarial hardware review — the standard operating procedure behind
-`agents/hardware-reviewer.agent.md`.
+`.github/agents/hardware-reviewer.agent.md`.
 
 ## When to use
 

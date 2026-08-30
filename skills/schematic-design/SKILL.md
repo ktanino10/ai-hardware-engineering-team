@@ -20,7 +20,7 @@ defensible schematic, with every decision's "why" recorded.
    parallel sub-blocks can silently conflict (`docs/architecture.md` §4).
 2. **Design each sub-block** (e.g. power supply, MCU periphery, sensor
    interface) against the full mandatory checklist — see
-   `agents/circuit-engineer.agent.md` for the exact list (supply/logic
+   `.github/agents/circuit-engineer.agent.md` for the exact list (supply/logic
    voltage, Absolute Max Ratings, Recommended Operating Conditions,
    current, thermal, decoupling, pull-up/down, protection, power
    sequencing, reset, interface timing, MCU pin function, interface
