@@ -1,0 +1,48 @@
+# =============================================================================
+# AI Hardware Engineering Team — .gitignore
+# =============================================================================
+#
+# IMPORTANT — Copyright / License policy for manufacturer datasheets
+# -----------------------------------------------------------------------------
+# This repository is PUBLIC. Manufacturer datasheets (PDFs, etc.) are
+# copyrighted works. Do NOT commit the actual datasheet files.
+#
+# `datasheets/` must only ever contain metadata reference records
+# (`*.md` files describing manufacturer, part number, revision, official URL,
+# retrieval date). Local working copies of the actual PDFs may be kept on
+# disk for analysis, but they must never be committed.
+#
+# See datasheets/README.md and .github/instructions/datasheets.instructions.md
+# for the full policy.
+# -----------------------------------------------------------------------------
+
+# Datasheet binaries (never commit these)
+datasheets/**/*.pdf
+datasheets/**/*.PDF
+datasheets/**/*.zip
+datasheets/**/*.ZIP
+datasheets/**/*.doc
+datasheets/**/*.docx
+datasheets/local-cache/
+datasheets/**/local-cache/
+
+# Local scratch / working files
+*.local.md
+.DS_Store
+Thumbs.db
+
+# KiCad backup/lock/autosave artifacts (design files themselves are tracked)
+hardware/**/*.kicad_pcb-bak
+hardware/**/*.kicad_sch-bak
+hardware/**/*-backups/
+hardware/**/_autosave-*
+hardware/**/fp-info-cache
+hardware/**/*.lck
+
+# SPICE / simulation scratch output (future integration)
+hardware/**/*.raw
+hardware/**/*.op.raw
+
+# Editor/OS
+.vscode/
+.idea/

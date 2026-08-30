@@ -1,0 +1,11 @@
+# CODEOWNERS
+#
+# Requires human review on paths tied to Human-in-the-loop gates
+# (docs/architecture.md section 10). Adjust @ktanino10 to the actual
+# Chief Engineer / reviewing team for this project if that changes.
+
+/hardware/pcb/                    @ktanino10
+/validation/bring-up-procedure.md @ktanino10
+/validation/change-log.md         @ktanino10
+/bom/                              @ktanino10
+/requirements/                     @ktanino10

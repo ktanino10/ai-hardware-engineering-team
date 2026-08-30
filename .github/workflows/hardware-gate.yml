@@ -1,0 +1,36 @@
+name: Hardware Gate
+
+# Enforces docs/architecture.md section 8 (Design Complete Gate):
+# a PR touching design/validation artifacts must not carry an unresolved
+# CRITICAL finding, or a HIGH finding without RESOLVED/ACCEPTED-RISK status,
+# in validation/open-issues.md.
+
+on:
+  pull_request:
+    paths:
+      - "validation/**"
+      - "hardware/**"
+      - "bom/**"
+      - "requirements/**"
+      - "tools/check_open_issues.py"
+  push:
+    branches: [main]
+    paths:
+      - "validation/**"
+      - "hardware/**"
+      - "bom/**"
+      - "requirements/**"
+      - "tools/check_open_issues.py"
+  workflow_dispatch: {}
+
+jobs:
+  open-issues-gate:
+    name: Check open-issues.md for unresolved CRITICAL/HIGH findings
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Run hardware gate check
+        run: python3 tools/check_open_issues.py
