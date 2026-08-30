@@ -924,3 +924,484 @@ opened as a new ID (consistent with this cycle's tightly-scoped
   behavior right now. A trivial, non-blocking housekeeping item
   (`datasheets/evidence-log.md` DS-MCU-012 Value column) remains for a
   future pass but does not affect this verdict.
+
+---
+
+## Mechanical Reviewer — Cycle 1 (first-ever Mechanical review, 2026-09-02)
+
+### Review Cycle Metadata
+
+- **Design revision reviewed**: `hardware/mechanical/bench-imu-01-enclosure.scad`
+  (full parametric OpenSCAD source, 483 lines) together with its companion
+  `hardware/mechanical/bench-imu-01-dimensional-spec.md` (full rationale +
+  self-check, 570 lines) — Author: Mechanical Lead (AI agent), "this
+  session," Status at handoff: self-check §11 claims "10/10 PASS," §12 lists
+  9 Open Items carried forward. This is the **first-ever Mechanical
+  Reviewer cycle** for this repository — the pass/fail benchmark named in
+  `docs/architecture-evolution.md` §24 ("Can this AI engineering system
+  create a believable, buildable enclosure from real electronics
+  information?"). No prior Mechanical review exists to re-review against.
+- **Reviewer**: Mechanical Reviewer — see
+  `.github/agents/mechanical-reviewer.agent.md`. Independent of the
+  Mechanical Lead role/session that authored the design.
+- **Independence statement**: I did not author this enclosure. Every one of
+  the 10 checklist items, the dimensional-spec's own §7 "Computed clearance
+  checks," its §8 fastener-placement table and 3-way rejected-alternatives
+  comparison, its §9 manufacturability claims, its §10 assembly-order
+  walkthrough, and its §11 10/10 self-check were independently re-derived
+  this cycle directly from the raw values in the `.scad` file and
+  cross-checked against `hardware/mechanical-interface.md` — none were
+  accepted on the strength of the Mechanical Lead's stated confidence, its
+  "10/10 self-check PASS" claim, or its own narrative reasoning. All
+  arithmetic (Z-height stack-up, standoff/wall clearances, bay margins,
+  annular-wall thicknesses around every boss, fastener engagement depths,
+  the `hull()`-based gusset geometry) was independently recomputed via
+  Python scripts run against numbers transcribed directly from the `.scad`
+  file, not by re-reading the spec's own arithmetic and nodding along.
+- **Scope**: Full design — first review cycle for the Bench-IMU-01
+  enclosure, so no "changed area only" narrowing applies. Covers
+  `hardware/mechanical/bench-imu-01-enclosure.scad` and
+  `hardware/mechanical/bench-imu-01-dimensional-spec.md` in full,
+  cross-checked against `hardware/mechanical-interface.md` in full (Board
+  Geometry, Mounting, Component Height Clearance — including the corrected
+  8.5mm top-side figure superseding the 3.2mm USB-C figure — Connectors/
+  Switches/LEDs, Mass). `hardware/schematic/bench-imu-01-design.md` §10-§13
+  was read for original Circuit Engineer context only (component-level
+  decisions are out of scope this cycle — the Electronics discipline's own
+  Cycle 1/Cycle 2 gate already covers those).
+- **Tooling disclosure (important honesty note)**: **No OpenSCAD/CAD
+  rendering or slicing tool is available in this environment.** Neither the
+  Mechanical Lead's own design nor this review could render the `.scad`
+  file, generate an STL, or run it through a slicer to visually/mechanically
+  confirm geometry. This review is conducted entirely **from source code** —
+  reading the parametric `.scad` file's raw numbers and module logic
+  directly and recomputing geometry by hand/script, the same constraint the
+  Mechanical Lead itself operated under. This is disclosed as a real
+  methodological limitation, not papered over: at least one of this cycle's
+  findings (MISS-002, the base-tab gusset) is exactly the class of defect a
+  five-second look at a rendered/sliced preview would catch instantly, but
+  it was still independently caught here by working through the `hull()`/
+  `cube()` primitives' actual dimensions by hand.
+- **Parallel sub-scans run**: None dispatched as separate sub-agent scans
+  this cycle — the full 10-item checklist was worked as a single integrated
+  pass by this Mechanical Reviewer, consistent with the agent instruction
+  that the verdict is a single serial integration step, not something to
+  fragment across uncoordinated parallel opinions.
+- **rubber-duck premise review run in parallel?**: Not indicated as run for
+  this cycle. No `rubber-duck`-sourced row exists in
+  `validation/open-issues.md` for the Mechanical discipline as of this
+  cycle; this report does not rely on or duplicate any such review.
+- **KiCad / CAD tool cross-checks used**: None — `kicad-*` tools were not
+  invoked, since this design has no KiCad project (no PCB layout exists yet
+  for Bench-IMU-01; the enclosure is designed against the Markdown
+  interface contract, not a KiCad board file) and no OpenSCAD-equivalent
+  rendering tool is available in this environment (see Tooling disclosure
+  above).
+
+### Checklist Results
+
+Full checklist per `.github/skills/mechanical-review/SKILL.md`, all 10 items
+independently worked (not a partial spot-check):
+
+| # | Checklist item | Result | Notes |
+|---|---|---|---|
+| 1 | PCB mounting (standoff positions/diameters, boss integrity) | **PASS** | All 4 standoffs independently recomputed at the exact MH-1..MH-4 board-local coordinates from `hardware/mechanical-interface.md` "Mounting"; ⌀6.0mm OD confirmed clear of the interior wall by exactly 2.0mm on every corner (computed from `interior_x`/`interior_y`/`board_offset_x`/`board_offset_y`, not merely re-read from the spec). Minor dead-data note: `mount_holes[i][2]` (2.8mm clearance dia) is present in the array but never read by `standoff()`/`base_standoffs()` — see MISS-006. |
+| 2 | Connector accessibility (cutout position/size/orientation) | **Finding — MISS-001 (HIGH)** | J1 (USB-C) cutout and D1 (LED) hole independently recomputed and confirmed correct (J1's Y/Z cutout range checks out against its own board-local position; D1 clear of the bay by 2.5mm and of MH-4 by 9.19mm vs. a 4.5mm sum-of-radii). J2/J3/SW1-vs-header-bay margin, however, is independently found to be measured from each connector's centerline, not from the design's own assumed footprints — real margins as low as 0.0mm, not the ~6mm implied. See MISS-001. |
+| 3 | Component height clearance (top + bottom vs. interface file) | **PASS** | Full Z-stack independently recomputed from the base up: `floor_t(2.0)+standoff_h(6.0)+pcb_thickness(1.6)=9.6` → `+top_component_clearance(8.5)=18.1` (header stack top) vs. `base_total_h=floor_t+standoff_h+pcb_thickness+top_component_clearance+z_margin(0.5)=18.6` (split line) → margin = 18.6−18.1 = **0.5mm exactly**, matching `z_margin` precisely and confirming no collision → `total_height=base_total_h+lid_roof_t(2.0)=20.6mm`. **This independently matches the Mechanical Lead's claimed 20.6mm total height and "header stack top sits below the split line" conclusion exactly — no error found in the single most consequential number in this design.** |
+| 4 | Internal clearance/interference (parts vs. walls/each other/fasteners) | **PASS** | Rear-tab-vs-bay clearance (spec's own pre-flagged Open Item #8) independently recomputed and confirmed correct (2.5mm gap on both sides, using true edge-to-edge math). The external-corner-tab approach and its 3 rejected alternatives (§8) were independently assessed: the reasoning for rejecting the shared-riser, inward-bulging-boss, and 4-interior-boss alternatives is sound, and the chosen approach is conceptually collision-free at the PCB/bay level — see items 5/6/9 below for implementation-level defects found in how that approach was executed. |
+| 5 | Fastener placement (wall thickness around every boss, no fastener conflicts) | **Findings — MISS-003 (MEDIUM), MISS-004 (MEDIUM)** | PCB standoff annular wall ((6.0−2.0)/2=2.0mm) and PCB standoff engagement depth (4.4mm of 5.0mm, 0.6mm spare) both independently confirmed adequate. Base-tab pilot-hole annular wall (3.0mm/2.0mm margins) also confirmed adequate. However: the **lid tab's** clearance-hole annular wall is independently computed at only **1.6mm**, below the design's own stated 2.0mm minimum (MISS-003); and the lid/base-tab fastener pair has **0.0mm** engagement-depth spare margin, vs. the PCB standoff's deliberate 0.6mm spare (MISS-004). |
+| 6 | Wall thickness (structural + stated 3D-printability rule) | **Finding — MISS-002 (HIGH), referenced here** | The uniform 2.0mm perimeter/roof/skirt wall thickness is independently confirmed adequate everywhere it was checked (skirt, roof, floor, standoff annular wall). The base corner tab, however, is a genuine cantilevered horizontal extension of that wall whose claimed printability solution (a 45° gusset) is found to be geometrically non-functional — see MISS-002 (fully written up under item 9 below, where the printability claim itself lives). |
+| 7 | Assembly order (physically achievable sequence, no trapped parts) | **PASS** | §10's walkthrough independently re-derived and confirmed logically sound: PCB population before enclosure assembly correctly avoids the "headers trapped behind the lid" trap, and the lid-tab/base-tab external fastening is correctly sequenced last. Specifically checked per this cycle's task: rear-tab screwdriver access near the header bay — the rear tabs' global X-range has no XY overlap with the bay's X-range (separated by the same 2.5mm gap as item 4), so no interference is computable from the given data; a residual, undocumented ergonomic question (whether a tall real J2/J3 header could crowd a screwdriver's approach to the adjacent rear tabs) is noted but not raised as a formal finding, since it is not independently provable either way without the real header hardware confirmed (spec's own pre-existing Open Item #1). No snap-fit/permanent joint anywhere in the design was found to contradict the "no permanent snaps or adhesive" claim; the lid-skirt-to-base-wall joint is independently confirmed a true clearance (slip) fit, not an interference fit (`lid_skirt_inner_x/y = base_outer_x/y + 2×fit_clearance`, i.e. strictly larger by construction). |
+| 8 | Print-fit tolerance (single stated value, consistently applied) | **Finding — MISS-005 (LOW)** | `fit_clearance` (0.2mm/side) is independently confirmed applied correctly and consistently at the one genuine printed-part-to-printed-part mating surface in this design (the lid skirt / base wall joint) — the only place two independently-printed solids actually slide against each other. However, the design's own claim (`.scad` lines 101-104 and dimensional-spec §11 item 8) that this same value also governs "all fastener clearance-hole sizing" is independently found not to be true of the implemented code — see MISS-005. |
+| 9 | Manufacturability / 3D-printability (overhangs/bridges vs. stated rule, min wall thickness) | **Finding — MISS-002 (HIGH)** | J1's cutout bridge span (9.5mm vs. the stated 10mm `max_bridge_span`) independently confirmed within rule. The lid tab's "no chamfer needed" claim is independently verified TRUE via Z-coordinate/print-orientation reasoning (lid tabs genuinely share the roof's Z-range and are bed-adjacent when the lid is printed roof-down — independently confirmed by working through the `rotate([180,0,0])`/`translate(...)` print-layout transform, which correctly places the roof at Z=0..2mm touching the bed). The base tab's "45° self-supporting chamfer/gusset," however, is independently found to be a geometrically degenerate ~0.01mm sliver — see MISS-002, the most significant finding this cycle. |
+| 10 | Interface-value traceability (every dimension traced to a source or explicit assumption) | **Finding — MISS-006 (LOW)** | Extensive, essentially complete `ASSUMPTION`/`ESTIMATE`/`DERIVED` tagging independently confirmed present on nearly every declared variable. Zero literal `CONFIRMED` tags exist in the `.scad` file — independently confirmed this is *correct*, not a violation, since `hardware/mechanical-interface.md`'s own Board Geometry/Mounting/Component-Height/Connector tables are themselves all `ESTIMATE`/`ASSUMPTION` (no real KiCad board exists yet), so inheriting that label is proper propagation, not a mismatch. Connector-position lines (`j1_x`/`j2_x`/etc.) lack an inline tag but are preceded by an explicit interface-row citation comment, satisfying `.github/instructions/mechanical-design.instructions.md`'s traceability rule via its "traces to an interface-file row" clause. `j1_ref_height` (3.2mm, the superseded USB-C figure) is independently confirmed used *only* for J1's own cutout sizing/visual, never commingled with the global `top_component_clearance` (8.5mm) budget. Two harmless dead/unused array fields were found (`mount_holes[i][2]`, `tab_positions[i][1]`) — see MISS-006. |
+
+**Summary**: 0 CRITICAL, 2 HIGH (MISS-001, MISS-002), 2 MEDIUM (MISS-003,
+MISS-004), 2 LOW (MISS-005, MISS-006).
+
+### Findings
+
+#### MISS-001 — Header/button bay (J2/J3/SW1) clearance margin is measured from connector centerlines, not from the design's own assumed footprints
+
+- **Issue**: The dimensional-spec (§6, §7) and the `.scad` file's own
+  comments (lines 233-238) both characterize `bay_x_min`/`bay_x_max`/
+  `bay_y_min` as providing a "6mm margin" around J2, J3, and SW1.
+  Independently recomputing this margin against the SAME `.scad` file's own
+  `reference_pcba()` module (lines 445-451), which models J2/J3 as
+  10mm(X)×6mm(Y) boxes and SW1 as a ⌀5mm cylinder — not points — shows the
+  real clearances are far smaller: J2's near edge to `bay_x_min` = **1.0mm**
+  (not 6mm), J2/J3's far edge to `bay_y_min` = **0.0mm** (not 6mm — the bay
+  boundary is drawn exactly coincident with the assumed footprint's own
+  edge), and SW1's near edge to `bay_x_max` = **3.5mm** (not 6mm).
+- **Rationale**: `bay_x_min = j2_x(16) − 6 = 10` and `bay_x_max = sw1_x(44) +
+  6 = 50` (lines 233-234) are computed from each connector's bare
+  X-coordinate — a single point — with a flat 6mm offset applied. But
+  `reference_pcba()` (the SAME file's own visualization of these parts)
+  independently defines J2/J3 as `cube([10, 6, top_component_clearance])`
+  translated to span board-local X:[hx−5, hx+5] — i.e. J2 itself already
+  occupies X:[11,21], 5mm on either side of its own centerline.
+  Cross-referencing the two: the bay boundary (X=10) sits only 1.0mm
+  outside J2's own assumed body edge (X=11), not 6mm — the connector's own
+  footprint half-width silently consumed 5 of the intended 6mm. The same
+  pattern repeats in Y: `bay_y_min = 34` is explicitly commented as "6mm
+  header/switch footprint-depth allowance in from the board's Y=40 edge,"
+  but `reference_pcba()`'s own J2/J3 boxes are translated to Y:[34,40] —
+  meaning Y=34 IS the assumed footprint's own far edge, not a boundary 6mm
+  clear of it. SW1 fares better (footprint X:[41.5,46.5] vs.
+  `bay_x_max`=50 → 3.5mm real clearance) but is still well under the "6mm"
+  language. This is a genuine, presently-verifiable internal inconsistency —
+  it does not require the real J2/J3 hardware to be confirmed first (spec's
+  own Open Item #1) to detect, since it is fully derivable from numbers
+  already committed to the file; it is, however, compounded by that same
+  unconfirmed-hardware risk, since a shrouded/keyed real header commonly
+  exceeds a bare-pin-row's nominal footprint.
+- **Datasheet Source**: `hardware/mechanical-interface.md` "Connectors,
+  Switches & LEDs" table, J2/J3/SW1 rows (X/Y point positions only, no
+  footprint dimension given by the interface file itself) — cross-referenced
+  against `hardware/mechanical/bench-imu-01-enclosure.scad` lines 233-238
+  (`bay_x_min`/`bay_x_max`/`bay_y_min` derivation) and lines 445-451
+  (`reference_pcba()`'s own assumed J2/J3/SW1 footprints);
+  `bench-imu-01-dimensional-spec.md` §6 ("all comfortably inside with
+  margin") and §11 self-check item 2 ("PASS").
+- **Failure Mechanism**: If the real J2/J3 headers or SW1's real package
+  occupy anything close to the footprint this same design already assumes
+  for visualization purposes, the lid's header-bay opening does not
+  actually provide the 6mm of clearance its own comments and self-check
+  claim — a real assembled unit could have a shrouded header body or switch
+  bezel touching or overlapping the cutout's edge, requiring the bay to be
+  enlarged/reworked (filing/redesign) to actually mate a cable or press the
+  button without contacting the printed edge.
+- **Affected Component**: Lid header/button bay cutout (`bay_x_min`,
+  `bay_x_max`, `bay_y_min` in `bench-imu-01-enclosure.scad`); J2 (UART
+  header), J3 (SWD header), SW1 (reset button).
+- **Recommended Fix**: Recompute `bay_x_min`/`bay_x_max`/`bay_y_min` from
+  each connector's own assumed (or, once available, real) footprint *edge*,
+  not its centerline/point position, and re-add a genuine spare margin
+  (e.g. 6mm) beyond that edge — consistent with how the tab-vs-bay
+  clearance (Open Item #8) already correctly uses edge-to-edge math
+  elsewhere in the same document. At minimum, reconcile the "6mm margin"
+  language with the footprint `reference_pcba()` itself assumes, so the two
+  don't silently disagree.
+- **Severity**: HIGH — a likely functional-access failure under realistic
+  conditions (a real shrouded header or switch bezel at or near the assumed
+  footprint size), directly contradicting the self-check's own
+  "PASS...all comfortably inside with margin" claim for this checklist
+  item, and affecting 3 of the design's 5 connectors/controls.
+
+#### MISS-002 — Base corner-tab "45° self-supporting chamfer/gusset" is geometrically non-functional (degenerate ~0.01mm sliver, not a real wedge)
+
+- **Issue**: `base_tab()` (lines 310-335) implements its claimed "45°
+  self-supporting chamfer/gusset" as `hull()` of two `cube([tab_w, 0.01,
+  0.01])` blocks (lines 329-334) — both degenerately thin (0.01mm) in
+  *both* the Y and Z directions, not just one. `hull()` of two such
+  near-point-like clusters produces an extremely thin (~0.01mm) diagonal
+  sliver, not a solid triangular wedge filling the space beneath the tab.
+  This directly contradicts dimensional-spec §9.2's explicit claim ("a 45°
+  self-supporting chamfer/gusset... runs from the wall face up to the tab's
+  underside, keeping the whole feature within the stated `max_overhang_deg`
+  rule without printed support material") and self-check §11 item 9's
+  "PASS... checked against actual design features."
+- **Rationale**: The nominal centerline geometry is correct —
+  `tab_chamfer_run = tab_project(6.0)` (lines 267-277), giving an equal 6mm
+  rise/6mm run (a true 45° slope), and both `hull()` inputs are correctly
+  *positioned* at the two endpoints a real gusset should span (the wall's
+  outer face at the gusset's base Z, and the tab's own outer-bottom edge at
+  the tab's Z) — there is no disconnection between the gusset and either
+  the wall or the tab. The defect is purely in the *cross-sectional
+  thickness* of the solid produced: for `hull()` to yield a real,
+  load-bearing wedge with meaningful cross-sectional area, at least one of
+  the two input primitives needs genuine (non-degenerate) extent in the
+  direction being spanned (Y, here). As coded, both inputs are 0.01mm in Y
+  *and* Z, so the resulting hull is a thin diagonal blade far below any FDM
+  printer's minimum feature size (typically ~0.4-0.8mm, i.e. one to two
+  nozzle widths) — it would not print as a meaningful support structure,
+  and may not even mesh/slice reliably as a distinct feature at all.
+  Separately, the `.scad` file's own comment at the gusset (lines 321-325)
+  already partially hedges this ("a reasonable approximation of a wedge
+  gusset... this is not a load-bearing dimension... a human should feel
+  free to refine the exact profile") — but this caveat was not carried
+  through into the dimensional-spec's more confident §9.2 claim or into
+  self-check item 9's "PASS," which state the overhang issue is fully
+  addressed. The base tab itself is confirmed (via `base_total_h -
+  tab_base_t` through `base_total_h`, i.e. Z:[13.6,18.6]mm in the base's own
+  natural floor-down print orientation) to be a genuine 90°, 6mm-deep,
+  5mm-thick horizontal overhang roughly 3/4 of the way up the base's 18.6mm
+  print height — mid-print, not bed-adjacent — so it does need real support
+  (printed or gusset-based) to avoid drooping/degraded print quality,
+  contrary to the "without printed support material" claim.
+- **Datasheet Source**: `hardware/mechanical/bench-imu-01-enclosure.scad`
+  lines 267-277 (chamfer rationale comment), lines 310-335 (`base_tab()`
+  implementation, especially the `hull(){ cube([tab_w,0.01,0.01]);
+  cube([tab_w,0.01,0.01]); }` construct at lines 329-334);
+  `bench-imu-01-dimensional-spec.md` §9.2 (explicit "without printed support
+  material" claim) and §11 self-check item 9 ("PASS").
+- **Failure Mechanism**: Printed exactly as coded, the base tab's
+  overhanging outer 6mm × 8mm × 5mm volume has no real supporting structure
+  beneath it in the model. Sliced without a human manually adding support
+  material (which both the design and its self-check claim is
+  unnecessary), the tab is likely to droop, print with poor surface
+  quality, or partially fail to bridge at this exact location — precisely
+  where the M2.5 self-tapping pilot hole for the lid-fastening screw is
+  threaded. A degraded tab boss risks stripped threads, a cracked tab, or a
+  lid corner that cannot be fully/reliably fastened. This affects all 4
+  base tabs identically (100% of the lid-fastening mechanism's base-side
+  bosses), since `base_tab()` is called identically for every entry in
+  `tab_positions`.
+- **Affected Component**: All 4 base corner tabs (`base_tab()` /
+  `base_tabs()` in `bench-imu-01-enclosure.scad`) — the entire base-side
+  half of the lid's fastening mechanism.
+- **Recommended Fix**: Replace the degenerate `hull()` construct with a
+  genuine solid wedge — e.g. a `linear_extrude` of a right-triangle 2D
+  `polygon()` (with real rise and run matching `tab_chamfer_run`) swept
+  along `tab_w`, or a `hull()` between two primitives that each have real
+  (non-zero, print-resolvable) extent in Y and Z — so the gusset actually
+  fills the triangular volume beneath the tab. Alternatively/additionally,
+  explicitly flag in the design that the base tabs require sliced-in
+  support material until the gusset geometry is corrected, rather than
+  claiming the overhang is already self-supporting.
+- **Severity**: HIGH — a likely, systemic print-quality/structural defect
+  at the sole fastening feature on the base side of the lid joint, under
+  normal/expected printing conditions (not a rare corner case), directly
+  contradicting an explicit design claim and a self-check "PASS" for this
+  exact checklist item.
+
+#### MISS-003 — Lid tab's clearance-hole annular wall (1.6mm) is below the design's own stated 2.0mm minimum wall thickness
+
+- **Issue**: The lid tab reuses the same `tab_w(8.0mm) ×
+  tab_project(6.0mm)` rectangular footprint as the base tab, but with a
+  larger `tab_clear_dia(2.8mm)` clearance hole (vs. the base tab's
+  `tab_pilot_dia(2.0mm)` threaded pilot) centered in it. This yields a
+  Y-direction (projection-depth) wall margin of `(6.0−2.8)/2 = 1.6mm` on
+  both sides of the hole — below the design's own stated `min_wall_t =
+  2.0mm` rule. The equivalent base-tab calculation, using the smaller
+  2.0mm pilot diameter in the same footprint, gives exactly 2.0mm (right
+  at, not below, the minimum).
+- **Rationale**: The design applied its own minimum-wall-thickness rule
+  correctly when originally sizing the base tab's footprint against its
+  smaller pilot hole, but did not re-check the *same* footprint against the
+  *larger* clearance hole reused for the lid tab. This is a real,
+  directly-computable shortfall (not a judgment call): `tab_w`/
+  `tab_project`/`tab_clear_dia`/`min_wall_t` are all named variables already
+  in the file, and the arithmetic only requires combining them — it is not
+  dependent on any unconfirmed real-hardware fact. This directly
+  contradicts self-check §11 item 5's claim ("adequate surrounding material
+  at every boss").
+- **Datasheet Source**: `hardware/mechanical/bench-imu-01-enclosure.scad`
+  line 112 (`min_wall_t = 2.0`), line 251 (`tab_w = 8.0`), line 252
+  (`tab_project = 6.0`), line 261 (`tab_clear_dia = 2.8`);
+  `bench-imu-01-dimensional-spec.md` §11 self-check item 5 ("PASS...
+  adequate surrounding material at every boss").
+- **Failure Mechanism**: The lid tab experiences compressive bearing stress
+  from the screw head (clamping the lid down against the base tab) rather
+  than radial thread-forming stress (since this is a clearance, not a
+  threaded, hole) — so the practical risk is lower than a thread-cutting
+  scenario, but a 1.6mm PETG wall at a fastening point is nonetheless
+  thinner than the design's own declared safe minimum, raising a real (if
+  bounded) risk of cracking or deforming under repeated assembly/
+  disassembly or over-torquing, at all 4 lid tabs.
+- **Affected Component**: All 4 lid corner tabs (`lid_tab()` /
+  `lid_tabs()` in `bench-imu-01-enclosure.scad`).
+- **Recommended Fix**: Either widen `tab_w`/`tab_project` for the lid tab
+  specifically (a lid-side-only footprint override) to restore ≥2.0mm
+  margin around the larger clearance hole, or reduce `tab_clear_dia` to the
+  minimum practical M2.5 clearance size that still fits within the existing
+  footprint with ≥2.0mm margin.
+- **Severity**: MEDIUM — a real, clearly-quantifiable violation of the
+  design's own stated minimum-wall-thickness rule at a fastening boss
+  (directly analogous to this skill's own MEDIUM example, "wall thickness
+  thinner than the stated 3D-printing minimum"), with a bounded failure
+  mode (elevated crack/deformation risk under clamping stress, not a
+  certain break) rather than a functional blocker.
+
+#### MISS-004 — Lid/base-tab fastener pair has zero engagement-depth spare margin, unlike the PCB standoff's deliberate 0.6mm spare
+
+- **Issue**: The single M2.5×6mm screw used throughout this design
+  (`screw_len = 6.0mm`) engages 4.4mm of the PCB standoff's 5.0mm pilot
+  depth (0.6mm spare) when fastening the PCB, but engages exactly 4.0mm of
+  the base tab's exactly-4.0mm pilot depth (`tab_pilot_depth = 4.0mm`) when
+  fastening the lid — a **0.0mm spare margin** fit, computed as: 6.0mm
+  screw − 2.0mm lid-tab clearance-hole thickness (`tab_lid_t =
+  lid_roof_t`) = 4.0mm available engagement, exactly equal to the 4.0mm
+  pilot depth available.
+- **Rationale**: The design's own comment (`.scad` lines 156-158) already
+  explicitly discloses the raw numbers ("Lid tabs: passes through the lid
+  tab's clearance thickness (2.0mm) and engages 4.0mm of the base tab's
+  4.0mm pilot depth") and the fastener-placement table (dimensional-spec
+  §8) explicitly labels this "full engagement" — a positive-sounding
+  characterization of what is, numerically, a zero-tolerance condition, in
+  contrast to the PCB standoff row's explicit "4.4mm engaged" (of 5.0mm)
+  figure one row above it in the same table, which shows the design *does*
+  know how to reason about spare margin when it chooses to. The two
+  fastener applications of the identical screw are not held to the same
+  margin-of-safety standard, and the zero-margin case is framed as a
+  strength ("full engagement") rather than flagged as a risk.
+- **Datasheet Source**: `hardware/mechanical/bench-imu-01-enclosure.scad`
+  lines 151-158 (`screw_len` comment, explicitly stating both engagement
+  figures) and line 256 (`tab_pilot_depth = 4.0`);
+  `bench-imu-01-dimensional-spec.md` §8 fastener-placement table
+  (PCB-standoff row: "4.4mm engaged"; lid/base-tab row: "full engagement").
+- **Failure Mechanism**: Any positive real-world tolerance in the direction
+  of a longer-than-nominal screw (a common ±0.2-0.3mm variance for M2.5
+  self-tapping fasteners) or a shallower-than-nominal printed pilot hole
+  would cause the screw to bottom out in the base tab's blind pilot hole
+  before the lid tab is fully clamped flush against it — at that corner,
+  the lid sits very slightly proud/loose rather than fully seated, a real
+  but bounded fastening-quality degradation (not a broken part or a lid
+  that cannot close at all), potentially recurring at any/all of the 4 lid
+  corners.
+- **Affected Component**: All 4 lid-to-base corner-tab fastener joints
+  (`base_tab()`/`lid_tab()` in `bench-imu-01-enclosure.scad`).
+- **Recommended Fix**: Either deepen `tab_pilot_depth` slightly (trading
+  against the tab's own "1.0mm solid floor remaining" margin, which has its
+  own room to give a little) or shorten the lid-side clearance-hole
+  thickness assumption, to restore a small positive spare-engagement margin
+  analogous to the PCB standoff's 0.6mm, and re-characterize the
+  fastener-placement table's "full engagement" language to explicitly flag
+  the margin (or lack of it) the way the standoff row already does.
+- **Severity**: MEDIUM — a real, quantifiable inconsistency in
+  margin-of-safety practice between two uses of the same fastener within
+  the same design, with a plausible but bounded failure mode (an
+  unevenly-clamped lid corner under realistic fastener-length tolerance,
+  not a broken part or unusable design).
+
+#### MISS-005 — Design's claim that `fit_clearance` governs "all fastener clearance-hole sizing" does not match the implemented code
+
+- **Issue**: The `.scad` file's own header comment for `fit_clearance`
+  (lines 101-104) states it is "THE single stated clearance allowance,
+  applied at every place two parts actually mate: lid-skirt-to-base-wall
+  radial gap, **and all fastener clearance-hole sizing**," and
+  dimensional-spec §11 self-check item 8 repeats this claim near-verbatim
+  ("0.2mm/side... applied at the lid/base skirt joint **and fastener
+  clearance holes**"). Independently checked, this is not true of the code
+  as implemented: `fit_clearance` (0.2mm/side) is used in exactly two
+  lines (`lid_skirt_inner_x`/`lid_skirt_inner_y`, lines 186-187) — the
+  lid-skirt/base-wall joint only. The fastener clearance-hole diameters
+  (`mount_holes[i][2] = 2.8`, lines 62-69; `tab_clear_dia = 2.8`, line 261)
+  are independent hardcoded literals that do not mathematically derive from
+  `fit_clearance` at all: a strict `fit_clearance`-based clearance hole for
+  an M2.5 screw (nominal 2.5mm major diameter) would compute as `2.5 +
+  2×0.2 = 2.9mm`, not the 2.8mm actually used.
+- **Rationale**: The 2.8mm figure is, on its own terms, a perfectly
+  reasonable and independently-justified M2.5 clearance-hole size
+  (`mount_holes`' own comment at line 63 cites the design.md/ISO 273
+  close-to-normal-fit convention directly, 2.7-2.9mm) — there is no
+  physical defect in the actual hole size chosen. The defect is that the
+  code's own comment and the self-check both assert a single-variable,
+  unified governance ("THE single stated clearance allowance... applied at
+  every place") for a quantity that is, in fact, governed by two entirely
+  separate, independently-chosen conventions (a print-to-print mating
+  tolerance for the skirt joint, and a standard screw-clearance-hole
+  convention for the fastener holes) — this is exactly the kind of
+  silently-inconsistent traceability claim
+  `.github/instructions/mechanical-design.instructions.md` warns against,
+  here manifesting as a claim rather than a value blend.
+- **Datasheet Source**: `hardware/mechanical/bench-imu-01-enclosure.scad`
+  lines 101-104 (`fit_clearance` header comment), lines 186-187 (its only
+  two actual uses), line 63 (`mount_holes` clearance-dia comment,
+  independent ISO 273 convention), line 261 (`tab_clear_dia` comment);
+  `bench-imu-01-dimensional-spec.md` §11 self-check item 8 ("PASS...
+  applied at... fastener clearance holes").
+- **Failure Mechanism**: None physical — the actual fastener clearance
+  holes are correctly sized for their purpose regardless of which variable
+  is credited. The risk is purely to future maintainability/traceability: a
+  future edit to `fit_clearance` (e.g. tightening or loosening the stated
+  print tolerance) would silently *not* propagate to the fastener
+  clearance holes despite the code's own comment and self-check claiming it
+  would, potentially misleading whoever makes that future change into
+  believing a single-parameter update covers both cases when it does not.
+- **Affected Component**: `fit_clearance` documentation/self-check claim;
+  `mount_holes[i][2]` and `tab_clear_dia` (`bench-imu-01-enclosure.scad`).
+- **Recommended Fix**: Either express the fastener clearance-hole diameters
+  as an actual function of `fit_clearance` (if that is genuinely the
+  intended governing parameter) or, more simply, correct the header
+  comment and self-check item 8's wording to state that fastener clearance
+  holes follow a separate, standard screw-clearance convention, distinct
+  from `fit_clearance`'s print-to-print mating role — mirroring how
+  `board_xy_keepout` and `z_margin` are already correctly and explicitly
+  distinguished from `fit_clearance` elsewhere in the same file (lines 126,
+  161-165).
+- **Severity**: LOW — a documentation/self-check accuracy defect with no
+  physical/functional consequence, since the actual dimension chosen
+  (2.8mm) is independently reasonable on its own merits.
+
+#### MISS-006 — Two array fields are defined but never consumed by the geometry code (dead data)
+
+- **Issue**: `mount_holes[i][2]` (the 2.8mm PCB clearance-hole diameter,
+  third column of the `mount_holes` array, lines 62-69) is never read by
+  `standoff()` or `base_standoffs()` (lines 294-308), which only use
+  `m[0]`/`m[1]` (X/Y). Separately, `tab_positions[i][1]` (the Y-component,
+  second column of the `tab_positions` array, lines 279-288) is never read
+  by `base_tab()` or `lid_tab()`, which derive the tabs' global Y-position
+  purely from the direction flag `pos[2]`, not from `pos[1]`.
+- **Rationale**: Both fields look load-bearing at the point they are
+  declared (they read as real geometric inputs alongside the columns that
+  *are* used) but are silently ignored by the code that consumes each
+  array. This is not a physical defect — no incorrect geometry results from
+  it — but is a genuine traceability/maintainability gap: a future editor
+  changing `mount_holes[i][2]` or `tab_positions[i][1]`, expecting it to
+  affect the model, would see no effect at all, and no comment currently
+  flags either field as unused/vestigial.
+- **Datasheet Source**: `hardware/mechanical/bench-imu-01-enclosure.scad`
+  lines 62-69 (`mount_holes` array definition) vs. lines 294-308
+  (`standoff()`/`base_standoffs()`, only consuming `m[0]`/`m[1]`); lines
+  279-288 (`tab_positions` array definition) vs. lines 310-335
+  (`base_tab()`, only consuming `pos[0]`/`pos[2]`).
+- **Failure Mechanism**: None currently manifest — this is a latent
+  documentation/maintainability risk, not an active geometric defect. The
+  risk is a future edit silently having no effect, or a future reader
+  misinterpreting either column as currently governing something it does
+  not.
+- **Affected Component**: `mount_holes` array, `tab_positions` array
+  (`bench-imu-01-enclosure.scad`).
+- **Recommended Fix**: Either wire `mount_holes[i][2]` into `standoff()`'s
+  PCB-side clearance-hole modeling (if a through-hole in the PCB itself is
+  ever modeled) and remove/comment `tab_positions[i][1]` as intentionally
+  unused (since the tab's Y-position is fully and correctly determined by
+  the direction flag alone), or add a one-line comment at each declaration
+  noting the field is currently unused, so a future editor isn't misled.
+- **Severity**: LOW — a style/traceability/documentation nitpick with no
+  functional or manufacturability consequence.
+
+### Verdict
+
+- **Verdict**: CONDITIONAL
+- **Open CRITICAL count**: 0
+- **Open HIGH count**: 2 (MISS-001, MISS-002)
+- **Independent confirmation of the design's most consequential number**:
+  The full Z-height stack-up (`floor_t`+`standoff_h`+`pcb_thickness`+
+  `top_component_clearance`+`z_margin`+`lid_roof_t` → `total_height`) was
+  independently recomputed from the raw `.scad` values, not re-derived from
+  the spec's own arithmetic, and **matches the Mechanical Lead's claimed
+  20.6mm total height and "no collision, 0.5mm margin" conclusion exactly**.
+  PCB mounting (item 1), component height clearance (item 3), and internal
+  clearance/interference (item 4) all independently checked out with **no
+  error found** — the enclosure's core architecture (does the PCB fit, do
+  the standoffs land correctly, does the tallest component clear the lid)
+  is sound.
+- **What's blocking a clean PASS**: MISS-001 (header/button bay margin
+  measured from centerlines, not the design's own assumed footprints — real
+  margins as low as 0.0mm) and MISS-002 (the base tab's claimed
+  self-supporting print gusset is geometrically degenerate and provides no
+  real support), both HIGH. Neither is a "PCB doesn't fit" class defect,
+  but both directly contradict explicit self-check "PASS" claims (§11
+  items 2 and 9 respectively) and both are systemic (MISS-001 affects 3 of
+  5 connectors/controls; MISS-002 affects all 4 base fastening tabs).
+- **Also open, non-gating but should be dispositioned before Design
+  Complete**: MISS-003 and MISS-004 (MEDIUM — lid-tab wall thickness below
+  the design's own stated minimum, and zero-margin fastener engagement at
+  the same tab joint), MISS-005 and MISS-006 (LOW — a
+  documentation/self-check-accuracy gap around `fit_clearance`'s actual
+  scope, and two harmless dead-data array fields).
+- **Next action**: Loop back to the Mechanical Lead (routing decision for
+  the Hardware Lead to make) for MISS-001 (recompute the bay margins from
+  the connectors' own assumed footprint edges, not centerlines, and
+  reconcile with the tab-vs-bay clearance's already-correct edge-to-edge
+  convention) and MISS-002 (replace the degenerate `hull()` gusset with a
+  genuine solid wedge, or explicitly require sliced-in support material for
+  the base tabs) at minimum — both HIGH findings should be resolved before
+  this design proceeds toward a physical print. The two MEDIUM findings
+  (MISS-003, MISS-004) should also be addressed or explicitly dispositioned
+  (`RESOLVED`/`DEFERRED`/`ACCEPTED-RISK` with Chief Engineer sign-off)
+  before Design Complete per `docs/architecture.md` §8. The two LOW
+  findings (MISS-005, MISS-006) are documentation/hygiene corrections that
+  do not block progress.
