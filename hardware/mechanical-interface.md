@@ -1,200 +1,686 @@
 # Electronics → Mechanical Interface
 
-The physical/geometric contract the Electronics side hands to the Mechanical
-Lead — the minimum field set needed for Phase 1
-(`docs/architecture-evolution.md` §13), reusing the existing `Parameter |
-Value | Unit | Source` table convention (`datasheets/README.md`,
-`hardware/power-budget.md`) plus explicit `Confidence` and
-`Assumption / Notes` columns, since not every mechanical fact is either a
-confirmed number or a flat `UNKNOWN` the way most Electronics facts are.
+**Status**: **Rev 3 — full re-population, not an incremental patch.** Populated
+by the Mechanical Lead (AI agent) from `hardware/schematic/bench-imu-01-design.md`
+**Rev 5** (status line: "ready for Hardware Reviewer re-review focused on the
+new U6 stage" — i.e. Rev 5's newest sub-block, the U6 supervisory controller,
+has not yet cleared its own Hardware-Reviewer gate as of this population;
+this is an Electronics-side review-status fact, noted here for traceability,
+not something this handoff task blocks on or resolves), `bom/component-selection.md`
+(Motor / Motor Driver IC / Motor-Rail Supervisory Controller sections), and
+`requirements/requirements.md` Rev 3 (REQ-301–309, REQ-403–406, §9b/§9c).
+Date: 2026-09-09 (this population). Author: Mechanical Lead (AI agent).
 
-**Status: populated for Bench-IMU-01** — this repository's first real,
-end-to-end design cycle, and the actual benchmark run for the Mechanical
-discipline (`docs/architecture-evolution.md` §24: "Can this AI engineering
-system create a believable, buildable enclosure from real electronics
-information?"). Populated by the Mechanical Lead directly from the Circuit
-Engineer's `hardware/schematic/bench-imu-01-design.md` (Rev 2,
-Hardware-Reviewer-passed, human ACCEPTED-RISK sign-off recorded) — **not**
-from a KiCad project: `kicad-list_projects` was verified empty this session
-(no KiCad project exists yet for this repository), so every field below is
-extracted from the Circuit Engineer's own documented facts (mainly §10
-"Board geometry facts for the ... Mechanical Lead handoff", plus §11 pin
-table, §12 net list, §13 parts list), per the "Who fills this in" section
-below, rather than from the KiCad read-only tool surface. Below, `design.md`
-is shorthand for `hardware/schematic/bench-imu-01-design.md`.
+**Why this is a full re-population and not a patch**: Rev 2 of this file
+described a single static sensor/MCU board — every dimension in it was a
+component footprint or a board edge. Rev 3 adds a **Motor Driver + Reaction
+Wheel subsystem** (M1 = T-Motor MN2206-13 KV2000, U5 = TI DRV10983, U6 = TI
+TPS26631PWPR, J4 = Same Sky PJ-102AH barrel jack, plus 15 supporting passives/
+protection parts across Rev 3–5) that is different **in kind**, not just in
+degree: M1 is very likely not a PCB-mounted part at all (see Part B), it
+connects via wire leads rather than PCB traces, and it drives a spinning mass
+whose relevant "keep-out" is a **swept volume through a full rotation**
+(REQ-306), a category of fact this file has never needed before. Rather than
+awkwardly append motor rows to a document architecture built for a static
+board, this revision restructures the file into **Part A** (the static
+sensor/MCU board, carried forward from Rev 2 and resized for Rev 3's board
+growth) and **Part B** (the motor + reaction-wheel subsystem, entirely new).
+Every Rev 2 fact that is still valid is carried forward with its original
+sourcing intact; nothing is silently dropped.
 
-Every row's `Confidence` label is this Mechanical Lead's own independent
-judgment against *this file's* legend definitions below — not a verbatim
-copy of the Circuit Engineer's own wording. In two places this produces a
-different call than the Circuit Engineer's own document: (1) the LQFP-32
-and SOT-23-5 package heights, which the Circuit Engineer's own §10 marks
-`CONFIRMED` against a generic JEDEC package-*family* standard rather than
-the exact part's own mechanical drawing (its own text flags this caveat and
-explicitly invites the Mechanical Lead to make its own call — see the
-caveat after the Component Height Clearance table); (2) the board's
-tallest-component conclusion itself, once components the Circuit Engineer's
-own analysis didn't size (J2/J3 headers) are accounted for — see the same
-caveat.
+**Scope note**: This file records physical **facts and constraints** for the
+next phase (enclosure/mechanical design) to consume. It does not itself
+design an enclosure, a motor mount, or a flywheel — those are explicitly
+out of scope for this population task (see `.github/agents/mechanical-lead.agent.md`)
+and are left for a later session. Where a fact does not yet exist (e.g. no
+flywheel product has been selected), this file states the Mechanical Lead's
+own reasoned engineering assumption for the next phase to adopt, verify, or
+override — not a placeholder.
 
 ## Who fills this in
 
-Per `.github/agents/mechanical-lead.agent.md`, the **Mechanical Lead** is
-responsible for populating this file — extracting from an existing KiCad
-project via the same read-only tools already documented in
-`docs/architecture.md` §5.2 (`get_project_structure`,
-`extract_project_netlist`, `analyze_bom`,
-`generate_pcb_thumbnail`/`generate_project_thumbnail`), or from
-Circuit-Engineer-/human-supplied facts if no KiCad project exists yet. This
-requires no change to the Circuit Engineer's own files or process.
+The Mechanical Lead populates this file by reading `hardware/schematic/
+bench-imu-01-design.md` (specifically §9 "Mechanical/thermal co-design" and
+§10 "Board geometry facts," which the Circuit Engineer writes specifically
+for this handoff), `bom/component-selection.md` for component-level
+manufacturer facts not restated in the schematic doc, `requirements/
+requirements.md` for the constraints this file's facts must satisfy, and (if
+a KiCad project exists) the read-only KiCad MCP tools (`get_project_structure`,
+`extract_project_netlist`, `analyze_bom`, `generate_pcb_thumbnail`). **No
+KiCad project exists for this design as of this population** (`kicad-list_projects`
+returns empty) — every fact below is sourced from the schematic-equivalent
+design document and manufacturer data, not a KiCad footprint/placement file.
+Where a physical fact genuinely isn't determined anywhere upstream, the
+Mechanical Lead records its own best engineering judgment, labeled per the
+legend below — never a silent guess presented as fact.
 
-## Confidence / Assumption legend
+## Confidence / assumption legend
 
-Use exactly one of these per row's `Confidence` column:
+- **CONFIRMED** — an actual KiCad project value, a manufacturer datasheet/
+  product-page spec, or a measured value. Cite the source.
+- **ASSUMPTION** — a stated design choice made in the absence of confirmed
+  data. State why.
+- **ESTIMATE** — a reasonable approximation, explicitly flagged as such.
+- **UNKNOWN** — not yet determined. Must not be relied on as if confirmed;
+  escalate before treating it as load-bearing.
 
-| Label | Meaning |
-|---|---|
-| `CONFIRMED` | From an actual KiCad project / manufacturer spec / measured value. `Source` cites the Evidence ID or the specific tool output used. |
-| `ASSUMPTION` | A stated design assumption made in the absence of confirmed data. `Assumption / Notes` must say why. |
-| `ESTIMATE` | A reasonable approximation (e.g. "typical PCB thickness 1.6 mm"), explicitly flagged as such. |
-| `UNKNOWN` | Not yet determined. Must **not** be used as if confirmed (`docs/architecture.md` §6.1) — escalate before the Mechanical Lead relies on it for a load-bearing dimension (e.g. a mounting hole position). |
+As in Rev 2: every Confidence label below is this Mechanical Lead's own
+independent judgment against this legend, not a verbatim copy of the Circuit
+Engineer's own labels for the same fact where the two sources overlap. Where
+this file's label diverges from the schematic document's own framing, that
+divergence is called out explicitly (see B1) rather than silently presented
+as agreement.
 
-## Board Geometry
+---
 
-| Parameter | Value | Unit | Source | Confidence | Assumption / Notes |
-|---|---|---|---|---|---|
-| PCB Length | 60 | mm | `design.md` §10 ("PCB outline/size") + REQ-302 | ESTIMATE | The Circuit Engineer's own §10 estimate is a range, "~55×35mm up to the full 60×40mm REQ-302 target," with an explicit recommendation to design to "the full allowed envelope... for routing/assembly margin." This Mechanical Lead adopts the top of that range as the fixed working figure — REQ-302 is a "Should" ceiling, not a floor, so using it fully is compliant, and it maximizes downstream margin for mounting-hole inset, connector-cutout clearance, and wall thickness in the enclosure-design phase. Not CONFIRMED by an actual KiCad board outline — none exists yet (`kicad-list_projects` verified empty this session). |
-| PCB Width | 40 | mm | same as above | ESTIMATE | Same reasoning as PCB Length — top of the Circuit Engineer's stated ~35–40mm range. |
-| PCB Thickness | 1.6 | mm | Mechanical Lead's own engineering default — not stated anywhere in `design.md` (confirmed absent by direct search of the whole document) | ASSUMPTION | The near-universal standard PCB thickness for a design with no stated special requirement (rigidity, flex, unusual layer count, or heavy connector leverage). REQ-301 fixes layer count (2) but not thickness. 1.6mm is the default essentially every low-volume PCB fabricator ships absent a special request; revisit only if a future finding shows the USB-C receptacle's mounting tabs or the mounting-hole standoffs need a non-standard thickness for mechanical strength (no such need is evident yet). |
-| Board Outline | Rectangular, 60mm × 40mm bounding box; no cutouts, notches, or castellated edges | — | Mechanical Lead's own inference from `design.md`'s silence (no non-rectangular shape, notch, or cutout is mentioned anywhere in the document — checked §0–§18 directly) + REQ-301's flat single-2-layer-PCB framing | ASSUMPTION | Not a literal Circuit-Engineer-confirmed statement — `design.md` §10's table never states board shape explicitly; this is this Mechanical Lead's own reasonable default for a first, simple 2-layer bench board with no stated mechanical keep-out or routing constraint requiring anything other than a plain rectangle. |
+# Part A — Static sensor/MCU board (carried forward from Rev 2, resized for Rev 3)
 
-## Mounting
+This part covers the same ground as Rev 2's entire file: the sensor/MCU board
+that already existed before this revision. All Rev 2 component placements
+(U1–U4, J1–J3, SW1, D1, R1–R5, C1–C9) are **unchanged in relative layout**;
+only the board's own overall size grows, and the mounting-hole positions and
+top-edge component Y-coordinates are rescaled to track the new edges (see
+below). Nothing about the sensor/MCU circuit itself changed electrically in
+Rev 3–5 (confirmed: `bench-imu-01-design.md` §13 lists U1–U4/J1–J3/SW1/D1/
+R1–R5/C1–C9/MH1–4 with no Rev 3+ tag; all "new" tags are on the motor
+subsystem).
 
-**Coordinate convention** (Mechanical Lead's own addition, needed to make
-X/Y usable — not specified anywhere in `design.md`): origin `(0, 0)` at the
-board's bottom-left corner, viewed from the top/component side; `X` runs
-0→60mm along the PCB Length edge, `Y` runs 0→40mm along the PCB Width edge.
-All X/Y values in this file use this convention.
+## A1. Board geometry
 
-| Hole ID | X | Y | Diameter | Unit | Source | Confidence | Notes |
-|---|---|---|---|---|---|---|---|
-| MH-1 | 3.5 | 3.5 | 2.8 | mm | `design.md` §10 ("Mounting holes": "4×, near each corner, inset ~3–4mm... M2.5, hole ⌀≈2.7–2.8mm") + ISO 273 metric clearance-hole convention (M2.5: close fit 2.7mm / normal fit 2.9mm) | ESTIMATE | Bottom-left corner. The Circuit Engineer gave only qualitative placement ("near each corner, inset ~3–4mm") — the X/Y here are this Mechanical Lead's own specific proposal: a symmetric 3.5mm inset from both edges (midpoint of the Circuit Engineer's stated 3–4mm range). Diameter 2.8mm is chosen at the upper end of the Circuit Engineer's stated 2.7–2.8mm range (also inside ISO 273's M2.5 close-to-normal-fit band) for slightly easier assembly clearance. This is a proposed coordinate for enclosure-design purposes, not a Circuit-Engineer-specified or KiCad-confirmed position — expect it to move once a real board layout exists. |
-| MH-2 | 56.5 | 3.5 | 2.8 | mm | same as MH-1 | ESTIMATE | Bottom-right corner (60 − 3.5 = 56.5). Same reasoning as MH-1. |
-| MH-3 | 56.5 | 36.5 | 2.8 | mm | same as MH-1 | ESTIMATE | Top-right corner (40 − 3.5 = 36.5). Same reasoning as MH-1. |
-| MH-4 | 3.5 | 36.5 | 2.8 | mm | same as MH-1 | ESTIMATE | Top-left corner. Same reasoning as MH-1. Checked against this Mechanical Lead's own proposed connector/LED placements below (Connectors, Switches & LEDs table) for interference — clear by ≥9mm in every case. |
+| Parameter | Value | Unit | Source / Rationale | Confidence |
+|---|---|---|---|---|
+| Board outline shape | Rectangle | — | Carried forward from Rev 2; no cutouts/notches/castellated edges. A two-lobed or dog-bone outline (sensor lobe + motor lobe) was considered and rejected as over-engineering for this phase — a plain rectangle with internal zoning (below) is simpler to print/mount and still satisfies REQ-308 | ASSUMPTION |
+| Length (X-axis) | 100 | mm | See "Board growth rationale" below | ASSUMPTION |
+| Width (Y-axis) | 50 | mm | See "Board growth rationale" below | ASSUMPTION |
+| Thickness | 1.6 | mm | Unchanged from Rev 2 (standard FR4 thickness). Rev 3's motor-rail traces likely use heavier copper weight for current capacity, but that is an Electronics-domain layer-stackup detail that does not change overall board Z-thickness — not restated here | ASSUMPTION |
+| Board area | 5,000 | mm² | 100 × 50 | Derived |
+| Diagonal | ≈111.8 | mm | √(100²+50²) | Derived |
 
-## Component Height Clearance
+**Board growth rationale (why 100×50mm, not some other size)**: Rev 2 was
+60×40mm (2,400mm²) holding 23 real components (4 ICs + 3 connectors/header +
+1 switch + 1 LED + 5 resistors + 9 capacitors, excluding mounting holes).
+Rev 3–5 add 25 new reference designators (U5, M1, J4, D2, D3, R6–R9, C10–C15
+in Rev 3 = 15 items; R10, F1 in Rev 4 = 2 items; U6, R11–R15, C16–C17 in Rev 5
+= 8 items — verified against `bench-imu-01-design.md` §13's exact parts list),
+bringing the total to 47–48 real components depending on whether M1 is
+counted as board-mounted (see Part B — this is exactly the open question
+that makes the count ambiguous). That is a **2.04×–2.09× component-count
+increase**. This file proposes **100×50mm = 5,000mm², a 2.08× area increase**
+— chosen to track the component-count growth rather than an arbitrary
+round number, with the arithmetic checked against both bounds of the
+component-count ratio. Both the length and width, and the diagonal, remain
+well clear of REQ-308's relaxed ~150mm soft desk-scale sanity ceiling, with
+considerable headroom. **REQ-308 explicitly relaxes the old 60×40mm ceiling
+for this reason** — this file is not violating a hard requirement by growing
+the board, it is exercising the room REQ-308 deliberately created.
 
-| Parameter | Value | Unit | Source | Confidence | Notes |
-|---|---|---|---|---|---|
-| Max component height (top side) | 8.5 | mm | Mechanical Lead's own estimate — standard 2.54mm-pitch straight pin header, assumed for J2/J3 (~6.0mm mating pin length + ~2.5mm insulator height, consistent across generic 2.54mm-pitch header manufacturer specs) | ESTIMATE | **Supersedes `design.md` §10's own "tallest component = USB-C receptacle (J1), ≈3.2mm" conclusion.** See the caveat paragraph immediately below this table for the full reasoning; short version: the Circuit Engineer's §10 analysis only sizes the components it had a concrete reason to size (LQFP-32, SOT-23-5, and the USB-C-vs-Micro-USB-B connector trade-off) — it never gives a physical header type/height for J2/J3, and a conventional straight 2.54mm pin header (the same convention as the NUCLEO-style debug header `design.md` §4.4 explicitly compares J3 to) would be taller than the USB-C receptacle. Recommend the Hardware Lead/Circuit Engineer confirm the actual J2/J3 header hardware (straight vs. right-angle, standard vs. low-profile) since it is now this enclosure's height-budget-driving fact, not the connector-type choice `design.md` itself flagged. |
-| Max component height (bottom side) | 0 | mm | `design.md` §13 (parts list) | ASSUMPTION | No bottom-side components are identified anywhere in `design.md` (checked directly — no "bottom side"/"both sides"/"single-sided" statement exists anywhere in the document). This is this Mechanical Lead's own inference from that silence, not a literal Circuit-Engineer confirmation of single-sided assembly: a conventional single-sided (top-only) assembly is the standard, lowest-cost choice for a 2-layer board this size/part-count with no stated density pressure requiring bottom-side placement. This is a load-bearing assumption for how thin the enclosure's base half can be — if a future KiCad layout places anything on the bottom (e.g. for routing/density), this row must be revisited. |
+**Board zoning (new for Rev 3, ASSUMPTION)**: to keep REQ-307's vibration-
+isolation and §9's thermal-separation guidance concrete at the layout level
+(this file does not design the isolation itself — see B3/B5 — but a sensible
+zone layout is a cheap, low-risk first step any enclosure design will want),
+this file proposes three X-axis zones spanning the board's full 50mm width:
 
-**Caveat on this table's two most consequential judgment calls** (both this
-Mechanical Lead's own, one diverging from and one adding to `design.md`
-§10's analysis):
+| Zone | X-range | Width | Contents |
+|---|---|---|---|
+| Sensor zone | 0–60mm | 60mm | All Rev 2 components: U1–U4, J1–J3, SW1, D1, R1–R5, C1–C9, MH1/MH4 (left-hand pair) |
+| Buffer/isolation gap | 60–70mm | 10mm | Deliberately empty — physical separation between the sensor/MCU domain and the motor-driver domain, responding to §9's vibration+thermal separation guidance and REQ-307 |
+| Motor zone | 70–100mm | 30mm | U5, U6, J4, D2, D3, F1, R6–R15, C10–C17, MH2/MH3 (right-hand pair), MH5/MH6 (new) |
 
-1. **Package-height confidence downgrade (LQFP-32, SOT-23-5).** `design.md`
-   §10 marks the LQFP-32 (U1, ≈1.4mm) and SOT-23-5 (U3, ≈1.1–1.25mm) package
-   heights **CONFIRMED**, citing DS-MCU-048 / DS-PWR-046 (JEDEC MS-026/
-   MO-178 package-*family* outline standards) — and its own text flags the
-   caveat itself: *"confirmed against the JEDEC package-family outline
-   standard, not against [the part's] own literal mechanical drawing
-   page... a distinction worth preserving for the Mechanical Lead's own
-   rigor."* Taking up that explicit invitation: in **this file's** stricter
-   4-label scheme, a family-standard-based height is not the same as a
-   part-specific, manufacturer-drawing-confirmed height (`CONFIRMED`'s own
-   definition above requires "an actual KiCad project / manufacturer spec /
-   measured value" for *this* part). This Mechanical Lead therefore records
-   both as **ESTIMATE**, not CONFIRMED, in this file specifically — this
-   downgrade changes no Value cell above (neither is the tallest component
-   either way), only how much weight the next phase should put on them. The
-   USB-C receptacle height (≈3.2mm, DS-CONN-003) keeps `design.md`'s own
-   **ESTIMATE** label unchanged — independently reviewed and agreed: it is
-   explicitly a representative-part figure for an MPN not yet locked in,
-   squarely an ESTIMATE by this file's own definition, never a CONFIRMED one.
-2. **Header/switch/LED physical dimensions are absent from `design.md`, not
-   just imprecise.** §13's parts list gives J2/J3 as "4-pin header"
-   (function/pinout only), SW1 as "momentary pushbutton, N.O." (electrical
-   function only), and D1 as "generic indicator LED" (Vf assumed only) —
-   none carry a stated package, height, or pitch anywhere in the document
-   (confirmed by direct search). This Mechanical Lead's own estimates, not
-   used in the table above but flagged here for completeness: SW1 ≈5mm
-   (typical 6mm through-hole tactile-switch body height) and D1 ≈1mm
-   (assumed small SMD LED package, for consistency with the rest of this
-   design's all-SMD IC selection — though a through-hole 5mm LED, which
-   would add ≈8–9mm and become the new tallest feature on the board,
-   remains a real, undecided alternative). Neither changes this table's
-   Max-height conclusion (both stay under the 8.5mm header estimate above),
-   but both are genuine open items, the same in kind as the header-height
-   finding — see "Open items" near the end of this file.
+This zoning is a **layout proposal for the next phase**, not a claim that it
+by itself satisfies REQ-307 (vibration isolation is a mechanical-mounting
+question — see B3 — not solved by PCB layout alone). It is offered because
+it costs nothing to state now and materially simplifies the next phase's
+starting point.
 
-## Connectors, Switches & LEDs (cutouts)
+## A2. Mounting
 
-| Item | Type | X | Y | Orientation | Cutout needed? | Source | Confidence | Notes |
-|---|---|---|---|---|---|---|---|---|
-| J1 | USB-C receptacle, power-only (no D+/D− routed, REQ-105) | 0 | 20 | Horizontal edge-mount; plug axis along X, opening faces −X (outward through the board's left short edge) | Y | `design.md` §3.1/§10/§12 (type/function); X/Y/orientation = Mechanical Lead's own proposal | ESTIMATE | Type/function is Circuit-Engineer-confirmed; `design.md` only says "one short edge" (2 candidates: X=0 or X=60) — X=0, centered at Y=20 (board's Y midpoint), is this Mechanical Lead's own specific placement choice, made for a clean, symmetric layout, not a Circuit-Engineer-specified coordinate. Cutout: side-wall opening sized for a USB-C receptacle + cable clearance; exact cutout dimensions deferred to the enclosure-design phase. J1's own MPN is not yet formally selected (`design.md` §10/§13) — height estimate rests on one representative part (DS-CONN-003). |
-| J2 | 4-pin header: TX/RX/GND/3V3 (REQ-106, UART) | 16 | 40 | Vertical through-hole, pins point +Z; single row of 4 runs along X, parallel to the top edge | Y | `design.md` §6/§10/§13 (type/function); X/Y/orientation + physical header assumption = Mechanical Lead's own | ESTIMATE | `design.md` only says "along one long edge" (2 candidates: Y=0 or Y=40), together with J3 — Y=40 (top long edge), spaced from J3/SW1/the corner mounting holes, is this Mechanical Lead's own specific placement. Physical header type (straight 2.54mm pin header, ~8.5mm tall) is also this Mechanical Lead's own assumption — see the Component Height Clearance caveat above; `design.md` never states a header type. Cutout: a lid opening (or an omitted-lid region) above the header for cable/probe access. |
-| J3 | 4-pin header: VDD/SWCLK/GND/SWDIO (REQ-107, SWD debug) | 30 | 40 | Same as J2 | Y | `design.md` §4.4/§10/§13 (type/function); X/Y/orientation = Mechanical Lead's own | ESTIMATE | Same reasoning as J2 — placed 14mm from J2 and 14mm from SW1 for footprint/cutout clearance, and clear of both corner mounting holes by ≥13mm. |
-| SW1 | Momentary pushbutton, N.O. (REQ-004, manual reset) | 44 | 40 | Vertical actuation, cap points +Z (toward the lid) | Y | `design.md` §4.3/§13 (type/function only); X/Y/orientation/package = Mechanical Lead's own — `design.md` gives **no edge guidance at all** for SW1 | ASSUMPTION | `design.md` never states which edge/region SW1 is on (unlike J1/J2/J3, which at least got qualitative edge guidance) — placement here is entirely this Mechanical Lead's own choice (grouped near the debug headers, a common practical dev-board convention: reset-while-debugging access). Assumes a standard top-actuated through-hole tactile switch (~5mm tall; no package stated by Circuit Engineer, see Component Height Clearance caveat). Cutout call: direct finger access (a wall/lid opening sized to the button) rather than a recessed poke-hole — simpler for a bench/dev board, Phase-1 appropriate. |
-| D1 | Generic indicator/status LED, Vf≈2.0V assumed (REQ-003) | 10 | 30 | Top-emitting; assumed small SMD package, light emitted in +Z (toward the lid) | Y | `design.md` §7/§13 (type/function only); X/Y/orientation/package = Mechanical Lead's own — `design.md` gives **no edge/position guidance at all** for D1 | ASSUMPTION | Same gap as SW1 — no Circuit-Engineer placement guidance at all. Placed near the USB-C/power edge, a common convention (status LED visible near the power-input side), clear of MH-4 by ≈9mm and of J1's own footprint by ≈14mm. Package assumed SMD for consistency with the rest of this design's SMD-only IC selection; a through-hole 5mm LED is a real, undecided alternative (see Component Height Clearance caveat). Cutout call: a small (~3mm) through-hole in the lid directly above D1, no engineered light-pipe — simplest Phase-1 approach; a molded light-pipe/clear window is a possible later refinement, not required now. |
+**Coordinate convention** (unchanged from Rev 2): origin (0,0) at the
+board's bottom-left corner as viewed from the component side, X increasing
+right, Y increasing up (toward the top edge), matching typical KiCad/EDA
+convention. All coordinates below are board-relative, in mm.
 
-## Mass
+**Rescaling rule applied to carry Rev 2 coordinates forward**: Rev 2's
+interior/centered component positions (J1, J2, J3, SW1, D1) are scaled by
+the width ratio 50/40 = **1.25×** in Y only (X is unchanged — the board only
+grew in width/Y and length/X-extension, the original 0–60mm X-span is
+untouched). This preserves each component's *relative* position on the
+board (e.g. J1 was exactly Y-centered in Rev 2 at Y=20 of a 0–40 range;
+at Y=25 it is exactly Y-centered in the new 0–50 range) rather than
+leaving them at stale absolute coordinates that would no longer mean what
+they meant in Rev 2. Mounting holes, which are defined relative to the
+board *edge* (an inset distance, not a proportional interior position),
+are recalculated fresh against the new edges rather than scaled.
 
-| Parameter | Value | Unit | Source | Confidence | Notes |
-|---|---|---|---|---|---|
-| Approximate PCB + components mass | 8–10 (≈9 typical) | g | Mechanical Lead's own calculation from Board Geometry table above + `design.md` §13 parts list + generic FR4 density reference (~1.85 g/cm³) | ESTIMATE | Bare-board estimate: 60mm × 40mm × 1.6mm × 1.85 g/cm³ ≈ 7.1g (FR4 substrate + copper, standard density figure — no per-part datasheet mass cited by `design.md`). Populated-board component-mass adder ≈1.8–2.0g, dominated by J1's USB-C metal shell (~0.5g typical for this connector class), J2+J3's two 4-pin headers (~0.3g each ≈0.6g combined), and SW1's tactile-switch body (~0.3g); the MCU (U1), IMU, LDO (U3), and passives are each individually small (well under 0.1g apiece) and contribute the small remainder. Total ≈8.9–9.1g, rounded to an 8–10g range. This is a bench-estimate for a small, low-part-count board, not a summed manufacturer-datasheet mass table — reasonable for Phase 1 / REQ-502's paper-design framing, but would need real per-part masses (from actual selected MPNs' datasheets) if the design ever needs a precise mass budget (e.g. for a handheld or mass-sensitive application — not this project). |
+| Hole | X | Y | Diameter | Type | Rationale | Confidence |
+|---|---|---|---|---|---|---|
+| MH-1 | 3.5 | 3.5 | 2.8mm (M2.5 clearance) | Through-hole | Bottom-left, 3.5mm inset from both edges — unchanged rule from Rev 2 | ASSUMPTION |
+| MH-2 | 96.5 | 3.5 | 2.8mm (M2.5 clearance) | Through-hole | Bottom-right, 3.5mm inset from the new right/bottom edges | ASSUMPTION |
+| MH-3 | 96.5 | 46.5 | 2.8mm (M2.5 clearance) | Through-hole | Top-right, 3.5mm inset from the new right/top edges | ASSUMPTION |
+| MH-4 | 3.5 | 46.5 | 2.8mm (M2.5 clearance) | Through-hole | Top-left, 3.5mm inset from the new left/top edges | ASSUMPTION |
+| **MH-5** *(new)* | 85 | 3.5 | 2.8mm (M2.5 clearance) | Through-hole | New — bottom edge of the motor zone, near its X-centroid (70–100mm zone, midpoint 85mm) | ASSUMPTION |
+| **MH-6** *(new)* | 85 | 46.5 | 2.8mm (M2.5 clearance) | Through-hole | New — top edge of the motor zone, mirrors MH-5 | ASSUMPTION |
 
-## Open items (not blocking — flagged for the next phase, none escalated)
+**Why two new mounting holes**: REQ-304's floor is "≥4 mounting holes,
+positioned at corners or edges for support" — MH-1–4 alone already satisfy
+that floor on the new 100×50mm outline. MH-5/MH-6 are proposed **beyond**
+the floor specifically because Rev 3 introduces a new vibration source
+(M1, however it ends up mounted — see Part B) roughly 15–30mm from the
+nearest original corner hole; two additional anchor points straddling the
+motor zone give the board firmer, more local support against motor-induced
+vibration in that region, directly serving REQ-307. This is this
+Mechanical Lead's own judgment call, not dictated by any upstream document
+— flagged as ASSUMPTION accordingly, open to revision once an actual motor-
+mounting decision (Part B) makes the true vibration path concrete.
 
-None of these rise to this agent's own escalation bar ("a required field
-cannot be confirmed and is **not safe** to leave as ASSUMPTION/ESTIMATE" —
-`.github/agents/mechanical-lead.agent.md`): given REQ-502's explicit framing
-of this cycle as a paper/document design exercise with no physical
-fabrication happening, a well-reasoned ESTIMATE for each of these is the
-correct and expected Phase-1 artifact, not a blocker. Recorded here purely
-so the next phase (enclosure design) and any future KiCad-project creation
-know exactly which figures are this Mechanical Lead's own placeholder and
-should be revisited first once real layout data exists:
+All six holes assume M2.5 screws with a standard 0.3mm/side clearance
+(2.5+0.3×2=3.1mm → rounded to a common 2.8mm clearance-drill convention,
+unchanged reasoning from Rev 2), and PCB material sufficient annular ring
+around each hole — not independently re-verified this revision, carried
+forward as an ASSUMPTION.
 
-1. **J2/J3 physical header hardware is unconfirmed.** The 8.5mm top-side
-   height budget (Component Height Clearance table) rests entirely on an
-   assumed standard 2.54mm straight pin header — `design.md` never states
-   header type. If the real header turns out to be low-profile, right-angle,
-   or shrouded, the enclosure's Z-height budget changes materially. Owner:
-   Hardware Lead/Circuit Engineer to confirm before enclosure Z-height is
-   frozen.
-2. **SW1 and D1 packages are unconfirmed.** Neither has a stated physical
-   package anywhere in `design.md` — heights here (≈5mm, ≈1mm respectively)
-   are this Mechanical Lead's own reasonable assumptions, and a through-hole
-   5mm LED for D1 remains a real, undecided alternative that would exceed
-   the current 8.5mm max-height figure. Owner: Circuit Engineer, once D1/SW1
-   MPNs are selected.
-3. **J1's exact MPN is not yet locked** (`design.md` §10/§13) — the ≈3.2mm
-   height and physical footprint used anywhere in this file rest on one
-   representative part (GCT USB4125, DS-CONN-003), not a final selection.
-   Does not currently drive the enclosure's height budget (superseded by
-   the header-height estimate above), but would matter again for the J1
-   cutout's exact width/depth in the next phase. Owner: Circuit Engineer.
-4. **Bottom-side = 0 components is an inference from silence, not an explicit
-   Circuit-Engineer confirmation.** Revisit if a future KiCad layout places
-   anything on the bottom copper layer.
+## A3. Component height clearance
 
-## Deferred fields (not in Phase 1 — add only if a real project needs one)
+| Component | Height above PCB | Confidence | Source / Rationale |
+|---|---|---|---|
+| J4 (Same Sky PJ-102AH barrel jack) | ≈11.0mm | **ESTIMATE** | See "J4 height — provenance" below. **New tallest board-side component as of Rev 3**, superseding the Rev 2 figure below |
+| J2/J3 (4-pin headers) | ≈8.5mm | ESTIMATE (carried forward from Rev 2) | Standard 0.1" pin header, unpopulated-mate height estimate; Rev 2's own governing figure, now superseded by J4 above but retained as a secondary reference candidate (see caveat below) |
+| J1 (USB-C receptacle) | ≈3.2mm | ESTIMATE (carried forward from Rev 2) | GCT USB4125/4105-family illustrative height, MPN not formally selected (`bench-imu-01-design.md` §13) |
+| U5 (TI DRV10983) | ≈1.1–1.2mm | ESTIMATE | HTSSOP-24 (PWP) package, JEDEC MO-153-family standard body height envelope — non-driving |
+| U6 (TI TPS26631PWPR) | ≈1.1–1.2mm | ESTIMATE | HTSSOP-20 (PWP) package, same JEDEC family — non-driving |
+| D2 (ST STPS3L60) | ≈2.1mm | ESTIMATE | SMB (DO-214AA) package, standard-family body height — non-driving |
+| D3 (Littelfuse SMBJ16A) | ≈2.1mm | ESTIMATE | SMB (DO-214AA) package, same family — non-driving |
+| F1 (Littelfuse 30R500UF) | **not determined** | **UNKNOWN** | See "F1 — a newly surfaced gap" below |
+| R6–R15, C10–C17 | <1mm each | ASSUMPTION | Standard small SMD passive packages (0603-class per R10's explicit 0603 callout in §13; others not individually specified but presumed the same design-wide convention) — negligible, non-driving, consistent with Rev 2's treatment of R1–R5/C1–C9 |
+| **Bottom side (all components)** | 0 | ASSUMPTION (carried forward) | No bottom-side placements found anywhere in Rev 2 or the Rev 3–5 additions; re-checked this revision against the full §13 parts list, nothing contradicts this |
 
-Per `docs/architecture-evolution.md` §13, explicitly deferred until the
-benchmark shows they're actually needed: thermal zones, antenna keep-out,
-STEP/neutral 3D model reference, center of mass, battery wiring requirements,
-complex keep-out zones, detailed cable-exit geometry.
+**Governing clearance conclusion**: **≈11.0mm** top-side clearance should be
+budgeted for the sensor/MCU + motor-driver board region specifically because
+of J4, pending the caveats immediately below.
+
+**J4 height — provenance (why ESTIMATE, not CONFIRMED)**: `bench-imu-01-design.md`
+§10 explicitly flags "J4 may be the new tallest component, pending
+confirmation" without resolving it — this file's own job is to resolve it
+as far as reasonably possible. This session: (a) the manufacturer's current
+Rev 1.05 datasheet (`datasheets/samesky_pj-102ah_rev1-05.md`, DS-CONN-005)
+gives only electrical ratings and a 9.5mm mating-plug insertion depth — its
+mechanical drawing's actual dimension figures are embedded as vector
+graphics, not extractable as text, even via a direct fetch; (b) a web search
+returned a specific claim of H=11.0mm/L=14.4mm/W=9.0mm, attributed to a
+DigiKey-adjacent listing; (c) a second, independent web search corroborated
+the same 11.0mm figure via a different (mirror) site; (d) that mirror site
+turned out to host an **older Rev 1.02 (2016)** version of the same CUI/
+Same Sky datasheet — its OCR'd dimension text contains "11.0" paired with
+"0.433" (11.0mm ≈ 0.433in, an internally-consistent metric/imperial pair,
+i.e. not an arbitrary number) alongside a "9.0" width figure, giving
+genuine partial corroboration that 11.0mm is a real datasheet figure and
+not a hallucination — but this is an older hardware revision than the one
+currently cited (Rev 1.05, which shows a slightly different insertion
+depth, 9.5mm vs. that older document's own figures, confirming some minor
+spec drift between revisions), and no drawing was visually confirmed. **Net
+call: ESTIMATE, not CONFIRMED** — flagged for re-verification against a
+physical sample or the current Rev 1.05 drawing's actual vector content
+before the enclosure's Z-height is finalized. If 11.0mm later proves wrong,
+the fallback governing figure is the 8.5mm J2/J3 header estimate, which
+remains independently valid regardless of J4's outcome.
+
+**F1 — a newly surfaced gap**: F1 (Littelfuse 30R500UF) is described in its
+own datasheet family as a **"30R Series Radial Leaded"** resettable PTC
+fuse — i.e. a through-hole part with two wire leads and a disc-shaped body,
+mechanically unlike every other Rev 3–5 addition (all of which are small
+SMD parts). Neither the Circuit Engineer's design document nor the
+Component Engineer's evidence log (`datasheets/evidence-log.md`, DS-PROT-006/
+032/033) recorded a body diameter, thickness, or standoff height for this
+part — only its electrical ratings. This file surfaces that as a genuine,
+previously-unflagged gap: **F1's height above the board is UNKNOWN.**
+Judgment call: general familiarity with this class of radial PTC fuse
+(compact epoxy-coated discs, typically well under 10mm across and a few mm
+thick for this current rating) makes it plausible F1 does not exceed J4's
+~11.0mm estimate or M1's height if on-board (Part B) — but this is a
+plausibility judgment, not a confirmed or even estimated number, and this
+file declines to invent one. Not pursued further this session because it is
+judged unlikely to change the governing conclusion; flagged for a fresh
+manufacturer-drawing lookup before the enclosure Z-height is finalized.
+
+**Cross-reference to Part B**: if M1 ends up mounted directly to this board
+(against this Mechanical Lead's own non-binding leaning — see B3), its own
+18.5mm overall body height (CONFIRMED, DS-MTR-021) would exceed every figure
+in this table and become the new governing clearance dimension, growing the
+top-side clearance budget from ~11mm to ~18.5mm-plus. This is exactly the
+kind of consequence that makes the Part B mounting-method question
+consequential rather than academic, and is not resolved here.
+
+## A4. Connectors, switches & LEDs (cutouts)
+
+| Ref | Type | X | Y | Orientation | Notes | Confidence |
+|---|---|---|---|---|---|---|
+| J1 | USB-C receptacle | 0 | 25 | Horizontal edge-mount; plug axis along X, opening faces −X | Left edge, Y-centered (25 = midpoint of new 0–50mm range, preserving Rev 2's exact-center placement under the 1.25× rescale) | ESTIMATE (carried forward from Rev 2, rescaled) |
+| J2 | 4-pin header (UART) | 16 | 50 | Vertical, pins point +Y | Top edge (rescaled Y: 40×1.25=50). Rev 2 already placed this exactly at the board's then-top edge (Y=40 of a 0–40mm board) — the rescale preserves that same "exactly at the top edge" relationship on the new 0–50mm board, it is not a new decision to move it onto the edge | ESTIMATE (carried forward from Rev 2, rescaled) |
+| J3 | 4-pin header (SWD) | 30 | 50 | Vertical, pins point +Y | Top edge, same rescale/edge relationship as J2 | ESTIMATE (carried forward from Rev 2, rescaled) |
+| SW1 | Momentary pushbutton | 44 | 50 | Top-accessible | Top edge, same rescale/edge relationship as J2. Rev 2 gave **no** edge/position guidance for SW1 at all — its placement (grouped near the debug headers) was, and remains, this Mechanical Lead's own unconstrained choice | ASSUMPTION (carried forward from Rev 2, rescaled) |
+| D1 | Indicator LED | 10 | 37.5 | Top-visible | Interior position, rescaled (30×1.25=37.5). Rev 2 gave **no** position guidance for D1 either — placement near the power-input edge was, and remains, this Mechanical Lead's own unconstrained choice | ASSUMPTION (carried forward from Rev 2, rescaled) |
+| **J4** *(new)* | Barrel jack (Same Sky PJ-102AH) | 100 | 25 | Horizontal edge-mount; plug axis along X, opening faces +X | Right edge, Y-centered — mirrors J1's role/style on the opposite short edge. 2.0mm center pin per DS-CONN-005; outer barrel diameter not independently confirmed this session (commonly paired with 2.0mm-center-pin jacks of this class, per the schematic doc's own §13 caveat — not asserted as a specific cutout diameter here) | ASSUMPTION |
+| **MC-1** *(new, Mechanical-Lead-proposed — NOT a Circuit Engineer reference designator)* | Motor phase-wire connector (proposed) | 92 | 0 | Bottom edge of motor zone, pins/wire exit −Y | Provisional placement only, contingent on the still-open motor-mounting decision (Part B). If a future schematic revision formally adopts a connector here, the Circuit Engineer would assign it a real "J"-number — "MC-1" is deliberately not J-prefixed to avoid colliding with any future Circuit-Engineer-assigned designator | ASSUMPTION, explicitly provisional |
+
+**Cutout sizing**: as in Rev 2, none of the above have been sized to an
+exact cutout dimension (e.g. a precise USB-C or barrel-jack panel cutout
+profile) — that is enclosure-design-phase work. This file records position,
+orientation, and the connector's identity/rough envelope so that phase can
+size cutouts correctly.
+
+## A5. Mass (sensor/MCU board + all Rev 3–5 populated components, excluding M1 and the flywheel)
+
+| Item | Mass | Confidence | Rationale |
+|---|---|---|---|
+| Bare PCB substrate | 14.8g | ESTIMATE | 100mm × 50mm × 1.6mm × 1.85g/cm³ (standard FR4 density, same method/density as Rev 2) = 8.0cm³ × 1.85g/cm³. Scales consistently with the 2.08× board-area growth vs. Rev 2's own 7.1g bare-board figure |
+| Rev 2 components (U1–U4, J1–J3, SW1, D1, R1–R5, C1–C9) | ≈1.8–2.0g | ESTIMATE (carried forward) | Unchanged from Rev 2's own figure |
+| Rev 3–5 components (U5, U6, J4, D2, D3, F1, R6–R15, C10–C17) | ≈2.5–3.0g | ESTIMATE | J4 (barrel jack, metal-bodied) dominates at ≈1.5g; U5/U6 (HTSSOP) ≈0.15–0.2g each; D2/D3 (SMB) ≈0.1g each; F1 (radial PTC, epoxy body) ≈0.3–0.4g; R6–R15/C10–C17 (small SMD) negligible individually, ≈0.1–0.15g combined |
+| **Subtotal: populated board assembly** | **≈19–20g** | ESTIMATE | Sum of the above three rows |
+
+M1 and the flywheel are deliberately **excluded** from this table and
+carried separately in Part B, because their mass may or may not load this
+PCB at all, depending on the still-open mounting decision (B3). The combined
+total assembly mass (this subtotal + M1 + flywheel) is given in B7.
+
+---
+
+# Part B — Motor + reaction-wheel subsystem (new, Rev 3)
+
+**Why this needs its own part, not just new table rows**: everything in
+Part A is a component with a fixed footprint soldered to a fixed place on a
+board — the kind of fact this file has always recorded. M1 and its flywheel
+are qualitatively different: M1 is very likely not solder-mounted at all,
+its counterpart (the flywheel) is not yet a selected product, and the
+relevant keep-out is not a static footprint but a **swept volume through a
+full rotation** (REQ-306) — a category of spatial fact this file has never
+needed to express before. Each section below states plainly what is
+confirmed, what is this Mechanical Lead's own reasoned assumption, and what
+is a genuinely open question for the next phase or for escalation.
+
+## B1. Motor (M1) physical facts
+
+**Source**: T-Motor MN2206-13 KV2000, product-page dimensions/mass block,
+`datasheets/tmotor_mn2206-13-2000kv_rev-unknown.md`, Evidence ID **DS-MTR-021**
+(`datasheets/evidence-log.md`).
+
+| Parameter | Value | Unit | Confidence | Notes |
+|---|---|---|---|---|
+| Overall body diameter | 27 | mm | **CONFIRMED** | Manufacturer product-page spec block (DS-MTR-021) |
+| Overall body height (bell + stator stack) | 18.5 | mm | **CONFIRMED** | Same source |
+| Stator diameter | 22 | mm | **CONFIRMED** | Same source — see divergence note below |
+| Stator height | 6 | mm | **CONFIRMED** | Same source |
+| Shaft diameter | 3 | mm | **CONFIRMED** | Same source |
+| Mass | 30 | g | **CONFIRMED** | Same source |
+| Motor architecture | Outrunner (rotating bell/case, stationary stator core) | — | **CONFIRMED** | DS-MTR-017/DS-MTR-021 |
+| Mounting-hole bolt pattern | 4× M3 screws, ~16mm bolt circle diameter, ~12mm square spacing | — | **ASSUMPTION** — heavily hedged | See "Bolt pattern — provenance" below |
+| Mounting-hole depth/thread | Not determined | — | **UNKNOWN** | Not found in any source consulted this session |
+
+**Confidence divergence note (per this file's own legend, stated explicitly
+rather than silently)**: `bench-imu-01-design.md` §10's own table treats the
+stator dimension figure as an **ASSUMPTION**, reasoned from the part
+number's own "XXYY" stator-size naming convention (22mm×6mm from "2206").
+This file labels the same 22×6mm figure **CONFIRMED** instead, because
+DS-MTR-021 itself directly states the stator dimensions as part of the same
+manufacturer product-page block that gives the overall body size and mass —
+i.e., it is not solely inferred from the naming convention, it is also
+directly stated on the same cited source as the other (uncontested-CONFIRMED)
+figures in this table. The naming-convention match is a welcome independent
+corroboration of the same number, not a contradiction. Per this file's own
+precedent (Rev 2's header, and the legend above), the Mechanical Lead's
+confidence label is its own independent judgment where sources overlap —
+this is such a case, presented explicitly rather than silently overriding
+the schematic document's own framing.
+
+**Caveat on evidentiary class**: DS-MTR-021's source is described as a
+"Product page dimensions/mass block" — i.e., the manufacturer's own retail
+product page spec table, not a downloadable PDF mechanical drawing with
+dimensioned views. This still qualifies as CONFIRMED under this file's own
+legend ("manufacturer spec" — a manufacturer's own published product-page
+specification is exactly that), but it is a materially different
+evidentiary class from a formal dimensioned drawing, and is noted here for
+transparency, mirroring how Rev 2 distinguished JEDEC-family package
+envelopes from part-specific drawings.
+
+**Bolt pattern — provenance (why ASSUMPTION, heavily hedged)**: this
+figure was not found in any repository source (it is absent from
+DS-MTR-017 through DS-MTR-024, the complete evidence-log breakdown for this
+part). A web search this session returned a specific claim (4× M3, 16mm
+bolt circle, 12mm square spacing) explicitly described as a "standard mini
+quadcopter/multirotor motor" mounting convention for motors in this general
+size/frame class — not a T-Motor manufacturer drawing for this specific
+SKU. This file records it as a **starting-point ASSUMPTION only**,
+sufficient for early enclosure/bracket sketching, but it **must be verified
+against the actual physical part, an official T-Motor CAD file, or a
+purchased sample's own measured bolt pattern before any enclosure screw-boss
+position is finalized for manufacture.** This is not treated as unsafe to
+leave as an ASSUMPTION at this stage (no physical prototyping is happening
+this cycle — REQ-502's paper-design-cycle framing — and the figure does not
+block any design activity that follows, it only needs revisiting before
+physical commitment), so it is not escalated as a blocker.
+
+## B2. Flywheel physical facts (assumed design — no product exists yet)
+
+No flywheel product has been selected or specified anywhere upstream — the
+target in `requirements/requirements.md` §9b (≈100g mass at ≈30mm radius,
+≥3000 RPM, human-approved per §9c) is a **performance target**, not a
+physical part. This file proposes a concrete, reasoned geometry consistent
+with that target, for the next phase to adopt, refine, or override.
+
+| Parameter | Value | Unit | Confidence | Rationale |
+|---|---|---|---|---|
+| Target mass | 100 | g | CONFIRMED (as a target) | `requirements/requirements.md` §9b, human-approved §9c |
+| Target radius | 30 | mm | CONFIRMED (as a target) | Same source |
+| Target angular momentum | ≈14.1 at 3000 RPM | mN·m·s | CONFIRMED (as a target, derived) | §9b's own I=0.5·m·r² solid-disk-formula reasoning, independently re-verified: I = 0.5 × 0.1kg × (0.03m)² = 4.5×10⁻⁵kg·m²; L = I·ω at 3000 RPM (ω=314.2rad/s) ≈ 14.1×10⁻³N·m·s |
+| **Proposed geometry** | Solid disk, ⌀60mm × 4.5mm thick | — | **ASSUMPTION** | Derived below |
+| **Proposed material** | Mild steel (ρ≈7,850kg/m³) | — | **ASSUMPTION** | See "Material choice" below |
+| Center bore / hub interface | Not modeled | — | **UNKNOWN** | Depends on the shaft/hub attachment method, itself unresolved (see below) |
+
+**Geometry derivation**: for a solid disk of mass m and radius r, thickness
+t = m/(ρ·π·r²). At m=100g (0.1kg), r=30mm (0.03m), ρ=7,850kg/m³ (mild
+steel): t = 0.1 / (7,850 × π × 0.0009) = 0.1/22.19 ≈ **4.5mm**. This exactly
+reproduces the target I=4.5×10⁻⁵kg·m² by construction (solid-disk formula),
+so the ≥3000 RPM / ≈14.1mN·m·s target is met by definition at this geometry.
+
+**Material choice — why steel, not aluminum/brass/printed plastic**: for a
+*fixed* target mass and radius, disk thickness scales inversely with
+density. Alternatives computed on the same basis: aluminum (ρ≈2,700) →
+≈13.1mm thick; brass (ρ≈8,400) → ≈4.2mm thick (very close to steel); PLA/
+PETG (ρ≈1,250 average) → ≈28.3mm thick. Two reasons drive the steel choice:
+(1) **Safety**: a 3D-printed plastic disk this thick, spinning at ≥3000 RPM,
+carries genuine interlaminar/layer-adhesion weakness under centrifugal
+stress — directly relevant to REQ-403 (flywheel detachment/pinch-hazard
+mitigation, human-review-gated). **This file explicitly states the flywheel
+must NOT be assumed 3D-printed**, unlike the enclosure itself, which
+REQ-309 does permit to be 3D-printed. (2) **Compactness**: steel's higher
+density directly minimizes the disk's axial thickness for the same target
+mass/radius, which matters because it minimizes the axial dimension of the
+rotation clearance envelope (B5) that the enclosure must accommodate.
+Aluminum/brass remain physically plausible alternatives (brass in
+particular is a close second on thickness) but are not selected here as the
+primary proposal; this is a design proposal for the next phase, not a
+final material specification.
+
+**Explicitly not modeled — flagged for the next phase**: (a) if the next
+phase instead builds an annular/ring geometry rather than a solid disk
+(physically natural for direct bell-mounting, per `bom/component-selection.md`'s
+own framing — "outrunner (flywheel can mount directly to the rotating bell,
+maximizing inertia per gram)," line ~501), the true moment of inertia would
+exceed this solid-disk figure (ring I≈m·r² vs. disk I≈0.5·m·r² for the same
+mass/radius) — very likely still comfortably covered given the motor's own
+~17.2× continuous-torque margin over the disk-based target (`bom/component-selection.md`
+Motor Approval table), but flagged as a real modeling consideration, not
+silently assumed equivalent; (b) a center bore/hub interface for shaft
+mounting is not modeled at all — genuinely unresolved, tied to the same
+open mounting-method question as B3; (c) M1's own body radius (13.5mm) sits
+comfortably inside this flywheel's 30mm target radius (≈16.5mm of disk
+extends beyond the motor body on each side if bell-mounted), a basic
+geometric plausibility check, not a design conclusion.
+
+## B3. Motor mounting interface — OPEN ITEM, not resolved in this document
+
+**What the schematic document says, verbatim** (`bench-imu-01-design.md` §10):
+
+> "M1 is off-board or on-board? — UNKNOWN, not resolved this session:
+> whether the reaction-wheel motor mounts directly to this PCB, to a
+> separate mechanical structure connected only by wire, or some hybrid, is
+> a Mechanical Lead decision this document does not presume."
+
+§16 item 20 repeats the same open status. The Circuit Engineer has
+deliberately and explicitly left this decision to the Mechanical Lead — it
+is not an oversight or a gap in the schematic document, it is a considered
+hand-off.
+
+**This Mechanical Lead's own non-binding leaning (not a decision made in
+this document)**: off-board / bracket-mounted is more physically sensible,
+for four reasons: (1) M1 is a screw-mount part by its own manufacturer
+convention (§B1's bolt-pattern discussion), not a reflow/PCB-footprint
+part — nothing about it is designed to be soldered down; (2) a 1.6mm FR4
+PCB is a poor structural choice for cantilevering a spinning mass under
+sustained vibration — FR4 is not selected or rated for this kind of
+mechanical duty; (3) REQ-307's vibration-isolation requirement is
+substantially easier to satisfy with a motor mount that is mechanically
+separate from the sensor board than with one that shares the same rigid
+substrate; (4) `bom/component-selection.md`'s own "flywheel mounts to the
+rotating bell" framing implies a bolt-on interface that is naturally
+serviced by a dedicated bracket, not a PCB pad. **This is a leaning, not a
+decision** — the actual mounting method is enclosure-design work, out of
+scope for this population task, and is left open here.
+
+**Escalation assessment (this Mechanical Lead's own judgment, per the
+escalation triggers in `.github/agents/mechanical-lead.agent.md`)**: this
+question does **not** need Hardware-Lead/human escalation as a blocking gap
+at this handoff-population stage. It is squarely within the Mechanical
+Lead's own delegated design authority (the schematic document says so
+explicitly), and properly belongs to the *next* phase (actual enclosure/
+mount design), not this one. It **is** safety-relevant — it bears directly
+on REQ-403 (flywheel detachment/pinch-hazard mitigation) and REQ-306
+(rotation clearance) — so whichever way it is eventually decided, that
+decision must still pass REQ-403's own separate, already-established
+human-review gate before Design Complete. That gate is a pre-existing
+structural requirement in `requirements/requirements.md`, not a new
+escalation this file is introducing.
+
+**Consequence noted for the next phase**: whichever way this is decided
+has material downstream effects already surfaced in this file — it changes
+the governing top-side height-clearance figure (A3: 11.0mm vs. 18.5mm-plus
+if on-board), it determines whether M1's 30g mass loads the sensor/MCU PCB
+directly (A5/B7), and it determines where MC-1's provisional connector
+position (A4) is even relevant (a wire-to-bracket motor needs a board-edge
+connector; a PCB-mounted motor might not).
+
+## B4. Motor phase wiring / connector
+
+**Confirmed electrical fact**: U5 (DRV10983) pins 17–22 connect to M1's 3
+phase leads via the `MOTOR_PHASE_U/V/W` net (`bench-imu-01-design.md` §12).
+M1 is confirmed **sensorless** (DS-MTR-022 — 3 phase leads only, no separate
+Hall-sensor harness), so exactly 3 conductors are involved, no more.
+
+**Confirmed as a genuine gap**: no connector or wiring hardware for these 3
+leads is specified anywhere upstream — it is absent from the complete Rev
+3–5 parts list (`bench-imu-01-design.md` §13).
+
+**Proposed physical routing (ASSUMPTION, contingent on the B3 off-board
+leaning)**: if M1 is off-board, its 3 phase leads need some physical
+transition from loose wire to the PCB edge. This file proposes a small
+keyed/locking 3-pin connector (e.g., JST-XH class or similar) at the board
+edge (provisionally placed as **MC-1**, A4) as a reasonable default —
+keying prevents an accidental phase-swap during assembly/rework, which
+would otherwise just reverse rotation direction (a nuisance, not a safety
+issue, given the driver is commutation-agnostic to lead order) but is still
+worth avoiding for assembly repeatability. A real, undecided alternative is
+flagged explicitly: this motor class is RC-industry-conventionally supplied
+with **unkeyed bullet connectors** (3.5mm or similar), which some builders
+prefer specifically because they allow a deliberate phase-swap to reverse
+rotation direction without re-soldering. Both are physically reasonable;
+neither is selected as final here — this is a next-phase decision, flagged
+with its trade-off stated rather than silently resolved.
+
+**If M1 turns out to be on-board instead**, this section's proposed
+connector becomes moot — phase leads would instead need a direct solder-tab
+or through-hole termination pattern near U5's own footprint, which is not
+designed here either (Electronics-domain PCB layout work, not Mechanical).
+
+## B5. Rotation clearance envelope (REQ-306)
+
+**Requirement being served**: REQ-306 — the flywheel's full rotation must
+clear the enclosure at every point, with real margin. This is a
+categorically new kind of keep-out for this file: every previous height/
+clearance fact in Part A describes a **static** footprint; this describes a
+**swept volume through 360° of rotation**.
+
+**Nominal swept volume** (no margin): for a well-balanced, concentric disk
+rotating about its own central axis, the swept volume is identical to its
+own static footprint — a cylinder of the flywheel's own diameter and
+thickness, coaxial with the rotation axis. Per B2's proposed geometry:
+**⌀60mm × 4.5mm thick.**
+
+**Proposed clearance margin (ASSUMPTION)**: this file proposes the
+enclosure keep out a materially larger volume than the nominal swept
+cylinder:
+
+| Direction | Nominal | Proposed margin | Proposed clearance envelope |
+|---|---|---|---|
+| Radial | 30mm radius (⌀60mm) | +8mm (≈27% of radius) | ≥38mm radius (**⌀76mm**) |
+| Axial (each face) | 4.5mm total thickness | +3mm per face | **≥10.5mm total thickness** |
+
+**Rationale for the margin figures**: this is a reasoned starting proposal
+for the next phase, not a rigorously derived vibration-analysis result (no
+such analysis exists or is in scope this session). The radial margin
+accounts for four stacking factors: (a) manufacturing/concentricity
+tolerance in the flywheel itself; (b) bearing/shaft runout in M1; (c)
+dynamic-imbalance-induced wobble — likely the dominant term in practice for
+an unbalanced hobbyist-grade disk with no balancing step planned; (d)
+motor-mount compliance under vibration (REQ-307) allowing the whole
+assembly to shift slightly relative to the enclosure. The axial margin is
+smaller because axial runout for a disk this thin is typically a lesser
+contributor than radial wobble, but is still included rather than assumed
+zero.
+
+**Explicitly not a substitute for REQ-403**: this clearance envelope is a
+*geometric* keep-out proposal — it answers "how much space must be empty
+around the flywheel." It does **not** address REQ-403's separate,
+human-review-gated question of containment/detachment/pinch-hazard
+mitigation (e.g., whether a physical guard or shroud is needed in addition
+to clearance, what happens if the flywheel does detach). Both must be
+satisfied; this section only speaks to the first.
+
+**Position/orientation — UNKNOWN, tied to B3**: where this clearance
+cylinder sits within the enclosure, and whether its axis is vertical or
+horizontal, depends entirely on the still-open motor-mounting decision
+(B3) and is not determined here.
+
+**A load-bearing cross-check worth flagging now**: the proposed clearance
+**diameter (⌀76mm) is larger than this file's own proposed PCB width
+(50mm, A1)**. This means the enclosure's overall footprint in whatever
+plane the flywheel spins will very likely be driven by the flywheel's own
+swept volume, not by the sensor/MCU board's outline — regardless of how
+the B3 mounting question resolves. Even accounting for wall thickness and
+a small margin (a plausible flywheel bay might need roughly 76mm + 2×
+(2–3mm wall) + 2×(2–3mm clearance) ≈ 86–88mm across), this remains well
+within REQ-308's ~150mm ceiling — no requirement is violated — but it is a
+concrete, quantified reason this file's own assessment (see close-out
+below) is that the next phase looks like a full enclosure redesign rather
+than a scoped addition bolted onto the Rev 2 box.
+
+**Forward reference**: REQ-405 states firmware's eventual maximum-speed
+ceiling "must also feed Mechanical Lead's flywheel/containment design as a
+real input" — that firmware policy does not yet exist (`bench-imu-01-design.md`
+§7.5.11/§7.5.12, unchanged through Rev 5), so this envelope is sized against
+the ≥3000 RPM *target*, not a confirmed operating ceiling. Flagged as a
+dependency for the next phase to track, not resolved here.
+
+## B6. Print material assumptions
+
+Per `.github/agents/mechanical-lead.agent.md`'s own guidance ("state the
+assumed print material as an explicit ASSUMPTION if the human hasn't
+specified one; do not silently pick a material and present it as decided"),
+this file records two distinct material assumptions rather than one,
+because they are governed by different considerations:
+
+| Item | Assumed material | Confidence | Rationale |
+|---|---|---|---|
+| Enclosure | PLA or PETG (unspecified which, TBD next phase) | ASSUMPTION | REQ-309 explicitly permits/expects a 3D-printed enclosure ("3D-printable, piece count as needed") — no human specification of which filament exists yet; both are common FDM materials, the choice between them (PETG's better thermal/UV/impact tolerance vs. PLA's easier printing) is left to the next phase |
+| Flywheel | Mild steel (NOT 3D-printed) | ASSUMPTION | See B2 — this is a **safety-relevant divergence** from the enclosure's own print-material assumption, not an oversight: a spinning flywheel under centrifugal load is a fundamentally different mechanical duty than a static enclosure wall, and 3D-printed plastic's interlaminar weakness makes it an inappropriate choice here regardless of what the enclosure itself is made of |
+
+## B7. Total assembly mass (Part A subtotal + M1 + flywheel)
+
+| Item | Mass | Confidence | Notes |
+|---|---|---|---|
+| Populated board assembly (Part A, A5 subtotal) | ≈19–20g | ESTIMATE | See A5 |
+| M1 (motor) | 30g | **CONFIRMED** | DS-MTR-021. Loads the sensor/MCU PCB directly only if on-board (B3, unresolved) |
+| Flywheel (proposed geometry) | 100g | ASSUMPTION | B2 target/proposed geometry (mass is the fixed target the geometry was derived to hit, by construction) |
+| **Total assembly (excl. enclosure/bracket/fasteners)** | **≈149–150g** | ESTIMATE | Sum of the above three rows, regardless of how B3 resolves (the same three masses exist in the assembly either way; B3 only changes *which structure* carries M1's mass, not whether it exists) |
+
+---
+
+## Open items
+
+Carried forward and expanded significantly for Rev 3. None of these are
+treated as blocking this handoff-population task; each is flagged for the
+phase where it becomes load-bearing.
+
+**From Rev 2 (still open):**
+1. J1 (USB-C receptacle) MPN not formally selected — height estimate
+   (≈3.2mm) is illustrative only (`bench-imu-01-design.md` §13).
+2. D1 (indicator LED) MPN not selected — Vf assumed only, no physical
+   package/height confirmed.
+3. Mounting-hole annular-ring adequacy not independently re-verified this
+   revision.
+
+**New for Rev 3 (this population):**
+4. **J4 body height (≈11.0mm)** — ESTIMATE only, web-search-derived with
+   partial older-revision corroboration; verify against the current Rev
+   1.05 drawing or a physical sample before finalizing enclosure Z-height
+   (A3).
+5. **F1 physical size** — genuinely UNKNOWN, not previously flagged by
+   anyone upstream; judged unlikely to be governing but not confirmed
+   (A3).
+6. **M1 mounting-hole bolt pattern** — ASSUMPTION only, sourced from a
+   general hobbyist-motor-class web search, not a T-Motor-specific
+   drawing; verify before finalizing enclosure/bracket screw-boss
+   positions (B1).
+7. **Motor mounting interface (on-board vs. off-board vs. hybrid)** — the
+   single largest open item this revision. Explicitly and deliberately
+   left open by the Circuit Engineer for the Mechanical Lead to decide in
+   the next (enclosure-design) phase; this file records a non-binding
+   leaning (off-board) but does not decide it. Safety-relevant via
+   REQ-403/REQ-306; not itself an escalation trigger at this stage (see
+   B3's full assessment) but must pass REQ-403's human-review gate
+   whenever it is decided.
+8. **Flywheel design** — no product exists; this file proposes a concrete
+   geometry/material (steel, ⌀60mm×4.5mm disk) as a reasoned starting
+   point for the next phase, explicitly not a final specification (B2).
+9. **Motor phase-wire connector** — proposed (MC-1, keyed 3-pin) but
+   contingent on item 7 above; an unkeyed-bullet-connector alternative is
+   flagged as a live, undecided option (B4).
+10. **Rotation clearance envelope margins** (+8mm radial / +3mm axial) —
+    reasoned proposal, not a vibration-analysis result; flagged for
+    verification once real hardware/measured runout exists (B5).
+11. **Rotation envelope position/orientation within the enclosure** —
+    UNKNOWN, dependent on item 7.
+12. **Firmware max-speed ceiling** (REQ-405) — does not yet exist; the
+    rotation envelope (B5) is sized against the ≥3000 RPM target, not a
+    confirmed operating ceiling.
+
+## Deferred fields
+
+Unchanged from Rev 2, per `docs/architecture-evolution.md` §13 — still
+explicitly out of scope until a real project need arises: thermal zones (as
+a formal analysis — the qualitative sensor/motor separation in A1's zoning
+and §9's guidance are not a substitute), antenna keep-out, STEP/neutral 3D
+model reference, center of mass, battery wiring requirements, complex
+keep-out zones beyond what B5 introduces for the flywheel specifically,
+detailed cable-exit geometry beyond the rough positions given in A4/B4.
+Advanced statistical tolerance stack-up analysis and motion/joint design
+remain deferred per `docs/architecture-evolution.md` §10 (this file's own
+basic print-fit tolerance allowance is Phase 1 enclosure-design work, not
+yet performed since no `.scad`/dimensional-spec file exists yet — out of
+scope for this population task).
 
 ## Handoff & change control
 
-- **Produced by**: Mechanical Lead (see "Who fills this in" above).
-- **Consumed by**: Mechanical Lead itself
-  (`.github/skills/enclosure-design/SKILL.md`), and the Mechanical Reviewer
-  for independent cross-checking (`.github/skills/mechanical-review/SKILL.md`).
-- If a value here changes after Mechanical Design has started (e.g. the
-  Circuit Engineer moves a connector), log it in `validation/change-log.md`
-  (ECO) and check `validation/change-impact-matrix.md`'s existing
-  "Mechanical" impact row — the Mechanical Design phase
-  (`docs/workflow.md` Phase 9) may need to be revisited.
-- Governed by `.github/instructions/mechanical-design.instructions.md`.
+This file is maintained by the Mechanical Lead and read (not edited) by the
+Circuit Engineer (confirmed via `bench-imu-01-design.md` §18.1–18.3, which
+records that this file was never touched across Rev 2 through Rev 5). The
+next consumer is the Mechanical Lead's own future enclosure-design session
+(`.scad` + dimensional-spec table), and ultimately the Mechanical Reviewer.
+
+**Process note, flagged rather than actioned**: a change of this scope
+(full re-population, driven by a major new subsystem) would normally
+warrant a `validation/change-log.md` (ECO) entry and a
+`validation/change-impact-matrix.md` update under this project's own
+change-control norms. **This task's explicit scope constraint is "your only
+output this task is `hardware/mechanical-interface.md`"** — so neither of
+those files has been touched this session. This is flagged here for the
+Hardware Lead's attention as a likely follow-up action, not silently
+skipped without note.
+
+**This file's own assessment of what comes next**: given B5's finding that
+the flywheel's proposed rotation clearance diameter (⌀76mm) exceeds this
+file's own proposed board width (50mm), and given B3's open mounting-method
+question changes where in the enclosure that clearance volume must even
+live, the next phase (actual enclosure design) reads as a **full redesign**
+of the Rev 2 enclosure, not a scoped addition to it. The Rev 2 box was
+sized around a 60×40mm static board with no moving parts; nothing about
+that box's proportions, wall layout, or assembly sequence can be assumed to
+survive the addition of a rotating mass whose own keep-out volume is
+larger than the board itself.
