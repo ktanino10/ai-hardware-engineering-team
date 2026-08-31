@@ -1955,3 +1955,485 @@ side effect of the MISS-001 fix.
   Complete — recommended fix options are listed above; none require
   another full review cycle to evaluate once a choice is made, since the
   isthmus's own geometry is otherwise fully characterized.
+
+---
+
+## Hardware Reviewer — Cycle 3 (Fidelity-scoped review of ISS-014 KiCad correction, 2026-09-04)
+
+### Review Cycle Metadata
+
+- **Design revision reviewed**: `hardware/schematic/bench-imu-01-design.md`,
+  **"Rev 2, corrected"** status (top-of-document status line) — the
+  ISS-014 pin-bonding correction (`validation/change-log.md` ECO-006)
+  layered on top of the already-Design-Complete Rev 2 (ECO-005, Design
+  Complete granted 2026-09-03) — plus `hardware/schematic/bench-imu-01/`,
+  this repository's **first-ever real KiCad project**, built on the
+  corrected pins.
+- **Reviewer**: Hardware Reviewer — see
+  `.github/agents/hardware-reviewer.agent.md`. Independent of the Hardware
+  Lead session that discovered ISS-014, applied the fix to both the design
+  doc and the new KiCad project, and authored the KiCad project's own
+  `README.md` rationale/decisions log.
+- **Independence statement**: Per this cycle's explicit task framing, this
+  is a **fidelity-scoped independent review, not a full Design Complete
+  re-litigation**. Already-settled Rev 2 electrical facts that already
+  passed Cycle 1/Cycle 2 Independent Review and the Design Complete Gate
+  (voltage margins, decoupling capacitor values/sizing, thermal margins,
+  ESD/protection component choice, ISS-002's LDO input-margin disposition,
+  etc.) were **not** re-derived or re-checked this cycle — they remain out
+  of scope and closed. The sole question this cycle answers: **does the
+  real KiCad schematic provably, verifiably match what the (now-corrected)
+  Markdown design doc says it should be**, checked with the real KiCad
+  tools directly — not by re-reading the Hardware Lead's own `README.md`
+  claims, the design doc's own self-check language, or
+  `validation/open-issues.md`'s own ISS-014 Notes and accepting any of
+  them on faith. Every claim below (ERC result, netlist content, MCP tool
+  behavior, BOM content, symbol/footprint existence and dimensions) was
+  independently re-derived this cycle directly from the real files.
+- **Scope**: `hardware/schematic/bench-imu-01-design.md` — the "Rev 2,
+  corrected" changelog entry, §0 (tooling honesty statement, updated
+  passage), §2.3 (pin allocation), §4.1 (VDD/VDDA/VBAT/NRST), §4.3
+  (NRST/PF2 cross-reference), §5.2 (I2C pull-up sizing — checked whether
+  any *numeric* analysis changed), §5.3 (IMU pin-level wiring), §6 (I2C1-
+  free/I2C2 cross-reference), §11 (full corrected 32-pin MCU table), §12
+  (net list), §13 (parts list), §14 items 10/13 (power sequencing, MCU pin
+  function), §16 items 1/3/4/11 (UNKNOWNs touched by this correction,
+  including item 11's explicit request for this Reviewer's own severity
+  classification), §19 (handoff) — a full section-by-section re-read of
+  every area §19 itself flags as "needing re-review," not merely the 5
+  headline locations named in this cycle's kickoff. Plus:
+  `hardware/schematic/bench-imu-01/` (`.kicad_sch`/`.kicad_pro`/
+  `.kicad_sym`, `README.md`, `generate_schematic.py`),
+  `validation/open-issues.md` ISS-014, `validation/change-log.md` ECO-006,
+  `datasheets/evidence-log.md` DS-MCU-064 through DS-MCU-067, the new
+  `datasheets/stmicroelectronics_stm32_open_pin_data_stm32g031k4-6-8tx.md`
+  metadata record, and `bom/component-selection.md` (4 primary ICs).
+- **Parallel sub-scans run**: None — single integrated pass, consistent
+  with this document's own established practice that the verdict is one
+  serial integration step owned by the Hardware Reviewer, not fragmented
+  across uncoordinated sub-scans.
+- **rubber-duck premise review run in parallel?**: Not run this cycle.
+  ISS-014 was self-discovered by the Hardware Lead directly through
+  independent KiCad tooling verification (checking real symbol/footprint
+  pin existence against ST's own pin database before wiring anything), not
+  through a rubber-duck premise-review pass — there is no rubber-duck-
+  sourced row to reconcile this cycle.
+- **KiCad tool cross-checks used (the core of this cycle's method)**:
+  `kicad-cli` v10.0.1 run directly by this Reviewer — `sch erc
+  --severity-all`, `sch export netlist --format kicadsexpr`, `sch export
+  bom` — against the real
+  `hardware/schematic/bench-imu-01/bench-imu-01.kicad_sch`. In addition,
+  every one of the 16 `kicad-*` MCP tools available in this Reviewer's own
+  toolset was independently invoked directly against this exact project
+  this cycle (not merely re-reading `README.md`'s characterization of
+  which tools work) — full results below.
+- **Process-integrity / second independent source (new this cycle)**:
+  independently located and parsed KiCad's own official, bundled
+  `MCU_ST_STM32G0.kicad_sym` symbol library — a completely different
+  pipeline/source from ST's GitHub `STM32_open_pin_data` XML repo that the
+  design doc's own DS-MCU-064–067 evidence chain cites — to
+  cross-corroborate the no-PB10/PB11 claim from a second, independent
+  primary/authoritative source, not only the one the Hardware Lead already
+  cited.
+
+### Checklist Results (fidelity-scoped — most items out of scope this cycle by design)
+
+Full 16-item checklist per `.github/skills/hardware-review/SKILL.md`, run
+this cycle with an explicit fidelity-only lens per the task framing —
+items unrelated to the pin-identity correction or KiCad-construction
+fidelity are marked out of scope/unaffected rather than re-derived from
+scratch, consistent with this cycle's mandate not to re-litigate
+already-Design-Complete Rev 2 facts:
+
+| # | Checklist item | Result | Notes |
+|---|---|---|---|
+| 1 | Voltage violation | Out of scope this cycle (already-settled, Design Complete) | ISS-002's disposition (ACCEPTED-RISK, human-signed per ECO-005) is unrelated to the pin-identity correction; not re-derived this cycle. |
+| 2 | Absolute Maximum Rating violation | Out of scope this cycle (already-settled) | MCU VDD AMR (ISS-010, RESOLVED) is unaffected by *which physical pin* carries VDD/VDDA — same voltage rail, same AMR. Not re-derived. |
+| 3 | Current limit | Out of scope this cycle (unaffected) | `hardware/power-budget.md` figures are pin-identity-independent; ISS-014 adds/removes no current-consuming element. |
+| 4 | Thermal risk | Out of scope this cycle (unaffected) | No package, load, or ambient change from a pin-identity correction. |
+| 5 | Missing decoupling capacitor | Pass — independently confirmed unaffected | C3(VDD)/C4(VDDA) sit on the same combined VDD/VDDA net (physical pin 4) before and after correction — only *which physical pin number* carries this net changed. Independently confirmed via the real exported netlist: `/3V3` net includes `U1` pin `4`, `C3` pin `1`, `C4` pin `1`. |
+| 6 | Floating pin | **Pass — directly relevant, independently re-verified** | Confirmed via the real exported netlist (not `README.md`'s claim) that I2C2_SCL (`U1` pin `22`) and I2C2_SDA (`U1` pin `23`) are each on a real net with `R3`/`R4` pull-ups and `U2` attached — neither is floating/NC. NRST (pin `6`, dual-named `PF2_6`) and every one of the 22 free GPIOs are correctly accounted for in §11 and match the real netlist's `unconnected-(...)` pseudo-nets pin-for-pin (e.g. `PB8`→`unconnected-(U1-PB8-Pad32)`, `PB9`→`unconnected-(U1-PB9-Pad1)`). |
+| 7 | Incorrect pull-up/pull-down | **Pass — directly relevant, independently re-verified** | R3=R4=4.7kΩ (value unchanged, per this cycle's exclusion of already-settled sizing analysis) confirmed via the real netlist to land on the *new*, physically-real pins: `R3` pin `1` / `R4` pin `1` on `/I2C2_SCL` / `/I2C2_SDA` respectively (with `U1` pins `22`/`23`), `R3` pin `2` / `R4` pin `2` both on `/3V3` — not on the old, nonexistent PB10/PB11. |
+| 8 | Logic voltage mismatch | Out of scope this cycle (unaffected) | Single 3.3V rail throughout, untouched by the pin-identity correction. |
+| 9 | Interface timing | **Pass — independently confirmed unaffected, not merely assumed** | Directly re-read §5.2: the pull-up sizing analysis itself (Rp,min≈966Ω, Rp,max≈7.08kΩ, R3=R4=4.7kΩ, actual rise-time≈199ns/≈34% headroom, 75pF sensitivity ceiling) contains **zero numeric change** from the values Cycle 2 already independently reconfirmed — §5.2's only edit this correction touched is a peripheral-instance cross-reference, already covered by ISS-011. Moving I2C2 from PB10/PB11 to PA11/PA12 changes no bus capacitance, no pull-up value, no target speed — the timing analysis is pin-location-independent by construction. |
+| 10 | Power sequencing | Out of scope this cycle (unaffected) | §14 item 10's text ("VDD/VDDA combined into one physical pin, no separate VBAT pin exists — corrected this revision, ISS-014") independently confirmed against the real netlist (single `/3V3` net feeds `U1` pin `4`) — the *sequencing conclusion itself* (moot by construction, single rail) is unchanged; only the underlying pin-count fact was corrected (covered under item 11/§11 cross-check below). |
+| 11 | Grounding | **Pass — directly relevant, independently re-verified** | VSS (pin `5`, corrected from a previously-alleged 2-pin VSS/VSSA split to the real single combined pin) independently confirmed via the real netlist: `/GND` net includes `U1` pin `5` (`VSS_5`). Single ground net/plane statement otherwise unchanged. |
+| 12 | EMI/EMC risk | Out of scope this cycle (unaffected) | No new noise source; a DC-only pin reassignment. |
+| 13 | Motor noise | N/A — unaffected | Still no motor/rotating actuator on this board. |
+| 14 | Sensor noise | Out of scope this cycle (unaffected) | ISS-009 (LDO output cap) is unrelated to MCU pin identity, untouched this cycle. |
+| 15 | PCB layout concern (incl. mechanical/thermal co-design) | **Pass — this cycle's central concern** | This is precisely why a real KiCad project matters here: independently confirmed the `Bosch_LGA-14_3x2.5mm_P0.5mm` footprint genuinely exists with a real F.Fab body outline of exactly **3.000mm × 2.500mm** (matches the claimed 2.5×3.0mm), and that the MCU/IMU/LDO/ESD symbols all resolve to real KiCad official-library parts with correctly-populated footprint fields (BOM cross-check below). No PCB layout file exists yet (schematic-capture-only cycle, correctly self-reported by `kicad-validate_project`); the mechanical/thermal co-design trigger (rotating body) still does not apply. |
+| 16 | Datasheet recommendation violation | **Pass — RESOLVED this cycle (ISS-014), independently confirmed** | This *is* what ISS-014 was: the previously-documented PB10/PB11 pin assignment violated the MCU's own real, physical package pinout — a physical-existence violation, categorically the same "will fail as designed" class this taxonomy's CRITICAL row describes. Independently confirmed fixed: the real KiCad netlist routes I2C2 to PA11/PA12 (`U1` pins `22`/`23`), matching both the corrected design doc and **two** independent primary sources (ST's own GitHub pin-data XML per DS-MCU-064–067, and KiCad's own official `MCU_ST_STM32G0.kicad_sym` symbol, independently parsed this cycle — see below). |
+
+### Findings — independent verification of the ISS-014 KiCad correction
+
+Each claim below was independently re-derived this cycle from the real
+`kicad-cli`/MCP tool output or the real library files — not accepted on
+the strength of `README.md`'s, the design doc's, or
+`validation/open-issues.md`'s own restatement of it.
+
+#### 1. ERC — independently re-run, `README.md`'s claim CONFIRMED
+
+`kicad-cli sch erc --severity-all` run directly against
+`bench-imu-01.kicad_sch` (output rendered in Japanese by this KiCad
+installation's locale, unaffected by `LC_ALL=C`/`LANG=C` — a local
+display quirk, not a functional difference; translated and cross-checked
+term-by-term): **0 errors, 1 warning**. The one warning is a
+`lib_symbol_mismatch` on `U3` (`TLV75533PDBVR`) — independently confirmed
+this is the expected, benign consequence of KiCad's official library
+using an `extends`/variant relationship (`TLV75533PDBVR` extends the base
+`TLV70012_SOT23-5` symbol) that this project's generation flattens into a
+single concrete symbol definition. Independently confirmed this
+`extends` pattern is **not unique to U3** — it is also how KiCad's
+official library defines `U1` (`STM32G031K8Tx` extends
+`STM32G031K_4-6-8_Tx`) and `U4` (`USBLC6-2SC6` extends `USBLC6-2P6`),
+so the same benign mismatch mechanism generically applies across this
+project, not a one-off. **Matches `README.md`'s claim exactly.**
+
+#### 2. Netlist export — exhaustive, line-by-line cross-check (not a spot check)
+
+`kicad-cli sch export netlist --format kicadsexpr` run directly; parsed
+with an independently-written recursive-descent S-expression parser
+(a naive `(name "...")` regex fails on real KiCad output because these
+blocks contain nested parens, e.g. `(effects (font (size ...)))`, before
+their true closing paren) into a full net↔(ref,pin) map.
+
+- **§11 pin table (32/32 MCU pins) — 100% match, no exceptions.** Every
+  physical pin 1–32 independently cross-checked against the real netlist,
+  including the headline ISS-014 claims:
+  - Pin `4` (VDD/VDDA, combined) → `/3V3` net. Pin `5` (VSS/VSSA,
+    combined, single pin — not two) → `/GND` net. Pin `6` (`PF2_6`,
+    dual-named with NRST) → `/NRST` net. **No separate VBAT pin exists
+    anywhere in the netlist** — confirmed absent, matching the correction.
+  - Pin `22` → netlist pin-function string **`PA9/PA11`**, on net
+    `/I2C2_SCL`, alongside `R3` pin `1` and `U2` pin `13`. Pin `23` →
+    **`PA10/PA12`**, on net `/I2C2_SDA`, alongside `R4` pin `1` and `U2`
+    pin `14`. Both dual-pad pin-function strings independently confirm
+    the mechanism DS-MCU-067 describes, and match §11/§12's claims
+    exactly.
+  - Pins `24`/`25` (PA13/PA14) → `/SWDIO`/`/SWCLK`, matching §14 item 13's
+    claim.
+  - All 22 remaining free GPIOs independently confirmed as genuinely
+    unconnected in the real netlist (KiCad's own `unconnected-(U1-<pin
+    name>-Pad<N>)` pseudo-nets), pin-for-pin matching §11's "free" column.
+- **§12 net list (19/19 table rows) — 16/16 named nets and all 3 `(NC)`
+  groupings independently verified present with correct membership**,
+  with **one same-section internal inconsistency found** in exactly 2 of
+  the 19 rows — see Finding C below; this is a pre-existing Markdown
+  documentation issue, not a KiCad-construction defect (the KiCad
+  project's real netlist implements the *correct* topology throughout,
+  confirmed directly).
+
+#### 3. MCP tool census — all 16 `kicad-*` tools independently re-tested against this exact project (not re-reading `README.md`'s characterization)
+
+| Tool | Result this cycle | Exact output/error |
+|---|---|---|
+| `list_projects` | Works, but does not discover this project | `{"result":[]}` — does not crash (matches `README.md`), but also does not list this real, on-disk project; a minor caveat `README.md`'s narrower "doesn't crash" framing does not surface. |
+| `get_project_structure` | **Works correctly** | Returns full `{"name":"bench-imu-01",...,"files":{"project":...,"schematic":...}}`. |
+| `validate_project` | **Works correctly, accurate result** | `{"valid":false,...,"issues":["Missing PCB layout file"],"files_found":["project","schematic"]}` — correct, since this is a schematic-capture-only cycle with no PCB yet. |
+| `get_drc_history_tool` | **Works correctly** | `{"success":true,...,"entry_count":0,"trend":null}` — correct, since no PCB/DRC has ever run. |
+| `open_project` | Works (not re-invoked this cycle to avoid redundantly relaunching KiCad.app; independently confirmed earlier this cycle) | Issues a real `open -a KiCad.app <path>` OS-level command. |
+| `run_drc_check` | **Corrects `README.md`'s own hedge** — legitimately works, is simply inapplicable | `{"success":false,"error":"PCB file not found in project"}` — a **correct, working result**, not the ctx bug. `README.md` explicitly (and honestly) hedged this as "very likely" hitting the ctx bug "by the same pattern," without testing it — independently tested this cycle and found the hedge resolves the *other* way: this tool is not broken at all. |
+| `extract_schematic_netlist` | Broken | `Context is not available outside of a request` |
+| `analyze_schematic_connections` | Broken | `Context is not available outside of a request` |
+| `find_component_connections` | Broken | `Context is not available outside of a request` |
+| `identify_circuit_patterns` | Broken | `Context is not available outside of a request` |
+| `analyze_project_circuit_patterns` | Broken | `Context is not available outside of a request` |
+| `analyze_bom` | Broken | `Context is not available outside of a request` |
+| `extract_project_netlist` | Broken | `Context is not available outside of a request` |
+| `export_bom_csv` | Broken | `Context is not available outside of a request` |
+| `generate_pcb_thumbnail` | Broken (matches `README.md`'s hedge) | `Context is not available outside of a request` |
+| `generate_project_thumbnail` | **Corrects `README.md`'s own hedge** — broken, but with a *different* mechanism | `'FunctionTool' object is not callable` — not the ctx-bug text; `README.md` hedged this one the same way as `run_drc_check` ("very likely" ctx bug), which is independently confirmed wrong in mechanism (still broken, but a distinct registration/aliasing bug). |
+
+**Net census result**: 5 tools work as `README.md` claims
+(`list_projects` with the undisclosed empty-result caveat,
+`get_project_structure`, `validate_project`, `get_drc_history_tool`,
+`open_project`); 9 fail with the exact ctx-bug text `README.md`
+describes; 2 of `README.md`'s own explicitly-hedged ("very likely")
+guesses about untested tools are independently found to resolve
+differently than guessed (`run_drc_check` is not broken at all;
+`generate_project_thumbnail` is broken by a different mechanism). This is
+exactly the kind of refinement independent, first-hand testing is
+supposed to catch — `README.md`'s hedge language was honest (it did not
+assert false certainty), and this cycle supplies the missing real test.
+
+#### 4. BOM export — independently cross-checked against `bom/component-selection.md`
+
+`kicad-cli sch export bom` run directly; all 4 primary ICs' Value/
+Footprint fields independently cross-checked:
+
+| Ref | Exported Value | Exported Footprint | Cross-check result |
+|---|---|---|---|
+| U1 | `STM32G031K8T6` | `Package_QFP:LQFP-32_7x7mm_P0.8mm` | Matches `bom/component-selection.md` |
+| U2 | `BMI270` | `Package_LGA:Bosch_LGA-14_3x2.5mm_P0.5mm` | Matches `bom/component-selection.md` |
+| U3 | `TLV75533PDBV` | `Package_TO_SOT_SMD:SOT-23-5` | Matches `bom/component-selection.md` |
+| U4 | `USBLC6-2SC6` | `Package_TO_SOT_SMD:SOT-23-6` | Matches design doc §13/evidence-log DS-PROT-001/002 (U4 is Circuit-Engineer-owned protection circuitry, not a `component-selection.md` BOM-comparison part) |
+
+All 4 matched.
+
+#### 5. Symbol/footprint spot-checks (≥3 required, 3 performed) — all CONFIRMED
+
+1. **`Bosch_LGA-14_3x2.5mm_P0.5mm.kicad_mod` footprint** — independently
+   confirmed to exist in KiCad's official footprint library; computed its
+   real F.Fab body outline directly from the `.kicad_mod` file geometry =
+   exactly **3.000mm × 2.500mm**, matching the claimed 2.5×3.0mm.
+2. **`USBLC6-2SC6` symbol** — independently confirmed to exist (extends
+   base `USBLC6-2P6`); pins match DS-PROT-002's claimed pinout (I/O1=1&6,
+   GND=2, I/O2=3&4, VBUS=5) exactly, cross-checked against the real
+   netlist (`U4` pin `2`→`/GND`, pin `5`→`/VBUS_5V`, pins `1`/`3`/`4`/`6`→
+   unconnected).
+3. **`TLV75533PDBV` symbol** — independently confirmed to exist (extends
+   base `TLV70012_SOT23-5`); pins match `README.md`'s self-disclosed
+   pinout (1=IN, 2=GND, 3=EN, 4=NC, 5=OUT), cross-checked against the real
+   netlist (`U3` pin `1`→`/VBUS_5V`, pin `2`→`/GND`, pin `3`→`/EN_VIN`
+   (tied to VBUS_5V), pin `4`→unconnected, pin `5`→`/3V3`).
+
+#### 6. Second independent primary source — KiCad's own official `MCU_ST_STM32G0.kicad_sym`
+
+Independently located and parsed KiCad's own bundled
+`MCU_ST_STM32G0.kicad_sym` library (a completely separate pipeline from
+ST's GitHub `STM32_open_pin_data` XML the design doc cites) via a custom
+recursive-descent parser. **Confirmed**: the base symbol
+`STM32G031K_4-6-8_Tx` (extended by `STM32G031K8Tx`) has exactly 32 pins
+with **no PB10/PB11 anywhere**, and pins 22/23 are literally dual-named
+`PA9/PA11` and `PA10/PA12` — independently corroborating DS-MCU-067's
+"dual-pad" mechanism from a second, independent primary source, and
+matching the project's own exported netlist pin-function strings
+exactly.
+
+#### ISS-014 (design doc's own recommendation: CRITICAL) — pin-bonding correction — **independently RE-VERIFIED, fix holds up completely**
+
+- **Independent method**: All 6 findings above, combined — real `kicad-cli`
+  ERC/netlist/BOM output, a from-scratch 32-pin/19-row exhaustive
+  cross-check, a from-scratch re-test of all 16 MCP tools, 3 independent
+  symbol/footprint spot-checks, and a second independent primary source
+  (KiCad's own official MCU symbol library, parsed independently of ST's
+  GitHub pin-data XML).
+- **Result**: The KiCad schematic **provably and verifiably matches** the
+  corrected Markdown design doc, pin-for-pin and net-for-net, with no
+  exception found anywhere in §11 or §12. The original defect (PB10/PB11
+  do not exist on this LQFP-32 package) is independently confirmed real —
+  triangulated from **three** independent sources this cycle alone (ST's
+  own GitHub XML per the design doc's own citation, KiCad's official
+  bundled symbol library parsed fresh this cycle, and the real project's
+  own exported netlist) — and the fix (PA11/PA12) is independently
+  confirmed correct and completely implemented in the real KiCad project.
+- **Independent severity classification — CRITICAL, confirmed (not
+  deferred to the Hardware Lead's own recommendation)**: Per
+  `docs/architecture.md` §7.1, **CRITICAL** = "Design will fail or cause
+  damage/hazard under normal/expected operating conditions as designed";
+  **HIGH** = "Likely malfunction or reliability failure under realistic
+  conditions/corners." ISS-014 is not a probabilistic, corner-case, or
+  marginal-condition risk — it is a **physical/topological
+  impossibility**: no amount of correct firmware, layout care, or
+  operating-condition control could ever have made the originally
+  documented PB10/PB11 assignment work, because those pins do not exist
+  as bondable pads on this package at all. This is a deterministic,
+  100%-reproducible, "as designed" total failure of the I2C2/IMU
+  interface — squarely CRITICAL, not HIGH. This is categorically more
+  severe than the related-but-lesser ISS-011 (HIGH): ISS-011 was a pure
+  peripheral-instance/firmware-target label correction on pins that were
+  always physically real and correctly wired (same silicon pads, same
+  pull-ups, zero hardware rework, would have surfaced immediately and
+  harmlessly at firmware bring-up as a "wrong peripheral" bug); ISS-014
+  means the previously documented pins **physically do not exist**, so no
+  hardware rework path could ever have produced a working board from the
+  original documentation — independently re-derived from the taxonomy's
+  own wording, not merely accepted on the strength of the Hardware Lead's
+  parallel reasoning in §16 item 11 (which reaches the same conclusion,
+  checked here as independently sound rather than assumed correct).
+  **Conclusion: CRITICAL, independently confirmed.**
+- **Fix completeness**: Independently confirmed complete — every location
+  §19 flags as "needing re-review" (§0, §2.3, §4.1, §4.3, §5.2, §5.3, §6,
+  §11, §12, §13, §14 items 10/13, §16 items 1/3/4/11) was directly
+  re-read this cycle and found internally consistent with the correction,
+  with no stray leftover PB10/PB11/2-pin-VSS/separate-VBAT reference found
+  anywhere. `firmware/bench-imu-01/`'s own still-outstanding GPIOB-pin
+  initialization is correctly flagged by §19 as an explicitly out-of-scope
+  follow-up (Firmware Bring-up does not gate Design Complete,
+  `docs/architecture.md` §14/`docs/workflow.md` Phase 11) — not a gap in
+  *this* correction's completeness.
+- **Conclusion**: Fix holds up completely under independent re-verification.
+  `validation/open-issues.md` updated: **ISS-014 → RESOLVED** (2026-09-04).
+
+### New discrepancies found this cycle (not disclosed by `README.md`) — all LOW, all non-blocking
+
+#### Finding A — §12's own `3V3`/`GND` net-summary rows self-contradict §12's own `LED_CTRL` row and §7's prose (pre-existing Markdown-internal inconsistency, NOT a KiCad-construction defect)
+
+- **Issue**: §12's `3V3` row lists "...→ R3/R4 (I2C pull-ups) → R5 (LED
+  resistor) → J2..." as if `R5` sits on the 3V3 net, and the same
+  section's `GND` row lists "...→ D1 cathode (via R5) → SW1..." as if
+  D1's cathode reaches GND through `R5`. Both are factually wrong.
+- **Rationale**: The real netlist (independently exported and parsed this
+  cycle) proves `R5` has exactly two nodes, **neither of which is 3V3 or
+  GND**: `/LED_CTRL` = {`R5` pin `1`, `U1` pin `12`/`PA5`}, and `/LED_A` =
+  {`R5` pin `2`, `D1` pin `2`/anode}. `D1` pin `1` (cathode, `K_1`) is
+  directly on `/GND` with **no resistor in the path at all**. This exactly
+  matches §7's own authoritative prose ("GPIO PA5 sources current...
+  through a series resistor R5... to the LED (D1) anode; cathode returns
+  to GND") and §12's **own separate `LED_CTRL` row** ("U1 PA5 → R5 (330Ω)
+  → D1 anode") — so the `3V3`/`GND` rows contradict not just §7 but their
+  own sibling row in the very same table.
+- **Datasheet Source**: N/A (a documentation self-consistency defect, not
+  a datasheet/evidence-log matter).
+- **Failure Mechanism**: None — this is a narrative-description slip in a
+  summary table, not a wiring defect. The real KiCad project correctly
+  implements the PA5→R5→D1(anode), D1(cathode)→GND topology throughout;
+  independently confirmed via the real netlist above. No engineer reading
+  only §7 or only §12's `LED_CTRL` row would be misled; only the `3V3`/
+  `GND` rows' phrasing is imprecise.
+- **Affected Component**: Documentation only — `hardware/schematic/bench-imu-01-design.md`
+  §12, rows `3V3` and `GND`. No hardware/firmware/KiCad artifact affected.
+- **Recommended Fix**: Circuit Engineer to tighten §12's `3V3` row to omit
+  `R5` (it is not a 3V3-net member) and the `GND` row to state "D1 cathode
+  → GND directly (R5 is in series on the anode side only, see LED_CTRL
+  row)".
+- **Severity**: **LOW** — per `docs/architecture.md` §7.1 ("Style /
+  best-practice / documentation improvement, negligible functional
+  risk"). Pre-existing (present since this section was authored in the
+  original Rev 2 rework, unrelated to and unchanged by ISS-014), and the
+  KiCad project itself is unaffected — this is a pure Markdown
+  documentation nit.
+
+#### Finding B — `validation/open-issues.md` ISS-014's own Notes column names 5 MCP tools as having "independently tool-verified" the fix; all 5 are confirmed broken in this environment
+
+- **Issue**: ISS-014's Notes cell (prior to this cycle's edit) and
+  `validation/change-log.md` ECO-006 both state the KiCad project was
+  "independently tool-verified" via
+  `extract_schematic_netlist`/`analyze_schematic_connections`/
+  `find_component_connections`/`identify_circuit_patterns`/`analyze_bom`.
+- **Rationale**: This cycle independently re-tested all 5 of these exact
+  tools against this exact project (see MCP tool census above): every one
+  fails with `Context is not available outside of a request` and returns
+  no real output at all. The tool-attribution as literally written is
+  inaccurate — no real verification could have come from these 5 named
+  tools in this environment. This does **not** undermine the underlying
+  pin-correction's correctness, which is independently triangulated this
+  cycle via `kicad-cli` (ERC/netlist/BOM) plus a second, independent
+  primary source (KiCad's own official symbol library) — but it is a
+  genuine evidence-integrity/traceability imprecision in the backlog
+  record, distinct from the pin-correction's own soundness.
+- **Datasheet Source**: N/A (a process/traceability matter, not a
+  datasheet/electrical matter).
+- **Failure Mechanism**: A future reader trusting the Notes cell's literal
+  tool-attribution could be misled into believing these specific MCP
+  tools are functional in this environment, when they are not — a
+  reproducibility/audit-trail risk, not a hardware risk.
+  Self-closing: this cycle's own real, first-hand tool output (which
+  actually worked — `kicad-cli`) supplies the missing genuine
+  verification, leaving no residual gap once this cycle's Notes append is
+  in place (contrast with the ISS-006/Cycle-1 evidence-log citation
+  defect, which was scored MEDIUM precisely because a residual gap
+  remained open after that cycle — no such gap remains here).
+- **Affected Component**: Documentation only —
+  `validation/open-issues.md` ISS-014 Notes column,
+  `validation/change-log.md` ECO-006 tool-attribution language.
+- **Recommended Fix**: Already applied by this cycle's own Notes append
+  (below) — the real, working verification method (`kicad-cli` directly)
+  is now correctly attributed. A future pass may also tighten
+  `validation/change-log.md` ECO-006's own tool-attribution language to
+  match.
+- **Severity**: **LOW** — per §7.1's documentation-improvement definition;
+  self-closed by this same review cycle, so zero residual risk remains.
+
+#### Finding C — `validation/change-log.md` ECO-006 is dated *before* the Design Complete grant it explicitly describes itself as following ("post-Design-Complete")
+
+- **Issue**: ECO-006 (the ISS-014 correction) and the design doc's own
+  top-of-document status line both carry the date **2026-08-31**. This is
+  chronologically **before** ECO-003 (2026-09-01), ECO-004 (2026-09-03),
+  and — critically — **ECO-005 (2026-09-03), the entry that actually
+  grants Design Complete**, and also before this document's own Hardware
+  Reviewer Cycle 2 (2026-09-01) and both Mechanical Reviewer cycles
+  (2026-09-02/2026-09-03). Yet ECO-006 and no fewer than four separate
+  passages in the design doc (top-of-document status/date line, §0's
+  "Update" passage, §19's own section header, and §19's opening sentence)
+  explicitly and repeatedly describe this same correction as **"post-
+  Design-Complete."**
+- **Rationale**: A correction cannot simultaneously be dated *before* the
+  event that grants Design Complete and be accurately labeled "post-
+  Design-Complete" relative to that same event. Taken at face value, the
+  logged dates place ECO-006 three days *earlier* than the milestone it
+  claims to follow.
+- **Datasheet Source**: N/A (a change-log/date-labeling matter, not a
+  datasheet/electrical matter). Cross-checked against real `git log`
+  commit dates for context: actual commit timestamps for this whole
+  simulated project history cluster on only 2 real calendar days
+  (2026-08-30/31), confirming the in-document date fields are a
+  deliberate **narrative timeline device** decoupled from literal
+  wall-clock commit time throughout this repository (not unique to
+  ECO-006) — this finding is about the narrative dates' own internal
+  ordering being self-contradictory, not a claim that real review steps
+  were provably skipped or reordered (no evidence for that stronger claim
+  was found).
+- **Failure Mechanism**: None functionally — zero effect on the
+  correctness of the pin fix itself (independently confirmed sound via
+  many other, date-independent channels above) or on the KiCad-vs-Markdown
+  fidelity this cycle's mandate covers. A pure change-log/document-date
+  self-consistency defect; a future reader reconstructing project history
+  from these dates alone would be confused about true event ordering.
+- **Affected Component**: Documentation only —
+  `validation/change-log.md` ECO-006's date field, and the four
+  "2026-08-31, post-Design-Complete" passages in
+  `hardware/schematic/bench-imu-01-design.md` (top-of-doc status line, §0,
+  §19 header, §19 opening sentence).
+- **Recommended Fix**: Circuit Engineer/Hardware Lead to correct ECO-006's
+  date field (and the design doc's matching passages) to a value at or
+  after ECO-005's 2026-09-03 Design Complete grant — e.g. 2026-09-03 or
+  later — so the "post-Design-Complete" label is chronologically
+  consistent with the narrative it describes.
+- **Severity**: **LOW** — per §7.1's documentation-improvement definition;
+  purely cosmetic/narrative, no functional or electrical risk, and does
+  not affect this cycle's fidelity verdict.
+
+### New/residual observations this cycle
+
+No new CRITICAL, HIGH, or MEDIUM finding was introduced or discovered by
+the ISS-014 KiCad correction — independently checked via the full
+16-item re-run, the exhaustive 32-pin/19-row netlist cross-check, and the
+from-scratch 16-tool MCP census above. Three new **LOW** findings were
+surfaced this cycle (Findings A/B/C above), none of which were disclosed
+by `README.md`; all three are documentation-only, none affect the KiCad
+project's correctness, and none block this cycle's fidelity verdict.
+Consistent with this cycle's tightly-scoped `validation/open-issues.md`
+edit list (ISS-014 only), Findings A/B/C are recorded here rather than
+opened as new backlog IDs — a future pass may promote them to tracked
+`ISS-*` rows if the Hardware Lead judges that useful, but their LOW
+severity and self-contained nature do not require it for this verdict.
+
+### Verdict
+
+- **Verdict**: **PASS** (fidelity-scoped — this is not a full Design
+  Complete re-litigation, and should not be read as one)
+- **Open CRITICAL count (fidelity scope)**: 0 — ISS-014 independently
+  confirmed fixed and complete, moved to RESOLVED this cycle.
+- **Open HIGH count (fidelity scope)**: 0 new HIGH findings introduced or
+  discovered by this correction.
+- **What this verdict covers**: Whether the real KiCad schematic
+  (`hardware/schematic/bench-imu-01/`) provably and verifiably matches the
+  corrected Markdown design doc, pin-for-pin and net-for-net, and whether
+  ISS-014's fix is complete and correctly classified. Both independently
+  confirmed **yes** this cycle, via real `kicad-cli` output, a from-scratch
+  exhaustive cross-check (not a spot check), a from-scratch 16-tool MCP
+  census, and a second independent primary source.
+- **What this verdict does NOT cover**: Any already-settled Rev 2
+  electrical fact (voltage margins, decoupling, thermal, ESD/protection
+  choice, ISS-002's disposition) — explicitly out of scope per this
+  cycle's own task framing, unchanged from Cycle 2's independent
+  re-verification. The pre-existing OPEN MEDIUM/LOW backlog items
+  (ISS-005/007/008/009/012/013, MISS-005/006/007) are untouched by this
+  cycle and remain exactly as any prior cycle left them — this review does
+  not re-litigate or re-disposition any of them.
+- **Incidental, not re-litigated, factual observation**: Because ISS-014
+  was this repository's only OPEN CRITICAL finding project-wide,
+  `tools/check_open_issues.py` also now reports the overall gate as
+  passing (0 unresolved CRITICAL, 0 un-signed-off-status OPEN HIGH) once
+  this cycle's `validation/open-issues.md` edit lands — a side effect of
+  this narrow fix's disposition, not a claim that this cycle re-reviewed
+  or re-blessed the rest of the project's backlog.
+- **Next action**: No further Circuit Engineer rework loop is required for
+  ISS-014, which is closed. Findings A/B/C (all LOW, documentation-only)
+  may be routed to the Circuit Engineer/Hardware Lead for an
+  opportunistic cleanup pass, but do not block anything and do not
+  require another review cycle to evaluate. `firmware/bench-imu-01/`'s
+  still-outstanding GPIOB→GPIOA pin follow-up (flagged by §19, and by
+  ECO-006) remains correctly out of scope for Hardware Reviewer sign-off
+  (Firmware Bring-up does not gate Design Complete).
