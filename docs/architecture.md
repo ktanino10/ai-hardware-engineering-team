@@ -67,9 +67,10 @@ both write to the same `validation/open-issues.md` (§8).
 | **Hardware Reviewer** | Independent, adversarial review; severity-classified findings | Fixing the design itself |
 | **Mechanical Lead** *(Phase 1)* | Enclosure/mechanical design from `hardware/mechanical-interface.md`, sole owner of the mechanical geometry state, design rationale log | Marking own work reviewed/complete; editing Electronics artifacts |
 | **Mechanical Reviewer** *(Phase 1)* | Independent, adversarial mechanical review; severity-classified findings (shares `validation/open-issues.md` with Hardware Reviewer) | Fixing the design itself |
-| **Firmware Engineer** *(Phase 2)* | Driver-level bring-up firmware from a Design-Complete schematic: peripheral initialization, register-level configuration, design rationale log (`firmware/<board>/`) | Control loops/sensor fusion/unit conversion (Control Engineer's future territory, §14 — not yet triggered); editing Electronics artifacts; marking own work reviewed/complete (self-check stands in for independent review until a Firmware Reviewer trigger is met, `docs/architecture-evolution.md` §32) |
+| **Firmware Engineer** *(Phase 2)* | Driver-level bring-up firmware from a Design-Complete schematic: peripheral initialization, register-level configuration, design rationale log (`firmware/<board>/`) | Control loops/sensor fusion/unit conversion (Control Engineer's future territory, §14 — not yet triggered); editing Electronics artifacts; marking own work reviewed/complete (self-check stood in for independent review until a Firmware Reviewer trigger was met, `docs/architecture-evolution.md` §32 — now superseded: Firmware Reviewer performs independent review, Phase 5, `docs/architecture-evolution.md` §36) |
 | **Power Engineer** *(Phase 3)* | System power-tree/rail-topology proposal (`hardware/power-architecture.md`), multi-rail `hardware/power-budget.md` bookkeeping, once engaged (a Hardware Lead judgment call per project/revision, `.github/agents/power-engineer.agent.md`) | Implementing the actual regulator/converter circuit (Circuit Engineer); selecting the specific part (Component Engineer); self-approving a rail/source architecture decision (always HITL, §10) |
 | **Manufacturing Engineer** *(Phase 4)* | Manufacturing PROCESS parameters (infill %/pattern, wall/perimeter count, print orientation vs. load direction, material) for safety-critical/structural mechanical parts, once engaged (a Mechanical Lead / Hardware Lead judgment call per part, `.github/agents/manufacturing-engineer.agent.md`) | The part's CAD geometry itself (Mechanical Lead); declaring its own process specification independently reviewed (Mechanical Reviewer performs that independent cross-check, `.github/skills/mechanical-review/SKILL.md` item 11); certifying FDM plastic as adequate for a hazardous-energy containment purpose without real physical testing |
+| **Firmware Reviewer** *(Phase 5)* | Independent, adversarial review of Firmware Engineer's driver-level bring-up code: register/peripheral correctness, pin/interface fidelity against the actual schematic, safety-critical logic correctness where present, premise review; severity-classified findings (own firmware-scoped record, `firmware/<board>/<board>-firmware-review.md` — deliberately does not share `validation/open-issues.md` with Hardware/Mechanical Reviewer, §14, `.github/agents/firmware-reviewer.agent.md`) | Fixing the firmware itself; control-loop/sensor-fusion design (Control Engineer's future territory, §14 — not yet triggered); editing hardware/mechanical artifacts; claiming any real hardware-in-the-loop test or flashing |
 
 The Mechanical Lead / Mechanical Reviewer pair was added in Phase 1 of the
 multidisciplinary evolution (`docs/architecture-evolution.md` §7, §10, §27);
@@ -105,10 +106,31 @@ independently cross-checked by the Mechanical Reviewer
 self-certified — no new independent reviewer agent was introduced for this
 narrow addition, mirroring the same scope-proportionality reasoning §32/§33
 already used for not adding a Firmware Reviewer or Power Reviewer
-immediately. Hardware Lead orchestrates across all disciplines today (§10,
-§5.3, §5.4) — a separate "System Lead" role remains premature until the
-framework's own discipline count grows further
-(`docs/architecture-evolution.md` §7).
+immediately. The Firmware Reviewer was added in Phase 5
+(`docs/architecture-evolution.md` §36) once §14's own documented trigger was
+met on the same board — not a second board (that row's other named
+condition), but a real bring-up failure traced to a class of defect an
+independent pass would likely have caught: the pre-existing (Rev ≤2)
+`main.c` infinite-loop-on-`bmi270_init()`-failure coupling bug, self-caught
+and fixed during Rev 3 firmware bring-up
+(`firmware/bench-imu-01/src/main.c`, design rationale §4.9). Unlike
+Manufacturing Engineer, this is a genuinely new independent-reviewer agent
+(mirroring Mechanical Reviewer's original Phase 1 introduction pattern,
+`.github/agents/mechanical-reviewer.agent.md`, not Manufacturing Engineer's
+choice to extend an existing reviewer's own checklist) because no existing
+reviewer agent covered Firmware Engineer's output at all before this
+addition — Hardware Reviewer reviews Circuit Engineer, Mechanical Reviewer
+reviews Mechanical Lead, and nothing but self-check reviewed Firmware
+Engineer. Its findings are deliberately recorded in a firmware-scoped file
+(`firmware/<board>/<board>-firmware-review.md`,
+`.github/agents/firmware-reviewer.agent.md`), not
+`validation/open-issues.md`, so a firmware-only finding cannot silently
+block the Design Complete Gate the way §32 already flagged as an
+unresolved coupling risk — this extends the Firmware discipline to 2
+agents, the same way Mechanical's Lead/Reviewer pair works. Hardware Lead
+orchestrates across all disciplines today (§10, §5.3, §5.4) — a separate
+"System Lead" role remains premature until the framework's own discipline
+count grows further (`docs/architecture-evolution.md` §7).
 
 Full role specs: `.github/agents/hardware-lead.agent.md`,
 `.github/agents/component-engineer.agent.md`,
@@ -118,7 +140,8 @@ Full role specs: `.github/agents/hardware-lead.agent.md`,
 `.github/agents/mechanical-reviewer.agent.md`,
 `.github/agents/firmware-engineer.agent.md`,
 `.github/agents/power-engineer.agent.md`,
-`.github/agents/manufacturing-engineer.agent.md`. These are real GitHub Copilot
+`.github/agents/manufacturing-engineer.agent.md`,
+`.github/agents/firmware-reviewer.agent.md`. These are real GitHub Copilot
 custom agent profiles (per
 [docs.github.com/en/copilot/reference/custom-agents-configuration](https://docs.github.com/en/copilot/reference/custom-agents-configuration)),
 each with a required `description` field, so they are selectable directly
@@ -520,15 +543,15 @@ framework can add them without restructuring)
 | **PCB Engineer** | Layout, stackup, DRC closure, signal/power integrity at layout level | When schematic-to-layout handoff becomes a distinct phase |
 | ~~**Firmware Engineer**~~ **[IMPLEMENTED — Phase 2, see `docs/architecture-evolution.md` §32]** | Driver-level bring-up code, register-level configuration matching the schematic's actual pin/interface decisions | Met: `hardware/schematic/bench-imu-01-design.md` reached Design Complete. See §3, §5.4, `.github/agents/firmware-engineer.agent.md`, `.github/skills/firmware-bringup/SKILL.md` |
 | **Control Engineer** | Control-loop design (e.g., attitude control loops) | At 1-axis / 3-axis attitude control roadmap stage — **not met** by Bench-IMU-01 (a static bench sensor-readout board, no reaction wheel/motor/attitude-control project exists). Deliberately kept separate from Firmware Engineer above, even though both were once grouped loosely as "Control/Embedded" (`docs/architecture-evolution.md` §7/§11) — Firmware Engineer's own scope explicitly excludes control loops/sensor fusion/unit conversion (`.github/agents/firmware-engineer.agent.md` "Out of scope") precisely so this row's introduction stays gated on its own, later trigger |
-| **Firmware Reviewer** *(new row, Phase 2)* | Independent, adversarial review of Firmware Engineer's driver-level bring-up code (mirroring Hardware Reviewer / Mechanical Reviewer) | Deliberately deferred this round even though the Firmware Engineer role itself is now implemented — self-check stands in for now (`docs/architecture-evolution.md` §32). Introduce when: a second board's firmware is added, or a real bring-up failure is traced to a class of defect an independent pass would likely have caught |
+| ~~**Firmware Reviewer**~~ **[IMPLEMENTED — Phase 5, see `docs/architecture-evolution.md` §36]** | Independent, adversarial review of Firmware Engineer's driver-level bring-up code (mirroring Hardware Reviewer / Mechanical Reviewer) | Met: a real bring-up failure was traced to a class of defect an independent pass would likely have caught — the pre-existing (Rev ≤2) `main.c` infinite-loop-on-`bmi270_init()`-failure coupling bug, self-caught and fixed during Rev 3 firmware bring-up (`firmware/bench-imu-01/src/main.c`, design rationale §4.9) — the trigger this row already named as its own example (the *other* named condition, a second board's firmware, was not what was met). See §3, `.github/agents/firmware-reviewer.agent.md`, `.github/skills/firmware-review/SKILL.md` |
 | **Test Engineer** | Owns `validation/bring-up-procedure.md` formally, designs bench test plans, HIL/environmental test plans | When bring-up moves beyond a one-off MVP bench test |
 | **Datasheet Specialist** | Advanced/high-volume operator of `.github/skills/datasheet-analysis/SKILL.md`; owns `datasheets/evidence-log.md` quality and consistency | When datasheet volume/complexity outgrows ad hoc extraction by whichever agent needs a number |
 | **Safety/Compliance Reviewer** | Regulatory/standards review (e.g. UL/CE/FCC/EMC compliance where applicable) | When the project needs to target a regulated market or a safety-relevant certification |
 
 These are **not** created as `.github/agents/*.agent.md` files yet (except
-Firmware Engineer and Power Engineer, now implemented above) — introduce the
-rest only when their trigger condition is met, to avoid role/file
-proliferation ahead of actual need.
+Firmware Engineer, Power Engineer, and Firmware Reviewer, now implemented
+above) — introduce the rest only when their trigger condition is met, to
+avoid role/file proliferation ahead of actual need.
 
 **Manufacturing Engineer** (§3, `.github/agents/manufacturing-engineer.agent.md`,
 Phase 4) is a fourth implemented discipline **not previously listed in this
