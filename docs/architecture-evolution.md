@@ -128,6 +128,7 @@ conflict-resolution process `[repo: workflow.md §3]`.
 | System / Orchestrator | **[PRESERVE, renamed conceptually later]** | Still played by Hardware Lead, now across all three disciplines `[repo: hardware-lead.agent.md — unedited; orchestration guidance lives in docs/architecture.md §3/§5.3/§5.4, docs/workflow.md Phase 8-11]`. Still no separate "System Lead" — three disciplines exist now but a rename remains premature until the framework's own need grows further `[req §5, §24]`. |
 | Electrical & Electronics | **[PRESERVE]** | Existing 4-agent team, unchanged. |
 | Mechanical | **[IMPLEMENTED — Phase 1, see §31]** | First new discipline. Shipped: `mechanical-lead`/`mechanical-reviewer` agents, `enclosure-design`/`mechanical-review` skills, `hardware/mechanical-interface.md`. |
+| Manufacturing (Process Specification) | **[IMPLEMENTED — Phase 4, see §35]** | Mechanical-adjacent addition (extends the Mechanical discipline's Lead/Reviewer pair to 3, mirroring how Power Engineer extends Electronics rather than being a new top-level discipline). Shipped: `manufacturing-engineer` agent, `manufacturing-process-specification` skill, a new independent-check item on the existing Mechanical Reviewer checklist. Specifies the additive-manufacturing PROCESS parameters (infill/wall-count/orientation/material) a fabricated part needs to actually achieve the physical properties its CAD geometry assumes — a genuinely distinct concern from the CAD geometry itself. |
 | Independent Reviewer | **[PRESERVE + extended]** | Existing Hardware Reviewer pattern reused for Mechanical (§13, §31) — Mechanical Reviewer is now real, sharing `validation/open-issues.md`. **Deliberately not yet extended to Firmware** (Phase 2, §32) — see §32's own reasoning for why that's a documented, reversible scope decision rather than an oversight. |
 | Control / Embedded | **[SPLIT — Firmware sub-slice IMPLEMENTED Phase 2 (§32); Control Engineer sub-slice still DEFER]** | §11 (updated). The two were always distinct future roles in `docs/architecture.md` §14 with separate triggers; only Firmware's trigger ("when firmware work starts in earnest") has been met so far — Control Engineer's ("1-axis/3-axis attitude-control roadmap stage") explicitly has not. |
 | Integration / Test | **[DEFER]** | §11. |
@@ -416,6 +417,7 @@ Success bar (must exceed "a box with holes") `[req §9]`:
 | Assembly order | New |
 | Tolerance | New |
 | Basic manufacturability / 3D-printability | New |
+| Manufacturing process specification (infill/wall-count/orientation/material) for safety-critical/structural parts | New (Phase 4, §35) — distinct from "Basic manufacturability / 3D-printability" above: that row covers whether the geometry *can be printed at all* (overhangs, bridges, minimum wall thickness); this row covers whether the *as-printed* part actually has the physical properties (solid material, impact resistance) its geometry assumes once a real process (infill %, wall count, orientation) is chosen |
 
 Benchmark question (verbatim from the request): *"Can this AI engineering
 system create a believable, buildable enclosure from real electronics
@@ -1007,4 +1009,205 @@ actually exercising them for the first time.
 - **Status**: implemented, PR opened, awaiting independent audit before
   merge — same process every prior PR in this repository's history went
   through.
+
+## 35. Phase 4 Implementation Status (Addendum — Manufacturing Engineer)
+
+Added when Phase 4 (Manufacturing) was actually implemented, in a separate
+PR from this document's original merge and the Phase 1/2/3 (§31/§32/§33)
+addenda — kept as its own addendum for the same reason those are: preserve
+the audit trail of what was true before this phase vs. after.
+
+- **Trigger met, dated, and concrete — not a hypothetical.** During human
+  review of Bench-IMU-01 Rev 3's flywheel/reaction-wheel subsystem (branch
+  `ktanino10-bench-imu-01-rev3-motor-driver-0a7`, PR #11, still draft/
+  unmerged at the time of this writing, 2026-09-01), the human Chief
+  Engineer identified that the REQ-403 containment cap
+  (`hardware/mechanical/bench-imu-01-enclosure.scad`,
+  `containment_wall_t = 2*wall_t` = 4.0mm, a defense-in-depth `ASSUMPTION`
+  against a disclosed ~99–122J / ~250 km/h-rim-speed detached-flywheel-
+  fragment hazard) is a **CAD-geometric** claim only — nothing in this
+  repository specified the **manufacturing process** (infill %/pattern,
+  wall/perimeter count, print orientation, material) needed for a fabricated
+  part to actually contain that much solid material, as distinct from a
+  slicer's own default (typically 15–25% infill — mostly air). This was
+  independently confirmed, not asserted: a repository-wide
+  `grep -rn -i "infill" .` across every `.md`/`.scad` file returned **zero
+  hits** before this PR. The gap is directly adjacent to (but distinct from)
+  Rev 3's own already-disclosed `MISS-011` finding (MEDIUM, OPEN, tagged
+  `mechanical-reviewer`): that the containment wall/fastener adequacy claims
+  rest on qualitative reasoning, "not any impact-energy or pull-out-under-
+  shock calculation" — `MISS-011` is about the *absence of a load
+  calculation*; this gap is about the *absence of any framework role that
+  would even specify how the part gets fabricated* once such a calculation
+  existed. Neither Mechanical Lead's own checklist (geometric
+  manufacturability: overhangs, bridges, minimum wall thickness for
+  printability) nor Mechanical Reviewer's own checklist (independent
+  geometric cross-check) had a concept of *process parameters that
+  determine the printed part's actual structural properties* — verified
+  directly by re-reading `.github/skills/mechanical-review/SKILL.md`
+  checklist item 9 ("basic manufacturability / 3D-printability") before this
+  change, confirming it covers only *can this print without
+  warping/failing*, not *does the as-printed part have the assumed
+  material*.
+- **Human approval**: given, scoped explicitly to standing up the
+  Manufacturing Engineer discipline itself — **as its own standalone PR,
+  implemented and merged before any Rev 3 hardware/mechanical/firmware
+  design work that depends on it**, off a fresh branch from `main` (not
+  Rev 3's own branch), per explicit human instruction mirroring exactly how
+  Mechanical Lead/Reviewer (Phase 1), Firmware Engineer (Phase 2), and Power
+  Engineer (Phase 3) were each introduced and merged before being exercised
+  on a real design. Rev 3's own REQ-403 containment cap is explicitly **not
+  touched by this PR** — applying the new discipline to that real design is
+  a separate, already-planned follow-up once this framework PR is reviewed
+  and merged.
+- **Explicit human decision (per the kickoff instructions for this PR, not
+  silently assumed)**: Manufacturing Engineer is a **Mechanical-adjacent**
+  addition (extends the Mechanical discipline's Lead/Reviewer pair to 3, the
+  same way Power Engineer extends the Electronics team rather than standing
+  up as a new top-level discipline the way Mechanical/Firmware themselves
+  did), engaged only when the Mechanical Lead / Hardware Lead judges a
+  specific part's safety-critical/structural function warrants it — not
+  automatically for every mechanical design, and explicitly not for
+  cosmetic/fit-only enclosure walls, which stay fully covered by Mechanical
+  Lead's existing basic-manufacturability item. **No new independent
+  "Manufacturing Reviewer" agent was introduced.** Instead, the existing
+  Mechanical Reviewer's own checklist gained one new, narrow item (item 11,
+  `.github/skills/mechanical-review/SKILL.md`) performing the independent
+  cross-check that Manufacturing Engineer's specified process is internally
+  consistent with the part's actual disclosed load path — this is what
+  makes the new discipline a real independent-review gate rather than a
+  role that could quietly self-certify its own work, the single most
+  important design constraint on this addition (mirrors this project's
+  three-rule thesis: catch mistakes with a *different* reasoning process
+  than the one that made them). This reuses, rather than duplicates, the
+  scope-proportionality reasoning §32/§33 already recorded for *not* adding
+  a Firmware Reviewer or a Power Reviewer immediately — the difference here
+  is that an independent check was still required, so it was added onto the
+  *existing* Mechanical Reviewer rather than as a new agent, since the two
+  checks (geometric review, process review) share the same natural
+  reviewer relationship to the same Mechanical Lead output.
+- **A real, non-obvious distinction this addition exists to close** (worth
+  recording plainly, not just asserted): a CAD/OpenSCAD model's dimensions
+  describe a *shape*, not a *fabrication outcome* — whether a nominally
+  solid wall is actually solid once printed is decided entirely by process
+  parameters invisible in the geometry itself. This mirrors, at the
+  Mechanical/Manufacturing boundary, the same kind of gap this project has
+  found before by introducing a genuinely distinct discipline rather than
+  extending an existing checklist (Hardware Reviewer catching pin-bonding
+  defects Circuit Engineer's own review missed; Firmware Engineer's
+  register-level rigor catching things Circuit Engineer's schematic-level
+  view couldn't) — CAD geometric design and manufacturing-process
+  specification are recognized as distinct engineering specialties in real
+  practice, not an artificial split invented for this repository.
+- **Grounded technical basis for the new skill's content** (independently
+  web-searched this session, sources named so a future session can verify
+  or refresh them rather than trust this summary at face value): higher
+  infill (with diminishing returns above roughly 50–60%) and honeycomb/
+  triangle patterns improve impact-energy absorption over simple grid/line
+  patterns at the same density (*"3D Print Infill Percentage and Patterns
+  for Maximum Strength,"* 3dmag.com; *"Optimizing Impact Toughness in
+  3D-Printed PLA Structures,"* MDPI *Eng* 2024, 5(1):27); wall/perimeter
+  count generally has a larger effect on strength per gram than infill
+  density alone (*"How Many Walls (Perimeters) Should You Use?,"*
+  ucuz3d.com); FDM is strongly anisotropic, with the Z-axis (across layers)
+  consistently the weakest load direction because inter-layer bonds are
+  weaker than intra-layer molecular entanglement (*"Anisotropy Explained:
+  FDM 3D Prints Are Weaker on the Z-Axis,"* mlc-cad.com); PETG/ABS/Nylon
+  generally outperform PLA's brittleness for impact toughness, with
+  trade-offs in print reliability (PLA good adhesion/poor toughness, ABS
+  good toughness/warp-sensitive, PETG excellent adhesion with good
+  toughness, Nylon best toughness+adhesion but hygroscopic) (*"In-Depth
+  Comparison of Material Properties: PLA vs ABS vs PETG,"*
+  salesplastics.com). Honestly disclosed as the skill's own escalation
+  guidance, not papered over: industry practice (e.g. UL's
+  additive-manufacturing-specific certification pathway; ISO 12100's
+  guard-verification expectations for machinery hazards) does **not**
+  generally treat FDM-printed plastic as adequate for a genuinely
+  safety-critical containment/guarding purpose without real physical
+  testing of the specific printer/material/process combination — a
+  limitation this framework's Manufacturing Engineer role is required to
+  escalate explicitly to the human Chief Engineer, never to paper over with
+  a written-but-untested process specification.
+- **Verified, not assumed, during implementation** (mirroring §31/§32/§33's
+  own "verified, not assumed" bullets, for the same reasons): the GitHub
+  custom agent (`.github/agents/*.agent.md`, required `description`) and
+  agent skill (`.github/skills/<name>/SKILL.md`, required `name`+
+  `description`, `name` lowercase-hyphenated and matching its directory)
+  specs were re-checked this session — both unchanged since PR #2/#3/§31/
+  §32/§33, no additional "fix the spec" round was needed;
+  `tools/check_agent_frontmatter.py` and `tools/check_open_issues.py` were
+  both run locally and verified passing (see this PR's own description/
+  commit for the actual output).
+- **Files added**: `.github/agents/manufacturing-engineer.agent.md`,
+  `.github/skills/manufacturing-process-specification/SKILL.md`.
+- **Files edited, additively only** (nothing existing removed/reworded, no
+  section renumbered): `.github/skills/mechanical-review/SKILL.md` (one new
+  checklist item, item 11, only — the rest of the checklist and the
+  finding-format/severity/verdict sections are untouched),
+  `docs/architecture.md` (§3 agents table + role-spec file list + new
+  explanatory sentences, §14 new clarifying paragraph),
+  `docs/architecture-evolution.md` (this addendum, §7 new table row, §24
+  new table row).
+- **Deliberately narrower scope than Phase 1/2/3, disclosed rather than
+  silently inconsistent**: unlike Phase 1 (Mechanical) and Phase 3 (Power),
+  this PR does not template a new
+  `hardware/mechanical/*-manufacturing-spec.md` output artifact —
+  Manufacturing Engineer's output is inherently
+  per-part and load-case-specific (unlike `hardware/mechanical-interface.md`
+  or `hardware/power-architecture.md`, which have generic fields applicable
+  to any project), so there is no generic template to usefully pre-populate
+  before a real project exercises the role; the agent/skill files describe
+  the intended output convention instead. This PR also does not update
+  `docs/workflow.md`'s phase diagram/handoff-chain text, `README.md`'s
+  agent roster, `.github/copilot-instructions.md`'s "Eight agents" framing
+  (which does not yet say "Nine"), or `.github/CODEOWNERS`, and does not
+  update `.github/agents/mechanical-reviewer.agent.md`'s own "Mandatory
+  checklist" section (a verbatim copy of the skill's checklist, deliberately
+  left at 10 items rather than mirrored to the skill's new 11th item) or
+  `.github/agents/mechanical-lead.agent.md` (which could eventually gain a
+  cross-reference to the new discipline). This is an explicit, narrower
+  file-list scope set for this particular PR (touching only the files
+  enumerated above), not an oversight — flagged here plainly so a future
+  session doesn't have to rediscover the resulting documentation-consistency
+  gaps, and can close them in a small follow-up if the human agrees they're
+  worth closing.
+- **Confirmed untouched** (verified via `git diff` before opening the PR):
+  all 8 existing `.github/agents/*.agent.md` files (including
+  `mechanical-lead.agent.md` and `mechanical-reviewer.agent.md` — see the
+  scope note above for why `mechanical-reviewer.agent.md`'s own checklist
+  copy specifically was left as-is), all 9 existing `SKILL.md` files (other
+  than the single new checklist item in `mechanical-review/SKILL.md` noted
+  above), all 6 existing `.github/instructions/*.instructions.md` files (no
+  new one was created — Manufacturing Engineer's intended output falls
+  under `hardware/mechanical/**`, already governed by
+  `.github/instructions/mechanical-design.instructions.md`'s existing
+  CONFIRMED/ASSUMPTION/ESTIMATE/UNKNOWN and CAD-tool-honesty rules, not a
+  genuinely different rule set),
+  `.github/workflows/{hardware-gate.yml,agent-frontmatter-lint.yml}`,
+  both `tools/*.py` CI
+  scripts (run, not edited — see above),
+  `datasheets/{README.md,evidence-log.md}`
+  (no new Evidence category was pre-registered; the new
+  skill documents that a real project should reuse the existing open-ended
+  category list, `docs/architecture.md` §6.3, once a specific filament
+  product is named), `requirements/**`, `bom/component-selection.md`, every
+  file under `hardware/schematic/`, `hardware/pcb/`, `hardware/mechanical/`,
+  `hardware/power-architecture.md`, `hardware/power-budget.md`,
+  `firmware/**`, `validation/**`,
+  `docs/{workflow.md,evaluation.md,commands/make-circuit.md}`,
+  `README.md`, `.github/copilot-instructions.md`,
+  and `.github/CODEOWNERS` (see the scope note above for all of these).
+  **Bench-IMU-01 Rev 3's own branch/PR #11 was read only** — via
+  `git show <branch>:<path>` for specific files
+  (`requirements/requirements.md`,
+  `hardware/mechanical/bench-imu-01-dimensional-spec.md`,
+  `hardware/mechanical/bench-imu-01-enclosure.scad`,
+  `validation/open-issues.md`) to ground this
+  addendum's REQ-403/`MISS-011` citations in the real, current state of that
+  design — the branch was never checked out, and no file on it was written
+  to, per the explicit out-of-scope instruction for this PR.
+- **Status**: implemented, PR opened as its own standalone change (not
+  bundled with Rev 3 hardware/mechanical/firmware work, per explicit human
+  instruction), awaiting independent audit before merge — same process
+  every prior PR in this repository's history went through.
 
