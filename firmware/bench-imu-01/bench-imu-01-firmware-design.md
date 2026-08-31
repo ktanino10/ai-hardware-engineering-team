@@ -1,10 +1,82 @@
 # Bench-IMU-01 — Firmware Bring-up Design Document
 
-**Author**: Firmware Engineer (AI agent) · **Date**: 2026-08-31 · **Status**:
-Source-complete, self-checked, compiles cleanly with `arm-none-eabi-gcc`
-16.2.0 (this session) — not run on real hardware (none exists in this
-environment). Mirrors the evidence-citation and rationale discipline of
+**Author**: Firmware Engineer (AI agent) · **Date**: 2026-08-31, corrected
+2026-09-08 (ISS-014 firmware follow-up) · **Status**: Source-complete,
+self-checked, compiles cleanly with `arm-none-eabi-gcc` 16.2.0 (re-verified
+this session) — not run on real hardware (none exists in this environment).
+Mirrors the evidence-citation and rationale discipline of
 `hardware/schematic/bench-imu-01-design.md`, adapted for firmware.
+
+## Changelog — 2026-09-08 correction (ISS-014 firmware follow-up)
+
+This board's schematic (`hardware/schematic/bench-imu-01-design.md`) was
+corrected on 2026-08-31 (ECO-006) when independent research found that the
+STM32G031K8T6's real LQFP-32 package has **no PB10/PB11 pins at all** — the
+IMU's I2C2 bus, as this firmware originally configured it (PR #7), targeted
+a physically nonexistent pin pair. That schematic fix reassigned the bus to
+the real, physically-existing **PA11 (I2C2_SCL, physical pin 22) / PA12
+(I2C2_SDA, physical pin 23)**, same I2C2 peripheral instance, and was
+explicitly flagged at the time as a firmware follow-up not yet performed
+(`validation/open-issues.md` ISS-014 Notes; `validation/change-log.md`
+ECO-006's own "Not fixed by this ECO" disclosure).
+
+This revision performs that follow-up fix:
+
+- Independently re-verified the pin/AF mapping from primary sources before
+  touching any code (not merely trusting the schematic's own citation, and
+  explicitly not trusting an unverified claim of a prior Evidence ID
+  "DS-MCU-068" that turned out **not to actually exist** in
+  `datasheets/evidence-log.md` before this session — a good illustration of
+  why this repository's independence discipline requires re-deriving facts
+  rather than trusting a secondhand citation):
+  1. Re-fetched ST's own official pin database
+     (`STMicroelectronics/STM32_open_pin_data`,
+     `mcu/STM32G031K(4-6-8)Tx.xml`, the same primary source DS-MCU-067
+     already cites) directly this session and confirmed `<Pin Position="22">`
+     (name `PA11 [PA9]`, default/unremapped state) carries signal
+     `I2C2_SCL`, and `<Pin Position="23">` (`PA12 [PA10]`) carries
+     `I2C2_SDA` — corroborating DS-MCU-067 independently, not just
+     re-reading it.
+  2. That pin database does not itself encode alternate-function *numbers*
+     (only which signals are available at each pin), so the AF6 value
+     needed a separate primary source. Found and independently verified
+     against **two further official STMicroelectronics sources**, both new
+     to this repository's evidence trail (DS-MCU-068, DS-MCU-069): (a)
+     STMicroelectronics' own `STM32CubeG0` official firmware-example
+     repository's CubeMX-generated MSP file for the **NUCLEO-G031K8**
+     board — the same exact STM32G031K8T6 part this design uses — which
+     configures I2C2 on `GPIOA` pins 11/12 with
+     `GPIO_InitStruct.Alternate = GPIO_AF6_I2C2`; (b) STMicroelectronics'
+     own `stm32g0xx-hal-driver` header (`Inc/stm32g0xx_hal_gpio_ex.h`),
+     which defines `GPIO_AF6_I2C2` as the literal numeric value `0x06`.
+     Together these confirm AF6 is correct for PA11/PA12 I2C2 — the same AF
+     number the (now-corrected) PB10/PB11 assignment used, but this was
+     verified fresh, not assumed to carry over.
+- `src/gpio.c`/`src/gpio.h`: GPIO configuration moved from GPIOB pins 10/11
+  to **GPIOA pins 11/12**, same AF6, same open-drain configuration (I2C2
+  peripheral instance and register base address were already correct and
+  unchanged — only the GPIO port/pin/AF-mux target changes).
+- `src/clock.c`/`src/clock.h`: `RCC_IOPENR_GPIOBEN` removed from
+  `clock_init()` — GPIOB is no longer used anywhere in this board's real
+  pin allocation (every pin this firmware configures — PA2, PA3, PA5, PA11,
+  PA12 — is now on GPIOA), so enabling its clock would be dead, misleading
+  configuration.
+- `src/stm32g031_regs.h`: removed the now-unused `GPIOB_BASE`/`GPIOB`/
+  `RCC_IOPENR_GPIOBEN` definitions (this header's own stated purpose is "a
+  minimal, purpose-built subset ... covering only the peripherals this
+  board's schematic actually uses" — keeping a genuinely-unused GPIOB
+  definition around would contradict that and risk a future re-introduction
+  of this exact defect).
+- Rebuilt with `arm-none-eabi-gcc` 16.2.0 this session: succeeds, zero
+  warnings under `-Wall -Wextra`, identical image size to before (10,804
+  bytes `.text`/`.rodata`, 4 bytes `.bss`, 0 bytes `.data` — a pure pin/port
+  relabeling changes no code size). Disassembly spot-check confirms the
+  GPIOB base address (`0x50000400`) no longer appears anywhere in the
+  linked binary, and every GPIO access in `gpio_init()`/`led_set()`/
+  `led_toggle()` now resolves through the single GPIOA base
+  (`0x50000000`).
+- See `validation/open-issues.md` ISS-014 (Notes) and
+  `validation/change-log.md` (new ECO entry) for the formal record.
 
 ## 0. Tooling honesty statement
 
@@ -46,7 +118,7 @@ see the citation next to each one.
 | Fact | Value | Schematic source |
 |---|---|---|
 | MCU | STM32G031K8T6, Cortex-M0+, LQFP-32, 64KB Flash/8KB SRAM | §1 |
-| IMU bus | **I2C2** (PB10=SCL, PB11=SDA) — corrected from an original I2C1 mislabeling (ISS-011) | §2.3, §5.2, §5.3, §11 |
+| IMU bus | **I2C2** (PA11=SCL, PA12=SDA) — peripheral instance corrected from an original I2C1 mislabeling (ISS-011); GPIO pins corrected again this revision from PB10/PB11, which do not physically exist on this package (ISS-014) | §2.3, §5.2, §5.3, §11 |
 | IMU address/mode | I2C address 0x68 (SDO→GND); I2C mode (CSB→VDDIO) | §5.3, DS-IMU-075/076 |
 | IMU acquisition | Polled, not interrupt-driven (INT1/INT2 left NC) | §5.3 |
 | Host UART | USART2 (PA2=TX, PA3=RX), header J2 | §6 |
@@ -157,16 +229,16 @@ citations.
 | Peripheral | Key facts | Evidence |
 |---|---|---|
 | Memory map | FLASH_BASE=0x08000000 (64K), SRAM_BASE=0x20000000 (8K) | DS-MCU-055 |
-| Base addresses | RCC=0x40021000, GPIOA=0x50000000, GPIOB=0x50000400, USART2=0x40004400, **I2C2=0x40005800 (not I2C1=0x40005400)** | DS-MCU-056 |
+| Base addresses | RCC=0x40021000, GPIOA=0x50000000, USART2=0x40004400, **I2C2=0x40005800 (not I2C1=0x40005400)** | DS-MCU-056 |
 | GPIO/RCC struct layout | MODER/OTYPER/PUPDR/ODR/BSRR/AFR offsets; RCC IOPENR/APBENR1/CSR offsets | DS-MCU-057 |
-| RCC clock-enable bits | GPIOAEN=bit0, GPIOBEN=bit1 (IOPENR); USART2EN=bit17, I2C2EN=bit22, PWREN=bit28 (APBENR1) | DS-MCU-058 |
+| RCC clock-enable bits | GPIOAEN=bit0 (IOPENR; GPIOB is not used by this board's real pin allocation, ISS-014, so its enable bit is deliberately not set); USART2EN=bit17, I2C2EN=bit22, PWREN=bit28 (APBENR1) | DS-MCU-058 |
 | RCC reset-reason bits | PINRSTF=bit26, PWRRSTF=bit27, SFTRSTF=bit28, IWDGRSTF=bit29, WWDGRSTF=bit30, RMVF=bit23 (CSR) | DS-MCU-059 |
 | I2C register layout/bits | CR1/CR2/ISR offsets and fields (SADD, START, STOP, NBYTES, AUTOEND, TXIS, RXNE, NACKF, STOPF, TC, BUSY) | DS-MCU-060 |
 | USART register layout/bits | CR1/ISR/BRR offsets and fields (UE, RE, TE, RXNE, TC, TXE) | DS-MCU-061 |
-| GPIO alternate functions | PA2/PA3=AF1 (USART2), PB10/PB11=AF6 (I2C2) | DS-MCU-062 |
+| GPIO alternate functions | PA2/PA3=AF1 (USART2), **PA11/PA12=AF6 (I2C2)** — corrected this revision from PB10/PB11 (ISS-014); AF6 value independently re-confirmed against two further official ST sources (STM32CubeG0's NUCLEO-G031K8 I2C2 example, `stm32g0xx-hal-driver`'s `GPIO_AF6_I2C2` numeric definition) | DS-MCU-062, DS-MCU-068, DS-MCU-069 |
 | I2C timing (400 kHz @ 16 MHz) | TIMINGR=0x00310309 (ST's own published value, AN4235 Table 11) | DS-MCU-063 |
 
-`gpio.c` configures PB10/PB11 **open-drain** (not push-pull) — I2C is a
+`gpio.c` configures PA11/PA12 **open-drain** (not push-pull) — I2C is a
 wired-AND bus, and the schematic already provides the external 4.7 kΩ
 pull-ups R3/R4 (§5.2); an internal pull-up or push-pull drive here would
 fight the bus. `i2c2.c` implements polling-mode (no interrupts), matching
@@ -220,7 +292,7 @@ emits one CSV line per sample, and toggles the heartbeat LED every 500 ms
 
 ## 7. Real build attempt (this session)
 
-`arm-none-eabi-gcc` was installed via Homebrew
+Original build (2026-08-31): `arm-none-eabi-gcc` was installed via Homebrew
 (`brew install arm-none-eabi-gcc`, a bottled/pre-built formula — succeeded,
 no compilation-from-source needed) and `make` was run in
 `firmware/bench-imu-01/`.
@@ -246,12 +318,31 @@ figures sit comfortably within the STM32G031K8T6's 64 KB flash / 8 KB RAM
 (DS-MCU-055). This was **not** flashed to real hardware — none exists in
 this environment (§0).
 
+**Re-verified this session (2026-09-08, ISS-014 firmware follow-up)**: ran
+`make clean && make` again after the GPIOB→GPIOA/PB10-PB11→PA11-PA12 pin
+fix (see Changelog above). Build succeeds again, again zero warnings under
+`-Wall -Wextra`, with the **identical** `.text`/`.bss`/`.data` byte counts
+as before (10,804/4/0) — expected, since relabeling which GPIO port/pins
+are configured changes no instruction count on this architecture. As an
+additional, non-cosmetic regression check (not performed in the original
+build write-up), `arm-none-eabi-objdump -d` was run against the linked
+`.elf` and grepped for the old GPIOB base address: **`0x50000400` (GPIOB)
+no longer appears anywhere in the compiled binary**, and every GPIO access
+in `gpio_init()`/`led_set()`/`led_toggle()` now resolves through the single
+GPIOA base address (`0x50000000`) — direct, compiled-code confirmation
+that the fix took effect, not just a source-level read-through. Still
+**not** flashed to real hardware — none exists in this environment (§0).
+
 ## 8. Self-check against `.github/skills/firmware-bringup/SKILL.md`'s checklist
 
 1. **Pin/peripheral instance fidelity** — I2C2 base address (0x40005800)
-   used throughout, verified distinct from I2C1 (0x40005400); PB10/PB11
-   AF6 confirmed against the part's own AF table, not assumed by
-   convention. ✅
+   used throughout, verified distinct from I2C1 (0x40005400); PA11/PA12
+   AF6 (corrected this revision from PB10/PB11, which do not physically
+   exist on this package — ISS-014) confirmed against the part's own pin
+   database and cross-confirmed against two further official ST sources
+   (STM32CubeG0's NUCLEO-G031K8 I2C2 example, `stm32g0xx-hal-driver`'s
+   `GPIO_AF6_I2C2` definition), not assumed by convention or carried over
+   from the prior (incorrect) PB10/PB11 citation. ✅
 2. **Clock configuration correctness** — HSI16/16 MHz stated and actually
    left unconfigured-from-reset (no PLL registers touched); I2C TIMINGR and
    USART BRR both computed for 16 MHz specifically. ✅
@@ -284,7 +375,10 @@ this environment (§0).
 independent Firmware Reviewer exists yet
 (`docs/architecture-evolution.md` §32) — per that section's documented
 scope decision, this self-check stands in for independent review this
-round.
+round. **2026-09-08 ISS-014 follow-up**: an additional, ad hoc independent
+verification pass was requested for this specific pin/AF correction (not a
+formal Firmware Reviewer gate, which still does not exist) — see the new
+"§10 Independent verification" below for its outcome.
 
 ## 9. Handoff
 
@@ -296,6 +390,12 @@ DS-IMU-088 (`datasheets/evidence-log.md`); three new datasheet metadata
 records (`datasheets/stmicroelectronics_cmsis_device_g0_master.md`,
 `datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md`,
 `datasheets/stmicroelectronics_an4235_i2c-timing-configuration-tool.md`).
+**2026-09-08 ISS-014 follow-up addition**: new Evidence ID rows DS-MCU-068,
+DS-MCU-069; two new datasheet metadata records
+(`datasheets/stmicroelectronics_stm32cubeg0_master.md`,
+`datasheets/stmicroelectronics_stm32g0xx-hal-driver_master.md`); updated
+`validation/open-issues.md` (ISS-014 Notes) and `validation/change-log.md`
+(new ECO entry).
 
 **Open items**:
 - The AN4235 TIMINGR value (DS-MCU-063) was cross-checked via two
@@ -311,3 +411,45 @@ records (`datasheets/stmicroelectronics_cmsis_device_g0_master.md`,
 
 I have not declared this firmware "tested" or "hardware-verified" anywhere
 in this document — per §0, no physical board exists this session.
+
+## 10. Independent verification (2026-09-08, ISS-014 firmware follow-up)
+
+An ad hoc, adversarial verification pass (not a formal Firmware Reviewer
+gate, which still does not exist — `docs/architecture-evolution.md` §32)
+was run against this fix, deliberately instructed to re-derive every fact
+from primary sources itself rather than trust this document's own
+citations. Summary of its independent findings (full report retained in
+this session's record):
+
+- Independently re-fetched ST's official pin database and confirmed PA11
+  (pin 22)/PA12 (pin 23) = I2C2_SCL/SDA; independently re-fetched both new
+  official ST sources (STM32CubeG0's NUCLEO-G031K8 example,
+  `stm32g0xx-hal-driver`'s header) and confirmed AF6 (`0x06`), cross-checked
+  against the exact same commit SHAs recorded in DS-MCU-068/069.
+- Independently checked the actual `git diff` against every one of its own
+  derived facts (GPIO port/base address, AF value, RCC enable bit,
+  AFRH bit-field math for pins 11/12, I2C2 base address unchanged, no
+  collateral change to USART2/LED pins) — all matched.
+- Independently rebuilt the firmware (`make clean && make`): succeeded,
+  zero warnings, identical image size. Independently confirmed via three
+  separate methods (objdump+grep, a raw byte-pattern scan of the ELF, and a
+  native, non-ARM re-execution of `gpio.c`'s exact bit-manipulation helper
+  functions against a mock register struct) that the GPIOB base address is
+  absent from the compiled output and the bit values written for pins
+  11/12 are exactly MODER=AF, AF=6, OTYPER=open-drain.
+- Full-text-scanned (not spot-checked) the updated design doc and README
+  for any stale PB10/PB11 claim presented as a current fact — found none;
+  all remaining PB10/PB11 mentions are correctly-framed historical/
+  corrective narrative.
+- Verified the new evidence-log rows/datasheet metadata records accurately
+  reflect its own independent fetches, and that `validation/open-issues.md`
+  (row/column count unchanged, `tools/check_open_issues.py` still passes)
+  and the new `change-log.md` ECO entry are accurate.
+
+**Verdict: CONFIRMED CORRECT.** Zero findings (no CRITICAL/HIGH/MEDIUM/LOW
+issues raised) — an independent, from-first-principles re-derivation, not a
+re-read of this document's own claims. Scoped strictly to firmware-register
+correctness; does not reopen or comment on Bench-IMU-01's Design Complete
+status (already granted, ECO-005) or ISS-014's schematic-level RESOLVED/
+CRITICAL disposition (already independently confirmed by a prior Hardware
+Reviewer Cycle-3 pass, unaffected by this firmware-only fix).

@@ -3,8 +3,13 @@
 
 void clock_init(void)
 {
-    /* GPIOA (PA2/PA3 USART2, PA5 LED) and GPIOB (PB10/PB11 I2C2) clocks. */
-    RCC->IOPENR |= RCC_IOPENR_GPIOAEN | RCC_IOPENR_GPIOBEN;
+    /* GPIOA only -- PA2/PA3 (USART2), PA5 (LED), and PA11/PA12 (I2C2).
+     * Corrected this revision (ISS-014): the IMU's I2C2 bus previously lived
+     * on PB10/PB11, which do not physically exist on this package; the real
+     * pins (PA11/PA12) are also on GPIOA, so GPIOB is no longer used
+     * anywhere in this board's real pin allocation and its clock is
+     * deliberately not enabled here. */
+    RCC->IOPENR |= RCC_IOPENR_GPIOAEN;
 
     /* I2C2, USART2, and PWR (needed to read/clear reset-reason flags via
      * RCC_CSR at boot -- see reset_reason.c) peripheral clocks. */

@@ -17,10 +17,14 @@
 #ifndef BENCH_IMU_01_CLOCK_H
 #define BENCH_IMU_01_CLOCK_H
 
-/* Enables the GPIOA/GPIOB/I2C2/USART2/PWR peripheral clocks this board's
- * schematic actually uses. Does not touch RCC_CR/RCC_CFGR/RCC_PLLCFGR --
- * the MCU is already running on HSI16 at reset, so there is deliberately
- * nothing else to configure for the clock source itself. */
+/* Enables the GPIOA/I2C2/USART2/PWR peripheral clocks this board's
+ * schematic actually uses. GPIOB is deliberately not enabled -- the IMU's
+ * I2C2 bus lives on PA11/PA12 (corrected this revision, ISS-014, from a
+ * previously-configured PB10/PB11 pair that does not physically exist on
+ * this package), so every pin this board uses is on GPIOA. Does not touch
+ * RCC_CR/RCC_CFGR/RCC_PLLCFGR -- the MCU is already running on HSI16 at
+ * reset, so there is deliberately nothing else to configure for the clock
+ * source itself. */
 void clock_init(void);
 
 #endif /* BENCH_IMU_01_CLOCK_H */

@@ -1,12 +1,15 @@
 /*
- * i2c2.h -- I2C2 polling-mode driver for the IMU bus (PB10=SCL, PB11=SDA,
- * hardware/schematic/bench-imu-01-design.md Section 5). Fast-mode, 400 kHz,
+ * i2c2.h -- I2C2 polling-mode driver for the IMU bus (PA11=SCL, PA12=SDA --
+ * corrected this revision, ISS-014; was previously PB10/PB11, which do not
+ * exist as physical pins on this package's real LQFP-32 package, see
+ * gpio.c/gpio.h and stm32g031_regs.h for the full correction),
+ * hardware/schematic/bench-imu-01-design.md Section 5. Fast-mode, 400 kHz,
  * matching the schematic's own R3/R4 pull-up sizing target (Section 5.2).
  *
  * Deliberately I2C2, not I2C1 -- see stm32g031_regs.h's I2C2_BASE comment
- * and gpio.c's PB10/PB11 AF6 comment for why this specific fact gets triple
- * emphasis in this codebase: it is the exact class of defect (ISS-011) an
- * independent Hardware Reviewer caught in the schematic itself.
+ * and gpio.c's PA11/PA12 AF6 comment for why this specific fact gets triple
+ * emphasis in this codebase: it is the exact class of defect (ISS-011,
+ * ISS-014) an independent review caught in the schematic itself.
  *
  * Polling-mode (no interrupts), matching the schematic's own polled-
  * acquisition design decision (Section 5.3: "this design uses I2C polling

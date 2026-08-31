@@ -6,7 +6,10 @@
  * every peripheral on the whole STM32G0 family and would be far more than
  * this small bring-up program needs). It is a minimal, purpose-built subset,
  * covering only the peripherals this board's schematic actually uses:
- * RCC, GPIOA, GPIOB, I2C2, USART2, plus the Cortex-M0+ core's SysTick.
+ * RCC, GPIOA, I2C2, USART2, plus the Cortex-M0+ core's SysTick. (GPIOB was
+ * removed this revision -- ISS-014 corrected the IMU's I2C2 bus from the
+ * physically nonexistent PB10/PB11 to the real PA11/PA12, both on GPIOA, so
+ * GPIOB is no longer used anywhere in this board's real pin allocation.)
  *
  * Every base address, register offset, and bit position below was
  * independently confirmed THIS SESSION directly against STMicroelectronics'
@@ -40,14 +43,13 @@
 #define AHBPERIPH_BASE    (PERIPH_BASE + 0x00020000UL)
 
 #define USART2_BASE  (APBPERIPH_BASE + 0x00004400UL) /* 0x40004400 */
-#define I2C2_BASE    (APBPERIPH_BASE + 0x00005800UL) /* 0x40005800 -- NOT I2C1 (0x40005400): the schematic's IMU bus is I2C2 (PB10/PB11), corrected from an original I2C1 mislabeling caught by Hardware Reviewer (ISS-011, hardware/schematic/bench-imu-01-design.md Section 2.3/Section 5.2). Using the wrong base address here would silently reproduce that exact defect at the firmware layer. */
+#define I2C2_BASE    (APBPERIPH_BASE + 0x00005800UL) /* 0x40005800 -- NOT I2C1 (0x40005400): the schematic's IMU bus is I2C2, on pins PA11/PA12 (corrected this revision, ISS-014, from a previously-configured PB10/PB11 pair that does not physically exist on this package -- DS-MCU-064/067/068/069), a peripheral-instance correction originally caught by Hardware Reviewer (ISS-011, hardware/schematic/bench-imu-01-design.md Section 2.3/Section 5.2). Using the wrong base address here would silently reproduce that exact defect at the firmware layer. */
 #define RCC_BASE     (AHBPERIPH_BASE + 0x00001000UL) /* 0x40021000 */
 #define GPIOA_BASE   (IOPORT_BASE + 0x00000000UL)    /* 0x50000000 */
-#define GPIOB_BASE   (IOPORT_BASE + 0x00000400UL)    /* 0x50000400 */
 
 /* ---------------------------------------------------------------------- */
 /* GPIO (DS-MCU-<NNN>: GPIO_TypeDef, offsets confirmed against the CMSIS   */
-/* header -- identical layout for GPIOA/GPIOB)                            */
+/* header -- this board's real pin allocation only uses GPIOA, ISS-014)    */
 /* ---------------------------------------------------------------------- */
 typedef struct
 {
@@ -64,7 +66,6 @@ typedef struct
 } GPIO_TypeDef;
 
 #define GPIOA ((GPIO_TypeDef *)GPIOA_BASE)
-#define GPIOB ((GPIO_TypeDef *)GPIOB_BASE)
 
 /* ---------------------------------------------------------------------- */
 /* RCC (DS-MCU-<NNN>: RCC_TypeDef, offsets confirmed against the CMSIS     */
@@ -85,7 +86,7 @@ typedef struct
     __IO uint32_t AHBRSTR;    /* 0x28 */
     __IO uint32_t APBRSTR1;   /* 0x2C */
     __IO uint32_t APBRSTR2;   /* 0x30 */
-    __IO uint32_t IOPENR;     /* 0x34 -- I/O port clock enables (GPIOAEN/GPIOBEN) */
+    __IO uint32_t IOPENR;     /* 0x34 -- I/O port clock enables (GPIOAEN) */
     __IO uint32_t AHBENR;     /* 0x38 */
     __IO uint32_t APBENR1;    /* 0x3C -- I2C2EN / USART2EN / PWREN live here */
     __IO uint32_t APBENR2;    /* 0x40 */
@@ -103,7 +104,10 @@ typedef struct
 
 /* RCC_IOPENR bit positions */
 #define RCC_IOPENR_GPIOAEN (1UL << 0)
-#define RCC_IOPENR_GPIOBEN (1UL << 1)
+/* GPIOBEN (bit 1) intentionally not defined here -- GPIOB is not used
+ * anywhere in this board's real pin allocation after ISS-014 moved the
+ * IMU's I2C2 bus from the physically nonexistent PB10/PB11 to the real
+ * PA11/PA12 (both on GPIOA). */
 
 /* RCC_APBENR1 bit positions */
 #define RCC_APBENR1_USART2EN (1UL << 17)
