@@ -4966,3 +4966,557 @@ framework lands, independently cross-checked by Mechanical Reviewer per
 the new checklist item — an additional prerequisite for a *complete*
 REQ-403 sign-off, on top of (not instead of) the human's own separate
 safety-topology review, which may still proceed in parallel.
+
+## Mechanical Reviewer — Manufacturing Process Cross-Check (Containment Cap), 2026-09-11
+
+### Review Cycle Metadata
+
+- **Document reviewed**: `hardware/mechanical/bench-imu-01-manufacturing-spec.md`
+  (89 lines), authored by the newly-introduced Manufacturing Engineer
+  discipline (`.github/agents/manufacturing-engineer.agent.md`,
+  `.github/skills/manufacturing-process-specification/SKILL.md`, both just
+  merged to `main`). This is a manufacturing-**process** specification
+  (infill %/pattern, wall/perimeter count, print orientation, material) for
+  Bench-IMU-01 Rev 3's flywheel `containment_cap()`, not a geometry change —
+  the `.scad` file and `bench-imu-01-dimensional-spec.md` are both unchanged
+  since Cycle 4 (independently confirmed: no diff against the Cycle 4
+  baseline was found in either file).
+- **This is the first-ever exercise of checklist item 11**, newly added to
+  `.github/skills/mechanical-review/SKILL.md`: an independent cross-check of
+  a Manufacturing Engineer's process specification, distinct in kind from
+  Cycles 1–4's pure geometry/interference reviews.
+- **Direct lineage**: this document is the direct response to **MISS-012**
+  (HIGH, OPEN, logged in the Addendum immediately above by the Hardware Lead
+  after a human-surfaced finding) — MISS-012's own Recommended Fix explicitly
+  called for "a Manufacturing Engineer pass on this containment cap
+  specifically..., independently cross-checked by Mechanical Reviewer per
+  the new checklist item, before REQ-403 sign-off is considered ready."
+  Today's review is exactly that cross-check. Independently re-confirmed
+  before starting: MISS-012 is still `OPEN` in `validation/open-issues.md`
+  (not resolved by any other action in the interim).
+- **Scope**: focused on checklist item 11 only — an independent cross-check
+  of the manufacturing-process specification itself, not a from-scratch
+  10-item geometry pass (items 1–10 are unaffected, since no `.scad`/
+  dimensional-spec geometry changed).
+- **Independence statement**: Per checklist item 11's own explicit text, none
+  of the manufacturing spec's own stated rationale, its own confidence
+  labels, or its own citation list was accepted as fact. Every one of the
+  following was independently re-derived or re-checked this cycle, from
+  scratch, against primary sources: the actual radial/axial geometry of
+  `fw_bay_wall()` vs. `containment_cap()` (directly from `.scad` source, not
+  from the spec document's own prose); the §3.2 load-case arithmetic (by
+  hand, from first principles); the confidence labels on that arithmetic's
+  own inputs (traced back to their original rows in
+  `bench-imu-01-dimensional-spec.md`); the manufacturing spec's own most
+  load-bearing literature claim (via independent web search, not by trusting
+  the citation list); and the claimed absence of slicer/FEA/physical-print
+  tooling in this environment (via a live tool call this session, not by
+  trusting the document's own disclosure). Where independent results agree
+  with the document's own claims, this is reported as corroboration, not as
+  confirmation-because-stated.
+
+### Tooling & methodology disclosure
+
+- **CAD/geometry**: `openscad` 2026.08.30 confirmed present locally; used to
+  re-inspect the live `.scad` source directly (targeted `grep`/`view`, not a
+  full re-render, since no geometry changed since Cycle 4 — a full render
+  would re-verify nothing new).
+- **No slicer, no FEA/simulation tool connected**: confirmed no slicer or
+  `cadquery`/`build123d` installed locally. Independently attempted a live
+  `blender-get_addon_status` call this session specifically to test the
+  manufacturing spec's own tooling-absence claim rather than accept it —
+  this returned a genuine handshake failure (Blender/BlenderMCP not reachable
+  from this environment), independently corroborating (not merely repeating)
+  the spec's own §6 disclosure that no FEA/simulation capability is available
+  here. No physical printer or destructive-test capability exists in this
+  environment either (no such tool is exposed to this session).
+- **Literature verification**: ran two independently-phrased web searches
+  targeting the specific question "does 100% infill always maximize
+  impact-energy absorption, or can lower-density infill/patterns outperform
+  it" — both converged on the same reported figures from the manufacturing
+  spec's own cited source (§7 reference #4). Attempted direct primary-source
+  confirmation via `web_fetch` (MDPI article page) and `curl` (with a full
+  browser user-agent string); both returned **HTTP 403** — MDPI blocks
+  direct/bot fetches. This is treated as a genuine, confirmed environment
+  access limitation, not a shortcut: the finding below is explicitly flagged
+  as corroborated via two independent secondary searches converging on
+  identical figures and the identical citation (journal/volume/issue), not
+  as primary-text-confirmed.
+- Independently web-searched and confirmed real/accurately-characterized:
+  reference #3 (3DMag, Z-axis anisotropy content), #5 (MLC CAD, same), #6 (UL
+  "Blue Card" AM certification program — confirmed it genuinely requires
+  physical testing tied to a specific printer+material+process combination),
+  #7 (ISO 12100 — confirmed it genuinely establishes the general principle
+  that ejection/fragment hazards require verification).
+- **Arithmetic**: re-derived the §3.2 load-case numbers by hand from first
+  principles (moment of inertia → kinetic energy → rim speed) and separately
+  traced each geometric input back to its original confidence label in
+  `bench-imu-01-dimensional-spec.md` — full detail under Finding 2 below.
+
+### Checklist Results
+
+Only item 11 is in scope this cycle (items 1–10 are unaffected — no
+`.scad`/dimensional-spec geometry changed since Cycle 4's PASS, so they are
+not re-derived from scratch here).
+
+| # | Checklist item | Result | Notes |
+|---|---|---|---|
+| 11 | Manufacturing-process cross-check (new) | **CONDITIONAL — 1 HIGH + 2 MEDIUM findings** | The specified process for `containment_cap()` itself (100% infill, 6+ perimeters, upright orientation, nylon/PETG) is individually reasonable given the disclosed load case, and the document's own confidence discipline is *mostly* honest (§4's process table correctly uses ESTIMATE/ASSUMPTION throughout, never CONFIRMED). But three independently-verified defects were found: a scope gap that leaves the actual primary radial containment structure (`fw_bay_wall()`) with zero specified process (MISS-013, HIGH); a confidence-marking overclaim on the derived load-case figures in §3.2 (MISS-014, MEDIUM); and a one-sided literature-framing gap on the infill/impact-energy question plus an unaddressed Z-axis anisotropy point for the cap's own flat top (MISS-015, MEDIUM). See Findings below. |
+
+### Findings
+
+#### Finding 1 — MISS-013 (HIGH): manufacturing spec's own scope claim is not met by its substantive analysis — the actual primary radial containment wall (`fw_bay_wall()`) has zero specified process
+
+- **Issue**: The manufacturing spec's own §1 Scope states it specifies the
+  process for "Bench-IMU-01 Rev 3's flywheel Containment Cap **and the
+  associated containment-wall intent already disclosed** in
+  `bench-imu-01-dimensional-spec.md` §8" (line 5, emphasis added — the
+  document's own words). Yet every substantive section (§2 part
+  identification, §3.2 load-case framing, §4 process-parameter table and its
+  rationale text) scopes exclusively to `containment_cap()`. It never names,
+  characterizes, or specifies a single process parameter (infill %,
+  pattern, perimeter count, orientation, material) for `fw_bay_wall()` —
+  the module that is actually unioned into `base()` and shares the identical
+  `containment_wall_t`=4.0mm variable this document exists to convert into a
+  real manufacturing instruction.
+- **Rationale**: Independently re-derived the actual radial geometry
+  directly from `bench-imu-01-enclosure.scad` (not from the manufacturing
+  spec's own prose):
+  - `fw_bay_wall()` (lines 922–949) is the flywheel's real primary radial
+    containment structure: a solid cylindrical wall from `fw_bay_inner_r`
+    (39.5mm) to `fw_bay_outer_r` (43.5mm) — thickness exactly
+    `containment_wall_t` = 4.0mm — spanning the disk's full rotational-plane
+    height (`fw_wall_h` = 43.0mm, line 670), topped by a wider flange band
+    (43.5mm → `fw_flange_or` = 52.5mm, line 504, hosting the 6 heat-set
+    inserts). This entire assembly is unioned into `module base()`
+    (lines 1057–1074, confirmed directly) — the **first** printed piece,
+    alongside `pcb_bay_base()`/`motor_platform()`/`motor_wire_bridge_solid()`.
+  - `containment_cap()` (lines 1076–1111) — the part this document
+    exclusively addresses — is a physically and radially **separate** piece,
+    printed **third**. Its flat top disk is `containment_wall_t`=4.0mm thick
+    (matching the value this document is about), but its downward skirt is a
+    thinner `wall_t`=2.0mm slip-fit collar (line 1079 comment: "SAME
+    cap+skirt joint style reused from the PCB lid") whose own radial position
+    (ID = `fw_flange_dia` + 2×`fit_clearance` = 105.0+0.4 = 105.4mm dia →
+    r=52.7mm; OD = 105.4+2×`wall_t` = 109.4mm dia → r=54.7mm — using
+    `fit_clearance`=0.2mm/side, line 205, and `fw_flange_dia`=105.0mm,
+    line 505) sits **over 9mm radially outside** the flange band, and
+    ~11.2mm outside `fw_bay_wall()`'s own outer face (r=43.5mm).
+  - A fragment ejected radially at the disk's own rim (r = `fw_dia`/2 = 30mm,
+    travelling at the disclosed 69.74 m/s in-plane rim speed) strikes
+    `fw_bay_wall()`'s inner face (r=39.5mm) first — a part of `base()` —
+    long before it could reach `containment_cap()`'s own skirt (r≥52.7mm),
+    and, if `fw_bay_wall()` performs its intended containment function at
+    all, never reaches the cap's skirt under the very failure scenario this
+    document exists to address.
+  - The manufacturing spec's own §4 "Print orientation" rationale (line 48)
+    explicitly frames "the likely radial fragment impact" as landing on
+    "the sidewall/skirt" — but per the geometry above, the cap's skirt is
+    not the primary radial threat-path surface; it is a secondary,
+    radially-recessed assembly joint.
+  - Independently re-confirmed via a repo-wide `grep -rn -i
+    "infill\|perimeter"` across every `.md` file that no other document
+    anywhere in this repository specifies a manufacturing-process parameter
+    for `base()`/`fw_bay_wall()` either — the gap is not filled elsewhere.
+- **Datasheet Source**: `hardware/mechanical/bench-imu-01-enclosure.scad`
+  lines 455 (`containment_wall_t`), 467–468 (`fw_bay_inner_r`/
+  `fw_bay_outer_r`), 501–505 (`bolt_circle_r`/`fw_flange_or`/`fw_flange_dia`),
+  205 (`fit_clearance`), 670 (`fw_wall_h`), 922–949 (`module fw_bay_wall()`),
+  1057–1074 (`module base()`), 1076–1111 (`module containment_cap()`);
+  `hardware/mechanical/bench-imu-01-manufacturing-spec.md` line 5 (§1 scope
+  claim) and line 48 (§4 print-orientation rationale); cross-references
+  `validation/open-issues.md` MISS-012 (the finding this document was
+  produced to address).
+- **Failure Mechanism**: If this document is treated as "the containment
+  manufacturing process is now specified" without independently noticing
+  the gap, `containment_cap()` would be printed per the specified reinforced
+  process while `base()` — containing the actual primary radial containment
+  wall directly in the disclosed threat's path — would be printed under
+  whatever default settings a slicer applies (typically 15–25% infill),
+  since nothing in this repository overrides them for that part. The
+  as-printed primary containment surface could be mostly air at the exact
+  location the design's safety argument depends on being solid, while the
+  secondary/backup surface (the cap) is solid — the reverse of what the
+  disclosed radial-ejection threat actually requires, and a continuation,
+  not a resolution, of MISS-012's own core concern as it applies to the wall
+  specifically.
+- **Affected Component**: `fw_bay_wall()` / `module base()`
+  (`bench-imu-01-enclosure.scad`); manufacturing-spec.md §1/§2/§3/§4
+  (scope statement vs. substantive-coverage mismatch).
+- **Recommended Fix**: Manufacturing Engineer to extend this document (or
+  produce a companion document) specifying infill %/pattern, wall/perimeter
+  count, print orientation, and material for `fw_bay_wall()` specifically
+  (part of `base()`'s own print job), reasoned against the same disclosed
+  121.60J/69.74m/s radial-ejection load case — either by broadening this
+  document's own substantive sections to match its existing §1 claim, or by
+  explicitly narrowing §1's own scope statement to admit the cap-only
+  limitation and opening a distinct tracked item for the wall, so the gap is
+  at minimum honestly disclosed rather than implicitly presented as closed.
+  Independently cross-check the result per checklist item 11 before
+  considering MISS-012 resolved.
+- **Severity**: **HIGH** (per `docs/architecture.md` §7.1: "likely
+  malfunction or reliability failure under realistic conditions/corners" —
+  a realistic, not remote-corner-case, risk that the as-printed primary
+  containment structure differs materially from its CAD-assumed solid
+  geometry; directly mirrors the severity already established for MISS-012
+  itself, of which this is a partial continuation, not a new category of
+  concern).
+
+#### Finding 2 — MISS-014 (MEDIUM): §3.2's disclosed-load-case table labels derived/computed figures `CONFIRMED`, despite depending on inputs the source document itself marks `ASSUMPTION`/`ESTIMATE`
+
+- **Issue**: §3.2 ("Disclosed load case… treated as given") labels all 5
+  rows `CONFIRMED` — including two *derived/computed* physics results
+  (Stored kinetic energy = 121.60 J; Rim tip speed = 69.74 m/s) and a
+  qualitative "Threat mechanism" (hub-collar-release) framing. This is an
+  evidentiary overclaim: at least two of the geometric inputs these figures
+  are computed from are themselves labeled less certain in their own source
+  document.
+- **Rationale**: Independently re-derived the arithmetic by hand from first
+  principles, both to confirm the physics and to identify exactly which
+  inputs it depends on:
+  - Moment of inertia: I = 0.5 × m × r² = 0.5 × 0.100 kg × (0.030 m)² =
+    4.5×10⁻⁵ kg·m²
+  - Kinetic energy: KE = 0.5 × I × ω² = 0.5 × 4.5×10⁻⁵ × (2324.8 rad/s)² ≈
+    121.6 J ✓ (matches the manufacturing spec's stated 121.60 J exactly)
+  - Rim speed: v = ω × r = 2324.8 × 0.030 = 69.74 m/s ✓ (matches exactly)
+  - Traced the two geometric inputs back to their **original** confidence
+    labels in `bench-imu-01-dimensional-spec.md`: disk mass (100g, within
+    the "Total assembly mass" row) is labeled **ESTIMATE** (line 311); disk
+    diameter `fw_dia`=60.0mm (→ r=30mm) is labeled **ASSUMPTION** (line 365,
+    §4.4 table). (The rotational-speed input ω is not independently
+    re-traced to a per-row confidence label here — the source §8 physics
+    table, lines 568–573, carries no explicit per-row confidence column at
+    all — but this is not needed to establish the finding: the mass and
+    radius inputs alone are enough, since both KE and rim speed depend on
+    each.)
+  - Per `.github/instructions/mechanical-design.instructions.md`'s own
+    convention, `CONFIRMED` means sourced from "an actual…datasheet/measured
+    value," while `ASSUMPTION`/`ESTIMATE` are explicitly less-certain,
+    non-measured categories. A quantity computed from a mix of inputs cannot
+    cleanly inherit the most favorable label among them — it is no more
+    certain than its least-certain input. Both 121.60 J and 69.74 m/s depend
+    directly on the ASSUMPTION-labeled radius and the ESTIMATE-labeled mass.
+    Labeling them CONFIRMED silently discards that lineage — precisely the
+    "never silently blend ASSUMPTION/ESTIMATE into CONFIRMED" rule this
+    convention exists to prevent.
+  - The "Threat mechanism" row's hub-collar-release framing is itself a
+    reasoned hypothesis about which failure mode governs — reasonable, but
+    not a confirmed physical fact, since hub collar retention strength is
+    independently confirmed **UNKNOWN** in the same source document
+    (dimensional-spec §16). Labeling this hypothesis CONFIRMED is a second
+    instance of the same overclaim pattern.
+  - By contrast, independently confirmed the process-parameter table (§4)
+    correctly avoids CONFIRMED entirely (all ESTIMATE/ASSUMPTION) — a
+    correct application of the same discipline elsewhere in the very same
+    document, which is why this is flagged as an internal inconsistency,
+    not a systemic failure to understand the convention. Also confirmed
+    §3.1 correctly re-labels `containment_wall_t` ESTIMATE (matching its
+    dimensional-spec source), and that "Classification: safety-critical
+    (CONFIRMED)" / "Escalation required (CONFIRMED)" in §2/§6 are legitimate
+    uses of CONFIRMED for procedural/categorical claims, not
+    physical-measurement claims — not everything CONFIRMED in this document
+    is wrong, only the §3.2 derived-physics rows.
+  - Note: the original dimensional-spec.md §8 table itself carries no
+    per-row confidence column at all — so this specific CONFIRMED-mislabeling
+    is the Manufacturing Engineer's own transcription/labeling choice when
+    building §3.2's table, not something inherited verbatim from upstream.
+- **Datasheet Source**: manufacturing-spec.md §3.2 (lines 25–31);
+  `bench-imu-01-dimensional-spec.md` line 311 (disk mass, ESTIMATE), line 365
+  (`fw_dia`, ASSUMPTION), §8 (lines 568–573, source physics table, no
+  per-row confidence column), §16 (hub collar retention strength, UNKNOWN);
+  `.github/instructions/mechanical-design.instructions.md` (confidence-label
+  definitions).
+- **Failure Mechanism**: A future reader — including the human Chief
+  Engineer at the REQ-403 escalation gate this document is headed toward —
+  skimming the CONFIRMED label on "Stored kinetic energy: 121.60 J" could
+  reasonably conclude this figure is measured/certain, rather than a
+  computed value carrying forward an ASSUMPTION-labeled disk diameter and an
+  ESTIMATE-labeled disk mass — understating the actual uncertainty in the
+  very load figure the document's entire process rationale is anchored to.
+- **Affected Component**: manufacturing-spec.md §3.2 (confidence labeling
+  only — the numbers themselves are independently confirmed arithmetically
+  correct; this is an evidence-discipline finding, not a physics-error
+  finding).
+- **Recommended Fix**: Re-label the two derived rows (Stored kinetic energy,
+  Rim tip speed) and the Threat mechanism row as `ESTIMATE` (matching the
+  least-certain input feeding each), or show each cell's own lineage
+  explicitly (e.g., "121.60 J (ESTIMATE — derived from CONFIRMED ω,
+  ESTIMATE mass, ASSUMPTION radius)"), consistent with how §4's own process
+  table already handles mixed-confidence reasoning correctly.
+- **Severity**: **MEDIUM** (per §7.1: "deviates from recommended practice,
+  raises risk, doesn't clearly break function" — an evidence-discipline
+  violation on safety-critical figures that could mislead a reader about
+  certainty, but doesn't itself change any engineering decision, introduce a
+  physical hazard, or invalidate the document's bottom-line recommendation).
+
+#### Finding 3 — MISS-015 (MEDIUM): one-sided "maximize infill" literature framing, and an unaddressed Z-axis-anisotropy gap for the cap's own flat top
+
+- **Issue**: (a) §4's "Infill percentage" row frames 100% infill as
+  unambiguously maximizing "impact-energy absorption" and minimizing
+  "hidden void volume," without disclosing that the document's own cited
+  source (its own §7 reference #4) reports a non-100%-infill sample
+  outperforming a 100%-infill solid sample for impact-energy absorption
+  specifically; (b) §4's "Print orientation" row's rationale addresses only
+  the skirt's in-plane/radial strength, never flagging that the cap's flat
+  top disk's own through-thickness (Z) direction — its primary axis of
+  exposure to a direct axial/perpendicular impact — is FDM's inherently
+  weakest direction regardless of infill % or perimeter count, a limitation
+  the document's own reference #3 states explicitly.
+- **Rationale**:
+  - Independently researched the manufacturing spec's own reference #4
+    ("Optimizing Impact Toughness in 3D-Printed PLA Structures Using Hilbert
+    Curve and Honeycomb Infill Patterns," MDPI *Eng. Proc.* 2024, 5(1):27)
+    via two independently-phrased web searches, both converging on the same
+    reported figures: a Hilbert-curve-infill sample absorbed **11% more**
+    Charpy impact energy than a 100%-infill solid sample, but **20.6% less**
+    than a 40%-infill plain sample — meaning a sample at well under half of
+    full density (40%) outperformed *both* the exotic pattern *and* the
+    fully-solid sample for impact-energy absorption in this specific
+    published dataset. This is a real, checkable nuance directly
+    contradicting the "maximize infill" framing for the impact-energy-
+    absorption goal specifically (as distinct from the bulk-
+    stiffness/strength goal, where more infill generally does help) — this
+    is exactly the nuance this review cycle was tasked to independently
+    check for. (See the tooling disclosure above for the confirmed HTTP 403
+    primary-source access limitation and the corresponding corroboration
+    caveat.)
+  - Independently verified reference #3 ("3D Print Infill Percentage and
+    Patterns for Maximum Strength," 3DMag) via web search: real, existing
+    source; its own content states FDM Z-axis strength is inherently weaker
+    and that "infill percent and pattern won't fully compensate for this
+    inherent FDM process characteristic." The manufacturing spec cites this
+    same source (§7 reference #3) in support of its perimeter-count
+    reasoning, but its own print-orientation rationale (§4) never applies
+    this same source's own Z-axis-anisotropy point to the cap's flat top
+    disk itself — whose primary threat exposure, for a fragment or shock
+    ejected axially/upward rather than purely radially, would be exactly
+    this through-thickness Z-direction.
+  - Independently verified references #5 (MLC CAD — same Z-axis-anisotropy
+    content), #6 (UL "Blue Card" AM certification program — confirmed it
+    genuinely requires physical testing tied to a specific
+    printer+material+process combination, non-transferable), and #7
+    (ISO 12100 — confirmed it genuinely establishes the general principle
+    that ejection/fragment hazards require verification; the specific test
+    methodology lives in ISO 14120, a minor precision nuance, not itself an
+    overclaim, since the manufacturing spec does not claim ISO 12100
+    supplies the specific test method).
+  - This does not necessarily invalidate the document's bottom-line
+    recommendation: more material remains a defensible conservative default
+    under deep uncertainty, and matching the Mechanical Lead's own
+    already-reviewed solid-CAD-geometry intent is a separate, valid,
+    independent rationale for 100% infill that doesn't depend on the
+    disputed literature point — but the document's own *stated derivation
+    chain* is less rigorous/more one-sided than presented.
+- **Datasheet Source**: manufacturing-spec.md §4 (lines 44, 48) and §7
+  (references #3, #4); independently-verified web search results converging
+  on MDPI *Eng. Proc.* 2024, 5(1):27's own reported 11%/20.6% figures (two
+  independent search sessions; primary text inaccessible — HTTP 403
+  confirmed via both `web_fetch` and `curl`); 3DMag "3D Print Infill
+  Percentage and Patterns for Maximum Strength" (independently confirmed
+  content).
+- **Failure Mechanism**: Presents a one-sided "more infill/more perimeters
+  is always better for this goal" narrative to the human Chief Engineer at
+  the escalation gate, when the document's own cited literature shows a more
+  nuanced picture for the specific goal (impact-energy absorption, not bulk
+  strength) this part actually needs; doesn't itself change the physical
+  part, but weakens the rigor/credibility of the derivation chain the
+  escalation packet presents as support for the specific parameter choices
+  (as distinct from the parameter choices themselves, which remain
+  separately defensible — see Positive Findings below).
+- **Affected Component**: manufacturing-spec.md §4 rationale text (Infill
+  percentage row, Print orientation row); §7 reference list (framing, not
+  the references' own existence/content, which were independently confirmed
+  accurate).
+- **Recommended Fix**: Add an explicit line acknowledging the more nuanced
+  literature picture (e.g., "some published FDM impact-toughness data shows
+  infill densities below 100% can outperform fully-solid prints for energy
+  absorption specifically, though evidence is pattern/material-dependent and
+  not treated as controlling here; 100% infill is retained as the
+  conservative default given deep uncertainty in the load case itself and to
+  match the Mechanical Lead's own already-reviewed solid-CAD-geometry
+  intent, not because the literature unambiguously endorses maximum infill
+  for impact-energy absorption specifically"); add a corresponding line
+  naming the cap top's own Z-axis exposure as a residual,
+  infill/perimeter-independent limitation, consistent with the document's
+  own reference #3.
+- **Severity**: **MEDIUM** (rigor/honesty gap in a stated derivation chain
+  headed to a human safety decision-maker; does not itself invalidate the
+  bottom-line recommendation, which remains separately defensible on
+  conservative-default and CAD-fidelity grounds).
+
+### Independent literature investigation — infill % vs. impact-energy absorption (task-specific deep dive)
+
+This review was specifically tasked with independently checking whether
+"100% infill is always the safest/best choice for impact-energy absorption"
+is actually correct, rather than confirming the document's own framing.
+**Independent finding: the blanket claim is not well-supported, and the
+manufacturing spec's own cited source directly demonstrates the more
+nuanced picture.**
+
+- General FDM literature consensus (multiple independent sources, not just
+  the manufacturing spec's own citation list) indicates that
+  energy-absorption efficiency (as opposed to bulk stiffness/strength) often
+  peaks *below* 100% infill, because some structural compliance/progressive-
+  crush behavior in a partially-infilled lattice can absorb more total
+  impact energy before failure than a fully rigid, fully solid print — a
+  materially different optimization goal from maximizing stiffness or
+  ultimate strength.
+- The manufacturing spec's own §7 reference #4 (MDPI *Eng. Proc.* 2024,
+  5(1):27) is a concrete, checkable, in-scope example of exactly this
+  pattern: independently verified via two separately-phrased web searches
+  that this source reports a **40%-infill plain sample beating both a
+  Hilbert-curve-infill sample (by ~20.6%) and a 100%-infill solid sample
+  (the Hilbert-curve sample itself beat 100%-solid by ~11%, and 40%-infill
+  beat the Hilbert-curve sample, so 40%-infill beat 100%-solid by an even
+  larger margin) for Charpy impact-energy absorption**. This is the
+  document's *own* cited source contradicting its *own* blanket "maximize
+  infill" framing for this specific goal.
+- This finding is corroborated via two independent, differently-phrased
+  searches converging on identical figures and the identical citation
+  (journal/volume/issue) — reasonably solid triangulation — but primary-text
+  confirmation was not achievable in this environment (MDPI blocked both
+  `web_fetch` and a browser-user-agent `curl` attempt with HTTP 403,
+  independently confirmed, not assumed).
+- **This does not mean 100% infill is the wrong choice here.** The disclosed
+  load case carries deep, compounding uncertainty (disk mass ESTIMATE, disk
+  radius ASSUMPTION, hub-collar failure mode itself UNKNOWN per Finding 2
+  above), and matching the Mechanical Lead's own already-reviewed solid-CAD
+  geometry is a legitimate, literature-independent rationale for maximizing
+  bulk material continuity as a conservative default under that uncertainty.
+  What is genuinely wrong is presenting "100% infill maximizes
+  impact-energy absorption" as a settled, one-directional literature
+  conclusion, when the document's own cited source shows the opposite in at
+  least one directly-relevant published dataset. See Finding 3 (MISS-015)
+  above for the formal write-up and recommended fix.
+
+### Independent assessment of the escalation conclusion (task-specific)
+
+The manufacturing spec concludes (§6) that FDM cannot be presented as an
+adequate, validated containment process for REQ-403 without real physical
+testing, and recommends escalating the adequacy question to the human Chief
+Engineer rather than claiming REQ-403 is closed. This review was tasked
+with independently assessing whether this is the correct, honest conclusion
+— not a cop-out — given the real state of this environment's tooling.
+
+**Independent assessment: yes, this conclusion is correct and honest, and
+should proceed to the human — subject to one caveat below.**
+
+- **Tooling-absence claim independently confirmed, not trusted at face
+  value**: this session independently confirmed no slicer is installed, no
+  `cadquery`/`build123d` is installed, and — critically — made a *live* call
+  to `blender-get_addon_status` specifically to test whether any
+  FEA/simulation capability might actually be reachable despite the
+  document's claim otherwise. That call returned a genuine handshake
+  failure. No physical printer or destructive-test capability is exposed to
+  this session. All of this independently corroborates the manufacturing
+  spec's own §6 disclosure through direct, live tool evidence gathered this
+  cycle, not by repeating the document's own words.
+- **The cited certification-body evidence independently checks out**:
+  reference #6 (UL's "Blue Card" additive-manufacturing certification
+  program) was independently web-searched and confirmed to genuinely require
+  physical testing tied to a specific printer + material + process
+  combination, non-transferable to a different combination — directly and
+  accurately supporting the position that a CAD/reasoning-only exercise
+  cannot substitute for physical validation of a safety-critical FDM part.
+  Reference #7 (ISO 12100) was independently confirmed to genuinely
+  establish the general principle that ejection/fragment hazards must be
+  verified.
+- **The escalation is not a way to avoid doing the reasoning work**: the
+  document does substantive, checkable engineering reasoning first (load
+  case, geometry, process-parameter selection, all independently re-derived
+  above) and only *then* concludes that reasoning alone cannot certify a
+  safety-critical containment part without physical testing — that is the
+  correct order of operations, not a shortcut past the reasoning.
+- **The caveat**: the escalation packet, as currently scoped, would present
+  the human Chief Engineer with a manufacturing-process specification that
+  *reads* as covering "the containment cap and the associated
+  containment-wall intent" (its own §1 wording) but in substance only
+  covers one of the two physically separate structures that share the
+  `containment_wall_t` claim (Finding 1 / MISS-013). Escalating the
+  fundamental FDM-adequacy question is correct and should proceed regardless
+  — that conclusion does not depend on Finding 1 being fixed first. But
+  presenting an incompletely-scoped specification at that escalation point
+  risks leaving the human with an inaccurate picture of what fraction of the
+  REQ-403 threat path has actually been assessed. **Recommendation: the
+  scope gap (Finding 1 / MISS-013) should be closed, or at minimum
+  explicitly and prominently disclosed as a known limitation, before or
+  alongside this escalation reaching the human** — not as a precondition for
+  escalating the FDM-adequacy question itself, but as a precondition for the
+  escalation being an honest, complete representation of what has been
+  checked.
+
+### Positive Findings
+
+- The specified process parameters for `containment_cap()` itself (100%
+  infill, minimum 6 perimeters, gyroid/honeycomb-family pattern, nylon/PETG,
+  upright print orientation) are individually reasonable and traceable to
+  the disclosed load case, independent of the literature-framing critique in
+  Finding 3 — the parameter *choices* are defensible even where the *stated
+  rationale* for them is incomplete.
+- §4's process-parameter table correctly uses ESTIMATE/ASSUMPTION
+  throughout and never overclaims CONFIRMED — a correct, good-faith
+  application of the confidence-marking discipline, independently confirmed
+  by direct inspection of every row.
+- §3.1 correctly re-labels `containment_wall_t`=4.0mm as ESTIMATE, matching
+  its dimensional-spec source (line 372) — independently verified, not
+  assumed.
+- §5's explicit list of exclusions (no load/impact simulation performed; no
+  physical print/test performed; not a substitute for the human REQ-403
+  safety sign-off) is itself honest and consistent with what this review
+  independently found to be true of this environment's tooling.
+- §8's own handoff framing ("ready for Mechanical Reviewer's independent
+  cross-check," "not final/approved," "does not self-certify") correctly
+  anticipates and invites exactly the review this cycle performed, rather
+  than presenting itself as already-validated.
+- The escalation conclusion itself (§6) is independently assessed as honest
+  and substantively correct, not a cop-out — see dedicated section above.
+
+### Verdict
+
+- **Verdict**: **CONDITIONAL** (not a clean PASS, and not a FAIL — this
+  routes back to the **Manufacturing Engineer**, via the Hardware Lead, not
+  to the Mechanical Lead: the `.scad` geometry itself is unchanged and not at
+  fault here; only the manufacturing-process specification's scope and
+  rigor need rework)
+- **Open CRITICAL count**: 0
+- **Open HIGH count**: 1 (MISS-013 — new this cycle)
+- **Open MEDIUM count (non-gating)**: 2 (MISS-014, MISS-015 — new this
+  cycle), plus the pre-existing MISS-011 (untouched by this cycle, not
+  re-litigated here)
+- **What independently checks out**: the process parameters specified for
+  `containment_cap()` itself are individually reasonable against the
+  disclosed load case; the confidence-marking discipline is correctly
+  applied everywhere in this document *except* §3.2; the cited UL/ISO
+  certification-body references are real and accurately characterized; the
+  claimed absence of slicer/FEA/physical-test tooling in this environment is
+  independently confirmed true via a live tool call this cycle; the
+  escalation-to-human conclusion is independently assessed as honest and
+  correct on its own terms.
+- **What remains open, gating**: MISS-013 (HIGH) — the manufacturing spec's
+  own §1 scope claim ("the associated containment-wall intent") is not met
+  by its substantive analysis, which addresses `containment_cap()` only and
+  never `fw_bay_wall()`/`base()`, the part that is actually first in the
+  disclosed radial-ejection threat's path. Per this checklist item's own
+  rule and `docs/architecture.md` §7.1, an open HIGH finding precludes a
+  clean PASS.
+- **What remains open, non-gating**: MISS-014 (MEDIUM) — §3.2 overclaims
+  CONFIRMED on derived load-case figures built from ASSUMPTION/ESTIMATE
+  inputs; MISS-015 (MEDIUM) — the infill/impact-energy literature framing is
+  one-sided relative to the document's own cited source, and the cap top's
+  own Z-axis anisotropy is not addressed. Neither blocks a CONDITIONAL
+  routing, but both should travel with the loop-back to the Manufacturing
+  Engineer.
+- **Next action**: Report CONDITIONAL to the Hardware Lead, routed to the
+  Manufacturing Engineer (not the Mechanical Lead) for: (1) extending process
+  coverage to `fw_bay_wall()`/`base()` or explicitly narrowing/disclosing the
+  scope limitation (MISS-013); (2) correcting the §3.2 confidence labels
+  (MISS-014); (3) adding the literature-nuance and Z-axis-anisotropy
+  disclosures (MISS-015). MISS-012 remains **OPEN** — this document makes
+  real, substantive progress toward closing it (a genuine process spec now
+  exists and has been independently cross-checked, where before none existed
+  at all), but does not fully close it, since the gap MISS-012 raised
+  persists for `fw_bay_wall()` specifically. The escalation of the
+  fundamental FDM-adequacy question to the human Chief Engineer is
+  independently assessed as correct and may proceed in parallel — but should
+  carry an explicit disclosure of the MISS-013 scope gap if it reaches the
+  human before that gap is closed.
