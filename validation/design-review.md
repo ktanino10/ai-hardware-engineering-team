@@ -3460,3 +3460,516 @@ component).
   The corresponding firmware GPIO/AF/clock change (GPIOB pins 10/11 → GPIOA
   pins 11/12, same AF6, same I2C2 peripheral base address) is correctly
   deferred to, and already flagged for, the Firmware Bring-up phase.
+
+---
+
+## Mechanical Reviewer — Cycle 3 (Independent Review of Rev 3 Motor Driver + Reaction Wheel Enclosure Redesign, 2026-09-11)
+
+### Review Cycle Metadata
+
+- **Design revision reviewed**: `hardware/mechanical/bench-imu-01-enclosure.scad`
+  (full parametric OpenSCAD source, 991 lines, up from Rev 2's 483) together
+  with its companion `hardware/mechanical/bench-imu-01-dimensional-spec.md`
+  (914 lines, up from Rev 2's 570), both at **"Rev. 3"** status — a full
+  redesign adding a Motor Driver + Reaction Wheel subsystem to the previously
+  Design-Complete Rev 2 board. Author: Mechanical Lead (AI agent), commit
+  `c5ac653` ("Mechanical Design (Rev 3): full enclosure redesign for motor +
+  flywheel"), dated 2026-08-31 (independently confirmed via `git log` this
+  cycle, not assumed). Status at handoff: dimensional-spec §15 self-check
+  claims "10/10 ✅" (explicitly disclosed as non-binding), §16 lists open
+  items carried forward, and the design's own report to the Hardware Lead
+  additionally self-discloses two items flagged specifically for this
+  review's attention: a pre-existing Rev 2-origin base-tab/lid-skirt solid
+  interference explicitly left unfixed (out of scope for the Rev 3 task),
+  and a new borderline motor-wire bridge span (9.0–9.42mm against the
+  design's own 10mm max-bridge-span rule, described as "90–94% of limit").
+- **Reviewer**: Mechanical Reviewer — see
+  `.github/agents/mechanical-reviewer.agent.md`. Independent of the
+  Mechanical Lead role/session that authored this design. This is the first
+  Mechanical Reviewer cycle to examine the **Rev 3** scope specifically
+  (Rev 2's own enclosure was reviewed and closed out across Mechanical
+  Reviewer Cycle 1/Cycle 2 above, both fully RESOLVED per `open-issues.md`
+  MISS-001 through MISS-004; MISS-005/006/007 remain open but LOW/MEDIUM and
+  non-gating, carried forward unchanged since Rev 3 did not touch that
+  geometry). Rev 3 is a full redesign adding an entire new subsystem, not a
+  delta on the Rev 2 geometry alone, so this cycle treats it as a full-scope
+  review rather than a changed-area-only pass.
+- **Independence statement**: No claim in
+  `bench-imu-01-dimensional-spec.md`'s own §3/§7/§8/§11/§12/§13/§15 self-check
+  was accepted on the strength of its stated confidence or its "10/10 PASS"
+  self-check claim. Every arithmetic claim in scope for this cycle — REQ-306's
+  radial *and* axial clearance, the full Z-height stack driving overall
+  assembled height, both of the Mechanical Lead's own self-disclosed items,
+  the REQ-403 containment disposition's specific claims, the new 3-piece
+  assembly's joints, and the off-board motor-mounting ASSUMPTION's
+  consistency — was independently re-derived this cycle directly from the
+  raw, line-numbered `.scad` source and cross-checked against
+  `hardware/mechanical-interface.md`, not re-read from the dimensional-spec
+  document's own prose and nodded along. One self-correction is disclosed
+  here for full transparency, consistent with the adversarial mandate
+  applying to this reviewer's own draft conclusions and not only to the
+  design document's: an early working note in this same review initially
+  mis-recalled REQ-306's clearance-margin figures (+8mm radial / +3mm axial)
+  as an interface-file **CONFIRMED** value; re-checking
+  `hardware/mechanical-interface.md` §B5 directly (line 516) before
+  finalizing any finding showed they are explicitly labeled **"Proposed
+  clearance margin (ASSUMPTION)"** — the `.scad` file's own comments already
+  correctly match this ASSUMPTION labeling, so this did not become a
+  labeling-defect finding, but the correction itself is recorded as evidence
+  the independence mandate was actually exercised, not merely asserted.
+- **Scope**: Full Rev 3 design —
+  `hardware/mechanical/bench-imu-01-enclosure.scad` and
+  `hardware/mechanical/bench-imu-01-dimensional-spec.md` in full, cross-checked
+  against `hardware/mechanical-interface.md` in full (Board Geometry, M1
+  motor CONFIRMED dimensions, flywheel ASSUMPTION dimensions, REQ-306
+  clearance-envelope margins, B1/B3 Open Items). `requirements/requirements.md`'s
+  Rev 3 mechanical/safety requirements (REQ-306, REQ-307, REQ-308, REQ-309,
+  REQ-403) read in full for acceptance-criteria context. Electronics-side
+  Rev 3 changes (`hardware/schematic/` — U6 Motor-Rail Supervisory Controller,
+  motor driver, etc.) were **not** re-reviewed here; that is the Electronics
+  discipline's own Cycle 3/4/5 scope, already closed out above. This cycle
+  takes the electrical interface as given (as published in
+  `hardware/mechanical-interface.md`) and reviews only the mechanical
+  response to it, per this agent's own defined scope boundary.
+- **Tooling disclosure**: Unlike Mechanical Reviewer Cycle 1/Cycle 2 (which
+  explicitly disclosed no OpenSCAD/CAD rendering tool was available in that
+  environment), this cycle independently confirmed a real, working `openscad`
+  2026.08.30 binary **is** available in this environment
+  (`/opt/homebrew/bin/openscad`), together with a working Python geometry
+  stack (`trimesh`/`numpy-stl`/`rtree`, installed into a scratch venv after
+  the system Python's PEP-668 policy blocked a direct `pip install`). This
+  materially raised the rigor available this cycle: rather than hand/formula
+  tracing alone, this cycle **rendered the full assembled design** (confirmed
+  an exact match to the dimensional-spec's own claimed manifold stats — Genus
+  6, 4610 vertices, 9240 facets — corroborating that the stated self-check
+  render is genuine, not fabricated) and separately rendered/`intersection()`
+  -tested two specific sub-geometries directly — the flywheel-bay `base()`
+  module alone, and a standalone reproduction of the hub-collar/disk Z-stack
+  using literal values transcribed from the real file — to empirically
+  confirm two findings (MISS-008, MISS-009) that would otherwise have rested
+  on formula-tracing alone. Methodological note: OpenSCAD's `use <file>`
+  statement imports only modules/functions, not top-level variables, so the
+  two empirical sub-geometry checks used small standalone scratch `.scad`
+  files with literal values hardcoded from the real file's own named
+  parameters at the cited line numbers, rather than importing the real file
+  directly — the literal values themselves are transcribed directly from the
+  real file and cited by line number in each finding below, so this is a
+  disclosed methodological detail, not a shortcut around checking the actual
+  design.
+- **Parallel sub-scans run**: None dispatched as separate sub-agent scans
+  this cycle — the full 10-item checklist plus the task's 5 specified focus
+  areas (REQ-306 arithmetic, the 2 self-disclosed items, the REQ-403
+  disposition, the new 3-piece assembly joints, and the motor-mounting
+  ASSUMPTION's consistency) were worked as a single integrated pass by this
+  Mechanical Reviewer.
+- **rubber-duck premise review run in parallel?**: Not indicated as run for
+  this cycle on the Mechanical discipline. This report does not rely on or
+  duplicate any such review.
+- **KiCad / CAD tool cross-checks used**: None — no KiCad project exists for
+  Bench-IMU-01 (unchanged since Mechanical Reviewer Cycle 1's own note); this
+  cycle's CAD cross-check was instead performed with the now-available
+  `openscad` binary directly against the actual `.scad` source, as described
+  in Tooling disclosure above.
+
+### Checklist Results
+
+Full checklist per `.github/skills/mechanical-review/SKILL.md`, all 10 items
+independently worked (not a partial spot-check), plus the 5 task-specified
+focus areas folded into the relevant checklist rows below:
+
+| # | Checklist item | Result | Notes |
+|---|---|---|---|
+| 1 | PCB mounting (standoff positions/diameters, boss integrity) | **PASS** | Independently re-derived against `hardware/mechanical-interface.md`'s Mounting table — unchanged from Rev 2's already-RESOLVED MISS-001-adjacent geometry; no Rev 3 change touched the PCB standoffs themselves. No new finding. |
+| 2 | Connector accessibility (cutout position/size/orientation) | **PASS** | J1–J4/SW1/D1 cutouts independently re-checked against §10's connector table; MC-1's disclosed 42mm interior wire run (the motor/encoder connector) is honestly stated as long-but-workable in the source document and independently confirmed to be an accurate, not understated, figure. No new finding — the *routing path* for MC-1's wiring is a separate defect, see item 4/7 (MISS-009) below. |
+| 3 | Component height clearance (top + bottom vs. interface file) | **FAIL — MISS-008 (CRITICAL)** | Radial clearance (checklist item 4 below) independently re-verified correct: `fw_bay_inner_r`=39.5mm vs. 38.0mm required (REQ-306), genuine +1.5mm margin beyond the interface's own ASSUMPTION-labeled +8mm radial allowance. **Vertical/axial clearance is not correct**: the Z-stack formula chain computing `fw_disk_bottom`/`fw_disk_top`/`fw_clearance_top` omits the hub collar's own height, producing a physically impossible disk position (see Finding 1). This invalidates §7's specific vertical-clearance claim and the overall-height table in §3, even though the underlying radial arithmetic and REQ-308's ~150mm envelope goal are otherwise fine. |
+| 4 | Internal clearance/interference (parts vs. walls, parts vs. parts, parts vs. bosses) | **FAIL — MISS-008 (CRITICAL), MISS-009 (HIGH), MISS-010 (HIGH)** | Three independent, unrelated interference defects found: (1) flywheel disk/hub-collar solid interpenetration (MISS-008); (2) the motor-wire duct's void is never actually subtracted from the enclosure's outer solids, so the intended wire path is itself solid material (MISS-009); (3) the pre-existing, self-disclosed Rev-2-origin base-tab/lid-skirt interference (MISS-010), confirmed still present and confirmed to have no tracked backlog entry. Motor-mount bolt geometry (4×M3 at (fw_cx±6, fw_cy±6)) independently re-checked clear of both the 15.5mm platform edge (5.3mm margin) and the central shaft hole — no defect found there. Cap-fastener bolt-circle (6×M3 at r=48.0mm, 0/60/120/180/240/300°) independently re-checked clear of the wire bridge (~24.85mm at its closest, ~90°) and of everything else — no defect found there either. |
+| 5 | Fastener placement (wall thickness around bosses; no conflicts) | **PASS**, with a load-verification caveat carried under item 9 | All 3 fastener classes (6×M2.5 PCB lid, 4×M3 motor mount, 6×M3-into-heat-set-inserts cap) independently re-checked for physical placement conflicts — none found; each boss has adequate surrounding wall material and no boss/fastener pair collides with another. The design's own explicit disclosure that no fastener-*load* calculation was performed (§12) is a real gap but is a rigor/verification finding, not a placement defect — tracked as MISS-011 under item 9, not here. |
+| 6 | Wall thickness (structural *and* the Lead's own stated 3D-printability rule) | **Finding — MISS-010 (HIGH)** for the pre-existing tab/skirt zone; otherwise **PASS** | The containment wall itself (`containment_wall_t`=4.0mm = 2×`min_wall_t`) independently re-confirmed to meet and exceed the stated 2.0mm print-safety minimum everywhere along its continuous annulus — no thin spot found by direct radial re-measurement at every angular sample checked. The one wall-thickness-adjacent defect this cycle is MISS-010, a pre-existing solid-solid *interference* (too little clearance, not too little wall) at the base-tab/lid-skirt joint — tracked there, not duplicated here. |
+| 7 | Assembly order (physically achievable sequence, nothing trapped) | **FAIL** | §14's 6-step sequence independently re-walked against the corrected-vs-as-modeled geometry: **Step 5** ("slide the flywheel disk onto the hub collar") is not physically achievable as modeled, because the disk's own modeled Z-position already overlaps the collar's modeled volume before any sliding occurs (MISS-008). **Step 4** (route the motor/encoder wiring through the wire duct before closing the PCB lid) is not physically achievable as modeled either, because the duct itself is solid material along its intended path (MISS-009). No part is found permanently trapped with zero access once these two defects are corrected — the underlying 3-piece order (Base → PCB Lid → Containment Cap) is otherwise sound and each piece independently confirmed accessible for fastening in sequence. |
+| 8 | Basic print-fit tolerance (stated clearance allowance applied consistently everywhere) | **PASS** | The design's own stated 0.2mm/side `fit_clearance` independently re-checked at every piece-to-piece mating interface this Rev 3 assembly actually has: (a) base-wall/PCB-lid-skirt joint (unchanged from Rev 2, where this convention was already independently verified) — consistent; (b) the new cap-skirt/base-flange joint (§11.F) — independently re-confirmed the same 0.2mm/side allowance is applied here too, not merely asserted; no interface found where the allowance is claimed once and silently dropped elsewhere. |
+| 9 | Basic manufacturability/3D-printability (overhangs/bridges within the Lead's own rule; min wall thickness everywhere) | **Finding — MISS-011 (MEDIUM)** | The self-disclosed borderline motor-wire bridge span (9.0–9.42mm) was independently re-derived from the `.scad` file's own duct-span geometry and confirmed to fall within, not beyond, the design's own stated 10mm max-bridge-span rule (94.2% of the limit at worst, not over it) — no new finding on the bridge span itself; this is disclosed correctly and does not need reclassifying. The one manufacturability finding this cycle is separate: the REQ-403 containment disposition's specific wall-thickness/fastener-retention adequacy claims rest on qualitative reasoning, not any impact-energy or pull-out-under-shock calculation, and this gap is disclosed 3 times in the source document itself (§8/§12/§13.3) but was not yet entered into the tracked backlog — MISS-011. Min wall thickness independently spot-checked at multiple points beyond the single reference wall the design document itself cites (containment wall, PCB-lid roof, cap flange, base floor) — no location found below the stated 2.0mm minimum other than the already-tracked pre-existing MISS-010 interference zone (which is an interference, not a thin-wall, defect) and Rev 2's own already-tracked MISS-007 (unchanged, LOW-adjacent-MEDIUM, non-gating, carried forward). |
+| 10 | Interface-value traceability (every dimension traces to `hardware/mechanical-interface.md` or is explicitly ASSUMPTION/ESTIMATE, never silently blended with CONFIRMED) | **PASS** | Independently spot-checked the highest-stakes labels in this revision: M1 motor body dimensions (CONFIRMED, DS-MTR-021, correctly labeled throughout both the `.scad` comments and the dimensional-spec); flywheel dimensions (ASSUMPTION, correctly labeled throughout); REQ-306's own +8mm radial/+3mm axial clearance margins (ASSUMPTION per interface line 516 — see the Independence statement's self-correction above — correctly labeled as ASSUMPTION in both the `.scad` file's comments and the dimensional-spec, not silently upgraded to CONFIRMED anywhere found); the 4×M3/16mm motor bolt-pattern (the interface file's own Open Item B1, left OPEN by the Circuit Engineer) is consistently and explicitly labeled as the Mechanical Lead's own unconfirmed ASSUMPTION everywhere this cycle found it used (`.scad` header comments, dimensional-spec §4/§8/§16) — no location found where it is silently treated as settled/CONFIRMED. No mislabeling defect found. |
+
+### Findings
+
+#### Finding 1 — Flywheel disk Z-stack formula omits hub-collar height, producing a physically impossible disk position
+
+- **Issue**: `fw_disk_bottom` — the parameter that positions the bottom face
+  of the flywheel disk — is computed as
+  `fw_motor_bell_top + fw_hub_standoff` (=28.5+3.0=31.5mm), which omits the
+  hub collar's own height (`fw_hub_collar_h`=6.0mm) entirely. As modeled, the
+  disk's bottom 3.0mm occupies the same space as the top 3.0mm of the hub
+  collar it is supposed to rest on top of.
+- **Rationale**: The same `.scad` file, elsewhere, computes the shaft length
+  the motor needs to expose as
+  `fw_shaft_exposed_len_needed = fw_hub_collar_h + fw_hub_standoff` (=9.0mm,
+  line 392) — a formula that only makes sense if the collar sits *above* the
+  standoff and the disk sits *above* the collar (i.e., additively stacked:
+  standoff, then collar, then disk). `fw_disk_bottom`'s own formula
+  contradicts this internally within the same file: it positions the disk as
+  if the collar's height were zero, directly at the top of the standoff,
+  rather than at the top of the collar. This is not a matter of
+  interpretation or a rounding/tolerance question — it is an internal
+  self-contradiction between two formulas in the same source file, one of
+  which (line 392) treats collar height as additive and one of which (line
+  565) does not.
+- **Datasheet Source**: `hardware/mechanical/bench-imu-01-enclosure.scad`
+  lines 384–392 (`fw_hub_standoff`=3.0mm DERIVED, `fw_hub_collar_h`=6.0mm
+  ASSUMPTION, and the file's own
+  `fw_shaft_exposed_len_needed = fw_hub_collar_h + fw_hub_standoff` formula)
+  cross-referenced against lines 561–574 (`fw_disk_bottom`, `fw_disk_top`,
+  `fw_clearance_top` — the Z-stack formula chain containing the omission);
+  `bench-imu-01-dimensional-spec.md` §14 Assembly Step 5 ("slide the flywheel
+  disk onto the hub collar," independently re-quoted from the source text,
+  not paraphrased) and §7 (the REQ-306 vertical-clearance claim, which
+  depends on the now-shown-incorrect `fw_disk_top`/`fw_clearance_top`
+  values).
+- **Failure Mechanism**: Empirically confirmed, not just formula-traced: a
+  standalone `.scad` file was built this cycle with the exact literal Z
+  values the real file's own formulas produce (collar Z=[28.5, 34.5], disk
+  Z=[31.5, 36.0]) and rendered through the real `openscad` binary available
+  in this environment. `intersection()` of the two solids produced a genuine,
+  fully manifold overlap solid — not an empty result, not a degenerate
+  sliver — with volume ≈145.0mm³ via `trimesh` (vs. 150.8mm³ by hand
+  calculation, a difference within normal STL-facet-discretization tolerance,
+  the same tolerance class already precedented by the RESOLVED MISS-002
+  finding's own volume cross-check). The overlap's Z-bounds are exactly
+  [31.5, 34.5] — precisely the disk's bottom 3.0mm and the collar's top
+  3.0mm, matching the hand-derived prediction exactly. A second reading was
+  also independently ruled out this cycle: one might ask whether the collar
+  is simply meant to sit fully *inside* the disk's hollow bore rather than
+  below it — but the collar's own height (6.0mm) exceeds the disk's own
+  thickness (4.5mm), so the collar cannot be fully contained within the
+  disk's Z-envelope either; there is no consistent geometric reading under
+  which both parts occupy their stated positions without interference. As
+  literally modeled — and as the assembly instructions' own wording requires
+  (the disk must slide onto/over the collar's full height before coming to
+  rest on top of it) — the disk cannot occupy the Z-position the file
+  assigns it without physically colliding with the collar first.
+- **Affected Component**: Flywheel disk (`fw_disk_bottom`/`fw_disk_top`);
+  hub collar (`fw_hub_collar_od`/`fw_hub_collar_h`); every parameter
+  downstream of `fw_disk_top` in the Z-stack (`fw_clearance_top`, the
+  containment wall's own height, REQ-306's vertical-clearance claim, and the
+  REQ-403 containment envelope's specific sizing).
+- **Recommended Fix**: Correct `fw_disk_bottom` to
+  `fw_motor_bell_top + fw_hub_standoff + fw_hub_collar_h`
+  (=28.5+3.0+6.0=**37.5mm**, not the current 31.5mm), and propagate the
+  resulting +6.0mm shift through `fw_disk_top` (=**42.0mm**, not 36.0mm) and
+  `fw_clearance_top` (=**45.0mm**, not 39.0mm). Because the corrected
+  `fw_clearance_top` (45.0mm) now exceeds the current `fw_cap_outer_top`
+  (43.0mm) by 2.0mm, the cap's overall height — and therefore the assembly's
+  overall Z-envelope, §3's height table, and the containment wall's own
+  height — must also grow by at least 2.0mm plus wall thickness to keep the
+  flywheel disk actually enclosed under corrected geometry. This is not a
+  local, one-line fix: it cascades through the entire vertical stack above
+  the motor bell and must be re-verified end-to-end (REQ-306 vertical
+  margin, REQ-403 containment envelope, overall assembled height, and the
+  §14 assembly sequence) once corrected, not just patched at the single point
+  of the original error.
+- **Severity**: **CRITICAL** — per `docs/architecture.md` §7.1, this design
+  fails under its own normal, as-documented assembly sequence (Step 5), not
+  under a rare or marginal corner case: the flywheel literally cannot be
+  assembled as the design's own instructions describe without either the
+  collar or the disk being forced into a physically impossible position.
+  Blocks PASS.
+
+#### Finding 2 — Motor-wire duct void is never actually subtracted from the enclosure's outer solids; the documented cable-routing path is solid material
+
+- **Issue**: `motor_wire_bridge()`'s duct-void cylinder is only subtracted
+  from that module's own local bridging cube. It is never differenced
+  against `fw_bay_wall()`'s solid containment-wall annulus or
+  `pcb_bay_base()`'s south wall, both of which independently occupy the same
+  duct footprint along the intended cable path.
+- **Rationale**: `base()` (lines 850–857) is coded as a flat `union()` of 4
+  solids (floor, motor platform, flywheel-bay wall, PCB-bay base) with no
+  top-level `difference()` applied anywhere for the duct void — the void
+  subtraction happens only inside `motor_wire_bridge()`'s own return value,
+  before that module's result is unioned (not differenced) into the rest of
+  `base()`. A `union()` of an already-voided local solid with other,
+  unrelated solid geometry does not project that local void through the
+  other solids; each of those other solids remains fully solid wherever it
+  happens to occupy the same X/Y/Z region as the intended duct.
+- **Datasheet Source**: `hardware/mechanical/bench-imu-01-enclosure.scad`
+  lines 770–857 (`fw_bay_wall()`, `motor_wire_bridge()`, `base()` — the
+  `union()`-only construction independently confirmed directly from the
+  source, not inferred); `bench-imu-01-dimensional-spec.md` §10 (connector
+  accessibility table, MC-1 row, describing this as a functional wire path)
+  and §14 Assembly Step 4 (routing the motor/encoder wiring through this
+  duct before closing the PCB lid).
+- **Failure Mechanism**: Empirically confirmed via a rendered `base()`-only
+  geometry (independently re-rendered this cycle through the real `openscad`
+  binary, matching `Status: NoError, Genus: 6, Vertices: 808, Facets: 1636`)
+  and a `trimesh` point-containment sweep along the duct's own intended air
+  path (Y=92–95mm, r=39.5–42.5mm, taken directly from the duct's own stated
+  span in the source): every sampled point along this path returns **solid**,
+  not void, at two independent locations along the same nominal path — the
+  containment-wall annulus itself (`fw_bay_wall()`), and, a short distance
+  further along the same path, the PCB bay's own south wall
+  (`pcb_bay_base()`) independently re-blocking it a second time. The
+  motor/encoder wiring the design's own assembly instructions direct through
+  this "duct" has no physical passage to travel through as modeled; the wire
+  would have to pass through solid printed plastic, which is not possible
+  without post-print modification (e.g. hand-drilling) not described
+  anywhere in the design.
+- **Affected Component**: `motor_wire_bridge()` (local duct cutout only, not
+  propagated); `fw_bay_wall()` (containment-wall annulus); `pcb_bay_base()`
+  south wall; `base()` (top-level union lacking a corresponding top-level
+  difference); MC-1 motor/encoder wire connector's documented routing path.
+- **Recommended Fix**: Apply the duct-void subtraction at the top level of
+  `base()`'s own construction — e.g. wrap the relevant portion of `base()`
+  in a `difference()` that removes the duct cylinder from the union of
+  `fw_bay_wall()` and `pcb_bay_base()` as well as from
+  `motor_wire_bridge()`'s own local cube — then re-verify via a render plus
+  a containment sweep (as independently performed in this review, not a
+  visual inspection alone) that the full Y=92–95mm / r=39.5–42.5mm path is
+  void end-to-end after the fix, not merely void within
+  `motor_wire_bridge()`'s own local solid as it is today.
+- **Severity**: **HIGH** — per `docs/architecture.md` §7.1, this is a real,
+  likely-to-occur defect under completely normal assembly (not a rare
+  corner case), defeating an explicitly planned wiring path (§10 MC-1, §14
+  Step 4) — but it is neither an unconditional first-power-on failure of the
+  board's core function nor a safety hazard, and a practical (if inferior)
+  workaround exists (routing the motor/encoder wiring external to the
+  enclosure rather than through the intended internal duct), consistent with
+  the HIGH rather than CRITICAL definition.
+
+#### Finding 3 — Pre-existing Rev 2-origin base-tab/lid-skirt solid interference (~190mm³) is disclosed but was never entered into the tracked backlog
+
+- **Issue**: A genuine, ~190.06mm³ solid-solid interference between
+  `base_tabs()` and `lid_shell()`'s skirt band exists at all 4 corners of
+  the primary lid/base joint. This defect pre-dates Rev 3 (it is a Rev
+  2-origin defect, explicitly self-disclosed as out of scope for the Rev 3
+  motor/flywheel task in the design document's own §11.C, and explicitly
+  flagged there for this review's attention) — but a full re-read of this
+  file's entire existing backlog (ISS-001 through ISS-026, MISS-001 through
+  MISS-007) confirms **no entry currently tracks it**.
+- **Rationale**: The overlap sits between `base_tabs()`'s Z=[15.5, 21.1]
+  (global) and `lid_shell()`'s skirt band Z=[18.1, 21.1] (global) — a
+  genuine 2.0mm-deep (Y), 3.0mm-tall (Z) solid-solid interference at each of
+  the 4 corners. Independently reproduced by hand from the disclosed
+  geometry: 2.0mm × 3.0mm × 8mm tab width × 4 corners = 192mm³, matching the
+  disclosed 190.06mm³ within normal fillet/rounding tolerance — the
+  disclosed root-cause narrative and volume figure are independently
+  confirmed accurate, not merely re-cited. Being disclosed in prose inside a
+  design document is not the same as being tracked in
+  `validation/open-issues.md` — the one backlog that actually gates Design
+  Complete per `docs/architecture.md` §8 and is machine-checked by
+  `tools/check_open_issues.py` — and this defect was in neither
+  `ISS-001`–`ISS-026` nor `MISS-001`–`MISS-007` before this cycle.
+- **Datasheet Source**: `bench-imu-01-dimensional-spec.md` §11.C (full
+  root-cause narrative, self-disclosed this revision); `validation/open-issues.md`
+  (full re-read this cycle, ID range ISS-001–ISS-026, MISS-001–MISS-007 —
+  confirmed no existing row references this defect by geometry, component,
+  or volume figure).
+- **Failure Mechanism**: At each of the 4 corners, the base tab's own solid
+  volume and the lid skirt's own solid volume occupy an overlapping
+  2.0mm × 3.0mm region — two solids the design intends to be separate,
+  mating parts cannot occupy the same space. If sliced and printed exactly
+  as modeled, the lid cannot seat fully onto the base at any of the 4
+  corners without either forcibly deforming/crushing ~190mm³ of printed
+  material or the corner remaining proud/unseated — likely surfacing as a
+  visibly non-flush lid-to-base fit and/or interference with that corner's
+  own fastener engagement (the same fastener joint MISS-004 already
+  addresses, RESOLVED in Rev 2). This is directly analogous in class — a
+  real, fit-blocking, mating-face solid interference — to the already-
+  RESOLVED MISS-002 finding (degenerate base-tab gusset, also a base-tab
+  defect), not to the smaller, non-blocking MISS-007 class (a thin-but-
+  independently-usable isthmus with no actual overlap).
+- **Affected Component**: `base_tabs()` and `lid_shell()`'s skirt band, all
+  4 corners (`bench-imu-01-enclosure.scad`) — the same base/lid mating-face
+  joint MISS-002/003/004 already govern.
+- **Recommended Fix**: Apply the same fix pattern already proven on this
+  exact joint this project (MISS-002/003/004's resolution): resize or
+  reposition either `base_tabs()`'s Z-extent/Y-position or `lid_shell()`'s
+  skirt-band Z-extent so the two solids no longer share the same
+  2.0mm × 3.0mm region at any of the 4 corners, then re-verify via a full
+  render plus a boolean `intersection()` check (zero-volume expected)
+  rather than a hand estimate alone — matching the rigor already used to
+  close out MISS-002.
+- **Severity**: **HIGH** — per `docs/architecture.md` §7.1, a real,
+  structurally-blocking mating-face interference at all 4 corners of the
+  primary lid/base joint, not a rare corner case and not merely thin or
+  degraded. Assessed by direct analogy to the already-RESOLVED MISS-002
+  precedent (same defect class: solid-solid interference at a load-bearing
+  mating/fastening feature), not the MEDIUM MISS-007 precedent (a thin-but-
+  usable isthmus, not an actual overlap). Rated HIGH and left OPEN rather
+  than silently treated as already-accepted, since a HIGH finding can only
+  be dispositioned RESOLVED or ACCEPTED-RISK with a named human Chief
+  Engineer sign-off per this file's own Rules section — neither has happened
+  for this specific defect yet, even though it has existed since Rev 2.
+
+#### Finding 4 — REQ-403 containment disposition's specific wall-thickness/fastener-retention claims rest on qualitative reasoning, not an impact/shock calculation
+
+- **Issue**: The REQ-403 safety disposition's reasoning for why a 4.0mm
+  containment wall (=2× the design's own general-purpose print-safety
+  minimum) and 6×M3 heat-set-insert cap fasteners are adequate specifically
+  against a detached-flywheel impact is stated qualitatively — not derived
+  from the disposition's own stated ~122J/100g kinetic-energy hazard figure
+  via any impact-energy-absorption, wall-deflection-under-impact, or
+  fastener-pull-out-under-shock calculation.
+- **Rationale**: The document discloses this gap itself, honestly, in three
+  separate places (§8, §12, §13.3) rather than silently asserting rigor it
+  did not perform — this is a disclosure/verification-rigor gap on a
+  safety-critical claim, not a proven physical defect (no calculation has
+  been performed showing the wall or fasteners are actually inadequate
+  either). REQ-403's own process is explicitly designed to have a human
+  safety reviewer weigh exactly this kind of qualitative-vs-rigorous
+  judgment call before Design Complete — this finding's purpose is to ensure
+  that gap is visible to that reviewer via the tracked backlog, not just
+  buried in three separate footnotes of a design document.
+- **Datasheet Source**: `bench-imu-01-dimensional-spec.md` §8 (REQ-403
+  disposition narrative and physics table — independently reproduced this
+  cycle and confirmed arithmetically correct as far as it goes), §12
+  (fastener-placement table, explicit "no fastener-load calculation
+  performed" self-disclosure), §13.3 (explicit self-disclosed lack of
+  print-orientation-vs-impact-load analysis for the cap).
+- **Failure Mechanism**: Not an active/demonstrated failure — a verification
+  gap. The disposition argues qualitatively ("substantially thicker than
+  structural minimum," "multiple fasteners provide redundancy") rather than
+  quantitatively; if the wall or fasteners were in fact inadequate against
+  the stated hazard energy, the failure mode would be containment breach
+  under a real detachment event — but this review found no basis, either in
+  the source document or independently, to conclude they *are* inadequate,
+  only that adequacy has not been demonstrated by calculation.
+- **Affected Component**: Containment wall (`containment_wall_t`=4.0mm);
+  6×M3 heat-set-insert cap fasteners; the REQ-403 safety disposition
+  (`bench-imu-01-dimensional-spec.md` §8) as a whole.
+- **Recommended Fix**: Before this proposal is brought to the human safety
+  reviewer, either (a) perform a basic impact-energy/wall-deflection or
+  fastener-pull-out-under-shock estimate tied to the disposition's own
+  ~122J/100g figure (even an order-of-magnitude hand calculation would
+  materially strengthen the disposition's credibility), or (b) explicitly
+  carry the qualitative-only status forward as a named, disclosed limitation
+  in the material presented to the human reviewer, so that reviewer's
+  decision is made with full awareness that the specific numbers are not
+  independently load-verified — only the general topology (continuous wall,
+  no rotation-plane opening, independently confirmed true this cycle — see
+  Positive Findings below) is.
+- **Severity**: **MEDIUM** — non-gating. Per `docs/architecture.md` §7.1,
+  this is a disclosed rigor/traceability gap on a proposal still pending
+  human review, not an independently-demonstrated physical defect in the
+  current geometry — no confirmed malfunction or hazard has been shown, only
+  an absence of the calculation that would rule one out. Must still be
+  explicitly surfaced to the human REQ-403 safety-review gate rather than
+  silently dropped, since that gate is exactly where this class of
+  qualitative-vs-rigorous judgment call belongs.
+
+### Positive Findings
+
+Credited explicitly, since an adversarial review should also record what
+independently checks out, not only what does not:
+
+- **REQ-403's containment-topology claim independently verified TRUE**: the
+  claim that the containment design provides "a continuous 4mm wall, no
+  rotation-plane opening, bolted cap" was independently re-derived from the
+  containment wall's own radial/angular geometry (continuous annulus,
+  r=39.5–43.5mm, Z=2.0–39.0, no gap or seam found anywhere in its angular
+  sweep) and from the cap-fastener bolt-circle's own angular positions
+  (0/60/120/180/240/300°, none of which coincide with or require an opening
+  in the rotation plane itself). This specific claim holds up under
+  independent scrutiny — it is the *specific vertical sizing* built on top
+  of this correct topology (Finding 1) and the *specific load-adequacy*
+  claims (Finding 4) that do not yet independently check out, not the
+  topological claim itself.
+- **Two of the Mechanical Lead's own self-check catches, independently
+  re-confirmed as genuine and correctly fixed**: Error #3 (a wire-bridge/
+  motor collision) and Error #4 (a missing floor disc) are both confirmed,
+  by direct inspection of the current source, to be correctly resolved in
+  the geometry as it stands today — good technique on the Mechanical Lead's
+  part, simply not extended to the separate wire-duct defect this cycle
+  found (MISS-009, a bug in the same general area but not the same specific
+  geometry Error #3 addressed).
+- **Interface-value traceability (checklist item 10) is clean**: no
+  ASSUMPTION/CONFIRMED/ESTIMATE mislabeling found anywhere this cycle
+  checked, including at the specific point (REQ-306 margins) where this
+  reviewer's own first-pass note briefly got it wrong before independent
+  re-verification — see the Independence statement above.
+- **Cap-skirt/base-flange fit interface (§11.F) independently re-confirmed
+  correct**: the new 3rd piece's own mating interface (Containment Cap to
+  Base flange) was independently re-derived and found to correctly apply
+  the same 0.2mm/side `fit_clearance` convention already used elsewhere —
+  this is the newest joint in the design (introduced this revision) and it
+  received the same rigor as the older, already-proven base/lid joint (see
+  checklist item 8).
+- **Motor-mount bolt geometry independently confirmed safe**: the 4×M3
+  motor-mount bolt holes (at (fw_cx±6, fw_cy±6), radius 8.485mm from the
+  platform center) are independently re-confirmed clear of both the 15.5mm
+  platform edge (5.3mm margin) and the central shaft hole, and the
+  off-board/bracket-mounted motor-mounting approach's own ASSUMPTION
+  labeling (4×M3/16mm bolt pattern, unconfirmed) is used consistently
+  throughout the design wherever this reviewer checked for it — no location
+  found where it is silently treated as CONFIRMED.
+
+### Verdict
+
+- **Verdict**: **CONDITIONAL**
+- **Open CRITICAL count**: 1 (MISS-008)
+- **Open HIGH count**: 2 (MISS-009, MISS-010)
+- **Open MEDIUM count (non-gating)**: 1 new this cycle (MISS-011), plus
+  Rev 2's own already-open MISS-007 carried forward unchanged (untouched by
+  Rev 3, not re-litigated here).
+- **What independently checks out with no error found**: PCB mounting
+  (item 1), connector accessibility (item 2), radial clearance under
+  REQ-306 (item 3's radial half), fastener *placement* geometry across all
+  3 fastener classes (item 5), print-fit tolerance applied consistently at
+  every piece-to-piece interface including the new cap joint (item 8),
+  interface-value traceability with no mislabeling anywhere checked
+  (item 10), and — critically for the REQ-403 question this cycle was asked
+  to focus on — the containment design's **topological** claim (continuous
+  wall, no rotation-plane opening, bolted cap) independently verified true.
+- **What's blocking a clean PASS**: MISS-008 (CRITICAL — the flywheel disk's
+  own Z-stack formula omits the hub collar's height, producing a physically
+  impossible disk position that is empirically confirmed, not merely
+  formula-traced, and that invalidates the specific vertical-clearance
+  numbers behind both REQ-306's axial claim and REQ-403's containment
+  envelope sizing) and two HIGH findings (MISS-009 — the motor-wire duct is
+  solid, not void, along its intended path; MISS-010 — a pre-existing,
+  self-disclosed but previously untracked ~190mm³ base-tab/lid-skirt
+  interference).
+- **Also open, non-gating but should be dispositioned before Design
+  Complete**: MISS-011 (MEDIUM — REQ-403's specific wall-thickness/
+  fastener-retention claims rest on qualitative, not calculated, reasoning;
+  honestly self-disclosed by the design document 3 times but not previously
+  tracked).
+- **Independent assessment of the REQ-403 containment proposal's
+  credibility** (the specific question this cycle was asked to answer,
+  since a human safety review is gated on it): The proposal's **general
+  topology is credible** — the claim of a continuous, seamless containment
+  wall with no rotation-plane opening and a bolted (not merely friction-fit
+  or snap-fit) cap is independently re-derived from the actual geometry and
+  confirmed true, not just asserted. However, the proposal's **specific
+  numbers are not yet credible to bring to the human gate as currently
+  written**, for two independent reasons found this cycle: first, MISS-008
+  means the flywheel does not actually fit within the modeled/verified
+  clearance envelope at all under the design's own stated assembly sequence
+  — the specific containment-cap height and clearance figures cited in §8's
+  physics table are computed against a Z-stack that is internally
+  self-contradictory, so those specific numbers cannot be trusted until the
+  Z-stack is corrected and the containment envelope is re-verified against
+  the corrected geometry end-to-end (not just patched locally). Second,
+  MISS-011 means that even once MISS-008 is fixed, the specific
+  wall-thickness and fastener-retention numbers going into that human
+  review still rest on qualitative, not calculated, reasoning — a gap the
+  document already discloses honestly but that has not yet been closed or
+  explicitly flagged for the reviewer's attention via the tracked backlog.
+  **Recommendation: do not bring the REQ-403 disposition to the human safety
+  reviewer yet.** Fix MISS-008 first (the containment envelope's own sizing
+  is not currently verifiable at all until the flywheel's true Z-position is
+  corrected), re-verify the containment envelope against the corrected
+  geometry, and carry MISS-011's disclosed qualitative-only status forward
+  explicitly into whatever is ultimately presented to the human — at that
+  point, the topological soundness already confirmed this cycle plus a
+  corrected and re-verified envelope would make for a materially more
+  credible submission than what exists today.
+- **Next action**: Loop back to the Mechanical Lead (routing decision for
+  the Hardware Lead to make) for MISS-008 (fix the `fw_disk_bottom` formula
+  and propagate the correction through the full Z-stack and containment
+  envelope — CRITICAL, must be fixed before any further progress) and the
+  two HIGH findings MISS-009 (make the wire duct actually void along its
+  full intended path) and MISS-010 (resolve the pre-existing base-tab/
+  lid-skirt interference using the same fix pattern already proven on
+  MISS-002/003/004) at minimum — all three should be resolved before this
+  design proceeds toward a physical print or toward the REQ-403 human safety
+  review. MISS-011 (MEDIUM) should also be addressed or explicitly
+  dispositioned, and in either case explicitly carried into the REQ-403
+  human-review material rather than left implicit.
