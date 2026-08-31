@@ -1,8 +1,119 @@
 # Bench-IMU-01 — Schematic-Equivalent Design Document
 
-**Author**: Circuit Engineer (AI agent) · **Date**: 2026-08-31, revised 2026-09-01 · **Status**: **Revised (Rev 2)** — 3 HIGH findings from Hardware Reviewer Cycle 1 fixed, 2 additional corrections folded in; self-checked against the affected items; **ready for Hardware Reviewer re-review** (not a first review — see `validation/design-review.md` for Cycle 1's full findings and its Addendum)
+**Author**: Circuit Engineer (AI agent) · **Date**: 2026-08-31, revised 2026-09-01, revised 2026-09-04 · **Status**: **Revised (Rev 3)** — new Motor Driver (TI DRV10983) + Reaction Wheel (T-Motor MN2206-13 KV2000) subsystem added on the human-approved Option A power architecture (`hardware/power-architecture.md`, ECO-007); Rev 2's Design-Complete content is otherwise unchanged; **ready for Hardware Reviewer review of the new subsystem** (Rev 2's own content already passed its Cycle-1 re-review — this is new-scope review, not a re-review of unchanged material)
 
 ## Revision changelog
+
+**Rev 3 (2026-09-04)** — Circuit Engineer addition of the Motor Driver +
+Reaction Wheel subsystem, authorized by `validation/change-log.md` ECO-007
+(both HITL gates granted 2026-08-31: component approval of T-Motor
+MN2206-13 KV2000 + TI DRV10983 in `bom/component-selection.md`, and Option
+A power-architecture approval in `hardware/power-architecture.md`). This is
+an **addition cycle**, not a fix cycle — nothing Design-Complete in Rev 2 is
+reopened. New content is concentrated in a new **§7.5** (inserted between
+the existing §7 LED block and §8 Grounding, using decimal numbering so
+every existing §8–§18 anchor/cross-reference in this document and in
+`validation/`, `datasheets/`, and other agents' files stays valid), with
+necessary additive touches to §1, §2, §5, §8, §9, §10, §11, §12, §13, §14,
+§15, §16, §17, and §18 as flagged below. `hardware/power-budget.md`'s
+placeholder Rev 3 motor-rail row is finalized alongside this revision (see
+its own changelog). Per this design's own precedent, `bom/component-
+selection.md`, `requirements/requirements.md`, `hardware/power-
+architecture.md`'s Decision table, `hardware/mechanical-interface.md`, and
+`validation/open-issues.md`/`validation/design-review.md` are **not**
+touched by this agent; `datasheets/evidence-log.md` **is** appended to
+(consistent with this agent's mandate to cite Evidence IDs), gaining rows
+DS-MTR-052 through DS-MTR-070, DS-MCU-064 through DS-MCU-066, DS-CONN-005,
+and DS-PROT-004/005 (25 new rows, 282 total, zero duplicates).
+
+- **New power input (REQ-108)** — A second, independent, dedicated
+  ~12V-class motor power input is added: **J4** (Same Sky PJ-102AH barrel
+  jack, DS-CONN-005) → **D2** (ST STPS3L60 Schottky, series
+  reverse-polarity protection, DS-PROT-005) → **D3** (Littelfuse SMBJ16A
+  TVS, transient/surge protection, DS-PROT-004) → **U5** (TI DRV10983)
+  VCC. Chosen the same way Rev 2 chose J1/the ESD IC (§3.1/§3.2
+  precedent): a single, real, datasheet-grounded part per supporting role,
+  no ≥3-candidate comparison, per this project's own established
+  threshold for supporting (non-primary-BOM) parts. This rail is
+  electrically independent of the existing USB-derived 5V/3.3V logic
+  rail — Option A's fault-isolation intent (`hardware/power-
+  architecture.md`) is preserved; see §7.5 and §8 (grounding) for how the
+  two domains still share a *signal-reference* ground without being
+  power-tied.
+- **New MCU pin allocation (REQ-007/110, REQ-008/112)** — Five pins are
+  newly consumed from Rev 2's free-GPIO inventory (§11): **PA8**
+  (TIM1_CH1, SPEED/PWM output, HIGH confidence), **PA6** (TIM3_CH1 input
+  capture, FG tach input, HIGH confidence), **PB1** (GPIO push-pull
+  output, DIR, HIGH confidence), **PB6**/**PB7** (I2C1_SCL/SDA, HIGH
+  confidence) — real DRV10983 pinout confirmed pin-by-pin
+  (DS-MTR-052): no dedicated enable or fault pin exists on this part (a
+  generic H-bridge driver pin set was **not** assumed); enable/disable is
+  via the SPEED command itself (zero = stop), and fault visibility is
+  I2C-register-only or inferred from FG held high. I2C1 (PB6/PB7),
+  previously recorded as fully free surplus margin from ISS-011's Rev 2
+  correction, is now consumed — reframed from "optional future tuning"
+  to **required for motor-parameter commissioning** (Rm phase-resistance
+  and Kt BEMF-constant registers must be programmed for this specific
+  motor pairing to commutate correctly at all — DS-MTR-070) and for
+  setting `SpdCtrlMd`=1 (PWM mode) for REQ-007 (DS-MTR-068). Wiring the
+  bus is this design's job; programming those values is a firmware/
+  commissioning task (REQ-009 fence preserved).
+- **Grounding (checklist item 15/11; REQ-010, REQ-204)** — Addressed
+  explicitly, not left implicit: §8 is rewritten for a two-domain
+  treatment. The two power rails (existing USB-derived logic, new
+  dedicated motor input) remain independently sourced per Option A, but
+  **must** share one common ground reference at a single star point for
+  the PWM/FG/I2C1 signals between MCU and driver to be valid logic
+  signals at all. Return-current routing and REQ-010/REQ-204 noise
+  isolation from the IMU are discussed as their own consideration, not
+  bundled silently into the rail-independence statement.
+- **Protection (REQ-111/404)** — DRV10983's real protection mechanisms
+  confirmed from its own datasheet (5 distinct mechanisms: OCP, Lock
+  Detection, UVLO, Thermal Shutdown, Voltage-Surge/AVS —
+  DS-MTR-057/058/059/060/061), not assumed to be "on" by default. A
+  correction against `bom/component-selection.md`'s DS-MTR-037 is found
+  and flagged narratively in §7.5.6 and in `datasheets/
+  texasinstruments_drv10983_slvscp6h.md`'s own Update section — **not**
+  self-assigned a new ISS number (per this document's own established
+  precedent that `validation/open-issues.md`/`validation/design-
+  review.md` are Hardware-Reviewer/Hardware-Lead-owned registries; ISS
+  numbers ISS-001 through ISS-013 already exist and none were self-minted
+  by this agent in Rev 2 either).
+- **ECO-007 directive (BEMF/FG low-RPM degradation)** — The human
+  directive that this caveat must be tracked in the Firmware bring-up
+  plan / `validation/fmea.md` (not just the comparison report) is
+  respected: this is primarily a firmware/FMEA item, out of this agent's
+  scope to resolve. One concrete circuit-level fact **is** found and
+  recorded per the agent instructions' "flag it in your design rationale"
+  guidance: the FG output's open-loop behavior is I2C-register-
+  configurable (`FGOLsel[1:0]`, DS-MTR-062) and the open-to-closed-loop
+  transition threshold is likewise register-set (`Op2ClsThr[4:0]`,
+  DS-MTR-063) — real, named hooks a firmware engineer can use, wired and
+  available via this design's I2C1 bus, but not configured by this
+  circuit design (REQ-009 fence).
+- **Mechanical/Thermal co-design (checklist item 18/15; REQ-204/307)** —
+  §9 flips from Rev 2's correct "Explicitly Not Applicable" (no rotating
+  body existed) to real content: the motor is a rotating body. Electrical
+  -side facts relevant to vibration-induced solder-joint/connector stress
+  and to thermal/vibration proximity effects on the IMU's bias stability
+  are recorded for the Mechanical Lead's later attention — this document
+  does not design the mechanical mitigation itself.
+- **Power budget (REQ-109)** — `hardware/power-budget.md`'s placeholder
+  Rev 3 motor-rail row is finalized with this design's actual connector
+  (PJ-102AH) and real DRV10983+motor worst-case current figures, tracked
+  as its own rail, not folded into REQ-103's 3.3V logic budget.
+- **Self-check**: re-run against the full 18-item Circuit Engineer
+  checklist (§14) and the 16-item Hardware Reviewer checklist (§15),
+  explicitly re-covering items 1–9 for the new motor domain. **Precise
+  N/A→real-content flips** (the only items that were genuinely Not
+  Applicable in Rev 2): §14 item 18 (Mechanical/Thermal), §15 item 13
+  (Motor noise) and the "near rotating bodies" portion of item 15 (PCB
+  layout/mechanical-thermal co-design). **Re-checked/updated, not
+  flipped** (these were already applicable in Rev 1/2, just extended for
+  the new motor domain or two-domain system): §14 item 13 (MCU pin
+  function — re-checked for ISS-011/ISS-006 plus the new motor pins) and
+  §15 item 11 (Grounding — updated for the new two-power-domain
+  treatment, §8). See §14/§15 for the item-by-item record.
 
 **Rev 2 (2026-09-01)** — Circuit Engineer rework addressing
 `validation/design-review.md` Cycle 1 findings, per
@@ -105,12 +216,22 @@ it does not unilaterally swap parts.
 | MCU (U1) | STMicroelectronics STM32G031K8T6 | LQFP-32 | Arm Cortex-M0+ ≤64MHz, 64KB Flash + 8KB SRAM, 2×I2C/2×SPI/2×UART, SWD+JTAG, no native USB | DS-MCU-012–021 |
 | IMU (U2) | Bosch Sensortec BMI270 | LGA-14 (2.5×3.0×0.83mm) | 6-axis accel+gyro, I2C≤1MHz FM+ or SPI≤10MHz, VDD ROC 1.71–3.6V / AMR −0.3…+3.6V, VDDIO ROC 1.2–3.6V | DS-IMU-001–017, 070 |
 | LDO (U3) | Texas Instruments TLV75533PDBVR | SOT-23-5 | Fixed 3.3V, Vin ROC 1.45–5.5V / AMR 6.0V, 500mA max, dropout typ220/max238mV@500mA, Iq 25µA | DS-PWR-001–011 |
+| Motor driver (U5) — **new Rev 3** | Texas Instruments DRV10983 | HTSSOP-24 (PWP) | Sensorless 3-phase BLDC driver, VCC ROC 8/24(typ)/28V (AMR −0.3…30V), 2A continuous / 3A peak per phase, integrated I2C-configurable OCP/Lock/UVLO/Thermal/AVS protection, PWM or analog SPEED input, hardware FG tach output | DS-MTR-052–070 |
+| Motor (M1) — **new Rev 3** | T-Motor MN2206-13 KV2000 | Sensorless BLDC, reaction-wheel form factor | 2S–3S (7.4–12.6V), ≈1.05A derived current need for 5mN·m target, 18A continuous rating, no integrated RPM sensor (FG tach comes from the driver's BEMF sensing, not the motor itself) | DS-MTR-001–051 (Component-Engineer-approved candidate research), human-signed-off via ECO-007 |
 
 Requirements are sourced from `requirements/requirements.md` (human
 signed off) and cited by REQ-ID throughout this document. Component
 candidate comparisons live in `bom/component-selection.md` and are not
 repeated here except where a specific cited number (e.g. the LDO thermal
-estimate) is directly reused.
+estimate, or the DRV10983/T-Motor margin figures) is directly reused.
+
+**New this revision (Rev 3)** — the Motor driver (U5) and Motor (M1) rows
+above were Component-Engineer-approved and human-signed-off via ECO-007
+(`validation/change-log.md`) before this design cycle began, per this
+agent's own instructions not to proceed on an unconfirmed part. All
+pinout/register/protection-circuit facts needed to actually wire U5 were
+extracted fresh from TI's primary datasheet (SLVSCP6H) this revision —
+see §7.5 for the full treatment.
 
 **RESOLVED this revision (ISS-010)** — the STM32G031K8T6 VDD Absolute
 Maximum Rating **lower bound**, carried forward from
@@ -135,25 +256,54 @@ Two rails exist on this board:
 - **3V3** — post-regulator, LDO (U3) output, fixed 3.3V (DS-PWR-003).
   Feeds: MCU (U1) VDD/VDDA/VBAT, IMU (U2) VDD/VDDIO, both header 3V3 reference
   pins (SWD J3, UART J2), status LED (D1) via R5, I2C pull-ups (R3/R4).
+- **VM_MOTOR (~12V-class) — new Rev 3** — independent input, from the new
+  barrel jack (J4), nominal 12V (2S–3S LiPo class per REQ-108/Option A),
+  through series reverse-polarity diode D2 and TVS D3, to the DRV10983
+  (U5) VCC pins. **Electrically independent of the 5V/3V3 rails above —
+  no shared regulator, no shared source** (Option A's fault-isolation
+  intent, `hardware/power-architecture.md`). U5's own internal step-down
+  regulator is configured in **linear mode** (§7.5.3) specifically so it
+  cannot supply the MCU/IMU domain, per the task's explicit constraint.
+  See §7.5 for the full power-input block and §17/`hardware/power-
+  budget.md` for the numeric budget.
 
 Single 3.3V logic level throughout (REQ-102, "Should") — no
-level-shifting circuitry anywhere in this design. USB 5V VBUS is isolated
-from all logic by the LDO; USB D+/D− (which would otherwise be a
-5V-tolerance concern) are unpopulated per REQ-105 (power-only port, no
-data), so 5V-tolerance is moot.
+level-shifting circuitry anywhere in this design for the MCU/IMU domain.
+USB 5V VBUS is isolated from all logic by the LDO; USB D+/D− (which would
+otherwise be a 5V-tolerance concern) are unpopulated per REQ-105
+(power-only port, no data), so 5V-tolerance is moot for that domain. The
+new VM_MOTOR domain operates at up to 28V (U5's AMR ceiling, DS-MTR-053)
+internally, but the **signal-level** pins this design's MCU actually
+touches (U5's SPEED/DIR/SCL/SDA/FG pins) are a separate, low-voltage
+digital I/O group with their own ROC (−0.1 to 3.3 nominal/3.6V max,
+DS-MTR-054) — cross-domain voltage compatibility for those specific
+signal pins is analyzed pin-by-pin in §7.5.4, not assumed.
 
 ### 2.2 Ground scheme
 
-**Single ground net/plane for the whole board.** REQ-301 fixes a single
-2-layer PCB (no daughtercards/stacked boards) — for a design this small
-and this simple (3 active ICs, no motor/analog-precision/RF section
-requiring a split or star-ground topology), a single unbroken ground
-pour on one layer is the correct, standard choice, not an oversight. All
-GND pins (U1 VSS×2, U2 GND+GNDIO, U3 GND, U4 GND, R1/R2 CC pull-down
-returns, C1–C9 return sides, both header GND pins, LED cathode return)
-tie to this one net. This is stated here explicitly per the design task's
-own instruction not to leave it implicit (see also §8, Grounding block,
-and §14 item 15/checklist item 11 in the self-check).
+**Single ground net/plane for the whole board — now spanning two
+independent power domains, addressed explicitly (updated this
+revision).** REQ-301 fixes a single 2-layer PCB (no daughtercards/stacked
+boards) — for a design this small (3 active ICs in Rev 2; +1 driver IC
+and 1 motor connector in Rev 3, still a single small board, no
+analog-precision/RF section requiring a split or star-ground topology), a
+single unbroken ground pour on one layer remains the correct, standard
+choice, not an oversight. All GND pins (U1 VSS×2, U2 GND+GNDIO, U3 GND,
+U4 GND, R1/R2 CC pull-down returns, C1–C9 return sides, both header GND
+pins, LED cathode return, and — **new Rev 3** — U5 GND/PGND×2/SWGND, M1's
+motor-frame return where applicable, J4's sleeve/shield return, D2/D3
+return sides) tie to this one net. **New Rev 3 nuance, not present in
+Rev 2**: the two power *rails* (5V/3V3 vs. VM_MOTOR) are deliberately
+independent sources (Option A), but they still tie to this **same**
+ground net/plane — ground is shared even though power is not. This is
+necessary (not optional) for the PWM/FG/I2C1 signals crossing between U1
+and U5 to be valid logic signals at all (a signal referenced to one
+ground and read against a different, unconnected ground is undefined).
+§8 (Grounding block) gives the full two-domain treatment this task
+requires, including return-current routing and REQ-010/REQ-204 noise
+isolation for the IMU — this is stated here explicitly per the design
+task's own instruction not to leave it implicit (see also §14 item 15/
+checklist item 11 in the self-check).
 
 ### 2.3 Pin allocation (summary; full table in §11)
 
@@ -171,19 +321,24 @@ rework/conflicts across blocks:
 | Status LED drive | PA5 | ASSUMPTION — arbitrary free GPIO choice (also the conventional "Nucleo LED" pin on many ST boards), no AF conflict since it's used as plain GPIO output |
 | NRST | NRST (pin 4) | HIGH — dedicated reset pin |
 | BOOT0 | not populated this cycle | see §4.2/§4.4/§16 — **corrected this revision (ISS-006)**: BOOT0 is muxed onto PA14 (already committed to SWCLK above), not PB8; PB8 does physically exist on this package but its function is unrelated (alternate I2C1_SCL) |
+| **SPEED/PWM (new Rev 3)** | **PA8** | **HIGH** (pin name/AF) — TIM1_CH1, AF2, confirmed against DS-MCU-064/Table 13; physical LQFP-32 pin number MODERATE (deferred to layout, see §16) |
+| **FG tach input (new Rev 3)** | **PA6** | **HIGH** (pin name/AF) — TIM3_CH1 input-capture, AF1, FT_ea 5V-tolerant, confirmed DS-MCU-064/066/Table 13; physical pin number MODERATE |
+| **DIR (new Rev 3)** | **PB1** | **HIGH** — plain GPIO push-pull output, no AF conflict; physical pin number MODERATE |
+| **I2C1 SCL (new Rev 3)** | **PB6** | **HIGH** (pin name/AF) — AF6, confirmed DS-MCU-065/Table 14; physical pin number MODERATE; FT_f/Fm+-capable per general-family generalization — MODERATE confidence specifically on the Fm+ tolerance claim, not independently re-confirmed against a Table-18 FT_f line item this session (§16) |
+| **I2C1 SDA (new Rev 3)** | **PB7** | **HIGH** (pin name/AF) — AF6, confirmed DS-MCU-065/Table 14; same physical-pin-number and Fm+-tolerance caveats as PB6 above |
 
 This leaves **USART1 and LPUART1 both free** (only USART2 is used) —
 satisfies the Component Engineer's own note that one of the MCU's 2 UART
 peripherals should remain genuinely free (only 1 of 2 committed here,
 comfortably; actually both USART1 and LPUART1 remain free since USART2 is
-the one consumed — even better margin than "one free" required). **Also,
-new this revision (ISS-011)**: since the IMU bus correctly occupies I2C2
-(not I2C1 as originally labeled), **I2C1 is now recorded as entirely
-free** as well — both of PB10/PB11's I2C1-sibling pin pairs (PB6/PB7
-primary AF, PB8/PB9 secondary AF, DS-MCU-053) remain unused. This is a
-genuine improvement in peripheral margin versus this document's original,
-mistaken understanding — not a regression. See §11 for the full free-GPIO
-inventory.
+the one consumed — even better margin than "one free" required). **Rev 2
+update (ISS-011)**: since the IMU bus correctly occupies I2C2 (not I2C1
+as originally labeled), I2C1 was recorded as entirely free. **Rev 3
+update**: that I2C1 margin is now **consumed** — PB6/PB7 (I2C1 SCL/SDA)
+are wired to U5 for motor-parameter commissioning and `SpdCtrlMd`
+configuration (DS-MTR-070/068; not merely "optional future tuning" — see
+§7.5.4). PB8/PB9 (I2C1's secondary AF pair, DS-MCU-053) remain unused and
+free. See §11 for the full, updated free-GPIO inventory.
 
 ## 3. Block 1 — Power input + regulation
 
@@ -645,6 +800,37 @@ separate VDDIO AMR ceiling distinct from the general ~3.6V figure was
 found in prior research (DS-IMU-006 caveat carried forward, not re-resolved
 this session) — 3.3V sits safely under either reading.
 
+### 5.5 REQ-010 regression check (new Rev 3) — IMU capability unaffected by the motor addition
+
+REQ-010 requires that the existing IMU readout (REQ-001) "shall remain
+unaffected/unregressed" by the Rev 3 motor addition. Checked explicitly,
+not assumed:
+
+- **Bus**: the IMU stays on I2C2 (PB10/PB11); the new motor subsystem's
+  I2C1 (PB6/PB7, §7.5.4) is a **physically distinct peripheral instance**
+  on different pins — no bus sharing, no address collision, no added bus
+  traffic or timing contention on the IMU's own bus.
+- **GPIO**: the five newly-consumed pins (PA8, PA6, PB1, PB6, PB7, §2.3)
+  do not overlap any Rev 2 net (I2C2 PB10/PB11, USART2 PA2/PA3, LED PA5,
+  SWD PA13/PA14, NRST) — confirmed against the full pin table (§11)
+  before allocation, per SKILL.md's "fix shared resources serially first"
+  step.
+- **Supply-noise coupling**: the IMU's 3V3 supply is unchanged (still the
+  LDO's output, §2.1) and the new VM_MOTOR rail is a **separate source**
+  (Option A) — no shared regulator through which motor-switching ripple
+  could couple onto the IMU's supply rail. Ground-return coupling (a
+  different, real mechanism, since both domains do share one ground net)
+  is addressed in §8, not dismissed here.
+- **Vibration**: a genuinely new physical effect (REQ-204), addressed in
+  §9 — not an electrical "regression" of the IMU's own interface, but a
+  new environmental factor the IMU didn't previously have to tolerate.
+
+**Conclusion**: no bus/pin/supply-noise regression found at the interface
+level from this addition. The remaining, real cross-domain coupling paths
+(common-ground return current, motor-vibration-driven mechanical/thermal
+effects) are distinct concerns, tracked in §8 and §9 respectively rather
+than folded silently into this regression check.
+
 ## 6. Block 4 — Host communication (UART header)
 
 **4-pin header (J2): TX / RX / GND / 3V3** (REQ-106), labeled from the
@@ -690,30 +876,467 @@ Satisfies REQ-003 ("visual status/heartbeat LED", Should) — "heartbeat"
 implies firmware toggles PA5 periodically, consistent with driving it as
 a plain GPIO output rather than a passive always-on power-indicator LED.
 
+## 7.5 Block 5.5 — Motor Driver + Reaction Wheel subsystem (new Rev 3)
+
+Inserted as decimal-numbered §7.5 (between §7 Status LED and §8
+Grounding) specifically so every existing §8–§18 cross-reference already
+in this document, and every external reference to those anchors from
+`validation/`, `datasheets/`, and other files, remains valid — no
+renumbering. Implements REQ-007/110 (PWM speed-setpoint interface),
+REQ-008/112 (FG tach wiring), REQ-108 (Option A architecture), REQ-109
+(separate rail tracking), REQ-111/404 (protection), REQ-204/307
+(mechanical/thermal, see §9), on the Component-Engineer-approved,
+human-signed-off (ECO-007) T-Motor MN2206-13 KV2000 + TI DRV10983 pairing
+(§1). **REQ-009 fence respected throughout**: this section wires an
+interface and records commissioning-relevant facts; it contains no
+control-loop logic, no PID, no sensor-fusion-driven behavior.
+
+### 7.5.1 New power input: connector choice
+
+**J4 = Same Sky (formerly CUI Devices) PJ-102AH**, a 2.0mm-center-pin,
+right-angle, through-hole barrel jack, rated **24Vdc / 5.0A**
+(DS-CONN-005). Chosen the same way Rev 2 chose J1 (USB-C) and U4 (the ESD
+IC, §3.1/§3.2): a single, real, datasheet-grounded part for a supporting
+role, no ≥3-candidate comparison — per this project's own established
+threshold ("a real, datasheet-grounded single part is sufficient for
+this supporting role"). A barrel jack is the conventional choice for a
+bench-test DC power input at this voltage/current class (readily
+available mating plugs from bench supplies and LiPo-balance-charger
+accessories); PJ-102AH was selected specifically for having a
+primary-manufacturer datasheet with a complete, unambiguous ratings table
+(unlike several alternatives whose distributor listings lacked a
+directly-fetchable primary datasheet this session).
+
+Rated 24V/5.0A gives **~2× voltage margin** over this design's actual
+~12V-nominal (2S–3S, 7.4–12.6V per the approved motor's own class,
+`bom/component-selection.md`) input and **>4× current margin** over the
+worst-case ≤3A motor-rail draw (DS-CONN-005, §17/`hardware/
+power-budget.md`). The connector's rating is a **safety ceiling for the
+part itself**, not a specification of the external supply the user
+plugs in — exactly as Rev 2's own J1 (USB-C receptacle) does not imply
+this design specifies or BOMs a USB charger. Center pin = **+**, one
+outer terminal = **sleeve/GND**; the datasheet's drawing shows a third
+terminal consistent with a normally-closed switch contact (common in
+this connector class, e.g. for auto-disconnecting an internal battery
+when external power is plugged in) — **deliberately left unpopulated**,
+since no requirement calls for power-presence detection this cycle
+(flagged as a residual layout-time detail, not a blocking unknown, in the
+PJ-102AH metadata file and §16).
+
+### 7.5.2 Protection topology and routing to U5 VCC
+
+Because a barrel jack, unlike the keyed USB-C receptacle, **genuinely can
+be reverse-plugged or fed a wrong-polarity supply by a user** (mirroring
+Rev 2's own §3.3 rationale for why USB-C itself needs no reverse-polarity
+diode), this input gets its own protection stage that Rev 2's USB-C input
+does not need:
+
+**J4 (+) → D2 (STPS3L60, series) → D3 (SMBJ16A, shunt TVS) → U5 (VCC,
+pins 23/24)**, with J4 sleeve/GND, D2/D3 return sides, and U5's
+GND/PGND/SWGND all tied to the single common ground net (§8).
+
+- **D2 = STMicroelectronics STPS3L60** (60V/3A power Schottky rectifier,
+  SMB package, DS-PROT-005), in series, blocks reverse-polarity input.
+  A Schottky (not a standard silicon diode) was chosen for its lower
+  forward-voltage drop, minimizing both conduction loss and the voltage
+  "tax" subtracted from the already-modest motor-rail headroom. 60V/3A
+  rating comfortably exceeds the DRV10983's own absolute-maximum 3A
+  startup/locked-motor current (DS-MTR-056) without being a current
+  bottleneck.
+- **D3 = Littelfuse SMBJ16A** unidirectional TVS (16.0V standoff / 26.0V
+  max clamping voltage @ IPP, SMB package, DS-PROT-004), shunt-connected
+  across VCC/GND downstream of D2, absorbs transient surges (e.g. from
+  motor-deceleration energy return, or supply-side transients) before
+  they reach U5's VCC pin. Chosen over the same-family SMBJ18A
+  specifically because SMBJ16A's 26.0V clamp leaves 4.0V/13% margin under
+  the DRV10983's 30V VCC absolute maximum rating (DS-MTR-053), versus
+  SMBJ18A's tighter 0.8V/3% margin (DS-PROT-004) — a meaningfully safer
+  choice for the same package/cost class. Unidirectional (not
+  bidirectional) is correct here since D3 sits downstream of D2's
+  reverse-blocking action, never itself exposed to reverse polarity.
+
+**New finding this revision — 2S vs. 3S viability through the added
+diode (flagged for Hardware Reviewer attention, not self-resolved)**:
+combining two datasheet facts not previously cross-checked together
+reveals a real, quantitative constraint. D2's forward drop is 0.53V
+typ (@3A/100°C) to 0.62V max (@3A/25°C) (DS-PROT-005 — real drop at this
+design's actual ~1.05A nominal current is expected to be somewhat lower
+still, so these figures are used conservatively). U5's UVLO rising
+(power-up) threshold is VUVLO_R = 7/7.4/8V min/typ/max (DS-MTR-057).
+Stacking these: a **2S source (7.4V nominal, ~6.0–8.4V realistic
+discharge range)** minus even the typical 0.53V diode drop lands at
+**≈6.87V nominal — below VUVLO_R's typical 7.4V threshold**, meaning a 2S
+pack at or below its nominal voltage may not reliably power U5 up
+through this design's own reverse-polarity diode; only a freshly-charged
+2S pack (~8.4V) clears UVLO with any margin, and that margin erodes as
+the pack discharges. A **3S source (11.1V nominal, ~9.0–12.6V realistic
+range)** minus the same drop lands at **≈10.6V nominal, ≈8.4V even at a
+conservative 9.0V near-cutoff** — comfortably above VUVLO_R across its
+whole practical discharge range. **This design's practical recommendation
+is 3S operation**, even though the approved motor is rated across both
+2S–3S — this is a consequence of adding the (well-justified) series
+protection diode, not a defect in the motor/driver selection itself, and
+is not remedied by changing D2 (STPS3L60 is already a low-VF choice; a
+lower-VF option would trade off reverse-leakage/voltage rating and was
+not judged worth chasing for a single-diode voltage-margin gain against
+a 2S edge case). Recorded here for the Hardware Reviewer/Hardware Lead to
+weigh — accept the 3S-only practical recommendation, or revisit if 2S
+operation is later required (§16).
+
+### 7.5.3 U5's internal regulator: configured so it cannot power the MCU/IMU domain
+
+The DRV10983 integrates a step-down regulator that can be configured
+**buck mode** (external inductor, up to 100mA external load, "can also be
+used to provide power for an external circuit such as a microcontroller")
+or **linear mode** (external resistor replacing the inductor). This
+design uses **linear mode**, configured via **R9 = 39Ω ¼W** between U5's
+SW and VREG pins (DS-MTR-065's Table 11 reference value), specifically
+**because** Table 10's own Recommended Operating Conditions state linear
+mode's external-load current capability is **0mA** (DS-MTR-064) — not
+merely "this design chooses not to route it there," but a
+datasheet-stated structural guarantee that this regulator mode cannot
+supply an external load. This directly satisfies the task's explicit
+constraint that U5's own internal regulator "must not be tapped to power
+the MCU/IMU domain, which stays exactly as Rev 2" — the MCU/IMU domain's
+3V3 rail continues to come exclusively from U3 (TLV75533PDBVR), unchanged
+from Rev 2, with **no electrical connection whatsoever** between U5's
+VREG/V1P8/V3P3 outputs and the U3-derived 3V3 rail.
+
+**U5's own V3P3 output (5mA max load, DS-MTR-069) is used only to bias
+this design's own new pull-up resistors** (R6/R7/R8, §7.5.4/§7.5.5) —
+this is a few-hundred-microamp biasing function, not "powering a domain,"
+and is explicitly distinct from the higher-current VREG output this
+paragraph constrains. Three pull-ups (SCL/SDA/FG) at worst case
+simultaneously low draw ≈3×0.7mA≈2.1mA, comfortably under V3P3's own 5mA
+ceiling.
+
+**Decoupling and external components**, per DRV10983's own Table 11
+reference circuit (DS-MTR-065, checklist item 17 — no deviation): C10 =
+10µF (VCC–GND), C11 = 0.1µF/10V (VCP–VCC), C12 = 0.1µF rated ≥VCC×2
+(CPP–CPN), R9 = 39Ω ¼W (SW–VREG, linear-mode select, per above), C13 =
+10µF/10V (VREG–GND), C14 = 1µF/5V (V1P8–GND), C15 = 1µF/5V (V3P3–GND).
+All placed close to U5's package per standard practice; no deviation from
+TI's own recommended values.
+
+### 7.5.4 MCU pin allocation and DRV10983 signal-pin wiring
+
+DRV10983's real 24-pin HTSSOP pinout was pulled from its primary
+datasheet pin-by-pin (DS-MTR-052) specifically to avoid assuming a
+generic H-bridge pin set — confirmed: **no dedicated enable or fault
+pin exists on this part.** Enable/disable is via the SPEED command
+itself (commanding zero speed), and fault visibility is I2C-register-only
+(Status register 0x10) or inferred from FG held high during a lock
+condition. The signal pins actually needed are SPEED, DIR, SCL, SDA, and
+FG — five pins, matching this design's five newly-allocated MCU pins:
+
+| U5 pin (DRV10983) | Function | MCU pin | Peripheral | Confidence |
+|---|---|---|---|---|
+| 13 (SPEED) | Speed command (PWM, this design — §7.5.5) | **PA8** | TIM1_CH1 (AF2) | HIGH (pin name/AF, DS-MCU-064/Table 13); physical LQFP-32 pin number MODERATE (deferred to layout, §16) |
+| 14 (DIR) | Direction command | **PB1** | Plain GPIO, push-pull output | HIGH (no AF conflict); physical pin number MODERATE |
+| 12 (FG) | Tach/speed-indicator output (open-drain, DS-MTR-069) | **PA6** | TIM3_CH1 input-capture (AF1) | HIGH (pin name/AF, DS-MCU-064/066/Table 13); FT_ea 5V-tolerant (cross-domain safety, DS-MCU-066); physical pin number MODERATE |
+| 10 (SCL) | I2C1 clock | **PB6** | I2C1_SCL (AF6) | HIGH (pin name/AF, DS-MCU-065/Table 14); physical pin number MODERATE; Fm+/FT_f tolerance is a MODERATE-confidence family generalization, not independently re-confirmed against a Table-18 FT_f line item this session (§16) |
+| 11 (SDA) | I2C1 data | **PB7** | I2C1_SDA (AF6) | HIGH (pin name/AF, DS-MCU-065/Table 14); same physical-pin-number and Fm+-tolerance caveats as SCL |
+
+**PA8 chosen for SPEED/PWM** because TIM1 is this MCU's advanced/
+motor-control-oriented timer and PA8 is TIM1_CH1 — a natural fit, and
+confirmed genuinely free in Rev 2's own inventory (§11 before this
+revision). **PA6 chosen for FG** specifically for its confirmed FT_ea
+5V-tolerance (DS-MCU-066) — even with the MCU domain fully unpowered
+(VDD=0), U5's V3P3-referenced FG pull-up (≤3.6V max, DS-MTR-053) sits
+within PA6's VDD+4.0V=4.0V absolute ceiling with no significant
+forward-injection path, per the same analysis already used to validate
+this pin (§7.5.6 continues this point for the pull-up sizing itself).
+**PB1 chosen for DIR** as a plain free GPIO — no AF requirement since DIR
+is a simple push-pull digital command, not a timer/analog function.
+**PB6/PB7 chosen for I2C1** because they are this MCU's I2C1 primary AF
+pair (DS-MCU-065), and — critically — I2C1 was recorded as entirely free
+margin after Rev 2's own ISS-011 correction (§2.3); no conflict with the
+IMU's I2C2 bus (PB10/PB11), which remains completely untouched.
+
+**Pull-up resistors** (per DRV10983's own Table 11 reference circuit,
+DS-MTR-065 — checklist item 17, no deviation): **R6 = 4.75kΩ** (FG, pin
+12), **R7 = 4.75kΩ** (SCL, pin 10), **R8 = 4.75kΩ** (SDA, pin 11) — all
+three referenced to **U5's own V3P3 output** (§7.5.3), a deliberate
+cross-domain choice (not the MCU's 3V3), justified by the FT-pin
+tolerance analysis above/DS-MCU-066. This differs from the IMU's I2C2
+pull-up sizing method (§5.2, an NXP UM10204-formula derivation assuming
+an MCU-side 3.3V pull-up rail) because this bus's pull-up reference is
+the driver's own V3P3 domain, a different electrical context — reusing
+TI's own recommended reference-circuit value directly is the more
+appropriate and more conservative choice here (checklist item 17: follow
+the datasheet's own recommended application circuit).
+
+### 7.5.5 SPEED/DIR interpretation and I2C commissioning requirement
+
+**SPEED's interpretation (analog vs. PWM) is register-selected, not
+fixed in hardware**: `SpdCtrlMd`=0 selects analog-voltage mode
+(full-speed = V(V3P3)×0.9, zero-speed = 100mV); `SpdCtrlMd`=1 selects
+PWM-digital mode (VDIG_IH≥2.2V, VDIG_IL≤0.6V, input frequency 1–100kHz)
+(DS-MTR-068). **REQ-007 (PWM/duty-cycle speed-setpoint control) requires
+`SpdCtrlMd`=1** — this design wires PA8/TIM1_CH1 to drive SPEED as a PWM
+signal, but the pin is functionally inert as a *PWM* input until
+`SpdCtrlMd` is actually set to 1 via I2C or EEPROM (a firmware/
+commissioning task, REQ-009 fence preserved — this document wires the
+interface, it does not perform the configuration).
+
+**The I2C1 bus is more than optional future tuning — it is this design's
+practical commissioning path**, upgraded in framing this revision from
+earlier assumptions: DRV10983 requires motor-specific **Rm (phase
+resistance, 7-bit register, 9.67mΩ/LSB, 0–18.5Ω range)** and **Kt (BEMF
+constant, 7-bit register, 0–1760mV/Hz range)** parameters for correct
+sensorless commutation (DS-MTR-070). The device *can* run from its
+integrated EEPROM's stored defaults with **zero I2C connection ever
+made** — but generic EEPROM defaults are very unlikely to match the
+T-Motor MN2206-13 KV2000's actual Rm/Kt, so correct/optimized commutation
+for this specific motor pairing practically requires programming these
+registers at least once via I2C (register-mode writes bypass the EEPROM
+defaults, DS-MTR-070). **Wiring PB6/PB7 is this design's job; measuring
+and writing the actual Rm/Kt values, and setting `SpdCtrlMd`=1, is a
+firmware/commissioning task** — consistent with REQ-009's fence (motor-
+parameter values are not closed-loop control logic).
+
+**DIR** has no internal bias documented in the datasheet (only SPEED's
+sleep-mode pulldown was called out, DS-MTR-069) but is actively driven by
+MCU PB1 as a push-pull output — the practical floating-at-MCU-reset
+window (before firmware initializes PB1) is a low-severity residual
+concern (worst case: an undefined direction command during a window when
+SPEED's own internal bias, see below, already tends toward zero
+commanded speed) — noted in §16, not treated as requiring an added
+component.
+
+**SPEED's internal pulldown — a deliberate non-addition, evidence-based,
+not an oversight**: the datasheet documents `RPD_SPEED_SL` = an internal
+SPEED-pin pulldown to ground, 55kΩ typ, **specifically under the test
+condition "VSPEED=0 (sleep mode)"** (DS-MTR-069) — i.e. confirmed for the
+device's sleep-mode state, not asserted as a universal always-on
+default-safe bias in every power/reset condition. This is a genuine,
+if partial, mitigant for SPEED floating during MCU-domain reset/init —
+contrast with the Rev 2 LDO EN-pin case (ISS-001), where **no** internal
+bias existed at all and a firm external tie was required. Here, TI's own
+Table 11 reference circuit does **not** include an external SPEED bias
+resistor either — this design follows that reference circuit (checklist
+item 17) rather than adding one on its own initiative absent a specific
+documented requirement forcing it. The residual cross-domain power-up-
+ordering question (MCU GPIO init timing vs. U5's own VCC ramp, given the
+two domains are independently sourced per Option A) is honestly flagged
+in §16, not silently assumed away.
+
+### 7.5.6 Protection (REQ-111/404) — DRV10983's real mechanisms confirmed
+
+Five **distinct** protection mechanisms are confirmed directly from the
+DRV10983's own datasheet (not assumed to be "on" by default):
+
+| Mechanism | Trigger | Response | Evidence |
+|---|---|---|---|
+| Overcurrent Protection (OCP) | IOC_limit = 3 MIN/4 MAX A, phase-to-phase, fixed/non-configurable | Hi-Z output, auto-clears once overcurrent condition is no longer present (condition-based, not a fixed retry timer) | DS-MTR-058 |
+| Lock Detection | 6 independently-maskable sub-schemes (`LockEn[5:0]`) — current-limit (`HWiLimitThr`), abnormal speed, abnormal Kt, no-motor-detected, open-/closed-loop-stuck | Hi-Z output, auto-**retry** after tLOCK_OFF=5s | DS-MTR-059 |
+| Undervoltage Lockout (UVLO) | VUVLO_F=6.7/7.1/7.5V falling, VUVLO_R=7/7.4/8V rising | Shuts down below threshold, auto-recovers above | DS-MTR-057 |
+| Thermal Shutdown | TSDN=150°C, 10°C hysteresis | Shuts down, auto-recovers on cooling | DS-MTR-060 |
+| Voltage Surge (AVS) | Mechanical AVS (motor-deceleration energy return) | Clamps/limits VCC surge | DS-MTR-061 |
+
+All five are hardware-automatic (no firmware polling required for the
+protection itself to engage) — satisfying REQ-111's "Should" for
+built-in overcurrent/stall protection suitable for repeated bench
+testing without added circuitry. I2C read access to the Status register
+(0x10) additionally lets firmware **distinguish which** mechanism
+tripped (OCP=bit5, MtrLck=bit4, OverTemp=bit7) rather than only
+observing "FG held high" generically — valuable for REQ-404's
+stall-detection/shutdown behavior, though that behavior itself is a
+firmware-level concern (REQ-009 fence).
+
+**Correction found against `bom/component-selection.md` — flagged
+narratively, not self-numbered as a new ISS**: that document's DS-MTR-037
+describes DRV10983 overcurrent protection as "programmable via I2C…
+auto-retry." Primary-datasheet verification this revision shows that
+description in fact applies to **Lock Detection** (DS-MTR-059, genuinely
+configurable/auto-retry), not to **OCP** itself (DS-MTR-058, fixed
+threshold, condition-based auto-clear, not a retry timer). Per this
+document's own established precedent (`validation/open-issues.md`/
+`validation/design-review.md` are Hardware-Reviewer/Hardware-Lead-owned
+registries, not touched by this agent, and no ISS number has ever been
+self-assigned by the Circuit Engineer in this project), this correction
+is recorded here and in `datasheets/
+texasinstruments_drv10983_slvscp6h.md`'s own Update section, **not**
+by editing `bom/component-selection.md` and **not** by inventing a new
+ISS number — for the Hardware Reviewer/Hardware Lead to log formally in
+their own registry if they concur. The correction does not change this
+design's actual wiring or component choice — both mechanisms exist and
+both are hardware-automatic; only the *description* of which mechanism
+does what was imprecise upstream.
+
+### 7.5.7 ECO-007 directive — BEMF/FG low-RPM degradation
+
+ECO-007 (`validation/change-log.md`) carries a human directive that the
+DRV10983/T-Motor pairing's BEMF-derived FG signal typically degrades
+below ~500–1500 RPM, and that this caveat **must** be tracked in the
+Firmware bring-up plan and/or `validation/fmea.md` — not resolved here.
+Respecting that directive (this is primarily a Firmware Engineer/FMEA
+item), this design nonetheless records the one concrete **circuit-level**
+fact found that substantiates and gives firmware real hooks for that
+concern, per this agent's own instructions ("if there's a real
+circuit-level mitigation or note worth recording... flag it... don't
+silently omit it"):
+
+- **`FGOLsel[1:0]`** (register, SysOpt9 0x2B bits 7:6, DS-MTR-062)
+  configures FG's behavior during open-loop operation: by default (00),
+  FG toggles at the **commanded drive frequency** during open-loop
+  (which is not yet BEMF-sensed speed — the datasheet's own words: "this
+  may not reflect the actual motor speed"), or can be configured to hold
+  FG high during open-loop instead (01/10 settings).
+- **`Op2ClsThr[4:0]`** (register, SysOpt4 0x26 bits 7:3, DS-MTR-063) sets
+  the open-to-closed-loop transition threshold — below it, commutation is
+  forced/open-loop (Align+IPD, then Accelerate, per the datasheet's own
+  state-machine description) and is not BEMF-dependent at all, meaning
+  motor **starting** never relies on a valid BEMF-derived FG reading;
+  only FG's fidelity as a *speed-feedback* signal during that specific
+  low-RPM phase is reduced.
+
+Both registers are reachable via this design's I2C1 bus (§7.5.4/§7.5.5)
+— wired and available, not configured by this circuit design (REQ-009
+fence). Routed to Firmware bring-up/FMEA per the human directive, with
+these two named, real register hooks recorded here so that work does not
+have to rediscover them from scratch.
+
+### 7.5.8 Power-up sequencing (checklist item 10)
+
+DRV10983's own recommended power-up connection order is 1) GND, 2) VCC,
+3) PWM(SPEED), 4) FG — with the datasheet noting that once VCC>2.2V the
+FG/PWM order no longer matters, but explicitly cautioning to "ensure FG ≤
+VCC at all times" (DS-MTR-066). Because Option A deliberately makes the
+MCU/IMU domain and the U5/motor domain **independently sourced** (no
+shared regulator, no defined mutual power-up ordering), there is no
+hardware guarantee that the MCU's GPIOs are already initialized before
+U5's VCC ramps, or vice versa. This is not remedied by an added component
+in this design (TI's own reference circuit, §7.5.3, includes none for
+this purpose, and SPEED's partial internal-pulldown mitigant is discussed
+in §7.5.5) — it is recorded here as a real, if low-severity (bounded by
+SPEED's sleep-mode pulldown tendency and by FG being firmware-read, not
+power-critical), cross-domain sequencing consideration for the Hardware
+Reviewer's awareness and for firmware bring-up to be aware of (§16).
+
 ## 8. Block 6 — Grounding
 
-**Single ground plane/net for this entire design**, stated here
-explicitly (not left implicit) per the design task's own instruction.
-Justification: REQ-301 fixes a single 2-layer PCB; with only 3 active ICs
-(MCU, IMU, LDO) plus one protection IC, no motor, no precision-analog
-section, and no RF section on this board, there is no structural reason
-to split ground planes or use a star-ground topology — a single
-continuous ground pour on one of the two copper layers is both the
-simplest and the electrically correct choice for a design at this
-complexity level. Every GND-role pin across every block (§§3–7) returns
-to this one net; this is restated in the full net list, §12.
+**Single ground plane/net for this entire design, now explicitly spanning
+two independent power domains** — updated this revision (Rev 2's
+single-domain framing is superseded by this section; see §2.2 for the
+short pointer added there). Stated here explicitly per the design task's
+own instruction not to leave this implicit.
+
+**What stays true from Rev 2**: REQ-301 fixes a single 2-layer PCB; a
+single continuous ground pour on one copper layer is still the simplest
+and electrically correct choice for a board at this complexity level (5
+active ICs total after Rev 3: MCU, IMU, LDO, ESD-protection IC, motor
+driver) — there is still no analog-precision or RF section that would
+independently justify a split-plane/multi-point-star topology on
+grounding grounds alone. Every GND-role pin across every block (§§3–7.5)
+returns to this **one** net; restated in the full net list, §12.
+
+**What is new and must be stated as its own decision (per the design
+task's point 3)**: the two power **rails** are deliberately independent
+sources (5V/3V3 logic via U3, VM_MOTOR via J4→D2→D3→U5 — Option A's
+fault-isolation intent, `hardware/power-architecture.md`), but they are
+**not** independent at the **ground** reference — both domains' GND pins
+tie to the same single ground net/plane described above. This is a
+deliberate, necessary choice, not a contradiction of Option A's
+fault-isolation intent:
+
+- **Why common ground is required, not optional**: the PWM (SPEED),
+  tach (FG), and I2C1 (SCL/SDA) signals crossing between U1 (MCU) and U5
+  (driver) are single-ended digital signals — their voltage levels are
+  only meaningful relative to a shared 0V reference. Without a common
+  ground, "logic high" on U5's FG output would be undefined relative to
+  U1's own GND, and none of REQ-007/008/110/112's interface wiring would
+  actually function. Option A's fault-isolation intent is about the
+  **power** rails (a fault on the motor rail should not directly damage
+  or brown out the logic rail's regulator, and vice versa) — it was never
+  a requirement for galvanic isolation of the *signal* reference, which
+  would need opto-isolators or digital isolators neither REQ-108 nor
+  `hardware/power-architecture.md` calls for.
+- **Return-current consideration (REQ-010, REQ-204)**: the motor domain's
+  return current (up to ≈3A transient during start-up/lock, DS-MTR-056/
+  058; ≈1.05A nominal) shares the same physical ground pour as the IMU's
+  own low-level analog/digital return currents. This is a real potential
+  noise-coupling path (ground-bounce / IR-drop across the shared copper)
+  distinct from the supply-noise-coupling path already ruled out in §5.5
+  (since the rails themselves don't share a regulator). **Layout-level
+  mitigation recommended for the Mechanical/PCB layout stage** (this
+  document is schematic-equivalent, not a layout, per §0): route the
+  motor input (J4), its protection stage (D2/D3), and U5's high-current
+  VCC/PGND/phase-output area as a single, compact group with a short,
+  direct return path back to the star point, physically separated from
+  the IMU (U2) and its decoupling caps, rather than letting the motor
+  domain's return current path run underneath or adjacent to the IMU's
+  footprint. A single star-ground tie-in point (where the logic domain's
+  main return and the motor domain's main return both meet the shared
+  pour) is recommended over letting the two domains' return currents mix
+  at multiple, arbitrary points across the plane.
+- **REQ-204/EMI**: the same physical separation recommendation reduces
+  both conducted return-current coupling and radiated near-field coupling
+  from U5's switching phase outputs (U/V/W, commutated at the PWM/
+  commutation frequency) reaching the IMU's sensitive analog front-end —
+  addressed here as a grounding/layout consideration; the vibration
+  (mechanical) side of REQ-204 is addressed separately in §9, not
+  conflated with this electrical-noise consideration.
+
+**Net result**: one ground net/plane, as in Rev 2, but now carrying an
+explicit rationale for *why* that remains correct even though a second,
+independently-sourced power rail has been added — not an unexamined
+carry-forward of the Rev 2 statement.
 
 ## 9. Block 7 — Mechanical/Thermal co-design (checklist item 18)
 
-**Explicitly Not Applicable.** REQ-202 states "Vibration/shock
-qualification: Won't (not applicable) — No rotating body/motor in this
-benchmark, so the `docs/architecture.md` §12 mechanical/thermal co-design
-trigger does not apply this cycle." There is no reaction-wheel motor, fan,
-or any other rotating body anywhere in this design — Bench-IMU-01 is a
-static bench board (MCU + IMU + power only). This checklist item is
-written down here as a determination, not silently skipped, per the
-design task's own explicit instruction and per my own agent instructions'
-checklist item 18.
+**No longer Not Applicable — flipped to real content this revision**
+(REQ-204/307 supersede REQ-202's Rev 2 disposition for this revision
+specifically; REQ-202 itself is retained verbatim elsewhere as Rev 2's
+historical record, not deleted or edited). Rev 2 correctly determined
+this item was N/A because no rotating body existed; that reasoning no
+longer applies now that a reaction-wheel motor (M1) is part of this
+design. Per this agent's own instructions and the design task, this
+section **records electrical-side facts relevant to the Mechanical
+Lead's later attention — it does not perform the mechanical mitigation
+design itself** (that is explicitly the Mechanical Lead's role, not
+this agent's).
+
+- **The motor is a genuine rotating body (REQ-204)**: M1 (T-Motor
+  MN2206-13 KV2000) drives a reaction-wheel flywheel at speed, which is a
+  sustained vibration source for as long as the wheel spins — qualitatively
+  different from any Rev 2 component (none of which move). REQ-307 asks
+  that the motor+flywheel mount be evaluated for vibration isolation from
+  the IMU's PCB area "where feasible" — a mechanical/mounting decision,
+  not a circuit one, but flagged here as a live, real consideration
+  (not skipped as N/A the way Rev 2 correctly could).
+- **Vibration-induced solder-joint/connector stress (checklist item 18)**:
+  sustained vibration is a known long-term fatigue mechanism for
+  solder joints (particularly larger/heavier through-hole parts and any
+  connector under mechanical load) and for connector retention (J4, the
+  new barrel jack, is a through-hole part that will see repeated
+  plug/unplug mechanical stress **in addition to** any board-borne
+  vibration from M1). This design does not add mechanical reinforcement
+  itself (e.g. adhesive/strain-relief) — flagged as a Mechanical Lead
+  consideration, since the actual mounting/isolation solution is
+  mechanical-domain, not a schematic-level fix.
+- **Thermal/vibration relevance to the IMU (REQ-204, REQ-010 overlap)**:
+  the BMI270's accelerometer/gyroscope bias is a well-known
+  temperature-sensitive parameter for MEMS IMUs generally (bias drift
+  with die temperature is a standard MEMS IMU characteristic; the
+  BMI270's own specific bias-vs-temperature coefficient was not
+  independently re-extracted from its datasheet this revision — flagged
+  as a residual research gap in §16, not fabricated). U5 (the motor
+  driver) and M1 (the motor) are both real, non-trivial heat sources
+  during sustained operation (U5 dissipates from I²R and switching
+  losses at up to ~1–3A; M1 dissipates from winding resistance at the
+  same current) — **physical placement/thermal separation between the
+  motor+driver group and the IMU is a real, non-cosmetic consideration**
+  for bias stability, in addition to the vibration-isolation point above.
+  This is exactly the `docs/architecture.md` §12 mechanical/thermal
+  co-design trigger REQ-202 correctly found inapplicable in Rev 2 and
+  which now genuinely applies.
+- **Facts recorded for the Mechanical Lead handoff** (§10 continues this
+  with physical placement/geometry specifics): M1's mass/mounting
+  interface, U5's package/thermal characteristics, and J4's mounting
+  style are the concrete electrical-side inputs the Mechanical Lead needs
+  to design the actual isolation/mounting solution — this design does not
+  presume or design that solution.
 
 ## 10. Block 8 — Board geometry facts for the (later, separate) Mechanical Lead handoff
 
@@ -733,6 +1356,9 @@ ASSUMPTION labels applied honestly per item.
 | USB-C receptacle (J1) height | ≈2.6–3.2mm (representative real part: GCT USB4125, horizontal/top-mount, = 3.16mm) | ESTIMATE (representative-part CONFIRMED, but J1's actual MPN not yet locked) | DS-CONN-003 |
 | Micro-USB-B receptacle height (comparison only — not used) | ≈6.5–6.9mm (GCT USB3140=6.5mm; Würth 614105150721=6.9mm) | ESTIMATE (representative-part CONFIRMED) — **comparison-only**, this design chose USB-C | DS-CONN-004 |
 | **Tallest component on the board** | **The USB-C receptacle (J1), ≈3.2mm** — clearly taller than the LQFP-32 (≈1.4mm) or the SOT-23-5 (≈1.1–1.25mm) | ESTIMATE (built from a CONFIRMED-by-representative-part height) | Confirms the design task's own hint |
+| **Barrel jack (J4) — new Rev 3** | Right-angle THT, mating-plug insertion depth 9.5mm (DS-CONN-005); overall body height above the PCB **not independently extracted this session** — right-angle THT barrel jacks of this class are typically taller than J1's SMD/top-mount USB-C receptacle | **ASSUMPTION/UNKNOWN** (insertion depth is CONFIRMED per DS-CONN-005; body height is not) | Flagged for Mechanical Lead to pull directly from PJ-102AH's own mechanical drawing before finalizing enclosure Z-height (§10 flag below) — **J4 may in fact be the new tallest component on the board, superseding J1**, pending that confirmation |
+| **HTSSOP-24 (U5, DRV10983) package height — new Rev 3** | ≈1.1–1.2mm typ (JEDEC MO-153 HTSSOP family envelope) | **CONFIRMED-via-standard** (same caveat as the LQFP-32/SOT-23-5 rows above: family-standard, not U5's own part-specific drawing, not independently re-pulled this session) | JEDEC MO-153 HTSSOP outline family |
+| **Motor (M1, T-Motor MN2206-13 KV2000) size/mass/mounting — new Rev 3** | Stator nominally ⌀22mm×6mm (standard BLDC "XXYY" size-code convention: 22=stator diameter mm, 06=stator height mm) — mass, full outline, shaft diameter, and mounting-hole pattern **not independently pulled from T-Motor's own mechanical drawing this session** | **ASSUMPTION** (size-code convention) / **UNKNOWN** (mass, mounting pattern) | Flagged for Mechanical Lead to obtain directly from T-Motor's own mechanical drawing/CAD file — needed before REQ-307's vibration-isolation mount can be designed; this design's own electrical-side scope stops at flagging the need (§9) |
 
 **Caveat on the two "CONFIRMED" package-height rows**: these are
 confirmed against the **JEDEC package-family outline standard**
@@ -742,13 +1368,39 @@ part's own datasheet mechanical drawing this session. Real parts
 following these outlines are expected to match the family's standard
 height envelope; flagged as CONFIRMED-via-standard rather than
 CONFIRMED-via-part-specific-drawing, a distinction worth preserving for
-the Mechanical Lead's own rigor.
+the Mechanical Lead's own rigor. The same caveat applies to the new U5
+HTSSOP-24 row above (MO-153).
 
 **Flag to Mechanical Lead**: the connector-type choice (USB-C vs.
 Micro-USB-B) materially changes the Z-height budget for any enclosure
 (REQ-305) — roughly 3.2mm vs. 6.5–6.9mm for the tallest single component
 on the board. This design's USB-C choice keeps the enclosure lid
 clearance requirement smaller than a Micro-USB-B design would have.
+
+**New Rev 3 flags to Mechanical Lead**:
+
+- **J4 (barrel jack) placement**: recommend placing J4 on a board edge
+  distinct from J1 (USB-C) if the enclosure design benefits from
+  separating the two power-input access points; not a hard requirement
+  from this design, purely a layout-convenience note. J4's exact edge/
+  position is not yet fixed in this schematic-equivalent document (no
+  physical layout exists yet, §0).
+- **U5+M1 physical grouping vs. IMU (U2) separation**: per §9's
+  mechanical/thermal co-design finding, the Mechanical Lead should plan
+  for physical distance/isolation between the motor+driver group (U5,
+  M1, and their high-current traces/connector J4) and the IMU (U2) —
+  both for vibration-isolation (REQ-307) and for thermal separation
+  (§9's bias-drift-with-temperature concern). This design does not fix
+  a specific distance/placement itself (that is layout/mechanical-domain
+  work), only flags the need.
+- **M1 is off-board or on-board?** — **UNKNOWN, not resolved this
+  session**: whether the reaction-wheel motor mounts directly to this
+  PCB, to a separate mechanical structure connected only by wire, or
+  some hybrid, is a Mechanical Lead decision this document does not
+  presume. If wired (not board-mounted), the wire run itself is a minor
+  additional consideration (length/gauge for the ≤3A worst-case current,
+  and connector choice at the wire-to-board interface) not designed here
+  — flagged in §16.
 
 ## 11. Full MCU pin-assignment table (STM32G031K8T6, LQFP-32)
 
@@ -760,7 +1412,11 @@ corrected this revision and independently confirmed against the primary
 AF table (DS-MCU-052, ISS-011); USART2 (PA2/PA3) remains MODERATE-HIGH
 confidence, standard STM32 convention, not individually re-pulled from
 the exact AF table this session — unchanged this revision, out of scope,
-see §16.
+see §16. **New Rev 3**: PA8, PA6, PB1, PB6, PB7 are now consumed by the
+motor subsystem (§7.5.4) — pin **names**/AF numbers for all five are
+HIGH confidence (DS-MCU-064/065, Tables 13/14); their physical LQFP-32
+**pin numbers** are MODERATE confidence, same caveat as PB8/PB9 below,
+deferred to layout.
 
 | Pin # | Name | Function in this design | Notes |
 |---|---|---|---|
@@ -768,38 +1424,53 @@ see §16.
 | 2–3 | (other GPIO, unused this cycle) | NC / free | Available for future use |
 | 4 | NRST | NRST net (C5 + SW1) | §4.3 |
 | 5 | VDDA | 3V3 (via C4) | §4.1 |
-| 6–15 | PA0–PA9 (GPIO, selected used below) | PA2=USART2_TX, PA3=USART2_RX, PA5=LED drive; others free | §2.3, §6, §7 |
+| 6–15 | PA0–PA9 (GPIO, selected used below) | PA2=USART2_TX, PA3=USART2_RX, PA5=LED drive; **new Rev 3: PA6=FG tach input (TIM3_CH1), PA8=SPEED/PWM output (TIM1_CH1)**; others free | §2.3, §6, §7, §7.5.4 |
 | 16 | VSS | GND | Power pin |
 | 17 | VDD | 3V3 (via C3) | §4.1 |
-| 18–25 | PA10–PA15, PB0–PB1 (selected used below) | PA13=SWDIO, PA14=SWCLK (also this sub-family's BOOT0 mux pin, corrected this revision — ISS-006, §4.2); others free | §4.4 |
+| 18–25 | PA10–PA15, PB0–PB1 (selected used below) | PA13=SWDIO, PA14=SWCLK (also this sub-family's BOOT0 mux pin, corrected this revision — ISS-006, §4.2); **new Rev 3: PB1=DIR**; others free | §4.4, §7.5.4 |
 | 26–31 | PB2–PB5, PB10, PB11 (selected used below) | PB10=**I2C2**_SCL, PB11=**I2C2**_SDA — corrected this revision, ISS-011 (was labeled I2C1); others free | §5.3 |
 | 32 | VBAT | 3V3 (direct tie) | §4.1 |
 
-**PB8/PB9 note (new this revision, ISS-006)**: PB8 and PB9 are now
-confirmed to physically exist on this package (DS-MCU-051/053) but are
-not shown as a distinct row above — their exact pin numbers were not
-independently re-resolved against the primary ST datasheet this session
-(a residual, non-blocking pin-numbering uncertainty, §16 item 1); they
-fall somewhere within the ranges already listed and are counted in the
-free-GPIO inventory below. Their real function is the secondary AF6
-mapping for **I2C1_SCL/I2C1_SDA** respectively (DS-MCU-053) — unrelated
-to BOOT0, which this document originally (incorrectly) suspected.
+**PB6/PB7/PB8/PB9 note (PB8/PB9 corrected Rev 2/ISS-006; PB6/PB7 newly
+consumed Rev 3)**: PB6, PB7, PB8, and PB9 are all now confirmed to
+physically exist on this package (DS-MCU-051/053/065) but are not shown
+as distinct rows above — their exact physical pin **numbers** were not
+independently re-resolved against the primary ST datasheet's LQFP-32 pin
+diagram this session (a residual, non-blocking pin-numbering
+uncertainty, §16 item 1; likely candidates for the still-unlabeled "2–3
+(other GPIO)" slot and/or interspersed among the ranges already listed).
+Their **names**/AF functions are HIGH confidence regardless of physical
+numbering: PB8/PB9 = secondary AF6 mapping for I2C1_SCL/I2C1_SDA
+(DS-MCU-053, unused this design, left free); **PB6/PB7 = primary AF6
+mapping for I2C1_SCL/I2C1_SDA (DS-MCU-065) — this design's choice, now
+consumed by the motor subsystem (§7.5.4)**, not PB8/PB9's secondary pair.
 
 Full free-GPIO inventory after this design's allocation (for the
 Mechanical/future-firmware team's reference, not individually itemized
-above): PA0, PA1, PA4, PA6, PA7, PA8, PA9, PA10, PA11, PA12, PA15, PB0,
-PB1, PB2, PB3, PB4, PB5 — 17 GPIOs remain completely free, **plus PB8 and
-PB9, now confirmed to exist (corrected this revision, ISS-006/DS-MCU-051
-— exact pin numbers not independently re-resolved this session, §16 item
-1)**, bringing the free-GPIO count to **19**. This includes both free
-UART peripherals (USART1, LPUART1), SPI1/SPI2 (unused this cycle since
-I2C was chosen for the IMU, §5.1), and — **new this revision (ISS-011)**
-— **I2C1 in its entirety** (PB6/PB7 primary AF mapping, or PB8/PB9
-secondary AF mapping, DS-MCU-053), since the IMU bus is now correctly
-understood to occupy I2C2 (PB10/PB11), not I2C1 as this document
-originally, mistakenly, labeled it. This is a genuine improvement in
-peripheral margin versus this document's original understanding — not a
-regression.
+above): PA0, PA1, PA4, PA7, PA9, PA10, PA11, PA12, PA15, PB0, PB2, PB3,
+PB4, PB5 — 14 GPIOs remain completely free, plus PB8 and PB9 (existence
+confirmed, exact pin numbers not independently re-resolved, ISS-006/
+DS-MCU-051/053), bringing the free-GPIO count to **16**. This still
+includes both free UART peripherals (USART1, LPUART1 — neither is
+pinned to PB6/PB7 specifically on this part, so consuming PB6/PB7 for
+I2C1 does not remove USART1/LPUART1's own availability), and SPI1/SPI2
+(unused this cycle since I2C was chosen for the IMU, §5.1).
+
+**Rev 3 bookkeeping note**: Rev 2's own free-GPIO accounting listed "17
+GPIOs... plus PB8 and PB9... bringing the free-GPIO count to 19" while
+separately describing "I2C1 in its entirety (PB6/PB7 primary AF mapping...)"
+as free margin — PB6/PB7 were correctly described as free in that
+narrative sentence but were not literally included in the enumerated
+17-pin list or the "19" total (a minor, non-blocking bookkeeping gap in
+Rev 2, immaterial since the correct free-margin conclusion was still
+reached). This revision's accounting above treats that starting point
+honestly (Rev 2's true free-GPIO total was 21, not 19, once PB6/PB7 are
+properly counted) before subtracting this revision's 5 newly-consumed
+pins (PA6, PA8, PB1, PB6, PB7) to reach the new total of 16. Flagged here
+for transparency, not corrected retroactively in Rev 2's own changelog
+text above (per this document's own precedent of not reopening
+Design-Complete prior-revision content beyond what's genuinely
+necessary).
 
 ## 12. Net list summary (net-by-net)
 
@@ -810,7 +1481,7 @@ regression.
 | CC1 | J1 CC1 contact → R1 (5.1kΩ) → GND |
 | CC2 | J1 CC2 contact → R2 (5.1kΩ) → GND |
 | 3V3 | U3 OUT → C2 → U1 VDD(pin17)/VDDA(pin5, via C4)/VBAT(pin32) → U2 VDD(pin8, via C6)/VDDIO(pin5, via C7) → R3/R4 (I2C pull-ups) → R5 (LED resistor) → J2 pin "3V3" → J3 pin "VDD" |
-| GND | U1 VSS(pins1,16) → U2 GND(pin7)/GNDIO(pin6) → U3 GND → U4 GND(pin2) → R1/R2 return → C1–C9 return sides → D1 cathode (via R5) → SW1 one leg → J1 shell/GND contact → J2 pin "GND" → J3 pin "GND" |
+| GND | U1 VSS(pins1,16) → U2 GND(pin7)/GNDIO(pin6) → U3 GND → U4 GND(pin2) → R1/R2 return → C1–C9 return sides → D1 cathode (via R5) → SW1 one leg → J1 shell/GND contact → J2 pin "GND" → J3 pin "GND" → **(new Rev 3, §8) J4 sleeve/GND contact → D2/D3 return sides → U5 GND(pin8)/PGND(pins15,16)/SWGND(pin5) → C10–C15 return sides — single common ground net spanning both power domains, §8** |
 | NRST | U1 NRST(pin4) → C5 → GND; also → SW1 → GND (momentary) |
 | SWDIO | U1 PA13(pin?) → J3 pin "SWDIO" |
 | SWCLK | U1 PA14(pin?) → J3 pin "SWCLK" (PA14 also carries this sub-family's BOOT0 mux function — corrected this revision, ISS-006, §4.2; no separate BOOT0 net exists, see §13) |
@@ -824,6 +1495,16 @@ regression.
 | (NC) | U4 I/O1(pins1,6), I/O2(pins3,4) — unpopulated, no D+/D− on this board (REQ-105) |
 | (NC) | U2 pins 2(ASDx), 3(ASCx), 4(INT1), 9(INT2), 10(OCSB), 11(OSDO) — unpopulated, aux interface + interrupts unused this cycle (§5.3) |
 | (NC) | J1 D+/D− contacts — present on the physical connector for cable compatibility, not routed to any MCU/protection pin (REQ-105) |
+| **VM_MOTOR** *(new Rev 3, §2.1/§7.5.2)* | J4 center-pin(+) contact → D2 anode(STPS3L60, series reverse-polarity protection) → D2 cathode → D3 (SMBJ16A, shunt TVS, cathode-to-VM_MOTOR/anode-to-GND) → U5 VCC(pins23,24) → C10 (10µF, VCC–GND) |
+| **SPEED_PWM** *(new Rev 3, §7.5.4/§7.5.5)* | U1 PA8 (TIM1_CH1, AF2) → U5 SPEED(pin13) — PWM duty-cycle command, `SpdCtrlMd`=1 required (I2C-configured, firmware-owned, REQ-007/REQ-009 scope fence) |
+| **DIR** *(new Rev 3, §7.5.4)* | U1 PB1 (plain GPIO, push-pull output) → U5 DIR(pin14) |
+| **FG_TACH** *(new Rev 3, §7.5.4)* | U5 FG(pin12, open-drain) → R6 (4.75kΩ, pull-up to U5's own V3P3, pin9) → U1 PA6 (TIM3_CH1 input-capture, AF1, FT_ea 5V-tolerant) |
+| **I2C1_SCL** *(new Rev 3, §7.5.4 — a different bus from the IMU's I2C2, not to be confused with the pre-Rev-3 I2C1/I2C2 mislabeling corrected under ISS-011)* | U1 PB6 (AF6) → R7 (4.75kΩ, pull-up to U5's own V3P3, pin9) → U5 SCL(pin10, open-drain) |
+| **I2C1_SDA** *(new Rev 3, §7.5.4)* | U1 PB7 (AF6) → R8 (4.75kΩ, pull-up to U5's own V3P3, pin9) → U5 SDA(pin11, open-drain) |
+| **U5_V3P3** *(new Rev 3, §7.5.3 — driver's own internal low-current reference output, distinct from the board's main 3V3 rail; no electrical connection between the two, per Option A)* | U5 V3P3(pin9) → R6/R7/R8 (pull-up references) → C15 (1µF/5V, V3P3–GND) |
+| **U5_VREG/V1P8** *(new Rev 3, §7.5.3 — driver's own internal logic supply, linear mode, powers U5's internal circuitry only; explicitly NOT connected to the board's 3V3 rail or any MCU/IMU pin, per Option A/REQ-108)* | U5 SW(pin4) → R9 (39Ω ¼W, linear-mode select) → U5 VREG(pin6) → C13 (10µF/10V, VREG–GND) → U5-internal → V1P8(pin7) → C14 (1µF/5V, V1P8–GND) |
+| **U5_CHARGE_PUMP** *(new Rev 3, §7.5.3 — internal gate-drive charge pump network, no MCU/external connection)* | U5 VCP(pin1) → C11 (0.1µF/10V, VCP–VCC) ; U5 CPP(pin2) → C12 (0.1µF ≥VCC×2 rating, CPP–CPN) → U5 CPN(pin3) |
+| **MOTOR_PHASE_U/V/W** *(new Rev 3, §7.5 — 3-phase motor drive, no MCU involvement)* | U5 U(pins17,18) → M1 phase U; U5 V(pins19,20) → M1 phase V; U5 W(pins21,22) → M1 phase W |
 
 ## 13. Parts list (this design specifically — distinct from `bom/component-selection.md`'s candidate comparison)
 
@@ -851,11 +1532,39 @@ regression.
 | C8 | 1–4.7µF (optional bulk) | Near MCU, extra margin, not strictly required |
 | C9 | 1µF (optional bulk) | Near IMU, per BMI270 datasheet §7.3.3 |
 | MH1–MH4 | Mounting holes | M2.5, ×4, see §10 |
+| **U5** *(new Rev 3)* | Texas Instruments DRV10983 | Sensorless 3-phase BLDC driver, HTSSOP-24 (PWP), exposed pad tied to GND; internal regulator configured for linear mode (§7.5.3) |
+| **M1** *(new Rev 3)* | T-Motor MN2206-13 KV2000 | Sensorless BLDC reaction-wheel motor, 2S–3S; Component-Engineer-approved, human-signed-off via ECO-007 |
+| **J4** *(new Rev 3)* | Same Sky PJ-102AH | Right-angle THT barrel jack, 2.0mm center pin (DS-CONN-005 — outer barrel diameter not independently confirmed this session, commonly paired with 2.0mm-center-pin jacks of this class but not asserted as a specific number here), 24V/5.0A rated, center-pin = (+) |
+| **D2** *(new Rev 3)* | ST STPS3L60 | Schottky diode, 60V/3A, series reverse-polarity protection, VF=0.53V typ/0.62V max @3A/25°C (DS-PROT-005) |
+| **D3** *(new Rev 3)* | Littelfuse SMBJ16A | Unidirectional TVS, SMB, 16.0V standoff/26.0V max clamp, shunt surge protection (DS-PROT-004) |
+| **R6** *(new Rev 3)* | 4.75kΩ | FG pull-up, referenced to U5's own V3P3 (pin9), per DS-MTR-065 Table 11 |
+| **R7** *(new Rev 3)* | 4.75kΩ | I2C1 SCL pull-up, referenced to U5's own V3P3, per DS-MTR-065 Table 11 |
+| **R8** *(new Rev 3)* | 4.75kΩ | I2C1 SDA pull-up, referenced to U5's own V3P3, per DS-MTR-065 Table 11 |
+| **R9** *(new Rev 3)* | 39Ω ¼W | U5 SW–VREG linear-mode-select resistor, per DS-MTR-065 Table 11 |
+| **C10** *(new Rev 3)* | 10µF ceramic | U5 VCC–GND decoupling, per DS-MTR-065 Table 11 |
+| **C11** *(new Rev 3)* | 0.1µF/10V ceramic | U5 VCP–VCC (charge pump), per DS-MTR-065 Table 11 |
+| **C12** *(new Rev 3)* | 0.1µF, rated ≥VCC×2 | U5 CPP–CPN (charge pump), per DS-MTR-065 Table 11 |
+| **C13** *(new Rev 3)* | 10µF/10V ceramic | U5 VREG–GND, per DS-MTR-065 Table 11 |
+| **C14** *(new Rev 3)* | 1µF/5V ceramic | U5 V1P8–GND, per DS-MTR-065 Table 11 |
+| **C15** *(new Rev 3)* | 1µF/5V ceramic | U5 V3P3–GND, per DS-MTR-065 Table 11 |
 
 **No BOOT0 pull-down resistor or header is included** — deliberate
 decision, §4.2 (reasoning corrected this revision, ISS-006: BOOT0 is
 muxed onto PA14/SWCLK, not PB8 as originally written; the design decision
 itself is unchanged).
+
+**No DRV10983 EN or FAULT pin/component is included** — there is none on
+this part (§7.5.4); enable/disable is via the SPEED command itself, and
+fault visibility is I2C-register-only or inferred from FG held high
+(§7.5.6), consistent with the real pinout (DS-MTR-052) rather than an
+assumed generic H-bridge-driver pin set.
+
+**No external SPEED pull-down resistor is included** — deliberate
+decision, §7.5.5: the datasheet's own Table 11 reference circuit
+(DS-MTR-065) has none, and the internal `RPD_SPEED_SL` (55kΩ typ,
+sleep-mode-documented, DS-MTR-069) is treated as a partial, not a
+complete, mitigant — flagged in §16, not silently resolved by adding an
+undocumented component.
 
 ## 14. Mandatory 18-item checklist walkthrough (my own agent instructions)
 
@@ -981,8 +1690,92 @@ not to skip any.
     ISS-006). ESD IC: D+/D− channels left unpopulated is a
     deliberate, logged deviation from the part's full 4-line typical
     application (§3.2).
-18. **Mechanical/Thermal co-design** — explicitly **N/A**, §9 (REQ-202, no
-    rotating body).
+18. **Mechanical/Thermal co-design** — **no longer N/A this revision** —
+    real content in §9 (REQ-204/307: M1 is a genuine rotating body).
+
+### Rev 3 motor-domain re-check (items 1–9, 13, 15–17)
+
+Per this revision's design task, items 1–9 are explicitly re-checked
+against the **new motor domain** (U5/M1/J4/D2/D3), not merely carried
+forward by assumption:
+
+1. **Supply Voltage (motor domain)** — VM_MOTOR sourced from J4, ROC
+   8/24(typ)/28V at U5's VCC per its own datasheet (DS-MTR-054/056);
+   this design's target source class is a 3S LiPo/DC source (≈11.1V
+   nominal, ≈9–12.6V practical range) — comfortably inside ROC with
+   substantial margin both directions. **2S sources (≈6.0–8.4V) are
+   flagged as marginal-to-non-viable through the added series diode
+   (D2)'s ~0.53–0.62V drop against U5's own 7/7.4/8V UVLO rising
+   threshold — practical recommendation: 3S-only operation (§7.5.2,
+   flagged for Hardware Reviewer, not self-resolved)**.
+2. **Logic Voltage (motor domain)** — U5's own digital I/O (SPEED/DIR/
+   SCL/SDA/FG) all operate at U5's own internal V3P3-referenced logic
+   levels (VIH≥2.2V/VIL≤0.6V, DS-MTR-068/069) — compatible with the
+   MCU's 3.3V logic (§7.5.4); no level-shifting needed, same conclusion
+   as the existing logic domain, independently re-verified for this new
+   cross-IC interface specifically.
+3. **Absolute Maximum Ratings (motor domain)** — VCC AMR −0.3 to 30V
+   (DS-MTR-053); U/V/W/SW outputs −1 to 30V; SPEED/SCL/SDA/DIR/FG −0.3
+   to 4V. TVS (D3) clamps at 26.0V max, 4.0V/13% margin under the 30V
+   VCC AMR ceiling (DS-PROT-004) — satisfied.
+4. **Recommended Operating Conditions (motor domain)** — see item 1
+   above; TJ ROC −40 to 125°C (DS-MTR-054), same as item 6 below.
+5. **Current (motor domain, per-pin and total)** — U5 phase current 2A
+   continuous/3A peak (DS-MTR-052/058); M1 derived need ≈1.05A nominal
+   for the 5mN·m target, 18A continuous motor rating (component-selection
+   research, well above what this driver would ever deliver — the driver,
+   not the motor, is the practical current ceiling). J4's own 5.0A rating
+   provides >4× margin over the ≈1.05A nominal / ≤3A absolute-worst-case
+   figure. Full computation in the updated `hardware/power-budget.md`
+   (§17).
+6. **Thermal (motor domain)** — U5 RθJA=36.1°C/W (DS-MTR-055); at a
+   conservatively-estimated worst-case internal dissipation (well under
+   1W at ≈1.05A nominal operation, order-of-magnitude below the current
+   AMR), junction-temperature rise stays far below the 125°C ROC ceiling
+   with wide margin — not computed to a precise worst-case wattage this
+   session (no continuous-stall-current operating scenario is expected
+   in normal use, thanks to item 13's Lock Detection protection), flagged
+   as a reasonable-but-not-exhaustive thermal treatment in §16. M1's own
+   winding-temperature behavior is Component-Engineer/motor-datasheet
+   territory, not independently re-derived here.
+7. **Decoupling (motor domain)** — C10–C15, all per U5's own Table 11
+   reference circuit (DS-MTR-065), no deviation (§7.5.3).
+8. **Pull-up/Pull-down (motor domain)** — R6/R7/R8 (FG/SCL/SDA,
+   4.75kΩ each, referenced to U5's own V3P3 per DS-MTR-065); no external
+   SPEED pull-down added, deliberate, evidence-based (§7.5.5, DS-MTR-069).
+9. **Protection (motor domain)** — 5 distinct mechanisms confirmed from
+   U5's real datasheet (OCP, Lock Detection, UVLO, Thermal Shutdown, AVS
+   — §7.5.6, DS-MTR-057/058/059/060/061), plus the added external series
+   diode (D2, reverse-polarity) and shunt TVS (D3, surge) on the new
+   power input (§7.5.2). **REQ-111/404 satisfied** — the specific
+   mechanism relied on for overcurrent/stall protection is confirmed to
+   be **Lock Detection** (auto-retry, I2C-configurable via `LockEn[5:0]`/
+   `HWiLimitThr[2:0]`), not OCP (fixed, non-retrying) — a correction
+   against `bom/component-selection.md`'s DS-MTR-037 description, flagged
+   narratively for Hardware Reviewer/Hardware Lead reconciliation (§7.5.6,
+   not self-resolved, no new ISS number self-assigned per this agent's
+   scope).
+
+13. **MCU pin function (motor domain)** — PA8 (TIM1_CH1/SPEED), PA6
+    (TIM3_CH1/FG), PB1 (DIR), PB6/PB7 (I2C1 SCL/SDA) — all HIGH confidence
+    on name/AF (DS-MCU-064/065), MODERATE on physical LQFP-32 pin number
+    (§11, §16).
+15. **Grounding (motor domain)** — addressed as its own explicit decision,
+    §8 — common ground net now deliberately spans both power domains,
+    with return-current/layout guidance for REQ-010/REQ-204.
+16. **Noise (motor domain)** — §8's return-current/physical-separation
+    guidance (REQ-010, REQ-204); §5.5's REQ-010 regression check
+    (independent rails, no shared bus/pin, decoupled per §7.5.3);
+    linear-mode internal regulator (not switching/buck mode) chosen
+    partly because it needs no external inductor, avoiding one more
+    potential switching-noise source on this board (§7.5.3) — though the
+    driver's own 3-phase commutation of M1 remains an inherent, expected
+    noise source regardless of regulator mode, addressed via physical/
+    ground separation, not elimination.
+17. **Recommended Application Circuit (motor domain)** — U5's own Table
+    11 reference circuit followed with **no deviation** (§7.5.3/§7.5.4;
+    linear mode vs. buck mode is a choice **between two configurations
+    TI's own datasheet documents**, not a deviation from either).
 
 ## 15. Self-check against the Hardware Reviewer's 16-item checklist (`.github/skills/hardware-review/SKILL.md`)
 
@@ -1068,7 +1861,14 @@ the obvious issues myself before handoff.
    comfortably at the 50pF assumption, marginally at a 75pF worst case).
 10. **Power sequencing** — Not found; structurally moot by design (§14
     item 10).
-11. **Grounding** — Not found; single ground net, explicitly stated (§8).
+11. **Grounding** — Not found; single ground net, explicitly stated (§8),
+    **now updated this revision to explicitly address a two-power-domain
+    system** — the motor rail (VM_MOTOR) and logic rail (3V3) are
+    independently sourced (Option A), but deliberately share the same
+    ground reference so the PWM/FG/I2C1 signals crossing between U1 and
+    U5 remain valid single-ended logic (§8, full rationale). No
+    grounding violation found; the two-domain rationale is itself the
+    new content, not a defect.
 12. **EMI/EMC risk** — No formal EMC pre-compliance target this cycle
     (REQ-401, "no specific regulatory certification target...for this
     prototype/benchmark iteration"). Reasonable practice followed: solid
@@ -1077,18 +1877,41 @@ the obvious issues myself before handoff.
     No dedicated EMI filtering (ferrite beads, common-mode chokes) added
     on the USB VBUS line beyond the ESD/TVS array — judged unnecessary
     for a non-certified bench prototype; would be revisited if REQ-401's
-    scope ever changes.
-13. **Motor noise** — Not applicable; no motor on this board (§9).
+    scope ever changes. **New Rev 3**: the motor domain adds a real,
+    non-zero EMI source (U5's 3-phase commutation of M1) — mitigated by
+    physical/ground separation guidance (§8), not by added filtering
+    components; same "no formal EMC target this cycle" REQ-401
+    disposition applies to the motor domain as well, not re-litigated
+    per-subsystem.
+13. **Motor noise** — **No longer Not Applicable this revision.** M1 (via
+    U5's 3-phase commutation) is a real electrical-noise source. Addressed
+    via: (a) REQ-010 regression check confirming no shared bus/pin/rail
+    with the IMU (§5.5); (b) §8's physical-separation/return-current
+    grounding guidance; (c) U5's own full decoupling network (C10–C15,
+    §7.5.3) at the source; (d) linear-mode regulator choice avoiding an
+    additional switching-noise source. No quantitative conducted/radiated
+    noise measurement was performed this session (no PCB layout exists
+    yet, §0) — flagged in §16 as a Hardware-Reviewer/layout-stage item,
+    not fabricated as already-resolved.
 14. **Sensor noise** — Addressed qualitatively (§14 item 16: linear LDO,
     short IMU decoupling/trace runs) but **no quantitative IMU
     noise-floor/PSRR analysis was performed this session** — flagged in
     §16 as a reasonable follow-up if IMU measurement precision becomes a
-    concern in a later cycle (not currently a REQ).
+    concern in a later cycle (not currently a REQ). **New Rev 3 overlap
+    with item 13 above**: the motor domain is now an additional
+    potential sensor-noise contributor to watch for (not just the
+    logic-rail supply-noise question this item originally addressed) —
+    cross-referenced, not duplicated, in §5.5/§9.
 15. **PCB layout concern (incl. mechanical/thermal co-design near
     rotating bodies)** — No PCB layout exists yet (no KiCad project, §0);
     board-geometry facts are recorded as estimates for the Mechanical
-    Lead (§10). Mechanical/thermal co-design near rotating bodies: N/A,
-    no rotating body (§9).
+    Lead (§10, now including new Rev 3 rows for J4/U5/M1). **Mechanical/
+    thermal co-design near rotating bodies: no longer N/A this
+    revision** — M1 is a genuine rotating body; real content recorded in
+    §9 (vibration-induced solder-joint/connector stress, thermal
+    relevance to the IMU's bias stability) and flagged for the
+    Mechanical Lead's later attention, not designed/mitigated by this
+    agent.
 16. **Datasheet recommendation violation** — All four parts' own
     recommended application circuits were followed, with every deviation
     explicitly logged and justified (§14 item 17 lists all four:
@@ -1096,7 +1919,10 @@ the obvious issues myself before handoff.
     revision, ISS-001**, IMU=INT1/INT2 NC, MCU=no crystal/no BOOT0
     circuit (reasoning corrected, ISS-006), ESD
     IC=D+/D− NC). No unlogged/silent deviation identified in this
-    self-check.
+    self-check. **New Rev 3**: U5's own Table 11 reference circuit
+    (DS-MTR-065) followed with no deviation — linear mode is one of two
+    configurations the datasheet itself documents, not a departure from
+    either (§14 item 17 motor-domain re-check).
 
 **Self-check summary (Cycle 1, original)**: no CRITICAL or HIGH-severity issue identified by
 my own pass. Several items carry an explicit residual flag for the
@@ -1107,7 +1933,7 @@ BOOT0-pull-down scope decision, item 9's I2C capacitance sensitivity, item
 precisely so the Hardware Reviewer knows where to look first, not because
 I believe them to be actual defects.
 
-**Re-self-check after Rev 2 fixes (this revision)**: focused re-check of
+**Re-self-check after Rev 2 fixes (Rev 2 cycle)**: focused re-check of
 items most relevant to the three HIGH findings and the two folded-in
 corrections, per my own agent instructions' handoff requirement —
 
@@ -1140,6 +1966,39 @@ cross-section consistency check noted in the changelog at the top of
 this document). ISS-002 remains, by design, an item for Hardware
 Lead/Chief Engineer disposition rather than something I can close
 unilaterally.
+
+**Rev 3 motor-domain self-check (this revision)**: items 1–9 re-checked
+against the new motor domain in full in §14's own "Rev 3 motor-domain
+re-check" subsection (not duplicated verbatim here) — summary: no
+CRITICAL or HIGH-severity issue identified by my own pass. Two findings
+are flagged narratively for Hardware Reviewer/Hardware Lead attention,
+neither self-resolved nor assigned a self-minted ISS number (per this
+agent's scope, `.github/agents/circuit-engineer.agent.md` "Out of
+scope"):
+
+- **The OCP/Lock Detection correction** (item 9 above; §7.5.6) — the
+  real overcurrent/stall protection mechanism is Lock Detection
+  (auto-retry), not OCP (fixed, non-retrying) as `bom/component-
+  selection.md`'s DS-MTR-037 description states. REQ-111/404 is still
+  satisfied (Lock Detection is a genuine, configurable, auto-retry
+  overcurrent/stall response), but the specific mechanism-name
+  attribution should be reconciled between the two documents by
+  Hardware Reviewer/Hardware Lead.
+- **The 2S/3S UVLO finding** (item 1 above; §7.5.2) — a 2S source
+  through the added series protection diode (D2) lands close to or
+  below U5's UVLO rising threshold; practical recommendation is 3S-only
+  operation, even though the Component-Engineer-approved motor (M1) is
+  itself rated for 2S–3S. This is a consequence of the protection
+  topology added this revision, not a flaw in the original part
+  selection — flagged for Hardware Reviewer awareness and for whoever
+  ultimately specifies the field power source.
+
+No new CRITICAL or HIGH-severity issue is believed to have been
+introduced by this revision's additions themselves (no floating pin
+introduced — DIR's lack of an internal/external bias is flagged as a
+low-severity residual, §16; no AMR/ROC excursion at the recommended 3S
+operating point; no pin-table/net-list inconsistency found across
+§7.5/§11/§12/§13 on this pass).
 
 ## 16. Open UNKNOWNs (for Hardware Lead / Hardware Reviewer)
 
@@ -1274,7 +2133,125 @@ In priority order:
     the human sign-off the architecture doc specifies before it can be
     marked resolved or accepted.
 
+**New this revision (Rev 3) — motor subsystem items 11–20:**
+
+11. **Physical LQFP-32 pin numbers for the 5 new motor-domain pins
+    (PA8/PA6/PB1/PB6/PB7) are MODERATE confidence** — pin **names**/AF
+    numbers are HIGH confidence (DS-MCU-064/065), but their placement
+    within the 32 physical package pin numbers was not independently
+    re-resolved this session, the same residual category as the existing
+    PB8/PB9 pin-numbering gap (item 1 above). Not a blocker for this
+    paper-design cycle; needed before layout.
+12. **PB6/PB7's Fm+ (400kHz+ I2C)/FT_f 5V-tolerance classification is a
+    MODERATE-confidence family generalization** — confirmed as AF6=I2C1
+    (DS-MCU-065/Table 14), but not independently re-confirmed against a
+    specific Table-18 FT_f line item this session the way PA6/FT_ea was
+    (DS-MCU-066). Low risk (this design only requires 3.3V-referenced
+    operation, well within any STM32G0 GPIO's basic ROC regardless of
+    FT/Fm+ classification specifics) but flagged for completeness.
+13. **DIR pin has no internal or external bias and is not proven safe if
+    floating during MCU reset/init** — low-severity residual concern: an
+    undriven DIR input on U5 during the brief window before the MCU's
+    GPIO init completes could latch an indeterminate direction on first
+    spin-up. No component was added to mitigate this (would need a
+    pull-up/pull-down that isn't in TI's own Table 11 reference circuit
+    either) — flagged for Hardware Reviewer/firmware awareness rather
+    than resolved with hardware.
+14. **Cross-domain power-up sequencing is not hardware-enforced** — the
+    MCU/IMU domain (via U3) and the motor domain (via J4→D2→D3→U5) are
+    independently sourced per Option A, so there is no guarantee about
+    which powers up first relative to the other. U5's own datasheet
+    recommends a GND→VCC→SPEED→FG connection order and cautions "ensure
+    FG ≤ VCC at all times" (DS-MTR-066) — in this design's real
+    deployment, that ordering is a **field power-on-sequencing practice**
+    (which supply the operator energizes first), not something the
+    schematic itself enforces, since both domains' power inputs are
+    separate physical connectors (J1, J4) under separate control. Bounded
+    somewhat by SPEED's partial internal pulldown (RPD_SPEED_SL,
+    DS-MTR-069) and by FG being firmware-read rather than driving
+    anything, but not a complete guarantee. Flagged for Hardware
+    Reviewer; no component added this revision to force a specific
+    power-up order across two intentionally-independent connectors.
+15. **PJ-102AH (J4)'s 3rd terminal is left unpopulated, its exact function
+    not confirmed** — the datasheet's own drawing shows 3 terminals
+    (center pin + 2 outer), consistent with a normally-closed
+    switch-contact design common in this connector class, but the
+    specific datasheet page fetched this session did not include an
+    internal schematic unambiguously labeling which outer terminal is
+    the switch contact vs. sleeve/GND (DS-CONN-005 metadata file, "Known
+    gaps" section). This design uses the center pin (+) and one outer
+    terminal (assumed sleeve/GND); the third terminal is left
+    unpopulated. Low risk (leaving a switch contact unpopulated is a
+    safe default — it simply never activates whatever it would have
+    controlled) but flagged for layout-time confirmation.
+16. **DRV10983's I2C address was not extracted from the datasheet this
+    session** — does not affect this design's hardware wiring (only one
+    I2C1 slave exists on this segment, so no address conflict is
+    possible regardless of its value), deferred as a firmware-relevant
+    detail, not a circuit-relevant one.
+17. **2S vs. 3S source viability through the added protection diode
+    (D2)** — a 2S source (≈7.4V nominal) minus D2's ~0.53–0.62V forward
+    drop lands at ≈6.87V, close to or below U5's UVLO rising threshold
+    (7/7.4/8V min/typ/max, DS-MTR-057), while 3S (≈11.1V nominal) remains
+    comfortably clear throughout its practical discharge range. **Recorded
+    as a practical "3S-only operation recommended" finding** (§7.5.2,
+    §14 motor-domain re-check item 1) — not a flaw in the
+    Component-Engineer-approved motor selection (M1 is validly rated for
+    2S–3S), but a consequence of this revision's own added series
+    protection diode. Flagged for Hardware Reviewer/Hardware Lead to
+    confirm the operational recommendation, and for whoever ultimately
+    specifies the field power source (battery pack or bench supply) to
+    respect the 3S-class requirement.
+18. **The OCP/Lock Detection mechanism-name correction** — this design's
+    research (DS-MTR-058/059) finds that `bom/component-selection.md`'s
+    DS-MTR-037 description of DRV10983 overcurrent protection as
+    "programmable via I2C…auto-retry" in fact describes the **Lock
+    Detection** feature, not **OCP** itself (which is a fixed,
+    non-configurable, non-retrying, condition-based-clear mechanism).
+    REQ-111/404 is still satisfied (Lock Detection is the genuine
+    configurable auto-retry response relied on), but the two documents'
+    mechanism-name attribution should be reconciled. `bom/component-
+    selection.md` is not edited by this agent (out of Circuit Engineer
+    scope, per this agent's own instructions) — flagged for Hardware
+    Reviewer/Hardware Lead to log formally if they concur.
+19. **BMI270's own bias-vs-temperature coefficient was not independently
+    re-extracted from its datasheet this session** (§9) — MEMS IMU bias
+    drift with die temperature is a well-known general characteristic,
+    cited qualitatively, but the BMI270's own specific figure was not
+    pulled to quantify how much thermal separation from U5/M1 is actually
+    needed. Flagged as a residual research gap for whoever (Hardware
+    Reviewer, or a future session) wants to turn §9's qualitative
+    flag into a quantitative thermal-separation spec for the Mechanical
+    Lead.
+20. **M1's mass, full mechanical outline, shaft diameter, and
+    mounting-hole pattern were not independently pulled from T-Motor's
+    own mechanical drawing this session** (§10) — only the standard
+    BLDC "XXYY" size-code convention (⌀22mm×6mm stator, ASSUMPTION) is
+    recorded. Needed by the Mechanical Lead before REQ-307's
+    vibration-isolation mount can be designed; this design's own
+    electrical-side scope stops at flagging the need. Related: whether
+    M1 mounts directly to this PCB or to a separate mechanical structure
+    (off-board, wired) is also UNKNOWN/not resolved this session — a
+    Mechanical Lead decision, §10.
+21. **U5's precise worst-case power dissipation/junction-temperature rise
+    was not computed to an exact wattage this session** (§14 motor-domain
+    re-check item 6) — RθJA=36.1°C/W is confirmed (DS-MTR-055), and the
+    qualitative margin against the 125°C ROC junction-temperature ceiling
+    is wide (well under 1W at ≈1.05A nominal operation, an order of
+    magnitude below the current AMR), but a precise figure would require
+    the integrated FET bridge's own RDS(on) — **not independently
+    extracted for the DRV10983 specifically this session** (a same-family
+    alternate candidate, DRV10970, has a recorded ~400mΩ combined figure,
+    DS-MTR-044, but that number belongs to a different part and is
+    deliberately not borrowed here to avoid misattributing it to U5). Flagged
+    as a reasonable-but-not-exhaustive thermal treatment for the Hardware
+    Reviewer, to be tightened if a precise figure is later needed (e.g. for
+    a sustained-near-stall duty-cycle use case beyond this design's nominal
+    ≈1.05A operating point).
+
 ## 17. Power budget (summary — full detail in `hardware/power-budget.md`)
+
+**3V3 logic rail (unchanged from Rev 2 — REQ-103):**
 
 - **Worst-case total on 3V3 rail ≈16.2mA** (MCU 10.2mA@64MHz [DS-MCU-014]
   + IMU 0.685mA [DS-IMU-010] + LED ≈3.94mA [ESTIMATE] + I2C pull-ups
@@ -1292,6 +2269,49 @@ In priority order:
   (`bom/component-selection.md`), ≈79°C headroom to 150°C max — and this
   design's real load is far below the 300mA that estimate already used,
   so actual heating is lower still.
+
+**VM_MOTOR rail (new this revision — REQ-109, tracked entirely
+separately from the 3V3 budget above, never folded in):**
+
+- **Connector: J4 = Same Sky PJ-102AH**, rated 24V/5.0A (DS-CONN-005) —
+  finalizes the placeholder row that `hardware/power-budget.md` previously
+  carried as "TBD."
+- **Motor+driver worst-case current: ≈1.05A nominal** (derived target for
+  5mN·m, Kt≈4.77mN·m/A) **/ ≤3A absolute worst-case** (TI's own
+  start-up/locked-motor ceiling, DS-MTR-056) — this 3A figure sits right
+  at U5's own fixed OCP threshold (3 MIN/4 MAX A, DS-MTR-058), i.e. TI
+  itself designed the protection point around this same realistic worst
+  case.
+- **Margin vs. J4's own rating**: ≈2.0A / ≈40% (3A worst-case vs. 5.0A
+  connector rating) — comfortable margin at the connector/protection-path
+  level.
+- **Margin vs. U5's OCP threshold**: ≈0–1A / 0–25% at the MIN threshold —
+  tight, but expected: this is a protection trip point TI sized close to
+  the real worst case, not a rail-capacity ceiling meant to have wide
+  margin.
+- **Practical source-class recommendation: 3S only**, not the full
+  2S–3S range M1 itself is rated for — a 2S source's nominal voltage
+  minus D2's own forward-voltage drop lands at/below U5's UVLO rising
+  threshold (§7.5.2, §16 item 17), a consequence of this revision's own
+  added series protection diode.
+- **Protection mechanism for REQ-111/404: Lock Detection** (I2C-
+  configurable, auto-retry after 5s, DS-MTR-059) — **not OCP** (DS-MTR-058,
+  fixed/non-configurable/condition-based-clear). This corrects the
+  mechanism-name attribution in `bom/component-selection.md`'s DS-MTR-037
+  (flagged for Hardware Reviewer/Hardware Lead reconciliation, §16 item 18
+  — not edited by this agent).
+- **Thermal**: U5 RθJA=36.1°C/W (DS-MTR-055) against a 125°C ROC ceiling —
+  qualitatively wide margin at ≈1.05A nominal, not computed to a precise
+  worst-case wattage this session (RDS(on) not independently extracted for
+  this specific part, §16 item 21).
+- **Field DC source itself (battery pack/bench supply/adapter) is not a
+  specified component** — an operational choice outside this schematic's
+  parts list, the same convention Rev 2 already used for J1's upstream
+  "USB host."
+- Full numeric detail, all four tables (Supply Capability, Subsystem Load,
+  Rail Margin Summary, both Thermal cross-checks), now finalized in
+  `hardware/power-budget.md` — no more placeholder/TBD rows remain there
+  for this revision's motor subsystem.
 
 ## 18. Handoff (per `.github/agents/circuit-engineer.agent.md`)
 
@@ -1357,3 +2377,110 @@ Hardware Reviewer's alone to make. I am also not marking ISS-004,
 ISS-005, ISS-007, ISS-008, or ISS-009 resolved, touched, or in any way
 addressed by this revision — those remain for a later disposition pass,
 per the Hardware Lead's own scoping of this cycle's work.
+
+### 18.1 Rev 3 handoff (this revision — Motor Driver + Reaction Wheel addition)
+
+**This is a new-subsystem handoff, not a re-review of a prior fix cycle.**
+Rev 2 above (Cycle 2) was Design-Complete and human-approved before this
+revision began; none of its content was reopened except where this
+addition genuinely required it (§2.1–§2.3 rails/ground-scheme/pin
+allocation, §11 free-GPIO inventory, §12/§13 net/parts lists, §14/§15
+checklists, §16/§17 UNKNOWNs/budget). See the Revision changelog at the
+top of this document for the complete list of what Rev 3 changed, section
+by section.
+
+**To**: Hardware Reviewer, via Hardware Lead, for a **first review of the
+Rev 3 motor subsystem addition** — per `.github/skills/hardware-review/
+SKILL.md`, this is new-block review, not a fix re-check, so the full
+16-item checklist applies to the new content, not just the changed-area
+subset. Areas touched this revision: §1, §2.1–§2.3, §5.5 [new], §7.5
+[new, 8 subsections], §8 [rewritten], §9 [rewritten, N/A→real], §10
+[additions], §11 [additions + a transparently-flagged Rev 2 bookkeeping
+gap], §12 [additions], §13 [additions], §14 [item 18 flipped + new
+motor-domain re-check subsection], §15 [items 11/13/15/16 rewritten + new
+motor-domain self-check subsection], §16 [11 new items, 11–21], §17
+[new VM_MOTOR summary].
+
+**Artifacts**:
+- This document (`hardware/schematic/bench-imu-01-design.md`), revised to
+  Rev 3 — schematic artifact + design rationale log + self-check results
+  (§14/§15, including the new Rev 3 motor-domain re-check/self-check
+  subsections), combined.
+- `hardware/power-budget.md` — **finalized this revision**: the
+  previously-placeholder VM_MOTOR row ("TBD"/"specific connector...still
+  to be sourced") now carries real numbers — J4=Same Sky PJ-102AH
+  (24V/5.0A, DS-CONN-005), motor+driver worst-case ≈1.05A nominal/≤3A
+  absolute-worst-case, full Supply Capability / Subsystem Load / Rail
+  Margin Summary tables, plus a new U5 thermal cross-check section. No
+  `TBD` rows remain in that file for this revision's subsystem.
+- `datasheets/evidence-log.md` — **+25 new rows this revision**
+  (DS-MTR-052 through DS-MTR-070 [19 rows, DRV10983 pin/AMR/ROC/thermal/
+  5-protection-mechanism/register-map/reference-circuit research],
+  DS-MCU-064/065/066 [3 rows, STM32G031 PA8/PA6/PB1/PB6/PB7 pin/AF
+  confirmations], DS-CONN-005 [J4/PJ-102AH], DS-PROT-004/005 [D3/SMBJ16A,
+  D2/STPS3L60]) — verified against no duplicate row IDs. **No new
+  datasheet metadata files created**: all 25 rows cite the metadata
+  records already registered at `datasheets/texasinstruments_drv10983_
+  slvscp6h.md`, `datasheets/tmotor_mn2206-13-2000kv_rev-unknown.md`,
+  `datasheets/samesky_pj-102ah_rev1-05.md`, `datasheets/littelfuse_
+  smbj16a_rev4.md`, and `datasheets/stmicroelectronics_stps3l60_ds2134-
+  rev7.md`, per the task's explicit instruction not to duplicate
+  already-registered parts' metadata records. One citation-precision fix
+  made to the STPS3L60 metadata file this revision (an internal
+  cross-reference correction, not a new fact).
+- Open `UNKNOWN`s: §16 above — **11 new items appended this revision**
+  (items 11–21, none renumbering or deleting the 10 pre-existing Rev
+  1→2 items, per this section's own established "annotate/append, don't
+  renumber" convention). Two of these are the headline findings I am
+  flagging most strongly for Hardware Reviewer/Hardware Lead attention
+  (neither self-resolved, no ISS number self-assigned, per my own
+  agent instructions' scope):
+  1. **Item 18 — OCP/Lock Detection mechanism-name correction**:
+     `bom/component-selection.md`'s DS-MTR-037 attributes DRV10983's
+     I2C-programmable auto-retry overcurrent behavior to "OCP"; this
+     revision's primary-source research (DS-MTR-058/059) finds that
+     description actually belongs to the separate **Lock Detection**
+     feature, not OCP itself (which is fixed/non-configurable). REQ-111/
+     404 is still satisfied either way (Lock Detection is the genuine
+     mechanism relied on) — this is a documentation-attribution issue for
+     Hardware Reviewer/Hardware Lead to reconcile, not a functional gap.
+  2. **Item 17 — 2S/3S UVLO finding**: this revision's own added series
+     protection diode (D2) creates a voltage-margin issue at 2S that did
+     not exist before the diode was added — practical recommendation is
+     **3S-only operation**, even though the Component-Engineer-approved
+     motor (M1) is validly rated across the full 2S–3S range. Not a part-
+     selection flaw; a consequence of this revision's own protection
+     addition, flagged for Hardware Reviewer/Hardware Lead to confirm or
+     revisit.
+  Remaining 9 new items (11–16, 19–21) are lower-severity residual
+  research gaps or interpretive judgment calls, itemized in full in §16
+  — none are believed to block a paper-design review, all are flagged
+  rather than silently assumed.
+
+**On the ECO-007 human directive (FG degradation below ~500–1500 RPM)**:
+tracked per the task's request. This revision found a genuine
+circuit-adjacent, register-level fact worth recording rather than
+treating this as purely a firmware/FMEA item: `FGOLsel[1:0]`
+(DS-MTR-062) and `Op2ClsThr[4:0]` (DS-MTR-063) are the specific
+DRV10983 configuration registers governing FG behavior during open-loop
+operation and the open-to-closed-loop transition threshold, respectively
+— both are I2C/EEPROM-configurable, and this design's SCL/SDA wiring
+(§7.5.4) exists specifically so they can be tuned post-assembly without
+hardware rework. No register value is set by this document (REQ-009
+scope fence — wiring the interface, not writing configuration/control
+logic); the finding is recorded here as the concrete substantiation ECO-007
+asked for, for Firmware Engineer/FMEA attention.
+
+**Constraints confirmed respected this revision**: `bom/component-
+selection.md`, `requirements/requirements.md`, `hardware/power-
+architecture.md`'s Decision table, `hardware/mechanical-interface.md`,
+and everything under `hardware/mechanical/`/`firmware/` were read-only
+references, never edited. No control-loop code or logic of any kind was
+introduced (REQ-009) — every SPEED/DIR/FG/I2C reference in this document
+describes wiring and commissioning-time configuration, not a runtime
+control algorithm.
+
+No KiCad project exists to run `extract_schematic_netlist` /
+`analyze_schematic_connections` / `validate_project` against (§0) — this
+document, including its Rev 3 additions, is the self-check substitute for
+this revision too, consistent with Rev 1 and Rev 2.
