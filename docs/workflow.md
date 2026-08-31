@@ -358,6 +358,81 @@ is the one fork in the framework that runs *before* Circuit Design rather
 than alongside/after it, since Phase 12 by definition must finish before
 Circuit Engineer can correctly design the power sub-block at all.
 
+### 4.1 Cross-Branch ID Collision Resolution (Shared-Namespace Files)
+
+Three files hold a flat, monotonically-increasing ID namespace that any
+session/branch can append rows to: `ECO-<NNN>` in
+`validation/change-log.md`, `ISS-<NNN>`/`MISS-<NNN>` in
+`validation/open-issues.md`, and `DS-<CATEGORY>-<NNN>` in
+`datasheets/evidence-log.md` (architecture.md §6.3). When two branches
+diverge from the same baseline and each independently appends a new row to
+one of these files, each branch can only see its own view of the namespace
+at allocation time — it has no way to know what a sibling branch is
+concurrently allocating. If both pick the same next-available number for
+unrelated content, merging produces a genuine ID collision.
+
+**Git's own merge does not catch this.** Two branches each appending a new
+table row is a clean, non-conflicting text merge (different/independent
+lines) even though the result now has two different rows silently sharing
+one ID — the collision is semantic, not textual, so it can land on `main`
+with no merge-conflict marker at all.
+
+This is not hypothetical — it happened for real, more than once, on this
+repository's own `bench-imu-01-rev3-motor-driver` branch merging `main`
+(see that branch's `validation/change-log.md` ECO-014 and ECO-018 for the
+full, dated record):
+
+- **First `main` merge (ECO-014)**: three simultaneous collisions —
+  `ECO-006`..`ECO-012`, `ISS-014`, and `DS-MCU-064`..`DS-MCU-068` — each
+  branch had independently allocated the same numbers for unrelated
+  content since diverging from the same Rev 2 baseline.
+- **Second `main` merge (ECO-018)**: a *new* `DS-MCU-069` collision,
+  because the first merge's own renumbering had already claimed that slot
+  on this branch — proof the same collision class can recur on the same
+  branch, not just once per pair of branches.
+- **Incomplete first-pass renumbering**: the initial ECO-014 fix updated
+  the defining table row but missed several other live citations, requiring
+  two dedicated follow-up commits to find and correct dangling/stale
+  references the first pass missed, plus a third pass that found two more
+  on a final repo-wide sweep.
+
+**Resolution convention, empirically observed here (judgment still
+applies — this is not a rigid rule):**
+
+1. **Detect early.** Run `python3 tools/check_id_uniqueness.py` before
+   finalizing any merge between two branches that both extended
+   `validation/change-log.md`, `validation/open-issues.md`, or
+   `datasheets/evidence-log.md` since diverging from a shared baseline.
+2. **Decide which side keeps the number.** Keep whichever side's usage is
+   already more load-bearing — more reviewed, more cross-referenced
+   elsewhere, or an already-closed/self-contained record — and renumber
+   the other side's colliding ID to the next free number in the *union* of
+   both namespaces (not a naive +1). In the real history above this
+   usually meant the branch performing the merge renumbered its own
+   newly-added IDs and kept the incoming `main` numbers canonical (`ECO`,
+   first `DS-MCU` collision) — but not always: for `ISS-014`, the
+   *incoming* `main` finding was renumbered (to `ISS-027`) instead, because
+   the local branch's own `ISS-014` was already a fully-resolved, unrelated
+   finding, and leaving it in place avoided perturbing something already
+   closed. Don't assume the direction is always the same; check which side
+   is actually more disruptive to move.
+3. **Sweep the whole repository, not just the defining file.** Every place
+   the old ID is cited must be found and updated — `grep -rn "<old-id>"`
+   across the entire repo, not just the table row that defines it. Treat
+   this as a mandatory step: this repository's own history needed multiple
+   dedicated follow-up commits specifically because the first renumbering
+   pass didn't do this exhaustively.
+4. **Record the renumbering as its own `validation/change-log.md` entry**
+   (as ECO-014/ECO-018 did), stating old→new for every ID moved and why.
+5. **Re-run `check_id_uniqueness.py`** after the sweep to confirm zero
+   collisions remain before treating the merge as done.
+
+This is deliberately handled as tooling + process documentation, not a new
+agent/reviewer role: detecting a duplicate ID is a deterministic bookkeeping
+check, not an engineering-judgment task, and a new discipline for it would
+be exactly the role/file proliferation architecture.md §14's closing
+paragraph warns against introducing ahead of actual need.
+
 ## 5. How to Start a New Design Cycle
 
 Use `docs/commands/make-circuit.md` for the copy-pasteable kickoff prompt.
