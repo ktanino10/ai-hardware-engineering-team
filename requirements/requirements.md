@@ -2,12 +2,12 @@
 
 Status: **APPROVED** (2026-08-30, human Chief Engineer, via ask_user "Approve all three as recommended" at the Component Selection checkpoint — see §10 Approval and `validation/change-log.md`). All 4 Open Questions in §9 were answered as-proposed; see §10a.
 
-**Rev 3 status: DRAFT, pending human confirmation of the open questions in
-§9b.** This revision extends the base document (Rev 1/2, above, unchanged)
-for the Motor Driver + Reaction Wheel subsystem — the next two steps of the
-roadmap (`docs/architecture.md` §11), taken together as one combined
-revision. New/changed content below is marked "Rev 3"; nothing already
-approved above is altered.
+**Rev 3 status: APPROVED** (2026-08-31, human Chief Engineer, via the
+creator/"General Chat" session — see §10a). This revision extends the base
+document (Rev 1/2, above, unchanged) for the Motor Driver + Reaction Wheel
+subsystem — the next two steps of the roadmap (`docs/architecture.md` §11),
+taken together as one combined revision. New/changed content below is
+marked "Rev 3"; nothing already approved above is altered.
 
 Produced by `.github/skills/requirements-engineering/SKILL.md`. Every requirement
 below has a stable ID referenced by `requirements/traceability-matrix.md`.
@@ -312,9 +312,9 @@ place, not silently left stale.
 |---|---|---|---|
 | Chief Engineer (Human) | Human Chief Engineer (via creator/"General Chat" session) | 2026-08-30 | **Approved** — requirements confirmed final; proceed to Component Selection |
 
-## 10a. Rev 3 Approval (provisional — see §9c)
+## 10a. Rev 3 Approval (real human sign-off received — supersedes the "provisional" framing above)
 
 | Role | Name | Date | Decision |
 |---|---|---|---|
-| Hardware Lead | Hardware Lead (this session) | 2026-08-31 | **Provisionally adopted** — all four §9b defaults proposed, `ask_user` unreachable this cycle, proceeding autonomously per the human's own explicit "work autonomously" authorization; not a substitute for the human's real sign-off, which remains open and solicited via `send_session_message` |
-| Chief Engineer (Human) | *(pending)* | | *(open — proceeding provisionally in the meantime, per autonomous-work authorization; will update this row the moment a real answer arrives)* |
+| Hardware Lead | Hardware Lead (this session) | 2026-08-31 | Provisionally adopted all four §9b defaults after `ask_user` went unreachable this cycle (see §9c) — superseded by the real human confirmation below, received via the creator/"General Chat" session (the channel that has actually reached the human this cycle) |
+| Chief Engineer (Human) | Human Chief Engineer (via creator/"General Chat" session, who relayed to and confirmed with the human directly) | 2026-08-31 | **Approved — "all four provisional defaults are approved as proposed, no changes."** This is the human's real Rev 3 Requirements sign-off, not a provisional placeholder — REQ-007's target figures, no motor-type preference, REQ-503's ≤$75–90 ceiling, and REQ-308's bare-bench-rig/~150mm sanity bound are now confirmed requirements, not open questions. Component Selection (motor + driver) proceeded against these targets and is recorded in `bom/component-selection.md`. Process note recorded for the rest of this design cycle: since `ask_user` is not reliably reaching the human this cycle, every remaining HITL gate is routed through the cross-session message channel instead (report the gate content there, wait for a reply there) rather than falling back to provisional-autonomous adoption. |

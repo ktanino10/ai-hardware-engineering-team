@@ -424,3 +424,470 @@ justification needed.)*
 | Component Engineer | Component Engineer (AI agent) | 2026-08-30 | Proposed — TLV75533PDBVR |
 | Hardware Lead | Hardware Lead (this session) | 2026-08-30 | Concur — recommend approval; not treated as requiring separate Chief Engineer sign-off per Escalation flag 3, but reported alongside MCU/IMU per the human's explicit "report all three" instruction |
 | Chief Engineer (Human) — required if architecture-defining/major component | Human Chief Engineer | 2026-08-30 | **Approved** — "Approve all three as recommended" (Checkpoint B, recorded via ask_user; independently re-confirmed after the worktree-restore incident, see `validation/change-log.md` ECO-001) |
+
+---
+
+## Motor (Reaction Wheel Drive)
+
+> **Rev 3 addition.** This section and "Motor Driver IC" below were produced
+> together in one pass, per this task's own instruction — the motor-type
+> decision and driver-IC decision are coupled (a driver family only makes
+> sense against a specific motor commutation type), so they were reasoned
+> about jointly even though they are recorded as two separate sections
+> mirroring this file's existing per-part-need structure. **The target this
+> comparison is designed against (REQ-007's flywheel mass/radius/RPM/torque
+> figures, and the "no motor-type preference" framing) is itself only a
+> *provisional*, not-yet-human-confirmed default** —
+> `requirements/requirements.md` §9b/§9c. If the human changes those figures
+> materially, the torque-margin conclusions below should be revisited, not
+> assumed to still hold.
+
+- **Driving requirement(s)**: REQ-007 (open-loop PWM/speed-setpoint control
+  of the flywheel — the core functional need), REQ-008 (measure and report
+  actual RPM back to the host, contingent on whatever RPM-sensing capability
+  the selected motor+driver combination actually provides — this is why RPM-
+  sensing capability is scored as its own comparison criterion below, a new
+  criterion specific to this task), REQ-009 (open-loop only — no closed-loop/
+  PID/sensor-fusion control this cycle, which de-weights "smoothest possible
+  commutation for precision control" relative to what a real flight reaction
+  wheel would need), REQ-108/109 (a dedicated power architecture and a
+  separate motor-rail current budget will be defined by the Power Engineer
+  once engaged, directly consuming the real current/voltage numbers in the
+  comparison table below — this is the primary reason these numbers must be
+  datasheet-grounded, not rough guesses), REQ-110 (MCU shall generate a PWM
+  or equivalent drive signal — informs which control interfaces count as a
+  "clean" match), REQ-111/404 (driver-level overcurrent/stall protection —
+  more a driver-selection criterion, but the motor's own stall-current
+  behavior feeds it), REQ-112 (wire any available RPM/tach signal to the
+  MCU), REQ-204/307 (vibration exposure and isolation from the IMU — motor
+  mass and mounting matter), REQ-306/403 (rotation clearance and projectile/
+  pinch-hazard safety — shaft interface and mounting matter), REQ-503 (Rev 3
+  ≤$75–90 USD total subsystem soft budget — this motor is one line item
+  within that, not the whole budget).
+- **Constraints**: bench-test, open-loop-only hardware — not a flight
+  reaction wheel, so real flight-heritage brushless preference is *context*,
+  not a binding constraint (§9b Q2); no motor-type preference stated —
+  brushed DC, BLDC, and stepper are compared on merit; flywheel target
+  ≈100 g at ≈30 mm radius, spin-up to ≥3000 RPM, storing ≈10–15 mN·m·s,
+  motor delivering ≥5 mN·m continuous torque (arithmetic re-verified this
+  session: I = 0.5·m·r² ≈ 4.5×10⁻⁵ kg·m² at 100 g/30 mm, L = I·ω ≈ 14.1
+  mN·m·s at 3000 RPM — consistent with `requirements/requirements.md` §9b's
+  own figures); real bearing/friction losses not yet characterized (per
+  §9b's own caveat) — torque-margin conclusions below assume the datasheet/
+  derived torque figures are available *at the shaft*, before any such
+  losses; Rev 3 soft budget ≤$75–90 total for the whole new subsystem
+  (motor + driver + flywheel + connectors + wiring), not just the motor;
+  no existing rail on this board is assumed adequate for a motor load —
+  that is exactly the open question this comparison's real numbers feed
+  into the Power Engineer's upcoming HITL gate, not an assumption made here.
+
+### Candidate Comparison
+
+*(4 candidates compared, across all 3 motor types per the "no preference"
+constraint — exceeds the ≥3 minimum, no sole-source justification needed.)*
+
+| Parameter | Candidate A — Maxon RE 16 Ø16mm 118725 (Brushed DC) — ⚠ DISQUALIFIED | Candidate B — Anaheim Automation BLY171D-24V-4000 (Sensored BLDC) | Candidate C — T-Motor MN2206-13 KV2000 (Sensorless BLDC) — ✅ RECOMMENDED | Candidate D — SOYO SY28STH32-0674A / Pololu #1205 (Stepper) — ⚠ DISQUALIFIED |
+|---|---|---|---|---|
+| Manufacturer | Maxon Motor AG / maxon group | Anaheim Automation, Inc. | T-Motor (Nanjing Tiger Motor Technology) | SOYO (sold as Pololu item #1205) |
+| Part Number | 118725 | BLY171D-24V-4000 | MN2206-13 KV2000 (Navigator series) | SY28STH32-0674A |
+| Motor type | Brushed DC, graphite brushes | 3-phase BLDC, **sensored** (integrated Hall) | 3-phase BLDC, **sensorless** (outrunner), 12N14P | 2-phase hybrid stepper, NEMA11 |
+| Rated / nominal voltage | 4.8 V nominal [DS-MTR-001] | 24 V DC [DS-MTR-009] | 2S–3S LiPo, 7.4–11.1 V nominal / 8.4–12.6 V full-charge — no single stated max terminal voltage, rated by cell count [DS-MTR-017] | 3.8 V rated [DS-MTR-025] |
+| No-load current / speed | 105 mA / 12,700 RPM @ 4.8 V [DS-MTR-001] | N/A (BLDC rated by load point, not no-load) — derived no-load speed ≈8,889 RPM from Ke [DS-MTR-011] | 0.3 A @ 10 V; derived no-load speed ≈20,000 RPM @10V / ≈22,200 RPM @11.1V (derived from KV, not directly published) [DS-MTR-018] | N/A (stepper — no-load current concept doesn't apply the same way) |
+| Stall / max current | Stall current 7.56 A, stall torque 26.3 mN·m [DS-MTR-002] | Rated current ≈1.08 A **derived** from ~26W/24V, not directly published [DS-MTR-010] | Max continuous current 18 A (180 s rating); theoretical stall current ≈135 A (not a practical operating point) [DS-MTR-019, DS-MTR-020] | Rated current 670 mA/phase [DS-MTR-025] |
+| Torque available at ≥5 mN·m target | Continuous (nominal) rating only 2.15 mN·m @ 11,200 RPM/0.72 A — **below target on a continuous-duty basis**, but ≈20.1 mN·m available at 3000 RPM under short-term spin-up conditions from the speed-torque line, with only ≈2°C estimated winding temperature rise over a 2.83 s spin-up [DS-MTR-003, DS-MTR-004, DS-MTR-006] | Rated **continuous** torque 62.8 mN·m @ 4000 RPM — **12.6× the target**, heavily over-specified [DS-MTR-010]; peak (intermittent) torque ≈219 mN·m also legible on the same spec sheet, though the exact duration/duty-cycle basis defining "peak" was not confirmed this session [DS-MTR-012] | No manufacturer torque figure published (normal for a hobbyist multirotor motor). **Derived** Kt = 60/(2π·KV) = 4.77 mN·m/A ⇒ only ≈1.05 A needed for 5 mN·m — ample headroom vs. the 18 A continuous rating [DS-MTR-020] | **Marginal/unconfirmed.** Holding torque 58.8 mN·m @ 3.8 V/670 mA is a *low-speed/static* figure only [DS-MTR-026]; at the 3000 RPM/10 kHz step rate, winding L/R time constant (0.75 ms) is 7.5× the 0.10 ms step period — only ≈12.5% of holding torque realistically available (≈7.4 mN·m theoretical, borderline) at rated voltage; a 24 V chopper drive improves this to an estimated 5–20 mN·m, "marginal at best" — **no manufacturer torque-speed curve exists to confirm** [DS-MTR-030, DS-MTR-031] |
+| Max rated / mechanical speed | 16,000 RPM max permissible mechanical speed [DS-MTR-004] | 4000 RPM rated (this is the sheet's *rated* operating point, not a hard ceiling) [DS-MTR-011] | No published max; 3000 RPM target is only 13–20% of the ≈20,000–22,200 RPM derived no-load speed — "a very gentle operating condition" [DS-MTR-018] | 200 steps/rev at 1.8°/step; RPM is entirely a function of commanded step rate, not an intrinsic motor ceiling [DS-MTR-026] |
+| Torque/speed constants | Kt = 3.48 mN·m/A, Ke = 2750 RPM/V [DS-MTR-004] | Ke = 2.7 V/kRPM ⇒ derived ≈370 RPM/V KV-equivalent [DS-MTR-009] | KV = 2000 RPM/V (published); Kt = 4.77 mN·m/A (**derived**, not published) [DS-MTR-017, DS-MTR-020] | Coil resistance 5.6 Ω/phase, inductance 4.2 mH/phase [DS-MTR-025] |
+| Mass | 40 g [DS-MTR-005] | ≈299 g (0.66 lb) — **≈3× the 100 g flywheel target alone**, mechanically awkward [DS-MTR-013] | **30 g** — lightest of all 4 candidates [DS-MTR-021] | 110 g [DS-MTR-027] |
+| Package / dimensions / shaft | Body Ø16 mm confirmed; length/shaft/mounting pattern **UNKNOWN this session** — a research sub-agent's figures for these were self-flagged "from training data," not independently re-verified, so they are not repeated here as if confirmed [DS-MTR-005] | 42 mm² NEMA17 frame × 40.4 mm length, pole count **UNKNOWN** [DS-MTR-013] | Ø27 mm × 18.5 mm overall; stator Ø22 mm × 6 mm; 3 mm shaft; outrunner (flywheel can mount directly to the rotating bell, maximizing inertia per gram) [DS-MTR-021] | NEMA11, 28×28 mm × ≈32 mm length; 5 mm D-flat shaft; rotor inertia **UNKNOWN** [DS-MTR-027] |
+| **RPM-sensing capability** (new criterion) | **None integrated** on this base SKU — encoder-combination SKUs exist only as separate paid accessories ($30–80+); external bolt-on encoder (e.g. magnetic AS5600, optical US Digital) is a realistic DIY option [DS-MTR-005] | **Yes — 3× integrated Hall-effect sensors**, 5-wire harness, 5 V logic (needs level-shifting or open-drain/pull-up confirmation for a 3.3 V MCU input) — the only candidate with native integrated sensing [DS-MTR-014] | **None integrated** (sensorless outrunner) — but the paired driver IC (see Motor Driver IC section) supplies a hardware FG output derived from back-EMF; reliable BEMF detection typically degrades below ≈500–1500 RPM, a caveat for spin-up specifically, not the 3000 RPM steady-state point [DS-MTR-022] | **None integrated**; no confirmed encoder-equipped sibling SKU found — a stepper's own commanded step count is a form of "sensing" only if steps are never lost, which the torque-margin finding above makes a real risk at this RPM [DS-MTR-028] |
+| Lifecycle / EOL | **NRND** (Not Recommended for New Designs), verbatim [DS-MTR-007] | Active, no EOL notice found [DS-MTR-015] | Active (older 1400KV sibling appears discontinued; no EOL notice for this 2000KV variant) [DS-MTR-023] | Active/in-stock at Pololu [DS-MTR-029] |
+| Availability / lead time | In stock at maxongroup.us direct store [DS-MTR-008] | Up to 90-day factory-direct lead time; faster 3rd-party (Radwell, eBay) alternates exist [DS-MTR-016] | In stock, ships immediately (Graves RC Hobbies) [DS-MTR-023] | In stock (Pololu direct; cross-listed at DigiKey) [DS-MTR-029] |
+| Reference design / prior art | None found for continuous-spin/reaction-wheel use | None found for this exact SKU; NEMA17-class BLDCs used generically in academic reaction-wheel literature [DS-MTR-016] | **Exceptionally strong** — 2 GitHub CubeSat reaction-wheel projects built around this exact motor or a close sibling, plus a Charles' Labs build and an Embry-Riddle academic platform [DS-MTR-024] | None found for continuous-spin/reaction-wheel use |
+| Ecosystem / driver compatibility | Standard brushed H-bridge driver family (see Motor Driver IC section's footnote) | Compatible with sensored-BLDC drivers (e.g. DRV8313, MCF8315A, A4931 — noted by research, not carried into the formal driver comparison since this motor isn't recommended) | Mature sensorless-BLDC ecosystem: BLHeli_32/AM32 ESCs, VESC, SimpleFOC, and the paired driver IC below | Standard stepper chopper-driver family (not researched in depth this session since this motor is disqualified on physics grounds before reaching driver pairing) |
+| Price @ qty 1 | **$209.52** (qty 1–4); $184.82 (qty 5–19); $155.93 (qty 20–49) [DS-MTR-008] | **$65.00** (qty 1); $62.18 (qty 10); $50.16 (qty 25) [DS-MTR-015] | **$18.99** (qty 1) [DS-MTR-023] | **$39.92** (qty 1); $37.52 (qty 5); $35.27 (qty 25) [DS-MTR-029] |
+| % of Rev 3 $75–90 subsystem budget (qty 1, low end) | ≈279% — **motor alone exceeds the entire subsystem budget** | ≈87% — consumes nearly the whole subsystem budget alone | ≈25% — leaves ≈$50–65 headroom for driver + flywheel + PCB + connectors + wiring | ≈53% |
+| Known risks / disqualifying factors | **DISQUALIFIED**: price ≈2.7× over budget; NRND lifecycle; zero native RPM-sensing path; no reaction-wheel reference design. Continuous torque rating alone reads below target (though short-term spin-up torque and thermal margin are adequate) — not the primary disqualifier, budget/lifecycle are. | Not disqualified on electrical/functional grounds — heavily over-specified on torque, native Hall sensing is a real strength — but mass (≈3× the flywheel itself) and price (≈87% of the whole subsystem budget) make it a poor fit versus Candidate C. Retained as the strongest **fallback** candidate if Candidate C's sensorless RPM-sensing path fails at bring-up. | Low technical risk identified; open items are the derived (not manufacturer-published) torque constant and the sensorless BEMF low-speed detection floor during spin-up (both addressed in Recommendation below). | **DISQUALIFIED**: well-cited physics (L/R time-constant analysis) shows continuous torque at the 3000 RPM target is marginal-to-infeasible with an ordinary driver; zero native RPM-sensing path; no reaction-wheel reference design found; no published torque-speed curve to even confirm the marginal estimate. |
+
+*A cheaper Pololu brushed-DC alternative (item #1117) was informally
+surfaced during research as a potential lower-cost brushed-DC option, but
+was found to fail the torque margin (back-calculated stall torque only
+≈3.6–7 mN·m against the 5 mN·m target) and has no manufacturer datasheet —
+not viable, and not added as a formal 5th candidate since it fails on its
+own merits rather than adding a genuinely new trade-off to weigh.*
+
+### Recommendation
+
+- **Recommended candidate**: **C — T-Motor MN2206-13 KV2000 (sensorless
+  BLDC)**.
+- **Motor-type elimination reasoning (the coupling point with the Motor
+  Driver IC section below)**: brushed DC and stepper are **both eliminated
+  as a type**, not just as individual SKUs — brushed DC's best-fitting real
+  candidate (Maxon) is disqualified on budget/lifecycle grounds and brushed
+  DC as a type has zero native RPM-sensing path requiring an added external
+  encoder regardless of which specific brushed motor is chosen; stepper's
+  well-cited L/R time-constant physics makes continuous torque at the 3000
+  RPM target marginal-to-infeasible with an ordinary driver, independent of
+  which specific stepper SKU is chosen, and also has zero native RPM-sensing
+  path. This leaves **BLDC as the only motor type still in contention**,
+  which is why the Motor Driver IC section below formally compares only
+  BLDC/sensorless-BLDC driver ICs (with H-bridge brushed-DC drivers
+  mentioned only as a footnote for process transparency, per this task's own
+  instruction to match the driver comparison to the surviving motor type).
+- **Rationale** (success probability first, peak spec second):
+  1. **Budget fit is decisive, not marginal.** At $18.99, Candidate C
+     consumes only ≈25% of the Rev 3 subsystem's $75–90 soft ceiling,
+     leaving ≈$50–65 for the driver IC, flywheel machining, PCB, connectors,
+     and wiring. Candidates A and B alone consume 279% and 87% of that same
+     budget respectively — either would force cuts elsewhere in the
+     subsystem or blow the ceiling outright.
+  2. **Mass is the lightest of all 4 candidates (30 g)** — directly helps
+     REQ-306 (rotation clearance envelope) and REQ-307 (vibration isolation
+     from the IMU) by keeping the rotating assembly's total mass/inertia
+     budget dominated by the flywheel itself (≈100 g) rather than by the
+     motor, and helps REQ-308's soft desk-scale enclosure bound.
+  3. **Torque margin is real and generous, not assumed.** The derived
+     torque constant (Kt = 4.77 mN·m/A) means only ≈1.05 A is needed to
+     produce the 5 mN·m target — against an 18 A continuous rating, this is
+     roughly 17× current headroom. Even granting meaningful uncertainty in
+     the derivation (it is *derived* from KV, not a manufacturer-published
+     torque figure — see Open UNKNOWNs), the margin is large enough to
+     absorb real bearing/friction losses that requirements.md's own §9b
+     explicitly flags as not yet characterized.
+  4. **Direct, repeated reaction-wheel/CubeSat project heritage is the
+     strongest differentiator versus every other candidate.** Two
+     independent GitHub projects (`yiqiangjizhang/CubeSat-Reaction-Wheel-
+     control`, `Thissp97/Reaction-Wheel-for-CubeSat`) plus a Charles' Labs
+     build and an Embry-Riddle academic platform have already run this
+     exact motor (or a close KV sibling) as a continuous-spin reaction
+     wheel — this is direct evidence the part *works* in this exact
+     application, not just that its datasheet numbers look adequate on
+     paper. None of the other 3 candidates have any reaction-wheel-specific
+     prior art at all.
+  5. **RPM-sensing gap is real but has a credible resolution, not a silent
+     gap.** Candidate C itself has no integrated Hall sensor or encoder —
+     but the recommended paired driver IC (TI DRV10983, see Motor Driver IC
+     section) provides a hardware FG output pin derived from back-EMF
+     sensing, which is judged an adequate REQ-008/112 answer at the 3000
+     RPM steady-state operating point. This is not free of risk — see Open
+     UNKNOWNs below and the Motor Driver IC section's own escalation flags.
+  6. This recommendation deliberately does **not** chase Candidate B's
+     "real" integrated Hall sensors or Candidate A's mature, well-
+     characterized-at-low-speed brushed DC control simplicity, because
+     both lose on cost/mass/lifecycle grounds that matter more for this
+     specific project's success than peak sensing fidelity — consistent
+     with this role's "success probability first, peak spec second"
+     mandate.
+- **Trade-offs accepted**:
+  - *vs. Candidate A (Maxon, brushed DC)*: gives up a mature, simple,
+    well-understood brushed-DC control scheme (no commutation electronics
+    needed beyond a basic H-bridge) — in exchange for eliminating an NRND
+    lifecycle risk and a price point that alone exceeds the entire Rev 3
+    subsystem budget. Not a close call.
+  - *vs. Candidate B (Anaheim, sensored BLDC)*: gives up **native, direct
+    Hall-effect RPM sensing** (a real, meaningful capability Candidate C
+    lacks) and gives up a large, confirmed torque margin (62.8 mN·m
+    continuous vs. Candidate C's ≈1.05 A-derived need) — in exchange for
+    ≈3.4× lower price, ≈10× lower mass, and direct reaction-wheel project
+    heritage that Candidate B does not have. This is the trade-off most
+    worth revisiting if Candidate C's sensorless RPM-sensing path proves
+    unreliable at bring-up (see Escalation flags) — Candidate B is recorded
+    here specifically as that fallback.
+  - *vs. Candidate D (SOYO/Pololu stepper)*: gives up native, precise
+    open-loop position control via commanded step count (in principle, if
+    no steps are ever lost) — in exchange for avoiding a well-cited,
+    unresolved risk that the stepper cannot deliver its target torque at
+    all at the required RPM, and gaining a motor type with an actual
+    continuous-high-speed-spin design intent (BLDC) rather than one
+    optimized for low-speed positioning torque.
+- **Open `UNKNOWN`s**:
+  - The core torque figure this recommendation rests on (Kt = 4.77 mN·m/A,
+    ⇒ ≈1.05 A needed for 5 mN·m) is a **derived** estimate from the
+    published KV constant, not a manufacturer-stated torque number — no
+    stall/peak torque or torque-speed curve is published for this SKU at
+    all (normal for a multirotor-market motor). The margin is large enough
+    (≈17× on current) that this is judged low-risk, but it is not the same
+    confidence level as a directly-published torque figure.
+  - Whether the paired driver's BEMF-derived FG signal will be clean/
+    monotonic specifically during the 0→3000 RPM spin-up ramp for *this*
+    motor+driver combination is not resolvable from datasheets alone — no
+    hardware has been built yet. Flagged as a bring-up validation item for
+    Circuit Engineer/Firmware, not a blocking issue for this recommendation.
+  - Real bearing/friction losses for whatever bearing/shaft/flywheel-mount
+    solution Mechanical Lead eventually designs are not yet characterized
+    (per requirements.md §9b's own caveat) — the ≈17× current margin is
+    judged large enough to absorb a reasonable range of such losses, but
+    this has not been bench-verified (REQ-504 — no physical build this
+    cycle).
+  - Candidate A's package dimensions beyond body diameter (length, shaft,
+    mounting pattern) and Candidate B's pole count are recorded `UNKNOWN`
+    in the table above rather than guessed — not blocking since neither is
+    the recommended candidate, but would need to be closed before either
+    could be seriously re-considered as a fallback.
+
+### Escalation flags
+
+1. **Architecture-defining / major component decision — requires Hardware
+   Lead + human Chief Engineer approval before Circuit Engineer uses this**
+   (`docs/architecture.md` §10). This is explicitly **not self-approved**;
+   see Approval table below.
+2. **The target this comparison is designed against is itself only
+   provisionally adopted, not human-confirmed** — `requirements/
+   requirements.md` §9b/§9c records the flywheel/torque/RPM figures and the
+   "no motor-type preference" framing as the Hardware Lead's own proposed
+   defaults, adopted autonomously after `ask_user` went unanswered this
+   cycle, with the human's real sign-off still open and solicited. If the
+   human changes any of those figures materially, this comparison's torque-
+   margin conclusions (especially the derived-Kt margin analysis for
+   Candidate C) should be re-checked, not assumed to still hold.
+3. **New ~12 V rail requirement for the Power Engineer.** The recommended
+   motor+driver pairing (Candidate C + TI DRV10983, see Motor Driver IC
+   section) needs to run from approximately 12 V to clear the driver's 8 V
+   minimum input with real margin — Candidate C's own 2S-nominal (7.4 V)
+   rating undershoots that minimum. Rev 1/2 of this board has only a single
+   3.3 V rail (via the existing TLV75533 LDO, REQ-102). **This is a
+   structural change to the power architecture, not a decision made here**
+   — it is flagged for the Power Engineer's own HITL-gated rail-topology/
+   sourcing proposal (`hardware/power-architecture.md`,
+   `.github/agents/power-engineer.agent.md`), per REQ-108's own contingency
+   for exactly this kind of finding.
+4. **Fallback path recorded, not silently discarded.** If Candidate C's
+   sensorless RPM-sensing path (BEMF-derived FG signal from the paired
+   driver) proves unreliable at physical bring-up, Candidate B (Anaheim
+   BLY171D-24V-4000, native Hall sensors) is the recorded fallback — at the
+   cost of ≈3.4× price, ≈10× mass, and a driver-IC change (see Motor Driver
+   IC section's DRV10970 comparison, which is Hall-sensor-compatible).
+
+### Approval
+
+| Role | Name | Date | Decision |
+|---|---|---|---|
+| Component Engineer | Component Engineer (AI agent) | 2026-08-31 | Proposed — T-Motor MN2206-13 KV2000 (sensorless BLDC), paired with TI DRV10983 (see Motor Driver IC section) |
+| Hardware Lead | Hardware Lead (this session) | 2026-08-31 | Concur — recommend approval. Independently re-verified the load-bearing arithmetic this candidate rests on: Kt = 60/(2π·2000 RPM/V) = 4.77 mN·m/A (confirmed by direct substitution); current need for 5 mN·m target = 5/4.77 ≈ 1.05 A (confirmed); margin vs. 18 A continuous rating ≈17.1× (confirmed); flywheel target itself (100 g/30 mm/3000 RPM ⇒ I≈4.5×10⁻⁵ kg·m², L=I·ω≈14.1 mN·m·s) independently re-derived and matches both this file's and `requirements/requirements.md` §9b's figures. Toshiba TC78B009FTG evidence-quality disqualifier is well-reasoned (existence not in doubt — 3 simultaneous live distributor listings — but no primary-source datasheet text was actually read this session, correctly not treated as a blocking "no datasheet found" escalation). Escalation flag 3 (new ~12 V rail requirement) is the key finding — routing to Power Engineer now for the architecture proposal before this recommendation goes to the human. |
+| Chief Engineer (Human) — required if architecture-defining/major component | *(pending)* | | *(open — **required** before Circuit Engineer uses this recommendation; architecture-defining/major component decision per `docs/architecture.md` §10, and REQ-007's own underlying target is itself still only provisionally adopted per `requirements/requirements.md` §9c — not self-approved)* |
+
+---
+
+## Motor Driver IC
+
+> **Rev 3 addition, coupled to the Motor section above.** Per the Motor
+> section's own "Motor-type elimination reasoning," brushed DC and stepper
+> are both eliminated as motor *types*, leaving only BLDC in contention —
+> so this comparison covers only sensorless/sensored-BLDC driver ICs, not
+> every driver family that exists. H-bridge (brushed-DC) driver ICs were
+> researched in parallel this session (TI DRV8871, TI DRV8833, Allegro
+> A4950) but are not carried into the formal comparison below and have no
+> assigned Evidence IDs or datasheet metadata records, since no fact about
+> them is actually relied upon anywhere in this file — recorded here only
+> for process transparency, per this task's own instruction that the driver
+> comparison should match whichever motor type(s) survive.
+
+- **Driving requirement(s)**: REQ-110 (MCU shall generate a PWM/commutation
+  drive signal to control the motor driver IC's speed/duty cycle — this is
+  the primary control-interface fit criterion below), REQ-111 (motor driver
+  IC shall include or enable overcurrent/stall protection appropriate for
+  repeated bench testing by hand) together with its companion REQ-404
+  (motor driver/firmware shall implement stall/overcurrent detection and a
+  shutdown behavior to prevent sustained overheating during bench testing —
+  REQ-111/404 are scored together below since they describe the same
+  protection need split across IC vs. firmware), REQ-008/112 (RPM/tach
+  feedback shall be wired to an MCU input where the motor+driver combination
+  provides one — this is why tach/FG output availability is scored
+  explicitly below, directly following on from the Motor section's finding
+  that the recommended motor itself has no integrated sensing), REQ-108/109
+  (the driver's own supply-voltage range and current rating are themselves
+  primary inputs to the Power Engineer's upcoming rail/topology decision —
+  same "real numbers, not guesses" mandate as the Motor section), REQ-503
+  (Rev 3 ≤$75–90 USD total subsystem soft budget — the driver is a second
+  line item within that, alongside the motor).
+- **Constraints**: must be electrically and functionally compatible with
+  the motor type(s) still in contention after the Motor section's own
+  comparison — concretely, this means **sensorless-BLDC-capable** drivers
+  are the primary fit (matching the recommended T-Motor MN2206-13), with
+  Hall-sensored-BLDC-only drivers scored but expected to be a poor fit
+  given the recommended motor has no Hall sensors to wire to one; supply
+  voltage range must cover a realistic operating point for the recommended
+  motor (2S–3S LiPo range, 7.4–12.6V, with an actual target rail still
+  pending the Power Engineer's own decision — see Motor section Escalation
+  flag 3); control interface should map cleanly onto a bare MCU PWM output
+  (REQ-110) without requiring protocol translation hardware for basic
+  open-loop operation (REQ-007/009); package must be at least partially
+  hand-solderable given this project's small-batch/bench-assembly context
+  (mirrors the MCU/Regulator sections' own package-assembly scoring);
+  Rev 3 soft budget shared with the motor, not a separate ceiling.
+
+### Candidate Comparison
+
+*(3 candidates compared — meets the ≥3 minimum; all 3 are sensorless-or-
+Hall-sensored 3-phase BLDC driver ICs, the only motor type still in
+contention per the Motor section above.)*
+
+| Parameter | Candidate A — TI DRV10983 — ✅ RECOMMENDED | Candidate B — TI DRV10970 | Candidate C — Toshiba TC78B009FTG |
+|---|---|---|---|
+| Manufacturer | Texas Instruments | Texas Instruments | Toshiba Electronic Devices & Storage |
+| Part Number | DRV10983 | DRV10970 | TC78B009FTG |
+| Motor-type compatibility | **Sensorless** 3-phase BLDC — direct match to the recommended T-Motor MN2206-13 (sensorless, DS-MTR-022) [DS-MTR-035] | **Requires Hall-effect sensors** on the motor — hard incompatibility with the recommended sensorless T-Motor MN2206-13 [DS-MTR-045] | Sensorless 3-phase BLDC per secondary-source claim — would also match the T-Motor, but this claim is **not primary-source-confirmed this session** [DS-MTR-050] |
+| Supply voltage range (VM) | 8–28 V [DS-MTR-032] | 5–18 V — **hard ceiling incompatible with a 24V-nameplate motor** such as the Anaheim BLY171D-24V-4000, though not with the recommended T-Motor [DS-MTR-042] | Up to 30 V operating (36 V absolute maximum per a distributor listing) — the widest range of the 3, would cover either motor candidate [DS-MTR-049] |
+| Max current rating (per phase) | 2 A continuous / 3 A peak — against the T-Motor's derived ≈1.05 A need (DS-MTR-020), this is ≈2× continuous-current margin [DS-MTR-034] | 1 A RMS continuous / 1.5 A peak — the most current-limited of the 3 candidates [DS-MTR-044] | 3 A maximum — highest of the 3, but continuous-vs-peak distinction **UNKNOWN this session** [DS-MTR-049] |
+| Integrated power stage | Fully-integrated on-die power MOSFETs for all 6 switches — no external FETs needed [DS-MTR-035] | Integrated FETs, combined R_DS(on) ≈400 mΩ [DS-MTR-044] | On-die MOSFET integration **not independently confirmed this session** (typical for this device class, but not verified against a primary source) [DS-MTR-050] |
+| Integrated logic regulator | **Yes** — integrated buck regulator generates the device's own 3.3V or 5V logic supply, confirming direct compatibility with this project's existing 3.3V MCU domain with no separate level-shifting hardware needed [DS-MTR-033] | Dedicated VIO pin confirms 3.3V logic-level compatibility, but no evidence of an integrated regulator generating that supply on-die [DS-MTR-043] | **UNKNOWN this session** — not extractable from secondary sources |
+| Control interface | PWM duty cycle, analog voltage, or I2C — PWM path maps directly onto REQ-110 with no protocol translation needed; I2C available for optional tuning/telemetry, not required for basic open-loop speed control (REQ-007/009) [DS-MTR-036] | Hardware PWM + FR (direction) pins only — no I2C [DS-MTR-046] | PWM, analog, or I2C per secondary-source claim — **not primary-source-confirmed** [DS-MTR-050] |
+| Overcurrent / stall / thermal protection (REQ-111/404) | Overcurrent protection programmable via I2C with auto-retry; stall inferred from I2C status register + FG-signal silence. Exact thermal-shutdown threshold/behavior **UNKNOWN this session** (not extractable from the fetched pages) [DS-MTR-037] | Overcurrent protection plus locked-rotor/stall detection via absence of expected Hall-switching transitions, auto-retry timing set by an external capacitor on a RETRY pin [DS-MTR-046] | ALERT pin reported for abnormality/lock detection per secondary-source claim; specific OCP/TSD thresholds **UNKNOWN this session**, **not primary-source-confirmed** [DS-MTR-050] |
+| Tach / FG output (REQ-008/112) | **Yes — hardware FG pin**, TI's own page states verbatim: "Motor speed feedback is available through either the FG pin or I2C." This is the key finding resolving REQ-008/112 for the sensorless T-Motor, since the motor itself has no integrated sensor — the driver supplies the RPM path instead. Low-RPM (spin-up) FG reliability below the BEMF-detection floor is a residual, datasheet-unresolvable integration risk [DS-MTR-038] | **Yes — hardware FG pin plus a separate dedicated RD (rotor-lock) output** — arguably the richest fault/speed signal set of the 3, but only usable given this part's own Hall-sensor requirement [DS-MTR-047] | FG output reported (open-drain, ≈5 mA sink, needs an external pull-up) plus a separate ALERT pin, per secondary-source claim — **not primary-source-confirmed** [DS-MTR-050] |
+| Package / hand-solderability | 24-pin HTSSOP w/ exposed pad, 0.65mm lead pitch — leads hand-solderable with a fine-tip iron and flux; exposed pad itself needs reflow/hot-air for full rated thermal performance (partial, not full, hand-assembly constraint). θJA and exact body dimensions **UNKNOWN this session** [DS-MTR-039] | 24-pin TSSOP w/ exposed pad — same hand-solderability profile as Candidate A [DS-MTR-048] | WQFN-36 — no exposed leads at all, the **hardest to hand-solder of all 3 candidates** (realistically needs a reflow oven or hot-air rework station, not a hand iron) |
+| Lifecycle / EOL | Active / "PRODUCTION DATA" per TI's own product page [DS-MTR-040] | Active [DS-MTR-048] | Active — confirmed only via simultaneous distributor stock, not a manufacturer lifecycle statement (no primary Toshiba page read this session) [DS-MTR-051] |
+| Availability / lead time | In stock: DigiKey 6,500 units, Mouser 6,316 units (checked 2026-08-31) [DS-MTR-040] | In stock: DigiKey 5,130 units, Mouser 2,186 units (checked 2026-08-31) [DS-MTR-048] | In stock: DigiKey 3,808 units, Mouser 693 units, Arrow 4,000 units (checked 2026-08-31) — this 3-distributor stock breadth is itself the strongest evidence the part and its datasheet genuinely exist, despite this session's inability to read the datasheet's primary text [DS-MTR-051] |
+| Reference design / EVM | **DRV10983EVM confirmed** — supports 8–28V input, PWM/analog speed control, USB2ANY-based I2C GUI for configuration/telemetry [DS-MTR-041] | **DRV10970EVM confirmed** [DS-MTR-048] | No confirmed evaluation board found this session |
+| Price @ qty 1 | **≈$2.58** (DigiKey, PWPR cut-tape); ≈$2.57 (qty 100) [DS-MTR-040] | **≈$1.48–1.53** (DigiKey) — cheapest of the 3 [DS-MTR-048] | ≈$2.66 (DigiKey/Mouser); ≈$1.50 (qty 100) [DS-MTR-051] |
+| Known risks / disqualifying factors | Thermal-shutdown threshold and θJA not confirmed this session (flagged, not blocking — see Open UNKNOWNs) | **DISQUALIFIED for this pairing**: hard Hall-sensor requirement is incompatible with the recommended sensorless T-Motor MN2206-13; also its 18V ceiling would exclude the Anaheim fallback motor's 24V nameplate rating if that fallback were ever exercised. Not a flaw in the IC itself — simply the wrong sensing-topology fit for this cycle's recommended motor. | **Not selected as primary recommendation.** Raw specs (widest voltage range, highest current rating) look competitive or better than Candidate A on paper, but the entire electrical/functional profile rests on a **secondary-source synthesis** this session could not independently verify against a primary Toshiba document (404 on the direct PDF link, a Mouser page timeout, and a JS-rendered Toshiba product page unreadable to this session's tooling) — see `datasheets/toshiba_tc78b009ftg_rev-unknown.md`'s own "Confidence flag" section. This is an evidence-quality gap, not a specification gap, and is why Candidate A is recommended over Candidate C despite comparable on-paper specs. |
+
+### Recommendation
+
+- **Recommended candidate**: **A — TI DRV10983**, paired with the Motor
+  section's recommended **T-Motor MN2206-13 KV2000**.
+- **Compatibility reasoning (motor+driver pairing, not two independent
+  picks)**:
+  1. **Voltage match**: the T-Motor is rated for 2S–3S LiPo operation
+     (7.4–12.6V across nominal-to-full-charge). The DRV10983's 8–28V input
+     range comfortably covers the upper half of that window with margin,
+     but **undershoots the T-Motor's 2S-nominal 7.4V** — this pairing is
+     only sound at a **≈12V-class operating point** (3S-equivalent), which
+     is why the Motor section's Escalation flags explicitly call out a new
+     ~12V rail requirement for the Power Engineer, rather than assuming the
+     motor's own "nominal" voltage is what will actually be supplied.
+  2. **Current match**: the T-Motor's derived torque-current need (≈1.05A
+     for the 5 mN·m target, Kt = 4.77 mN·m/A) sits well inside the
+     DRV10983's 2A continuous / 3A peak rating — roughly 2× continuous
+     headroom on top of the ≈17× headroom already identified against the
+     motor's own 18A continuous rating in the Motor section. Two
+     independent margins, both generous.
+  3. **Control-interface match**: the DRV10983 accepts a bare PWM duty-
+     cycle input, which is exactly what REQ-110 specifies the MCU shall
+     generate — no protocol-translation hardware (e.g. a separate I2C
+     level shifter) is required for basic open-loop operation, keeping
+     REQ-009's open-loop-only scope fence easy to honor in firmware.
+  4. **Commutation-scheme match**: both parts are sensorless (180°
+     sinusoidal BEMF on the driver side, standard outrunner BEMF on the
+     motor side) — no Hall-sensor wiring harness is needed between the two,
+     simplifying the physical interconnect versus the disqualified
+     Candidate B pairing.
+  5. **RPM-sensing resolution**: the DRV10983's hardware FG pin is the
+     mechanism that resolves REQ-008/112 for this pairing, since the
+     T-Motor itself has no integrated sensor (established in the Motor
+     section). This is the single most load-bearing cross-section finding
+     in this whole task — it is why the motor and driver had to be chosen
+     together rather than independently.
+  6. **Logic-supply convenience**: the DRV10983's integrated buck regulator
+     can generate 3.3V/5V logic on-die, which may simplify (though does not
+     eliminate the need for) the Power Engineer's new-rail design — this is
+     offered as a data point for that HITL gate, not a decision made here.
+- **Rationale** (success probability first, peak spec second):
+  1. **Evidence quality, not raw specs, is the deciding factor between
+     Candidate A and Candidate C.** Candidate C (Toshiba) has a nominally
+     wider voltage range (up to 30V vs. 28V) and higher current rating (3A
+     vs. 2A) — on paper, arguably the "stronger" part. But every one of
+     those figures rests on a secondary-source synthesis this session could
+     not verify against Toshiba's own primary documentation (three
+     independent access failures: a 404 on the direct PDF, a Mouser page
+     timeout, and a JS-rendered product page this session's tooling could
+     not read). Candidate A's equivalent facts (voltage range, current
+     rating, control interface, FG output) were all confirmed via a
+     directly-fetched, readable TI page this same session. For a
+     recommendation feeding directly into the Power Engineer's HITL gate,
+     confirmed-primary-source numbers are judged more valuable than
+     nominally-higher but secondary-source-only numbers.
+  2. **Package/assembly risk favors Candidate A.** Candidate C's WQFN-36
+     package has no exposed leads at all and realistically needs a reflow
+     oven or hot-air rework station — a meaningfully worse fit for this
+     project's small-batch/hand-assembly context than Candidate A's
+     HTSSOP-24, whose leads are hand-solderable even though its exposed pad
+     still benefits from reflow.
+  3. **Reference design availability favors Candidate A decisively.** A
+     confirmed DRV10983EVM exists with documented PWM/analog/I2C support;
+     no evaluation board could be confirmed for Candidate C this session.
+     For a first-time motor-driver bring-up on bench-test hardware, a real
+     EVM meaningfully de-risks firmware/hardware bring-up.
+  4. **Candidate B is disqualified on a hard compatibility fact, not a
+     preference.** Its Hall-sensor requirement is incompatible with the
+     recommended sensorless T-Motor; pairing them would require either
+     switching to the Anaheim BLY171D fallback motor (see Motor section
+     Escalation flag 4) or abandoning Candidate B, not a tunable trade-off.
+     Its lowest-of-the-3 price (≈$1.48–1.53) and richest fault-signal set
+     (FG **and** RD pins) are real strengths, recorded here specifically as
+     the paired fallback if the Anaheim motor is ever substituted in.
+- **Trade-offs accepted**:
+  - *vs. Candidate B (TI DRV10970)*: gives up the lowest price of the 3
+    candidates and the richest fault-signal set (FG **and** RD pins) — in
+    exchange for sensorless compatibility with the recommended motor, which
+    Candidate B cannot provide at all without a motor substitution.
+  - *vs. Candidate C (Toshiba TC78B009FTG)*: gives up a nominally wider
+    voltage range and higher current rating — in exchange for confirmed
+    primary-source data, a meaningfully easier hand-assembly package, and a
+    confirmed EVM. If a future session obtains and reads Toshiba's primary
+    datasheet PDF and the figures hold up, Candidate C would be worth
+    re-scoring — it is not disqualified on a hard technical fact the way
+    Candidate B is, only on an evidence-quality and assembly-risk basis.
+- **Open `UNKNOWN`s**:
+  - DRV10983's exact thermal-shutdown threshold/behavior and θJA/package
+    body dimensions were not extractable from the pages fetched this
+    session — not judged blocking given the generous current margin
+    already identified, but should be closed before Circuit Engineer
+    finalizes thermal layout.
+  - Whether the DRV10983's FG signal will be clean/monotonic specifically
+    during this pairing's 0→3000 RPM spin-up ramp (below the typical BEMF-
+    detection floor of ≈500–1500 RPM) is not resolvable from a datasheet —
+    flagged as a bring-up validation item for Circuit Engineer/Firmware,
+    cross-referenced from the Motor section.
+  - Toshiba TC78B009FTG's entire profile in this comparison is secondary-
+    source-only and explicitly not relied upon for the final
+    recommendation — see this section's Escalation flags below and
+    `datasheets/toshiba_tc78b009ftg_rev-unknown.md`'s own Confidence flag
+    section.
+
+### Escalation flags
+
+1. **Architecture-defining / major component decision — requires Hardware
+   Lead + human Chief Engineer approval before Circuit Engineer uses this**
+   (`docs/architecture.md` §10), same as the Motor section — this is one
+   coupled motor+driver recommendation, not two independent ones, and is
+   explicitly **not self-approved**; see Approval table below.
+2. **Evidence-confidence gap for Candidate C (Toshiba TC78B009FTG) — flagged
+   explicitly, not treated as a silent gap or as a full "no datasheet
+   found" escalation.** This session could not read Toshiba's primary
+   datasheet PDF (404 on the direct link), a Mouser distributor page
+   (request timeout), or Toshiba's own product page (JavaScript-rendered,
+   unreadable to this session's fetch tooling). All of Candidate C's
+   figures in the table above instead come from a secondary, AI-synthesized
+   web-search source cross-referencing an alldatasheet.jp mirror. This is
+   **not** escalated as a "no datasheet can be found" stop condition per
+   this role's own escalation triggers, because the part and a genuine
+   datasheet demonstrably exist — three independent live distributors
+   (DigiKey, Mouser, Arrow) stock it as an active production part, which
+   would not be true of a fictitious or unavailable part. The gap is
+   recorded as a confidence/verification gap, not an existence gap, and is
+   the deciding reason Candidate C was not recommended over Candidate A
+   despite nominally competitive specs. A future session with working
+   access to Toshiba's primary PDF should re-verify before this part is
+   reconsidered for anything beyond a documented fallback.
+3. **New ~12V rail requirement — repeated from the Motor section, applies
+   equally to this driver.** The DRV10983's 8–28V input range only clears
+   its own minimum with real margin at a ≈12V-class operating point, not at
+   the T-Motor's 2S-nominal 7.4V. Rev 1/2 of this board has only a single
+   3.3V rail. Flagged for the Power Engineer's own HITL-gated rail-topology
+   proposal, not decided here.
+4. **Thermal numbers remain partially incomplete for all 3 candidates**
+   (θJA UNKNOWN for Candidate A/B, full thermal profile UNKNOWN for
+   Candidate C) — flagged explicitly because the Power Engineer's own
+   agent definition calls for real thermal data per candidate, and this is
+   the one dimension where this comparison could not fully deliver it from
+   the sources available this session. Does not block the recommendation
+   given the generous current margins already identified, but should be
+   closed before Circuit Engineer finalizes the driver's PCB thermal
+   layout (copper pour sizing, via stitching under the exposed pad).
+
+### Approval
+
+| Role | Name | Date | Decision |
+|---|---|---|---|
+| Component Engineer | Component Engineer (AI agent) | 2026-08-31 | Proposed — TI DRV10983, paired with T-Motor MN2206-13 KV2000 (see Motor section) |
+| Hardware Lead | Hardware Lead (this session) | 2026-08-31 | Concur — recommend approval. The motor+driver compatibility reasoning (voltage/current/control-interface/commutation-scheme match) is sound and the DRV10983's FG-pin RPM path is a well-justified resolution for REQ-008/112 given the motor itself has no integrated sensor. Same evidence-quality-over-raw-spec reasoning against Candidate C (Toshiba) as the Motor section — agree this is the right call for a first-time bring-up. Routing the ~12V rail requirement (Escalation flag 3) to Power Engineer now. |
+| Chief Engineer (Human) — required if architecture-defining/major component | *(pending)* | | *(open — **required** before Circuit Engineer uses this recommendation; architecture-defining/major component decision per `docs/architecture.md` §10 — not self-approved)* |
