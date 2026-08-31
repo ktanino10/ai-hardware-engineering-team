@@ -129,7 +129,7 @@ conflict-resolution process `[repo: workflow.md §3]`.
 | Electrical & Electronics | **[PRESERVE]** | Existing 4-agent team, unchanged. |
 | Mechanical | **[IMPLEMENTED — Phase 1, see §31]** | First new discipline. Shipped: `mechanical-lead`/`mechanical-reviewer` agents, `enclosure-design`/`mechanical-review` skills, `hardware/mechanical-interface.md`. |
 | Manufacturing (Process Specification) | **[IMPLEMENTED — Phase 4, see §35]** | Mechanical-adjacent addition (extends the Mechanical discipline's Lead/Reviewer pair to 3, mirroring how Power Engineer extends Electronics rather than being a new top-level discipline). Shipped: `manufacturing-engineer` agent, `manufacturing-process-specification` skill, a new independent-check item on the existing Mechanical Reviewer checklist. Specifies the additive-manufacturing PROCESS parameters (infill/wall-count/orientation/material) a fabricated part needs to actually achieve the physical properties its CAD geometry assumes — a genuinely distinct concern from the CAD geometry itself. |
-| Independent Reviewer | **[PRESERVE + extended]** | Existing Hardware Reviewer pattern reused for Mechanical (§13, §31) — Mechanical Reviewer is now real, sharing `validation/open-issues.md`. **Deliberately not yet extended to Firmware** (Phase 2, §32) — see §32's own reasoning for why that's a documented, reversible scope decision rather than an oversight. |
+| Independent Reviewer | **[PRESERVE + extended]** | Existing Hardware Reviewer pattern reused for Mechanical (§13, §31) — Mechanical Reviewer is now real, sharing `validation/open-issues.md`. Deliberately not extended to Firmware in Phase 2 (§32) — see §32's own reasoning for why that was a documented, reversible scope decision rather than an oversight. **Extended to Firmware in Phase 5 (§36)** once that row's own documented trigger was met on the same board (a real bring-up failure traced to a class of defect an independent pass would likely have caught, `docs/architecture.md` §14) — Firmware Reviewer is now real, but deliberately records findings in a firmware-scoped file (`firmware/<board>/<board>-firmware-review.md`), not `validation/open-issues.md`, so it does not gate the Design Complete Gate the way Hardware/Mechanical Reviewer do (§32's own coupling-risk reasoning, carried forward rather than re-litigated). |
 | Control / Embedded | **[SPLIT — Firmware sub-slice IMPLEMENTED Phase 2 (§32); Control Engineer sub-slice still DEFER]** | §11 (updated). The two were always distinct future roles in `docs/architecture.md` §14 with separate triggers; only Firmware's trigger ("when firmware work starts in earnest") has been met so far — Control Engineer's ("1-axis/3-axis attitude-control roadmap stage") explicitly has not. |
 | Integration / Test | **[DEFER]** | §11. |
 | Software/AI, Advanced Concepts, Procurement, Simulation, Visualization | **[CONSIDER LATER / DEFER]** | Only if real projects justify them `[req §5]`; see §16–21. |
@@ -1208,6 +1208,203 @@ the audit trail of what was true before this phase vs. after.
   to, per the explicit out-of-scope instruction for this PR.
 - **Status**: implemented, PR opened as its own standalone change (not
   bundled with Rev 3 hardware/mechanical/firmware work, per explicit human
+  instruction), awaiting independent audit before merge — same process
+  every prior PR in this repository's history went through.
+
+## 36. Phase 5 Implementation Status (Addendum — Firmware Reviewer)
+
+Added when Phase 5 (Firmware Reviewer) was actually implemented, in a
+separate PR from this document's original merge and the Phase 1/2/3/4
+(§31/§32/§33/§35) addenda — kept as its own addendum for the same reason
+those are: preserve the audit trail of what was true before this phase vs.
+after.
+
+- **Trigger met, dated, and concrete — not a hypothetical.** `docs/architecture.md`
+  §14 already documented a Firmware Reviewer future role with two named
+  alternative triggers: "a second board's firmware is added, **or** a real
+  bring-up failure is traced to a class of defect an independent pass would
+  likely have caught." The second condition, not the first, was met — on
+  the *same* board (Bench-IMU-01), not a second one. During Rev 3's
+  Firmware Bring-up (motor driver open-loop control implementing
+  REQ-405/406 safety logic — overspeed shutdown, latched-fault policy;
+  branch `ktanino10-bench-imu-01-rev3-motor-driver-0a7`, PR #11, still
+  draft/unmerged and explicitly untouched by this change, at the time of
+  this writing 2026-09-01; commit `739677c`, "Firmware Bring-up (Rev 3):
+  motor driver open-loop + IMU I2C pin fix"), the Firmware Engineer's own
+  self-check — which `.github/agents/firmware-engineer.agent.md` explicitly
+  frames as standing in for independent review until a Firmware Reviewer
+  trigger is met — found and fixed a real coupling bug in
+  `firmware/bench-imu-01/src/main.c`: the pre-existing (Rev ≤2) code looped
+  forever (`for (;;) { led_toggle(); delay_ms(100); }`) if `bmi270_init()`
+  failed, which — once a second, functionally-independent subsystem (Rev
+  3's motor driver) existed on the same board — would have silently
+  prevented the motor subsystem from ever initializing at all, a genuine,
+  unintended coupling between two subsystems the design explicitly requires
+  to be independent (see `firmware/bench-imu-01/bench-imu-01-firmware-design.md`
+  §4.9 on that branch — read directly via `git show
+  origin/ktanino10-bench-imu-01-rev3-motor-driver-0a7:<path>` for this PR,
+  never checked out). This was self-caught, which is good, but it is
+  exactly the class of blind-spot defect this project's own repeatedly-
+  demonstrated thesis says a second, independent reasoning process is best
+  positioned to catch — the same reason Hardware Reviewer exists
+  independently of Circuit Engineer, and Mechanical Reviewer independently
+  of Mechanical Lead (`validation/fmea.md` FMEA-003/FMEA-008 already
+  document checklist-only/single-pass review missing real defects that a
+  genuinely independent second pass caught, the same pattern now confirmed
+  in Firmware). Firmware — now containing genuine safety-critical logic
+  (REQ-405/406, which exist specifically to satisfy the ACCEPTED-RISK
+  condition attached to `validation/open-issues.md` ISS-020/ISS-021) — was
+  the one discipline still running on self-check alone before this PR.
+- **Human approval**: given, scoped explicitly to standing up the Firmware
+  Reviewer discipline itself — **as its own standalone PR, off a fresh
+  branch from `main`** (not Rev 3's own branch), opened for independent
+  audit and never merged by the session that authored it, per explicit
+  human instruction mirroring exactly how Mechanical Lead/Reviewer
+  (Phase 1), Firmware Engineer (Phase 2), Power Engineer (Phase 3), and
+  Manufacturing Engineer (Phase 4) were each introduced and merged before
+  being exercised on a real design. Rev 3's own branch/PR #11,
+  `firmware/bench-imu-01/`'s actual source files, and every file under
+  `hardware/`/`requirements/`/`bom/`/`validation/` are explicitly **not
+  touched by this PR** — applying the new discipline to Rev 3's own
+  `firmware/bench-imu-01/src/motor.c` and the rest of its firmware bring-up
+  is a separate, already-planned follow-up once this framework PR is
+  reviewed and merged, exactly as Manufacturing Engineer's introduction
+  stayed out of Rev 3's mechanical files (§35).
+- **Explicit human decision — a genuinely new independent-reviewer agent,
+  not an extension of an existing one (unlike Manufacturing Engineer)**:
+  Manufacturing Engineer (Phase 4, §35) deliberately did **not** introduce a
+  new independent-reviewer agent — it added one checklist item to the
+  already-existing Mechanical Reviewer, because a reviewer for Mechanical
+  Lead's output already existed. No equivalent existed for Firmware:
+  Hardware Reviewer reviews Circuit Engineer's output, Mechanical Reviewer
+  reviews Mechanical Lead's output, and nothing but the Firmware Engineer's
+  own self-check reviewed Firmware Engineer's output. The correct precedent
+  to mirror for *this* introduction is therefore Mechanical Reviewer's own
+  original stand-up (Phase 1, §27/§31) — a brand-new agent + skill pair
+  mirroring Hardware Reviewer's adversarial-review shape — not Manufacturing
+  Engineer's "augment an existing reviewer" shape. `.github/agents/
+  firmware-reviewer.agent.md` and `.github/skills/firmware-review/SKILL.md`
+  were written accordingly, mirroring `hardware-reviewer.agent.md`/
+  `hardware-review/SKILL.md` and `mechanical-reviewer.agent.md`/
+  `mechanical-review/SKILL.md`'s structure, checklist-and-severity
+  discipline, and voice.
+- **A real, non-obvious technical reason carried forward, not
+  re-litigated**: `docs/architecture-evolution.md` §32 already identified,
+  when Firmware Engineer was introduced, that `validation/open-issues.md`'s
+  shared CI gate (`tools/check_open_issues.py`) blocks the Design Complete
+  Gate on *any* open CRITICAL/HIGH row regardless of source — correct for
+  Hardware/Mechanical findings (the same physical PCB/enclosure) but wrong
+  for Firmware findings, which do not block PCB fabrication or Design
+  Complete (`docs/architecture.md` §14, `docs/workflow.md` Phase 11).
+  Rather than solving this with either a separate CI gate or a
+  `Source`-based carve-out in `check_open_issues.py` — both explicitly
+  flagged in §32 as not yet justified, and both would require touching
+  `validation/**`, out of scope for this PR — Firmware Reviewer records
+  findings in a new, per-board firmware-scoped file
+  (`firmware/<board>/<board>-firmware-review.md`), never
+  `validation/open-issues.md`. Its verdict therefore does not gate the
+  Design Complete Gate (§8) but does gate the "before flashing firmware to
+  real hardware for the first time" Human-in-the-loop checkpoint (§10) —
+  the same proportional, gate-specific treatment already used for
+  REQ-405/406's own pre-power-on condition (`validation/open-issues.md`
+  ISS-020/ISS-021, `validation/bring-up-procedure.md`, read only via `git
+  show` from Rev 3's branch to ground this reasoning, never written to).
+- **Also folded in, rather than adding a third new agent**: a rubber-duck-
+  style premise-review checklist item (mandatory checklist item 7,
+  `.github/agents/firmware-reviewer.agent.md`) — mirroring the *spirit* of
+  the independent premise/assumption challenge `docs/architecture.md` §5.1
+  runs for Hardware Reviewer via a separate `rubber-duck` invocation, not
+  the *letter* of standing up a second, firmware-specific rubber-duck-
+  equivalent agent this round. This is the same scope-proportionality
+  discipline §32/§35 already applied elsewhere: close the evidenced gap
+  with the minimum number of new agents the evidence actually supports.
+- **Verified, not assumed, during implementation** (mirroring §31/§32/§33/
+  §35's own "verified, not assumed" bullets, for the same reasons): the
+  GitHub custom agent (`.github/agents/*.agent.md`, required `description`)
+  and agent skill (`.github/skills/<name>/SKILL.md`, required `name`+
+  `description`, `name` lowercase-hyphenated and matching its directory)
+  specs were re-checked this session — both unchanged since PR
+  #2/#3/§31/§32/§33/§35, no additional "fix the spec" round was needed;
+  `tools/check_agent_frontmatter.py` (10 agents, 11 skills, all valid) and
+  `tools/check_open_issues.py` were both run locally and verified passing
+  (see this PR's own commit for the actual output). Also verified, not
+  assumed, for the new skill's own recommended independent-verification
+  practice: `arm-none-eabi-gcc` 16.2.0 (the same toolchain §32 confirmed
+  installable) is genuinely installed in this session too — re-checked
+  directly (`which arm-none-eabi-gcc` / `arm-none-eabi-gcc --version`)
+  rather than assumed carried over from a prior session, confirming a
+  future Firmware Reviewer review cycle really can attempt an independent
+  rebuild in an environment like this one, not just in principle.
+- **Files added**: `.github/agents/firmware-reviewer.agent.md`,
+  `.github/skills/firmware-review/SKILL.md`.
+- **Files edited, additively only** (nothing existing removed/reworded, no
+  section renumbered): `docs/architecture.md` (§3 new agents-table row +
+  new explanatory sentences + role-spec file list; §14 Firmware Reviewer
+  row struck through and annotated `[IMPLEMENTED]`, exceptions sentence
+  extended to name it; Firmware Engineer's own §3 row cell appended, not
+  reworded, to note the supersession), `docs/architecture-evolution.md`
+  (this addendum; §7 Independent Reviewer row appended, not reworded, to
+  note the Phase 5 extension).
+- **Deliberately narrower scope than Phase 1, disclosed rather than
+  silently inconsistent** (the same discipline §35's own "deliberately
+  narrower scope" bullet used): this PR does **not** update
+  `.github/instructions/firmware.instructions.md` (still states "No
+  independent Firmware Reviewer agent exists yet"),
+  `.github/agents/firmware-engineer.agent.md`'s own "Out of scope"/
+  "Escalation triggers" bullets (still reference the pre-Phase-5 framing),
+  `.github/skills/firmware-bringup/SKILL.md` (still frames self-check as
+  standing in for independent review), `docs/workflow.md` (Phase 11's own
+  "no independent Firmware Reviewer exists yet" line), `README.md`'s agent
+  roster (already missing Manufacturing Engineer too — a pre-existing,
+  disclosed gap this PR does not compound but also does not fix),
+  `.github/copilot-instructions.md`'s "Roles" section (still says "Eight
+  agents," already stale for Manufacturing Engineer as well), or
+  `.github/CODEOWNERS` (no change needed: the existing `/firmware/
+  @ktanino10` line already covers the new
+  `firmware/<board>/<board>-firmware-review.md` file convention). These are
+  real, disclosed documentation-consistency gaps — some pre-existing, some
+  newly introduced by this PR — left for a fast, low-risk follow-up once a
+  human agrees they're worth closing, the same explicit trade-off §35 made
+  for its own narrower-than-Phase-1/2/3 scope. This PR also does not create
+  an actual `firmware/<board>/<board>-firmware-review.md` file for any real
+  board — Firmware Reviewer's output is inherently per-board/per-cycle, so
+  there is no generic template to usefully pre-populate before a real
+  review cycle exercises the role, the same reasoning Manufacturing
+  Engineer's own introduction used for not pre-populating a
+  `hardware/mechanical/*-manufacturing-spec.md` template.
+- **Confirmed untouched** (verified via `git diff` before opening the PR):
+  all 9 existing `.github/agents/*.agent.md` files (including
+  `firmware-engineer.agent.md` itself — see the scope note above for why
+  its stale "no Firmware Reviewer agent exists yet" framing specifically
+  was left as-is), all 10 existing `SKILL.md` files (including
+  `firmware-bringup/SKILL.md`, for the same reason), all 6 existing
+  `.github/instructions/*.instructions.md` files (no new one was created —
+  Firmware Reviewer's intended output falls under `firmware/**`, already
+  governed by `.github/instructions/firmware.instructions.md`'s existing
+  rules; that file's own now-superseded sentence is the one disclosed gap
+  above, not a missing-coverage problem), `.github/workflows/
+  {hardware-gate.yml,agent-frontmatter-lint.yml}`, both `tools/*.py` CI
+  scripts (run, not edited), `datasheets/{README.md,evidence-log.md}` (no
+  new Evidence category — Firmware Reviewer re-derives facts already
+  categorized under the component's existing `DS-MCU-`/`DS-IMU-`/`DS-MTR-`
+  categories, `docs/architecture.md` §6.3), `requirements/**`,
+  `bom/component-selection.md`, every file under `hardware/schematic/`,
+  `hardware/pcb/`, `hardware/mechanical/`, `hardware/power-architecture.md`,
+  `hardware/power-budget.md`, all of `firmware/**` (including
+  `firmware/bench-imu-01/` in its current, pre-Rev-3-merge state on
+  `main`), `validation/**`, `docs/{workflow.md,evaluation.md,
+  commands/make-circuit.md}`, `README.md`, `.github/copilot-instructions.md`,
+  and `.github/CODEOWNERS` (see the scope note above for all of these).
+  **Rev 3's own branch/PR #11 was read only** — via `git show
+  <branch>:<path>` for specific files (`firmware/bench-imu-01/src/main.c`,
+  `firmware/bench-imu-01/bench-imu-01-firmware-design.md`,
+  `firmware/bench-imu-01/src/motor.h`, `validation/open-issues.md`) to
+  ground this addendum's `main.c`/§4.9/ISS-020/ISS-021 citations in the
+  real, current state of that design — the branch was never checked out,
+  and no file on it was written to, per the explicit out-of-scope
+  instruction for this PR.
+- **Status**: implemented, PR opened as its own standalone change (not
+  bundled with Rev 3 firmware/hardware/mechanical work, per explicit human
   instruction), awaiting independent audit before merge — same process
   every prior PR in this repository's history went through.
 
