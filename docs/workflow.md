@@ -23,6 +23,8 @@ flowchart LR
     H10 -- "CRITICAL/HIGH" --> H9
     H10 -- "clear" --> G
     D -- "fixed pin/interface allocation" --> H11["11. Firmware\nBring-up"]
+    B -- "power complexity warrants it" --> H12["12. Power\nArchitecture"]
+    H12 -- "human-approved architecture" --> D
 ```
 
 Phases 8-10 (Mechanical, Phase 1 of the multidisciplinary evolution —
@@ -32,7 +34,13 @@ criteria below for why. Phase 11 (Firmware, Phase 2 of the multidisciplinary
 evolution — `docs/architecture-evolution.md` §32) also forks from Phase 4,
 for the same data-driven reasoning, but does **not** feed back into Phase
 7's gate — see Phase 11's entry/exit criteria below for why firmware
-bring-up is intentionally not a sixth Design Complete condition.
+bring-up is intentionally not a sixth Design Complete condition. Phase 12
+(Power Architecture, Phase 3 of the multidisciplinary evolution —
+`docs/architecture-evolution.md` §33) forks from Phase 2 instead, since it
+needs Component Selection's real per-subsystem current/voltage numbers
+before an architecture proposal is possible, and feeds forward *into*
+Phase 4 rather than running alongside it — see Phase 12's entry/exit
+criteria below.
 
 ## 2. Phase Detail
 
@@ -82,12 +90,17 @@ bring-up is intentionally not a sixth Design Complete condition.
 ### Phase 4 — Circuit Design
 - **Owner**: Circuit Engineer. Uses `.github/skills/schematic-design/SKILL.md`.
 - **Entry criteria**: Parts approved (Phase 2) and datasheet constraints
-  extracted (Phase 3).
+  extracted (Phase 3). When Power Engineer is engaged for this project/
+  revision (Phase 12 below), the power-section work specifically also
+  requires Phase 12's human-approved architecture first — the rest of
+  Circuit Design (non-power sub-blocks) is not blocked on it.
 - **Activities**: fix shared resources first (rails, ground scheme, pin
   allocation) — serially — then design sub-blocks (power / MCU periphery /
   sensor interface / …), each against the full mandatory checklist in
   `.github/agents/circuit-engineer.agent.md`, each decision backed by an Evidence ID,
-  update `hardware/power-budget.md`, then integrate serially.
+  update `hardware/power-budget.md`, then integrate serially. When Power
+  Engineer is engaged, "fix rails" means implementing its approved
+  architecture (Phase 12), not deciding the rail topology from scratch.
 - **Exit criteria**: schematic artifact + design rationale log + self-check
   against the Hardware Reviewer's checklist completed, handed off.
 - **Parallel-safe?** Sub-blocks: yes, after interfaces are fixed. Integration:
@@ -236,6 +249,49 @@ evolution — `docs/architecture-evolution.md` §32)*
   parallelize against. Safe to run in parallel with Phases 5/6/7/8-10 for
   the same data-driven reasons Phase 8 is.
 
+### Phase 12 — Power Architecture *(Phase 3 of the multidisciplinary
+evolution — `docs/architecture-evolution.md` §33)*
+- **Owner**: Power Engineer, when engaged (a Hardware Lead judgment call per
+  project/revision — `.github/agents/power-engineer.agent.md` "When this
+  role is engaged"). Uses `.github/skills/power-architecture/SKILL.md`. For
+  a simple single-rail design, this phase is skipped entirely and Circuit
+  Engineer continues to own `hardware/power-budget.md` directly within
+  Phase 4, exactly as before this phase existed.
+- **Entry criteria**: Component Selection (Phase 2) has produced real
+  current/voltage/thermal figures for a new subsystem's candidate parts, and
+  the Hardware Lead has judged this project's power complexity exceeds what
+  Circuit Engineer can track ad hoc (architecture.md §14's own example: "at
+  Motor Driver / Reaction Wheel stage"). Deliberately forks from Phase 2
+  rather than Phase 4, since an architecture proposal needs real subsystem
+  numbers before it's possible at all, and must complete *before* Phase 4's
+  power sub-block (not alongside it, unlike Phases 8-10/11's own
+  parallel-with-later-phases pattern) — Circuit Engineer cannot correctly
+  design a rail whose topology hasn't been decided yet.
+- **Activities**: aggregate every existing + new subsystem's real load
+  against existing rail capability; where a new rail/physical input is
+  genuinely required, propose ≥2 real, named architecture options with
+  trade-offs (never a single silently-picked default); check rail
+  sequencing/coupling concerns; present the options for the human Chief
+  Engineer's architecture decision (architecture.md §10); record the
+  options + decision in `hardware/power-architecture.md`; update
+  `hardware/power-budget.md` for the approved architecture's multi-rail
+  numeric rollup; flag any new part-sourcing need back to Component
+  Engineer.
+- **Exit criteria**: `hardware/power-architecture.md` shows a recorded human
+  decision + updated multi-rail `hardware/power-budget.md`, handed off to
+  Circuit Engineer.
+- **HITL gate**: the architecture decision itself is never self-approved by
+  Power Engineer — same "architecture decisions" gate every other major
+  topology choice in this framework goes through (architecture.md §10).
+- **Loop-back rule**: if a later subsystem addition exceeds the approved
+  architecture's headroom, re-enter this phase before Circuit Design
+  proceeds on that subsystem's power section.
+- **Parallel-safe?** Candidate-option drafting: yes, in the sense that it
+  reuses Component Selection's already-parallel candidate research: no
+  additional research fan-out of its own. The architecture recommendation
+  and the human decision are each single serial steps, same reasoning as
+  every other framework decision point (architecture.md §4).
+
 ## 3. Conflict Resolution / Deadlock Escalation Protocol
 
 Applies whenever two agents (or an agent and a human-set constraint) produce
@@ -292,13 +348,22 @@ converge on, matching the single shared `validation/open-issues.md` backlog
 (Phase 2, Firmware — §2 Phase 11 above) can run independently:
 `circuit-integrate` → (fork) `firmware-bringup` — this branch does **not**
 converge on `design-complete-gate` (§2 Phase 11's own note on why), so it
-has no todo dependency on the other two chains' gate step.
+has no todo dependency on the other two chains' gate step. When Power
+Engineer is engaged (Phase 3 — §2 Phase 12 above), a chain precedes
+`circuit-integrate` instead of following it: `component-comparison-
+consolidate` → (fork) `power-architecture-propose` → `power-architecture-
+gate` (the human decision) → `circuit-design-power` (now unblocked, feeds
+into the same `circuit-integrate` step every other sub-block does) — this
+is the one fork in the framework that runs *before* Circuit Design rather
+than alongside/after it, since Phase 12 by definition must finish before
+Circuit Engineer can correctly design the power sub-block at all.
 
 ## 5. How to Start a New Design Cycle
 
 Use `docs/commands/make-circuit.md` for the copy-pasteable kickoff prompt.
-Mechanical Lead / Mechanical Reviewer and Firmware Engineer all follow the
-same invocation model as the 4 Electronics agents (architecture.md §3):
-native custom-agent invocation where the running surface supports it, or
-the `task` tool loading their `.github/agents/*.agent.md` +
-`.github/skills/*/SKILL.md` content explicitly where it doesn't.
+Mechanical Lead / Mechanical Reviewer, Firmware Engineer, and Power Engineer
+all follow the same invocation model as the 4 Electronics agents
+(architecture.md §3): native custom-agent invocation where the running
+surface supports it, or the `task` tool loading their
+`.github/agents/*.agent.md` + `.github/skills/*/SKILL.md` content explicitly
+where it doesn't.

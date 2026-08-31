@@ -77,7 +77,14 @@ or manages a workflow automatically.
   of the MCU+IMU+Power benchmark): note explicitly that
   `hardware/power-budget.md` must be updated and re-checked against supply
   capability as part of Circuit Design, and that this likely qualifies as a
-  "major BOM change" / architecture decision HITL gate.
+  "major BOM change" / architecture decision HITL gate. If the new
+  subsystem's power needs may not fit the existing rail(s), consider
+  whether Power Engineer should be engaged first
+  (`.github/agents/power-engineer.agent.md`, Phase 3 —
+  `docs/architecture-evolution.md` §33) to propose the rail architecture
+  (`hardware/power-architecture.md`) before Circuit Design starts on the
+  power section — this is the Hardware Lead's judgment call per project,
+  not automatic for every subsystem addition.
 - **Continuing into Mechanical Design once Electronics has a stable board
   outline** (Phase 1 of the multidisciplinary evolution —
   `docs/architecture-evolution.md` §31; `docs/workflow.md` Phase 8-10): once

@@ -29,14 +29,17 @@ leaves an evidence trail a human can audit later.
 | Electronics | Component Engineer | [`.github/agents/component-engineer.agent.md`](.github/agents/component-engineer.agent.md) |
 | Electronics | Circuit Engineer | [`.github/agents/circuit-engineer.agent.md`](.github/agents/circuit-engineer.agent.md) |
 | Electronics | Hardware Reviewer (independent) | [`.github/agents/hardware-reviewer.agent.md`](.github/agents/hardware-reviewer.agent.md) |
+| Electronics *(Phase 3)* | Power Engineer | [`.github/agents/power-engineer.agent.md`](.github/agents/power-engineer.agent.md) |
 | Mechanical *(Phase 1)* | Mechanical Lead | [`.github/agents/mechanical-lead.agent.md`](.github/agents/mechanical-lead.agent.md) |
 | Mechanical *(Phase 1)* | Mechanical Reviewer (independent) | [`.github/agents/mechanical-reviewer.agent.md`](.github/agents/mechanical-reviewer.agent.md) |
 | Firmware *(Phase 2)* | Firmware Engineer | [`.github/agents/firmware-engineer.agent.md`](.github/agents/firmware-engineer.agent.md) |
 
-Electronics is the original 4-agent MVP. Mechanical and Firmware were added
-later, once each discipline's own trigger condition was met (never
-speculatively) — see `docs/architecture.md` §3/§14 and
-`docs/architecture-evolution.md` §31/§32.
+Electronics is the original 4-agent MVP, extended to 5 with the Power
+Engineer (Phase 3, engaged only when a project's power complexity warrants
+it — not automatic for every design). Mechanical and Firmware were added
+later as new top-level disciplines, once each one's own trigger condition
+was met (never speculatively) — see `docs/architecture.md` §3/§14 and
+`docs/architecture-evolution.md` §31/§32/§33.
 
 ## Repository layout
 
@@ -48,8 +51,8 @@ requirements/        Requirements + requirements traceability matrix
 datasheets/          Datasheet METADATA only (never the actual copyrighted
                      files — see datasheets/README.md) + Evidence ID log
 hardware/            Schematic / PCB artifacts + system power budget +
-                     Electronics->Mechanical interface + mechanical/
-                     design artifacts (Phase 1)
+                     power architecture (Phase 3) + Electronics->Mechanical
+                     interface + mechanical/ design artifacts (Phase 1)
 bom/                 Component selection / comparison records
 firmware/            Driver-level bring-up firmware, one subdirectory per
                      board (Phase 2)

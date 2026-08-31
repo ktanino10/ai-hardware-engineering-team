@@ -30,6 +30,8 @@ flowchart TD
     L --> RE["Requirements Engineering\n(skill, run by Lead + Human)"]
     RE --> CE["Component Engineer"]
     CE --> CIR["Circuit Engineer"]
+    CE -- "power complexity warrants it" --> PE["Power Engineer\n(Phase 3)"]
+    PE -- "human-approved architecture" --> CIR
     CIR --> REV["Hardware Reviewer\n(independent)"]
     REV -- "CRITICAL / HIGH finding" --> CIR
     REV -- "no open CRITICAL" --> VAL["Validation"]
@@ -66,6 +68,7 @@ both write to the same `validation/open-issues.md` (§8).
 | **Mechanical Lead** *(Phase 1)* | Enclosure/mechanical design from `hardware/mechanical-interface.md`, sole owner of the mechanical geometry state, design rationale log | Marking own work reviewed/complete; editing Electronics artifacts |
 | **Mechanical Reviewer** *(Phase 1)* | Independent, adversarial mechanical review; severity-classified findings (shares `validation/open-issues.md` with Hardware Reviewer) | Fixing the design itself |
 | **Firmware Engineer** *(Phase 2)* | Driver-level bring-up firmware from a Design-Complete schematic: peripheral initialization, register-level configuration, design rationale log (`firmware/<board>/`) | Control loops/sensor fusion/unit conversion (Control Engineer's future territory, §14 — not yet triggered); editing Electronics artifacts; marking own work reviewed/complete (self-check stands in for independent review until a Firmware Reviewer trigger is met, `docs/architecture-evolution.md` §32) |
+| **Power Engineer** *(Phase 3)* | System power-tree/rail-topology proposal (`hardware/power-architecture.md`), multi-rail `hardware/power-budget.md` bookkeeping, once engaged (a Hardware Lead judgment call per project/revision, `.github/agents/power-engineer.agent.md`) | Implementing the actual regulator/converter circuit (Circuit Engineer); selecting the specific part (Component Engineer); self-approving a rail/source architecture decision (always HITL, §10) |
 
 The Mechanical Lead / Mechanical Reviewer pair was added in Phase 1 of the
 multidisciplinary evolution (`docs/architecture-evolution.md` §7, §10, §27);
@@ -74,10 +77,18 @@ in Phase 2 (`docs/architecture-evolution.md` §32) once its own trigger
 (§14: "when firmware work starts in earnest") was met — no Firmware
 Reviewer agent exists yet (Phase 2 deliberately introduced only one new
 agent, not the usual design+independent-review pair, per §32's own
-scope-proportionality reasoning). Hardware Lead orchestrates across all
-three disciplines today (§10, §5.3, §5.4) — a separate "System Lead" role
-remains premature until the framework's own discipline count grows further
-(`docs/architecture-evolution.md` §7).
+scope-proportionality reasoning). The Power Engineer was added in Phase 3
+(`docs/architecture-evolution.md` §33) once its own trigger (§14: "when
+subsystem count / power complexity exceeds what Circuit Engineer can track
+ad hoc") was judged met — an Electronics-adjacent addition (extends the
+original 4-agent Electronics team to 5, the same way Component Engineer/
+Circuit Engineer/Hardware Reviewer already divide Electronics work, rather
+than a new top-level discipline the way Mechanical/Firmware are), engaged
+only when the Hardware Lead judges a given project's power complexity
+warrants it, not for every future design by default. Hardware Lead
+orchestrates across all disciplines today (§10, §5.3, §5.4) — a separate
+"System Lead" role remains premature until the framework's own discipline
+count grows further (`docs/architecture-evolution.md` §7).
 
 Full role specs: `.github/agents/hardware-lead.agent.md`,
 `.github/agents/component-engineer.agent.md`,
@@ -85,7 +96,8 @@ Full role specs: `.github/agents/hardware-lead.agent.md`,
 `.github/agents/hardware-reviewer.agent.md`,
 `.github/agents/mechanical-lead.agent.md`,
 `.github/agents/mechanical-reviewer.agent.md`,
-`.github/agents/firmware-engineer.agent.md`. These are real GitHub Copilot
+`.github/agents/firmware-engineer.agent.md`,
+`.github/agents/power-engineer.agent.md`. These are real GitHub Copilot
 custom agent profiles (per
 [docs.github.com/en/copilot/reference/custom-agents-configuration](https://docs.github.com/en/copilot/reference/custom-agents-configuration)),
 each with a required `description` field, so they are selectable directly
@@ -380,10 +392,16 @@ required:
 - `hardware/power-budget.md` aggregates every subsystem's current/power draw
   against the supply's capability, per rail, with margin — updated every time
   a subsystem is added (e.g., a motor driver later in the roadmap).
-- **Future role**: a dedicated **Power Engineer** (see §14) formally owns the
-  system power budget and power tree/sequencing once the system grows past
-  the benchmark's complexity. Until then, the Circuit Engineer maintains
-  `hardware/power-budget.md` as part of `.github/skills/schematic-design/SKILL.md`.
+- **Power Engineer** *(Phase 3 of the multidisciplinary evolution,
+  `docs/architecture-evolution.md` §33)* formally owns the system power-tree
+  proposal (`hardware/power-architecture.md`) and multi-rail
+  `hardware/power-budget.md` bookkeeping once engaged — a Hardware Lead
+  judgment call per project/revision (`.github/agents/power-engineer.agent.md`
+  "When this role is engaged"), not automatic for every design. For a simple
+  single-rail benchmark, the Circuit Engineer continues to maintain
+  `hardware/power-budget.md` directly as part of
+  `.github/skills/schematic-design/SKILL.md`, exactly as before this role
+  existed.
 - **Mechanical/Thermal co-design** is an explicit Circuit Engineer checklist
   item (see `.github/agents/circuit-engineer.agent.md`): rotating bodies (e.g. a
   reaction wheel motor) create vibration and localized heating that can
@@ -413,7 +431,7 @@ framework can add them without restructuring)
 
 | Future role | Scope | Trigger to introduce |
 |---|---|---|
-| **Power Engineer** | System power budget, power tree, sequencing across subsystems (§12) | When subsystem count / power complexity exceeds what Circuit Engineer can track ad hoc (e.g., at Motor Driver / Reaction Wheel stage) |
+| ~~**Power Engineer**~~ **[IMPLEMENTED — Phase 3, see `docs/architecture-evolution.md` §33]** | System power-tree proposal (`hardware/power-architecture.md`), power budget, sequencing across subsystems (§12) | Met: judged met at the Motor Driver / Reaction Wheel stage — the trigger this row already named as its own example. See §3, `.github/agents/power-engineer.agent.md`, `.github/skills/power-architecture/SKILL.md`. Engaged per-project by Hardware Lead judgment (not automatic for every future design, per that file's "When this role is engaged") |
 | **PCB Engineer** | Layout, stackup, DRC closure, signal/power integrity at layout level | When schematic-to-layout handoff becomes a distinct phase |
 | ~~**Firmware Engineer**~~ **[IMPLEMENTED — Phase 2, see `docs/architecture-evolution.md` §32]** | Driver-level bring-up code, register-level configuration matching the schematic's actual pin/interface decisions | Met: `hardware/schematic/bench-imu-01-design.md` reached Design Complete. See §3, §5.4, `.github/agents/firmware-engineer.agent.md`, `.github/skills/firmware-bringup/SKILL.md` |
 | **Control Engineer** | Control-loop design (e.g., attitude control loops) | At 1-axis / 3-axis attitude control roadmap stage — **not met** by Bench-IMU-01 (a static bench sensor-readout board, no reaction wheel/motor/attitude-control project exists). Deliberately kept separate from Firmware Engineer above, even though both were once grouped loosely as "Control/Embedded" (`docs/architecture-evolution.md` §7/§11) — Firmware Engineer's own scope explicitly excludes control loops/sensor fusion/unit conversion (`.github/agents/firmware-engineer.agent.md` "Out of scope") precisely so this row's introduction stays gated on its own, later trigger |
@@ -423,9 +441,9 @@ framework can add them without restructuring)
 | **Safety/Compliance Reviewer** | Regulatory/standards review (e.g. UL/CE/FCC/EMC compliance where applicable) | When the project needs to target a regulated market or a safety-relevant certification |
 
 These are **not** created as `.github/agents/*.agent.md` files yet (except
-Firmware Engineer, now implemented above) — introduce the rest only when
-their trigger condition is met, to avoid role/file proliferation ahead of
-actual need.
+Firmware Engineer and Power Engineer, now implemented above) — introduce the
+rest only when their trigger condition is met, to avoid role/file
+proliferation ahead of actual need.
 
 ## 15. Evaluation
 
@@ -438,7 +456,7 @@ methodology and metrics.
 .github/copilot-instructions.md            Repo-wide Copilot operating rules
 .github/agents/*.agent.md                  Custom agent profiles (name+description frontmatter):
                                               4 Electronics MVP agents + 2 Mechanical agents (Phase 1)
-                                              + 1 Firmware agent (Phase 2)
+                                              + 1 Firmware agent (Phase 2) + 1 Power agent (Phase 3)
 .github/skills/*/SKILL.md                  Agent skill profiles (name+description frontmatter):
   requirements-engineering/SKILL.md
   component-selection/SKILL.md
@@ -448,6 +466,7 @@ methodology and metrics.
   enclosure-design/SKILL.md                Mechanical Lead's procedure (Phase 1)
   mechanical-review/SKILL.md                Mechanical Reviewer's procedure (Phase 1)
   firmware-bringup/SKILL.md                 Firmware Engineer's procedure (Phase 2)
+  power-architecture/SKILL.md                Power Engineer's procedure (Phase 3)
 .github/instructions/*.instructions.md     Path-scoped rules (datasheets/, hardware+bom/, validation/,
                                               hardware/mechanical/+mechanical-interface.md — Phase 1,
                                               firmware/ — Phase 2)
@@ -468,7 +487,8 @@ datasheets/
 hardware/
   schematic/README.md
   pcb/README.md
-  power-budget.md                          System power budget
+  power-budget.md                          System power budget (multi-rail once Power Engineer engaged)
+  power-architecture.md                    Power-tree/rail-topology proposal + decision record (Phase 3)
   mechanical-interface.md                  Electronics -> Mechanical interface contract (Phase 1)
   mechanical/README.md                     Mechanical design artifacts (Phase 1, text/parametric only)
 
