@@ -74,3 +74,13 @@ void usart2_write_i32(int32_t v)
         usart2_write_u32((uint32_t)v);
     }
 }
+
+int usart2_read_byte(uint8_t *out)
+{
+    if ((USART2->ISR & USART_ISR_RXNE) == 0u)
+    {
+        return 0;
+    }
+    *out = (uint8_t)USART2->RDR; /* reading RDR clears RXNE */
+    return 1;
+}

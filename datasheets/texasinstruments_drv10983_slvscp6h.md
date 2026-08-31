@@ -25,9 +25,11 @@
   cached to any local disk.
 - **Used for Evidence IDs**: DS-MTR-032, DS-MTR-033, DS-MTR-034, DS-MTR-035,
   DS-MTR-036, DS-MTR-037, DS-MTR-038, DS-MTR-039, DS-MTR-040, DS-MTR-041,
-  plus DS-MTR-052 through DS-MTR-063 (added by the Circuit Engineer during
-  Bench-IMU-01 Rev 3 schematic design, 2026-09-04 — see the Update note
-  below)
+  plus DS-MTR-052 through DS-MTR-071 (added by the Circuit Engineer/Hardware
+  Reviewer during Bench-IMU-01 Rev 3 schematic design, 2026-09-04/05 — see
+  the Update note below), plus DS-MTR-072 through DS-MTR-076 (added by the
+  Firmware Engineer during Bench-IMU-01 Rev 3 motor bring-up firmware,
+  2026-09-10 — see the second Update note near the end of this file)
 
 ## Update (Circuit Engineer, 2026-09-04, Bench-IMU-01 Rev 3)
 
@@ -78,3 +80,22 @@ content is not touched by the Circuit Engineer).
   compatibility/trade-off reasoning. Its data here is now **primary-PDF
   verified** (upgraded from the prior HTML-product-page-only confidence
   level) as of the 2026-09-04 Update above.
+
+## Update (Firmware Engineer, 2026-09-10, Bench-IMU-01 Rev 3 motor bring-up firmware)
+
+Re-fetched the primary PDF this session (same `r.jina.ai` text-extraction
+proxy, same URL already cited above) to extract the register-level facts
+needed to actually write `drv10983.c`, none of which were yet captured by
+DS-MTR-032–071: the I2C slave address (0x52, DS-MTR-072), the
+DevCtrl/EECtrl register-mode-vs-EEPROM-commit mechanics including the
+0xB6/eeWrite EEPROM-programming key (DS-MTR-073 — decisive evidence for
+this firmware's register-mode-only design choice, since this board's motor
+rail voltage can never reach the EEPROM-write precondition), the FaultCode
+(0x1E) bit layout (DS-MTR-074), the MotorSpeed1/2 registers together with
+TI's own explicit "up to 6% error, use FG instead" guidance (DS-MTR-075 —
+the primary-source justification for this firmware using the FG/TIM3
+tachometer, not an I2C speed-register read, as REQ-405's actual overspeed-
+enforcement measurement), and the full Op2ClsThr numeric table (DS-MTR-076,
+supplementing DS-MTR-063's already-established qualitative mechanism with
+the concrete Hz range and this part's factory-default value). All five new
+rows cite this same datasheet record; no new metadata file was needed.

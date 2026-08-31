@@ -32,14 +32,21 @@
   to this repository (only the small, purpose-built subset actually needed
   is hand-written into `firmware/bench-imu-01/src/stm32g031_regs.h`, citing
   this record)
-- **Used for Evidence IDs**: DS-MCU-055 through DS-MCU-061 (see
-  `datasheets/evidence-log.md`) — STM32G031K8T6 peripheral memory map
-  (FLASH/SRAM/RCC/GPIOA/GPIOB/I2C1/I2C2/USART2 base addresses), GPIO/RCC/
-  I2C/USART register-struct offsets, and RCC clock-enable/reset-reason bit
-  positions used by the Bench-IMU-01 bring-up firmware. (The GPIO
-  alternate-function values, DS-MCU-062, come from the part's datasheet
-  itself, not this header — this header defines register structs/
-  addresses, not the pin-to-AF mapping table.)
+- **Used for Evidence IDs**: DS-MCU-055 through DS-MCU-061, and DS-MCU-074/
+  DS-MCU-075 (see `datasheets/evidence-log.md`) — STM32G031K8T6 peripheral
+  memory map (FLASH/SRAM/RCC/GPIOA/GPIOB/I2C1/I2C2/USART2 base addresses),
+  GPIO/RCC/I2C/USART register-struct offsets, and RCC clock-enable/
+  reset-reason bit positions used by the Bench-IMU-01 bring-up firmware.
+  Rev 3 (Motor Driver subsystem, 2026-09-10) added DS-MCU-074 (I2C1 base
+  address + RCC_APBENR1_I2C1EN, reusing the generic I2C_TypeDef struct
+  already covered above) and DS-MCU-075 (TIM1/TIM3 base addresses, the
+  TIM_TypeDef struct, and RCC_APBENR1_TIM3EN/RCC_APBENR2_TIM1EN), for the
+  new PA8/TIM1 PWM-speed-command and PA6/TIM3 FG-tachometer-capture
+  peripherals. (The GPIO alternate-function *values* for I2C2, DS-MCU-062,
+  and for I2C1/TIM1/TIM3, DS-MCU-074/075's own AF cross-checks, come from
+  the part's datasheet/pin-database/web-corroboration, not this CMSIS
+  header — this header defines register structs/addresses, not the
+  pin-to-AF mapping table.)
 - **Cross-check note**: the RCC_IOPENR/RCC_APBENR1/RCC_CSR bit positions
   cited from this source were independently cross-checked this session
   against a second, independent source (a web search summarizing STM32G0

@@ -11,8 +11,20 @@
  * ST-specific) followed by STM32G031's own device interrupt list (index 16+,
  * confirmed this session against ST's official CMSIS header,
  * cmsis_device_g0/Include/stm32g031xx.h "IRQn_Type" -- sized through index
- * 16+29 to cover every IRQn that header defines for this part, even though
- * this polling-only firmware never unmasks any of them at the NVIC).
+ * 16+29 to cover every IRQn that header defines for this part).
+ *
+ * Rev 3 (Motor Driver + Reaction Wheel subsystem) update: this firmware's
+ * IMU data-acquisition path remains deliberately polling-only (schematic
+ * Section 5.3's own design choice), but index 32 (IRQ16, TIM3) is now wired
+ * to a real handler, TIM3_IRQHandler (tim3_fg.c) -- the FG tachometer's
+ * capture-compare event must be serviced the instant it occurs, because at
+ * the motor's structural top speed (~20,000 RPM) the FG period (~0.43 ms)
+ * is far shorter than any safe main-loop poll interval; a poll could
+ * silently coalesce multiple edges into one falsely-low RPM reading, which
+ * is unacceptable for REQ-405's overspeed cutoff. See tim3_fg.h and
+ * datasheets/evidence-log.md DS-MCU-076 for the full reasoning. Every other
+ * device IRQ remains Default_Handler and unmasked-at-the-NVIC, unaffected
+ * by this change.
  */
 #include <stdint.h>
 
@@ -26,6 +38,7 @@ extern uint32_t _ebss;
 void Reset_Handler(void);
 void Default_Handler(void);
 extern void SysTick_Handler(void); /* real implementation in systick.c */
+extern void TIM3_IRQHandler(void); /* real implementation in tim3_fg.c -- Rev 3 FG tachometer capture */
 
 int main(void);
 
@@ -64,7 +77,7 @@ __attribute__((section(".isr_vector"))) const isr_handler_t g_pfnVectors[] = {
     Default_Handler, /* 29: IRQ13 TIM1_BRK_UP_TRG_COM */
     Default_Handler, /* 30: IRQ14 TIM1_CC */
     Default_Handler, /* 31: IRQ15 TIM2 */
-    Default_Handler, /* 32: IRQ16 TIM3 */
+    TIM3_IRQHandler, /* 32: IRQ16 TIM3 -- Rev 3: FG tachometer capture-compare interrupt (tim3_fg.c), DS-MCU-076 */
     Default_Handler, /* 33: IRQ17 LPTIM1 */
     Default_Handler, /* 34: IRQ18 LPTIM2 */
     Default_Handler, /* 35: IRQ19 TIM14 */

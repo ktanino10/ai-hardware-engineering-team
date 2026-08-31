@@ -13,14 +13,26 @@
  * firmware simple, single-frequency values instead of a family of them; (c)
  * REQ-001's >=100 Hz ODR and REQ-106's UART link have no headroom requirement
  * that would need the part's higher clock ceiling (up to 64 MHz).
+ *
+ * REVALIDATED (Rev 3 motor subsystem, this cycle): the new TIM1 (SPEED PWM),
+ * TIM3 (FG input capture), and I2C1 (U5 commissioning bus) peripherals all
+ * derive from this same 16 MHz HSI16 with no fractional-prescaler headaches
+ * -- 16 MHz / 800 = an exact 20 kHz for TIM1's PWM period, 16 MHz / 160 = an
+ * exact 100 kHz (10 us/tick) for TIM3's capture counter (PSC=159 -- chosen
+ * over a finer PSC=15/1 us-tick alternative for wraparound-safety margin at
+ * low RPM; see tim3_fg.h for the full trade-off analysis), and I2C1 reuses
+ * I2C2's already-validated 400 kHz-at-16 MHz TIMINGR constant verbatim (same
+ * silicon IP block, same bus clock). There is no motor-subsystem requirement
+ * that would justify revisiting this clock choice, so it is being
+ * deliberately reaffirmed, not silently inherited without re-examination.
  */
 #ifndef BENCH_IMU_01_CLOCK_H
 #define BENCH_IMU_01_CLOCK_H
 
-/* Enables the GPIOA/GPIOB/I2C2/USART2/PWR peripheral clocks this board's
- * schematic actually uses. Does not touch RCC_CR/RCC_CFGR/RCC_PLLCFGR --
- * the MCU is already running on HSI16 at reset, so there is deliberately
- * nothing else to configure for the clock source itself. */
+/* Enables the GPIOA/GPIOB/I2C1/I2C2/TIM1/TIM3/USART2/PWR peripheral clocks
+ * this board's schematic actually uses. Does not touch RCC_CR/RCC_CFGR/
+ * RCC_PLLCFGR -- the MCU is already running on HSI16 at reset, so there is
+ * deliberately nothing else to configure for the clock source itself. */
 void clock_init(void);
 
 #endif /* BENCH_IMU_01_CLOCK_H */
