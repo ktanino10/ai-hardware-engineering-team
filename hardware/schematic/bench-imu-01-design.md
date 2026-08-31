@@ -1,8 +1,189 @@
 # Bench-IMU-01 — Schematic-Equivalent Design Document
 
-**Author**: Circuit Engineer (AI agent) · **Date**: 2026-08-31, revised 2026-09-01, revised 2026-09-04 · **Status**: **Revised (Rev 3)** — new Motor Driver (TI DRV10983) + Reaction Wheel (T-Motor MN2206-13 KV2000) subsystem added on the human-approved Option A power architecture (`hardware/power-architecture.md`, ECO-007); Rev 2's Design-Complete content is otherwise unchanged; **ready for Hardware Reviewer review of the new subsystem** (Rev 2's own content already passed its Cycle-1 re-review — this is new-scope review, not a re-review of unchanged material)
+**Author**: Circuit Engineer (AI agent) · **Date**: 2026-08-31, revised 2026-09-01, revised 2026-09-04, revised 2026-09-06 · **Status**: **Revised (Rev 4)** — loop-back rework addressing all 5 open HIGH findings from `validation/design-review.md` Cycle 3 (Hardware Reviewer + rubber-duck review of the Rev 3 Motor Driver + Reaction Wheel subsystem): ISS-014 (2S/3S UVLO margin — fixed), ISS-015 (SPEED uncommanded-motion risk — fixed), ISS-019 (J4 input envelope/fault containment — fixed), ISS-020 (no maximum-speed/overspeed envelope — addressed/flagged), ISS-021 (no latched-fault shutdown, REQ-404 — addressed/flagged); Rev 3's own unrelated content is otherwise unchanged; **ready for Hardware Reviewer re-review of Cycle 3's 5 HIGH findings** (a focused re-check of the changed areas, not a full re-review of already-passed material)
 
 ## Revision changelog
+
+**Rev 4 (2026-09-06)** — Circuit Engineer loop-back rework addressing
+`validation/design-review.md` Cycle 3 findings (Hardware Reviewer +
+rubber-duck, both reviewing Rev 3's Motor Driver + Reaction Wheel
+subsystem in parallel), per `.github/agents/circuit-engineer.agent.md`
+("When you receive Hardware Reviewer findings... address every CRITICAL
+and HIGH finding explicitly — do not silently drop one"). Cycle 3 returned
+**CONDITIONAL, 0 CRITICAL, 5 HIGH** (ISS-014, ISS-015, ISS-019, ISS-020,
+ISS-021) — all 5 are addressed below; **none silently dropped**. ISS-016/
+017/018 (LOW) and ISS-022/023 (MEDIUM) are **not** among the 5 HIGH
+findings routed to this rework cycle and are untouched. Per this
+document's own established precedent (Rev 2/Rev 3), `bom/component-
+selection.md`, `requirements/requirements.md`, `hardware/power-
+architecture.md`'s Decision table, `hardware/mechanical-interface.md`,
+`validation/open-issues.md`, and `validation/design-review.md` are
+**not** touched by this agent; `hardware/power-budget.md` **is** updated
+(F1/R10 numeric effects, plus the ISS-014 cross-document reconciliation
+the Hardware Reviewer found); `datasheets/evidence-log.md` **is**
+appended to (one new row, **DS-PROT-006**, for the new F1 part —
+ISS-015's own evidence needs are already met by existing rows
+DS-MTR-068/069/071, cited directly below, not re-derived from scratch);
+`validation/change-log.md` gains a new **ECO-009** row.
+
+- **ISS-014 (HIGH, fixed — scope/documentation correction; residual
+  flagged)** — §7.5.2's 2S/3S paragraph is rewritten. The prior framing
+  ("only a freshly-charged 2S pack... clears UVLO with any margin") is
+  corrected: the Hardware Reviewer independently re-derived the same
+  source figures (D2 VF=0.53V typ/0.62V max, DS-PROT-005; U5
+  VUVLO_R=7/7.4/8V min/typ/max, DS-MTR-057) and found 2S actually fails
+  **at the typical corner** (6.87V < 7.4V typ) — a likely, not merely
+  worst-case, outcome — and also found this document's own prior wording
+  disagreed with `hardware/power-budget.md`'s Rail Margin Summary on the
+  identical scenario. Both documents now state one precise,
+  corner-explicit conclusion: **3S-only is recorded as this design's
+  binding practical constraint**, not a soft recommendation, and the
+  typical-corner failure is stated as the headline (not the worst-case
+  corner alone). New §7.5.9's F1 (PTC fuse, below) adds further series
+  resistance, narrowing the 3S margin from ≈0.38V to ≈0.32V at the
+  near-cutoff corner — still adequate, quantified explicitly rather than
+  left unstated. **Flagged, not self-resolved** (per this agent's own
+  "Out of scope" instructions): (a) propagating the 3S-only constraint
+  into `bom/component-selection.md`/`requirements/requirements.md` — both
+  outside this agent's edit scope, routed to Hardware Lead; (b) the
+  Hardware Reviewer's own alternate-fix suggestion, evaluating a
+  lower-VF ideal-diode/ORing-FET reverse-polarity topology if 2S support
+  is later required — an architecturally significant part-class change,
+  routed to Component Engineer via Hardware Lead, not self-selected.
+- **ISS-015 (HIGH, fixed — external pulldown added; residual flagged)** —
+  §7.5.5's prior "deliberate non-addition of an external pulldown" stance
+  is reversed, citing the Hardware Reviewer's own primary-source findings
+  directly rather than re-deriving them: **DS-MTR-071** (new evidence row
+  added by the Hardware Reviewer this cycle) decodes U5's factory-default
+  EEPROM value (Table 8, register 0x2B=0x0C) to `SpdCtrlMd`=0=**analog
+  mode**, and §8.4.5.2 confirms analog mode is fully active, not inert,
+  out of reset — directly correcting this document's own superseded
+  reasoning (**DS-MTR-068**, qualified in place by the Hardware Reviewer,
+  2026-09-05). The same review additionally found that the internal
+  `RPD_SPEED_SL` pulldown this document previously cited as a partial
+  mitigant (**DS-MTR-069**) is documented **only** under the primary
+  datasheet's "SLEEP MODE (DRV10983Z)" table section — the plain
+  **DRV10983** actually specified in this design (no sleep-pin/Zener
+  component populated, confirmed against §13's own parts list) has a
+  separate "STANDBY MODE (DRV10983)" section with **no pulldown parameter
+  listed at all**, a more specific weakening of this document's prior
+  "partial mitigant" framing than previously acknowledged. New **R10 =
+  1kΩ 0603** resistor, SPEED net to common ground (§8) — sized (ASSUMPTION,
+  no specific SPEED-pin leakage figure exists in the datasheet) to hold
+  SPEED many multiples below VANA_ZS=100mV against realistic pin
+  leakage/coupling current, independent of MCU firmware state. This is an
+  explicit, acknowledged deviation from TI's own Table 11 reference
+  circuit (which lists no external SPEED pull component, per DS-MTR-071's
+  own cross-check) — justified because that reference circuit assumes a
+  single always-alive host system, which this design's dual-independent-
+  power-domain (Option A) architecture does not have. **Flagged, not
+  self-resolved**: (a) a supervisory load switch gating U5's own VCC on
+  the MCU domain's power state — new **§7.5.10** specifies the
+  function/ratings needed (architecturally significant, routed to
+  Component Engineer via Hardware Lead, not self-selected); (b) REQ-403's
+  own explicit human-safety-review gate applies regardless of the
+  technical path chosen — flagged for that review, not self-granted here.
+- **ISS-019 (HIGH, fixed — binding envelope + PTC fuse added; residual
+  flagged)** — New **§7.5.9** defines a binding J4 input envelope —
+  **9.0–13.0V** (3S near-cutoff to 3S full-charge + ~3% headroom),
+  explicitly excluding 4S packs or an incorrectly-set bench supply —
+  where none existed before (the prior "~12V-class" framing was
+  descriptive, not a bound). New **F1 = Littelfuse 30R500U** radial-leaded
+  PTC resettable fuse (**DS-PROT-006**), placed J4(+) → **F1** → D2 → D3
+  → U5 VCC, adds coordinated upstream fault containment against
+  short-circuit-level fault current that none of J4/D2/D3/U5's own
+  protection previously provided upstream of U5's own internal,
+  downstream-only OCP. Honestly scoped: F1's own trip current
+  (Itrip=10.00A) exceeds J4's own 5.0A connector rating — its real
+  protective value is against genuine short-circuit-level faults, not a
+  precisely-matched current limiter for J4 itself; this gap is why a true
+  input eFuse/active-OVP stage is flagged, not claimed closed, below. D3
+  (SMBJ16A, 16.0V standoff/26.0V max clamp, unchanged) remains correctly
+  scoped as a transient-only backstop, not a continuous-overvoltage
+  bound — this document does not overclaim TVS capability. **Flagged, not
+  self-resolved**: (a) true hardware-enforced continuous input
+  over-voltage lockout needs an active comparator+switch stage — unified
+  with ISS-015's flagged supervisory controller in the new §7.5.10 rather
+  than recommending a second, redundant part; (b) recording the
+  9.0–13.0V envelope in `validation/bring-up-procedure.md`'s future
+  motor-rail section — that file is not edited by this agent (ambiguous
+  ownership), flagged instead.
+- **ISS-020 (HIGH, addressed — no schematic-level fix exists; firmware
+  requirement flagged)** — New **§7.5.11** records the finding as-is (a
+  genuine premise-level gap, not a circuit defect): REQ-007's "≥3000 RPM"
+  has only ever been a functional floor; M1's own no-load speed
+  (DS-MTR-018, ≈20,000–22,200 RPM) is 6–7× that floor, with stored
+  rotational energy ≈45–55× higher at no-load than at the 3000 RPM
+  target. No component, connection, or protection circuit in this
+  design's own scope can bound a *commanded* maximum speed — that is a
+  firmware policy question (a maximum operating/fault speed, a commanded
+  ramp-rate limit, and a tach-supervised overspeed shutdown using the
+  already-wired FG signal, §7.5.4), not a hardware one, and this document
+  does not invent one. Explicitly **not** the REQ-009-prohibited
+  closed-loop attitude-control logic — a bounded safety cutoff is a
+  different class of behavior than attitude control, the same way an
+  overcurrent shutdown is not "control" in the excluded sense. **Flagged
+  for Hardware Lead mediation**, ties to REQ-403's safety-critical
+  human-review gate: this document proposes ~6000 RPM (2× the floor) only
+  as a numeric anchor for discussion, not a decision — the actual maximum
+  is Firmware/Mechanical Lead's/the human's call, and must in turn feed
+  Mechanical Lead's flywheel/containment design as a real input.
+- **ISS-021 (HIGH, addressed — no schematic-level fix exists; firmware
+  requirement flagged, hardware enabler flagged)** — New **§7.5.12**
+  records the finding: U5's own three protection mechanisms (OCP/
+  DS-MTR-058, Lock Detection/DS-MTR-059, Thermal Shutdown/DS-MTR-060) are
+  all auto-recovering/auto-retrying by design — none latch — so
+  REQ-404's own "shutdown behavior to prevent sustained overheating" is
+  not actually satisfied by relying on them alone: a persistent mechanical
+  jam would cause repeated fault-current pulses and repeated
+  auto-restarts indefinitely, each dissipating real heat (D2 alone
+  dissipates ≈1.86W at a 3A/0.62V worst-case fault current, DS-PROT-005)
+  with no design-level cutoff that ever actually stops trying. No passive
+  circuit change closes this gap — it requires a **firmware-level
+  latched-fault policy** (count consecutive Lock Detection retries,
+  Status register bit4/MtrLck, within a rolling window over the
+  already-wired I2C1 bus, §7.5.4; force SPEED to a safe/stopped state
+  after a threshold; require a deliberate re-arm) — flagged as a new
+  firmware requirement, not implemented here (REQ-009 fence). **Hardware
+  note, not a fix**: the same §7.5.10 flagged supervisory switch (ISS-015)
+  could additionally serve as the actual VCC-cutting enforcement
+  mechanism once firmware declares a latched-fault condition —
+  cross-referenced, not a third redundant part. REQ-404 is a "Should," not
+  a "Must" — noted, but this does not reduce the obligation to address
+  this HIGH finding explicitly.
+- **New §7.5.9–§7.5.12** — appended after §7.5.8, using this document's
+  own established decimal-numbering, append-don't-renumber convention
+  (Rev 3's own precedent); §7.5.1–§7.5.8 are otherwise unchanged by this
+  addition (only §7.5.2 and §7.5.5 receive the in-place corrections above,
+  and §7.5.8's closing paragraph is updated to reflect the severity
+  correction and the new §7.5.10 cross-reference).
+- **Power budget (REQ-109)** — `hardware/power-budget.md`'s VM_MOTOR
+  Supply Capability row gains F1; its Subsystem Load table gains R10's own
+  negligible worst-case 3V3-domain load (≈3.3mA, an atypical/instantaneous
+  100%-duty-cycle-held case, the same treatment already used for the
+  I2C pull-ups' own worst-case row); its Rail Margin Summary's 2S/3S row
+  is rewritten to state the same corrected, corner-explicit conclusion as
+  this document's own §7.5.2 — the cross-document inconsistency the
+  Hardware Reviewer found is now closed.
+- **§11/§12/§13** — corrected phrasing (self-check catch): R10 and F1 are
+  *not* added as new rows to §11's MCU pin-assignment table — neither
+  consumes an MCU pin, both being passive, in-line/shunt parts on
+  already-wired nets — §11 instead gains an explanatory "Rev 4 note"
+  confirming this and stating the free-GPIO count (16) is therefore
+  unchanged. §12's net list does gain both: F1 is inserted into the
+  existing VM_MOTOR path, and a new SPEED-pulldown branch is added for
+  R10. §13's parts list gains new **R10**/**F1** rows.
+- **§16** — items 14 and 17 are annotated in place per this document's
+  own established convention (§16's own "Annotation convention," introduced
+  in Rev 3); new items 22–26 are appended for this revision's own residual
+  flags (the §7.5.10 supervisory switch, the §7.5.9 continuous-OVP gap,
+  the `bring-up-procedure.md` envelope note, and the two new firmware
+  requirements from ISS-020/021).
+- **Self-check**: re-run against Hardware Reviewer checklist items 1, 3,
+  6, 7, 8, 9, and 10 (§15) — items 1/10 map to ISS-014's UVLO/
+  power-sequencing correction, items 6/7/10 to ISS-015's pulldown/
+  supervisory-switch flag, item 9/3 to ISS-019's protection stage. See
+  §14/§15 for the item-by-item record.
 
 **Rev 3 (2026-09-04)** — Circuit Engineer addition of the Motor Driver +
 Reaction Wheel subsystem, authorized by `validation/change-log.md` ECO-007
@@ -256,16 +437,22 @@ Two rails exist on this board:
 - **3V3** — post-regulator, LDO (U3) output, fixed 3.3V (DS-PWR-003).
   Feeds: MCU (U1) VDD/VDDA/VBAT, IMU (U2) VDD/VDDIO, both header 3V3 reference
   pins (SWD J3, UART J2), status LED (D1) via R5, I2C pull-ups (R3/R4).
-- **VM_MOTOR (~12V-class) — new Rev 3** — independent input, from the new
-  barrel jack (J4), nominal 12V (2S–3S LiPo class per REQ-108/Option A),
-  through series reverse-polarity diode D2 and TVS D3, to the DRV10983
-  (U5) VCC pins. **Electrically independent of the 5V/3V3 rails above —
-  no shared regulator, no shared source** (Option A's fault-isolation
-  intent, `hardware/power-architecture.md`). U5's own internal step-down
-  regulator is configured in **linear mode** (§7.5.3) specifically so it
-  cannot supply the MCU/IMU domain, per the task's explicit constraint.
-  See §7.5 for the full power-input block and §17/`hardware/power-
-  budget.md` for the numeric budget.
+- **VM_MOTOR (~12V-class) — new Rev 3, envelope bounded Rev 4** —
+  independent input, from the new barrel jack (J4), through a new PTC
+  resettable fuse (F1, Rev 4), series reverse-polarity diode D2 and TVS
+  D3, to the DRV10983 (U5) VCC pins. M1 itself remains rated 2S–3S per
+  REQ-108/Option A/`bom/component-selection.md` (unedited, unchanged) —
+  but **this design's own added series protection diode (D2) narrows the
+  practical operating recommendation to 3S-only, now stated as a binding
+  constraint with a bounded 9.0–13.0V source envelope (§7.5.2/§7.5.9,
+  ISS-014/ISS-019), not merely 2S–3S in the abstract**. **Electrically
+  independent of the 5V/3V3 rails above — no shared regulator, no shared
+  source** (Option A's fault-isolation intent, `hardware/power-
+  architecture.md`). U5's own internal step-down regulator is configured
+  in **linear mode** (§7.5.3) specifically so it cannot supply the
+  MCU/IMU domain, per the task's explicit constraint. See §7.5 for the
+  full power-input block and §17/`hardware/power-budget.md` for the
+  numeric budget.
 
 Single 3.3V logic level throughout (REQ-102, "Should") — no
 level-shifting circuitry anywhere in this design for the MCU/IMU domain.
@@ -955,33 +1142,73 @@ GND/PGND/SWGND all tied to the single common ground net (§8).
   bidirectional) is correct here since D3 sits downstream of D2's
   reverse-blocking action, never itself exposed to reverse polarity.
 
-**New finding this revision — 2S vs. 3S viability through the added
-diode (flagged for Hardware Reviewer attention, not self-resolved)**:
+**Corrected this revision (ISS-014, HIGH) — 2S is not a viable practical
+option through the added diode; 3S-only is a binding constraint**:
 combining two datasheet facts not previously cross-checked together
-reveals a real, quantitative constraint. D2's forward drop is 0.53V
-typ (@3A/100°C) to 0.62V max (@3A/25°C) (DS-PROT-005 — real drop at this
-design's actual ~1.05A nominal current is expected to be somewhat lower
-still, so these figures are used conservatively). U5's UVLO rising
-(power-up) threshold is VUVLO_R = 7/7.4/8V min/typ/max (DS-MTR-057).
-Stacking these: a **2S source (7.4V nominal, ~6.0–8.4V realistic
-discharge range)** minus even the typical 0.53V diode drop lands at
-**≈6.87V nominal — below VUVLO_R's typical 7.4V threshold**, meaning a 2S
-pack at or below its nominal voltage may not reliably power U5 up
-through this design's own reverse-polarity diode; only a freshly-charged
-2S pack (~8.4V) clears UVLO with any margin, and that margin erodes as
-the pack discharges. A **3S source (11.1V nominal, ~9.0–12.6V realistic
-range)** minus the same drop lands at **≈10.6V nominal, ≈8.4V even at a
-conservative 9.0V near-cutoff** — comfortably above VUVLO_R across its
-whole practical discharge range. **This design's practical recommendation
-is 3S operation**, even though the approved motor is rated across both
-2S–3S — this is a consequence of adding the (well-justified) series
-protection diode, not a defect in the motor/driver selection itself, and
-is not remedied by changing D2 (STPS3L60 is already a low-VF choice; a
-lower-VF option would trade off reverse-leakage/voltage rating and was
-not judged worth chasing for a single-diode voltage-margin gain against
-a 2S edge case). Recorded here for the Hardware Reviewer/Hardware Lead to
-weigh — accept the 3S-only practical recommendation, or revisit if 2S
-operation is later required (§16).
+reveals a real, quantitative constraint, independently re-derived by the
+Hardware Reviewer against the same two source figures this document
+already cited. D2's forward drop is 0.53V typ (@3A/100°C) to 0.62V max
+(@3A/25°C) (DS-PROT-005 — real drop at this design's actual ~1.05A
+nominal current is expected to be somewhat lower still, so these figures
+are used conservatively). U5's UVLO rising (power-up) threshold is
+VUVLO_R = 7/7.4/8V min/typ/max, and its UVLO falling (drop-out) threshold
+is VUVLO_F = 6.7/7.1/7.5V min/typ/max (both DS-MTR-057).
+
+Stacking these at every relevant corner, not just one:
+
+- **2S nominal (7.4V) − 0.53V typ drop = 6.87V, below VUVLO_R typ
+  (7.4V)** — fails to power up **at the typical corner**, not merely a
+  rare worst-case one. This is now the headline result; the prior
+  revision's framing cited only a single corner and understated the
+  likelihood of failure.
+- **2S full-charge (8.4V) − 0.62V max drop = 7.78V, below VUVLO_R max
+  (8V)** — even a freshly-charged 2S pack does not reliably clear UVLO at
+  the worst-case (cold-diode, high-current) corner. The prior claim that
+  a freshly-charged 2S pack "clears UVLO with any margin" is **incorrect
+  at the max corner and is retracted**.
+- **2S mid-discharge (7.0V) − 0.53V typ drop = 6.47V, below VUVLO_F min
+  (6.7V)** — a 2S pack that did manage to start up would drop out well
+  before reaching a normally-discharged voltage, so 2S offers no usable
+  runtime margin even in the best case.
+- **3S near-cutoff (9.0V) − 0.62V max drop = 8.38V, above VUVLO_R max
+  (8V) by 0.38V** — 3S remains robust even at the simultaneous
+  worst-case combination of coldest diode drop and near-cutoff pack
+  voltage.
+
+**3S-only is recorded as this design's binding practical constraint**,
+not a soft recommendation — 2S is expected to fail under normal
+(typical-corner) conditions, not just an edge case. This is a consequence
+of adding the (well-justified) series protection diode, not a defect in
+the motor/driver selection itself, and is not remedied by changing D2
+(STPS3L60 is already a low-VF choice; a lower-VF option would trade off
+reverse-leakage/voltage rating and was not judged worth chasing for a
+single-diode voltage-margin gain against a 2S edge case — flagged below
+for Component Engineer to evaluate, not self-selected). New §7.5.9's F1
+(PTC resettable fuse, added this revision for ISS-019) adds an estimated
+~0.06V further series drop at the 3S near-cutoff/worst-case corner
+(ESTIMATE, no Evidence ID — the datasheet publishes only Rmin initial and
+R1max post-trip resistance, not a max-initial figure; 0.02Ω assumed
+in-circuit resistance × 3A is a reasonable estimate, not a sourced
+figure), narrowing the 3S margin to **≈0.32V (8.32V vs. 8.0V VUVLO_R
+max)** — still adequate, and now stated quantitatively rather than left
+unstated.
+
+**Cross-document consistency, corrected this revision**: `hardware/
+power-budget.md`'s Rail Margin Summary previously stated the opposite
+framing for this identical scenario (2S "sits under UVLO_R's max,"
+implying 2S might still work at the typical corner) — the Hardware
+Reviewer's Cycle 3 finding was exactly this disagreement between the two
+documents. Both documents now state the same corner-explicit conclusion
+above; see `hardware/power-budget.md`'s Rail Margin Summary (updated this
+revision) for the mirrored statement.
+
+**Flagged, not self-resolved** (Hardware Lead mediation per this agent's
+"Out of scope" instructions): (a) propagating this 3S-only constraint
+into `bom/component-selection.md`/`requirements/requirements.md` — both
+outside this agent's edit scope; (b) evaluating a lower-VF ideal-diode/
+ORing-FET reverse-polarity topology if 2S support is later required — an
+architecturally significant part-class change, Component Engineer's call,
+not self-selected here (§16 item 17).
 
 ### 7.5.3 U5's internal regulator: configured so it cannot power the MCU/IMU domain
 
@@ -1096,30 +1323,93 @@ firmware/commissioning task** — consistent with REQ-009's fence (motor-
 parameter values are not closed-loop control logic).
 
 **DIR** has no internal bias documented in the datasheet (only SPEED's
-sleep-mode pulldown was called out, DS-MTR-069) but is actively driven by
-MCU PB1 as a push-pull output — the practical floating-at-MCU-reset
-window (before firmware initializes PB1) is a low-severity residual
-concern (worst case: an undefined direction command during a window when
-SPEED's own internal bias, see below, already tends toward zero
+pulldown was called out, DS-MTR-069) but is actively driven by MCU PB1 as
+a push-pull output — the practical floating-at-MCU-reset window (before
+firmware initializes PB1) is a low-severity residual concern (worst
+case: an undefined direction command during a window when SPEED's own
+bias — R10, below, added this revision — already tends toward zero
 commanded speed) — noted in §16, not treated as requiring an added
-component.
+component (ISS-016, LOW, out of this revision's rework scope).
 
-**SPEED's internal pulldown — a deliberate non-addition, evidence-based,
-not an oversight**: the datasheet documents `RPD_SPEED_SL` = an internal
-SPEED-pin pulldown to ground, 55kΩ typ, **specifically under the test
-condition "VSPEED=0 (sleep mode)"** (DS-MTR-069) — i.e. confirmed for the
-device's sleep-mode state, not asserted as a universal always-on
-default-safe bias in every power/reset condition. This is a genuine,
-if partial, mitigant for SPEED floating during MCU-domain reset/init —
-contrast with the Rev 2 LDO EN-pin case (ISS-001), where **no** internal
-bias existed at all and a firm external tie was required. Here, TI's own
-Table 11 reference circuit does **not** include an external SPEED bias
-resistor either — this design follows that reference circuit (checklist
-item 17) rather than adding one on its own initiative absent a specific
-documented requirement forcing it. The residual cross-domain power-up-
-ordering question (MCU GPIO init timing vs. U5's own VCC ramp, given the
-two domains are independently sourced per Option A) is honestly flagged
-in §16, not silently assumed away.
+**Corrected this revision (ISS-015, HIGH) — the prior "deliberate
+non-addition" stance for a SPEED pulldown is reversed; a real external
+pulldown is added.** Cycle 3 review (Hardware Reviewer + rubber-duck)
+found this section's own prior reasoning insufficient on two independent
+grounds, both accepted here rather than re-argued:
+
+1. **The factory-default SPEED state is analog mode, not inert.**
+   `SpdCtrlMd`'s factory-default EEPROM value (Table 8, register
+   0x2B=0x0C, decoding bit1=0=analog mode) means U5 boots into **analog**
+   mode, not PWM mode, in any uncommissioned window — and per the same
+   datasheet's §8.4.5.2, analog mode is fully active out of reset, not
+   inert: it interprets any voltage on SPEED as a real, proportional
+   commanded speed (stop below VANA_ZS=100mV, ramping linearly to full
+   speed at/above VANA_FS=V(V3P3)×0.9) (**DS-MTR-071**, added by the
+   Hardware Reviewer this cycle). This directly corrects — and
+   supersedes — this section's own prior reliance on **DS-MTR-068**'s
+   closing phrase (qualified in place by the Hardware Reviewer,
+   2026-09-05, not deleted, so the correction stays auditable) that
+   called SPEED "functionally inert until [PWM mode] is configured":
+   that phrasing is accurate only for the *PWM-mode* interpretation, not
+   for the pin's real, active behavior in its own factory-default analog
+   state.
+2. **The internal pulldown this section previously relied on as a
+   partial mitigant does not clearly cover the part actually specified.**
+   `RPD_SPEED_SL` (55kΩ typ, DS-MTR-069) is listed in the primary
+   datasheet's Electrical Characteristics table under the section header
+   **"SLEEP MODE (DRV10983Z)"** — textually grouped with, and
+   characterized alongside, the sleep-capable **DRV10983Z** variant's own
+   sleep-mode parameters. This design specifies the **plain DRV10983**
+   (confirmed via §13's own parts list — no Zener/sleep-pin component
+   populated), which has a separate **"STANDBY MODE (DRV10983)"** section
+   in the same table that does **not** list any internal-SPEED-pulldown
+   parameter at all. This does not prove the physical pulldown structure
+   is absent on the plain part's silicon (variants in one package are
+   often the same die with different firmware-configured feature sets) —
+   only that the datasheet neither documents nor guarantees it for the
+   part actually specified here, a more specific weakening of this
+   section's own prior "partial mitigant" framing than previously
+   acknowledged.
+
+**Fix**: new **R10 = 1kΩ, 0603**, wired from the SPEED net to common
+ground (§8) — a real external pulldown, not relying on any internal/
+undocumented bias. Sized (ASSUMPTION, no datasheet SPEED-pin leakage
+figure exists to size precisely against) so that any realistic pin
+leakage or stray capacitive/coupling current produces a voltage far below
+VANA_ZS=100mV across 1kΩ, dominating over leakage currents many times
+larger than a typical CMOS-class input would present. This is an
+explicit, acknowledged deviation from TI's own Table 11 reference
+circuit, which lists no external SPEED pull component (independently
+cross-checked by the Hardware Reviewer via DS-MTR-071) — justified
+because Table 11 implicitly assumes a single always-alive host system,
+which this design's dual-independent-power-domain (Option A) architecture
+does not have (the Hardware Reviewer's own Recommended Fix option 1). R10
+draws from the **3V3 rail**, not VM_MOTOR, only while MCU's PA8 GPIO
+drives HIGH; see `hardware/power-budget.md` for the added worst-case load
+(§17).
+
+**Bounding factor, honestly retained from the Hardware Reviewer's own
+finding** (this fix reduces risk — it does not retroactively make the
+underlying hazard chain hypothetical): even before this fix, any
+resulting motion would have been ramped/current-limited (`StAccel`/
+`OpenLCurr`, Table 6, per DS-MTR-071's own cross-check) using
+generic/unmatched commutation parameters, not an instantaneous
+full-speed event. R10 is added specifically so this bounding factor is
+no longer the *only* thing standing between the factory-default
+analog-mode state and an actual uncommanded-motion event.
+
+**Flagged, not self-resolved** (Hardware Lead mediation, per this
+agent's "Out of scope" instructions): (a) a supervisory load switch
+gating U5's own VCC on the MCU domain's power state — the Hardware
+Reviewer's own Recommended Fix option 2, which would directly enforce
+the missing cross-domain power-up ordering rather than only bounding
+SPEED's voltage — specified as a new part's required function in new
+**§7.5.10** below, routed to Component Engineer via Hardware Lead as an
+architecturally significant choice, not self-selected; (b) REQ-403's own
+explicit requirement that final disposition of this class of finding
+receive human safety review before any Design Complete gate — this
+applies regardless of which technical fix is chosen, and is not
+something this agent can self-grant (`docs/architecture.md` §8).
 
 ### 7.5.6 Protection (REQ-111/404) — DRV10983's real mechanisms confirmed
 
@@ -1206,13 +1496,255 @@ VCC at all times" (DS-MTR-066). Because Option A deliberately makes the
 MCU/IMU domain and the U5/motor domain **independently sourced** (no
 shared regulator, no defined mutual power-up ordering), there is no
 hardware guarantee that the MCU's GPIOs are already initialized before
-U5's VCC ramps, or vice versa. This is not remedied by an added component
-in this design (TI's own reference circuit, §7.5.3, includes none for
-this purpose, and SPEED's partial internal-pulldown mitigant is discussed
-in §7.5.5) — it is recorded here as a real, if low-severity (bounded by
-SPEED's sleep-mode pulldown tendency and by FG being firmware-read, not
-power-critical), cross-domain sequencing consideration for the Hardware
-Reviewer's awareness and for firmware bring-up to be aware of (§16).
+U5's VCC ramps, or vice versa.
+
+**Severity corrected this revision (ISS-015, HIGH)**: this cross-domain
+sequencing gap was previously framed here as "real, if low-severity" —
+that framing is retracted. Cycle 3 review found the same gap ties
+directly to REQ-403 (safety-critical, human-review-gated) precisely
+because, absent any supervisory gating, the "uncommissioned" window (U5
+powered, MCU either not yet powered or not yet finished with GPIO/I2C
+init) is not bounded to be short — it could persist indefinitely
+depending on bench connection order, during which U5 runs in its
+factory-default active analog SPEED mode (§7.5.5, DS-MTR-071). New R10
+(§7.5.5, this revision) now firmly bounds SPEED's own voltage during this
+window regardless of sequencing, which is this revision's actual fix for
+the voltage-level part of the hazard — but R10 does **not** itself
+enforce a power-up *order*, only a safe SPEED *level* whenever the MCU
+side is not actively driving it. Directly enforcing the missing
+cross-domain ordering (rather than only bounding SPEED's level) would
+require a supervisory component — **flagged in new §7.5.10 below**, not
+added as a passive fix here, consistent with §7.5.5's own disposition of
+this same finding.
+
+### 7.5.9 J4 input envelope and upstream fault containment (new, ISS-019)
+
+**Fixed this revision (ISS-019, HIGH) — a binding source voltage/current
+envelope is defined, and a new upstream protection part is added.** Prior
+revisions described VM_MOTOR informally as "~12V-class, 2S–3S LiPo"
+without ever stating a bound every part in the path is checked against,
+and without any protection element upstream of U5's own internal,
+downstream-only OCP (§7.5.6) — a fault between J4 and U5 (e.g. a shorted
+or reverse-inserted external supply lead) had no coordinated
+containment: J4 is rated 5.0A (DS-CONN-005), D2 is rated for its own
+repetitive/surge figures (DS-PROT-005), D3 clamps transients only
+(DS-PROT-004) — none of these is a deliberately-chosen fault-current-
+limiting element; each is simply rated high enough not to be the binding
+constraint on its own.
+
+**Binding voltage envelope: 9.0V to 13.0V.** Lower bound (9.0V) is 3S's
+own near-cutoff voltage (§7.5.2); upper bound (13.0V) is 3S's own
+full-charge voltage (12.6V) plus ~3% headroom for a slightly-miscalibrated
+bench supply, while remaining well clear of a 4S pack's own nominal
+(14.8V) or full-charge (16.8V) voltage. This is a **binding constraint**,
+not a description — an operator connecting a 4S pack, or a bench supply
+mis-set above 13.0V, is outside this design's qualified input envelope.
+This does not change D3's own role: D3 remains a transient/surge-only
+backstop at 26.0V max clamp (DS-PROT-004) — it is not repurposed as, nor
+claimed to be, a continuous-overvoltage bound; a sustained 4S connection
+would sit below D3's own clamp voltage and would not be caught by D3 at
+all, which is exactly why a true continuous-OVP stage is flagged below,
+not claimed solved by D3.
+
+**New F1 = Littelfuse 30R500U**, a radial-leaded PTC (polymeric
+positive-temperature-coefficient) resettable fuse (**DS-PROT-006**):
+Ihold=5.00A, Itrip=10.00A, Vmax=30Vdc, Imax=40A (fault current),
+Rmin=0.010Ω (initial), R1max=0.050Ω (post-trip). Placement: J4(+) →
+**F1** → D2 (anode) → D3 (shunt) → U5 VCC — upstream of both existing
+protection parts, closest to the actual external-fault entry point.
+Ihold (5.00A) sits above this design's own ≤3A worst-case operating
+current (§7.5.4 item 5) with margin, so F1 will not nuisance-trip under
+any expected operating condition, including U5's own OCP fault condition
+(IOC_limit=3 MIN/4 MAX A, DS-MTR-058) — F1 is a slower-acting,
+higher-threshold backstop behind U5's own internal protection, not a
+replacement for it.
+
+**Honestly scoped, not overclaimed**: F1's own Itrip (10.00A) exceeds
+J4's own 5.0A connector rating (DS-CONN-005) — F1 is not a precisely-
+matched current limiter for J4 itself, and a fault current between 5A
+and 10A would exceed J4's own rating before F1 trips. F1's real
+protective value is against genuine short-circuit-level fault currents
+(well above 10A, tripping in seconds per its own time-to-trip curve),
+not as a tight bound on J4's own rating — this gap is exactly why a true
+input eFuse/active current-limiting stage is flagged below, not claimed
+closed by F1 alone.
+
+**Thermal derating (ambient)**: per Littelfuse's own published Ihold
+temperature-derating table (30R500U row: 5.00A@20°C baseline, 3.85A@50°C,
+3.40A@60°C, 3.05A@70°C, 2.60A@85°C), F1's derated hold current remains
+**at or above** this design's ≤3A worst-case current through the
+datasheet's own 70°C point (3.05A), dropping below 3A somewhere between
+70°C and 85°C — interpolating linearly between those two published
+points, ≈71.7°C. Comfortably above REQ-201's 40°C ambient design target
+either way, with no bench-top ambient scenario expected to approach this
+limit.
+
+**Series-drop impact already incorporated in §7.5.2, not a separate
+concern**: F1 adds an estimated ~0.06V further worst-case series drop
+(ESTIMATE, no Evidence ID — the datasheet publishes only Rmin initial and
+R1max post-trip resistance, not a max-initial figure; 0.02Ω assumed
+in-circuit resistance × 3A) — already folded into §7.5.2's corrected
+3S-margin figure (≈0.32V), not double-counted here.
+
+**Flagged, not self-resolved**: (a) a true hardware-enforced continuous
+input overvoltage lockout — F1 and D3 together bound fault currents and
+transients respectively, but neither bounds a sustained, out-of-envelope
+DC input voltage (e.g. a 4S pack held connected) — this needs an active
+comparator+switch stage, unified with ISS-015's flagged supervisory
+controller below (§7.5.10) rather than adding a second, separately
+specified part; (b) recording the 9.0–13.0V envelope in `validation/
+bring-up-procedure.md`'s eventual motor-rail bring-up section — that
+document is not edited by this agent, flagged for whoever owns it next.
+
+### 7.5.10 Flagged: supervisory motor-rail protection controller (new, serves ISS-015/019/021 — not self-selected, routed to Component Engineer via Hardware Lead)
+
+**This section specifies required function and ratings only — it does
+not select a specific MPN.** Per this agent's own scope (a part beyond
+the "single supporting part, no full comparison" class used for D2/D3/F1
+"is a more architecturally significant choice" to be "flag[ged]
+instead"), a supervisory controller that actively gates U5's own VCC
+based on system state is judged architecturally significant: it would be
+the first *active* (not passive) protection element in this design, and
+its correct specification determines whether three independent HIGH
+findings (ISS-015, ISS-019's residual continuous-OVP gap, ISS-021) are
+actually closed or merely bounded. It is deliberately **not selected**
+here.
+
+**Required function** (a single part could plausibly satisfy all three
+uses below, avoiding three separately-specified, redundant components):
+
+1. **Load-switch gating of U5's VCC** (serves ISS-015): a series
+   high-side switch between F1/D2/D3 and U5's own VCC pins, with a
+   logic-level enable input controllable from the MCU domain (a spare
+   GPIO — **PA9 is tentatively noted as available** per this design's
+   own free-GPIO inventory, §11, but is **not committed or wired** by
+   this document) — **default-OFF/fail-safe when the enable input is
+   undriven or the MCU domain is unpowered**, directly enforcing the
+   missing cross-domain power-up order (Hardware Reviewer's own
+   Recommended Fix option 2 for ISS-015) rather than only bounding
+   SPEED's own voltage level (which R10, §7.5.5, already does).
+2. **Continuous overvoltage lockout** (serves ISS-019's residual gap):
+   paired with a simple comparator or fixed-threshold OVP function
+   referenced against the 9.0–13.0V binding envelope (§7.5.9) —
+   disabling the load switch if VM_MOTOR is sensed outside that
+   envelope, closing the gap F1/D3 do not cover (a sustained
+   out-of-envelope DC voltage, not a transient or a hard short).
+3. **Firmware-commandable latched cutoff** (serves ISS-021): the same
+   enable input doubles as the actuator for a firmware-declared
+   latched-fault condition (§7.5.12) — once firmware counts a
+   qualifying number of Lock Detection retries and declares a fault, it
+   can drive the enable input low, physically removing U5's VCC until a
+   deliberate re-arm, which none of U5's own three internal protection
+   mechanisms (§7.5.6) can do on their own since none of them latch.
+
+**Ratings needed**: continuous current rating ≥3A (covering this
+design's own ≤3A worst-case operating current, §7.5.4 item 5, with
+margin); voltage rating ≥16V minimum, ideally ≥30V (covering the
+9.0–13.0V binding envelope, §7.5.9, with margin, and ideally matching
+U5's own 30V VCC AMR, DS-MTR-053, so the switch itself is never the
+weakest link); low on-resistance (target ≤35mΩ or so) to avoid eroding
+the already-narrow 3S/UVLO margin (§7.5.2) any further than F1/D2
+already do; default-OFF/fail-safe logic sense (enable HIGH = ON, so an
+undriven or grounded enable line results in U5 de-energized, not
+energized) — this fail-safe direction is a hard requirement, not a
+preference, given REQ-403.
+
+**Not decided here**: exact part family (a dedicated eFuse/load-switch
+IC with integrated OVP is one plausible class; a discrete high-side
+MOSFET plus a separate comparator IC is another) — this is exactly the
+kind of comparison Component Engineer's own process is built to
+perform, and is routed there via Hardware Lead, not decided unilaterally
+by this agent.
+
+### 7.5.11 Flagged: maximum commanded speed / overspeed envelope (new, ISS-020 — firmware requirement, no schematic-level fix)
+
+**No circuit-level fix exists for this finding, and none is invented
+here.** REQ-007's "≥3000 RPM" (`bom/component-selection.md`) has only
+ever been stated as a functional floor — a minimum the design must be
+capable of reaching — not a ceiling on *commanded* speed. M1's own
+no-load speed is approximately 20,000–22,200 RPM (component-selection
+research, DS-MTR-018) — 6–7× REQ-007's floor — and because stored
+rotational kinetic energy scales with the square of angular velocity, M1
+stores roughly 45–55× the rotational energy at no-load that it would at
+the 3000 RPM floor. Nothing in this design's own schematic scope (U5,
+M1, J4, D2, D3, F1, R10, the flagged §7.5.10 controller) can bound a
+*commanded* maximum speed — that requires a firmware policy comparing a
+live tachometer reading against a chosen ceiling and taking action,
+which is compute/logic, not a passive or even active analog protection
+circuit.
+
+**What already exists to support this**: the FG (tachometer/speed
+feedback) signal is already wired (§7.5.4, R6 pull-up, MCU
+PA6/TIM3_CH1) — the sensing prerequisite for any firmware-side overspeed
+policy already exists in hardware; only the *policy* (a chosen ceiling,
+a response) is missing, and that is explicitly a firmware concern.
+
+**Explicitly not the REQ-009-prohibited closed-loop control**: a bounded
+safety cutoff that stops the motor once a measured speed exceeds a fixed
+ceiling is categorically different from closed-loop attitude/rate
+control (REQ-009's own fence) — the same way this design's own existing
+overcurrent-shutdown behavior (§7.5.6) is not itself "control" in the
+prohibited sense. This distinction is asserted here for Hardware Lead/
+human-reviewer confirmation, not unilaterally decided as settled.
+
+**Flagged for Hardware Lead mediation, ties to REQ-403**: this document
+proposes **~6000 RPM (2× REQ-007's own floor) only as a numeric anchor
+for discussion**, not a decision — per `validation/open-issues.md`'s own
+ISS-020 Recommended Fix framing, the actual maximum commanded speed,
+maximum commanded acceleration/ramp rate, and the overspeed-response
+behavior (e.g. force SPEED to a safe/stopped state, using the same FG
+feedback path) are Firmware Lead's and the human safety reviewer's call,
+not this agent's. Whatever ceiling is ultimately chosen must also feed
+Mechanical Lead's own flywheel/containment design as a real input
+(`docs/architecture.md` §12's mechanical/thermal co-design mandate, §9
+below) — a lower firmware-enforced ceiling directly reduces the
+containment energy Mechanical Lead must design against.
+
+### 7.5.12 Flagged: latched-fault shutdown policy for REQ-404 (new, ISS-021 — firmware requirement, hardware enabler cross-referenced)
+
+**No circuit-level fix exists for this finding either — U5's own three
+protection mechanisms are all auto-recovering by design, which is not
+itself a defect, but is a real gap against REQ-404's own intent.** §7.5.6
+already confirms OCP (DS-MTR-058), Lock Detection (DS-MTR-059), and
+Thermal Shutdown (DS-MTR-060) as U5's three relevant protection
+mechanisms — Cycle 3 review correctly observes that **none of the three
+latch**: OCP auto-clears once the overcurrent condition is no longer
+present, Lock Detection auto-retries after tLOCK_OFF=5s, and Thermal
+Shutdown auto-recovers on cooling. REQ-404's own "shutdown behavior to
+prevent sustained overheating" is not actually satisfied by relying on
+these alone: a persistent mechanical jam (e.g. a fouled bearing, a
+mechanical interference with M1's rotor) would not be resolved by any of
+the three — it would instead produce **repeated fault-current pulses and
+repeated auto-restarts indefinitely**, each dissipating real heat, with
+no design-level mechanism that ever actually stops trying. D2 alone
+dissipates approximately 1.86W at a 3A/0.62V-max worst-case fault
+current (DS-PROT-005) — a real, non-trivial, repeating thermal event
+under this failure mode, not a hypothetical one.
+
+**Fix requires firmware, not a passive circuit change**: a **latched-
+fault policy** — count consecutive Lock Detection events (Status
+register bit4, `MtrLck`) within a rolling time window over the
+already-wired I2C1 bus (§7.5.4); once a threshold count is reached
+within the window, force SPEED to a safe/stopped state and **require a
+deliberate re-arm** (e.g. an explicit firmware command or a power-cycle)
+before resuming — rather than allowing U5's own indefinite auto-retry
+behavior to continue unsupervised. This is flagged as a new, explicit
+firmware requirement, not implemented here (REQ-009's own fence: this is
+a schematic-level document, and the actual retry-counting/state-machine
+logic is firmware, not a circuit).
+
+**Hardware note, not a fix**: the same §7.5.10 flagged supervisory
+switch (specified above for ISS-015/ISS-019) can additionally serve as
+the actual VCC-cutting enforcement mechanism once firmware declares a
+latched-fault condition — called out explicitly so Component Engineer/
+Hardware Lead evaluate it as **one** part serving three purposes, not
+recommend three separate/redundant parts across three separate findings.
+
+**REQ-404 is a "Should," not a "Must"** (confirmed against `requirements/
+requirements.md`'s own exact wording) — noted for completeness, not used
+to reduce the obligation to address this HIGH finding explicitly,
+consistent with this agent's own instructions to address every HIGH
+finding regardless of the underlying requirement's own priority tier.
 
 ## 8. Block 6 — Grounding
 
@@ -1472,6 +2004,18 @@ text above (per this document's own precedent of not reopening
 Design-Complete prior-revision content beyond what's genuinely
 necessary).
 
+**Rev 4 note — no new MCU pin consumed by this revision's own fixes**:
+R10 (§7.5.5, ISS-015) is a passive pulldown on the already-wired SPEED
+net (PA8) and consumes no additional pin; F1 (§7.5.9, ISS-019) is a
+passive in-line part on VM_MOTOR and has no MCU connection at all. The
+free-GPIO count above (16) is therefore unchanged by this revision.
+**PA9 is tentatively noted, not committed or wired**, as an available
+candidate for the flagged §7.5.10 supervisory switch's enable line, were
+Component Engineer/Hardware Lead to adopt that part — if wired in a
+future revision, the free-GPIO count would drop to 15; this is flagged
+here only as a planning note for that eventuality, not a decision made by
+this revision.
+
 ## 12. Net list summary (net-by-net)
 
 | Net | Connects |
@@ -1495,8 +2039,8 @@ necessary).
 | (NC) | U4 I/O1(pins1,6), I/O2(pins3,4) — unpopulated, no D+/D− on this board (REQ-105) |
 | (NC) | U2 pins 2(ASDx), 3(ASCx), 4(INT1), 9(INT2), 10(OCSB), 11(OSDO) — unpopulated, aux interface + interrupts unused this cycle (§5.3) |
 | (NC) | J1 D+/D− contacts — present on the physical connector for cable compatibility, not routed to any MCU/protection pin (REQ-105) |
-| **VM_MOTOR** *(new Rev 3, §2.1/§7.5.2)* | J4 center-pin(+) contact → D2 anode(STPS3L60, series reverse-polarity protection) → D2 cathode → D3 (SMBJ16A, shunt TVS, cathode-to-VM_MOTOR/anode-to-GND) → U5 VCC(pins23,24) → C10 (10µF, VCC–GND) |
-| **SPEED_PWM** *(new Rev 3, §7.5.4/§7.5.5)* | U1 PA8 (TIM1_CH1, AF2) → U5 SPEED(pin13) — PWM duty-cycle command, `SpdCtrlMd`=1 required (I2C-configured, firmware-owned, REQ-007/REQ-009 scope fence) |
+| **VM_MOTOR** *(new Rev 3, envelope/protection extended Rev 4)* | J4 center-pin(+) contact → **F1 (Littelfuse 30R500U, PTC resettable fuse, new Rev 4, ISS-019)** → D2 anode(STPS3L60, series reverse-polarity protection) → D2 cathode → D3 (SMBJ16A, shunt TVS, cathode-to-VM_MOTOR/anode-to-GND) → U5 VCC(pins23,24) → C10 (10µF, VCC–GND) |
+| **SPEED_PWM** *(new Rev 3, external pulldown added Rev 4)* | U1 PA8 (TIM1_CH1, AF2) → U5 SPEED(pin13) — PWM duty-cycle command, `SpdCtrlMd`=1 required (I2C-configured, firmware-owned, REQ-007/REQ-009 scope fence); **also → R10 (1kΩ, new Rev 4, ISS-015) → GND**, a real external pulldown holding SPEED near zero-command whenever PA8 is not actively driven (§7.5.5) |
 | **DIR** *(new Rev 3, §7.5.4)* | U1 PB1 (plain GPIO, push-pull output) → U5 DIR(pin14) |
 | **FG_TACH** *(new Rev 3, §7.5.4)* | U5 FG(pin12, open-drain) → R6 (4.75kΩ, pull-up to U5's own V3P3, pin9) → U1 PA6 (TIM3_CH1 input-capture, AF1, FT_ea 5V-tolerant) |
 | **I2C1_SCL** *(new Rev 3, §7.5.4 — a different bus from the IMU's I2C2, not to be confused with the pre-Rev-3 I2C1/I2C2 mislabeling corrected under ISS-011)* | U1 PB6 (AF6) → R7 (4.75kΩ, pull-up to U5's own V3P3, pin9) → U5 SCL(pin10, open-drain) |
@@ -1547,6 +2091,8 @@ necessary).
 | **C13** *(new Rev 3)* | 10µF/10V ceramic | U5 VREG–GND, per DS-MTR-065 Table 11 |
 | **C14** *(new Rev 3)* | 1µF/5V ceramic | U5 V1P8–GND, per DS-MTR-065 Table 11 |
 | **C15** *(new Rev 3)* | 1µF/5V ceramic | U5 V3P3–GND, per DS-MTR-065 Table 11 |
+| **R10** *(new Rev 4, ISS-015)* | 1kΩ, 0603 | SPEED external pulldown to GND — added this revision, reversing Rev 3's "deliberate non-addition" stance; see §7.5.5 |
+| **F1** *(new Rev 4, ISS-019)* | Littelfuse 30R500U | Radial-leaded PTC resettable fuse, Ihold=5.00A/Itrip=10.00A/Vmax=30Vdc, in-line on VM_MOTOR upstream of D2/D3 (DS-PROT-006); see §7.5.9 |
 
 **No BOOT0 pull-down resistor or header is included** — deliberate
 decision, §4.2 (reasoning corrected this revision, ISS-006: BOOT0 is
@@ -1559,12 +2105,13 @@ fault visibility is I2C-register-only or inferred from FG held high
 (§7.5.6), consistent with the real pinout (DS-MTR-052) rather than an
 assumed generic H-bridge-driver pin set.
 
-**No external SPEED pull-down resistor is included** — deliberate
-decision, §7.5.5: the datasheet's own Table 11 reference circuit
-(DS-MTR-065) has none, and the internal `RPD_SPEED_SL` (55kΩ typ,
-sleep-mode-documented, DS-MTR-069) is treated as a partial, not a
-complete, mitigant — flagged in §16, not silently resolved by adding an
-undocumented component.
+**External SPEED pull-down resistor added this revision (R10, ISS-015)**
+— reversing Rev 3's "deliberate non-addition" stance, §7.5.5: Cycle 3
+review found the datasheet's own Table 11 reference circuit's omission
+of one, and the internal `RPD_SPEED_SL`'s sleep-mode-only/DRV10983Z-only
+documentation (55kΩ typ, DS-MTR-069), were not adequate mitigants given
+the factory-default SPEED state is fully active analog mode, not inert
+(DS-MTR-071) — see §7.5.5 for the full corrected reasoning.
 
 ## 14. Mandatory 18-item checklist walkthrough (my own agent instructions)
 
@@ -1776,6 +2323,74 @@ forward by assumption:
     11 reference circuit followed with **no deviation** (§7.5.3/§7.5.4;
     linear mode vs. buck mode is a choice **between two configurations
     TI's own datasheet documents**, not a deviation from either).
+
+### Rev 4 motor-domain re-check (items 1, 3, 8, 9, 10 — Cycle 3 rework)
+
+Per this cycle's 5 HIGH findings (ISS-014, ISS-015, ISS-019, ISS-020,
+ISS-021), the following items are re-checked against **this revision's
+fixes**, superseding or extending (not silently replacing) the "Rev 3
+motor-domain re-check" conclusions immediately above wherever the
+conclusion actually changed:
+
+1. **Supply Voltage (motor domain) — SHARPENED (ISS-014).** The Rev 3
+   re-check above already flagged 2S as "marginal-to-non-viable"; this
+   revision corrects that to a precise, corner-by-corner result:
+   2S **fails at the typical corner already** (7.4V nominal − D2's 0.53V
+   typ VF = 6.87V, below U5's 7.4V typ VUVLO_R, DS-MTR-057) — not merely
+   a rare worst case. 3S clears UVLO at every corner, margin ≈0.38V
+   (near-cutoff 9.0V − 0.62V max VF = 8.38V vs. 8V max VUVLO_R), narrowing
+   to ≈0.32V once new F1's own estimated ≈0.06V added drop is included.
+   **New binding envelope: 9.0–13.0V (§7.5.9, ISS-019)**, replacing the
+   previously-unbounded source assumption; enforced by new F1 in-line
+   ahead of D2/D3.
+3. **Absolute Maximum Ratings (motor domain) — EXTENDED (ISS-019).** New
+   F1 (Littelfuse 30R500U, DS-PROT-006): Vmax=30Vdc, comfortably inside
+   U5's own 30V VCC AMR ceiling with no added margin risk (F1 sits
+   upstream in series, not across VCC, so its own Vmax is a rating on
+   the part itself, not an added voltage at U5); Imax=40A, non-binding
+   given J4/U5's own much lower operating currents. The new 9.0–13.0V
+   envelope sits well inside every AMR already checked in the Rev 3
+   re-check above — no AMR margin is newly put at risk by this
+   revision's additions.
+8. **Pull-up/Pull-down (motor domain) — REVERSED (ISS-015).** The Rev 3
+   re-check above stated "no external SPEED pull-down added, deliberate,
+   evidence-based (§7.5.5, DS-MTR-069)" — Cycle 3 review found that
+   position inadequately evidenced once DS-MTR-071 (Table 8/§8.4.5.2)
+   confirmed SPEED's factory-default state is active analog mode, not
+   inert, and that the cited `RPD_SPEED_SL` pulldown is documented only
+   for the DRV10983Z's sleep mode, not the plain DRV10983 actually
+   specified. **This revision reverses that stance**: new **R10** (1kΩ,
+   0603) is now wired SPEED→GND as a real external pulldown (§7.5.5,
+   §12, §13). R6/R7/R8 (FG/SCL/SDA pull-ups) are unchanged.
+9. **Protection (motor domain) — EXTENDED (ISS-019) and CAVEATED
+   (ISS-021).** The Rev 3 re-check above already confirmed 5 internal
+   mechanisms (OCP/Lock Detection/UVLO/Thermal Shutdown/AVS) plus D2/D3
+   externally. **New this revision**: F1 adds a 6th protective element
+   (PTC resettable fuse, fault-current magnitude/duration bounding,
+   §7.5.9) on the same input path as D2/D3. **Caveat newly surfaced**:
+   none of OCP, Lock Detection, or Thermal Shutdown **latch** — all
+   auto-recover once the fault condition clears (DS-MTR-058/059/060) —
+   so REQ-404's "Should"-priority "shutdown behavior to prevent sustained
+   overheating" is **not fully satisfied by U5's hardware alone**
+   (ISS-021, §7.5.12); a firmware-side latched-fault policy is now an
+   explicit new requirement, not a hardware gap this hardware checklist
+   item can itself close.
+10. **Power sequencing (motor domain) — NEW ITEM this revision
+    (ISS-015).** Not included in the Rev 3 motor-domain re-check above
+    (a gap in that revision's own walkthrough scope, corrected here).
+    U5's own datasheet recommends a GND→VCC→SPEED→FG connection order and
+    cautions "ensure FG ≤ VCC at all times" (DS-MTR-066); this design's
+    two power domains (MCU/IMU via J1, motor via J4) are independently
+    sourced (Option A) with no hardware-enforced ordering between them.
+    **This revision's fix**: R10 (item 8 above) bounds SPEED's own
+    voltage regardless of which domain powers up first, removing the
+    specific uncommanded-motion hazard Cycle 3 flagged. **Residual gap,
+    honestly retained, not overclaimed as closed**: R10 fixes SPEED's
+    *level*, not the power-up *order* itself — U5's VCC can still ramp
+    before the MCU domain is alive, with no component forcing a specific
+    sequence across J1/J4. Full ordering enforcement needs the flagged
+    §7.5.10 supervisory load-switch (architecturally significant, routed
+    to Component Engineer via Hardware Lead, not added this revision).
 
 ## 15. Self-check against the Hardware Reviewer's 16-item checklist (`.github/skills/hardware-review/SKILL.md`)
 
@@ -2000,6 +2615,66 @@ low-severity residual, §16; no AMR/ROC excursion at the recommended 3S
 operating point; no pin-table/net-list inconsistency found across
 §7.5/§11/§12/§13 on this pass).
 
+**Re-self-check after Rev 4 fixes (Cycle 3 rework)**: focused re-check
+of items most relevant to this cycle's 5 HIGH findings (ISS-014, ISS-015,
+ISS-019, ISS-020, ISS-021), per my own agent instructions' handoff
+requirement —
+
+- **Item 1 (Voltage violation)** — ISS-014's UVLO margin finding is
+  corrected to its precise corner-by-corner result (§7.5.2, §14's new
+  "Rev 4 motor-domain re-check" item 1): 3S-only is now stated as a
+  **binding constraint**, not a soft recommendation; `hardware/
+  power-budget.md`'s Rail Margin Summary is reconciled to the identical
+  conclusion, closing the cross-document inconsistency Cycle 3 found. Not
+  self-declared "resolved" in the sense of eliminating the constraint —
+  the 2S/3S split is inherent to the added series-diode topology, and is
+  flagged (not closed) for Hardware Lead/Component Engineer to decide
+  whether an alternate topology is warranted (§16 items 17/22).
+- **Item 3 (Current limit)** — ISS-019's unbounded J4 source envelope is
+  closed with a new binding 9.0–13.0V envelope plus **F1** (PTC
+  resettable fuse, §7.5.9). Residual, honestly retained: F1 bounds
+  fault-current magnitude/duration, not continuous overvoltage — not
+  overclaimed as full current-limiting (§16 items 22/23).
+- **Item 4 (Thermal risk)** — ISS-021's finding that REQ-404's "shutdown
+  behavior to prevent sustained overheating" is not fully satisfied by
+  U5's own non-latching Thermal Shutdown/Lock Detection/OCP (all
+  auto-recover, DS-MTR-058/059/060) is independently reconfirmed this
+  session, not merely carried over from the reviewers' own finding. Not
+  resolvable at the hardware level alone: a firmware latched-fault
+  requirement is now specified (§7.5.12), flagged for Firmware Lead; the
+  flagged §7.5.10 supervisory switch is noted as a candidate hardware
+  backstop if firmware-only latching is later judged insufficient.
+- **Item 6 (Floating pin) / Item 7 (Incorrect pull-up/pull-down)** —
+  ISS-015's SPEED-pin risk is fixed with new **R10** (1kΩ, a real
+  external pulldown, §7.5.5), reversing Rev 3's inadequately-evidenced
+  "no external pulldown needed" position once DS-MTR-071 confirmed the
+  factory-default state is active analog mode, not inert. R6/R7/R8
+  (FG/SCL/SDA pull-ups) are unchanged, not re-opened.
+- **Item 10 (Power sequencing)** — newly checked this cycle (Rev 3's own
+  self-check did not cover this item — a gap in that revision's scope,
+  corrected here via §14's new item 10). R10 bounds SPEED's own voltage
+  regardless of power-up order, removing the specific uncommanded-motion
+  hazard; the underlying cross-domain power-up-*order* gap itself is
+  **not** eliminated and remains flagged for the §7.5.10 supervisory
+  switch (§16 items 14/22).
+
+**ISS-020 does not map to a specific item on this 16-item circuit-level
+checklist** — a maximum-commanded-speed/overspeed ceiling is a
+system-level operating-envelope/firmware-safety question, not a voltage,
+AMR, current, thermal, pin-bias, sequencing, grounding, noise, layout, or
+datasheet-deviation circuit defect. It is addressed via §7.5.11/§16 item
+24 (flagged for Firmware Lead and tied to REQ-403's human-review gate),
+deliberately not folded into this checklist so as not to mischaracterize
+a firmware/policy gap as a circuit-level finding.
+
+No new CRITICAL or HIGH-severity issue is believed to have been
+introduced by this revision's own fixes themselves: R10 draws a small,
+quantified, non-rail-threatening addition from 3V3 (§17); F1 sits well
+within U5's own VCC AMR and within J4's connector rating; no new floating
+pin, pin-table, or net-list inconsistency was found across §7.5/§11/§12/
+§13 on this pass (§12/§13 cross-checked directly against §7.5.5/§7.5.9's
+new component additions).
+
 ## 16. Open UNKNOWNs (for Hardware Lead / Hardware Reviewer)
 
 **Annotation convention (new this revision)**: items below are annotated
@@ -2157,21 +2832,29 @@ In priority order:
     pull-up/pull-down that isn't in TI's own Table 11 reference circuit
     either) — flagged for Hardware Reviewer/firmware awareness rather
     than resolved with hardware.
-14. **Cross-domain power-up sequencing is not hardware-enforced** — the
-    MCU/IMU domain (via U3) and the motor domain (via J4→D2→D3→U5) are
-    independently sourced per Option A, so there is no guarantee about
-    which powers up first relative to the other. U5's own datasheet
-    recommends a GND→VCC→SPEED→FG connection order and cautions "ensure
-    FG ≤ VCC at all times" (DS-MTR-066) — in this design's real
-    deployment, that ordering is a **field power-on-sequencing practice**
-    (which supply the operator energizes first), not something the
-    schematic itself enforces, since both domains' power inputs are
-    separate physical connectors (J1, J4) under separate control. Bounded
-    somewhat by SPEED's partial internal pulldown (RPD_SPEED_SL,
-    DS-MTR-069) and by FG being firmware-read rather than driving
-    anything, but not a complete guarantee. Flagged for Hardware
-    Reviewer; no component added this revision to force a specific
-    power-up order across two intentionally-independent connectors.
+14. **Cross-domain power-up sequencing is not hardware-enforced — SPEED's
+    voltage is now bounded regardless of sequencing (ISS-015, this
+    revision), but the ordering gap itself is not eliminated.** Originally:
+    "the MCU/IMU domain (via U3) and the motor domain (via J4→D2→D3→U5)
+    are independently sourced per Option A, so there is no guarantee about
+    which powers up first relative to the other... Bounded somewhat by
+    SPEED's partial internal pulldown (RPD_SPEED_SL, DS-MTR-069)... but
+    not a complete guarantee." Cycle 3 review found this partial mitigant
+    inadequate (the factory-default SPEED state is fully active analog
+    mode, not inert, DS-MTR-071; `RPD_SPEED_SL` is documented only for the
+    DRV10983Z variant's sleep mode, not the plain DRV10983 actually
+    specified) and escalated this to HIGH, tying it to REQ-403 (ISS-015).
+    **This revision's fix**: new R10 (1kΩ, real external pulldown to
+    ground, §7.5.5) now firmly bounds SPEED's own voltage during any
+    uncommissioned window, independent of power-up order. **What remains
+    open**: R10 bounds SPEED's *level*, it does not itself enforce a
+    power-up *order* — U5's own VCC can still ramp before the MCU domain
+    is alive, and no component forces a specific sequence across the two
+    intentionally-independent connectors (J1, J4). Directly enforcing the
+    missing order requires a supervisory switch — **flagged in new
+    §7.5.10**, routed to Component Engineer via Hardware Lead as an
+    architecturally significant addition, not resolved by this revision's
+    passive fix alone.
 15. **PJ-102AH (J4)'s 3rd terminal is left unpopulated, its exact function
     not confirmed** — the datasheet's own drawing shows 3 terminals
     (center pin + 2 outer), consistent with a normally-closed
@@ -2190,18 +2873,31 @@ In priority order:
     possible regardless of its value), deferred as a firmware-relevant
     detail, not a circuit-relevant one.
 17. **2S vs. 3S source viability through the added protection diode
-    (D2)** — a 2S source (≈7.4V nominal) minus D2's ~0.53–0.62V forward
-    drop lands at ≈6.87V, close to or below U5's UVLO rising threshold
-    (7/7.4/8V min/typ/max, DS-MTR-057), while 3S (≈11.1V nominal) remains
-    comfortably clear throughout its practical discharge range. **Recorded
-    as a practical "3S-only operation recommended" finding** (§7.5.2,
-    §14 motor-domain re-check item 1) — not a flaw in the
-    Component-Engineer-approved motor selection (M1 is validly rated for
-    2S–3S), but a consequence of this revision's own added series
-    protection diode. Flagged for Hardware Reviewer/Hardware Lead to
-    confirm the operational recommendation, and for whoever ultimately
-    specifies the field power source (battery pack or bench supply) to
-    respect the 3S-class requirement.
+    (D2) — SHARPENED and CORRECTED this revision (ISS-014).** Originally:
+    "a 2S source (≈7.4V nominal) minus D2's ~0.53–0.62V forward drop
+    lands at ≈6.87V, close to or below U5's UVLO rising threshold
+    (7/7.4/8V min/typ/max, DS-MTR-057)... Recorded as a practical '3S-only
+    operation recommended' finding... not a flaw in the Component-
+    Engineer-approved motor selection... but a consequence of this
+    revision's own added series protection diode." Cycle 3 review found
+    this framing understated the finding on two counts: (a) 2S actually
+    fails **at the typical corner** (6.87V < 7.4V typ), not merely a
+    close/marginal case; (b) this document's own prior wording ("only a
+    freshly-charged 2S pack clears UVLO with any margin") disagreed with
+    `hardware/power-budget.md`'s own Rail Margin Summary on the identical
+    scenario — an unresolved cross-document inconsistency. **This
+    revision's fix**: §7.5.2 is rewritten with corner-by-corner numbers
+    (typical, max, near-cutoff) and now states **3S-only as a binding
+    practical constraint**, not a soft recommendation; `hardware/
+    power-budget.md`'s Rail Margin Summary is reconciled to state the
+    identical conclusion. New F1 (§7.5.9, ISS-019) narrows the 3S margin
+    further, from ≈0.38V to ≈0.32V — quantified, not left unstated. Still
+    flagged for Hardware Reviewer/Hardware Lead to confirm the operational
+    recommendation, and **flagged, not self-resolved**, for propagation
+    into `bom/component-selection.md`/`requirements/requirements.md`
+    (both outside this agent's edit scope) and for Component Engineer to
+    evaluate a lower-VF ideal-diode/ORing-FET topology if 2S support is
+    later required.
 18. **The OCP/Lock Detection mechanism-name correction** — this design's
     research (DS-MTR-058/059) finds that `bom/component-selection.md`'s
     DS-MTR-037 description of DRV10983 overcurrent protection as
@@ -2248,34 +2944,103 @@ In priority order:
     Reviewer, to be tightened if a precise figure is later needed (e.g. for
     a sustained-near-stall duty-cycle use case beyond this design's nominal
     ≈1.05A operating point).
+22. **§7.5.10's flagged supervisory motor-rail protection controller is
+    not yet a selected part** (new this revision — ISS-015/019/021). Its
+    required function and ratings are specified (load-switch gating of
+    U5's VCC, a continuous-OVP lockout referenced to the 9.0–13.0V
+    envelope, a firmware-commandable latched cutoff), but no MPN is
+    chosen — this is judged an architecturally significant addition (the
+    first *active* protection element in this design), routed to
+    Component Engineer via Hardware Lead for a real comparison, not
+    selected unilaterally by this agent. Until resolved: ISS-015's
+    cross-domain power-up-ordering gap and ISS-019's continuous-
+    overvoltage gap both remain genuinely open — R10 and F1 (added this
+    revision) bound SPEED's voltage and fault current respectively, but
+    neither enforces power-up ordering nor a continuous-overvoltage
+    lockout.
+23. **The 9.0–13.0V VM_MOTOR input envelope (§7.5.9, new this revision) is
+    not yet recorded in `validation/bring-up-procedure.md`** — that
+    document has no motor-rail section as of this revision and is not
+    edited by this agent (ambiguous ownership between Hardware Reviewer,
+    Hardware Lead, and a future firmware/bring-up owner). Flagged so
+    whoever authors that section includes this bound.
+24. **Maximum commanded speed / overspeed ceiling is undecided** (new
+    this revision — ISS-020, §7.5.11). This document proposes ~6000 RPM
+    (2× REQ-007's own floor) only as a numeric anchor for discussion, not
+    a decision. The actual ceiling, commanded ramp-rate limit, and
+    overspeed-response behavior are Firmware Lead's/the human safety
+    reviewer's call, and the chosen ceiling must also feed Mechanical
+    Lead's flywheel/containment design. Ties to REQ-403's human-review
+    gate — this item cannot be closed by this agent alone.
+25. **Firmware latched-fault policy for REQ-404 is undecided/
+    unimplemented** (new this revision — ISS-021, §7.5.12). The required
+    behavior is specified (count consecutive Lock Detection events,
+    Status bit4/`MtrLck`, within a rolling window over the existing I2C1
+    bus; force SPEED to a safe/stopped state; require deliberate re-arm),
+    but this is a firmware requirement, not something a schematic-level
+    document can itself close. Flagged for Firmware Lead; the flagged
+    §7.5.10 supervisory switch (item 22 above) is a candidate hardware
+    enforcement point, once specified/selected.
+26. **F1's own added series resistance is an ESTIMATE, not a datasheet-
+    sourced figure** (new this revision — ISS-019, §7.5.2/§7.5.9).
+    Littelfuse's own datasheet publishes only Rmin (initial) and R1max
+    (post-trip) resistance, not a max-initial figure; the ~0.06V drop used
+    in this revision's UVLO-margin analysis assumes 0.02Ω in-circuit
+    resistance × 3A — a reasonable but unverified estimate, not a sourced
+    figure. Flagged for Hardware Reviewer to confirm or tighten if a more
+    precise figure becomes available (e.g. a manufacturer datasheet
+    revision, or a bench measurement at bring-up).
 
 ## 17. Power budget (summary — full detail in `hardware/power-budget.md`)
 
-**3V3 logic rail (unchanged from Rev 2 — REQ-103):**
+**3V3 logic rail (Rev 2/Rev 3 figures below unchanged; new Rev 4 addition
+called out separately — REQ-103):**
 
 - **Worst-case total on 3V3 rail ≈16.2mA** (MCU 10.2mA@64MHz [DS-MCU-014]
   + IMU 0.685mA [DS-IMU-010] + LED ≈3.94mA [ESTIMATE] + I2C pull-ups
   worst-case ≈1.4mA [ESTIMATE]).
 - **Typical total ≈7.0mA** (MCU 2.1mA@16MHz + IMU 0.685mA + LED ≈3.94mA +
   I2C pull-ups realistic ≈0.3mA).
-- **Margin vs. REQ-103 (≤300mA)**: ≈283.8mA / ≈94.6% margin.
-- **Margin vs. TLV75533PDBVR's 500mA rating (DS-PWR-003)**: ≈483.8mA /
-  ≈96.8% margin.
-- Both confirm the Component Engineer's own pre-design expectation
-  ("MCU+IMU are only ~10-15mA combined") — even including the LED and
-  I2C pull-ups this design adds, total draw is still an order of
-  magnitude below either ceiling.
+- **New Rev 4: R10 (SPEED pulldown, ISS-015) adds ≈0–3.3mA, PWM-duty-cycle
+  dependent** (3.3V high-level ÷ 1kΩ). PA8 drives SPEED_PWM as a
+  TIM1_CH1 PWM output, not a static level, so R10's own draw is not
+  constant — 0mA whenever PA8 is instantaneously low, up to 3.3mA
+  worst-case whenever it is instantaneously high. Using the standard
+  conservative worst-case-superposition convention this budget already
+  applies to every other rail entry (all worst-case figures assumed
+  simultaneous, not the real expected coincidence), the worst-case 3V3
+  total becomes **≈19.5mA**; a representative mid-duty (~50%) typical
+  addition of ≈1.65mA brings the typical total to **≈8.65mA**.
+- **Margin vs. REQ-103 (≤300mA)**: ≈280.5mA / ≈93.5% margin (was ≈94.6%
+  pre-R10 — negligibly reduced).
+- **Margin vs. TLV75533PDBVR's 500mA rating (DS-PWR-003)**: ≈480.5mA /
+  ≈96.1% margin (was ≈96.8% pre-R10).
+- Both still confirm the Component Engineer's own pre-design expectation
+  ("MCU+IMU are only ~10-15mA combined") — even including the LED, I2C
+  pull-ups, and now R10, total draw remains an order of magnitude below
+  either ceiling.
 - LDO thermal: reused ≈71°C TJ estimate at 40°C ambient/300mA
   (`bom/component-selection.md`), ≈79°C headroom to 150°C max — and this
-  design's real load is far below the 300mA that estimate already used,
-  so actual heating is lower still.
+  design's real load (even with R10) is far below the 300mA that estimate
+  already used, so actual heating is lower still.
 
-**VM_MOTOR rail (new this revision — REQ-109, tracked entirely
-separately from the 3V3 budget above, never folded in):**
+**VM_MOTOR rail (new Rev 3, sharpened/extended this revision — REQ-109,
+tracked entirely separately from the 3V3 budget above, never folded in):**
 
 - **Connector: J4 = Same Sky PJ-102AH**, rated 24V/5.0A (DS-CONN-005) —
   finalizes the placeholder row that `hardware/power-budget.md` previously
   carried as "TBD."
+- **New Rev 4: bounded source envelope, 9.0–13.0V (ISS-019, §7.5.9)** —
+  derived from the 3S-only conclusion below (9.0V = 3S near-cutoff) and
+  a 3S full-charge ceiling plus headroom (13.0V ≥ 12.6V + ~3%); excludes
+  4S and above. Enforced by new **F1 (Littelfuse 30R500U PTC resettable
+  fuse, DS-PROT-006)** in-line ahead of D2/D3, bounding fault-current
+  magnitude/duration rather than precisely limiting steady-state current
+  (F1's 10.00A Itrip exceeds J4's own 5.0A rating — an honestly-scoped
+  gap, not overclaimed as precision current-limiting). A continuous
+  (non-fault) overvoltage lockout is **not** provided by F1 or by D3 (a
+  transient-only TVS backstop) — flagged, §16 item 22/23, as residual
+  scope for the flagged §7.5.10 supervisory controller.
 - **Motor+driver worst-case current: ≈1.05A nominal** (derived target for
   5mN·m, Kt≈4.77mN·m/A) **/ ≤3A absolute worst-case** (TI's own
   start-up/locked-motor ceiling, DS-MTR-056) — this 3A figure sits right
@@ -2289,29 +3054,50 @@ separately from the 3V3 budget above, never folded in):**
   tight, but expected: this is a protection trip point TI sized close to
   the real worst case, not a rail-capacity ceiling meant to have wide
   margin.
-- **Practical source-class recommendation: 3S only**, not the full
-  2S–3S range M1 itself is rated for — a 2S source's nominal voltage
-  minus D2's own forward-voltage drop lands at/below U5's UVLO rising
-  threshold (§7.5.2, §16 item 17), a consequence of this revision's own
-  added series protection diode.
-- **Protection mechanism for REQ-111/404: Lock Detection** (I2C-
-  configurable, auto-retry after 5s, DS-MTR-059) — **not OCP** (DS-MTR-058,
-  fixed/non-configurable/condition-based-clear). This corrects the
+- **Practical source-class recommendation: 3S only — SHARPENED this
+  revision to a binding constraint, not a soft recommendation
+  (ISS-014, §7.5.2, §16 item 17).** A 2S source fails UVLO margin at its
+  **typical** corner already (7.4V nominal − D2's 0.53V typ VF = 6.87V,
+  below U5's 7.4V typ VUVLO_R), not merely in a rare worst case as
+  previously stated here — this revision corrects that understatement.
+  3S clears UVLO at every corner (near-cutoff 9.0V − 0.62V max VF =
+  8.38V > 8V max VUVLO_R), with margin narrowing from ≈0.38V to ≈0.32V
+  once F1's own estimated ≈0.06V added drop is included. This remains a
+  consequence of this design's own added series protection diode, not a
+  flaw in the Component-Engineer-approved motor selection (M1 is validly
+  rated 2S–3S) — flagged for propagation into `bom/component-
+  selection.md`/`requirements/requirements.md` (outside this agent's
+  edit scope).
+- **Protection mechanisms for REQ-111/404 — none latch (ISS-021,
+  §7.5.12, §16 item 25).** OCP (fixed, condition-based-clear,
+  DS-MTR-058), Lock Detection (I2C-configurable, auto-retry after 5s,
+  DS-MTR-059), and Thermal Shutdown (auto-recover, DS-MTR-060) all
+  self-clear once the fault condition subsides — none of the three
+  latches off. REQ-404's "Should"-priority "shutdown behavior to prevent
+  sustained overheating" is therefore **not fully satisfied by hardware
+  alone**; this revision specifies (but, as a firmware behavior, cannot
+  itself implement) a firmware-side latched-fault policy counting
+  consecutive Lock Detection events. This also corrects the prior
   mechanism-name attribution in `bom/component-selection.md`'s DS-MTR-037
-  (flagged for Hardware Reviewer/Hardware Lead reconciliation, §16 item 18
-  — not edited by this agent).
+  (flagged for Hardware Reviewer/Hardware Lead reconciliation, §16 item
+  18 — not edited by this agent).
 - **Thermal**: U5 RθJA=36.1°C/W (DS-MTR-055) against a 125°C ROC ceiling —
   qualitatively wide margin at ≈1.05A nominal, not computed to a precise
   worst-case wattage this session (RDS(on) not independently extracted for
-  this specific part, §16 item 21).
+  this specific part, §16 item 21). D2's own worst-case fault-condition
+  dissipation (≈1.86W at 3A/0.62V, §7.5.2) is a separate, already-bounded
+  figure from a prior revision.
 - **Field DC source itself (battery pack/bench supply/adapter) is not a
   specified component** — an operational choice outside this schematic's
   parts list, the same convention Rev 2 already used for J1's upstream
-  "USB host."
+  "USB host." The 3S-class/9.0–13.0V bound above is this revision's
+  explicit constraint on whatever that source turns out to be.
 - Full numeric detail, all four tables (Supply Capability, Subsystem Load,
-  Rail Margin Summary, both Thermal cross-checks), now finalized in
-  `hardware/power-budget.md` — no more placeholder/TBD rows remain there
-  for this revision's motor subsystem.
+  Rail Margin Summary, both Thermal cross-checks), updated this revision
+  in `hardware/power-budget.md` (F1 added to Supply Capability, R10 added
+  to Subsystem Load, Rail Margin Summary reconciled to state the
+  identical 3S-only conclusion as §7.5.2 above — closing the
+  cross-document inconsistency Cycle 3 review found).
 
 ## 18. Handoff (per `.github/agents/circuit-engineer.agent.md`)
 
@@ -2484,3 +3270,152 @@ No KiCad project exists to run `extract_schematic_netlist` /
 `analyze_schematic_connections` / `validate_project` against (§0) — this
 document, including its Rev 3 additions, is the self-check substitute for
 this revision too, consistent with Rev 1 and Rev 2.
+
+### 18.2 Rev 4 handoff (this revision — Independent Review Cycle 3 rework)
+
+**This is a loop-back rework/re-review handoff, not a new-subsystem
+handoff.** Independent Review Cycle 3 (Hardware Reviewer + rubber-duck,
+run in parallel against Rev 3's Motor Driver + Reaction Wheel addition)
+raised 5 open HIGH findings (ISS-014, ISS-015, ISS-019, ISS-020,
+ISS-021), all against Rev 3's own new content. Per this agent's own
+instructions ("When you receive Hardware Reviewer findings"), every one
+is addressed explicitly below — none silently dropped. See the Revision
+changelog at the top of this document for the complete list of what Rev
+4 changed, section by section.
+
+**To**: Hardware Reviewer, via Hardware Lead, for a **fresh re-review**
+of the changed areas — per `.github/skills/hardware-review/SKILL.md`'s
+re-review guidance, this handoff calls out exactly what changed so the
+re-review can focus there, rather than re-running the full 16-item
+checklist against unchanged content. Areas touched this revision: Status
+line, changelog, §2.1, §7.5.2 [rewritten], §7.5.5 [rewritten], §7.5.8
+[closing paragraph rewritten], §7.5.9–§7.5.12 [new], §11, §12, §13, §14
+[new Rev 4 motor-domain re-check subsection], §15 [new Re-self-check
+after Rev 4 fixes subsection], §16 [items 14/17 annotated in place, items
+22–26 appended], §17.
+
+**Disposition of all 5 Cycle 3 HIGH findings** (full reasoning in the
+cited sections; summarized here per this agent's own report-back
+obligation):
+
+1. **ISS-014 (2S/3S UVLO margin)** — **FIXED** as a documentation/scope
+   correction: §7.5.2 now states corner-by-corner numbers and elevates
+   3S-only from a soft recommendation to a **binding constraint**;
+   `hardware/power-budget.md`'s Rail Margin Summary is reconciled to the
+   same conclusion, closing the cross-document inconsistency Cycle 3
+   found. **Also flagged** (§16 items 17/22): propagation into `bom/
+   component-selection.md`/`requirements/requirements.md` (outside this
+   agent's edit scope) and an alternate lower-VF diode/ORing-FET topology
+   evaluation, both routed to Hardware Lead/Component Engineer. The 2S/3S
+   conclusion itself is **unchanged — 3S-only was already this
+   document's practical position** — but is now stated with the
+   precision (typical-corner failure, not just worst-case) Cycle 3
+   correctly demanded.
+2. **ISS-015 (SPEED uncommanded-motion risk)** — **FIXED**: new **R10**
+   (1kΩ, real external pulldown, §7.5.5) bounds SPEED's voltage
+   regardless of power-up order, superseding the inadequate internal-
+   pulldown/Table-11 rationale Cycle 3 correctly rejected (DS-MTR-071
+   confirms factory-default active analog mode). **Also flagged**
+   (§16 items 14/22): the underlying cross-domain power-up-*order* gap
+   is bounded, not eliminated, by a level-clamp alone — full closure
+   needs the flagged §7.5.10 supervisory load-switch (architecturally
+   significant, routed to Component Engineer via Hardware Lead, not
+   selected by this agent) — and REQ-403's own human-review gate is
+   independent of and not satisfied by this hardware fix alone.
+3. **ISS-019 (unbounded J4 envelope)** — **FIXED**: new **F1** (Littelfuse
+   30R500U PTC resettable fuse, DS-PROT-006) in-line ahead of D2/D3, plus
+   an explicit, binding 9.0–13.0V source envelope (§7.5.9) replacing the
+   previously-unbounded assumption. **Also flagged** (§16 items 22/23):
+   F1 bounds fault magnitude/duration, not continuous overvoltage — that
+   residual gap is routed to the same flagged §7.5.10 supervisory
+   controller, and the new envelope needs recording in `validation/
+   bring-up-procedure.md` (not edited by this agent).
+4. **ISS-020 (no overspeed/max-speed envelope)** — **FLAGGED, not fixed
+   in hardware** (§7.5.11, §16 item 24): M1's no-load speed (≈20,000–
+   22,200 RPM, DS-MTR-018) is 6–7× REQ-007's 3000 RPM floor with no
+   maximum ever defined. This is judged a firmware/human-safety-review
+   decision (a maximum commanded-speed ceiling, ramp-rate limit, and
+   overspeed-response policy), not a schematic-level fix — no component
+   added, no ceiling unilaterally decided by this agent. Explicitly tied
+   to REQ-403's human-review gate; also feeds Mechanical Lead's
+   containment design once decided. Routed to Hardware Lead for
+   mediation/routing to Firmware Lead and the human safety reviewer.
+5. **ISS-021 (no latching, REQ-404 not satisfied)** — **FLAGGED, not
+   fixed in hardware** (§7.5.12, §16 item 25): independently confirmed
+   this revision that none of U5's three protection mechanisms (OCP,
+   Lock Detection, Thermal Shutdown — DS-MTR-058/059/060) latch; all
+   auto-recover once the fault condition clears. REQ-404's "Should"-
+   priority shutdown-behavior intent is not satisfiable by U5's hardware
+   alone. This revision specifies the required firmware behavior (count
+   consecutive Lock Detection events, force SPEED safe, require
+   deliberate re-arm) as an explicit new firmware requirement, and notes
+   the flagged §7.5.10 supervisory switch as a candidate hardware
+   enforcement point if firmware-only latching is judged insufficient —
+   but does not implement firmware or unilaterally declare this closed.
+
+**Net new firmware requirements this revision** (neither existed before
+Cycle 3): (a) an overspeed/maximum-commanded-speed shutdown policy
+(ISS-020, §7.5.11); (b) a latched-fault retry-counting policy on Lock
+Detection events (ISS-021, §7.5.12). Both are explicitly firmware-side,
+consistent with this document's REQ-009 scope fence (wiring/interfaces,
+not control logic) — flagged for Firmware Lead, not implemented here.
+
+**Artifacts**:
+- This document (`hardware/schematic/bench-imu-01-design.md`), revised
+  to Rev 4 — schematic artifact + design rationale log + self-check
+  results (§14's new "Rev 4 motor-domain re-check" subsection, §15's new
+  "Re-self-check after Rev 4 fixes" subsection), combined.
+- `hardware/power-budget.md` — **updated this revision**: Supply
+  Capability's VM_MOTOR row gains F1; Subsystem Load gains R10's
+  ≈0–3.3mA 3V3-rail addition; Rail Margin Summary's 2S/3S conclusion is
+  reconciled to state the identical corner-by-corner result as §7.5.2
+  above (the cross-document inconsistency Cycle 3 flagged is closed).
+- `datasheets/evidence-log.md` — **+1 new row this revision**
+  (**DS-PROT-006**, Littelfuse 30R500U, F1) — verified against no
+  duplicate row IDs. **+1 new datasheet metadata file**:
+  `datasheets/littelfuse_30r500u_rev-unknown.md` (F1 is a genuinely new
+  part this revision, unlike Rev 3's parts which all cited
+  already-registered metadata records).
+- Open `UNKNOWN`s: §16 above — **2 pre-existing items annotated in place**
+  (item 14: RESOLVED IN PART, SPEED level now bounded, ordering gap
+  remains open and routed to §7.5.10; item 17: SHARPENED/CORRECTED to the
+  precise corner-by-corner 3S-only finding), **5 new items appended**
+  (items 22–26: the flagged §7.5.10 supervisory controller; the
+  bring-up-procedure.md envelope-recording gap; ISS-020's undecided
+  overspeed ceiling; ISS-021's undecided firmware latched-fault policy;
+  F1's own estimated, not datasheet-sourced, added series resistance) —
+  none renumbered or deleted, per this section's own established
+  "annotate/append, don't renumber" convention.
+
+**Constraints confirmed respected this revision**: `bom/component-
+selection.md`, `requirements/requirements.md`, `hardware/power-
+architecture.md`'s Decision table, `hardware/mechanical-interface.md`,
+`validation/open-issues.md`, `validation/design-review.md`, and
+everything under `hardware/mechanical/`/`firmware/` were read-only
+references, never edited. No new component was selected outside the
+"single supporting part, no full comparison" class this document's own
+task scope permits: **R10** (a resistor) and **F1** (a fixed-threshold
+PTC fuse) are exactly that class, consistent with how D2/D3/J4 were
+selected in Rev 3. The one component that would be architecturally
+significant — the §7.5.10 supervisory load-switch/OVP/latch controller
+serving ISS-015/019/021's residual hardware-enforcement gaps — is
+deliberately **not** selected here; only its required function and
+ratings are specified, and its actual sourcing is routed to Component
+Engineer via Hardware Lead, per this agent's own "Out of scope"
+constraint against unilaterally selecting architecturally significant
+parts.
+
+**On mediation**: ISS-020 and ISS-021 are flagged, not hardware-fixed,
+because I judge them to be firmware/human-safety-review decisions rather
+than schematic-level gaps — this is my own engineering judgment, backed
+by the cited evidence (DS-MTR-018 no-load speed figures; DS-MTR-058/059/
+060 non-latching behavior), not an assertion. Per my own agent
+instructions, I am not unilaterally dismissing either finding — both are
+routed to the Hardware Lead for mediation if the Hardware Reviewer
+disagrees with treating them as flag-only rather than requiring a
+hardware interlock.
+
+No KiCad project exists to run `extract_schematic_netlist` /
+`analyze_schematic_connections` / `validate_project` against (§0) — this
+document, including its Rev 4 additions, is the self-check substitute for
+this revision too, consistent with Rev 1, Rev 2, and Rev 3.
