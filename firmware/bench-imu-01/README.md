@@ -7,7 +7,9 @@ design rationale, Evidence ID citations, and every decision's "why":
 
 ## What it does
 
-- Initializes I2C2 (PB10/PB11, 400 kHz Fast-mode) and brings up the BMI270
+- Initializes I2C2 (**PA11/PA12**, 400 kHz Fast-mode — corrected 2026-09-08,
+  ISS-014: the previously-configured PB10/PB11 do not physically exist on
+  this MCU's real LQFP-32 package) and brings up the BMI270
   IMU (address 0x68) with its full manufacturer-mandated initialization
   sequence, including the vendored ~8 KB configuration blob.
 - Reads accelerometer + gyroscope raw register counts at 100 Hz (REQ-001)
@@ -51,6 +53,27 @@ see the Firmware Engineer agent profile's "Out of scope").
 - Flashing (via `st-flash`/OpenOCD/a debugger) is not part of this
   repository's tooling today (`docs/architecture.md` §13, Future
   Integration) and was not attempted.
+
+## 2026-09-08 correction: PB10/PB11 → PA11/PA12 (ISS-014 firmware follow-up)
+
+This firmware originally (PR #7) configured the IMU's I2C2 bus on GPIOB
+pins 10/11. Independent research after that PR merged
+(`validation/open-issues.md` ISS-014) found that the STM32G031K8T6's real
+LQFP-32 package **has no PB10/PB11 pins at all** — that assignment could
+never have been physically wired. The schematic was corrected first
+(2026-08-31, ECO-006) to the real, physically-existing PA11/PA12 pins,
+same I2C2 peripheral instance; this firmware's own matching fix was
+explicitly flagged as a follow-up at the time and is what this revision
+performs.
+
+Re-verified this session: `make clean && make` succeeds again, zero
+warnings, **identical** image size (10,804/4/0 bytes) — a pure pin
+relabeling changes no code size. `arm-none-eabi-objdump -d` on the rebuilt
+`.elf` confirms the old GPIOB base address (`0x50000400`) no longer appears
+anywhere in the binary; every GPIO access now resolves through the single
+GPIOA base (`0x50000000`). Full account, new Evidence IDs, and independent
+verification: [`bench-imu-01-firmware-design.md`](bench-imu-01-firmware-design.md)'s
+Changelog and §10.
 
 ## Building (if you have the toolchain)
 

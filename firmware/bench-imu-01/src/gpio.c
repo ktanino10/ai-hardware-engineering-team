@@ -46,21 +46,29 @@ void gpio_init(void)
     set_moder(GPIOA, 3u, GPIO_MODER_AF);
     set_af(GPIOA, 3u, 1u);
 
-    /* PB10 = I2C2_SCL, PB11 = I2C2_SDA, both AF6 on this part (confirmed
-     * this session -- this is the pin pair the schematic's Hardware
-     * Reviewer independently re-verified maps to I2C2, not I2C1, correcting
-     * ISS-011; getting this AF value right, on top of the correct I2C2
-     * register base address in stm32g031_regs.h, is the firmware-layer half
-     * of not repeating that defect). Open-drain: required for I2C, and
+    /* PA11 = I2C2_SCL, PA12 = I2C2_SDA, both AF6 on this part -- corrected
+     * this revision (ISS-014). The previously-configured PB10/PB11 do not
+     * exist as physical pins at all on this MCU's real LQFP-32 package
+     * (ST's own official pin database, DS-MCU-064/067). Independently
+     * re-confirmed this session against a second, different official ST
+     * source -- STM32CubeG0's own NUCLEO-G031K8 I2C2 example
+     * (`Projects/NUCLEO-G031K8/.../stm32g0xx_hal_msp.c`), which configures
+     * this *exact* part's I2C2 on GPIOA pins 11/12 with
+     * `GPIO_InitStruct.Alternate = GPIO_AF6_I2C2`, and against the official
+     * `stm32g0xx-hal-driver` header confirming `GPIO_AF6_I2C2 == 0x06`
+     * numerically (DS-MCU-068/069). Getting this AF value and GPIO port
+     * right, on top of the correct I2C2 register base address in
+     * stm32g031_regs.h, is the firmware-layer half of not repeating the
+     * ISS-011/ISS-014 class of defect. Open-drain: required for I2C, and
      * consistent with the schematic's own external R3/R4 pull-ups -- do not
      * enable an internal pull-up here, it would work against R3/R4's
      * calculated value (Section 5.2). */
-    set_moder(GPIOB, 10u, GPIO_MODER_AF);
-    set_af(GPIOB, 10u, 6u);
-    set_open_drain(GPIOB, 10u, 1);
-    set_moder(GPIOB, 11u, GPIO_MODER_AF);
-    set_af(GPIOB, 11u, 6u);
-    set_open_drain(GPIOB, 11u, 1);
+    set_moder(GPIOA, 11u, GPIO_MODER_AF);
+    set_af(GPIOA, 11u, 6u);
+    set_open_drain(GPIOA, 11u, 1);
+    set_moder(GPIOA, 12u, GPIO_MODER_AF);
+    set_af(GPIOA, 12u, 6u);
+    set_open_drain(GPIOA, 12u, 1);
 }
 
 void led_set(int on)
