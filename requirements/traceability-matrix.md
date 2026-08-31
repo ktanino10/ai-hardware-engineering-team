@@ -52,6 +52,8 @@ disposition) — `docs/architecture.md` §8.
 | REQ-309 | 3D-printable enclosure, piece count as needed (Rev 3) | TBD | TBD | Manufacturability self-check + Mechanical Reviewer | Pending | |
 | REQ-403 | Flywheel detachment/pinch hazard mitigation (Rev 3) | TBD (Mechanical Design) | TBD | Human safety-critical-change sign-off required, `docs/architecture.md` §10 | Pending | |
 | REQ-404 | Motor stall/overcurrent shutdown behavior (Rev 3) | TBD (Circuit/Firmware) | TBD | Design + firmware inspection | Pending | Companion to REQ-111 |
+| REQ-405 | Firmware overspeed/max-speed shutdown enforcement (Rev 3, new -- ISS-020) | TBD (Firmware Engineer) | TBD | Firmware inspection + bench tach verification (future) | Pending | Ties to REQ-403 human safety-review gate |
+| REQ-406 | Firmware latched-fault policy on repeated Lock Detection (Rev 3, new -- ISS-021) | TBD (Firmware Engineer) | TBD | Firmware inspection | Pending | Companion to REQ-404 |
 | REQ-503 | Rev 3 BOM cost target ≤$75-90 (Rev 3) | All parts | `bom/component-selection.md` | Price rollup, mirrors REQ-501's own method | Pending | Proposed ceiling pending human confirmation, §9b |
 | REQ-504 | Schedule/no-physical-build unchanged (Rev 3) | N/A | N/A | N/A — paper/document design exercise, mirrors REQ-502 | Pending | |
 

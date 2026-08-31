@@ -754,6 +754,18 @@ contention per the Motor section above.)*
      is why the Motor section's Escalation flags explicitly call out a new
      ~12V rail requirement for the Power Engineer, rather than assuming the
      motor's own "nominal" voltage is what will actually be supplied.
+     **Binding constraint confirmed at Circuit Design/Independent Review
+     (2026-09-05/06, ISS-014, `hardware/schematic/bench-imu-01-design.md`
+     Rev 4 §7.5.2)**: the reverse-polarity protection diode Circuit Design
+     added to the motor input (D2) narrows this further — a 2S source
+     fails to clear the DRV10983's own UVLO threshold at *typical*, not
+     just worst-case, conditions once D2's forward drop is accounted for.
+     **This design is 3S-only in practice, not merely "3S-equivalent
+     preferred"** — 2S operation is not a supported configuration for this
+     specific implementation, even though the T-Motor itself remains
+     independently rated for 2S in isolation. See `hardware/
+     power-budget.md`'s Rail Margin Summary for the exact corner-by-corner
+     numbers.
   2. **Current match**: the T-Motor's derived torque-current need (≈1.05A
      for the 5 mN·m target, Kt = 4.77 mN·m/A) sits well inside the
      DRV10983's 2A continuous / 3A peak rating — roughly 2× continuous
@@ -891,3 +903,332 @@ contention per the Motor section above.)*
 | Component Engineer | Component Engineer (AI agent) | 2026-08-31 | Proposed — TI DRV10983, paired with T-Motor MN2206-13 KV2000 (see Motor section) |
 | Hardware Lead | Hardware Lead (this session) | 2026-08-31 | Concur — recommend approval. The motor+driver compatibility reasoning (voltage/current/control-interface/commutation-scheme match) is sound and the DRV10983's FG-pin RPM path is a well-justified resolution for REQ-008/112 given the motor itself has no integrated sensor. Same evidence-quality-over-raw-spec reasoning against Candidate C (Toshiba) as the Motor section — agree this is the right call for a first-time bring-up. Routing the ~12V rail requirement (Escalation flag 3) to Power Engineer now. |
 | Chief Engineer (Human) — required if architecture-defining/major component | Human Chief Engineer (via creator/"General Chat" session) | 2026-08-31 | **Approved** — "T-Motor MN2206-13 KV2000 + TI DRV10983, as recommended" (same sign-off as the Motor section above — one coupled decision, independently re-verified by the human this session). |
+
+---
+
+## Motor-Rail Supervisory Controller
+
+> **Rev 4 addition — routed by Circuit Engineer via Hardware Lead, not
+> self-selected.** Independent Review of the Rev 3 motor driver subsystem
+> found 3 HIGH findings (ISS-015 uncommanded-motion risk, ISS-019 unbounded
+> input envelope, ISS-021 non-latching faults — `validation/open-issues.md`).
+> Circuit Engineer's Rev 4 update (`hardware/schematic/bench-imu-01-design.md`
+> §7.5.10) specifies the required function and ratings for a resolving part
+> in full, but deliberately does not select a specific MPN — judging an
+> *active* supervisory switch (the first active, not passive, protection
+> element in this design) to be "a more architecturally significant choice"
+> than the single-part, no-full-comparison class used for D2/D3/F1, and
+> routing the selection here instead. This section is that routed selection.
+
+- **Driving requirement(s)** (verified against `requirements/requirements.md`
+  and `validation/open-issues.md` directly, not just this task's summary):
+  1. **REQ-403** (Rev 3, **Must**, safety-critical/human-review-gated — the
+     flywheel + mount shall not present a projectile or pinch/contact
+     hazard). This part's **function #1** (default-OFF/fail-safe load-switch
+     gating) is the hardware fix for **ISS-015**'s uncommanded-motion
+     finding, which ties directly to REQ-403 in that finding's own text:
+     DRV10983's SPEED pin factory-defaults to *active* analog-mode
+     interpretation, not inert (DS-MTR-068/071), and nothing in the current
+     design bounds cross-domain power-up sequencing. ISS-015's own
+     Recommended Fix option 2 reads, verbatim: "add a supervisory load
+     switch gating U5's VCC, enabled only once the MCU domain's own rail is
+     confirmed alive" — precisely this part's role.
+  2. **REQ-404** (Rev 3, Should — motor driver/firmware shall implement
+     stall/overcurrent detection and a shutdown behavior to prevent
+     sustained overheating). **ISS-021** found none of U5's 3 internal
+     protections (OCP, Lock Detection, Thermal Shutdown) actually latch, so
+     REQ-404's "shutdown" clause is not genuinely satisfied by the driver IC
+     alone — this part's **function #3** (firmware-commandable latched
+     cutoff) is the literal fix ISS-021's own Recommended Fix proposes:
+     "...and/or a supervisory switch cuts U5's VCC ... requiring a
+     deliberate re-arm." **ISS-019**'s finding (no coordinated input
+     overvoltage protection upstream of U5) also bears on REQ-404, since an
+     unbounded input voltage is itself a latent overheating/damage risk —
+     this part's **function #2** closes that gap.
+  3. **REQ-405** (Rev 3, Must, new at Independent Review from ISS-020 —
+     firmware shall enforce a maximum commanded speed and command the motor
+     to a safe/stopped state on exceeding it). An indirect but real tie:
+     this part's enable pin is what gives firmware a genuine **physical**
+     mechanism to enforce "safe/stopped state," rather than relying solely
+     on a soft SPEED=0 PWM command that may not survive every fault path.
+     Closing ISS-020's own max-speed/ramp-rate logic remains a Firmware/
+     Mechanical Lead deliverable (§7.5.11) — not something this component
+     alone resolves.
+  4. **REQ-406** (Rev 3, Should, new at Independent Review **directly from
+     ISS-021** — firmware shall implement a latched-fault policy on
+     repeated Lock Detection events, forcing a safe/stopped state requiring
+     deliberate re-arm). The most direct tie of the four: REQ-406 was
+     written specifically to codify ISS-021's finding, and this part's
+     function #3 is the hardware enabler §7.5.12 cross-references for
+     REQ-406's firmware policy to have physical teeth, not just a software
+     no-op against a driver that would auto-retry regardless.
+  5. **REQ-503** (Rev 3, Should — ≤$75–90 USD **whole-board** soft budget).
+     This part is a new incremental line item against that same ceiling —
+     see the Recommendation section's headroom calculation below.
+- **Constraints** (from §7.5.10, re-verified against the primary document
+  this session, not just this task's own summary of it):
+  - **Function coverage**: a single part (or a small, clearly-justified
+    2-part combination) must provide all 3 of: (1) load-switch gating of
+    U5's VCC with default-OFF/fail-safe logic when the enable input is
+    undriven or the MCU domain is unpowered; (2) continuous overvoltage
+    lockout referenced to the 9.0–13.0V binding envelope (§7.5.9),
+    disabling the switch if VM_MOTOR is sensed outside it; (3) a
+    firmware-commandable enable input the latched-cutoff policy (§7.5.12)
+    can drive low on a declared fault, requiring deliberate re-arm.
+  - **Ratings**: continuous current ≥3A (this design's own ≤3A worst-case
+    operating current, §7.5.4 item 5, with margin); voltage rating ≥16V
+    minimum, ideally ≥30V (covering the 9.0–13.0V envelope with margin and
+    ideally matching U5's own 30V VCC absolute maximum, DS-MTR-053, so the
+    switch itself is never the weakest link); low on-resistance, target
+    ≤35mΩ or so, to avoid eroding the already-narrow 3S/UVLO margin
+    (§7.5.2, ≈0.32V) any further than F1/D2 already do; default-OFF/
+    fail-safe logic sense (enable HIGH=ON) — a hard requirement per §7.5.10,
+    not a preference, given REQ-403.
+  - **Package / hand-solderability**: this project's own established,
+    repeatedly-applied preference for hand-solderable leaded packages
+    (every Rev 1–3 part selection has scored this explicitly — see e.g. the
+    Motor Driver IC section's WQFN-36 disqualification-adjacent finding
+    above) applies with the same weight here.
+  - **Budget**: REQ-503's ≤$75–90 soft ceiling is a **whole-board** figure,
+    confirmed via REQ-503's own requirements.md text and surrounding
+    rationale — not a motor-subsystem-only ceiling. The Recommendation
+    section's headroom calculation below therefore accounts for
+    MCU+IMU+Regulator+Motor+Driver+J4+D2+D3+F1, not just this new part in
+    isolation.
+  - **Lifecycle/availability/reference-design**: scored per this role's
+    standard process (`.github/skills/component-selection/SKILL.md`).
+
+### Candidate Comparison
+
+*(3 candidates compared — meets the ≥3 minimum. Candidates A and B are
+dedicated eFuse/power-load-switch ICs with integrated OVP, the first real
+candidate class this task's own framing called for; Candidate C is a
+discrete high-side MOSFET plus a separate hot-swap/sequencing controller
+(functionally the "separate comparator/OVP IC" the task's framing named),
+the second class. Vendor diversity was genuinely attempted, not just
+formally gestured at, but did not survive contact with the actual spec
+set: onsemi's NIS5132 was ruled out as 18V-max/NRND, its NCV891330 as the
+wrong device class (not a load-switch/eFuse), and its FPF2700 as lacking
+adjustable OVP and being current-limited to 2A; ADI/Maxim's MAX17608/
+MAX17615 were ruled out as too low-current, and its MAX17525 as
+VQFN/TDFN-only with thin OVP documentation. No viable cross-vendor
+single-chip alternative meeting the full spec set was found — all 3 final
+candidates below are TI parts, a real research finding, not a shortcut.)*
+
+| Parameter | Candidate A — TI TPS26631PWPR — ✅ RECOMMENDED | Candidate B — TI TPS259822ONRGER (TPS25982 family) | Candidate C — TI LM5069MM-1/NOPB + Infineon IRLZ44NPBF |
+|---|---|---|---|
+| Device class | Integrated eFuse / power-load-switch IC (single chip) [DS-PROT-010] | Integrated eFuse / power-load-switch IC (single chip) [DS-PROT-015] | Discrete high-side N-channel MOSFET (IRLZ44NPBF) switched/sequenced by a separate hot-swap controller (LM5069MM-1/NOPB) — a 2-part combination [DS-PROT-017][DS-PROT-019] |
+| Operating voltage / absolute max | 4.5–60V operating / 67V AMR — wide margin over both the 9.0–13.0V envelope and U5's own 30V VCC AMR [DS-PROT-010] | 2.7–24V operating / 30V AMR — closely matches, essentially without margin, U5's own 30V VCC AMR; narrowest margin of the 3 [DS-PROT-015] | LM5069: 9–80V operating, widest range of the 3; IRLZ44N: 55V VDS — both comfortably exceed the envelope with margin [DS-PROT-017][DS-PROT-019] |
+| Integrated / effective R_DS(on) | 31mΩ (integrated FET) — meets the ≤35mΩ target with headroom [DS-PROT-010] | 2.7mΩ — best-in-class of all 3 by a wide margin [DS-PROT-015] | ≈22mΩ @ VGS≈10V (IRLZ44N, gate charge-pumped by LM5069's own drive output) — also comfortably under target [DS-PROT-019] |
+| Adjustable current-limit range | 0.6–6A via RILIM resistor — comfortably spans this design's ≥3A need [DS-PROT-010] | 2–15A — widest range of the 3 [DS-PROT-015] | Fully adjustable via an external current-sense resistor — any limit achievable, at the cost of an added sense resistor and its own power dissipation [DS-PROT-017] |
+| Continuous OVP mechanism (**function #2**) | Adjustable "OVP Cut Off" via external resistor divider on a **separate, independent OVP pin** — a true lockout, not a clamp; optional factory-preset 34.3V alternative exists but is not used here (this design needs its own ≈13V threshold) [DS-PROT-011] | Adjustable, but via the **same physical EN/UVLO pin** as the enable/UVLO function — a combined, dual-purpose node, not 2 independent pins [DS-PROT-015] | Adjustable via a **separate, independent** external resistor divider referenced to LM5069's internal 2.5V reference — a true lockout, genuinely independent of the UVLO divider [DS-PROT-017] |
+| UVLO mechanism | Adjustable, separate/independent pin from OVP [DS-PROT-010][DS-PROT-011] | Same EN/UVLO pin as OVP — less independent; interacting resistor-divider design [DS-PROT-015] | Adjustable via a second, fully independent external resistor divider (separate from OVLO) [DS-PROT-017] |
+| Autonomous overload fault-response (secondary/defense-in-depth layer — see Recommendation for the primary function #3 mechanism) | MODE pin selects latch-off vs. auto-retry; TPS26631 specifically defaults to auto-retry with 2×IOL pulse-current tolerance (≤25.5ms) — a genuine fit for motor-inrush current profiles [DS-PROT-011][DS-PROT-012] | Latch-off / auto-retry selectable [DS-PROT-015] | LM5069-1 variant **natively latches** on an overload fault (the sibling "-2" variant auto-restarts instead, not used here) [DS-PROT-017] |
+| Default-OFF/fail-safe native pin bias (**function #1** — the hard REQ-403-driven requirement) | SHDN pin: internal 1MΩ pull-up to 2.7V, **floating defaults ON** — needs an external pull-down resistor to invert (standard, low-risk, well-precedented mitigation; Circuit Engineer's job to size) [DS-PROT-013] | EN/UVLO pin: **no internal bias at all** — floating is **undefined**, not merely wrong-direction; also needs an external pull-down, complicated by the pin's dual EN+UVLO duty [DS-PROT-016] | LM5069's enable/UVLO comparator: **floating natively defaults OFF** — the cleanest native match of the 3, no external resistor needed purely to invert an opposing bias [DS-PROT-018] |
+| Function coverage summary (per §7.5.10's 3 functions) | **All 3 met.** #1 via SHDN + a required external pull-down resistor; #2 via the independent OVP pin/divider; #3 via SHDN driven low by firmware (MODE-pin auto-retry as a secondary layer) | **All 3 met**, but #1's mitigation is less clean (undefined float, not just wrong-direction) and #2 shares a pin with UVLO — both real design-cleanliness costs vs. Candidate A | **All 3 met**, with #1 satisfied **natively** (no extra resistor needed purely for default-off) and #2/UVLO on fully independent dividers — the most "by-the-book" hot-swap-controller implementation of the 3, at the cost of 2 parts instead of 1 and a higher unit price |
+| Package / hand-solderability | HTSSOP-20 ("PWP") — leaded, hand-solderable, matches this project's established package preference [DS-PROT-014] | **VQFN-24 ("RGE") ONLY — no HTSSOP/SOIC/other leaded option exists for this family**, independently confirmed via a dedicated search this session — a real DFM/hand-assembly risk per this project's repeatedly-applied preference [DS-PROT-016] | LM5069 in VSSOP-10 ("MME") + IRLZ44N in TO-220 — both leaded/through-hole; TO-220 is arguably the single easiest package to hand-solder anywhere in this whole comparison [DS-PROT-018][DS-PROT-019] |
+| Lifecycle / availability | In stock at DigiKey, ships same day (checked 2026-09-08); no explicit manufacturer "Active"/"NRND" statement independently re-read this session [DS-PROT-014] | Live TI ordering/part-details page found and in stock per prior research; no explicit "Active"/"NRND" statement independently re-read this session [DS-PROT-016] | LM5069MM-1/NOPB: live DigiKey listing found and priced [DS-PROT-018]; IRLZ44NPBF: Active/current, widely available, not obsolete, per Infineon's own product page [DS-PROT-019] |
+| Reference design / EVM | **TPS26630-33EVM confirmed** — TI's own EVM documentation explicitly states TPS26631RGE can be substituted onto this board "when specifically evaluating the TPS26631," a direct, named-part confirmation [DS-PROT-020] | **No exact-part EVM found.** TPS259824OEVM (a close sibling device) is the nearest published stand-in, described as "pin- and function-compatible for most use cases" — real but secondary evidence, not a named-part confirmation [DS-PROT-021] | **LM5069EVM-627 confirmed** for the controller portion, with onboard UVLO/OVLO/current-limit/fault-timer adjustment jumpers directly relevant to this design's divider-sizing needs — covers LM5069 only, not the complete 2-part combination as this design would build it [DS-PROT-022] |
+| Price @ qty 1 | **$4.52** (TPS26631PWPR, DigiKey, cut-tape) + ≈$0.15–0.30 in low-value support resistors (SHDN pull-down, RILIM, OVP/UVLO dividers) ⇒ **≈$4.7–4.8 total**; $3.43 (qty 10), $2.86 (qty 100) for the chip alone [DS-PROT-014] | **$4.29** (TPS259822ONRGER, DigiKey) + similar support-resistor cost ⇒ **≈$4.4–4.6 total** [DS-PROT-016] | **$4.39** (LM5069MM-1/NOPB) + **$1.80** (IRLZ44NPBF) + ≈$0.30–0.60 in passives (2 independent resistor dividers + a current-sense resistor — more parts than Candidates A/B need) ⇒ **≈$6.5–6.8 total**, priciest and highest parts-count of the 3 [DS-PROT-018][DS-PROT-019] |
+| Known risks / disqualifying factors | Required external pull-down resistor for default-OFF is a real, but low-risk and well-precedented, added mitigation (see Escalation flags). Exact UVLO/OVP threshold ranges, PGOOD/FLT fault-reporting granularity, and thermal data (θJA) not confirmed this session (flagged, not blocking — see Open UNKNOWNs) | **Package is a real, project-relevant disadvantage**: VQFN-24-only, no leaded option, against this project's own repeated hand-solderability preference. Combined EN/UVLO pin is a design-cleanliness cost (harder to tune UVLO and default-off state independently). Best raw R_DS(on)/current-limit-range of the 3, but not enough to outweigh the package risk given this project's own established precedent (mirrors the WSON regulator and WQFN-36 driver non-selections) | **Not disqualified on any hard technical fact** — every function is met, several more cleanly than Candidate A (native default-off, fully independent dividers). Not recommended primarily on **parts-count and price**: 2 ICs instead of 1, more passives (2 full dividers + a current-sense resistor vs. Candidate A's simpler pull-down/RILIM/one divider set), and the highest unit price of the 3 (≈$6.5–6.8 vs. ≈$4.7–4.8) — a real but not dramatic (~$2/unit, not ~2×) price gap that was weighed carefully, not glossed over |
+
+### Recommendation
+
+- **Recommended candidate**: **A — TI TPS26631PWPR** (TPS2663x family),
+  gating U5's (TI DRV10983) VCC supply.
+- **Whole-board BOM budget headroom (REQ-503)**: REQ-503's ≤$75–90 USD
+  ceiling is scoped to the **whole board**, not just this new part or even
+  just the motor subsystem (confirmed directly against `requirements.md`'s
+  own text and surrounding rationale). Summing the parts already committed
+  and priced elsewhere in this file — MCU ≈$2.83 [DS-MCU-018], IMU ≈$4.23
+  [DS-IMU-012], Regulator ≈$0.45 [DS-PWR-009], Motor ≈$18.99 [DS-MTR-023],
+  Motor Driver IC ≈$2.58 [DS-MTR-040] — plus the motor-rail parts already
+  specified in the design document's own parts list and freshly priced
+  this cycle — J4 ≈$0.77 [DS-CONN-006], D2 ≈$0.48 [DS-PROT-007], D3
+  ≈$0.273 [DS-PROT-008], F1 ≈$1.62 (a **pricing proxy** via the active
+  30R500UF replacement, since the document's own specified 30R500U appears
+  obsolete — Escalation flag 5) [DS-PROT-009] — gives a **whole-board
+  committed subtotal of ≈$32.22** before this new part. Adding Candidate
+  A's own **≈$4.7–4.8** total (chip + support resistors, from the
+  Candidate Comparison table's Price row) brings the running whole-board
+  subtotal to **≈$37.0**, leaving **≈$38–53 of headroom** against REQ-503's
+  $75–90 ceiling. This figure explicitly **excludes**: (1) not-yet-itemized
+  trivial passives elsewhere on the board (a real but likely small, <$2–3,
+  unaccounted gap — honestly flagged, not guessed away); (2) PCB
+  fabrication, enclosure, and any connectors/wiring beyond J4; (3)
+  assembly/labor. None of these are judged large enough to threaten even
+  the $75 floor of REQ-503's range, but they are not zero, and are
+  recorded here rather than silently assumed away.
+- **Function-coverage confirmation (the 3 required functions from §7.5.10,
+  addressed explicitly since this is the safety-relevant crux of the whole
+  task)**:
+  1. **Function #1 — load-switch gating, default-OFF/fail-safe**: **Met,
+     with one required added part.** TPS26631's SHDN pin natively biases
+     the switch **ON** when floating (internal 1MΩ pull-up to 2.7V,
+     DS-PROT-013) — the *opposite* of REQ-403's fail-safe direction. This
+     is not a disqualifying flaw, but it does mean Circuit Engineer **must**
+     add an external pull-down resistor from SHDN to GND, sized to reliably
+     override the internal pull-up, so that an unpowered MCU domain or a
+     tri-stated/unconfigured GPIO reliably reads SHDN low (switch OFF) while
+     an active-high GPIO drive can still easily override it (switch ON).
+     This is a standard, low-risk, well-understood biasing technique — not
+     a novel workaround — but it is a genuinely required schematic addition,
+     not something to silently assume away. **Flagged explicitly in
+     Escalation flags below.**
+  2. **Function #2 — continuous OVP referenced to 9.0–13.0V**: **Met
+     natively.** TPS26631's OVP pin supports an adjustable "OVP Cut Off"
+     via an external resistor divider — a true lockout (the switch
+     disables outside the programmed window), not merely a transient
+     clamp, and **independent** of the UVLO pin (unlike Candidate B). This
+     directly closes ISS-019's residual gap (no coordinated input
+     overvoltage protection existed upstream of U5). Exact divider values
+     to hit the 9.0–13.0V window are Circuit Engineer's to size — the
+     mechanism itself is confirmed present and adjustable.
+  3. **Function #3 — firmware-commandable latched cutoff**: **Met, via a
+     reframing worth stating explicitly.** This function is fundamentally a
+     **firmware-implemented policy** — the MCU drives SHDN low and holds it
+     low until a deliberate re-arm event, exactly as REQ-406/§7.5.12
+     describe — not necessarily an autonomous hardware-native latch feature
+     of the chip itself. All 3 candidates in this comparison satisfy this
+     via nothing more than a simple, always-available enable/SHDN/UVLO
+     pin; TPS26631's own MODE-pin-selectable auto-retry behavior is a
+     valuable **secondary, defense-in-depth** layer (it independently
+     bounds the inrush/overload response even before firmware ever gets
+     involved), not the primary mechanism this function relies on. This
+     reframing matters because it means function #3 does **not** meaningfully
+     differentiate the 3 candidates — Candidate C's native hardware latch
+     (LM5069-1) is a nice-to-have, not a requirement-closing advantage,
+     since firmware has to implement the counted-retries/deliberate-re-arm
+     policy (REQ-406) regardless of which candidate is chosen.
+- **Rationale** (success probability first, peak spec second):
+  1. **Package/hand-solderability is the single most decisive factor
+     against Candidate B.** TPS25982's best-in-class 2.7mΩ R_DS(on) and
+     2–15A current-limit range are genuinely superior on paper, but it is
+     **only available in a 24-pin VQFN package** — no leaded alternative
+     exists for this family. This project has repeatedly, consistently
+     scored leadless QFN/WSON/DFN packages as a real hand-assembly risk
+     (the WSON regulator candidate and the WQFN-36 motor-driver candidate
+     were both scored down partly on this same basis) — this is not a new
+     standard invented for this part, it is this project's own established
+     precedent applied consistently.
+  2. **Single-chip simplicity favors Candidate A over Candidate C.**
+     Candidate C (LM5069 + IRLZ44N) meets every function, several of them
+     more cleanly than Candidate A (a natively default-OFF enable pin, and
+     fully independent UVLO/OVLO dividers instead of Candidate A's
+     independent-but-still-two-pins design) — it is a genuinely strong,
+     not merely "adequate," alternative. But it is 2 ICs instead of 1, needs
+     more passives (2 full resistor dividers plus a current-sense resistor,
+     versus Candidate A's pull-down + RILIM + one divider set), and is the
+     most expensive of the 3 (≈$6.5–6.8 vs. ≈$4.7–4.8 per unit) — more BOM
+     lines and more resistor-divider engineering surface for Circuit
+     Engineer to get right, for a price premium that is real (~$2/unit)
+     though not dramatic (not ~2× as an earlier, less-precisely-sourced
+     LM5069 price estimate had suggested — see the LM5069 datasheet
+     record's own correction note).
+  3. **Direct applications-section fit is corroborating, not decisive,
+     evidence.** TI's own TPS2663x datasheet Applications section names
+     "Motor drives – CNC, encoder supply" explicitly (DS-PROT-012) — a
+     genuine, on-point signal this device class is marketed for exactly
+     this use case. This is treated as supporting evidence alongside the
+     package/simplicity/price reasoning above, not as the primary
+     justification on its own.
+  4. **Reference design availability favors Candidate A over Candidate B.**
+     A real, TI-published EVM (TPS26630-33EVM) exists and explicitly names
+     TPS26631 as a supported substitution (DS-PROT-020) — stronger evidence
+     than Candidate B's close-sibling-only EVM stand-in (DS-PROT-021).
+     Candidate C's LM5069EVM-627 (DS-PROT-022) is also real and relevant,
+     but covers only the controller half of a 2-part combination.
+- **Trade-offs accepted**:
+  - *vs. Candidate B (TI TPS259822ONRGER / TPS25982)*: gives up
+    substantially better R_DS(on) (31mΩ vs. 2.7mΩ) and a wider adjustable
+    current-limit range (0.6–6A vs. 2–15A, though both comfortably cover
+    this design's actual ≥3A need) — in exchange for a hand-solderable
+    leaded package instead of a VQFN-only part, and independent (not
+    shared) OVP/UVLO pins.
+  - *vs. Candidate C (TI LM5069MM-1/NOPB + Infineon IRLZ44NPBF)*: gives up
+    a natively default-OFF enable pin (requiring an added external
+    pull-down resistor instead) and fully independent UVLO/OVLO dividers
+    (Candidate A's UVLO and OVP pins are independent of each other, but
+    each individually still shares board-level design attention with the
+    same single-chip architecture) — in exchange for a single-chip
+    solution with fewer BOM lines, less resistor-divider engineering
+    surface, and a lower unit price (≈$4.7–4.8 vs. ≈$6.5–6.8).
+- **Open `UNKNOWN`s** (deferred to Circuit Engineer's detailed design
+  phase, not blocking this recommendation):
+  - Exact UVLO pin threshold range/accuracy and OVP pin threshold
+    range/accuracy for TPS26631 — needed to actually size the resistor
+    dividers for the 9.0–13.0V envelope — **UNKNOWN this session**; a
+    working primary-PDF read (this session's tooling could not
+    text-extract the datasheet PDF) would close this.
+  - Exact resistor-divider topology — whether OVP/UVLO can reasonably share
+    any sense network or need fully separate dividers — is a genuine
+    Circuit-Engineer-level schematic decision, explicitly **not** decided
+    here.
+  - PGOOD/FLT pin exact fault-reporting granularity (which specific fault
+    classes each pin reports, timing) — **UNKNOWN this session**, relevant
+    to how firmware distinguishes an OVP-triggered shutdown from a
+    current-limit-triggered one.
+  - Thermal data (θJA, package power dissipation limits) — **UNKNOWN this
+    session**, same caveat pattern already applied to DRV10983/DRV10970 in
+    the Motor Driver IC section above.
+  - Exact SHDN pull-down resistor value — intentionally left to Circuit
+    Engineer, since it depends on board-level leakage/coupling assumptions
+    this role has no basis to guess at.
+
+### Escalation flags
+
+1. **Architecture-defining / major component decision — requires Hardware
+   Lead + human Chief Engineer approval before Circuit Engineer uses this**
+   (`docs/architecture.md` §10). This recommendation is explicitly **not
+   self-approved** — see Approval table below, both rows marked Pending.
+2. **Safety-relevant, not merely architecturally-significant** — this part
+   directly closes 3 HIGH Independent Review findings (ISS-015/019/021)
+   tied to REQ-403 (safety-critical, human-review-gated) and its companion
+   REQ-404/405/406. The same elevated scrutiny REQ-403's own HITL gate
+   calls for elsewhere in this design applies to this component choice.
+3. **Evidence-category taxonomy deviation — flagged, not silently
+   substituted.** This task's own framing suggested filing new Evidence IDs
+   under `PWR` or `MTR`. This section instead uses a **new `PROT` category**
+   (DS-PROT-007 through DS-PROT-022 this cycle), for a specific, stated
+   reason: `PWR` has, in this project's history to date, been used
+   exclusively for voltage-conversion parts (LDO/buck regulators); `MTR`
+   has been used exclusively for parts intrinsic to the motor's own drive
+   electronics (the motor and its driver IC, per `docs/architecture.md`
+   §6.3's own "MTR (motor driver)" definition). `PROT` was already
+   established in this same design cycle specifically for this same
+   VM_MOTOR rail's protection components (D2/D3/F1) — a supervisory
+   gating/OVP controller is a more precise semantic fit there than either
+   suggested option. Category codes are not role-exclusive in this
+   project's history (multiple agent roles have added rows to the same
+   category before), so this is a considered judgment call, not a process
+   violation — **flagged here explicitly for Hardware Lead to confirm or
+   override**, not treated as a foregone conclusion.
+4. **Required external pull-down resistor on SHDN — a real, required
+   schematic addition, not a hidden assumption.** TPS26631's native SHDN
+   bias is backwards relative to this design's fail-safe requirement (see
+   Recommendation, function #1). The mitigation is standard and low-risk,
+   but it must actually appear in Circuit Engineer's schematic — recorded
+   here so it cannot be silently dropped between this recommendation and
+   implementation.
+5. **Incidental finding — F1 (Littelfuse 30R500U) appears obsolete.**
+   Discovered while sourcing real prices for the already-committed
+   motor-subsystem parts to compute this section's BOM headroom figure
+   (below); no live distributor stock/pricing could be found for the exact
+   30R500U part number specified in the design document's parts list. The
+   active replacement, 30R500UF, was used only as a **pricing proxy**
+   (DS-PROT-009) — this is **not** a substitution of the design document's
+   own specified part, which is out of this role's edit scope to change.
+   Flagged for Hardware Lead/Circuit Engineer awareness; may warrant a
+   future-revision part re-selection.
+6. **Remaining technical UNKNOWNs must be closed before Circuit Engineer
+   finalizes the schematic** (see Recommendation's Open UNKNOWNs list) —
+   most notably the exact UVLO/OVP threshold ranges needed to size the
+   9.0–13.0V divider network, and thermal data for PCB layout purposes.
+
+### Approval
+
+| Role | Name | Date | Decision |
+|---|---|---|---|
+| Component Engineer | Component Engineer (AI agent) | 2026-09-08 | Proposed — TI TPS26631PWPR (TPS2663x family), gating U5's VCC, with a required external SHDN pull-down resistor (Escalation flag 4) and Circuit-Engineer-sized OVP/UVLO resistor dividers per §7.5.10. See Escalation flags 1–3 for items requiring Hardware Lead/human confirmation before this is used downstream. |
+| Hardware Lead | Hardware Lead (this session) | — | **Pending** — not yet reviewed this session. |
+| Chief Engineer (Human) — required if architecture-defining/major component | Human Chief Engineer (via creator/"General Chat" session) | — | **Pending** — safety-relevant and architecture-defining per Escalation flags 1–2; requires explicit human sign-off before Circuit Engineer proceeds, same HITL gate class as the Motor/Motor Driver IC sections above. Not yet routed this session. |
