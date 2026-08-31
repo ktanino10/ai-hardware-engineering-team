@@ -125,11 +125,11 @@ conflict-resolution process `[repo: workflow.md §3]`.
 
 | Discipline | Status | Notes |
 |---|---|---|
-| System / Orchestrator | **[PRESERVE, renamed conceptually later]** | Still played by Hardware Lead, now across both disciplines `[repo: hardware-lead.agent.md — unedited; orchestration guidance lives in docs/architecture.md §3/§5.3, docs/workflow.md Phase 8-10]`. Still no separate "System Lead" — two disciplines exist now but a rename remains premature until a third does `[req §5, §24]`. |
+| System / Orchestrator | **[PRESERVE, renamed conceptually later]** | Still played by Hardware Lead, now across all three disciplines `[repo: hardware-lead.agent.md — unedited; orchestration guidance lives in docs/architecture.md §3/§5.3/§5.4, docs/workflow.md Phase 8-11]`. Still no separate "System Lead" — three disciplines exist now but a rename remains premature until the framework's own need grows further `[req §5, §24]`. |
 | Electrical & Electronics | **[PRESERVE]** | Existing 4-agent team, unchanged. |
 | Mechanical | **[IMPLEMENTED — Phase 1, see §31]** | First new discipline. Shipped: `mechanical-lead`/`mechanical-reviewer` agents, `enclosure-design`/`mechanical-review` skills, `hardware/mechanical-interface.md`. |
-| Independent Reviewer | **[PRESERVE + extended]** | Existing Hardware Reviewer pattern reused for Mechanical (§13, §31) — Mechanical Reviewer is now real, sharing `validation/open-issues.md`. |
-| Control / Embedded | **[DEFER]** | §11. |
+| Independent Reviewer | **[PRESERVE + extended]** | Existing Hardware Reviewer pattern reused for Mechanical (§13, §31) — Mechanical Reviewer is now real, sharing `validation/open-issues.md`. **Deliberately not yet extended to Firmware** (Phase 2, §32) — see §32's own reasoning for why that's a documented, reversible scope decision rather than an oversight. |
+| Control / Embedded | **[SPLIT — Firmware sub-slice IMPLEMENTED Phase 2 (§32); Control Engineer sub-slice still DEFER]** | §11 (updated). The two were always distinct future roles in `docs/architecture.md` §14 with separate triggers; only Firmware's trigger ("when firmware work starts in earnest") has been met so far — Control Engineer's ("1-axis/3-axis attitude-control roadmap stage") explicitly has not. |
 | Integration / Test | **[DEFER]** | §11. |
 | Software/AI, Advanced Concepts, Procurement, Simulation, Visualization | **[CONSIDER LATER / DEFER]** | Only if real projects justify them `[req §5]`; see §16–21. |
 
@@ -195,13 +195,28 @@ interference, manufacturing constraints, material selection,
   2-agent split (design + independent adversarial review), consistent with
   this table's own "Independent Reviewer" row (§7) and §27 item 3.
 
-## 11. Future Control / Embedded Domain `[DEFER]`
+## 11. Future Control / Embedded Domain `[DEFER — Firmware sub-slice now IMPLEMENTED, see §32]`
 
-`[req §10]`. Reserved as a discipline; no agent/skill created. Firmware
+`[req §10]`. This section originally reserved "Control / Embedded" as one
+undifferentiated future discipline. **Status update (§32)**: it has since
+split into the two future roles `docs/architecture.md` §14 always listed
+separately, each with its own trigger — **Firmware Engineer** ("when
+firmware work starts in earnest") and **Control Engineer** ("at 1-axis/
+3-axis attitude control roadmap stage"). Only Firmware Engineer's trigger
+has been met (Bench-IMU-01 reached Design Complete); Control Engineer's has
+not (no reaction wheel/motor/attitude-control project exists) and remains
+`[DEFER]` exactly as originally written below — nothing in this section's
+original Control-Engineer-relevant content changes.
+
+Reserved as a discipline; no Control Engineer agent/skill created. Firmware
 frameworks/boards (Arduino, PlatformIO, Pico SDK, ESP-IDF, ESP32,
 Raspberry Pi, Jetson) are to be treated as replaceable providers, consistent
 with Tool Independence (§14) — not decided now, just noted so a future
-Control discipline doesn't get architecturally pinned to one board.
+Control discipline doesn't get architecturally pinned to one board. (The
+Firmware Engineer role implemented in §32 is consistent with this too — it
+is bare-metal C for the specific MCU already selected during Component
+Selection, not architecturally pinned to any of the frameworks named
+above.)
 
 **Integration / Test** `[DEFER]`: reserved per `[req §5]`. The existing
 `validation/bring-up-procedure.md` already covers Electronics-only bring-up
@@ -613,3 +628,136 @@ rewriting §30 above, to preserve the audit trail of what this document said
   bring-up-procedure.md}`, `docs/evaluation.md`.
 - **Status**: implemented, PR opened, awaiting independent audit before
   merge — same process this document itself went through.
+
+## 32. Phase 2 Implementation Status (Addendum — Firmware)
+
+Added when Phase 2 (Firmware) was actually implemented, in a separate PR
+from both this document's original merge and the Phase 1 (§31) addendum —
+kept as its own addendum for the same reason §31 is one: preserve the
+audit trail of what was true before this phase vs. after.
+
+- **Trigger met**: `docs/architecture.md` §14's Firmware Engineer trigger
+  ("when firmware work starts in earnest") was satisfied by
+  `hardware/schematic/bench-imu-01-design.md` (Rev 2) reaching Design
+  Complete and merging to `main` (PR #6) — a real, existing schematic with
+  fixed pin/interface decisions to build driver-level bring-up firmware
+  against, not a speculative addition.
+- **Human approval**: given, scoped explicitly to Firmware Engineer only —
+  Control Engineer, Firmware Reviewer, PCB Engineer, Power Engineer, Test
+  Engineer, Datasheet Specialist, and Safety/Compliance Reviewer all remain
+  exactly as `docs/architecture.md` §14 documents them (deferred, untouched
+  triggers), per the kickoff scope for this PR.
+- **Explicit human decision (asked via `ask_user`, not silently assumed)**:
+  no Firmware Reviewer agent is introduced this round — Firmware Engineer's
+  own rigorous self-check (`.github/skills/firmware-bringup/SKILL.md`'s
+  checklist) stands in for independent review until a documented future
+  trigger is met (a second board's firmware, or a bring-up failure traced
+  to a class of defect an independent pass would likely have caught — see
+  `docs/architecture.md` §14's now-added Firmware Reviewer row). This is a
+  deliberate, scope-proportionality decision, not an oversight: unlike
+  Mechanical (§27/§31), which mirrored the already-approved
+  design+independent-review 2-agent shape from the start, Firmware's
+  actual scope this round (one MCU, one bring-up program for one bench
+  board) is closer in scale to the "single real supporting part, no full
+  comparison needed" precedent this project already used for the ESD
+  protection IC during Circuit Design than to a whole new parallel
+  discipline needing its own adversarial agent immediately. A concrete,
+  non-speculative trigger is recorded rather than deferred indefinitely.
+- **A real, non-obvious technical reason also supported this decision**:
+  this repository's `validation/open-issues.md` is one shared backlog whose
+  CI gate (`tools/check_open_issues.py`) blocks on *any* open
+  CRITICAL/HIGH row regardless of which reviewer wrote it — correct and
+  intentional for Mechanical ("one gate, not two," since a Mechanical
+  finding can mean the same physical PCB needs to change), but a Firmware
+  finding is different in kind: it does not block PCB fabrication or the
+  existing Design Complete Gate. Writing Firmware Reviewer findings into
+  that same table as-is would let an unrelated firmware bug silently block
+  unrelated hardware-only pull requests forever — a real coupling defect,
+  not a style preference. Properly avoiding that would need either a
+  separate firmware-scoped backlog/CI check or a `Source`-based carve-out
+  in `check_open_issues.py`, neither of which is justified building yet for
+  a role that doesn't exist this round.
+- **Verified, not assumed, during implementation** (mirroring §31's own
+  "verified, not assumed" bullet, for the same reasons):
+  (a) the GitHub custom agent (`.github/agents/*.agent.md`, required
+  `description`) and agent skill (`.github/skills/<name>/SKILL.md`,
+  required `name`+`description`) specs were re-fetched directly from
+  current GitHub documentation this session — both unchanged since PR
+  #2/#3/§31, no fourth "fix the spec" round was needed;
+  (b) no ARM embedded toolchain, PlatformIO, or STM32CubeIDE/CubeMX was
+  pre-installed in this environment — checked, not assumed — but
+  `arm-none-eabi-gcc` was confirmed **installable** via a bottled Homebrew
+  formula, installed, and used to produce a real, zero-warning build (see
+  `firmware/bench-imu-01/bench-imu-01-firmware-design.md` §0/§7 for the
+  full account, including a genuine `-lgcc`/software-divide link error the
+  real build surfaced and this session fixed — stronger evidence than
+  read-through alone would have produced);
+  (c) no physical Bench-IMU-01 board exists to flash or power on in this
+  environment — the same tooling-honesty convention §31 established for
+  Mechanical's CAD tooling, now extended to Firmware
+  (`docs/architecture.md` §5.4);
+  (d) the BMI270's mandatory configuration-file upload sequence (soft
+  reset → disable advanced power save → chunked, word-addressed upload of
+  an 8192-byte manufacturer blob → poll for load success) was independently
+  confirmed against Bosch's own official open-source driver source code
+  before being implemented, rather than assumed from a simplified
+  description — the opaque blob itself was vendored verbatim with full
+  attribution (BSD-3-Clause, already this project's own SDK-ecosystem
+  evidence for this part since Component Selection, `DS-IMU-017`), never
+  approximated.
+- **Files added**: `.github/agents/firmware-engineer.agent.md`,
+  `.github/skills/firmware-bringup/SKILL.md`,
+  `.github/instructions/firmware.instructions.md`, the new top-level
+  `firmware/` directory (`firmware/README.md`,
+  `firmware/bench-imu-01/{README.md,
+  bench-imu-01-firmware-design.md, Makefile, linker/, src/}`), three new
+  datasheet metadata records
+  (`datasheets/stmicroelectronics_cmsis_device_g0_master.md`,
+  `datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md`,
+  `datasheets/stmicroelectronics_an4235_i2c-timing-configuration-tool.md`).
+- **Files edited, additively only** (nothing existing removed/reworded, no
+  section renumbered): `docs/architecture.md` (§3, new §5.4, §10, §13,
+  §14, §16), `docs/workflow.md` (§1 diagram, new Phase 11 under existing
+  §2), `docs/architecture-evolution.md` (this document — §7, §11, §28,
+  §29, this addendum), `.github/copilot-instructions.md` (Roles section),
+  `.github/CODEOWNERS` (one line), `validation/bring-up-procedure.md` (new
+  firmware-specific sub-section), `datasheets/evidence-log.md` (new
+  `DS-MCU-055` through `DS-MCU-063` and `DS-IMU-078` through `DS-IMU-088`
+  rows — additive only, no existing row edited), the existing
+  `stmicroelectronics_stm32g031k8t6_rev-unknown.md` and
+  `bosch-sensortec_bmi270_rev1.6.md` metadata records ("Used for Evidence
+  IDs" field extended, nothing removed), and the repository root
+  `README.md` (agent roster + directory layout brought current — this also
+  folded in the previously-missing Mechanical Lead/Reviewer entries, a
+  pre-existing gap from the Phase 1 PR, rather than compounding it by
+  adding Firmware alongside a roster that still said "four agents").
+- **Confirmed untouched** (verified via `git diff` before opening the PR):
+  all 6 existing `.github/agents/*.agent.md` files, all 7 existing
+  `SKILL.md` files, `.github/instructions/{hardware-design,datasheets,
+  mechanical-design,validation}.instructions.md`,
+  `.github/workflows/{hardware-gate.yml,agent-frontmatter-lint.yml}`,
+  `tools/{check_open_issues.py,check_agent_frontmatter.py}`,
+  `datasheets/{README.md,evidence-log.md}`'s existing rows,
+  `requirements/**`, `bom/component-selection.md`,
+  `hardware/**` (including `hardware/schematic/bench-imu-01-design.md`
+  itself — the Firmware Engineer role's own "Out of scope" explicitly
+  forbids editing Electronics artifacts), `validation/{fmea.md,
+  change-log.md,change-impact-matrix.md,open-issues.md,design-review.md}`,
+  `docs/evaluation.md`.
+- **Aside, out of this PR's scope, flagged for whoever owns it next**:
+  this session found `openscad` (`2021.01`) genuinely installed on this
+  machine, which contradicts `docs/architecture.md` §5.3/§13's recorded "no
+  CAD/3D modeling tool... verified" finding from the Phase 1 PR. This is
+  consistent with `requirements/traceability-matrix.md`'s own REQ-302/
+  REQ-305 rows, which already reference a real OpenSCAD compile having
+  happened in a *later* Mechanical session than the one §31 describes — so
+  this is a stale §5.3/§13 fact from an earlier point in this repository's
+  history, not a new discovery this PR is responsible for reconciling. Not
+  fixed here (out of scope for the Firmware-only kickoff this PR
+  implements; §5.3/§13 are Mechanical-owned facts, not Firmware-owned
+  ones) — left for a future Mechanical-scoped session to verify and
+  correct.
+- **Status**: implemented, PR opened, awaiting independent audit before
+  merge — same process every prior PR in this repository's history went
+  through.
+

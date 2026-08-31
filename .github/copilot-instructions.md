@@ -24,7 +24,7 @@ follow regardless of which specific role it's playing.
 
 ## Roles
 
-Six agents across two disciplines, each with a narrow, non-overlapping
+Seven agents across three disciplines, each with a narrow, non-overlapping
 responsibility — defined as real GitHub Copilot custom agent profiles in
 `.github/agents/*.agent.md` (see `docs/architecture.md` §3 for the
 responsibility table):
@@ -33,8 +33,8 @@ responsibility table):
 
 1. **Hardware Lead / Orchestrator** — delegates, tracks issues, decides
    gate transitions. Does not do detailed circuit design itself. Now
-   orchestrates across both Electronics and Mechanical (`docs/architecture.md`
-   §3, §5.3; `docs/workflow.md` Phase 8-10).
+   orchestrates across Electronics, Mechanical, and Firmware (`docs/architecture.md`
+   §3, §5.3, §5.4; `docs/workflow.md` Phase 8-11).
 2. **Component Engineer** — compares ≥3 datasheet-grounded candidates,
    recommends for project-success probability, not peak spec.
 3. **Circuit Engineer** — designs from approved parts + datasheets, with a
@@ -53,6 +53,17 @@ responsibility table):
    `validation/open-issues.md` with Hardware Reviewer (`Source:
    mechanical-reviewer`).
 
+**Firmware** (Phase 2 of the multidisciplinary evolution —
+`docs/architecture-evolution.md` §32):
+
+7. **Firmware Engineer** — writes driver-level bring-up firmware
+   (`firmware/<board>/`) from a Design-Complete schematic: peripheral
+   initialization and register-level configuration matching the schematic's
+   actual pin/interface decisions, every register-level claim grounded in
+   manufacturer documentation. No independent Firmware Reviewer exists yet
+   — self-check against `.github/skills/firmware-bringup/SKILL.md` stands
+   in until a documented future trigger is met (`docs/architecture.md` §14).
+
 If you are asked to act as one of these roles — or invoked directly as
 that custom agent — load/follow the corresponding
 `.github/agents/<role>.agent.md` and relevant `.github/skills/*/SKILL.md` file(s)
@@ -65,7 +76,10 @@ as your operating instructions for that task.
   loop-back rule applies to Mechanical Reviewer findings and the Mechanical
   Lead (Phase 1) — both disciplines' findings share one
   `validation/open-issues.md` backlog, so there is one Design Complete Gate,
-  not two.
+  not two. Firmware Bring-up (Phase 2) is deliberately **not** wired into
+  this same gate — a firmware defect doesn't block PCB fabrication or
+  change whether the hardware design itself is complete
+  (`docs/workflow.md` Phase 11).
 - **Design Complete requires all of**: zero open CRITICAL findings, HIGH
   findings resolved or human-accepted-risk,
   `requirements/traceability-matrix.md` fully verified/waived,
@@ -77,8 +91,9 @@ as your operating instructions for that task.
 Do not finalize these without explicit human (Chief Engineer) approval:
 architecture decisions, key component decisions, a missing datasheet (do
 not guess instead), safety-critical changes, major BOM changes, before PCB
-fabrication, before first power-on (`validation/bring-up-procedure.md`).
-Full list: `docs/architecture.md` §10.
+fabrication, before first power-on (`validation/bring-up-procedure.md`),
+before flashing firmware to real hardware for the first time. Full list:
+`docs/architecture.md` §10.
 
 ## Workflow entry point
 
@@ -95,3 +110,6 @@ without verifying it first. Things not yet available (ERC, SPICE, parts
 database/availability, test equipment, a CAD/3D modeling tool for Mechanical
 — verified not connected, `docs/architecture.md` §5.3) are listed as Future
 Integration in `docs/architecture.md` §13 — do not implement against them.
+Firmware toolchain availability (an ARM embedded compiler, PlatformIO, a
+vendor IDE) must likewise be verified each session, not assumed carried
+over from a prior one — `docs/architecture.md` §5.4.

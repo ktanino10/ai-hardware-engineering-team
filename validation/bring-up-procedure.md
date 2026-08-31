@@ -37,6 +37,26 @@ this copy, if a number ever needs re-confirming.
 | Known accepted residual risk | ISS-002 (LDO ROC margin, ACCEPTED-RISK) — if bench-measuring at a deliberately worst-case ~5.5V input, expect this is a known, human-accepted edge case, not a new finding | `validation/change-log.md` ECO-003 |
 | Enclosure fit check (once PCB exists) | Enclosure geometry is fit to `hardware/mechanical-interface.md`'s estimates, not a confirmed real PCB layout (FMEA-007) — verify physical board dimensions/connector positions against the enclosure BEFORE final assembly, not after | `hardware/mechanical-interface.md`, `hardware/mechanical/bench-imu-01-dimensional-spec.md` |
 
+## 0a. Firmware Flashing — Bench-IMU-01 (Phase 2, added — not executed this session)
+
+Driver-level bring-up firmware exists
+(`firmware/bench-imu-01/`, design rationale in
+`firmware/bench-imu-01/bench-imu-01-firmware-design.md`) and **compiles
+cleanly** with `arm-none-eabi-gcc` (verified this session — see that
+document's §0/§7). **Nothing in this section has been executed**: there is
+no physical Bench-IMU-01 board in this environment to flash, matching this
+whole procedure's own "not executed this session" framing (REQ-502). This
+section is prepared, like the rest of this file, for the human's future
+physical build.
+
+| Item | Value | Source |
+|---|---|---|
+| Debug/programming access | SWD via J3 (VDD/SWCLK/GND/SWDIO) — same header row already listed above | `bench-imu-01-design.md` §4.4 |
+| Flashing tool | Not part of this repository's tooling today (`docs/architecture.md` §13) — use a generic SWD programmer/debugger appropriate for an Arm Cortex-M0+ part (e.g. an ST-LINK or equivalent) with the built `firmware/bench-imu-01/build/bench-imu-01.hex` or `.elf` | `docs/architecture.md` §5.4/§13 |
+| Expected first-boot UART output (at 115200 8N1, on the J2 header) | A boot banner, one `RESET_REASON:` line (decoding `RCC_CSR` — expect `POWER_ON` on a first-ever flash, or `NRST_PIN(SW1_or_debugger)` if reset via SWD/reset line), then either `BMI270_INIT_OK` followed by continuous `millis,ax,ay,az,gx,gy,gz` CSV lines at ~100 Hz, or a `BMI270_INIT_FAILED: ...` line if the IMU didn't come up (check I2C2/PB10-PB11 wiring and the BMI270's solder joints first) | `firmware/bench-imu-01/src/main.c`, `reset_reason.c` |
+| Pre-flash checklist addition | Confirm the SWD debugger is configured for a Cortex-M0+ target at the expected VDD (3.3V, from J3's own VDD reference pin) before connecting — same polarity/orientation care as the rest of §1's checklist | `bench-imu-01-design.md` §4.4 |
+| Known residual, non-blocking item | The I2C_TIMINGR value used by the firmware (DS-MCU-063) was cross-checked via two independent web-search-derived sources but not directly re-verified against the primary ST AN4235 PDF this session — low-risk for a bench link, worth a direct check before this firmware is considered final | `datasheets/stmicroelectronics_an4235_i2c-timing-configuration-tool.md` |
+
 ## 1. Pre-Power-On Checklist
 
 - [ ] Visual inspection: correct component population and orientation

@@ -22,12 +22,17 @@ flowchart LR
     H9 --> H10["10. Independent\nMechanical Review"]
     H10 -- "CRITICAL/HIGH" --> H9
     H10 -- "clear" --> G
+    D -- "fixed pin/interface allocation" --> H11["11. Firmware\nBring-up"]
 ```
 
 Phases 8-10 (Mechanical, Phase 1 of the multidisciplinary evolution —
 `docs/architecture-evolution.md` §27) fork from Phase 4 rather than waiting
 for Phase 7, and feed back into the same Phase 7 gate — see Phase 8's entry
-criteria below for why.
+criteria below for why. Phase 11 (Firmware, Phase 2 of the multidisciplinary
+evolution — `docs/architecture-evolution.md` §32) also forks from Phase 4,
+for the same data-driven reasoning, but does **not** feed back into Phase
+7's gate — see Phase 11's entry/exit criteria below for why firmware
+bring-up is intentionally not a sixth Design Complete condition.
 
 ## 2. Phase Detail
 
@@ -189,6 +194,48 @@ multidisciplinary evolution — `docs/architecture-evolution.md` §13, §27)*
 - **Loop-back rule**: any CRITICAL or HIGH → back to Phase 9, then re-review.
 - **Parallel-safe?** No — one Reviewer, one verdict (architecture.md §4).
 
+### Phase 11 — Firmware Bring-up *(Phase 2 of the multidisciplinary
+evolution — `docs/architecture-evolution.md` §32)*
+- **Owner**: Firmware Engineer. Uses `.github/skills/firmware-bringup/SKILL.md`.
+- **Entry criteria**: Circuit Design (Phase 4) has fixed the pin/interface
+  allocation (pin assignments, peripheral instances, mode-select straps) for
+  the peripherals firmware needs — deliberately **data-driven, not
+  gate-driven**, the same reasoning as Phase 8: it does **not** require
+  Phase 7 (Design Complete Gate) to have passed first, since pin/interface
+  facts are typically stable well before every electrical HIGH finding is
+  resolved (e.g. an LDO input-margin disposition, architecture.md §8, has no
+  bearing on which pin the IMU's I2C bus uses).
+- **Activities**: extract the pin/interface contract from the schematic
+  design document (never re-derive it independently); fix the MCU clock
+  configuration first, serially, where the schematic leaves it open; gather
+  register-level facts from the MCU/peripheral manufacturers' primary
+  documentation with new Evidence IDs; implement any manufacturer-mandated
+  sensor initialization sequence exactly, vendoring opaque data verbatim
+  with attribution where required; write and self-check the firmware
+  (`.github/agents/firmware-engineer.agent.md`'s full checklist); attempt a
+  real compile if a toolchain is available or installable, disclosing the
+  actual outcome honestly either way (architecture.md §5.4).
+- **Exit criteria**: firmware source tree + design rationale document
+  (Evidence-ID-cited, mirroring the schematic's own style) + self-check
+  results + tooling/compile-status disclosure handed off to the Hardware
+  Lead.
+- **Loop-back rule**: if the schematic's pin/interface facts change after
+  this phase starts (e.g. Circuit Engineer reassigns a pin during Phase 5
+  rework), re-enter this phase for the affected peripheral driver(s).
+- **Does *not* feed Phase 7's gate.** Unlike Phases 8-10, Firmware Bring-up
+  is intentionally **not** wired into the Design Complete Gate
+  (architecture.md §8) — a firmware defect doesn't block PCB fabrication or
+  change anything about whether the *hardware* design is complete; it feeds
+  `validation/bring-up-procedure.md` instead, as preparatory work for a
+  future physical bring-up. See `docs/architecture-evolution.md` §32 for
+  why this also avoids a real coupling problem in the shared
+  `validation/open-issues.md` CI gate.
+- **Parallel-safe?** No independent Firmware Reviewer exists yet
+  (architecture.md §14, architecture-evolution.md §32) — self-check stands
+  in for review this round, so there is no separate review pass to
+  parallelize against. Safe to run in parallel with Phases 5/6/7/8-10 for
+  the same data-driven reasons Phase 8 is.
+
 ## 3. Conflict Resolution / Deadlock Escalation Protocol
 
 Applies whenever two agents (or an agent and a human-set constraint) produce
@@ -241,13 +288,17 @@ Mechanical — §2 Phase 8-10 above): `circuit-integrate` → (fork)
 `independent-mechanical-review` → conditional `mechanical-rework` or
 `design-complete-gate` — the *same* `design-complete-gate` todo both chains
 converge on, matching the single shared `validation/open-issues.md` backlog
-(architecture.md §8).
+(architecture.md §8). Once pin/interface allocation is fixed, a third fork
+(Phase 2, Firmware — §2 Phase 11 above) can run independently:
+`circuit-integrate` → (fork) `firmware-bringup` — this branch does **not**
+converge on `design-complete-gate` (§2 Phase 11's own note on why), so it
+has no todo dependency on the other two chains' gate step.
 
 ## 5. How to Start a New Design Cycle
 
 Use `docs/commands/make-circuit.md` for the copy-pasteable kickoff prompt.
-Mechanical Lead / Mechanical Reviewer follow the same invocation model as the
-4 Electronics agents (architecture.md §3): native custom-agent invocation
-where the running surface supports it, or the `task` tool loading their
-`.github/agents/*.agent.md` + `.github/skills/*/SKILL.md` content explicitly
-where it doesn't.
+Mechanical Lead / Mechanical Reviewer and Firmware Engineer all follow the
+same invocation model as the 4 Electronics agents (architecture.md §3):
+native custom-agent invocation where the running surface supports it, or
+the `task` tool loading their `.github/agents/*.agent.md` +
+`.github/skills/*/SKILL.md` content explicitly where it doesn't.
