@@ -21,14 +21,22 @@ leaves an evidence trail a human can audit later.
 - **To start a design cycle**: [`docs/commands/make-circuit.md`](docs/commands/make-circuit.md)
   has a copy-pasteable kickoff prompt.
 
-## The four agents (MVP)
+## The agents
 
-| Agent | Spec |
-|---|---|
-| Hardware Engineering Lead / Orchestrator | [`.github/agents/hardware-lead.agent.md`](.github/agents/hardware-lead.agent.md) |
-| Component Engineer | [`.github/agents/component-engineer.agent.md`](.github/agents/component-engineer.agent.md) |
-| Circuit Engineer | [`.github/agents/circuit-engineer.agent.md`](.github/agents/circuit-engineer.agent.md) |
-| Hardware Reviewer (independent) | [`.github/agents/hardware-reviewer.agent.md`](.github/agents/hardware-reviewer.agent.md) |
+| Discipline | Agent | Spec |
+|---|---|---|
+| Electronics | Hardware Engineering Lead / Orchestrator | [`.github/agents/hardware-lead.agent.md`](.github/agents/hardware-lead.agent.md) |
+| Electronics | Component Engineer | [`.github/agents/component-engineer.agent.md`](.github/agents/component-engineer.agent.md) |
+| Electronics | Circuit Engineer | [`.github/agents/circuit-engineer.agent.md`](.github/agents/circuit-engineer.agent.md) |
+| Electronics | Hardware Reviewer (independent) | [`.github/agents/hardware-reviewer.agent.md`](.github/agents/hardware-reviewer.agent.md) |
+| Mechanical *(Phase 1)* | Mechanical Lead | [`.github/agents/mechanical-lead.agent.md`](.github/agents/mechanical-lead.agent.md) |
+| Mechanical *(Phase 1)* | Mechanical Reviewer (independent) | [`.github/agents/mechanical-reviewer.agent.md`](.github/agents/mechanical-reviewer.agent.md) |
+| Firmware *(Phase 2)* | Firmware Engineer | [`.github/agents/firmware-engineer.agent.md`](.github/agents/firmware-engineer.agent.md) |
+
+Electronics is the original 4-agent MVP. Mechanical and Firmware were added
+later, once each discipline's own trigger condition was met (never
+speculatively) — see `docs/architecture.md` §3/§14 and
+`docs/architecture-evolution.md` §31/§32.
 
 ## Repository layout
 
@@ -39,13 +47,17 @@ leaves an evidence trail a human can audit later.
 requirements/        Requirements + requirements traceability matrix
 datasheets/          Datasheet METADATA only (never the actual copyrighted
                      files — see datasheets/README.md) + Evidence ID log
-hardware/            Schematic / PCB artifacts + system power budget
+hardware/            Schematic / PCB artifacts + system power budget +
+                     Electronics->Mechanical interface + mechanical/
+                     design artifacts (Phase 1)
 bom/                 Component selection / comparison records
+firmware/            Driver-level bring-up firmware, one subdirectory per
+                     board (Phase 2)
 validation/          Reviews, open issues, FMEA, change log (ECO), change
                      impact matrix, bring-up procedure
 docs/                Architecture, workflow, evaluation methodology,
                      standard kickoff prompt
-tools/               CI gate parser script
+tools/               CI gate parser scripts
 ```
 
 ## Key principles

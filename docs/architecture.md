@@ -65,20 +65,27 @@ both write to the same `validation/open-issues.md` (§8).
 | **Hardware Reviewer** | Independent, adversarial review; severity-classified findings | Fixing the design itself |
 | **Mechanical Lead** *(Phase 1)* | Enclosure/mechanical design from `hardware/mechanical-interface.md`, sole owner of the mechanical geometry state, design rationale log | Marking own work reviewed/complete; editing Electronics artifacts |
 | **Mechanical Reviewer** *(Phase 1)* | Independent, adversarial mechanical review; severity-classified findings (shares `validation/open-issues.md` with Hardware Reviewer) | Fixing the design itself |
+| **Firmware Engineer** *(Phase 2)* | Driver-level bring-up firmware from a Design-Complete schematic: peripheral initialization, register-level configuration, design rationale log (`firmware/<board>/`) | Control loops/sensor fusion/unit conversion (Control Engineer's future territory, §14 — not yet triggered); editing Electronics artifacts; marking own work reviewed/complete (self-check stands in for independent review until a Firmware Reviewer trigger is met, `docs/architecture-evolution.md` §32) |
 
 The Mechanical Lead / Mechanical Reviewer pair was added in Phase 1 of the
 multidisciplinary evolution (`docs/architecture-evolution.md` §7, §10, §27);
-the original 4 agents above are unchanged. Hardware Lead orchestrates across
-both disciplines today (§10, §5.3) — a separate "System Lead" role remains
-premature until a third discipline exists (`docs/architecture-evolution.md`
-§7).
+the original 4 agents above are unchanged. The Firmware Engineer was added
+in Phase 2 (`docs/architecture-evolution.md` §32) once its own trigger
+(§14: "when firmware work starts in earnest") was met — no Firmware
+Reviewer agent exists yet (Phase 2 deliberately introduced only one new
+agent, not the usual design+independent-review pair, per §32's own
+scope-proportionality reasoning). Hardware Lead orchestrates across all
+three disciplines today (§10, §5.3, §5.4) — a separate "System Lead" role
+remains premature until the framework's own discipline count grows further
+(`docs/architecture-evolution.md` §7).
 
 Full role specs: `.github/agents/hardware-lead.agent.md`,
 `.github/agents/component-engineer.agent.md`,
 `.github/agents/circuit-engineer.agent.md`,
 `.github/agents/hardware-reviewer.agent.md`,
 `.github/agents/mechanical-lead.agent.md`,
-`.github/agents/mechanical-reviewer.agent.md`. These are real GitHub Copilot
+`.github/agents/mechanical-reviewer.agent.md`,
+`.github/agents/firmware-engineer.agent.md`. These are real GitHub Copilot
 custom agent profiles (per
 [docs.github.com/en/copilot/reference/custom-agents-configuration](https://docs.github.com/en/copilot/reference/custom-agents-configuration)),
 each with a required `description` field, so they are selectable directly
@@ -173,6 +180,33 @@ working CAD/3D tool is verified connected in a future session:
   populate `hardware/mechanical-interface.md` from an existing KiCad project
   when one exists — this is reuse of an already-verified tool surface, not a
   new capability claim.
+
+### 5.4 Firmware toolchain (Phase 2)
+
+No ARM embedded toolchain, PlatformIO, or vendor IDE (STM32CubeIDE/
+STM32CubeMX or equivalent) is assumed pre-installed — **verify each
+session**, the same discipline §5.3 established for Mechanical's CAD
+tooling. During Bench-IMU-01 firmware bring-up (`docs/architecture-evolution.md`
+§32), this session found: `arm-none-eabi-gcc` was not pre-installed, but
+was confirmed **installable** via a bottled Homebrew formula and was
+successfully installed and used to produce a real, zero-warning build (see
+`firmware/bench-imu-01/bench-imu-01-firmware-design.md` §0/§7 for the full
+account, including a genuine link error the real build surfaced and fixed).
+PlatformIO and STM32CubeIDE/CubeMX were checked and are not installed.
+
+- The **Firmware Engineer** produces real firmware source (register-level
+  C, a linker script, a Makefile) per
+  `.github/agents/firmware-engineer.agent.md` and
+  `.github/skills/firmware-bringup/SKILL.md`.
+- If a toolchain is available or installable, attempt a real compile —
+  meaningfully stronger evidence than uncompiled source. If not available,
+  disclose "source-complete and internally self-consistent, not compiled"
+  plainly, mirroring §5.3's CAD-tooling disclosure convention.
+- There is no physical board to flash or power on in a typical Copilot CLI
+  session — do not claim "tested," "verified on hardware," or "flashed"
+  unless a real, verified-connected flashing tool and real hardware were
+  both actually used that session. Flashing tooling (e.g. `st-flash`,
+  OpenOCD) remains Future Integration (§13) until verified connected.
 
 ## 6. Evidence Model
 
@@ -323,6 +357,11 @@ required:
 - Before mechanical fabrication (3D printing/machining) of an enclosure or
   mechanical part — mirrors the "before PCB fabrication" gate, extended to
   the Mechanical discipline (Phase 1)
+- Before flashing firmware to real hardware for the first time — mirrors
+  the "before first power-on" gate, extended to the Firmware discipline
+  (Phase 2, `docs/architecture-evolution.md` §32). Not yet applicable to
+  any session without a physical board to flash (§5.4) — flagged here so a
+  future session with real hardware doesn't skip it.
 
 ## 11. Benchmark Project & Roadmap
 
@@ -364,6 +403,7 @@ tools/servers exist)
 | Component database / parts availability MCP | Not available | Evaluate when such a tool is actually connected |
 | Test equipment MCP (bench instruments) | Not available | Relevant once `validation/bring-up-procedure.md` moves to instrumented bench testing |
 | CAD/3D modeling tool (e.g. Blender or a parametric CAD/OpenSCAD engine) | Not available — **verified**, not assumed | A live connection check (`blender-get_addon_status`) failed ("Could not connect to Blender"); no local `openscad`/`freecad` binary or `cadquery`/`solid`/`build123d` Python library is installed either. Mechanical Lead produces text/parametric output only until a working tool is verified connected (§5.3) |
+| Firmware flashing / hardware-in-the-loop test tool (e.g. `st-flash`, OpenOCD, a debugger's own CLI) | Not available today | Relevant once a physical board exists to flash — see §5.4/§10. An ARM embedded *compiler* toolchain is a separate, already-available concern (§5.4), not blocked on this row |
 
 Never implement code/process that assumes any of the above exists. When one
 becomes available, move its row out of this table and into §5.
@@ -375,15 +415,17 @@ framework can add them without restructuring)
 |---|---|---|
 | **Power Engineer** | System power budget, power tree, sequencing across subsystems (§12) | When subsystem count / power complexity exceeds what Circuit Engineer can track ad hoc (e.g., at Motor Driver / Reaction Wheel stage) |
 | **PCB Engineer** | Layout, stackup, DRC closure, signal/power integrity at layout level | When schematic-to-layout handoff becomes a distinct phase |
-| **Firmware Engineer** | Driver-level bring-up code, register-level configuration matching the schematic's actual pin/interface decisions | When firmware work starts in earnest |
-| **Control Engineer** | Control-loop design (e.g., attitude control loops) | At 1-axis / 3-axis attitude control roadmap stage |
+| ~~**Firmware Engineer**~~ **[IMPLEMENTED — Phase 2, see `docs/architecture-evolution.md` §32]** | Driver-level bring-up code, register-level configuration matching the schematic's actual pin/interface decisions | Met: `hardware/schematic/bench-imu-01-design.md` reached Design Complete. See §3, §5.4, `.github/agents/firmware-engineer.agent.md`, `.github/skills/firmware-bringup/SKILL.md` |
+| **Control Engineer** | Control-loop design (e.g., attitude control loops) | At 1-axis / 3-axis attitude control roadmap stage — **not met** by Bench-IMU-01 (a static bench sensor-readout board, no reaction wheel/motor/attitude-control project exists). Deliberately kept separate from Firmware Engineer above, even though both were once grouped loosely as "Control/Embedded" (`docs/architecture-evolution.md` §7/§11) — Firmware Engineer's own scope explicitly excludes control loops/sensor fusion/unit conversion (`.github/agents/firmware-engineer.agent.md` "Out of scope") precisely so this row's introduction stays gated on its own, later trigger |
+| **Firmware Reviewer** *(new row, Phase 2)* | Independent, adversarial review of Firmware Engineer's driver-level bring-up code (mirroring Hardware Reviewer / Mechanical Reviewer) | Deliberately deferred this round even though the Firmware Engineer role itself is now implemented — self-check stands in for now (`docs/architecture-evolution.md` §32). Introduce when: a second board's firmware is added, or a real bring-up failure is traced to a class of defect an independent pass would likely have caught |
 | **Test Engineer** | Owns `validation/bring-up-procedure.md` formally, designs bench test plans, HIL/environmental test plans | When bring-up moves beyond a one-off MVP bench test |
 | **Datasheet Specialist** | Advanced/high-volume operator of `.github/skills/datasheet-analysis/SKILL.md`; owns `datasheets/evidence-log.md` quality and consistency | When datasheet volume/complexity outgrows ad hoc extraction by whichever agent needs a number |
 | **Safety/Compliance Reviewer** | Regulatory/standards review (e.g. UL/CE/FCC/EMC compliance where applicable) | When the project needs to target a regulated market or a safety-relevant certification |
 
-These are **not** created as `.github/agents/*.agent.md` files yet — introduce them
-only when the trigger condition is met, to avoid role/file proliferation
-ahead of actual need.
+These are **not** created as `.github/agents/*.agent.md` files yet (except
+Firmware Engineer, now implemented above) — introduce the rest only when
+their trigger condition is met, to avoid role/file proliferation ahead of
+actual need.
 
 ## 15. Evaluation
 
@@ -396,6 +438,7 @@ methodology and metrics.
 .github/copilot-instructions.md            Repo-wide Copilot operating rules
 .github/agents/*.agent.md                  Custom agent profiles (name+description frontmatter):
                                               4 Electronics MVP agents + 2 Mechanical agents (Phase 1)
+                                              + 1 Firmware agent (Phase 2)
 .github/skills/*/SKILL.md                  Agent skill profiles (name+description frontmatter):
   requirements-engineering/SKILL.md
   component-selection/SKILL.md
@@ -404,8 +447,10 @@ methodology and metrics.
   hardware-review/SKILL.md
   enclosure-design/SKILL.md                Mechanical Lead's procedure (Phase 1)
   mechanical-review/SKILL.md                Mechanical Reviewer's procedure (Phase 1)
+  firmware-bringup/SKILL.md                 Firmware Engineer's procedure (Phase 2)
 .github/instructions/*.instructions.md     Path-scoped rules (datasheets/, hardware+bom/, validation/,
-                                              hardware/mechanical/+mechanical-interface.md — Phase 1)
+                                              hardware/mechanical/+mechanical-interface.md — Phase 1,
+                                              firmware/ — Phase 2)
 .github/prompts/*.prompt.md                Reusable slash-command-style prompts
 .github/workflows/hardware-gate.yml        CI gate: blocks unresolved CRITICAL/HIGH
 .github/workflows/agent-frontmatter-lint.yml  CI lint: agent/skill required frontmatter (Phase 1)
@@ -429,6 +474,11 @@ hardware/
 
 bom/component-selection.md                 Candidate comparison template
 
+firmware/                                  Driver-level bring-up firmware (Phase 2)
+  README.md                                Discipline overview + tooling-honesty statement
+  <board>/                                 One subdirectory per board (e.g. bench-imu-01/)
+    README.md, <board>-firmware-design.md, Makefile, linker/, src/
+
 validation/
   design-review.md                         Per-cycle review report template (Hardware or Mechanical Reviewer)
   open-issues.md                           Living finding backlog (CI-checked; shared across disciplines)
@@ -440,7 +490,7 @@ validation/
 docs/
   architecture.md                          This document
   workflow.md                              End-to-end workflow + gates
-  architecture-evolution.md                Multidisciplinary evolution proposal + Phase 1 status
+  architecture-evolution.md                Multidisciplinary evolution proposal + Phase 1/2 status
   evaluation.md                            Single vs multi-agent metrics
   commands/make-circuit.md                 Standard kickoff prompt for a new design cycle
 

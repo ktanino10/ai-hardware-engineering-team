@@ -6,6 +6,7 @@
 
 /hardware/pcb/                    @ktanino10
 /hardware/mechanical/              @ktanino10
+/firmware/                          @ktanino10
 /validation/bring-up-procedure.md @ktanino10
 /validation/change-log.md         @ktanino10
 /bom/                              @ktanino10
