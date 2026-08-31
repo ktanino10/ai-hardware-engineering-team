@@ -21,7 +21,10 @@
  * not bonded out on the STM32G031K8T6's actual LQFP-32/UFQFPN32 package --
  * CRITICAL defect ISS-027 (validation/open-issues.md), RESOLVED at the
  * hardware/schematic level and confirmed by primary package/pinout evidence
- * (DS-MCU-073). The corrected, real wiring is PA11(SCL)/PA12(SDA) -- same
+ * (DS-MCU-073), independently re-derived a second time and corroborated
+ * against two further official ST sources by origin/main's own parallel fix
+ * for this same defect (DS-MCU-068/077 -- see gpio.c's PA11/PA12 AF6
+ * comment). The corrected, real wiring is PA11(SCL)/PA12(SDA) -- same
  * I2C2 peripheral instance, same AF6 alternate-function value; only the
  * port letter and pin numbers changed. i2c2.c/h needed no changes (they are
  * peripheral-register-level, not GPIO-pin-level).

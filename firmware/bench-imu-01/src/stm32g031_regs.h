@@ -78,7 +78,7 @@ typedef struct
 } GPIO_TypeDef;
 
 #define GPIOA ((GPIO_TypeDef *)GPIOA_BASE)
-#define GPIOB ((GPIO_TypeDef *)GPIOB_BASE)
+#define GPIOB ((GPIO_TypeDef *)GPIOB_BASE) /* Rev 3: DIR(PB1)/I2C1 SCL+SDA(PB6/PB7) -- see GPIOB_BASE above and clock.c's RCC_IOPENR_GPIOBEN enable. This define was silently dropped by the origin/main merge (main's own Rev-2-only scope correctly has no GPIOB user, so it deleted this cleanly with no conflict marker) -- restored here because motor.c/gpio.c's Rev 3 motor subsystem genuinely dereferences GPIOB. */
 
 /* ---------------------------------------------------------------------- */
 /* RCC (DS-MCU-<NNN>: RCC_TypeDef, offsets confirmed against the CMSIS     */
@@ -115,9 +115,16 @@ typedef struct
 
 #define RCC ((RCC_TypeDef *)RCC_BASE)
 
-/* RCC_IOPENR bit positions */
+/* RCC_IOPENR bit positions (DS-MCU-058) */
 #define RCC_IOPENR_GPIOAEN (1UL << 0)
-#define RCC_IOPENR_GPIOBEN (1UL << 1)
+#define RCC_IOPENR_GPIOBEN (1UL << 1) /* Rev 3: GPIOB now used for DIR(PB1)/
+ * I2C1 SCL+SDA(PB6/PB7) -- see GPIOB_BASE/clock.c. This define was silently
+ * dropped by the origin/main merge (correct for main's own GPIOB-free Rev-2
+ * scope, but wrong here) and is restored because clock.c's
+ * RCC->IOPENR |= RCC_IOPENR_GPIOAEN | RCC_IOPENR_GPIOBEN would otherwise
+ * fail to compile. The IMU's own I2C2 bus no longer needs GPIOB (it moved
+ * to PA11/PA12 on GPIOA, ISS-027) -- GPIOBEN is enabled for the motor
+ * subsystem's pins, not the IMU. */
 
 /* RCC_APBENR1 bit positions */
 #define RCC_APBENR1_TIM3EN    (1UL << 1)  /* Rev 3: TIM3 (FG tachometer input capture, PA6) */

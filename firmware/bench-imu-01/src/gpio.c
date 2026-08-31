@@ -57,10 +57,23 @@ void gpio_init(void)
      * same open-drain treatment as before -- only the port letter and pin
      * numbers change (GPIOB->GPIOA, 10/11->11/12); I2C2's own base address
      * in stm32g031_regs.h is unaffected (still correctly I2C2, not I2C1 --
-     * that is a separate, already-resolved defect, ISS-011). Open-drain:
-     * required for I2C, and consistent with the schematic's own external
-     * R3/R4 pull-ups -- do not enable an internal pull-up here, it would
-     * work against R3/R4's calculated value (Section 5.2). */
+     * that is a separate, already-resolved defect, ISS-011).
+     *
+     * Independently re-derived and corroborated a second time (origin/main's
+     * own parallel fix for this exact defect) against two further official
+     * ST sources: STM32CubeG0's own NUCLEO-G031K8 I2C2 example
+     * (`Projects/NUCLEO-G031K8/.../stm32g0xx_hal_msp.c`), which configures
+     * this *exact* part's I2C2 on GPIOA pins 11/12 with
+     * `GPIO_InitStruct.Alternate = GPIO_AF6_I2C2` (DS-MCU-068), and the
+     * official `stm32g0xx-hal-driver` header confirming `GPIO_AF6_I2C2 ==
+     * 0x06` numerically (DS-MCU-077). Both corroborating sources agree with
+     * DS-MCU-073/067 on every fact that matters here (port, pins, AF value);
+     * nothing about this pin assignment changes as a result -- they are
+     * cited for depth of evidence, not because they contradict anything.
+     *
+     * Open-drain: required for I2C, and consistent with the schematic's own
+     * external R3/R4 pull-ups -- do not enable an internal pull-up here, it
+     * would work against R3/R4's calculated value (Section 5.2). */
     set_moder(GPIOA, 11u, GPIO_MODER_AF);
     set_af(GPIOA, 11u, 6u);
     set_open_drain(GPIOA, 11u, 1);
@@ -92,7 +105,10 @@ void gpio_init(void)
     set_af(GPIOA, 6u, 1u);
 
     /* PB1 = DIR (plain GPIO output to U5). Push-pull, default LOW at boot
-     * (motor.c's default direction convention; see motor.h). */
+     * (motor.c's default direction convention; see motor.h). This pin
+     * (and PB6/PB7 below) is exactly why GPIOB's clock enable and base
+     * address must survive this merge intact even though the IMU bus no
+     * longer uses GPIOB -- see clock.c/clock.h and stm32g031_regs.h. */
     set_moder(GPIOB, 1u, GPIO_MODER_OUTPUT);
     set_open_drain(GPIOB, 1u, 0);
     GPIOB->ODR &= ~(1u << 1); /* DIR = 0 at boot, matches CCR1=0 (stopped) */

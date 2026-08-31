@@ -30,9 +30,14 @@
 #define BENCH_IMU_01_CLOCK_H
 
 /* Enables the GPIOA/GPIOB/I2C1/I2C2/TIM1/TIM3/USART2/PWR peripheral clocks
- * this board's schematic actually uses. Does not touch RCC_CR/RCC_CFGR/
- * RCC_PLLCFGR -- the MCU is already running on HSI16 at reset, so there is
- * deliberately nothing else to configure for the clock source itself. */
+ * this board's schematic actually uses. GPIOB is enabled for the Rev 3
+ * motor subsystem's PB1/PB6/PB7 pins -- it is NOT needed for the IMU's I2C2
+ * bus, which lives on PA11/PA12 (corrected this cycle, ISS-027, from a
+ * previously-configured PB10/PB11 pair that does not physically exist on
+ * this package -- independently corroborated by origin/main's own parallel
+ * fix, DS-MCU-068/077). Does not touch RCC_CR/RCC_CFGR/RCC_PLLCFGR -- the
+ * MCU is already running on HSI16 at reset, so there is deliberately
+ * nothing else to configure for the clock source itself. */
 void clock_init(void);
 
 #endif /* BENCH_IMU_01_CLOCK_H */

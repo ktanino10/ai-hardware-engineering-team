@@ -6,9 +6,12 @@ void clock_init(void)
     /* GPIOA (PA2/PA3 USART2, PA5 LED, PA6/PA8/PA9 motor, PA11/PA12 I2C2) and
      * GPIOB (PB1/PB6/PB7 motor) clocks. GPIOB is enabled for the Rev 3 motor
      * subsystem's DIR/I2C1 pins -- it is NOT needed by the IMU bus any more
-     * (I2C2 moved from PB10/PB11 to PA11/PA12 this cycle, ISS-027; see
-     * gpio.h). If the motor subsystem is ever removed, this GPIOBEN bit
-     * would need to be reconsidered, not left enabled "just in case". */
+     * (I2C2 moved from PB10/PB11 to PA11/PA12 this cycle, ISS-027 -- the
+     * same GPIO-port/pin fix independently arrived at, and corroborated
+     * against two further official ST sources, by origin/main's own
+     * parallel fix, DS-MCU-068/077; see gpio.h and gpio.c). If the motor
+     * subsystem is ever removed, this GPIOBEN bit would need to be
+     * reconsidered, not left enabled "just in case". */
     RCC->IOPENR |= RCC_IOPENR_GPIOAEN | RCC_IOPENR_GPIOBEN;
 
     /* I2C2 (IMU), I2C1 (DRV10983 U5 commissioning/status), USART2 (host

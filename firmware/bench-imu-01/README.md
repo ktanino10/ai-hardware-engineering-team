@@ -13,8 +13,11 @@ This firmware now covers two independent subsystems on the same board:
   the previous, now-confirmed-wrong PB10/PB11 (those pins do not physically
   exist on this part's actual LQFP-32 package — see
   `validation/open-issues.md` ISS-027, and §3 of the design doc for the
-  full fix). Same I2C2 peripheral instance, same AF6, same 400 kHz
-  Fast-mode timing — only the GPIO port/pin changed.
+  full fix, now corroborated against three independent official ST sources:
+  the CMSIS pin database, STM32CubeG0's NUCLEO-G031K8 I2C2 example, and the
+  `stm32g0xx-hal-driver` header's `GPIO_AF6_I2C2` macro). Same I2C2
+  peripheral instance, same AF6, same 400 kHz Fast-mode timing — only the
+  GPIO port/pin changed.
 - Brings up the BMI270 IMU (address 0x68) with its full manufacturer-mandated
   initialization sequence, including the vendored ~8 KB configuration blob.
 - Reads accelerometer + gyroscope raw register counts at 100 Hz (REQ-001)
