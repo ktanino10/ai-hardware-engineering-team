@@ -3785,7 +3785,8 @@ scratch, per this cycle's re-review scope.
   datasheet (**DS12992 Rev 4**), fetched fresh via
   `https://r.jina.ai/https://www.st.com/resource/en/datasheet/stm32g031k8.pdf`
   — not accepted from the design document's, evidence-log's, or Hardware
-  Lead's own citation/paraphrase (DS-MCU-068). Table 2 (device/peripheral
+  Lead's own citation/paraphrase (DS-MCU-073, originally logged as
+  "DS-MCU-068" before the 2026-09-11 main-merge renumbering). Table 2 (device/peripheral
   counts), Figure 7 (LQFP32 pinout), Figure 9 (LQFP48 pinout), Table 12
   (per-pin per-package assignment), and Tables 13/14 (Port A/B
   alternate-function maps) were each independently located and read. Before
@@ -3912,7 +3913,9 @@ component).
   scope discipline (schematic-only commit, firmware change correctly
   deferred to the already-planned Firmware Bring-up phase with a
   forward-reference note already in place).
-- **Datasheet Source**: DS-MCU-068 (independently re-confirmed against the
+- **Datasheet Source**: DS-MCU-073 (originally logged as "DS-MCU-068",
+  renumbered 2026-09-11 during the main-branch merge, `validation/change-log.md`
+  ECO-014 — independently re-confirmed against the
   primary ST DS12992 Rev 4 datasheet this cycle, not merely re-cited).
 - **Affected Component**: U1 (STM32G031K8T6) — PA11/PA12 (was PB10/PB11);
   R3/R4 (I2C pull-ups, endpoint only, sizing unaffected).
