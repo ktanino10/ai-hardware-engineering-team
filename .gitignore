@@ -38,6 +38,10 @@ hardware/**/*-backups/
 hardware/**/_autosave-*
 hardware/**/fp-info-cache
 hardware/**/*.lck
+hardware/**/*.kicad_prl
+hardware/**/.history/
+__pycache__/
+*.pyc
 
 # SPICE / simulation scratch output (future integration)
 hardware/**/*.raw

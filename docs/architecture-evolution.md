@@ -888,3 +888,107 @@ the audit trail of what was true before this phase vs. after.
   instruction), awaiting independent audit before merge — same process
   every prior PR in this repository's history went through.
 
+## 34. KiCad Tooling Verification Status (Addendum)
+
+Added when a real KiCad project was first created in this repository, in a
+separate PR from this document's original merge and the Phase 1/2/3 (§31/
+§32/§33) addenda — kept as its own addendum for the same reason those are:
+preserve the audit trail of what was true before vs. after. Unlike §31-§33,
+this is not a new discipline/agent-role addition — it is a **capability
+verification and correction**: `docs/architecture.md` §5.2/§13 had, since
+this project's inception, described KiCad MCP tooling and ERC in
+conditional/hypothetical terms ("available only when a KiCad MCP server is
+connected," "ERC has no dedicated tool in this toolset yet"). This addendum
+records that those tools are now verified genuinely connected and actively
+used, not hypothetical — with real, sometimes surprising findings from
+actually exercising them for the first time.
+
+- **Trigger met**: every prior design cycle (Bench-IMU-01 Rev 2, and the
+  in-progress, separate Rev 3 motor-driver session) had produced schematics
+  as structured Markdown documents, explicitly disclosing "no KiCad project
+  exists yet." The human confirmed KiCad 10.0.1 + `kicad-cli` genuinely
+  installed on this machine; this session independently re-verified that
+  before treating KiCad as available, per this repository's own established
+  discipline (`kicad-list_projects` returned `[]` — tool works, no project
+  existed yet).
+- **Human approval**: given, scoped explicitly to Rev 2 only (the stable,
+  already-merged, already-Design-Complete baseline) — the parallel,
+  in-progress Rev 3 motor-driver session's branch/files were explicitly
+  out of scope and not touched.
+- **Verified, not assumed, during implementation** (mirroring §31/§32/§33's
+  own "verified, not assumed" bullets, for the same reasons):
+  (a) every `kicad-*` MCP tool's actual behavior was tested directly against
+  a real project, not assumed from its description — see the significant
+  finding below;
+  (b) `kicad-cli sch erc` was independently tested twice (once by the
+  Hardware Lead, once again by a separate Hardware Reviewer fidelity-review
+  pass) and confirmed to produce real, meaningful ERC output, correcting
+  `docs/architecture.md` §5.2/§13's prior "not available" claim;
+  (c) `libngspice.dylib` was found genuinely bundled with the local KiCad
+  install, but `kicad-cli` has no `sim` subcommand — no scriptable
+  simulation path exists; recorded precisely (bundled engine, not
+  automatable) rather than either overclaiming a new capability or
+  repeating the old blanket "not available" framing, per explicit guidance
+  from the creator/orchestrating session.
+- **Significant finding, not merely a footnote**: of the 16 `kicad-*` MCP
+  tools, only 5 (`list_projects`, `get_project_structure`,
+  `validate_project`, `get_drc_history_tool`, `open_project`) actually work
+  in this environment. The other 11 — every tool whose implementation calls
+  `ctx.report_progress(...)` (confirmed by reading the local `kicad-mcp`
+  server's own source, `kicad_mcp/tools/netlist_tools.py` and siblings) —
+  fail with `Context is not available outside of a request`, a real,
+  reproducible server-side bug (confirmed independently twice, by two
+  separate sessions/passes, against the same project), not an artifact of
+  this project's own construction. `run_drc_check` and
+  `generate_project_thumbnail` were independently confirmed to fail for
+  *different*, unrelated reasons (a correct "no PCB file" result, and a
+  distinct `'FunctionTool' object is not callable` error, respectively) —
+  precision here matters, since conflating all 11 failures into one
+  "broken" bucket would have been less useful than isolating the actual
+  mechanism. Worked around by using `kicad-cli` directly for the equivalent
+  verification (`sch export netlist`, `sch export bom`, `sch erc`) — see
+  `hardware/schematic/bench-imu-01/README.md` for the full account.
+- **A real, non-obvious discovery this verification itself produced**:
+  building the real KiCad project (checking real symbol/footprint
+  availability before wiring anything) independently surfaced ISS-014 — the
+  STM32G031K8T6's real LQFP-32 package has no PB10/PB11 pins at all, so the
+  already-Design-Complete Rev 2 baseline's IMU I2C2 bus could not be
+  physically wired as documented. This is exactly the kind of defect a
+  Markdown-only review process cannot catch (it requires cross-checking a
+  MCU's real physical package pinout table, a different table from the
+  alternate-function table every prior review pass correctly checked
+  instead) — a concrete demonstration of why this capability verification
+  was worth doing, not just a formality. Full finding: `validation/
+  open-issues.md` ISS-014 (CRITICAL, RESOLVED after a fidelity-scoped
+  Hardware Reviewer Cycle 3 pass), `validation/change-log.md` ECO-006.
+- **Files added**: `hardware/schematic/bench-imu-01/` (`bench-imu-01.
+  kicad_pro`, `.kicad_sch`, `.kicad_sym`, `sym-lib-table`,
+  `generate_schematic.py`, `README.md`); `datasheets/
+  stmicroelectronics_stm32_open_pin_data_stm32g031k4-6-8tx.md`.
+- **Files edited, additively only** (nothing existing removed/reworded, no
+  section renumbered): `docs/architecture.md` (§5.2, §13, §16 directory
+  map), `docs/architecture-evolution.md` (this addendum),
+  `hardware/schematic/bench-imu-01-design.md` (Rev 2, corrected — new
+  changelog entry, §0, §2.3, §4.1, §4.3, §5.2, §5.3, §6, §11, §12, §13,
+  §14, §16, new §19 — see that document's own changelog for the full,
+  itemized account), `datasheets/evidence-log.md` (new DS-MCU-064 through
+  DS-MCU-067 rows), `validation/open-issues.md` (new ISS-014 row, plus a
+  Hardware Reviewer Cycle 3 append to its Notes), `validation/
+  design-review.md` (new Cycle 3 fidelity-review entry), `validation/
+  change-log.md` (new ECO-006 row), `validation/fmea.md` (new FMEA-008
+  systemic-lesson entry).
+- **Confirmed untouched**: the parallel, in-progress Rev 3 motor-driver
+  session's own branch/files were never read for authoritative content nor
+  written to; no PCB layout was attempted (`hardware/schematic/bench-imu-01/`
+  has no `.kicad_pcb` — `kicad-validate_project`'s own "Missing PCB layout
+  file" finding on this project is expected and correct, not a gap); no ERC
+  *MCP tool* is claimed to exist (only the raw `kicad-cli sch erc`
+  capability); no SPICE automation is claimed; `requirements/
+  traceability-matrix.md` was not edited (its REQ-104 row still cites the
+  pre-correction PB10/PB11 fact — flagged as follow-up work, not performed
+  here, to avoid a second, unrelated collision risk with the parallel Rev 3
+  session's own likely edits to that same file).
+- **Status**: implemented, PR opened, awaiting independent audit before
+  merge — same process every prior PR in this repository's history went
+  through.
+

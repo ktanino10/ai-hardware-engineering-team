@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "bench-imu-01")(type "KiCad")(uri "${KIPRJMOD}/bench-imu-01.kicad_sym")(options "")(descr "Project-local symbols not present in any standard KiCad library (BMI270)"))
+)
