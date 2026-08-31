@@ -155,7 +155,9 @@ first.
 
 ### 5.2 KiCad MCP tools (available only when a KiCad MCP server is connected in
 the operator's environment — this is an environment capability, not something
-this repository can guarantee for every user)
+this repository can guarantee for every user) — **verified connected and
+actively used, 2026-08-31** (see below; no longer purely hypothetical/
+conditional language)
 
 | Tool | Used by | When | Purpose |
 |---|---|---|---|
@@ -166,9 +168,71 @@ this repository can guarantee for every user)
 | `run_drc_check`, `get_drc_history_tool` | Hardware Reviewer (or future PCB Engineer) | PCB stage | DRC errors become `validation/open-issues.md` entries; DRC history feeds §14 evaluation metrics |
 | `generate_pcb_thumbnail`, `generate_project_thumbnail` | Hardware Lead / Reviewer | Before "pre-fabrication" HITL gate | Visual artifact attached to `validation/design-review.md` |
 
-**Not available today:** ERC (schematic-level electrical rule check) has no
-dedicated tool in this toolset yet. Treat ERC as Future Integration (§13) until
-such a tool exists — do not claim ERC coverage.
+**Verified 2026-08-31** — this repository's first real KiCad project
+(`hardware/schematic/bench-imu-01/`, `docs/architecture-evolution.md` §34)
+confirmed: KiCad 10.0.1 and `kicad-cli` are genuinely installed, and the
+`kicad-*` MCP tools above are genuinely callable — **but a real, significant
+MCP-server-side bug was found and precisely characterized**: of the 16
+`kicad-*` tools, only 5 (`list_projects`, `get_project_structure`,
+`validate_project`, `get_drc_history_tool`, `open_project`) actually work in
+this environment. The other 11 — every tool whose schema declares a required
+`ctx: Context` parameter (`extract_project_netlist`,
+`extract_schematic_netlist`, `analyze_schematic_connections`,
+`find_component_connections`, `identify_circuit_patterns`,
+`analyze_project_circuit_patterns`, `analyze_bom`, `export_bom_csv`,
+`generate_pcb_thumbnail`, `generate_project_thumbnail`, `run_drc_check`) —
+consistently fail. **This 5-working/11-failing split is a robust,
+independently-reproduced fact**, confirmed across three separate
+verification passes this session (the Hardware Lead, a delegated Hardware
+Reviewer fidelity-review pass, and an independent PR auditor pass — all
+three, working from different sessions/MCP clients, got the identical
+count). **The exact client-visible error text, however, is MCP-client-
+dependent — do not over-specify it as a single universal fact**: when a
+caller omits the `ctx` parameter entirely, every one of the 11 tools fails
+identically with `Input validation error: 'ctx' is a required property` (a
+client-side schema-validation rejection, before the tool body ever runs) —
+this is what the independent auditor's client always produced, for all 11
+tools without exception. When a caller instead explicitly supplies a
+placeholder `ctx` value (e.g. `{}`), the schema check passes and each tool's
+own body actually executes — at which point most (`extract_project_netlist`,
+`extract_schematic_netlist`, `analyze_schematic_connections`,
+`find_component_connections`, `identify_circuit_patterns`,
+`analyze_project_circuit_patterns`, `analyze_bom`, `export_bom_csv`,
+`generate_pcb_thumbnail`) fail with `Context is not available outside of a
+request` (traced to `kicad_mcp/tools/netlist_tools.py` and siblings in the
+local MCP server's own source calling `ctx.report_progress(...)`, which
+needs a live FastMCP request context this environment's tool-calling bridge
+does not supply) — but `run_drc_check` instead correctly executes and
+returns `{"success":false,"error":"PCB file not found in project"}` (a
+correct result given no `.kicad_pcb` exists, not a Context error at all),
+and `generate_project_thumbnail` fails with yet another, unrelated error
+(`'FunctionTool' object is not callable`). All of the above was independently
+reproduced by the Hardware Lead a second time, on demand, after the PR
+auditor's own pass reported the "omitted `ctx`" behavior exclusively —
+confirming both observations are correct for their respective calling
+pattern, not contradictory. **Workaround**: use `kicad-cli` directly
+(`sch export netlist`, `sch export bom`, `sch erc`) for the equivalent
+verification — the same underlying KiCad engine these MCP tools wrap, so the
+verification is equally real, and does not depend on this client-specific
+nuance at all. Report this precisely:
+**"most kicad-* MCP tools are broken in this environment (a real,
+reproducible server bug, though its exact symptom is client-dependent), not
+that KiCad tooling itself is unavailable"** —
+these are different claims, and only the first is currently true.
+
+**ERC — corrected 2026-08-31, was previously "not available"**: `kicad-cli
+sch erc` (the raw CLI, run directly, not via any `kicad-*` MCP tool wrapper —
+no such wrapper exists) **genuinely works** — verified this session by
+running it against a real KiCad 10-native schematic and getting real,
+meaningful ERC output (specific violation types: `power_pin_not_driven`,
+`pin_not_connected`, `pin_to_pin`, `lib_symbol_mismatch`, etc., not a generic
+placeholder). Used for real self-verification of
+`hardware/schematic/bench-imu-01/` (0 errors, 1 benign warning after several
+real authoring bugs were found and fixed via this exact loop — see that
+project's `README.md`). **Precise, non-overclaiming statement**: ERC is a
+real, working capability via `kicad-cli`, exercised in this repository — but
+there is still no `kicad-*` MCP tool wrapper for it (the MCP tool surface
+itself has no ERC-equivalent). Both facts are simultaneously true.
 
 ### 5.3 Mechanical tooling (Phase 1)
 
@@ -416,8 +480,8 @@ tools/servers exist)
 
 | Integration | Status | Notes |
 |---|---|---|
-| KiCad ERC | Not available as a tool today | See §5.2 |
-| SPICE (simulation, parameter sweep, stability/power analysis) | Not available | No SPICE MCP tool exists in this toolset today |
+| KiCad ERC | **MOVED to §5.2, 2026-08-31 — verified available via `kicad-cli sch erc`** | No longer belongs in this table; see §5.2 for the precise, non-overclaiming statement (real via CLI, still no MCP tool wrapper) |
+| SPICE (simulation, parameter sweep, stability/power analysis) | Not available for automated/scriptable use — **checked, not assumed, 2026-08-31** | The `ngspice` engine (`libngspice.dylib`) is genuinely bundled with the local KiCad 10.0.1 install, but `kicad-cli --help` has no `sim` subcommand — no scriptable/CLI-invokable simulation path was found. A human could still run a SPICE simulation interactively inside KiCad's own GUI (Simulation Command menu), which is not something an agent session can drive non-interactively. Remains Future Integration for *automated* use specifically |
 | Component database / parts availability MCP | Not available | Evaluate when such a tool is actually connected |
 | Test equipment MCP (bench instruments) | Not available | Relevant once `validation/bring-up-procedure.md` moves to instrumented bench testing |
 | CAD/3D modeling tool (e.g. Blender or a parametric CAD/OpenSCAD engine) | Not available — **verified**, not assumed | A live connection check (`blender-get_addon_status`) failed ("Could not connect to Blender"); no local `openscad`/`freecad` binary or `cadquery`/`solid`/`build123d` Python library is installed either. Mechanical Lead produces text/parametric output only until a working tool is verified connected (§5.3) |
@@ -486,6 +550,11 @@ datasheets/
 
 hardware/
   schematic/README.md
+  schematic/bench-imu-01/                  Real KiCad project for Bench-IMU-01 Rev 2 (corrected) —
+                                              this repository's first, see architecture-evolution.md §34:
+                                              bench-imu-01.kicad_pro/.kicad_sch/.kicad_sym (project-local
+                                              symbols, e.g. BMI270), sym-lib-table, generate_schematic.py
+                                              (the actual generation script), README.md (capture rationale)
   pcb/README.md
   power-budget.md                          System power budget (multi-rail once Power Engineer engaged)
   power-architecture.md                    Power-tree/rail-topology proposal + decision record (Phase 3)

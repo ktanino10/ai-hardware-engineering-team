@@ -1,115 +1,8 @@
 # Bench-IMU-01 — Schematic-Equivalent Design Document
 
-**Author**: Circuit Engineer (AI agent) · **Date**: 2026-08-31, revised 2026-09-01, revised 2026-09-04, revised 2026-09-06, revised 2026-09-08, revised 2026-09-10 · **Status**: **Revised (Rev 6)** — CRITICAL fix for `validation/open-issues.md` ISS-026: the IMU (U2, BMI270) I2C2 bus, documented/firmware-implemented as PB10(SCL)/PB11(SDA) since Rev 2's ISS-011 fix, is re-routed to **PA11(SCL)/PA12(SDA)** because PB10/PB11 do not physically exist on the STM32G031K8T6's actual LQFP-32 package (independently re-confirmed this revision against ST DS12992 Rev4 directly, matching `datasheets/evidence-log.md` DS-MCU-068) — same I2C2 peripheral, same AF6 selector, no conflict with the Rev 3 motor subsystem; R3/R4 pull-up sizing (§5.2) is unaffected (net endpoint only); the corresponding firmware GPIO/AF/clock change is explicitly deferred to the Firmware Bring-up phase, not made here; Rev 5's own content is otherwise unchanged; **ready for a fresh, focused Hardware Reviewer verification of this specific fix** (not a full re-review of already-passed material)
+**Author**: Circuit Engineer (AI agent) · **Date**: 2026-08-31, revised 2026-09-01, **Rev 2 Design Complete 2026-09-03** (`validation/change-log.md` ECO-005), **pin-bonding correction adopted** (ECO-006, see the "Rev 2, corrected" changelog entry below), revised 2026-09-04, revised 2026-09-06, revised 2026-09-08 · **Status**: **Revised (Rev 5)** — Motor Driver + Reaction Wheel subsystem (§7.5) added in Rev 3 and iterated through two loop-back rework cycles (Rev 4: F1 PTC fuse + binding 9.0–13.0V VM_MOTOR envelope + SPEED pulldown, addressing Independent Review Cycle 3's 5 HIGH findings; Rev 5: U6 TPS26631PWPR supervisory controller, closing the residual continuous-OVP/power-up-sequencing gap), **plus a corrected MCU pin-identity fix (ISS-027)**: no separate VDDA pin (combined with VDD at physical pin 4), no VBAT pin at all on this package, one combined VSS/VSSA pin (physical pin 5), NRST sharing physical pin 6 with GPIO PF2, and the IMU's I2C2 bus on **PA11(SCL)/PA12(SDA)** rather than the non-existent PB10/PB11. This more complete fix was independently surfaced by this repository's first real KiCad project (`hardware/schematic/bench-imu-01/`, tool-verified via `kicad-cli` ERC/netlist export) and is adopted here **in place of** this branch's own earlier, narrower attempt at the same defect class (previously tracked on this branch as "Rev 6"/ISS-026, I2C2 pins only — see the "Rev 2, corrected" entry below for why that narrower fix is superseded, not kept alongside this one). See §19 for the dedicated pin-correction handoff. **Ready for a fresh Hardware Reviewer pass**: a first review of the Rev 3–5 motor subsystem, and a fidelity-scoped re-review of the corrected pin areas (not a full Design-Complete re-litigation — see ISS-027).
 
 ## Revision changelog
-
-**Rev 6 (2026-09-10)** — Circuit Engineer CRITICAL fix addressing
-`validation/open-issues.md` ISS-026, per
-`.github/agents/circuit-engineer.agent.md` ("When you receive Hardware
-Reviewer findings... address every CRITICAL and HIGH finding explicitly").
-Only this document was modified; `firmware/bench-imu-01/` (the
-corresponding register-level GPIO/AF/clock code) is deliberately **not**
-touched here — deferred to this revision's already-planned Firmware
-Bring-up phase (see the forward-reference bullet below); `bom/component-selection.md`,
-`requirements/requirements.md`, `validation/open-issues.md`,
-`validation/design-review.md`, `validation/change-log.md`,
-`hardware/mechanical-interface.md`, and everything under
-`hardware/mechanical/` are untouched — none required a change for this
-fix (a pure MCU-internal net reassignment, no board-outline/connector/
-component change).
-
-- **ISS-026 (CRITICAL, fixed)** — The IMU (U2, BMI270) I2C2 bus had been
-  documented and firmware-implemented as **PB10(SCL)/PB11(SDA)** since
-  Rev 2's ISS-011 fix, but **PB10 and PB11 do not physically exist on
-  the STM32G031K8T6's actual LQFP-32/UFQFPN32 package** — they are
-  LQFP-48/UFQFPN48-only pads. Independently re-confirmed this revision
-  directly against the primary datasheet (ST DS12992 Rev4, fetched
-  fresh this session): **Table 2** (GPIO count = 30 for the
-  K-suffix/LQFP32 variant vs. 44 for the C-suffix/LQFP48 variant);
-  **Figure 7** (STM32G031KxT LQFP32 pinout — the full 32-pin
-  enumeration has no PB10/PB11 at all; PA11/PA12 are present);
-  **Figure 9** (STM32G031CxT LQFP48 pinout — PB10/PB11/PB12 explicitly
-  present, a direct minimal-pair contrast against Figure 7); and
-  **Table 12** (master pin-assignment table — the PB10 and PB11 rows
-  each show a dash in the LQFP32/UFQFPN32 column and a pin number only
-  in the LQFP48/UFQFPN48 column). This independently corroborates —
-  via a second, direct read of the same primary source rather than
-  merely trusting the citation — the Hardware Lead/Reviewer's own
-  citation chain (`datasheets/evidence-log.md` DS-MCU-068,
-  cross-corroborated there against stm32duino's CubeMX-derived
-  `PeripheralPins.c` pin tables).
-- **Fix: I2C2 bus moved to PA11(SCL)/PA12(SDA)** — both independently
-  confirmed present on this exact LQFP-32 package (Table 12: PA11 =
-  physical pin 22, PA12 = physical pin 23), both carrying **I2C2** via
-  **AF6** (Table 13, Port A alternate-function mapping) — the identical
-  alternate-function selector value already assumed for PB10/PB11
-  (Table 14, Port B mapping, also AF6 for both). **This is a pure pin
-  reassignment, not a peripheral-instance change**: I2C2 is still the
-  peripheral in use, exactly as every revision since Rev 2/ISS-011.
-  Confirmed free of conflict with the Rev 3 motor subsystem's
-  PA6/PA8/PA9/PB1/PB6/PB7 allocations (§2.3, §11) — PA11/PA12 were
-  already sitting in this document's own free-GPIO inventory (§11) and
-  are moved from there into committed use, not taken from a pin another
-  subsystem depends on.
-- **Every PB10/PB11 reference for the IMU bus corrected to PA11/PA12**
-  (re-confirmed complete via a fresh `grep -n "PB10\|PB11"` pass after
-  editing): §2.3 pin-allocation table, §5.3 IMU pin-level wiring table,
-  §5.5/§6/§7.5.4 cross-reference prose, §11 full pin-assignment table
-  (PA11/PA12 moved from the free list to the used list; the PB10/PB11
-  row removed entirely — not relabeled — since those pins do not
-  exist; the free-GPIO count drops from 15 to 13), §12 net list
-  (I2C2_SCL/I2C2_SDA net endpoints), §14 item 13 self-check, and §16
-  item 4 open-UNKNOWNs entry (the Rev 2 claim "the PB10/PB11 portion is
-  now resolved" is superseded there: it was a genuine physical-pin
-  defect, not merely an unverified assumption — this finding
-  supersedes that hedge rather than just adding to it). The Rev 2
-  changelog entry below (ISS-011) is left as a historical record rather
-  than rewritten — it correctly fixed the *peripheral* identity
-  (I2C1→I2C2) at the time, which remains true today; only the *pin*
-  assumption made then (PB10/PB11) has since been found wrong. A
-  forward-pointer to this Rev 6 entry is added there in place, per this
-  document's own precedent (§11's "Rev 3 bookkeeping note") of flagging
-  prior-revision gaps without rewriting prior-revision text.
-- **R3/R4 (I2C pull-up resistors) explicitly confirmed unaffected**:
-  their value (4.7kΩ each, §5.2) was sized from the NXP UM10204
-  rise-time formula against Vcc, VOL,max, IOL, and an assumed bus
-  capacitance — none of which depend on which physical MCU pin the bus
-  uses. Only R3/R4's *net endpoint* changes (which MCU pin they connect
-  to, §12); their own sizing analysis in §5.2 is untouched and does
-  **not** need re-derivation (same 400kHz Fast-mode target speed, same
-  pull-up topology, same 3V3 reference rail, same assumed ≈50pF bus
-  capacitance).
-- **Firmware forward-reference (deliberately not implemented here)**:
-  `firmware/bench-imu-01/` (`gpio.c`/`gpio.h`/`clock.c`/`i2c2.h`/
-  `stm32g031_regs.h`) still configures this bus on **GPIOB pins
-  10/11** and will need updating to **GPIOA pins 11/12** for the IMU's
-  I2C2 bus before firmware bring-up on real hardware — the I2C2
-  peripheral base address/register set itself is **unaffected** (still
-  I2C2, not a peripheral-instance change), only the GPIO
-  port/pin/AF-mux configuration changes (GPIOB→GPIOA, pins
-  10/11→11/12, same AF6 selector). This is deliberately deferred to
-  this revision's already-planned Firmware Bring-up phase per the task
-  directive for this fix — not done in this document or in
-  `firmware/bench-imu-01/` here.
-- **Power budget (`hardware/power-budget.md`)**: no update required —
-  this is a pure net/pin reassignment with no change to any subsystem's
-  current draw, rail, or component count; confirmed that file has no
-  PB10/PB11/PA11/PA12 references either before or after this fix.
-- **Self-check**: re-run against Hardware Reviewer checklist (§15)
-  items 6 (floating pin — confirmed moot: the vacated PB10/PB11 names
-  are simply removed, not left dangling, since they were never real
-  pads), 7 (pull-up/pull-down — confirmed still correct, see the R3/R4
-  bullet above), 8 (logic voltage mismatch — both PA11/PA12 and
-  PB10/PB11 are standard 3.3V-domain GPIOs on the same MCU, no change),
-  9 (interface timing — confirmed unaffected, §5.2's timing analysis
-  never depended on which physical pin was used), and 16 (datasheet
-  recommendation violation — BMI270's own recommended application
-  circuit, §5.3, is untouched by this MCU-side-only pin change). Also
-  re-ran `grep -n "PB10\|PB11"` against this whole document after all
-  edits above: zero remaining references outside the intentionally
-  preserved historical Rev 2 changelog text (flagged in place there,
-  not rewritten, per the bullet above).
 
 **Rev 5 (2026-09-08)** — Circuit Engineer loop-back rework implementing
 `bom/component-selection.md`'s newly human-approved "Motor-Rail Supervisory
@@ -228,7 +121,7 @@ TPS26631PWPR between the existing F1→D2→D3 protection stage and U5 VCC.
   policy of *when* to latch is firmware's decision alone, not implemented
   here.
 - New Evidence IDs **DS-PROT-023 through DS-PROT-033**
-  (`datasheets/evidence-log.md`) and new change record **ECO-011**
+  (`datasheets/evidence-log.md`) and new change record **ECO-012**
   (`validation/change-log.md`).
 
 **Rev 4 (2026-09-06)** — Circuit Engineer loop-back rework addressing
@@ -251,7 +144,7 @@ the Hardware Reviewer found); `datasheets/evidence-log.md` **is**
 appended to (one new row, **DS-PROT-006**, for the new F1 part —
 ISS-015's own evidence needs are already met by existing rows
 DS-MTR-068/069/071, cited directly below, not re-derived from scratch);
-`validation/change-log.md` gains a new **ECO-009** row.
+`validation/change-log.md` gains a new **ECO-010** row.
 
 - **ISS-014 (HIGH, fixed — scope/documentation correction; residual
   flagged)** — §7.5.2's 2S/3S paragraph is rewritten. The prior framing
@@ -413,7 +306,7 @@ DS-MTR-068/069/071, cited directly below, not re-derived from scratch);
   §14/§15 for the item-by-item record.
 
 **Rev 3 (2026-09-04)** — Circuit Engineer addition of the Motor Driver +
-Reaction Wheel subsystem, authorized by `validation/change-log.md` ECO-007
+Reaction Wheel subsystem, authorized by `validation/change-log.md` ECO-008
 (both HITL gates granted 2026-08-31: component approval of T-Motor
 MN2206-13 KV2000 + TI DRV10983 in `bom/component-selection.md`, and Option
 A power-architecture approval in `hardware/power-architecture.md`). This is
@@ -431,7 +324,7 @@ architecture.md`'s Decision table, `hardware/mechanical-interface.md`, and
 `validation/open-issues.md`/`validation/design-review.md` are **not**
 touched by this agent; `datasheets/evidence-log.md` **is** appended to
 (consistent with this agent's mandate to cite Evidence IDs), gaining rows
-DS-MTR-052 through DS-MTR-070, DS-MCU-064 through DS-MCU-066, DS-CONN-005,
+DS-MTR-052 through DS-MTR-070, DS-MCU-069 through DS-MCU-071, DS-CONN-005,
 and DS-PROT-004/005 (25 new rows, 282 total, zero duplicates).
 
 - **New power input (REQ-108)** — A second, independent, dedicated
@@ -487,7 +380,7 @@ and DS-PROT-004/005 (25 new rows, 282 total, zero duplicates).
   review.md` are Hardware-Reviewer/Hardware-Lead-owned registries; ISS
   numbers ISS-001 through ISS-013 already exist and none were self-minted
   by this agent in Rev 2 either).
-- **ECO-007 directive (BEMF/FG low-RPM degradation)** — The human
+- **ECO-008 directive (BEMF/FG low-RPM degradation)** — The human
   directive that this caveat must be tracked in the Firmware bring-up
   plan / `validation/fmea.md` (not just the comparison report) is
   respected: this is primarily a firmware/FMEA item, out of this agent's
@@ -523,6 +416,75 @@ and DS-PROT-004/005 (25 new rows, 282 total, zero duplicates).
   §15 item 11 (Grounding — updated for the new two-power-domain
   treatment, §8). See §14/§15 for the item-by-item record.
 
+**Rev 2, corrected (2026-08-31, post-Design-Complete)** — Circuit Engineer
+correction addressing **ISS-027 (severity pending independent Hardware
+Reviewer classification — recommended CRITICAL, see rationale below)**,
+discovered by the Hardware Lead while independently verifying real KiCad
+symbol/footprint availability for this repository's first real KiCad project
+(`hardware/schematic/bench-imu-01/`) — **not** found by a Markdown-only
+checklist or premise review, because it requires cross-checking the MCU's
+*physical package pinout* table specifically, a different table from the
+alternate-function table every prior review pass (Hardware Reviewer Cycles
+1/2, rubber-duck, and the Firmware Engineer's own DS-MCU-062) correctly
+checked instead.
+
+- **ISS-027 (new)** — Independent research this cycle (Hardware Lead, ST's
+  own official machine-readable pin database, `STMicroelectronics/
+  STM32_open_pin_data` GitHub repo, `mcu/STM32G031K(4-6-8)Tx.xml` —
+  DS-MCU-064) established that **PB10 and PB11 do not exist as pins
+  anywhere on the STM32G031K8T6's actual LQFP-32 package**. ISS-011's own
+  fix (I2C1→I2C2 relabeling) correctly identified the *peripheral instance*
+  these physical pins would map to via the alternate-function table, but
+  neither that fix nor either Hardware Reviewer cycle independently
+  cross-checked whether PB10/PB11 are *physically bonded out* on this
+  specific 32-pin package at all — a separate table in ST's own data from
+  the alternate-function table, and the actual root cause of this defect.
+  **This means the IMU I2C bus as previously documented cannot be
+  physically wired on the real part** — a materially more serious defect
+  than ISS-011's pure labeling correction, since no PCB trace can connect to
+  a pin that does not exist.
+  - **The real fix**: I2C2 remains the correct peripheral instance (no
+    change needed there) — it is simply reachable via different physical
+    pins on this package: **PA11 (I2C2_SCL, physical pin 22) and PA12
+    (I2C2_SDA, physical pin 23)**, the default (no remap required) state of
+    ST's own documented "dual-pad" pin-sharing feature on this small
+    package (DS-MCU-067). Neither PA11 nor PA12 conflicts with any other
+    net already committed in this design. Chosen over rerouting to true
+    I2C1 pins (PB6/PB7 or PB8/PB9, both confirmed real and unused,
+    DS-MCU-053) specifically because keeping the I2C2 *peripheral instance*
+    unchanged minimizes the blast radius of the already-merged Firmware
+    Bring-up code (PR #7), which initializes I2C2's own peripheral
+    registers correctly — only its GPIO pin/AF configuration needs a
+    follow-up fix (**not performed in this document/PR** — flagged for a
+    separate Firmware follow-up task).
+  - **Also corrected, same primary source (DS-MCU-064/065/066)**: this
+    package has no separate VDDA pin (physical pin 4 is a single combined
+    "VDD/VDDA" pin) and no separate VBAT pin at all (VBAT is not bonded out
+    on this package); NRST is not a fully dedicated pin — it shares
+    physical pin 6 with GPIO PF2 (factory default = NRST function,
+    MODERATE confidence, community-sourced, not independently re-verified
+    against the primary option-byte table this session — same confidence
+    class as this document's existing nBOOT_SEL disclosure). §2.3, §4.1,
+    §11, §12 updated throughout. This closes the moderate-confidence VDD/VSS
+    pin-count discrepancy this document already disclosed at the (former)
+    §16 item 3 — resolved in favor of the "1 VDD/1 VSS" reading, not the
+    "1 VDD/2 VSS" reading.
+  - **Self-check**: full-document search for every "PB10"/"PB11" occurrence
+    (17 found) — historical changelog prose describing the ISS-011 fix
+    itself is left as accurate history (not rewritten); every *current,
+    active* design statement (pin tables, net list, checklist, parts list)
+    is corrected to PA11/PA12. No other net, component, or requirement
+    changes as a result of this fix — same physical topology intent (a
+    pulled-up, 2-wire I2C bus from the MCU to the IMU), different physical
+    MCU pins only.
+  - **Not resolved by this document**: final severity classification
+    (recommended CRITICAL per `docs/architecture.md` §7.1 — "design will
+    fail... as designed" describes this defect precisely, more so than
+    ISS-011's own HIGH classification, since no hardware rework can make
+    the *previously documented* pins work at all) is the Hardware
+    Reviewer's call, not mine to self-assign. See `validation/
+    open-issues.md` ISS-027 and `validation/change-log.md` ECO-006.
+
 **Rev 2 (2026-09-01)** — Circuit Engineer rework addressing
 `validation/design-review.md` Cycle 1 findings, per
 `.github/agents/circuit-engineer.agent.md` ("When you receive Hardware
@@ -539,13 +501,22 @@ by the Hardware Reviewer / Hardware Lead and are not touched here.
   PCB/wiring change — pins are physically unchanged; only the
   peripheral-instance label and the firmware target change. **I2C1 is
   now recorded as entirely free** (a genuine peripheral-margin
-  improvement, not a regression). **(Note added Rev 6, ISS-026): the
-  "PB10/PB11" pin identification above was itself factually wrong —
-  those two pins do not exist at all on this part's actual LQFP-32
-  package. This was not caught until ISS-026 (Rev 6), which moved the
-  IMU's I2C2 bus to PA11/PA12 instead. The peripheral-identity
+  improvement, not a regression — later re-consumed by the Rev 3 motor
+  subsystem, see below). **(Note added by the "Rev 2, corrected" entry
+  immediately above, ISS-027): the "PB10/PB11" pin identification above
+  was itself factually wrong — those two pins do not exist at all on
+  this part's actual LQFP-32 package (nor do a separate VDDA pin, a VBAT
+  pin, or a second VSS pin exist; NRST also shares its pad with PF2 —
+  all corrected in that same entry). This was not caught until the more
+  complete, primary-source-based correction described in the "Rev 2,
+  corrected" entry immediately above (ISS-027), which moved the IMU's
+  I2C2 bus to PA11/PA12 instead. This branch had independently begun a
+  narrower version of this same fix (previously tracked here as "Rev
+  6"/ISS-026, moving only the I2C2 pins and not the other power/reset
+  pin-identity errors); that narrower fix is superseded by, and folded
+  into, the "Rev 2, corrected" entry above. The peripheral-identity
   correction made here in Rev 2 (I2C1→I2C2) remains correct and
-  unaffected — see the Rev 6 changelog entry above and §16 item 4.)**
+  unaffected — see that entry and §16 item 4.)**
 - **ISS-001 (HIGH, fixed)** — The LDO (U3) EN pin connection was hedged
   ("if the exact package variant... has an active EN pin..."). Independent
   research (Hardware Lead, this cycle, TI SBVS320D Rev D) confirmed EN
@@ -617,6 +588,21 @@ Once a KiCad project exists, step 6 of my own procedure
 explicitly rather than silently skipped (see §15, Hardware Reviewer
 checklist item 16 discussion).
 
+**Update (2026-08-31, post-Design-Complete)**: the above described this
+document's authoring context at the time — **it no longer reflects this
+repository's current tooling state.** A real KiCad project for this design
+now exists at `hardware/schematic/bench-imu-01/` (this repository's first),
+built and independently tool-verified against this document per
+`docs/architecture-evolution.md` §34. Building that real project is exactly
+what surfaced ISS-027 (see the "Rev 2, corrected" changelog entry above) —
+concrete evidence that "sufficient for an independent Hardware Reviewer to
+review net-by-net" (this section's own claim, above) had a real limit: a
+Markdown-only review, however careful, cannot catch a physical
+package-pin-bonding defect that only a real schematic-capture tool
+surfaces. This document remains the authoritative net-by-net rationale
+log; the KiCad project is the physically-verifiable artifact built from
+it, not a replacement for its rationale.
+
 ## 1. Scope and inputs (not re-litigated)
 
 Per task framing, the following are **human-approved and not up for
@@ -631,7 +617,7 @@ it does not unilaterally swap parts.
 | IMU (U2) | Bosch Sensortec BMI270 | LGA-14 (2.5×3.0×0.83mm) | 6-axis accel+gyro, I2C≤1MHz FM+ or SPI≤10MHz, VDD ROC 1.71–3.6V / AMR −0.3…+3.6V, VDDIO ROC 1.2–3.6V | DS-IMU-001–017, 070 |
 | LDO (U3) | Texas Instruments TLV75533PDBVR | SOT-23-5 | Fixed 3.3V, Vin ROC 1.45–5.5V / AMR 6.0V, 500mA max, dropout typ220/max238mV@500mA, Iq 25µA | DS-PWR-001–011 |
 | Motor driver (U5) — **new Rev 3** | Texas Instruments DRV10983 | HTSSOP-24 (PWP) | Sensorless 3-phase BLDC driver, VCC ROC 8/24(typ)/28V (AMR −0.3…30V), 2A continuous / 3A peak per phase, integrated I2C-configurable OCP/Lock/UVLO/Thermal/AVS protection, PWM or analog SPEED input, hardware FG tach output | DS-MTR-052–070 |
-| Motor (M1) — **new Rev 3** | T-Motor MN2206-13 KV2000 | Sensorless BLDC, reaction-wheel form factor | 2S–3S (7.4–12.6V), ≈1.05A derived current need for 5mN·m target, 18A continuous rating, no integrated RPM sensor (FG tach comes from the driver's BEMF sensing, not the motor itself) | DS-MTR-001–051 (Component-Engineer-approved candidate research), human-signed-off via ECO-007 |
+| Motor (M1) — **new Rev 3** | T-Motor MN2206-13 KV2000 | Sensorless BLDC, reaction-wheel form factor | 2S–3S (7.4–12.6V), ≈1.05A derived current need for 5mN·m target, 18A continuous rating, no integrated RPM sensor (FG tach comes from the driver's BEMF sensing, not the motor itself) | DS-MTR-001–051 (Component-Engineer-approved candidate research), human-signed-off via ECO-008 |
 
 Requirements are sourced from `requirements/requirements.md` (human
 signed off) and cited by REQ-ID throughout this document. Component
@@ -640,7 +626,7 @@ repeated here except where a specific cited number (e.g. the LDO thermal
 estimate, or the DRV10983/T-Motor margin figures) is directly reused.
 
 **New this revision (Rev 3)** — the Motor driver (U5) and Motor (M1) rows
-above were Component-Engineer-approved and human-signed-off via ECO-007
+above were Component-Engineer-approved and human-signed-off via ECO-008
 (`validation/change-log.md`) before this design cycle began, per this
 agent's own instructions not to proceed on an unconfirmed part. All
 pinout/register/protection-circuit facts needed to actually wire U5 were
@@ -668,8 +654,10 @@ Two rails exist on this board:
   5.0V, USB-spec tolerance 4.75–5.25V (REQ-101). Feeds: LDO (U3) input,
   ESD protection IC (U4) VBUS pin.
 - **3V3** — post-regulator, LDO (U3) output, fixed 3.3V (DS-PWR-003).
-  Feeds: MCU (U1) VDD/VDDA/VBAT, IMU (U2) VDD/VDDIO, both header 3V3 reference
-  pins (SWD J3, UART J2), status LED (D1) via R5, I2C pull-ups (R3/R4).
+  Feeds: MCU (U1) VDD/VDDA (combined pin, physical pin 4 — no separate
+  VDDA pin and no VBAT pin exist on this package, ISS-027, see §4.1), IMU
+  (U2) VDD/VDDIO, both header 3V3 reference pins (SWD J3, UART J2), status
+  LED (D1) via R5, I2C pull-ups (R3/R4).
 - **VM_MOTOR (~12V-class) — new Rev 3, envelope bounded Rev 4** —
   independent input, from the new barrel jack (J4), through a new PTC
   resettable fuse (F1, Rev 4), series reverse-polarity diode D2 and TVS
@@ -734,18 +722,18 @@ rework/conflicts across blocks:
 |---|---|---|
 | SWDIO | PA13 | HIGH — dedicated STM32 debug pin, not an alternate function |
 | SWCLK | PA14 | HIGH — dedicated STM32 debug pin, not an alternate function; also this MCU sub-family's BOOT0 boot-mode-select mux pin — corrected this revision, see §4.2 (ISS-006) |
-| I2C2 SCL | PA11 | HIGH — **moved this revision (ISS-026, DS-MCU-068)**: PB10 (assumed since Rev 2/ISS-011) does not physically exist on this LQFP-32 package; PA11 is confirmed present (physical pin 22) and carries I2C2_SCL via the same AF6 selector PB10 would have used (ST DS12992 Rev4 Table 13) |
-| I2C2 SDA | PA12 | HIGH — **moved this revision (ISS-026, DS-MCU-068)**: PB11 (assumed since Rev 2/ISS-011) does not physically exist on this LQFP-32 package; PA12 is confirmed present (physical pin 23) and carries I2C2_SDA via the same AF6 selector PB11 would have used (ST DS12992 Rev4 Table 13) |
+| I2C2 SCL | PA11 | HIGH — **corrected this revision (ISS-027)**: independently confirmed against ST's own official pin database (DS-MCU-064/067) that PB10/PB11 (this table's own prior entry, itself already a Rev 2/ISS-011 correction) **do not exist on this package at all** — real I2C2_SCL on this LQFP-32 part is PA11 (physical pin 22, default/unremapped state), no conflict with any other net in this design |
+| I2C2 SDA | PA12 | HIGH — as above (DS-MCU-064/067); real I2C2_SDA is PA12 (physical pin 23, default/unremapped state) |
 | USART2 TX | PA2 | MODERATE-HIGH — very common STM32 USART2 mapping; not individually re-verified against the exact AF table this session (see §16) |
 | USART2 RX | PA3 | MODERATE-HIGH — as above |
 | Status LED drive | PA5 | ASSUMPTION — arbitrary free GPIO choice (also the conventional "Nucleo LED" pin on many ST boards), no AF conflict since it's used as plain GPIO output |
-| NRST | NRST (pin 4) | HIGH — dedicated reset pin |
+| NRST | PF2/NRST shared pin (physical pin 6) | MODERATE — **corrected this revision (ISS-027)**: this is not a fully dedicated reset-only pin as previously stated (which also cited the wrong pin number, 4); ST's own pin database names it "PF2 - NRST" (DS-MCU-066), a shared pad whose factory-default state is the NRST function (GPIO PF2 is reachable only via a dedicated option-byte reconfiguration, not used here) — MODERATE confidence since the factory-default claim is community-sourced, not independently re-verified against the primary option-byte table this session |
 | BOOT0 | not populated this cycle | see §4.2/§4.4/§16 — **corrected this revision (ISS-006)**: BOOT0 is muxed onto PA14 (already committed to SWCLK above), not PB8; PB8 does physically exist on this package but its function is unrelated (alternate I2C1_SCL) |
-| **SPEED/PWM (new Rev 3)** | **PA8** | **HIGH** (pin name/AF) — TIM1_CH1, AF2, confirmed against DS-MCU-064/Table 13; physical LQFP-32 pin number MODERATE (deferred to layout, see §16) |
-| **FG tach input (new Rev 3)** | **PA6** | **HIGH** (pin name/AF) — TIM3_CH1 input-capture, AF1, FT_ea 5V-tolerant, confirmed DS-MCU-064/066/Table 13; physical pin number MODERATE |
+| **SPEED/PWM (new Rev 3)** | **PA8** | **HIGH** (pin name/AF) — TIM1_CH1, AF2, confirmed against DS-MCU-069/Table 13; physical LQFP-32 pin number MODERATE (deferred to layout, see §16) |
+| **FG tach input (new Rev 3)** | **PA6** | **HIGH** (pin name/AF) — TIM3_CH1 input-capture, AF1, FT_ea 5V-tolerant, confirmed DS-MCU-069/071/Table 13; physical pin number MODERATE |
 | **DIR (new Rev 3)** | **PB1** | **HIGH** — plain GPIO push-pull output, no AF conflict; physical pin number MODERATE |
-| **I2C1 SCL (new Rev 3)** | **PB6** | **HIGH** (pin name/AF) — AF6, confirmed DS-MCU-065/Table 14; physical pin number MODERATE; FT_f/Fm+-capable per general-family generalization — MODERATE confidence specifically on the Fm+ tolerance claim, not independently re-confirmed against a Table-18 FT_f line item this session (§16) |
-| **I2C1 SDA (new Rev 3)** | **PB7** | **HIGH** (pin name/AF) — AF6, confirmed DS-MCU-065/Table 14; same physical-pin-number and Fm+-tolerance caveats as PB6 above |
+| **I2C1 SCL (new Rev 3)** | **PB6** | **HIGH** (pin name/AF) — AF6, confirmed DS-MCU-070/Table 14; physical pin number MODERATE; FT_f/Fm+-capable per general-family generalization — MODERATE confidence specifically on the Fm+ tolerance claim, not independently re-confirmed against a Table-18 FT_f line item this session (§16) |
+| **I2C1 SDA (new Rev 3)** | **PB7** | **HIGH** (pin name/AF) — AF6, confirmed DS-MCU-070/Table 14; same physical-pin-number and Fm+-tolerance caveats as PB6 above |
 
 This leaves **USART1 and LPUART1 both free** (only USART2 is used) —
 satisfies the Component Engineer's own note that one of the MCU's 2 UART
@@ -753,12 +741,18 @@ peripherals should remain genuinely free (only 1 of 2 committed here,
 comfortably; actually both USART1 and LPUART1 remain free since USART2 is
 the one consumed — even better margin than "one free" required). **Rev 2
 update (ISS-011)**: since the IMU bus correctly occupies I2C2 (not I2C1
-as originally labeled), I2C1 was recorded as entirely free. **Rev 3
-update**: that I2C1 margin is now **consumed** — PB6/PB7 (I2C1 SCL/SDA)
-are wired to U5 for motor-parameter commissioning and `SpdCtrlMd`
+as originally labeled), I2C1 was recorded as entirely free at that time.
+**Pin-identity correction (ISS-027)**: the IMU's I2C2 bus itself was later
+found to be on PA11/PA12, not the non-existent PB10/PB11 as previously
+labeled (see the "Rev 2, corrected" changelog entry) — this does not
+change the I2C1-is-a-separate-peripheral conclusion above, only the
+physical pins the IMU's own I2C2 bus uses. **Rev 3 update**: the I2C1
+margin identified above is now **consumed** — PB6/PB7 (I2C1 SCL/SDA) are
+wired to U5 for motor-parameter commissioning and `SpdCtrlMd`
 configuration (DS-MTR-070/068; not merely "optional future tuning" — see
-§7.5.4). PB8/PB9 (I2C1's secondary AF pair, DS-MCU-053) remain unused and
-free. See §11 for the full, updated free-GPIO inventory.
+§7.5.4). PB8/PB9 (I2C1's secondary AF pair, DS-MCU-053, both
+independently confirmed to physically exist) remain unused and free. See
+§11 for the full, updated free-GPIO inventory.
 
 ## 3. Block 1 — Power input + regulation
 
@@ -978,45 +972,67 @@ Engineer). See §16 item 10 for the tracked disposition-pending record.
 
 ### 4.1 VDD / VDDA / VBAT pin handling and decoupling
 
-STM32G031K8T6 LQFP-32 power-pin count (DS-MCU-046, **MODERATE
-confidence** — distributor/aggregator sources datasheets.com, octopart.com,
-snapeda.com converge on a structurally coherent 32-row pin table; the raw
-ST PDF pin table was not independently re-parsed this session; a
-lower-detail source, embeddedrelated.com, separately claimed "1 VDD / 1
-VSS" which does not match the VSS=2 count below — flagged as an
-unreconciled discrepancy, though VDD=1 is corroborated by both sources so
-the decoupling plan below is unaffected either way):
+**Corrected this revision (ISS-027)** — see the full correction note below
+the table; the pin-count/numbering in this section was wrong on several
+points, now resolved against ST's own official pin database rather than
+the distributor/aggregator sources originally cited.
+
+STM32G031K8T6 LQFP-32 power-pin table, per ST's own official CubeMX pin
+database (DS-MCU-064/065, **HIGH confidence** — primary-source-equivalent,
+see `datasheets/stmicroelectronics_stm32_open_pin_data_stm32g031k4-6-8tx.md`;
+supersedes the original DS-MCU-046 distributor/aggregator-sourced table,
+which had the wrong pin numbers and incorrectly assumed a separate VDDA/VBAT
+pin existed):
 
 | Pin | Number | Count | Decoupling |
 |---|---|---|---|
-| VDD | 17 | ×1 | **C3 = 100nF ceramic**, VDD-to-GND, placed as close to pin 17 as layout allows |
-| VSS | 1, 16 | ×2 | Ground return, no decoupling cap needed (tie to GND plane) |
-| VDDA | 5 | ×1 | **C4 = 100nF ceramic**, VDDA-to-GND, no ferrite bead — tied directly to the 3V3 rail (ASSUMPTION: no ADC-precision requirement exists anywhere in `requirements/requirements.md`, so a simple direct tie is a reasonable simplification rather than an oversight) |
-| VBAT | 32 | ×1 | Tied directly to 3V3 rail (ASSUMPTION, standard generic-STM32 practice — no RTC coin-cell backup battery in this design, so VBAT can share the main 3V3 supply) |
-| NRST | 4 | — | See §4.3 |
+| VDD/VDDA (combined — see correction note) | 4 | ×1 | **C3 = 100nF ceramic**, VDD-to-GND, placed as close to pin 4 as layout allows. **C4 = 100nF ceramic** (originally specified as a separate "VDDA decoupling" cap) is kept in parallel at the same physical pin/net, per the design's original intent of separate VDD/VDDA decoupling — harmless redundancy now that both functions share one pin, not removed so as to preserve the original two-capacitor BOM/rationale |
+| VSS/VSSA (combined — see correction note) | 5 | ×1 | Ground return, no decoupling cap needed (tie to GND plane) — **only one ground pin on this MCU, not two as originally stated** |
+| VBAT | **does not exist as a separate pin on this package** | — | No net/cap needed — VBAT is not bonded out at all on this LQFP-32 part (see correction note); the original "tie to 3V3" ASSUMPTION is moot, not merely unconfirmed |
+| NRST | 6 (shared PF2/NRST pad) | — | See §4.3 |
 
-Only **1 VDD pin** exists on this LQFP-32 part (both sources agree on
-this specific count), so the "100nF per VDD pin" generic STM32 convention
-resolves to exactly one 100nF cap here (C3) — not the multi-cap fan-out
-some larger STM32 packages (with 4+ VDD pins) would need. This was
-verified rather than assumed generically, per the design task's explicit
-instruction.
+Only **1 VDD pin** (combined with VDDA) exists on this LQFP-32 part, so the
+"100nF per VDD pin" generic STM32 convention resolves to exactly one
+physical decoupling node here (C3 and C4 both land on it) — not the
+multi-cap fan-out some larger STM32 packages (with 4+ VDD pins) would need.
 
-**Correction this revision (ISS-006)**: the pin-count table above (from
-DS-MCU-046, distributor/aggregator sources) does **not** list a PB8/PB9
-pin, which this document originally read as evidence that PB8 is not
-bonded out on this package at all (see the original §4.2 reasoning this
-replaces, below). Independent research (Hardware Lead, this cycle,
-DS-MCU-051) found this premise was wrong: **PB8 does physically exist**
-on this package, corroborated across the sources checked this cycle,
-correcting the §4.1/§16 UNKNOWN this document originally carried on that
-specific point. (PB8's *exact pin number* within the ranges above was not
-independently re-resolved to full certainty against the primary ST PDF —
-a residual, non-blocking pin-numbering detail carried forward at §16 item
-1/§11, not a re-opening of the VDD/VSS decoupling analysis above, which is
-unaffected either way.) PB8's real function turns out to be an alternate
-I2C1_SCL mapping (DS-MCU-053), not BOOT0 — see §4.2 immediately below for
-the corrected BOOT0 picture.
+**Correction this revision (ISS-027)**: the table above previously cited
+VDD=pin 17, VSS=pins 1 and 16 (×2), VDDA=pin 5, VBAT=pin 32, and NRST=pin 4
+— sourced from distributor/aggregator pages (DS-MCU-046) that were
+**already flagged in this document as MODERATE confidence and not
+independently re-parsed against the raw ST PDF**. Independent research this
+cycle (Hardware Lead, ST's own official machine-readable pin database,
+`STMicroelectronics/STM32_open_pin_data` GitHub repository, DS-MCU-064/065)
+found the real picture is different in every respect: there is no separate
+VDDA pin at all (pin 4 is a single combined "VDD/VDDA" pin); there is no
+separate VBAT pin at all (VBAT is not bonded out on this package — a fact,
+not an ASSUMPTION, once a design needs it, that would require a different
+package); there is only one ground pin, not two (pin 5, combined
+"VSS/VSSA"); and NRST shares physical pin 6 with GPIO PF2 rather than being
+a fully dedicated pin at pin 4 (see §4.3/§2.3 for the NRST correction in
+full). **This also resolves this document's own previously-disclosed §16
+item 3 moderate-confidence discrepancy** ("1 VDD/2 VSS" vs. a lower-detail
+source's "1 VDD/1 VSS" claim) — in favor of the lower-detail source having
+been right all along: there genuinely is only one VSS pin on this package.
+None of these corrections change the decoupling *design* (still one 100nF
+cap effectively at the combined VDD/VDDA node, still no cap needed on the
+single ground pin, still no VBAT circuitry needed) — only the pin
+*identities/numbers* were wrong. This is a separate, independently-found
+correction from ISS-006's original PB8/PB9-existence finding (still valid,
+retained below).
+
+**Correction from a prior revision (ISS-006, retained)**: the pin-count
+table above (from DS-MCU-046, distributor/aggregator sources) does **not**
+list a PB8/PB9 pin, which this document originally read as evidence that
+PB8 is not bonded out on this package at all (see the original §4.2
+reasoning this replaces, below). Independent research (Hardware Lead, this
+cycle, DS-MCU-051) found this premise was wrong: **PB8 does physically
+exist** on this package, corroborated across the sources checked this
+cycle, correcting the §4.1/§16 UNKNOWN this document originally carried on
+that specific point — also now independently reconfirmed against the
+primary-source pin table (DS-MCU-064): PB8 is physical pin 32. PB8's real
+function turns out to be an alternate I2C1_SCL mapping (DS-MCU-053), not
+BOOT0 — see §4.2 immediately below for the corrected BOOT0 picture.
 
 ### 4.2 BOOT0 / nBOOT_SEL handling
 
@@ -1089,6 +1105,12 @@ carries no brick risk per the point above), that is recoverable without a
 board re-spin.
 
 ### 4.3 NRST decoupling + optional manual reset button (REQ-004, Could)
+
+**Note (ISS-027 cross-reference)**: this MCU's NRST function is
+implemented on a shared PF2/NRST pad (physical pin 6, not a fully
+dedicated NRST-only pin) — see §2.3/§4.1 for the pin-identity correction.
+The circuit design below (internal pull-up, C5 filter cap, optional SW1)
+is unaffected by that correction; only the physical pin number changed.
 
 Per ST's own application note **AN5096** "Getting started with STM32G0
 MCUs hardware development" (DS-MCU-047): the NRST pin has an internal
@@ -1193,8 +1215,8 @@ own datasheet PDF via this session's search):
 | 10 | OCSB (aux SPI CS) | NC — aux sensor interface unused |
 | 11 | OSDO (aux SPI SDO) | NC — aux sensor interface unused |
 | 12 | CSB | **→ VDDIO** (selects I2C mode — DS-IMU-075; tying to GND or toggling would select SPI instead) |
-| 13 | SCx (SCL/SCLK) | **I2C2 SCL** (MCU PA11), pulled up by R3 — moved from PB10 this revision, ISS-026 (PB10 does not physically exist on this LQFP-32 package, DS-MCU-068); same I2C2 peripheral, same AF6 selector, only the physical MCU pin changed |
-| 14 | SDx (SDA/SDI) | **I2C2 SDA** (MCU PA12), pulled up by R4 — moved from PB11 this revision, ISS-026 (PB11 does not physically exist on this LQFP-32 package, DS-MCU-068); same I2C2 peripheral, same AF6 selector, only the physical MCU pin changed |
+| 13 | SCx (SCL/SCLK) | **I2C2 SCL** (MCU PA11), pulled up by R3 — corrected this revision, ISS-027 (was PB10, which does not exist on this package; ISS-011 had already corrected the peripheral-instance label to I2C2 but not this pin-existence defect) |
+| 14 | SDx (SDA/SDI) | **I2C2 SDA** (MCU PA12), pulled up by R4 — corrected this revision, ISS-027 (was PB11, which does not exist on this package; see the "Rev 2, corrected" changelog entry) |
 
 **INT1/INT2 deliberately left NC** — this design uses **I2C polling**
 (host reads new data on a timer), not interrupt-driven acquisition. This
@@ -1226,21 +1248,25 @@ REQ-010 requires that the existing IMU readout (REQ-001) "shall remain
 unaffected/unregressed" by the Rev 3 motor addition. Checked explicitly,
 not assumed:
 
-- **Bus**: the IMU stays on I2C2 (**PA11/PA12 as of Rev 6, ISS-026 —
-  was PB10/PB11 through Rev 5; see the Rev 6 changelog entry**); the new
-  motor subsystem's I2C1 (PB6/PB7, §7.5.4) is a **physically distinct
-  peripheral instance** on different pins — no bus sharing, no address
-  collision, no added bus traffic or timing contention on the IMU's own
-  bus. (This Rev 3 regression-check conclusion itself is unaffected by
-  the Rev 6 pin move: I2C1/PB6-PB7 and I2C2/PA11-PA12 remain two
-  distinct peripherals on non-overlapping pins.)
+- **Bus**: the IMU stays on I2C2 (**PA11/PA12, corrected via the "Rev 2,
+  corrected" pin-identity fix, ISS-027** — was PB10/PB11 through Rev 5;
+  this branch's own earlier, narrower "Rev 6"/ISS-026 attempt at the same
+  underlying defect is superseded by that more complete fix, see the "Rev
+  2, corrected" changelog entry); the new motor subsystem's I2C1 (PB6/PB7,
+  §7.5.4) is a **physically distinct peripheral instance** on different
+  pins — no bus sharing, no address collision, no added bus traffic or
+  timing contention on the IMU's own bus. (This Rev 3 regression-check
+  conclusion itself is unaffected by the pin-identity correction: I2C1/
+  PB6-PB7 and I2C2/PA11-PA12 remain two distinct peripherals on
+  non-overlapping pins.)
 - **GPIO**: the five newly-consumed pins (PA8, PA6, PB1, PB6, PB7, §2.3)
-  do not overlap any Rev 2 net (I2C2 — **PA11/PA12 as of Rev 6, was
-  PB10/PB11 through Rev 5, ISS-026** —, USART2 PA2/PA3, LED PA5,
-  SWD PA13/PA14, NRST) — confirmed against the full pin table (§11)
-  before allocation, per SKILL.md's "fix shared resources serially first"
-  step; re-confirmed this (Rev 6) revision that PA11/PA12 also do not
-  overlap any of these five Rev 3 motor pins (§11, Rev 6 note).
+  do not overlap any Rev 2 net (I2C2 — **PA11/PA12 as of the "Rev 2,
+  corrected" fix, was PB10/PB11 through Rev 5, ISS-027** —, USART2 PA2/PA3,
+  LED PA5, SWD PA13/PA14, NRST) — confirmed against the full pin table
+  (§11) before allocation, per SKILL.md's "fix shared resources serially
+  first" step; re-confirmed since that pin-identity fix that PA11/PA12
+  also do not overlap any of these five Rev 3 motor pins (§11, "Rev 2,
+  corrected" note).
 - **Supply-noise coupling**: the IMU's 3V3 supply is unchanged (still the
   LDO's output, §2.1) and the new VM_MOTOR rail is a **separate source**
   (Option A) — no shared regulator through which motor-switching ripple
@@ -1272,13 +1298,16 @@ should remain genuinely free (both of the *other* two remain free here,
 since USART2 is the *only* one consumed of the MCU's 2 USART + 1 LPUART
 complement — "2 UARTs" in the approved-part description already accounted
 for USART2 as the consumed one). Similarly, on the I2C side (§5): **I2C1
-is now entirely free**, new this revision — the IMU bus correctly uses
-I2C2 (**PA11/PA12 as of Rev 6 — was PB10/PB11 through Rev 5, ISS-026,
-see §11 and the Rev 6 changelog entry**), not I2C1 as this document
-originally (incorrectly) labeled it (ISS-011, see the changelog at the
-top of this document and §11). This is a genuine peripheral-margin
-improvement versus this document's original, mistaken understanding,
-not a regression.
+Similarly, on the I2C side (§5): **I2C1 was freed by the Rev 2 IMU-bus
+relabeling but is now consumed by the motor subsystem** — the IMU bus
+correctly uses I2C2 (**PA11/PA12**, corrected via ISS-027 — mistakenly
+documented as the non-existent PB10/PB11 through Rev 2; see the "Rev 2,
+corrected" changelog entry and §11), not I2C1 as this document originally
+(incorrectly) labeled it (ISS-011, see the changelog and §11) — a genuine
+peripheral-margin improvement at the time, not a regression. That freed
+I2C1 margin is, in turn, consumed as of Rev 3 by the motor subsystem's
+commissioning bus on PB6/PB7 (§7.5.4, §11); only PB8/PB9 (I2C1's
+alternate pin pair) remain free today.
 
 No external crystal is populated — the MCU runs off its internal
 HSI16+PLL clock. UART bit-time tolerance at typical baud rates (e.g.
@@ -1314,7 +1343,7 @@ renumbering. Implements REQ-007/110 (PWM speed-setpoint interface),
 REQ-008/112 (FG tach wiring), REQ-108 (Option A architecture), REQ-109
 (separate rail tracking), REQ-111/404 (protection), REQ-204/307
 (mechanical/thermal, see §9), on the Component-Engineer-approved,
-human-signed-off (ECO-007) T-Motor MN2206-13 KV2000 + TI DRV10983 pairing
+human-signed-off (ECO-008) T-Motor MN2206-13 KV2000 + TI DRV10983 pairing
 (§1). **REQ-009 fence respected throughout**: this section wires an
 interface and records commissioning-relevant facts; it contains no
 control-loop logic, no PID, no sensor-fusion-driven behavior.
@@ -1499,17 +1528,17 @@ FG — five pins, matching this design's five newly-allocated MCU pins:
 
 | U5 pin (DRV10983) | Function | MCU pin | Peripheral | Confidence |
 |---|---|---|---|---|
-| 13 (SPEED) | Speed command (PWM, this design — §7.5.5) | **PA8** | TIM1_CH1 (AF2) | HIGH (pin name/AF, DS-MCU-064/Table 13); physical LQFP-32 pin number MODERATE (deferred to layout, §16) |
-| 14 (DIR) | Direction command | **PB1** | Plain GPIO, push-pull output | HIGH (no AF conflict); physical pin number MODERATE |
-| 12 (FG) | Tach/speed-indicator output (open-drain, DS-MTR-069) | **PA6** | TIM3_CH1 input-capture (AF1) | HIGH (pin name/AF, DS-MCU-064/066/Table 13); FT_ea 5V-tolerant (cross-domain safety, DS-MCU-066); physical pin number MODERATE |
-| 10 (SCL) | I2C1 clock | **PB6** | I2C1_SCL (AF6) | HIGH (pin name/AF, DS-MCU-065/Table 14); physical pin number MODERATE; Fm+/FT_f tolerance is a MODERATE-confidence family generalization, not independently re-confirmed against a Table-18 FT_f line item this session (§16) |
-| 11 (SDA) | I2C1 data | **PB7** | I2C1_SDA (AF6) | HIGH (pin name/AF, DS-MCU-065/Table 14); same physical-pin-number and Fm+-tolerance caveats as SCL |
+| 13 (SPEED) | Speed command (PWM, this design — §7.5.5) | **PA8** | TIM1_CH1 (AF2) | HIGH (pin name/AF, DS-MCU-069/Table 13); physical LQFP-32 pin number now also HIGH (§11, DS-MCU-064) |
+| 14 (DIR) | Direction command | **PB1** | Plain GPIO, push-pull output | HIGH (no AF conflict); physical pin number now also HIGH (§11, DS-MCU-064) |
+| 12 (FG) | Tach/speed-indicator output (open-drain, DS-MTR-069) | **PA6** | TIM3_CH1 input-capture (AF1) | HIGH (pin name/AF, DS-MCU-069/071/Table 13); FT_ea 5V-tolerant (cross-domain safety, DS-MCU-071); physical pin number now also HIGH (§11, DS-MCU-064) |
+| 10 (SCL) | I2C1 clock | **PB6** | I2C1_SCL (AF6) | HIGH (pin name/AF, DS-MCU-070/Table 14); physical pin number now also HIGH (§11, DS-MCU-064); Fm+/FT_f tolerance is a MODERATE-confidence family generalization, not independently re-confirmed against a Table-18 FT_f line item this session (§16) |
+| 11 (SDA) | I2C1 data | **PB7** | I2C1_SDA (AF6) | HIGH (pin name/AF, DS-MCU-070/Table 14); same physical-pin-number (now HIGH, §11) and Fm+-tolerance caveats as SCL |
 
 **PA8 chosen for SPEED/PWM** because TIM1 is this MCU's advanced/
 motor-control-oriented timer and PA8 is TIM1_CH1 — a natural fit, and
 confirmed genuinely free in Rev 2's own inventory (§11 before this
 revision). **PA6 chosen for FG** specifically for its confirmed FT_ea
-5V-tolerance (DS-MCU-066) — even with the MCU domain fully unpowered
+5V-tolerance (DS-MCU-071) — even with the MCU domain fully unpowered
 (VDD=0), U5's V3P3-referenced FG pull-up (≤3.6V max, DS-MTR-053) sits
 within PA6's VDD+4.0V=4.0V absolute ceiling with no significant
 forward-injection path, per the same analysis already used to validate
@@ -1517,12 +1546,13 @@ this pin (§7.5.6 continues this point for the pull-up sizing itself).
 **PB1 chosen for DIR** as a plain free GPIO — no AF requirement since DIR
 is a simple push-pull digital command, not a timer/analog function.
 **PB6/PB7 chosen for I2C1** because they are this MCU's I2C1 primary AF
-pair (DS-MCU-065), and — critically — I2C1 was recorded as entirely free
+pair (DS-MCU-070), and — critically — I2C1 was recorded as entirely free
 margin after Rev 2's own ISS-011 correction (§2.3); no conflict with the
-IMU's I2C2 bus (**PA11/PA12 as of Rev 6 — was PB10/PB11 through Rev 5;
-ISS-026 moved the IMU bus off PB10/PB11 because those pins do not exist
-on this package, but this Rev 3 PB6/PB7 allocation was never on
-PB10/PB11 in the first place, so this conclusion is unaffected**),
+IMU's I2C2 bus (**PA11/PA12 as of the "Rev 2, corrected" pin-identity fix
+— was PB10/PB11 as originally documented through Rev 5; ISS-027 moved the
+IMU bus off PB10/PB11 because those pins do not exist on this package,
+but this Rev 3 PB6/PB7 allocation was never on PB10/PB11 in the first
+place, so this conclusion is unaffected**),
 which remains completely untouched by the motor subsystem either way.
 
 **Pull-up resistors** (per DRV10983's own Table 11 reference circuit,
@@ -1530,7 +1560,7 @@ DS-MTR-065 — checklist item 17, no deviation): **R6 = 4.75kΩ** (FG, pin
 12), **R7 = 4.75kΩ** (SCL, pin 10), **R8 = 4.75kΩ** (SDA, pin 11) — all
 three referenced to **U5's own V3P3 output** (§7.5.3), a deliberate
 cross-domain choice (not the MCU's 3V3), justified by the FT-pin
-tolerance analysis above/DS-MCU-066. This differs from the IMU's I2C2
+tolerance analysis above/DS-MCU-071. This differs from the IMU's I2C2
 pull-up sizing method (§5.2, an NXP UM10204-formula derivation assuming
 an MCU-side 3.3V pull-up rail) because this bus's pull-up reference is
 the driver's own V3P3 domain, a different electrical context — reusing
@@ -1699,9 +1729,9 @@ design's actual wiring or component choice — both mechanisms exist and
 both are hardware-automatic; only the *description* of which mechanism
 does what was imprecise upstream.
 
-### 7.5.7 ECO-007 directive — BEMF/FG low-RPM degradation
+### 7.5.7 ECO-008 directive — BEMF/FG low-RPM degradation
 
-ECO-007 (`validation/change-log.md`) carries a human directive that the
+ECO-008 (`validation/change-log.md`) carries a human directive that the
 DRV10983/T-Motor pairing's BEMF-derived FG signal typically degrades
 below ~500–1500 RPM, and that this caveat **must** be tracked in the
 Firmware bring-up plan and/or `validation/fmea.md` — not resolved here.
@@ -2414,88 +2444,97 @@ clearance requirement smaller than a Micro-USB-B design would have.
 
 ## 11. Full MCU pin-assignment table (STM32G031K8T6, LQFP-32)
 
-Power/reset pins per DS-MCU-046/051 (MODERATE confidence overall pin
-count and numbering; **PB8's existence specifically is now confirmed**,
-corrected this revision, ISS-006 — see §4.1). GPIO alternate-function
-assignments per §2.3: **I2C2 is HIGH confidence as a peripheral
-identity** (corrected Rev 2, ISS-011, independently confirmed against
-the primary AF table, DS-MCU-052) — but the Rev 2–5 **pin pair
-(PB10/PB11) was wrong, not merely under-confirmed: PB10/PB11 do not
-physically exist on this LQFP-32 package at all (ISS-026, DS-MCU-068,
-corrected this revision, Rev 6)**. The bus now runs on
-**PA11(SCL)/PA12(SDA)** — the same I2C2 peripheral via the same AF6
-selector, both independently confirmed present on this exact package at
-physical pins **22/23** respectively (HIGH confidence — see the Rev 6
-changelog entry and §16 item 4 for the full citation chain). USART2
-(PA2/PA3) remains MODERATE-HIGH
-confidence, standard STM32 convention, not individually re-pulled from
-the exact AF table this session — unchanged this revision, out of scope,
-see §16. **New Rev 3**: PA8, PA6, PB1, PB6, PB7 are now consumed by the
-motor subsystem (§7.5.4) — pin **names**/AF numbers for all five are
-HIGH confidence (DS-MCU-064/065, Tables 13/14); their physical LQFP-32
-**pin numbers** are MODERATE confidence, same caveat as PB8/PB9 below,
-deferred to layout.
+**Corrected this revision (ISS-027)**: the table below is now sourced
+directly from ST's own official machine-readable CubeMX pin database
+(DS-MCU-064, HIGH confidence, primary-source-equivalent — see
+`datasheets/stmicroelectronics_stm32_open_pin_data_stm32g031k4-6-8tx.md`),
+superseding the original MODERATE-confidence distributor/aggregator-sourced
+table (DS-MCU-046/051), which had several real errors beyond the
+already-corrected PB8/PB9-existence point (ISS-006): wrong VDD/VSS/NRST pin
+numbers, a nonexistent separate VDDA pin, a nonexistent VBAT pin, and —
+most importantly — a nonexistent PB10/PB11 pin pair where the IMU's I2C2
+bus was previously documented. GPIO alternate-function assignments per
+§2.3: **I2C2 (now correctly PA11/PA12, not PB10/PB11) is HIGH confidence**
+(DS-MCU-064/067); USART2 (PA2/PA3) remains MODERATE-HIGH confidence,
+standard STM32 convention, not individually re-pulled from the exact AF
+table this session — unchanged this revision, out of scope, see §16.
+**Rev 3/Rev 5 motor-domain pins merged into this corrected table below**:
+PA6, PA8, PB1, PB6, PB7 (Rev 3, §7.5.4) and PA9 (Rev 5, §7.5.10) are
+consumed by the motor subsystem — pin **names**/AF numbers for all six
+are HIGH confidence (DS-MCU-069/070/071, Tables 13/14, this branch's own
+citations); their physical LQFP-32 **pin numbers**, previously only
+MODERATE confidence/deferred to layout, are now resolved to HIGH
+confidence directly from this same primary-source table (see the pin
+rows below and §16 item 11).
 
 | Pin # | Name | Function in this design | Notes |
 |---|---|---|---|
-| 1 | VSS | GND | Power pin |
-| 2–3 | (other GPIO, unused this cycle) | NC / free | Available for future use |
-| 4 | NRST | NRST net (C5 + SW1) | §4.3 |
-| 5 | VDDA | 3V3 (via C4) | §4.1 |
-| 6–15 | PA0–PA9 (GPIO, selected used below) | PA2=USART2_TX, PA3=USART2_RX, PA5=LED drive; **new Rev 3: PA6=FG tach input (TIM3_CH1), PA8=SPEED/PWM output (TIM1_CH1)**; **new Rev 5: PA9=U6 enable (SHDN drive, §7.5.10)**; others free | §2.3, §6, §7, §7.5.4, §7.5.10 |
-| 16 | VSS | GND | Power pin |
-| 17 | VDD | 3V3 (via C3) | §4.1 |
-| 18–25 | PA10–PA15, PB0–PB1 (selected used below) | PA13=SWDIO, PA14=SWCLK (also this sub-family's BOOT0 mux pin, corrected this revision — ISS-006, §4.2); **new Rev 3: PB1=DIR**; **new Rev 6: PA11=I2C2_SCL (physical pin 22), PA12=I2C2_SDA (physical pin 23) — moved here from the nonexistent PB10/PB11, ISS-026/DS-MCU-068, see §5.3**; others free | §4.4, §5.3, §7.5.4 |
-| 26–29 | PB2–PB5 (all free) | **PB10/PB11 removed from this table this revision (ISS-026, DS-MCU-068)** — those two pin names do not exist as physical pads on the LQFP-32/UFQFPN32 package at all (LQFP-48/UFQFPN48-only); the two now-unused pin-number slots are dropped from this row's range accordingly, not reassigned. PB2–PB5 themselves are unaffected by this fix and remain free, with the same MODERATE-confidence physical numbering as before (§16 item 1). **Note on the resulting 30–31 gap below**: this table's own pin-**number** column was already MODERATE-confidence/approximate before this fix (§16 item 1) — the physical LQFP-32 package still has 32 leads, and *something* real occupies positions 30–31, but this document never independently pulled the real Table 12 mapping for those two specific lead positions and is not inventing one now (out of scope for this fix, per the task's own instruction not to re-derive the whole table); the gap reflects that pre-existing, unchanged deferred-to-layout uncertainty, not a new claim that two leads are physically missing from the package | §5.3, §16 item 4 |
-| 32 | VBAT | 3V3 (direct tie) | §4.1 |
+| 1 | PB9 | Free (also I2C1_SDA secondary-AF option, DS-MCU-053 — unused) | |
+| 2 | PC14-OSC32_IN | Free (no external 32kHz crystal populated, §6) | |
+| 3 | PC15-OSC32_OUT | Free (as above) | |
+| 4 | VDD/VDDA (combined) | 3V3 (via C3 + C4) | §4.1 — corrected this revision, was two separate claimed pins (17, 5) |
+| 5 | VSS/VSSA (combined) | GND | §4.1 — corrected this revision, was claimed as two pins (1, 16) |
+| 6 | PF2-NRST (shared pad) | NRST net (C5 + SW1) | §4.3 — corrected this revision, was claimed as pin 4 |
+| 7 | PA0 | Free | |
+| 8 | PA1 | Free (also I2C1_SMBA option — unused) | |
+| 9 | PA2 | USART2_TX | §6 |
+| 10 | PA3 | USART2_RX | §6 |
+| 11 | PA4 | Free | |
+| 12 | PA5 | LED drive | §7 |
+| 13 | **PA6** | **FG tach input (new Rev 3)** — TIM3_CH1 input-capture, AF1, FT_ea 5V-tolerant (DS-MCU-069/071) | §7.5.4 |
+| 14 | PA7 | Free | |
+| 15 | PB0 | Free | |
+| 16 | **PB1** | **DIR (new Rev 3)** — plain GPIO push-pull output | §7.5.4 |
+| 17 | PB2 | Free | |
+| 18 | **PA8** | **SPEED/PWM output (new Rev 3)** — TIM1_CH1, AF2 (DS-MCU-069) | §7.5.4 |
+| 19 | **PA9** | **U6 enable (new Rev 5)** — SHDN drive, direct tie; external R11 = 10kΩ pulldown lives on the SHDN node itself, not in series with PA9 | §7.5.10 |
+| 20 | PC6 | Free | |
+| 21 | PA10 (default/unremapped state — this design does not engage PINREMAP) | Free (also I2C1_SDA primary-AF option, DS-MCU-053 — unused) | |
+| 22 | PA11 (default/unremapped state) | **I2C2_SCL** — corrected this revision, ISS-027 (was claimed as nonexistent PB10) | §5.3 |
+| 23 | PA12 (default/unremapped state) | **I2C2_SDA** — corrected this revision, ISS-027 (was claimed as nonexistent PB11) | §5.3 |
+| 24 | PA13 | SWDIO | §4.4 |
+| 25 | PA14-BOOT0 | SWCLK (also this sub-family's BOOT0 mux pin, ISS-006, §4.2) | §4.4 |
+| 26 | PA15 | Free | |
+| 27 | PB3 | Free | |
+| 28 | PB4 | Free | |
+| 29 | PB5 | Free (also I2C1_SMBA option — unused) | |
+| 30 | **PB6** | **I2C1 SCL (new Rev 3)** — AF6 (DS-MCU-070); motor-parameter commissioning bus, consumed (was free/I2C1_SCL primary-AF option pre-Rev-3) | §7.5.4 |
+| 31 | **PB7** | **I2C1 SDA (new Rev 3)** — AF6 (DS-MCU-070); same bus as PB6 above | §7.5.4 |
+| 32 | PB8 | Free (also I2C1_SCL secondary-AF option, DS-MCU-053 — unused) | |
 
-**PB6/PB7/PB8/PB9 note (PB8/PB9 corrected Rev 2/ISS-006; PB6/PB7 newly
-consumed Rev 3)**: PB6, PB7, PB8, and PB9 are all now confirmed to
-physically exist on this package (DS-MCU-051/053/065) but are not shown
-as distinct rows above — their exact physical pin **numbers** were not
-independently re-resolved against the primary ST datasheet's LQFP-32 pin
-diagram this session (a residual, non-blocking pin-numbering
-uncertainty, §16 item 1; likely candidates for the still-unlabeled "2–3
-(other GPIO)" slot and/or interspersed among the ranges already listed).
-Their **names**/AF functions are HIGH confidence regardless of physical
-numbering: PB8/PB9 = secondary AF6 mapping for I2C1_SCL/I2C1_SDA
-(DS-MCU-053, unused this design, left free); **PB6/PB7 = primary AF6
-mapping for I2C1_SCL/I2C1_SDA (DS-MCU-065) — this design's choice, now
-consumed by the motor subsystem (§7.5.4)**, not PB8/PB9's secondary pair.
+**PB8/PB9 note (superseded this revision)**: the previous revision's note
+here (ISS-006) correctly established that PB8/PB9 physically exist but
+could not independently resolve their *exact* pin numbers this cycle. The
+new primary source (DS-MCU-064) resolves this fully and with HIGH
+confidence: PB9 is physical pin 1, PB8 is physical pin 32 (both shown in
+the table above) — this residual §16 item 1 gap is now closed. Both
+remain free/unused in this design; PB6/PB7 (not PB8/PB9) are this
+design's chosen I2C1 pin pair, consumed by the motor subsystem above.
 
 Full free-GPIO inventory after this design's allocation (for the
-Mechanical/future-firmware team's reference, not individually itemized
-above): PA0, PA1, PA4, PA7, PA10, PA15, PB0, PB2, PB3,
-PB4, PB5 — 11 GPIOs remain completely free, plus PB8 and PB9 (existence
-confirmed, exact pin numbers not independently re-resolved, ISS-006/
-DS-MCU-051/053), bringing the free-GPIO count to **13** (down from 15,
-**PA11/PA12 committed this revision** — see Rev 6 note below). This still
-includes both free UART peripherals (USART1, LPUART1 — neither is
-pinned to PB6/PB7 specifically on this part, so consuming PB6/PB7 for
-I2C1 does not remove USART1/LPUART1's own availability), and SPI1/SPI2
-(unused this cycle since I2C was chosen for the IMU, §5.1).
+Mechanical/future-firmware team's reference; every pin not itemized with a
+specific function above): **PB9, PC14, PC15, PA0, PA1, PA4, PA7, PB0, PB2,
+PC6, PA10, PA15, PB3, PB4, PB5, PB8 — 16 GPIO-capable pins remain
+completely free**. This includes both free UART peripherals (USART1,
+LPUART1), SPI1/SPI2 (unused this cycle since I2C was chosen for the IMU,
+§5.1), and PB8/PB9 (I2C1's secondary AF pair, both confirmed to exist and
+remain unused). I2C1's *primary* AF pair (PB6/PB7) is, by contrast,
+consumed by the motor subsystem as of Rev 3 (see above) — not free.
 
-**Rev 3 bookkeeping note**: Rev 2's own free-GPIO accounting listed "17
-GPIOs... plus PB8 and PB9... bringing the free-GPIO count to 19" while
-separately describing "I2C1 in its entirety (PB6/PB7 primary AF mapping...)"
-as free margin — PB6/PB7 were correctly described as free in that
-narrative sentence but were not literally included in the enumerated
-17-pin list or the "19" total (a minor, non-blocking bookkeeping gap in
-Rev 2, immaterial since the correct free-margin conclusion was still
-reached). This revision's accounting above treats that starting point
-honestly (Rev 2's true free-GPIO total was 21, not 19, once PB6/PB7 are
-properly counted) before subtracting this revision's 5 newly-consumed
-pins (PA6, PA8, PB1, PB6, PB7) to reach the new total of 16. Flagged here
-for transparency, not corrected retroactively in Rev 2's own changelog
-text above (per this document's own precedent of not reopening
-Design-Complete prior-revision content beyond what's genuinely
-necessary).
+**Rev 3 note — 5 motor-domain pins consumed against this corrected
+table's own baseline**: this corrected, primary-source table's own
+Rev-2-baseline free-GPIO count is **22** (the full 32-pin enumeration
+above, less the power/reset/debug/UART/LED/IMU-bus pins already
+committed) — a genuine, HIGH-confidence improvement over this document's
+original, less-complete table (which had omitted PC6/PC14/PC15 entirely
+and miscounted several power pins). Rev 3's motor subsystem consumes 5 of
+those 22 (PA6, PA8, PB1, PB6, PB7), dropping the free count to **17**.
 
 **Rev 4 note — no new MCU pin consumed by this revision's own fixes**:
 R10 (§7.5.5, ISS-015) is a passive pulldown on the already-wired SPEED
 net (PA8) and consumes no additional pin; F1 (§7.5.9, ISS-019) is a
 passive in-line part on VM_MOTOR and has no MCU connection at all. The
-free-GPIO count above (16, as it stood after Rev 4) is unchanged by
+free-GPIO count above (17, as it stood after Rev 3) is unchanged by
 Rev 4 itself. **PA9 was tentatively noted, not committed or wired**, as
 an available candidate for the then-flagged §7.5.10 supervisory switch's
 enable line, pending Component Engineer/Hardware Lead adoption of that
@@ -2509,23 +2548,25 @@ implements the §7.5.10 supervisory switch and commits its enable line.
 allocation touched it) and is now wired directly to U6's SHDN pin
 (pin 13) — no series resistor; the external pull-down (R11 = 10kΩ, see
 §7.5.10) lives on the SHDN node itself, not in series with PA9. The
-free-GPIO count therefore drops from 16 to **15** this revision, per the
-updated inventory above.
+free-GPIO count therefore drops from 17 to **16** this revision, matching
+the inventory above.
 
-**Rev 6 note — PA11/PA12 committed, replacing the nonexistent PB10/PB11
-(ISS-026, DS-MCU-068)**: independent verification this revision (see
-the Rev 6 changelog entry) found that PB10/PB11 — assumed present since
-Rev 2's ISS-011 fix — do not physically exist as bonded pads on the
-STM32G031K8T6's actual LQFP-32/UFQFPN32 package variant (they are
-LQFP-48/UFQFPN48-only pins per ST DS12992 Rev4 Table 12; also absent
-from Figure 7's LQFP-32 pinout enumeration, present in Figure 9's
-LQFP-48 pinout). The IMU's I2C2 bus is moved to **PA11(SCL, physical
-pin 22)/PA12(SDA, physical pin 23)** — the same I2C2 peripheral via the
-same AF6 selector (ST DS12992 Rev4 Table 13), both confirmed present on
-this package and confirmed free of any conflict with the Rev 3 motor
-subsystem's PA6/PA8/PA9/PB1/PB6/PB7 allocations. PA11/PA12 move from
-the free-GPIO inventory above into committed use; the free-GPIO count
-drops from 15 to **13** this revision. No other pin allocation changes.
+**Note on PA11/PA12 and this branch's own, now-retired "Rev 6" pin
+migration**: this branch had independently begun a narrower version of
+this same pin-identity fix (previously tracked on this branch as "Rev
+6"/ISS-026, moving only the IMU's I2C2 bus from the mistaken PB10/PB11 to
+PA11/PA12) before the more complete correction adopted above (ISS-027 —
+also fixing the VDD/VDDA/VBAT/VSS/NRST pin-identity errors this branch's
+own Rev 6 fix never caught) superseded it; see the "Rev 2, corrected"
+changelog entry. Because this corrected table places I2C2 on PA11/PA12
+from its own Rev-2-baseline outset (they were never counted among the 22
+free pins above to begin with — they were always the IMU's I2C2 pins,
+just misidentified as the nonexistent PB10/PB11 until this correction),
+no separate "PA11/PA12 committed, free count drops by 2" step is needed
+in the Rev 3→5 accounting above. This corrected free-GPIO trajectory
+(22 → 17 → 17 → 16) supersedes this branch's own prior, narrower
+accounting (which had tracked 21 → 16 → 16 → 15 → 13, with that last,
+now-retired step being the superseded Rev 6 fix itself).
 
 ## 12. Net list summary (net-by-net)
 
@@ -2535,18 +2576,18 @@ drops from 15 to **13** this revision. No other pin allocation changes.
 | **EN_VIN** *(new this revision, ISS-001)* | **U3 EN(pin3) → U3 IN(pin2)** — firm, unconditional direct tie (always-enabled per TI's own recommended connection, §3.4); electrically the same node as VBUS_5V at U3's IN pin, broken out as its own named net for traceability since this connection was previously hedged/unconfirmed rather than firmly committed |
 | CC1 | J1 CC1 contact → R1 (5.1kΩ) → GND |
 | CC2 | J1 CC2 contact → R2 (5.1kΩ) → GND |
-| 3V3 | U3 OUT → C2 → U1 VDD(pin17)/VDDA(pin5, via C4)/VBAT(pin32) → U2 VDD(pin8, via C6)/VDDIO(pin5, via C7) → R3/R4 (I2C pull-ups) → R5 (LED resistor) → J2 pin "3V3" → J3 pin "VDD" |
-| GND | U1 VSS(pins1,16) → U2 GND(pin7)/GNDIO(pin6) → U3 GND → U4 GND(pin2) → R1/R2 return → C1–C9 return sides → D1 cathode (via R5) → SW1 one leg → J1 shell/GND contact → J2 pin "GND" → J3 pin "GND" → **(new Rev 3, §8) J4 sleeve/GND contact → D2/D3 return sides → U5 GND(pin8)/PGND(pins15,16)/SWGND(pin5) → C10–C15 return sides** → **(new Rev 5, §7.5.10) U6 GND(pin9) *and* PowerPAD (both, per TI's own instruction — the pad is not a substitute for pin 9) → R11/R14/R15/C16/C17 return sides → U6 PGTH(pin16) tie — single common ground net spanning both power domains, §8** |
-| NRST | U1 NRST(pin4) → C5 → GND; also → SW1 → GND (momentary) |
-| SWDIO | U1 PA13(pin?) → J3 pin "SWDIO" |
-| SWCLK | U1 PA14(pin?) → J3 pin "SWCLK" (PA14 also carries this sub-family's BOOT0 mux function — corrected this revision, ISS-006, §4.2; no separate BOOT0 net exists, see §13) |
-| **I2C2_SCL** *(peripheral name corrected Rev 2, ISS-011 — was named I2C1_SCL; MCU pin moved Rev 6, ISS-026 — was U1 PB10, which does not physically exist on this LQFP-32 package, DS-MCU-068)* | U1 PA11 → R3 (pull-up to 3V3) → U2 SCx(pin13) |
-| **I2C2_SDA** *(peripheral name corrected Rev 2, ISS-011 — was named I2C1_SDA; MCU pin moved Rev 6, ISS-026 — was U1 PB11, which does not physically exist on this LQFP-32 package, DS-MCU-068)* | U1 PA12 → R4 (pull-up to 3V3) → U2 SDx(pin14) |
+| 3V3 | U3 OUT → C2 → U1 VDD/VDDA(pin4, combined — via C3+C4)/no VBAT pin on this package (corrected this revision, ISS-027; see §4.1) → U2 VDD(pin8, via C6)/VDDIO(pin5, via C7) → R3/R4 (I2C pull-ups) → J2 pin "3V3" → J3 pin "VDD" — **corrected this revision**: previously listed "→ R5 (LED resistor)" as though R5 sat on the 3V3 net itself; R5 is a series resistor between PA5 and D1's anode (see the separate LED_CTRL/LED_A rows below) and was never actually part of this net — a documentation-only inconsistency independently caught by Hardware Reviewer Cycle 3's fidelity review, LOW severity, no electrical impact (the real KiCad project already implements the correct topology) |
+| GND | U1 VSS/VSSA(pin5, single combined pin — corrected this revision, ISS-027; was claimed as pins 1,16) → U2 GND(pin7)/GNDIO(pin6) → U3 GND → U4 GND(pin2) → R1/R2 return → C1–C9 return sides → D1 cathode (via R5) → SW1 one leg → J1 shell/GND contact → J2 pin "GND" → J3 pin "GND" → **(new Rev 3, §8) J4 sleeve/GND contact → D2/D3 return sides → U5 GND(pin8)/PGND(pins15,16)/SWGND(pin5) → C10–C15 return sides** → **(new Rev 5, §7.5.10) U6 GND(pin9) *and* PowerPAD (both, per TI's own instruction — the pad is not a substitute for pin 9) → R11/R14/R15/C16/C17 return sides → U6 PGTH(pin16) tie — single common ground net spanning both power domains, §8** |
+| NRST | U1 NRST(pin6, shared PF2/NRST pad — corrected this revision, ISS-027; was claimed as pin 4) → C5 → GND; also → SW1 → GND (momentary) |
+| SWDIO | U1 PA13(pin24) → J3 pin "SWDIO" |
+| SWCLK | U1 PA14(pin25) → J3 pin "SWCLK" (PA14 also carries this sub-family's BOOT0 mux function — corrected this revision, ISS-006, §4.2; no separate BOOT0 net exists, see §13) |
+| **I2C2_SCL** *(corrected this revision, ISS-027 — was PB10, which does not exist on this package; ISS-011 had already corrected the peripheral-instance label to I2C2)* | U1 PA11(pin22) → R3 (pull-up to 3V3) → U2 SCx(pin13) |
+| **I2C2_SDA** *(corrected this revision, ISS-027 — was PB11, which does not exist on this package)* | U1 PA12(pin23) → R4 (pull-up to 3V3) → U2 SDx(pin14) |
 | IMU_CSB | U2 CSB(pin12) → VDDIO (tied, selects I2C mode) |
 | IMU_SDO | U2 SDO(pin1) → GND (tied, selects address 0x68) |
 | UART_TX | U1 PA2 (USART2_TX) → J2 pin "TX" |
 | UART_RX | U1 PA3 (USART2_RX) → J2 pin "RX" |
-| LED_CTRL | U1 PA5 → R5 (330Ω) → D1 anode |
+| LED_CTRL / LED_A | U1 PA5 → R5(pin1) [net **LED_CTRL**]; R5(pin2) → D1 anode [net **LED_A**] — **corrected this revision**: R5 is a series resistor, so these are two distinct electrical nets, not one combined "U1 PA5 → R5 → D1 anode" path as previously written (a single shared net spanning both sides of R5 would incorrectly short across it); matches the real KiCad project's own net split, independently confirmed by Hardware Reviewer Cycle 3 |
 | (NC) | U4 I/O1(pins1,6), I/O2(pins3,4) — unpopulated, no D+/D− on this board (REQ-105) |
 | (NC) | U2 pins 2(ASDx), 3(ASCx), 4(INT1), 9(INT2), 10(OCSB), 11(OSDO) — unpopulated, aux interface + interrupts unused this cycle (§5.3) |
 | (NC) | J1 D+/D− contacts — present on the physical connector for cable compatibility, not routed to any MCU/protection pin (REQ-105) |
@@ -2595,7 +2636,7 @@ drops from 15 to **13** this revision. No other pin allocation changes.
 | C9 | 1µF (optional bulk) | Near IMU, per BMI270 datasheet §7.3.3 |
 | MH1–MH4 | Mounting holes | M2.5, ×4, see §10 |
 | **U5** *(new Rev 3)* | Texas Instruments DRV10983 | Sensorless 3-phase BLDC driver, HTSSOP-24 (PWP), exposed pad tied to GND; internal regulator configured for linear mode (§7.5.3) |
-| **M1** *(new Rev 3)* | T-Motor MN2206-13 KV2000 | Sensorless BLDC reaction-wheel motor, 2S–3S; Component-Engineer-approved, human-signed-off via ECO-007 |
+| **M1** *(new Rev 3)* | T-Motor MN2206-13 KV2000 | Sensorless BLDC reaction-wheel motor, 2S–3S; Component-Engineer-approved, human-signed-off via ECO-008 |
 | **J4** *(new Rev 3)* | Same Sky PJ-102AH | Right-angle THT barrel jack, 2.0mm center pin (DS-CONN-005 — outer barrel diameter not independently confirmed this session, commonly paired with 2.0mm-center-pin jacks of this class but not asserted as a specific number here), 24V/5.0A rated, center-pin = (+) |
 | **D2** *(new Rev 3)* | ST STPS3L60 | Schottky diode, 60V/3A, series reverse-polarity protection, VF=0.53V typ/0.62V max @3A/25°C (DS-PROT-005) |
 | **D3** *(new Rev 3)* | Littelfuse SMBJ16A | Unidirectional TVS, SMB, 16.0V standoff/26.0V max clamp, shunt surge protection (DS-PROT-004) |
@@ -2698,7 +2739,8 @@ not to skip any.
    fuse/PTC was not judged necessary — **flagged as a judgment call, not
    independently re-verified this session**, see §16.
 10. **Power sequencing** — **none required.** Single 3V3 rail feeds MCU
-    (VDD/VDDA/VBAT all tied together) and IMU (VDD/VDDIO tied together, same
+    (VDD/VDDA combined into one physical pin, no separate VBAT pin exists
+    on this package — corrected this revision, ISS-027, §4.1) and IMU (VDD/VDDIO tied together, same
     rail) simultaneously; tying VDD=VDDIO on the IMU makes any
     VDD-before-VDDIO (or vice versa) sequencing requirement moot by
     construction — there is no relative timing between two supplies that
@@ -2714,30 +2756,36 @@ not to skip any.
     UART: no fixed clock requirement beyond internal-oscillator baud-rate
     tolerance (§6), judged adequate for a point-to-point link at typical
     baud rates.
-13. **MCU pin function** — **re-checked this revision (ISS-011, ISS-006)**.
-    Full pin table in §11, now correctly showing **I2C2** (not I2C1) on
-    PB10/PB11 — independently confirmed via ST's primary AF table
-    (DS-MCU-052, ST DS12992 Rev4 Table 16), upgraded from MODERATE to HIGH
-    confidence for this specific pin pair. **Superseded Rev 6 (ISS-026,
-    DS-MCU-068)**: the PB10/PB11 pin pair described above does not
-    physically exist on this LQFP-32 package at all — that was a
-    genuine physical-pin error, not merely a confidence gap. The IMU's
-    I2C2 bus now runs on **PA11(SCL)/PA12(SDA)**, the same I2C2
-    peripheral via the same AF6 selector, both independently confirmed
-    present on this package (physical pins 22/23). See the Rev 6
-    changelog entry and §11/§12 for the corrected tables. BOOT0/boot-strap pin handling
+13. **MCU pin function** — **re-checked this revision (ISS-011, ISS-006,
+    ISS-027)**.
+    Full pin table in §11, now correctly showing **I2C2** on **PA11/PA12**
+    (physical pins 22/23) — corrected this revision (ISS-027): the
+    previous revision's PB10/PB11 assignment, while correctly labeled
+    I2C2 by ISS-011's own fix, does not exist as a physical pin pair on
+    this package at all (independently confirmed via ST's own official
+    pin database, DS-MCU-064/067, HIGH confidence). This branch had
+    independently begun a narrower version of this same fix (tracked as
+    "Rev 6"/ISS-026/DS-MCU-073), moving only the I2C2 pins; the correction
+    above supersedes it in full, additionally fixing the VDD/VDDA/VBAT/VSS/NRST
+    pin-identity errors that fix never caught (see the "Rev 2, corrected"
+    changelog entry). BOOT0/boot-strap pin
+    handling
     in §4.2 corrected: BOOT0 is muxed onto **PA14** (shared with SWCLK),
-    not PB8; PB8 does physically exist on this package (DS-MCU-051) but
+    not PB8; PB8 does physically exist on this package (DS-MCU-051,
+    confirmed at physical pin 32 per DS-MCU-064) but
     its function is I2C1_SCL (DS-MCU-053), unrelated to BOOT0 — the
     physical-bonding UNKNOWN that previously blocked this item is
     resolved (PB8 exists), though the nBOOT_SEL factory-default value
     itself remains community-sourced only, tracked as a residual bring-up
     verification item, not a pin-function unknown (§16). SWD dedicated
     pins (PA13/PA14) remain confirmed HIGH confidence, noting PA14's dual
-    SWCLK/BOOT0-mux role explicitly. USART2 alternate-function assignment
+    SWCLK/BOOT0-mux role explicitly, and now independently reconfirmed at
+    physical pins 24/25 (DS-MCU-064). USART2 alternate-function assignment
     (PA2/PA3) remains MODERATE-HIGH confidence pending AF-table
     re-verification — unchanged this revision, out of scope for this
-    cycle's HIGH-finding rework (§16).
+    cycle's HIGH-finding rework (§16). NRST is now known to share a
+    physical pad with PF2 (pin 6), not a dedicated pin at pin 4 as
+    previously stated (§4.1/§4.3, ISS-027).
 14. **Interfaces (I2C/SPI/UART per each datasheet's recommended
     application circuit)** — I2C: BMI270's own recommended schematic
     followed exactly for decoupling/mode-select pins (§5.3, DS-IMU-074/075/076)
@@ -2838,8 +2886,9 @@ forward by assumption:
 
 13. **MCU pin function (motor domain)** — PA8 (TIM1_CH1/SPEED), PA6
     (TIM3_CH1/FG), PB1 (DIR), PB6/PB7 (I2C1 SCL/SDA) — all HIGH confidence
-    on name/AF (DS-MCU-064/065), MODERATE on physical LQFP-32 pin number
-    (§11, §16).
+    on name/AF (DS-MCU-069/070), now also HIGH on physical LQFP-32 pin
+    number (§11, DS-MCU-064; previously MODERATE, resolved as a byproduct
+    of the "Rev 2, corrected" pin-identity fix, ISS-027, see §16 item 11).
 15. **Grounding (motor domain)** — addressed as its own explicit decision,
     §8 — common ground net now deliberately spans both power domains,
     with return-current/layout guidance for REQ-010/REQ-204.
@@ -3407,10 +3456,11 @@ In priority order:
    secondary AF6 mapping for I2C1_SCL (DS-MCU-053). The original "PB8
    doesn't exist, so the BOOT0 question is moot" reasoning was simply
    wrong on both counts — PB8 exists, and it was never the BOOT0 pin to
-   begin with. **Residual, non-blocking**: PB8/PB9's *exact pin numbers*
-   within the LQFP-32 package were not independently re-resolved against
-   the primary ST datasheet this session (they fall within the ranges
-   already listed in §11); this does not affect the design decision below.
+   begin with. **Residual item RESOLVED this pass (ISS-027)**: PB8/PB9's
+   *exact pin numbers* are now confirmed with HIGH confidence against ST's
+   own official pin database (DS-MCU-064) — PB9 is physical pin 1, PB8 is
+   physical pin 32 (§11) — closing the "not independently re-resolved"
+   gap this item previously carried.
    **Design decision (unchanged)**: no physical BOOT0 circuit populated,
    relying on the nBOOT_SEL=1 factory default (DS-MCU-044, MODERATE
    confidence, still not independently re-verified this session) — this
@@ -3427,49 +3477,48 @@ In priority order:
    bound). **Now resolved**: the Hardware Reviewer independently verified
    the lower bound at **−0.3V** against ST DS12992 Rev4 Table 18 — see
    §1. No remaining gap on this item.
-3. **STM32G031K8T6 VDD/VSS exact pin count has a moderate-confidence
-   discrepancy across sources** (DS-MCU-046: 1 VDD/2 VSS from 3
-   converging distributor sources vs. a separate lower-detail source
-   claiming 1 VDD/1 VSS). VDD=1 is corroborated by both, so the
-   decoupling plan (§4.1) is unaffected regardless of which VSS count is
-   correct — flagged for completeness, not because it changes any design
-   decision. **Unchanged this revision** — out of scope, not one of this
-   cycle's HIGH findings or folded-in corrections.
-4. **I2C1/USART2 alternate-function pin assignments — PARTIALLY RESOLVED
-   this revision.** Originally: "PB10/PB11 for I2C1 SCL/SDA; PA2/PA3 for
+3. **STM32G031K8T6 VDD/VSS exact pin count discrepancy — RESOLVED this
+   pass (ISS-027).** Originally a moderate-confidence discrepancy across
+   sources (DS-MCU-046: 1 VDD/2 VSS from 3 converging distributor sources
+   vs. a separate lower-detail source claiming 1 VDD/1 VSS), flagged for
+   completeness but not thought to change any design decision. **Now
+   resolved with HIGH confidence** against ST's own official pin database
+   (DS-MCU-064/065): the lower-detail source was actually right — there is
+   only **one** VSS pin (physical pin 5, combined "VSS/VSSA"), not two.
+   This also revealed the 3-source "convergence" was itself wrong on VDD's
+   own pin *number* (claimed 17; real is 4, combined "VDD/VDDA") and on
+   the existence of separate VDDA (does not exist) and VBAT (does not
+   exist) pins — a materially larger correction than this item originally
+   anticipated. See §4.1/§11/§12 for the corrected pin table and net list.
+4. **I2C1/USART2 alternate-function pin assignments — the I2C portion
+   corrected TWICE now; see ISS-027.** Originally: "PB10/PB11 for I2C1
+   SCL/SDA; PA2/PA3 for
    USART2 TX/RX were not individually re-verified against the exact
    STM32G031K8T6 alternate-function table this session... MODERATE /
-   MODERATE-HIGH confidence." **The PB10/PB11 portion is now resolved,
-   and it was a real mislabeling, not just an unverified assumption**:
-   independent research this cycle (Hardware Lead, DS-MCU-052, ST
-   DS12992 Rev4 Table 16) confirms PB10/PB11 map to **I2C2**, not I2C1
-   (ISS-011) — corrected throughout this document (§2.3, §5.2, §5.3, §6,
-   §11, §12, §13, §14), now HIGH confidence. Credit: Hardware Lead's
-   independent re-verification resolved a genuine defect in this
-   document, not merely a documentation gap. **The USART2 (PA2/PA3)
-   portion remains open, unchanged this revision** — still
+   MODERATE-HIGH confidence." A prior revision (ISS-011) corrected the
+   *peripheral-instance label* from I2C1 to I2C2 on these same pins,
+   citing DS-MCU-052/ST DS12992 Rev4 Table 16, and marked this item
+   "resolved" — **that resolution was itself incomplete**: it corrected
+   which peripheral the pins mapped to, but never independently
+   cross-checked whether PB10/PB11 are physically bonded out on this
+   32-pin package at all (a different table in ST's own data). Independent
+   research this pass (Hardware Lead, ST's own official pin database,
+   DS-MCU-064/067) found they are **not** — this package has no PB10/PB11
+   pin at all. **Now corrected a second time, and now HIGH confidence for
+   the right reason**: I2C2_SCL/SDA are physically PA11/PA12 (pins 22/23,
+   default/unremapped state) — corrected throughout this document (§2.3,
+   §5.2, §5.3, §6, §11, §12, §13, §14). Credit for the *original* AF-table
+   correction (I2C1→I2C2) stands — that fact remains true and useful, it
+   was simply insufficient on its own to guarantee physical buildability.
+   **The USART2 (PA2/PA3) portion remains open, unchanged this
+   revision** — still
    MODERATE-HIGH confidence, standard STM32 convention, not individually
    re-pulled from the exact AF table; should still be confirmed against
    the real AF table (or via STM32CubeMX) before committing to a PCB
    layout. Low risk of being wrong given how conventional this mapping
-   is, but not yet a closed item.
-
-   **Superseded Rev 6 (ISS-026, DS-MCU-068):** "the PB10/PB11 portion is
-   now resolved" above was itself incorrect at the physical-pin level —
-   PB10/PB11 do not exist as bonded pads on this LQFP-32/UFQFPN32
-   package at all (they are LQFP-48/UFQFPN48-only, confirmed against ST
-   DS12992 Rev4 Table 12 and cross-corroborated against stm32duino's
-   CubeMX-derived pin tables). This was not a "not yet independently
-   re-verified" gap like the USART2 item above — it was a genuine,
-   previously-unnoticed defect that survived Rev 2 through Rev 5. The
-   I2C2 peripheral-identity conclusion above remains correct and
-   unaffected; only the specific pin pair named was wrong. Fixed this
-   revision by moving the bus to **PA11(SCL)/PA12(SDA)** — same I2C2
-   peripheral, same AF6 selector, both confirmed present on this package
-   (physical pins 22/23) and free of conflict with the Rev 3 motor
-   subsystem. See the Rev 6 changelog entry and §2.3, §5.3, §11, §12.
-   The USART2 (PA2/PA3) item above remains open and unchanged by this
-   fix.
+   is, but not yet a closed item — though independently corroborated at
+   least at the pin-*number* level this pass (PA2=physical pin 9,
+   PA3=physical pin 10, DS-MCU-064).
 5. **BMI270 floating/NC pin guidance (INT1, INT2, ASDx, ASCx, OCSB, OSDO)
    was not independently re-verified against the BMI270 datasheet's own
    explicit floating-pin recommendations this session** — I assumed
@@ -3534,17 +3583,24 @@ In priority order:
 **New this revision (Rev 3) — motor subsystem items 11–20:**
 
 11. **Physical LQFP-32 pin numbers for the 5 new motor-domain pins
-    (PA8/PA6/PB1/PB6/PB7) are MODERATE confidence** — pin **names**/AF
-    numbers are HIGH confidence (DS-MCU-064/065), but their placement
-    within the 32 physical package pin numbers was not independently
-    re-resolved this session, the same residual category as the existing
-    PB8/PB9 pin-numbering gap (item 1 above). Not a blocker for this
-    paper-design cycle; needed before layout.
+    (PA8/PA6/PB1/PB6/PB7) — RESOLVED (folded in from the "Rev 2,
+    corrected" pin-identity fix, ISS-027).** Originally MODERATE
+    confidence (pin **names**/AF numbers HIGH via DS-MCU-069/070, but
+    their placement within the 32 physical package pin numbers not
+    independently re-resolved this session, the same residual category as
+    the existing PB8/PB9 pin-numbering gap, item 1 above). ST's own
+    official CubeMX pin database (DS-MCU-064, obtained independently this
+    pass for the unrelated ISS-027 pin-identity correction, §11) turns out
+    to also settle this item as a byproduct — it enumerates all 32
+    physical pin positions by name, confirming PA6=13, PB1=16, PA8=18,
+    PB6=30, PB7=31 at the same HIGH confidence as the rest of that
+    table. No blocker for this paper-design cycle remains on this point;
+    confirmed, not just deferred, before layout.
 12. **PB6/PB7's Fm+ (400kHz+ I2C)/FT_f 5V-tolerance classification is a
     MODERATE-confidence family generalization** — confirmed as AF6=I2C1
-    (DS-MCU-065/Table 14), but not independently re-confirmed against a
+    (DS-MCU-070/Table 14), but not independently re-confirmed against a
     specific Table-18 FT_f line item this session the way PA6/FT_ea was
-    (DS-MCU-066). Low risk (this design only requires 3.3V-referenced
+    (DS-MCU-071). Low risk (this design only requires 3.3V-referenced
     operation, well within any STM32G0 GPIO's basic ROC regardless of
     FT/Fm+ classification specifics) but flagged for completeness.
 13. **DIR pin has no internal or external bias and is not proven safe if
@@ -3783,6 +3839,23 @@ In priority order:
     of this section briefly conflated the two before being caught and
     corrected this session) — not because the final C17 value itself is
     in doubt.
+30. **ISS-027 — final severity classification pending independent
+    Hardware Reviewer determination (new this pass; renumbered from this
+    section's own former item 11 to avoid colliding with the Rev 3
+    motor-subsystem items 11–20 above — content unchanged apart from the
+    ISS-014→ISS-027 renumbering applied consistently across this
+    document).** The facts themselves are settled (see the "Rev 2,
+    corrected" changelog entry at the top of this document, and
+    §2.3/§4.1/§11/§12): the previously documented PB10/PB11 I2C2 pins do
+    not exist on this package; the real pins are PA11/PA12; VDD/VDDA are
+    one combined pin (4), VSS/VSSA are one combined pin (5), VBAT does not
+    exist, and NRST shares a pad with PF2 (pin 6). I have applied the fix
+    and recommend **CRITICAL** (`docs/architecture.md` §7.1 — "design will
+    fail... as designed", which a non-existent pin describes more
+    precisely than ISS-011's own HIGH classification did), but per my own
+    agent instructions this classification is the Hardware Reviewer's to
+    make, not mine to self-assign. See `validation/open-issues.md`
+    ISS-027.
 
 ## 17. Power budget (summary — full detail in `hardware/power-budget.md`)
 
@@ -4033,7 +4106,7 @@ motor-domain self-check subsection], §16 [11 new items, 11–21], §17
 - `datasheets/evidence-log.md` — **+25 new rows this revision**
   (DS-MTR-052 through DS-MTR-070 [19 rows, DRV10983 pin/AMR/ROC/thermal/
   5-protection-mechanism/register-map/reference-circuit research],
-  DS-MCU-064/065/066 [3 rows, STM32G031 PA8/PA6/PB1/PB6/PB7 pin/AF
+  DS-MCU-069/070/071 [3 rows, STM32G031 PA8/PA6/PB1/PB6/PB7 pin/AF
   confirmations], DS-CONN-005 [J4/PJ-102AH], DS-PROT-004/005 [D3/SMBJ16A,
   D2/STPS3L60]) — verified against no duplicate row IDs. **No new
   datasheet metadata files created**: all 25 rows cite the metadata
@@ -4074,7 +4147,7 @@ motor-domain self-check subsection], §16 [11 new items, 11–21], §17
   — none are believed to block a paper-design review, all are flagged
   rather than silently assumed.
 
-**On the ECO-007 human directive (FG degradation below ~500–1500 RPM)**:
+**On the ECO-008 human directive (FG degradation below ~500–1500 RPM)**:
 tracked per the task's request. This revision found a genuine
 circuit-adjacent, register-level fact worth recording rather than
 treating this as purely a firmware/FMEA item: `FGOLsel[1:0]`
@@ -4085,7 +4158,7 @@ operation and the open-to-closed-loop transition threshold, respectively
 (§7.5.4) exists specifically so they can be tuned post-assembly without
 hardware rework. No register value is set by this document (REQ-009
 scope fence — wiring the interface, not writing configuration/control
-logic); the finding is recorded here as the concrete substantiation ECO-007
+logic); the finding is recorded here as the concrete substantiation ECO-008
 asked for, for Firmware Engineer/FMEA attention.
 
 **Constraints confirmed respected this revision**: `bom/component-
@@ -4365,3 +4438,59 @@ No KiCad project exists to run `extract_schematic_netlist` /
 `analyze_schematic_connections` / `validate_project` against (§0) — this
 document, including its Rev 5 additions, is the self-check substitute for
 this revision too, consistent with Rev 1 through Rev 4.
+
+## 19. Handoff — ISS-027 pin correction (2026-08-31, post-Design-Complete)
+
+**This is a post-Design-Complete correction, not part of the original Rev
+2 rework cycle §18 describes above (left unmodified as accurate history).**
+Rev 2 reached Design Complete 2026-09-03 (`validation/change-log.md`
+ECO-005) under the review rigor available at that time — Markdown-only,
+no real KiCad project existed yet. This repository's first real KiCad
+project for this design (`hardware/schematic/bench-imu-01/`) then
+independently surfaced ISS-027 (§2.3/§4.1/§11/§12, and the "Rev 2,
+corrected" changelog entry at the top of this document) — a genuine
+physical-pin-bonding defect that no Markdown-only review, however careful,
+could have caught, because it requires cross-checking the MCU's real
+package pinout table against the design, not just the alternate-function
+table.
+
+**To**: Hardware Reviewer, via Hardware Lead, for a **fidelity-scoped
+independent review** — not a full Design Complete re-litigation. The
+Reviewer should confirm this document's corrected pin claims (§2.3, §4.1,
+§11, §12) actually match the real KiCad project built from it (using the
+KiCad tools directly, not re-reading this document's own claims), and
+independently classify ISS-027's severity per `docs/architecture.md` §7.1.
+Areas needing re-review: §0, §2.3, §4.1, §4.3, §5.2, §5.3, §6, §11, §12,
+§13, §14 item 10/13, §15 (unchanged — this correction was not
+self-checked against the Hardware Reviewer's 16-item checklist as a fresh
+pass; that is deliberately left to the delegated Reviewer instead, given
+the narrow, well-understood nature of this specific fix), §16 items 1, 3,
+4, 30. (This document's own Motor Driver + Reaction Wheel subsystem, §18.1
+through §18.3 above, is unrelated to this correction and was already
+independently reviewed on its own track — see the Revision changelog.)
+
+**What did *not* change**: no requirement, no component selection, no
+electrical topology/rail/decoupling/protection decision, no already-settled
+voltage/thermal/timing margin from the original Rev 2 cycle. This is a
+pin-*identity* correction only — same physical bus topology (a
+pulled-up, 2-wire I2C link from the MCU to the IMU), same peripheral
+instance (I2C2), same pull-up values, same power/thermal numbers
+(`hardware/power-budget.md` remains unchanged).
+
+**Artifacts**:
+- This document, corrected (see the "Rev 2, corrected" changelog entry).
+- `hardware/schematic/bench-imu-01/` — the new real KiCad project, built
+  on these corrected pins, independently tool-verified.
+- `datasheets/evidence-log.md` — DS-MCU-064 through DS-MCU-067 added.
+- `datasheets/stmicroelectronics_stm32_open_pin_data_stm32g031k4-6-8tx.md`
+  — new datasheet metadata record (ST's own official pin-database source).
+- `validation/open-issues.md` — ISS-027 (this finding).
+- `validation/change-log.md` — ECO-006.
+
+**Flagged, not fixed here**: `firmware/bench-imu-01/` (Phase 2, PR #7,
+already merged) initializes GPIOB pins 10/11 for I2C2 (DS-MCU-062) — this
+firmware will need a follow-up fix (GPIOA pins 11/12 instead) once this
+correction is reviewed and accepted. Firmware Bring-up does not gate the
+Design Complete process (`docs/architecture.md` §14/`docs/workflow.md`
+Phase 11), so this is explicitly out of scope for this correction, not an
+oversight.

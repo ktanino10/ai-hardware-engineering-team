@@ -24,7 +24,7 @@
 ## Why this part
 
 Selected as the new ~12V-class motor power input connector for Bench-IMU-01
-Rev 3, per `hardware/power-architecture.md`'s approved Option A (ECO-007).
+Rev 3, per `hardware/power-architecture.md`'s approved Option A (ECO-008).
 This is a supporting-component decision (not a major/architecture-defining
 one), consistent with this project's own Rev 2 precedent for J1/the ESD IC
 (`.github/skills/schematic-design/SKILL.md`, `bench-imu-01-design.md` §3.1)

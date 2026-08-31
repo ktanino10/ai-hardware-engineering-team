@@ -31,7 +31,7 @@ of discovering them after the fact. Cross-reference by ID with
 - Link back to the ECO ID so `change-log.md` and this file stay in sync
   instead of drifting apart.
 
-### For `ECO-006` — Rev 3 motor power architecture proposal
+### For `ECO-007` — Rev 3 motor power architecture proposal
 
 | Impact Domain | Impact Level (None/Low/Medium/High) | Cross-check Required? | Verification Result |
 |---|---|---|---|
@@ -44,7 +44,7 @@ of discovering them after the fact. Cross-reference by ID with
 | BOM / lifecycle (does this affect other line items, e.g. shared connector) | High | Y | Verified qualitatively: every option introduces at least one new sourced power-entry/control part class competing for the remaining ≈$53–68 REQ-503 headroom after motor+driver cost. Specific BOM impact awaits Component Engineer sourcing. |
 | Requirements coverage (`requirements/traceability-matrix.md`) | High | Y | Verified: this pass exists specifically to satisfy REQ-108/109 by creating the architecture-decision record and separate motor-rail budget row, but final closure still depends on the human decision. |
 
-### For `ECO-008` — Rev 3 Circuit Design (motor driver integration)
+### For `ECO-009` — Rev 3 Circuit Design (motor driver integration)
 
 | Impact Domain | Impact Level (None/Low/Medium/High) | Cross-check Required? | Verification Result |
 |---|---|---|---|
