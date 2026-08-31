@@ -175,27 +175,49 @@ confirmed: KiCad 10.0.1 and `kicad-cli` are genuinely installed, and the
 MCP-server-side bug was found and precisely characterized**: of the 16
 `kicad-*` tools, only 5 (`list_projects`, `get_project_structure`,
 `validate_project`, `get_drc_history_tool`, `open_project`) actually work in
-this environment. The other 11 — every tool whose implementation calls
-`ctx.report_progress(...)` for progress reporting (`extract_project_netlist`,
+this environment. The other 11 — every tool whose schema declares a required
+`ctx: Context` parameter (`extract_project_netlist`,
 `extract_schematic_netlist`, `analyze_schematic_connections`,
 `find_component_connections`, `identify_circuit_patterns`,
 `analyze_project_circuit_patterns`, `analyze_bom`, `export_bom_csv`,
-`generate_pcb_thumbnail`) — fail with `Context is not available outside of a
+`generate_pcb_thumbnail`, `generate_project_thumbnail`, `run_drc_check`) —
+consistently fail. **This 5-working/11-failing split is a robust,
+independently-reproduced fact**, confirmed across three separate
+verification passes this session (the Hardware Lead, a delegated Hardware
+Reviewer fidelity-review pass, and an independent PR auditor pass — all
+three, working from different sessions/MCP clients, got the identical
+count). **The exact client-visible error text, however, is MCP-client-
+dependent — do not over-specify it as a single universal fact**: when a
+caller omits the `ctx` parameter entirely, every one of the 11 tools fails
+identically with `Input validation error: 'ctx' is a required property` (a
+client-side schema-validation rejection, before the tool body ever runs) —
+this is what the independent auditor's client always produced, for all 11
+tools without exception. When a caller instead explicitly supplies a
+placeholder `ctx` value (e.g. `{}`), the schema check passes and each tool's
+own body actually executes — at which point most (`extract_project_netlist`,
+`extract_schematic_netlist`, `analyze_schematic_connections`,
+`find_component_connections`, `identify_circuit_patterns`,
+`analyze_project_circuit_patterns`, `analyze_bom`, `export_bom_csv`,
+`generate_pcb_thumbnail`) fail with `Context is not available outside of a
 request` (traced to `kicad_mcp/tools/netlist_tools.py` and siblings in the
-local MCP server's own source: this environment's tool-calling bridge does
-not supply a live FastMCP request context these tools need). `run_drc_check`
-independently confirmed **not** affected by this bug (it correctly reports
-`"PCB file not found in project"` when no `.kicad_pcb` exists — a correct
-result, not a Context error). `generate_project_thumbnail` fails with a
-*different* error (`'FunctionTool' object is not callable`) — a distinct,
-separate bug from the Context one. **Workaround**: use `kicad-cli` directly
+local MCP server's own source calling `ctx.report_progress(...)`, which
+needs a live FastMCP request context this environment's tool-calling bridge
+does not supply) — but `run_drc_check` instead correctly executes and
+returns `{"success":false,"error":"PCB file not found in project"}` (a
+correct result given no `.kicad_pcb` exists, not a Context error at all),
+and `generate_project_thumbnail` fails with yet another, unrelated error
+(`'FunctionTool' object is not callable`). All of the above was independently
+reproduced by the Hardware Lead a second time, on demand, after the PR
+auditor's own pass reported the "omitted `ctx`" behavior exclusively —
+confirming both observations are correct for their respective calling
+pattern, not contradictory. **Workaround**: use `kicad-cli` directly
 (`sch export netlist`, `sch export bom`, `sch erc`) for the equivalent
 verification — the same underlying KiCad engine these MCP tools wrap, so the
-verification is equally real. Independently re-confirmed by a Hardware
-Reviewer fidelity-review pass (`validation/design-review.md`, Cycle 3) using
-the exact same tools against the exact same project. Report this precisely:
+verification is equally real, and does not depend on this client-specific
+nuance at all. Report this precisely:
 **"most kicad-* MCP tools are broken in this environment (a real,
-reproducible server bug), not that KiCad tooling itself is unavailable"** —
+reproducible server bug, though its exact symptom is client-dependent), not
+that KiCad tooling itself is unavailable"** —
 these are different claims, and only the first is currently true.
 
 **ERC — corrected 2026-08-31, was previously "not available"**: `kicad-cli

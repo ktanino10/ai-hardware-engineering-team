@@ -933,20 +933,36 @@ actually exercising them for the first time.
 - **Significant finding, not merely a footnote**: of the 16 `kicad-*` MCP
   tools, only 5 (`list_projects`, `get_project_structure`,
   `validate_project`, `get_drc_history_tool`, `open_project`) actually work
-  in this environment. The other 11 — every tool whose implementation calls
-  `ctx.report_progress(...)` (confirmed by reading the local `kicad-mcp`
-  server's own source, `kicad_mcp/tools/netlist_tools.py` and siblings) —
-  fail with `Context is not available outside of a request`, a real,
-  reproducible server-side bug (confirmed independently twice, by two
-  separate sessions/passes, against the same project), not an artifact of
-  this project's own construction. `run_drc_check` and
-  `generate_project_thumbnail` were independently confirmed to fail for
-  *different*, unrelated reasons (a correct "no PCB file" result, and a
-  distinct `'FunctionTool' object is not callable` error, respectively) —
-  precision here matters, since conflating all 11 failures into one
-  "broken" bucket would have been less useful than isolating the actual
-  mechanism. Worked around by using `kicad-cli` directly for the equivalent
-  verification (`sch export netlist`, `sch export bom`, `sch erc`) — see
+  in this environment. **This 5/16 split is a robust, reproducible fact**,
+  independently confirmed across three separate verification passes (the
+  Hardware Lead, a delegated Hardware Reviewer, and an independent PR
+  auditor — three different sessions/MCP clients, identical count each
+  time). **The exact client-visible error text for the other 11 is
+  MCP-client-dependent, and was initially over-specified as a single
+  universal fact — corrected here after the PR auditor's own independent
+  pass surfaced the discrepancy**: with `ctx` omitted entirely, all 11 fail
+  identically with `Input validation error: 'ctx' is a required property`
+  (a client-side schema rejection — this is the *only* behavior the
+  auditor's client ever produced). With a placeholder `ctx` value
+  explicitly supplied, the schema check passes and each tool's real body
+  executes — at which point most fail with `Context is not available
+  outside of a request` (confirmed by reading the local `kicad-mcp`
+  server's own source, `kicad_mcp/tools/netlist_tools.py` and siblings:
+  these call `ctx.report_progress(...)`, needing a live FastMCP request
+  context this environment's bridge does not supply), while `run_drc_check`
+  instead correctly executes (`{"success":false,"error":"PCB file not
+  found in project"}` — a correct result, not a bug) and
+  `generate_project_thumbnail` fails with yet another, unrelated error
+  (`'FunctionTool' object is not callable`) — all independently
+  reproduced twice by the Hardware Lead. Neither observation is wrong; they
+  reflect different calling patterns. The lesson generalizes beyond this
+  one finding: **when reporting a tool-availability fact, distinguish what
+  is robust (the count, reproduced across independent passes) from what
+  may be calling-environment-specific (exact error text) — precision on
+  the wrong detail is itself a form of overclaiming.** Worked around by
+  using `kicad-cli` directly for the equivalent verification
+  (`sch export netlist`, `sch export bom`, `sch erc`), which does not
+  depend on this client-specific nuance at all — see
   `hardware/schematic/bench-imu-01/README.md` for the full account.
 - **A real, non-obvious discovery this verification itself produced**:
   building the real KiCad project (checking real symbol/footprint

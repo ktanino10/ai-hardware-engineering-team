@@ -25,28 +25,45 @@ its rationale.
 - **A real, significant MCP tool bug was discovered and precisely
   characterized this session**: of the 16 `kicad-*` MCP tools, only 5
   (`list_projects`, `get_project_structure`, `validate_project`,
-  `get_drc_history_tool`, `open_project`) actually work. The other 11 —
-  every one that takes a `ctx: Context` parameter (`extract_project_netlist`,
-  `extract_schematic_netlist`, `analyze_schematic_connections`,
-  `find_component_connections`, `identify_circuit_patterns`,
-  `analyze_project_circuit_patterns`, `analyze_bom`, `export_bom_csv`, and
-  by the same pattern very likely `generate_pcb_thumbnail`,
-  `generate_project_thumbnail`, `run_drc_check`) — fail with
-  `Context is not available outside of a request`. Traced to the local
-  `kicad-mcp` server's own source (`kicad_mcp/tools/netlist_tools.py` and
-  siblings): these tools call `await ctx.report_progress(...)` internally
-  for progress reporting, which requires a live FastMCP request context
-  this environment's tool-calling bridge does not supply for these specific
-  tools. This is a genuine, reproducible server-side bug (confirmed across
-  multiple different tools, multiple different valid inputs, and a repeat
-  call), **not** an artifact of this project's own construction — verified
-  by testing the exact same tools against this exact same project. **Worked
-  around** by using `kicad-cli` directly for the equivalent verification
-  (`sch export netlist`, `sch export bom`, `sch erc`) — the same underlying
-  KiCad engine these MCP tools wrap, so the verification is equally real,
-  just invoked one layer lower. `kicad-cli sch erc` itself is a genuine,
-  working capability this session also newly confirmed (see
-  `docs/architecture.md` §5.2/§13, corrected).
+  `get_drc_history_tool`, `open_project`) actually work. **This 5/16 split is
+  robust** — independently reproduced by a delegated Hardware Reviewer pass
+  and by a separate PR auditor pass, each from a different session, each
+  getting the identical count. The other 11 all take a `ctx: Context`
+  parameter (`extract_project_netlist`, `extract_schematic_netlist`,
+  `analyze_schematic_connections`, `find_component_connections`,
+  `identify_circuit_patterns`, `analyze_project_circuit_patterns`,
+  `analyze_bom`, `export_bom_csv`, `generate_pcb_thumbnail`,
+  `generate_project_thumbnail`, `run_drc_check`) and consistently fail — but
+  **the exact client-visible error text is MCP-client-dependent, not a
+  single universal fact** (corrected here after the PR auditor's own
+  independent pass surfaced this): omitting `ctx` entirely gets
+  `Input validation error: 'ctx' is a required property` for all 11, every
+  time, in every client tested — a client-side schema rejection before the
+  tool body ever runs. Explicitly supplying a placeholder `ctx` value (e.g.
+  `{}`) instead gets past that check and lets each tool's real body
+  execute — at which point most fail with `Context is not available outside
+  of a request` (traced to the local `kicad-mcp` server's own source,
+  `kicad_mcp/tools/netlist_tools.py` and siblings: these call
+  `await ctx.report_progress(...)`, needing a live FastMCP request context
+  this environment's tool-calling bridge does not supply), while
+  `run_drc_check` instead correctly executes
+  (`{"success":false,"error":"PCB file not found in project"}` — a correct
+  result given no `.kicad_pcb` exists, not a bug) and
+  `generate_project_thumbnail` fails with yet another, unrelated error
+  (`'FunctionTool' object is not callable`). Both the "omit `ctx`" and
+  "supply `ctx`" behaviors were independently reproduced twice by the
+  Hardware Lead after the discrepancy surfaced — neither observation was
+  wrong, they reflect different calling patterns. This is a genuine,
+  reproducible server-side defect (the ctx-injection gap itself), **not**
+  an artifact of this project's own construction — but report the *count*
+  as the robust fact, and the *specific error text* with its
+  client-dependency caveat attached, not as a single universal detail.
+  **Worked around** by using `kicad-cli` directly for the equivalent
+  verification (`sch export netlist`, `sch export bom`, `sch erc`) — the
+  same underlying KiCad engine these MCP tools wrap, so the verification is
+  equally real and does not depend on this client-specific nuance at all.
+  `kicad-cli sch erc` itself is a genuine, working capability this session
+  also newly confirmed (see `docs/architecture.md` §5.2/§13, corrected).
 
 ## Directory contents
 
