@@ -1,9 +1,12 @@
-# Littelfuse 30R Series (30R500U) Resettable PPTC Datasheet — Rev "GD.04/09/25"
+# Littelfuse 30R Series (30R500U / 30R500UF) Resettable PPTC Datasheet — Rev "GD.04/09/25"
 
 - **Manufacturer**: Littelfuse, Inc.
-- **Part Number**: 30R500U (from the 30R Series family datasheet, which
-  covers 30R090U through 30R900U in one document — radial-leaded PPTC
-  resettable fuses)
+- **Part Number**: originally recorded against **30R500U**; as of Rev 5
+  of `bench-imu-01-design.md` (2026-09-08), F1's actual orderable MPN is
+  **30R500UF** — see "Rev 5 rename / swap note" below. Both MPNs are
+  covered by the same 30R Series family datasheet, which covers
+  30R090U(F) through 30R900U(F) in one document — radial-leaded PPTC
+  resettable fuses
 - **Datasheet Title**: "Resettable PPTC Datasheet" / "30R Series Radial
   Leaded" (as printed on the document's own header/footer)
 - **Revision / Version**: document control code "Revised: GD. 04/09/25"
@@ -19,15 +22,45 @@
   (manufacturer-hosted datasheet PDF, confirmed reachable and
   text-extractable this session via an `r.jina.ai` reader proxy, same
   approach already used for DS-PROT-004/005's source documents)
-- **Retrieved Date**: 2026-09-06
+- **Retrieved Date**: 2026-09-06 (original 30R500U research); rename/
+  status re-check 2026-09-08 (Rev 5, see below)
 - **Local cache note**: not committed; content read live via the
   `r.jina.ai` text-extraction proxy this session; full Electrical
   Characteristics table and Temperature Rerating (Ihold-derating) table
   captured directly from the primary document; not cached to any local
   disk.
-- **Used for Evidence IDs**: DS-PROT-006
+- **Used for Evidence IDs**: DS-PROT-006, DS-PROT-032, DS-PROT-033
 
-## Key extracted figures (30R500U row, Electrical Characteristics table)
+## Rev 5 rename / swap note (Circuit Engineer, 2026-09-08)
+
+This metadata record was originally created (2026-09-06) against
+**30R500U**, then selected for F1 in `bench-imu-01-design.md` Rev 4
+(§7.5.9, ISS-019). This session (Rev 5), 30R500U was independently
+re-confirmed **obsolete** (no live distributor stock — corroborating
+Component Engineer's own prior DS-PROT-009 finding for the *unrelated*
+Littelfuse SMBJ TVS part, which flagged the same style of lifecycle
+issue for a different component). Littelfuse's own current product
+listing/lifecycle guidance names **30R500UF** as the direct,
+manufacturer-recommended replacement: confirmed **Active/orderable**
+status, RoHS3-compliant construction — the trailing "F" suffix denotes
+the RoHS3 construction variant within the same 30R-series family, not a
+different electrical/mechanical part. The 30R-series family datasheet
+covers both the U and UF suffix variants identically in its own
+Electrical Characteristics and Temperature Rerating tables (same
+30R500 row, no separate U-vs-UF split) — confirmed via the same document
+already cited as DS-PROT-006. **All technical content below (originally
+captured against the 30R500U label) applies identically to 30R500UF**;
+this file was renamed (`git mv`) rather than duplicated, since the
+underlying datasheet, part family, and every extracted figure are
+unchanged — only the orderable MPN and its RoHS/lifecycle status
+changed. See DS-PROT-032 (obsolescence/replacement/RoHS3 rationale) and
+DS-PROT-033 (electrical/mechanical identity confirmation) in
+`datasheets/evidence-log.md`, and `bench-imu-01-design.md` §7.5.9/§13/
+§16 item 26/§18.3 for the resulting design-doc changes. No re-analysis
+of any electrical margin, series-drop estimate, or thermal-derating
+figure below was needed as a result of this swap.
+
+## Key extracted figures (30R500U/30R500UF row, Electrical Characteristics table)
 
 | Parameter | Value |
 |---|---|

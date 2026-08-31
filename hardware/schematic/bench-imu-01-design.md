@@ -1,8 +1,128 @@
 # Bench-IMU-01 — Schematic-Equivalent Design Document
 
-**Author**: Circuit Engineer (AI agent) · **Date**: 2026-08-31, revised 2026-09-01, revised 2026-09-04, revised 2026-09-06 · **Status**: **Revised (Rev 4)** — loop-back rework addressing all 5 open HIGH findings from `validation/design-review.md` Cycle 3 (Hardware Reviewer + rubber-duck review of the Rev 3 Motor Driver + Reaction Wheel subsystem): ISS-014 (2S/3S UVLO margin — fixed), ISS-015 (SPEED uncommanded-motion risk — fixed), ISS-019 (J4 input envelope/fault containment — fixed), ISS-020 (no maximum-speed/overspeed envelope — addressed/flagged), ISS-021 (no latched-fault shutdown, REQ-404 — addressed/flagged); Rev 3's own unrelated content is otherwise unchanged; **ready for Hardware Reviewer re-review of Cycle 3's 5 HIGH findings** (a focused re-check of the changed areas, not a full re-review of already-passed material)
+**Author**: Circuit Engineer (AI agent) · **Date**: 2026-08-31, revised 2026-09-01, revised 2026-09-04, revised 2026-09-06, revised 2026-09-08 · **Status**: **Revised (Rev 5)** — loop-back rework implementing the now-human-approved **U6 = TI TPS26631PWPR** Motor-Rail Supervisory Controller (`bom/component-selection.md` "Motor-Rail Supervisory Controller" §Approval — Chief Engineer (Human) "Approved — 'TPS26631PWPR confirmed.'"), closing out the hardware side of ISS-015/ISS-019's residual load-switch/OVP/UVLO gaps and giving ISS-021 its physical enforcement point (not its firmware policy — that remains open, §7.5.11/§7.5.12 unchanged), plus an F1 obsolete-part swap (Littelfuse 30R500U → 30R500UF, active direct replacement); Rev 4's own unrelated content is otherwise unchanged; **ready for Hardware Reviewer re-review focused on the new U6 stage** (a focused re-check of the changed area, not a full re-review of already-passed material)
 
 ## Revision changelog
+
+**Rev 5 (2026-09-08)** — Circuit Engineer loop-back rework implementing
+`bom/component-selection.md`'s newly human-approved "Motor-Rail Supervisory
+Controller" recommendation, per `.github/agents/circuit-engineer.agent.md`
+("Process" steps 1–7) and the explicit task directive to wire U6 = TI
+TPS26631PWPR between the existing F1→D2→D3 protection stage and U5 VCC.
+
+- **U6 = TPS26631PWPR (HTSSOP-20/"PWP") added** as a series load-switch/eFuse
+  between D3 and U5 VCC, implementing the load-switch function §7.5.10 had
+  previously only flagged (Rev 4). Confirmed Component-Engineer-approved
+  before use (`.github/agents/circuit-engineer.agent.md` "Process" step 1) —
+  see `bom/component-selection.md`'s Approval table, both the Component
+  Engineer's proposal row (2026-09-08) and the human Chief Engineer's
+  "Approved" row.
+- **New EN/SHDN pull-down R11 = 10 kΩ** added from U6's SHDN pin to GND,
+  inverting the part's internal SHDN pull-up (defaults the device **ON**) to
+  the required default-**OFF**/fail-safe direction per REQ-403 and this
+  document's own prior §7.5.10 spec. Primary sizing basis is TI's own
+  **guaranteed** Electrical Characteristics spec — I(SHDN) leakage current
+  max = 10 µA at V(SHDN) = 0 V, plus TI's own explicit application-note text:
+  "To assert SHDN low, the pulldown must have sinking capability of at least
+  10 µA" (SLVSE94G §8.3.13) — not on the internal pull-up's own resistance
+  value, which is **not a guaranteed datasheet spec** (see next bullet).
+  R11 = 10 kΩ gives a worst-case V(SHDN) ≈ 100 mV at the guaranteed 10 µA
+  leakage max, ≈8× below the guaranteed V(SHUTF) = 0.8 V shutdown-confirm
+  threshold and ≈20× below the guaranteed V(SHUTR) = 2 V enable threshold —
+  both from TI's own Electrical Characteristics table. See §7.5.10 for the
+  full derivation.
+- **SHDN internal pull-up resistance discrepancy found and reconciled**:
+  the task's own framing (independently re-confirmed by the human via a
+  fresh web search this session) cites "a genuine internal ≈440 kΩ EN
+  pull-up." This session's own direct visual read of TI's datasheet Figure
+  8-1 functional block diagram shows **"1 MegΩ"** at the SHDN node — and
+  this matches the pre-existing Component-Engineer-recorded evidence row
+  **DS-PROT-013** (citing a TI E2E forum post) and the pre-existing
+  Component Engineer datasheet metadata file, both of which already state
+  1 MΩ, not 440 kΩ. **Neither figure is a guaranteed Electrical
+  Characteristics table spec** — TI's datasheet shows 1 MΩ only in the
+  functional (illustrative) block diagram, with no formal min/typ/max table
+  row for this resistance — so this is not treated as a blocking
+  discrepancy: R11's primary sizing basis (above) does not depend on either
+  figure, and R11 = 10 kΩ dominates comfortably under **both** candidate
+  values (440 kΩ → ≈44× the pull-down; 1 MΩ → ≈100× the pull-down). Flagged
+  for Hardware Reviewer awareness; see §16 new item.
+- **New OVP/UVLO resistor divider R12 = 887 kΩ / R13 = 60.4 kΩ / R14 =
+  88.7 kΩ** (all E96, 1%) added, referenced to §7.5.9's 9.0–13.0 V J4 input
+  envelope, per TI's own datasheet divider architecture (SLVSE94G §9.2.2.2–
+  9.2.2.5): IN_SYS/IN —[R12]— UVLO pin —[R13]— OVP pin —[R14]— GND. Trip
+  points computed from TI's own guaranteed reference voltages (V(UVLOR) =
+  1.176/1.200/1.224 V, V(OVPR) = 1.176/1.200/1.224 V min/typ/max): UVLO
+  rising trips at 8.17–8.51 V (worst-case 5.49% below the 9.0 V floor), OVP
+  rising trips at 13.74–14.30 V (worst-case 5.67% above the 13.0 V ceiling).
+  Divider string current 8.69–12.55 µA across the envelope, 2.9×–4.2× above
+  TI's own explicit "must be 20× the leakage current" design floor (SLVSE94G
+  §9.2.2, using the guaranteed ±150 nA I(UVLO)/I(OVP) leakage spec). Full
+  derivation, hysteresis (falling-threshold) behavior, and full-stack
+  (reference **and** resistor tolerance both adverse) worst-case figures in
+  §7.5.10.
+- **New R(ILIM) = R15 = 3.57 kΩ** (E96, 1%) sets U6's overload trip point to
+  4.69–5.40 A (min–max), clearing U5's own 3–4 A OCP with margin and sitting
+  below F1's 10 A PTC trip — a three-tier protection hierarchy (U5 OCP → U6
+  overload → F1 PTC). Per TI's own R(ILIM) equation and tested-value table
+  (SLVSE94G §7/§9).
+- **New dVdT capacitor C17 = 22 nF** sets U6's inrush-current-limiting ramp
+  rate, sized against **this design's own real downstream capacitance**
+  (C10 = 10 µF, reused — no new output capacitor added) rather than TI's own
+  1 mF worked-example scenario, which does not transfer to this design
+  (flagged explicitly to prevent a copy-the-datasheet-example error). Gives
+  ≈22 mA worst-case inrush (negligible) and adds a fixed ≈1.83 ms UVLO/OVP
+  turn-on delay (PGTH tied low, §7.5.10).
+- **New input bypass capacitor C16 = 1 µF** added at U6 IN/IN_SYS, per TI's
+  own explicit recommendation ("TI recommends a minimum of 1 µF for C(IN)
+  ... to limit the slew rates during surge testing," SLVSE94G §9.2.2.5.1) —
+  a new component this revision (not foreseen when §7.5.10 was first
+  flagged in Rev 4).
+- **MCU enable pin PA9 committed** (final, not tentative) as U6's SHDN
+  drive — the same pin this document's own Rev 4 §11 note had already
+  earmarked tentative. Re-confirmed still free this revision before commit;
+  free-GPIO count drops from 16 to 15 (§11).
+- **F1 swapped: Littelfuse 30R500U → 30R500UF.** Independently confirmed
+  this session (fresh web search) to be the manufacturer's own direct
+  replacement for the now-obsolete 30R500U flagged in **DS-PROT-009** —
+  same "30R Series Radial Leaded" datasheet PDF, same electrical spec table
+  (Ihold=5A/Itrip=10A/Vmax=30Vdc/Imax=40A), same package/footprint, RoHS3-
+  compliant construction, and confirmed **Active**/orderable on
+  littelfuse.com. Parts list, net list, and the datasheet metadata record
+  (renamed in place: `datasheets/littelfuse_30r500u_rev-unknown.md` →
+  `datasheets/littelfuse_30r500uf_rev-unknown.md`) all updated; no
+  electrical analysis elsewhere in this document changes as a result
+  (§7.5.9's F1 protection-envelope analysis is unaffected — same part,
+  different orderable suffix).
+- **`hardware/power-budget.md` updated**: U6 adds a negligible IQ(ON) =
+  1.38/1.7 mA (typ/max) or IQ(OFF) = 21/60 µA (typ/max) draw on VM_MOTOR
+  (device-state-dependent, not additive) plus ≈8.7–12.6 µA divider bias
+  current; R11 adds ≈330 µA on the 3V3 rail whenever PA9 drives SHDN high.
+  Both rails' margins remain effectively unchanged at the stated precision;
+  see `hardware/power-budget.md` for the updated figures and a new U6
+  thermal cross-check (ΔTJ ≈ 10–16 °C at ≤3 A worst-case, comfortably below
+  T(TSD) = 165 °C).
+- **New self-check subsections** added to §14 ("Rev 5 motor-domain
+  re-check") and §15 ("Re-self-check after Rev 5 fixes") covering the new
+  U6 stage against this document's own 18-item mandatory-check list and the
+  Hardware Reviewer's 16-item checklist respectively.
+- **§16 UNKNOWNs**: item 22 (the flagged supervisory controller) annotated
+  **RESOLVED/IMPLEMENTED**; four new residual items added (SHDN pull-up
+  discrepancy, OVP worst-case-corner trip point, PGTH/MODE design choices'
+  interaction with ISS-021's still-undecided firmware latch policy, and the
+  dVdT/C(OUT) sizing basis) — none of these block handoff, all flagged for
+  Hardware Reviewer awareness.
+- **ISS-020/ISS-021 explicitly NOT resolved by this revision** — per the
+  task's own explicit instruction, these remain genuine firmware-policy
+  gaps (§7.5.11/§7.5.12, unchanged this revision). U6's SHDN pin (driven by
+  the now-committed PA9) gives firmware a real, physical enforcement point
+  for ISS-021's eventual latch — cycling SHDN also resets a latched-off U6
+  fault condition (TI SLVSE94G Table 5-1, SHDN pin description) — but the
+  policy of *when* to latch is firmware's decision alone, not implemented
+  here.
+- New Evidence IDs **DS-PROT-023 through DS-PROT-033**
+  (`datasheets/evidence-log.md`) and new change record **ECO-011**
+  (`validation/change-log.md`).
 
 **Rev 4 (2026-09-06)** — Circuit Engineer loop-back rework addressing
 `validation/design-review.md` Cycle 3 findings (Hardware Reviewer +
@@ -1513,9 +1633,9 @@ the voltage-level part of the hazard — but R10 does **not** itself
 enforce a power-up *order*, only a safe SPEED *level* whenever the MCU
 side is not actively driving it. Directly enforcing the missing
 cross-domain ordering (rather than only bounding SPEED's level) would
-require a supervisory component — **flagged in new §7.5.10 below**, not
-added as a passive fix here, consistent with §7.5.5's own disposition of
-this same finding.
+require a supervisory component — **flagged in Rev 4's §7.5.10, now
+implemented as U6 in §7.5.10 below (Rev 5)**, not added as a passive fix
+here, consistent with §7.5.5's own disposition of this same finding.
 
 ### 7.5.9 J4 input envelope and upstream fault containment (new, ISS-019)
 
@@ -1546,12 +1666,24 @@ would sit below D3's own clamp voltage and would not be caught by D3 at
 all, which is exactly why a true continuous-OVP stage is flagged below,
 not claimed solved by D3.
 
-**New F1 = Littelfuse 30R500U**, a radial-leaded PTC (polymeric
+**New F1 = Littelfuse 30R500UF** *(swapped from 30R500U this revision,
+Rev 5 — see below)*, a radial-leaded PTC (polymeric
 positive-temperature-coefficient) resettable fuse (**DS-PROT-006**):
 Ihold=5.00A, Itrip=10.00A, Vmax=30Vdc, Imax=40A (fault current),
 Rmin=0.010Ω (initial), R1max=0.050Ω (post-trip). Placement: J4(+) →
-**F1** → D2 (anode) → D3 (shunt) → U5 VCC — upstream of both existing
-protection parts, closest to the actual external-fault entry point.
+**F1** → D2 (anode) → D3 (shunt) → **U6 (Rev 5)** → U5 VCC — upstream of
+both existing protection parts, closest to the actual external-fault
+entry point.
+
+**Swap rationale (Rev 5, independently confirmed this session via web
+search, DS-PROT-032):** the previously-specified 30R500U is obsolete
+(no live distributor stock, per Component Engineer's own prior-session
+finding, DS-PROT-009); Littelfuse's own current product listing gives
+**30R500UF** as the direct, manufacturer-recommended replacement —
+Active/orderable status, RoHS3-compliant construction — with no change
+to any electrical or mechanical rating (same document family as
+DS-PROT-006, confirmed specifically for the electrical/mechanical
+identity claim under **DS-PROT-033** below).
 Ihold (5.00A) sits above this design's own ≤3A worst-case operating
 current (§7.5.4 item 5) with margin, so F1 will not nuisance-trip under
 any expected operating condition, including U5's own OCP fault condition
@@ -1570,7 +1702,8 @@ input eFuse/active current-limiting stage is flagged below, not claimed
 closed by F1 alone.
 
 **Thermal derating (ambient)**: per Littelfuse's own published Ihold
-temperature-derating table (30R500U row: 5.00A@20°C baseline, 3.85A@50°C,
+temperature-derating table (30R500 row — shared by 30R500U and 30R500UF,
+same datasheet PDF, DS-PROT-006/DS-PROT-033: 5.00A@20°C baseline, 3.85A@50°C,
 3.40A@60°C, 3.05A@70°C, 2.60A@85°C), F1's derated hold current remains
 **at or above** this design's ≤3A worst-case current through the
 datasheet's own 70°C point (3.05A), dropping below 3A somewhere between
@@ -1586,75 +1719,279 @@ R1max post-trip resistance, not a max-initial figure; 0.02Ω assumed
 in-circuit resistance × 3A) — already folded into §7.5.2's corrected
 3S-margin figure (≈0.32V), not double-counted here.
 
-**Flagged, not self-resolved**: (a) a true hardware-enforced continuous
-input overvoltage lockout — F1 and D3 together bound fault currents and
-transients respectively, but neither bounds a sustained, out-of-envelope
-DC input voltage (e.g. a 4S pack held connected) — this needs an active
-comparator+switch stage, unified with ISS-015's flagged supervisory
-controller below (§7.5.10) rather than adding a second, separately
-specified part; (b) recording the 9.0–13.0V envelope in `validation/
-bring-up-procedure.md`'s eventual motor-rail bring-up section — that
-document is not edited by this agent, flagged for whoever owns it next.
+**Flagged in Rev 4, resolved this revision (a) / still flagged (b)**:
+(a) a true hardware-enforced continuous input overvoltage lockout — F1
+and D3 together bound fault currents and transients respectively, but
+neither bounds a sustained, out-of-envelope DC input voltage (e.g. a 4S
+pack held connected) — **this is now closed by U6's OVP function
+(§7.5.10, Rev 5)**, an active comparator+switch stage referenced to this
+same 9.0–13.0V envelope, unified with ISS-015's load-switch function and
+ISS-021's latched-cutoff enforcement point in the same part rather than
+three separately-specified components; (b) recording the 9.0–13.0V
+envelope in `validation/bring-up-procedure.md`'s eventual motor-rail
+bring-up section — that document is not edited by this agent, still
+flagged for whoever owns it next (§16).
 
-### 7.5.10 Flagged: supervisory motor-rail protection controller (new, serves ISS-015/019/021 — not self-selected, routed to Component Engineer via Hardware Lead)
+### 7.5.10 U6 = TPS26631PWPR — supervisory motor-rail protection controller (IMPLEMENTED this revision, Rev 5 — closes ISS-015/019 residuals, gives ISS-021 its hardware enforcement point)
 
-**This section specifies required function and ratings only — it does
-not select a specific MPN.** Per this agent's own scope (a part beyond
-the "single supporting part, no full comparison" class used for D2/D3/F1
-"is a more architecturally significant choice" to be "flag[ged]
-instead"), a supervisory controller that actively gates U5's own VCC
-based on system state is judged architecturally significant: it would be
-the first *active* (not passive) protection element in this design, and
-its correct specification determines whether three independent HIGH
-findings (ISS-015, ISS-019's residual continuous-OVP gap, ISS-021) are
-actually closed or merely bounded. It is deliberately **not selected**
-here.
+**Part identity and human approval.** Rev 4 deliberately specified only
+function and ratings here, judging a controller that actively gates U5's
+VCC architecturally significant and out of this agent's own
+part-selection scope. Component Engineer subsequently proposed **U6 = TI
+TPS26631PWPR** (TPS2663x family, 20-pin HTSSOP/"PWP", 4.5–60V IN, 6A,
+integrated OVP/UVLO/adjustable-current-limit eFuse/load-switch), and the
+human Chief Engineer approved it (`bom/component-selection.md`
+"Motor-Rail Supervisory Controller" §Approval: "**Approved — 'TPS26631PWPR
+confirmed.'**"), directing "Circuit Engineer to implement: the load
+switch + external EN pull-down (fail-safe-OFF direction) + OVP/UVLO
+dividers, in a new Rev 5." Confirmed approved before use, per this
+agent's own "Process" step 1. Placement: **F1 → D2 → D3 → U6 → U5 VCC
+(pins 23/24)** — one part serving all three of Rev 4's flagged uses
+(load-switch/ISS-015, continuous OVP lockout/ISS-019 residual,
+firmware-commandable cutoff/ISS-021's enforcement point), not three
+separately-specified redundant components.
 
-**Required function** (a single part could plausibly satisfy all three
-uses below, avoiding three separately-specified, redundant components):
+**Pinout and connections** (TI SLVSE94G Table 5-1, **DS-PROT-023**; pin
+numbers below are the PWP/20-pin column): pins 1–3 **IN** and pins 18–20
+**OUT** are each tied together in parallel per TI's own instruction ("Do
+not leave any of the IN and OUT pins un-connected," §8.3.11) — IN ties to
+D3's downstream node, OUT ties to U5 VCC and the existing **C10** (10µF);
+pin 6 **IN_SYS** ties directly to IN (no external reverse-polarity FET —
+see below); pin 7 **UVLO** and pin 8 **OVP** are the new divider taps
+(below); pin 9 **GND** and the **PowerPAD** both go to the ground plane —
+TI's own pin description requires the PowerPAD be soldered to the GND
+plane *in addition to* pin 9, not as a substitute for it (**DS-PROT-023**);
+pin 10 **dVdT** gets new **C17** (below); pin 11 **ILIM** gets new **R15**
+(below); pin 12 **MODE** is left open (below); pin 13 **SHDN** gets new
+**R11** and the MCU drive (below); pin 16 **PGTH** ties to GND (below);
+pins 14/15/17 (**IMON/FLT/PGOOD**) and pins 4/5 (**B_GATE/DRV**) are left
+floating (below).
 
-1. **Load-switch gating of U5's VCC** (serves ISS-015): a series
-   high-side switch between F1/D2/D3 and U5's own VCC pins, with a
-   logic-level enable input controllable from the MCU domain (a spare
-   GPIO — **PA9 is tentatively noted as available** per this design's
-   own free-GPIO inventory, §11, but is **not committed or wired** by
-   this document) — **default-OFF/fail-safe when the enable input is
-   undriven or the MCU domain is unpowered**, directly enforcing the
-   missing cross-domain power-up order (Hardware Reviewer's own
-   Recommended Fix option 2 for ISS-015) rather than only bounding
-   SPEED's own voltage level (which R10, §7.5.5, already does).
-2. **Continuous overvoltage lockout** (serves ISS-019's residual gap):
-   paired with a simple comparator or fixed-threshold OVP function
-   referenced against the 9.0–13.0V binding envelope (§7.5.9) —
-   disabling the load switch if VM_MOTOR is sensed outside that
-   envelope, closing the gap F1/D3 do not cover (a sustained
-   out-of-envelope DC voltage, not a transient or a hard short).
-3. **Firmware-commandable latched cutoff** (serves ISS-021): the same
-   enable input doubles as the actuator for a firmware-declared
-   latched-fault condition (§7.5.12) — once firmware counts a
-   qualifying number of Lock Detection retries and declares a fault, it
-   can drive the enable input low, physically removing U5's VCC until a
-   deliberate re-arm, which none of U5's own three internal protection
-   mechanisms (§7.5.6) can do on their own since none of them latch.
+**Load-switch function (ISS-015) — IN_SYS/IN tied together, no external
+reverse-polarity FET.** TI's own §8.3.11 guidance: "If the external
+N-channel FET is not used then connect IN_SYS and IN together and leave
+B_GATE and DRV pins floating" (**DS-PROT-023**) — this design does not add
+Q1/Q2 (TI's own optional external reverse-polarity FETs, §9.4 "Dos and Do
+Nots") because reverse-polarity protection is already provided upstream
+by the existing series Schottky **D2** (§7.5.9) — adding TI's optional
+FETs here would be redundant, not a gap. B_GATE's own pull-down
+(Rpd_BGATE = 800/1010/1200 kΩ min/typ/max) and DRV are both left
+unconnected accordingly. U6's own OUT/C(OUT) decoupling reuses the
+**existing C10 (10µF)** — no new output capacitor is added; C10 already
+sits on the U5-VCC node U6's OUT now feeds directly.
 
-**Ratings needed**: continuous current rating ≥3A (covering this
-design's own ≤3A worst-case operating current, §7.5.4 item 5, with
-margin); voltage rating ≥16V minimum, ideally ≥30V (covering the
-9.0–13.0V binding envelope, §7.5.9, with margin, and ideally matching
-U5's own 30V VCC AMR, DS-MTR-053, so the switch itself is never the
-weakest link); low on-resistance (target ≤35mΩ or so) to avoid eroding
-the already-narrow 3S/UVLO margin (§7.5.2) any further than F1/D2
-already do; default-OFF/fail-safe logic sense (enable HIGH = ON, so an
-undriven or grounded enable line results in U5 de-energized, not
-energized) — this fail-safe direction is a hard requirement, not a
-preference, given REQ-403.
+**EN/SHDN pull-down — new R11 = 10 kΩ, SHDN pin (13) to GND.** SHDN low =
+OFF (TI Table 5-1: "Pulling SHDN low makes the device...enter into low
+power shutdown mode"); the part's own internal pull-up defaults it high
+(ON) absent an external pull-down — inverted here to the required
+default-OFF/fail-safe direction per REQ-403, exactly as Rev 4's §7.5.10
+spec required.
 
-**Not decided here**: exact part family (a dedicated eFuse/load-switch
-IC with integrated OVP is one plausible class; a discrete high-side
-MOSFET plus a separate comparator IC is another) — this is exactly the
-kind of comparison Component Engineer's own process is built to
-perform, and is routed there via Hardware Lead, not decided unilaterally
-by this agent.
+*Primary sizing basis (guaranteed spec, not an assumed resistor value)*:
+TI's own Electrical Characteristics table gives **I(SHDN) leakage current
+= 10 µA max at V(SHDN) = 0 V** (a real, guaranteed, tested limit — not a
+typical/illustrative figure), and TI's own application text states
+explicitly: **"To assert SHDN low, the pulldown must have sinking
+capability of at least 10 µA"** (SLVSE94G §8.3.13, **DS-PROT-024**). With
+R11 = 10 kΩ sinking this guaranteed 10 µA worst case, the resulting
+V(SHDN) ≈ 10 µA × 10 kΩ = **100 mV** — measured against TI's own
+guaranteed SHDN thresholds (**DS-PROT-024**): V(SHUTF) = 0.8 V (falling/
+shutdown-confirm threshold) → **≈8× margin**; V(SHUTR) = 2 V (rising/
+enable threshold, the tighter constraint for guaranteeing the device
+cannot self-enable from a cold, undriven start) → **≈20× margin**. R11's
+ceiling for TI's own 10 µA/0.8 V requirement is 80 kΩ; 10 kΩ sits 8× below
+that ceiling, chosen (rather than something smaller, e.g. 1 kΩ) to limit
+the ≈330 µA the MCU's 3V3 rail must additionally source whenever PA9
+drives SHDN high (§17/`hardware/power-budget.md`) — a different design
+driver than R10's own 1 kΩ (§7.5.5, an analog-level SPEED pulldown
+against U5's own input impedance, not a digital logic pin against this
+part's own leakage spec); the two are not expected to match.
+
+*SHDN internal pull-up resistance — discrepancy found and reconciled, not
+blocking.* The task's own framing (independently re-confirmed by the
+human via a fresh web search, `bom/component-selection.md`'s Approval
+table) cites "a genuine internal ≈440 kΩ EN pull-up." This session's own
+direct visual read of TI's Figure 8-1 functional block diagram shows
+**"1 MegΩ"** at the SHDN node, pulling up to an internal 2.7V rail
+(**DS-PROT-025**) — matching the pre-existing **DS-PROT-013** (a TI E2E
+forum citation, recorded by Component Engineer before this revision) and
+the pre-existing Component Engineer datasheet metadata file, both of
+which already state 1 MΩ. **Neither figure is a guaranteed Electrical
+Characteristics table spec** — TI shows 1 MΩ only in the functional
+(illustrative) block diagram, with no formal min/typ/max table row for
+this specific resistance (**DS-PROT-025**) — which is a plausible reason
+different sources report different figures. Not treated as blocking:
+R11's sizing basis above uses only guaranteed specs, independent of
+either figure; as a secondary, non-blocking corroboration, R11 = 10 kΩ
+still dominates by ≈44× (using 440 kΩ) or ≈100× (using 1 MΩ) at the
+resistor-ratio level either way. Flagged for Hardware Reviewer/Component
+Engineer awareness — see §16.
+
+**OVP/UVLO resistor divider — new R12 = 887 kΩ, R13 = 60.4 kΩ, R14 = 88.7
+kΩ (all E96, 1%)**, referenced to §7.5.9's 9.0–13.0V binding envelope, per
+TI's own divider architecture (SLVSE94G §9.2.2.2, **DS-PROT-026**):
+**IN_SYS/IN —[R12]— UVLO (pin 7) —[R13]— OVP (pin 8) —[R14]— GND**. TI's
+own Equations 9–10: V(OVPR) = [R14/(R12+R13+R14)]·V(OV), V(UVLOR) =
+[(R13+R14)/(R12+R13+R14)]·V(UV) — independently re-derived from scratch
+against this design's own target trip points (not copied from TI's own
+worked example, which targets a different, 24V-class envelope) and
+verified by back-substitution.
+
+*Trip points, using TI's own guaranteed reference voltages* (V(UVLOR) =
+V(OVPR) = 1.176/1.200/1.224 V min/typ/max, **DS-PROT-026**):
+- **UVLO rising**: 8.1721 / 8.3388 / 8.5056 V (min/typ/max, reference
+  tolerance only, resistors ideal). All three sit below the 9.0V floor —
+  **honestly scoped, not overclaimed**: this means U6 may turn on
+  slightly before VM_MOTOR technically reaches the nominal 3S-near-cutoff
+  floor (encroachment up to ≈0.83V in the worst corner), which is a minor
+  conservatism gap against the *stated* 9.0V design intent, not a safety
+  violation — no downstream part is at risk operating down to ≈8.2V, U5's
+  own UVLO (§7.5.2) is the part that actually matters for low-voltage
+  safety and is unchanged by U6.
+- **OVP rising**: 13.7368 / 14.0171 / 14.2975 V (min/typ/max, reference
+  tolerance only). All three sit above the 13.0V ceiling with margin — the
+  safety-relevant direction (blocking a 4S pack or an out-of-envelope
+  bench supply from reaching U5): worst-case-max trip (14.2975V) still
+  leaves **0.503V/3.4% clearance** below a 4S pack's own nominal 14.8V
+  (sanity check — a 4S pack is correctly rejected before it is ever
+  mistaken for being in-envelope).
+- **Full-stack worst case** (TI's ±2% reference tolerance **and** ±1%
+  resistor tolerance both stacked adversely — a more conservative bound
+  than reference-tolerance-alone above): UVLO = 8.6527V (0.3473V/3.86%
+  margin below the 9.0V floor); OVP = 13.4881V (0.4881V/3.75% margin above
+  the 13.0V ceiling). Both directions retain positive, real margin even
+  under this doubly-adverse assumption.
+- **Hysteresis (falling thresholds)**: using V(UVLOF)/V(OVPF) =
+  1.09/1.122/1.15V min/typ/max, UVLO falling ≈7.57–7.99V and OVP
+  falling/recovery ≈12.73–13.43V — normal, expected hysteresis behavior
+  (prevents chatter at either boundary), not a flaw; both hysteresis bands
+  sit clear of each other with no overlap risk within the 9–13V envelope.
+- **Divider bias current**: 8.69–12.55µA across the 9–13V envelope,
+  2.9×–4.2× above TI's own explicit design floor — "the resistor string
+  current, I(R123) must be chosen to be 20x greater than the leakage
+  current of UVLO and OVP pins" (SLVSE94G §9.2.2.2, **DS-PROT-026**), using
+  TI's own guaranteed ±150nA I(UVLO)/I(OVP) leakage spec (20×150nA = 3µA
+  floor).
+
+**R(ILIM) — new R15 = 3.57 kΩ (E96, 1%).** TI's own Equation 8, R(ILIM) =
+18/I(OL) kΩ (**DS-PROT-027**), against this design's own protection
+hierarchy needs — U5's OCP already trips at 3–4A (DS-MTR-058) and F1's
+PTC trips at 10A (DS-PROT-006/033); R15 = 3.57kΩ (the nearest E96 value
+below TI's own tested 4.02kΩ table row, chosen to bias toward a higher,
+not lower, overload trip current so U6 never nuisance-trips ahead of U5's
+own OCP) gives **I(OL) ≈ 4.69/5.04/5.40A (min/typ/max)** — 17.2% above
+U5's 4A OCP max at U6's own worst-case-low trip, and comfortably below
+F1's 10A PTC — a clean three-tier hierarchy: **U5 OCP (3–4A) → U6 overload
+(4.69–5.40A) → F1 PTC (10A)**, each backstopping the one before it rather
+than racing it.
+
+**dVdT capacitor — new C17 = 22 nF, dVdT pin (10) to GND.** TI's own
+Equations 1–2 (**DS-PROT-028**): I(INRUSH) = C(OUT)·V(IN)/t(dVdT),
+t(dVdT) = 20.8×10³·V(IN)·C(dVdT) → combined, **I(INRUSH) =
+C(OUT)/(20.8×10³·C(dVdT))**, independent of V(IN). **Sized against this
+design's own real downstream capacitance — C(OUT) = the existing C10 =
+10µF, reused, not a new part** — deliberately *not* copied from TI's own
+worked-example scenario, which targets C(OUT) = 1mF (1000µF, TI's own
+Figure 8-3 caption and §9.2.2.3 worked example, **DS-PROT-028**) for a
+15W-DC-DC-converter buffer-capacitor use case ≈100× larger than this
+design's own C10 — flagged explicitly to prevent a copy-the-datasheet-
+example error (an earlier draft of this section briefly conflated the
+two before this was caught and corrected). With C(OUT)=10µF, C17=22nF:
+**I(INRUSH) ≈ 21.9mA** (negligible against any protection threshold in
+this design), transient inrush dissipation (TI's Equation 3,
+P(D,INRUSH)=0.5·V(IN)·I(INRUSH)) ≈99–142mW across the 9–13V envelope for
+only the ≈5ms ramp duration (thermally negligible — see thermal
+paragraph below), sitting 2.2× above the C(dVdT)≥10nF ROC floor.
+
+**PGTH tied to GND (pin 16) — deliberate, forces every turn-on through
+the slow/controlled ramp.** TI's own Timing Requirements table
+(**DS-PROT-028**): with V(PGTH) < V(PGTHF) (guaranteed true whenever PGTH
+is grounded, since V(PGTHF)=1.09–1.15V min–max), turn-on always takes the
+slower, C(dVdT)-scaled path — UVLO_ton(dly) = 742+49.5×C(dVdT)[nF] µs,
+OVP_ton(dly) = 150+49.5×C(dVdT)[nF] µs — rather than the fast,
+C(dVdT)-independent bypass path available when V(PGTH) > V(PGTHF)
+(70–251µs / 58–225µs). With C17=22nF this adds a fixed ≈1.83ms delay on
+every turn-on (cold power-up **and** OVP-recovery) — negligible, and a
+deliberate trade-off (safety/inrush-control over speed) called out
+explicitly since PGTH's nominal purpose (a PGOOD-threshold comparator
+input) is not otherwise used here (PGOOD itself is left floating, below)
+— PGTH is repurposed purely as a "always take the controlled-ramp path"
+configuration bit. Flagged for Hardware Reviewer awareness — see §16.
+
+**New input bypass capacitor C16 = 1 µF, IN/IN_SYS to GND.** Satisfies
+three separate, consistent TI recommendations simultaneously
+(**DS-PROT-029**): (a) "TI recommends a minimum of 1 µF for C(IN) ... to
+limit the slew rates during surge testing" (§9.2.2.5.1, the most
+stringent applicable figure — this is the one C16 is sized against); (b)
+"Connect a minimum of a 0.1-µF capacitor across IN_SYS and GND" (§8.3.11);
+(c) a general "input ceramic bypass capacitor higher than 0.1µF" if the
+supply is more than a few inches away (§9.5). A new component this
+revision — not foreseen when §7.5.10 was first flagged in Rev 4.
+
+**MODE (pin 12) left open — latch-off overload response, not
+auto-retry.** TI's own Table 8-1 (device-specific row for TPS26631,
+**DS-PROT-030**): with MODE = Open, on an overload the device applies
+active current limiting (2× for tCB(dly), then 1× for up to
+tCL_PLIM(dly)) then **latches OFF**; "Latch reset by toggling SHDN low to
+high or UVLO low to high or power cycling IN_SYS." (The alternative,
+MODE shorted to GND, auto-retries after t(TSD_retry) instead — not chosen
+here.) This is a deliberate design choice, not a default: it means U6
+itself will not silently auto-retry through a persistent overload the way
+U5's own OCP does (§7.5.6) — and it creates a useful synergy with the
+already-committed PA9/SHDN signal: the **same pin** that firmware drives
+to enable/disable U6 (ISS-015) and that firmware would drive low to
+enforce an eventual latched-fault policy (ISS-021, §7.5.12) can **also**
+reset a MODE-Open-induced overload latch, by toggling SHDN low-to-high
+(TI Table 5-1's own SHDN pin description independently confirms this:
+"Cycling SHDN pin voltage resets the device that has latched off due to a
+fault condition," **DS-PROT-024**) — one physical control point serving
+all three functions, not three separate signals. Flagged for Hardware
+Reviewer/Firmware Lead awareness: this interacts with ISS-021's *still
+entirely undecided* firmware latch policy (§7.5.12, unchanged this
+revision) and should be revisited once that policy is actually designed
+— see §16.
+
+**PGOOD/FLT/IMON left floating (unused this revision).** All three are
+explicitly supported floating configurations per TI's own guidance
+(**DS-PROT-030**): "If PGOOD is unused then connect to GND or leave it
+floating"; "FLT can be left open or connected to GND when not used";
+IMON is left open in TI's own standard characterization condition
+(R(ILIM)=30kΩ, IMON=PGOOD=FLT=OPEN, throughout the Electrical
+Characteristics tables). Not wired to firmware this revision — a
+possible future opportunity (e.g. FLT as a fast fault-status read
+distinct from the FG-based motor-status path, §7.5.4) is noted but not
+required by any currently-open issue; IMON in particular must never gain
+a bypass capacitor if used later (TI: "must not have a bypass capacitor
+to avoid delay in the current monitoring information").
+
+**Decoupling, thermal, and quiescent current.** No new IN/OUT capacitors
+beyond C16 (new, IN/IN_SYS) and the reused C10 (OUT, unchanged) — see
+above. Thermal: RθJA = 32.2°C/W (PWP/HTSSOP-20 package, **DS-PROT-031**);
+R(ON) = 26/30.44/34.5mΩ (min/typ/max, TJ=25°C) rising to 33–45mΩ
+(min–max, TJ=85°C) — steady-state conduction dissipation at this design's
+own ≤3A worst-case operating current is **0.234–0.310W** (25°C-row) to
+**0.297–0.405W** (85°C-row, the more conservative corner), giving
+ΔTJ≈7.5–13.0°C via RθJA — using the conservative 85°C-row/45mΩ corner:
+TJ≈53°C at REQ-201's 40°C ambient design target, **72°C margin below the
+125°C ROC ceiling, 97°C below the 150°C AMR ceiling, and 112°C below
+T(TSD)=165°C's auto-recovering thermal-shutdown backstop**
+(**DS-PROT-031**). IQ(ON)=1.38/1.7mA, IQ(OFF)=21/60µA (typ/max,
+**DS-PROT-031**) — both negligible against VM_MOTOR's own scale; full
+figures and rail-margin impact in `hardware/power-budget.md` (§17).
+
+**MCU enable pin — PA9 committed (final, not tentative).** Re-confirmed
+still free this revision (§11) before commit — the same pin Rev 4's
+§7.5.10 had only tentatively earmarked. Direct connection to SHDN (pin
+13), no series resistor — R11 alone sets the pull-down; PA9 driving high
+sources the enable current directly. Free-GPIO count drops from 16 to 15
+(§11).
+
+**Residual items for Hardware Reviewer** (not blocking, all newly
+recorded in §16): the SHDN pull-up discrepancy (above); the OVP
+worst-case-corner trip point sitting only 3.4% clear of a 4S pack in the
+full-stack-worst-case corner; PGTH/MODE's interaction with ISS-021's
+still-undecided firmware latch policy; the dVdT/C(OUT) sizing basis
+(this design's own 10µF, not TI's 1mF example).
 
 ### 7.5.11 Flagged: maximum commanded speed / overspeed envelope (new, ISS-020 — firmware requirement, no schematic-level fix)
 
@@ -1733,12 +2070,19 @@ firmware requirement, not implemented here (REQ-009's own fence: this is
 a schematic-level document, and the actual retry-counting/state-machine
 logic is firmware, not a circuit).
 
-**Hardware note, not a fix**: the same §7.5.10 flagged supervisory
-switch (specified above for ISS-015/ISS-019) can additionally serve as
-the actual VCC-cutting enforcement mechanism once firmware declares a
-latched-fault condition — called out explicitly so Component Engineer/
-Hardware Lead evaluate it as **one** part serving three purposes, not
-recommend three separate/redundant parts across three separate findings.
+**Hardware note, not a fix**: §7.5.10's **U6 (TPS26631PWPR, implemented
+this revision, Rev 5)** — the same supervisory controller wired for
+ISS-015/ISS-019 — now gives firmware the **physical enforcement point**
+this policy will eventually need: firmware can drive PA9/SHDN low to
+physically remove U5's VCC once it declares a latched-fault condition.
+**This is not a resolution of ISS-021 itself** — the retry-counting,
+rolling-window, and re-arm *policy* above remains entirely undecided and
+is not implemented, invented, or defaulted by this hardware revision;
+U6 only ensures the mechanism to act on that policy, once designed,
+already exists in silicon rather than needing a future hardware
+revision. One part serving three purposes (ISS-015/019/021's enforcement
+point), not three separate/redundant parts across three separate
+findings.
 
 **REQ-404 is a "Should," not a "Must"** (confirmed against `requirements/
 requirements.md`'s own exact wording) — noted for completeness, not used
@@ -1863,6 +2207,15 @@ this agent's).
   This is exactly the `docs/architecture.md` §12 mechanical/thermal
   co-design trigger REQ-202 correctly found inapplicable in Rev 2 and
   which now genuinely applies.
+- **U6 (Rev 5) is a minor, not a materially new, addition to this heat
+  group**: §7.5.10 confirms U6's own steady-state conduction dissipation
+  (0.234–0.405W depending on R(ON) test corner) is an order of magnitude
+  below U5's own (which dominates the motor-domain heat budget) — U6 sits
+  physically adjacent to U5/M1 in the same motor-domain group (§12's net
+  list places it electrically between D3 and U5), so it does not
+  introduce a new, separate thermal zone requiring its own IMU-separation
+  analysis; the existing U5/M1-vs-IMU separation consideration above
+  already covers it.
 - **Facts recorded for the Mechanical Lead handoff** (§10 continues this
   with physical placement/geometry specifics): M1's mass/mounting
   interface, U5's package/thermal characteristics, and J4's mounting
@@ -1956,7 +2309,7 @@ deferred to layout.
 | 2–3 | (other GPIO, unused this cycle) | NC / free | Available for future use |
 | 4 | NRST | NRST net (C5 + SW1) | §4.3 |
 | 5 | VDDA | 3V3 (via C4) | §4.1 |
-| 6–15 | PA0–PA9 (GPIO, selected used below) | PA2=USART2_TX, PA3=USART2_RX, PA5=LED drive; **new Rev 3: PA6=FG tach input (TIM3_CH1), PA8=SPEED/PWM output (TIM1_CH1)**; others free | §2.3, §6, §7, §7.5.4 |
+| 6–15 | PA0–PA9 (GPIO, selected used below) | PA2=USART2_TX, PA3=USART2_RX, PA5=LED drive; **new Rev 3: PA6=FG tach input (TIM3_CH1), PA8=SPEED/PWM output (TIM1_CH1)**; **new Rev 5: PA9=U6 enable (SHDN drive, §7.5.10)**; others free | §2.3, §6, §7, §7.5.4, §7.5.10 |
 | 16 | VSS | GND | Power pin |
 | 17 | VDD | 3V3 (via C3) | §4.1 |
 | 18–25 | PA10–PA15, PB0–PB1 (selected used below) | PA13=SWDIO, PA14=SWCLK (also this sub-family's BOOT0 mux pin, corrected this revision — ISS-006, §4.2); **new Rev 3: PB1=DIR**; others free | §4.4, §7.5.4 |
@@ -1979,10 +2332,11 @@ consumed by the motor subsystem (§7.5.4)**, not PB8/PB9's secondary pair.
 
 Full free-GPIO inventory after this design's allocation (for the
 Mechanical/future-firmware team's reference, not individually itemized
-above): PA0, PA1, PA4, PA7, PA9, PA10, PA11, PA12, PA15, PB0, PB2, PB3,
-PB4, PB5 — 14 GPIOs remain completely free, plus PB8 and PB9 (existence
+above): PA0, PA1, PA4, PA7, PA10, PA11, PA12, PA15, PB0, PB2, PB3,
+PB4, PB5 — 13 GPIOs remain completely free, plus PB8 and PB9 (existence
 confirmed, exact pin numbers not independently re-resolved, ISS-006/
-DS-MCU-051/053), bringing the free-GPIO count to **16**. This still
+DS-MCU-051/053), bringing the free-GPIO count to **15** (down from 16,
+**PA9 committed this revision** — see Rev 5 note below). This still
 includes both free UART peripherals (USART1, LPUART1 — neither is
 pinned to PB6/PB7 specifically on this part, so consuming PB6/PB7 for
 I2C1 does not remove USART1/LPUART1's own availability), and SPI1/SPI2
@@ -2008,13 +2362,22 @@ necessary).
 R10 (§7.5.5, ISS-015) is a passive pulldown on the already-wired SPEED
 net (PA8) and consumes no additional pin; F1 (§7.5.9, ISS-019) is a
 passive in-line part on VM_MOTOR and has no MCU connection at all. The
-free-GPIO count above (16) is therefore unchanged by this revision.
-**PA9 is tentatively noted, not committed or wired**, as an available
-candidate for the flagged §7.5.10 supervisory switch's enable line, were
-Component Engineer/Hardware Lead to adopt that part — if wired in a
-future revision, the free-GPIO count would drop to 15; this is flagged
-here only as a planning note for that eventuality, not a decision made by
-this revision.
+free-GPIO count above (16, as it stood after Rev 4) is unchanged by
+Rev 4 itself. **PA9 was tentatively noted, not committed or wired**, as
+an available candidate for the then-flagged §7.5.10 supervisory switch's
+enable line, pending Component Engineer/Hardware Lead adoption of that
+part.
+
+**Rev 5 note — PA9 now committed (final, not tentative)**: Component
+Engineer proposed, and the human Chief Engineer approved, **U6 =
+TPS26631PWPR** (`bom/component-selection.md`), so this revision
+implements the §7.5.10 supervisory switch and commits its enable line.
+**PA9 was re-confirmed still free** before commit (no other Rev 3/Rev 4
+allocation touched it) and is now wired directly to U6's SHDN pin
+(pin 13) — no series resistor; the external pull-down (R11 = 10kΩ, see
+§7.5.10) lives on the SHDN node itself, not in series with PA9. The
+free-GPIO count therefore drops from 16 to **15** this revision, per the
+updated inventory above.
 
 ## 12. Net list summary (net-by-net)
 
@@ -2025,7 +2388,7 @@ this revision.
 | CC1 | J1 CC1 contact → R1 (5.1kΩ) → GND |
 | CC2 | J1 CC2 contact → R2 (5.1kΩ) → GND |
 | 3V3 | U3 OUT → C2 → U1 VDD(pin17)/VDDA(pin5, via C4)/VBAT(pin32) → U2 VDD(pin8, via C6)/VDDIO(pin5, via C7) → R3/R4 (I2C pull-ups) → R5 (LED resistor) → J2 pin "3V3" → J3 pin "VDD" |
-| GND | U1 VSS(pins1,16) → U2 GND(pin7)/GNDIO(pin6) → U3 GND → U4 GND(pin2) → R1/R2 return → C1–C9 return sides → D1 cathode (via R5) → SW1 one leg → J1 shell/GND contact → J2 pin "GND" → J3 pin "GND" → **(new Rev 3, §8) J4 sleeve/GND contact → D2/D3 return sides → U5 GND(pin8)/PGND(pins15,16)/SWGND(pin5) → C10–C15 return sides — single common ground net spanning both power domains, §8** |
+| GND | U1 VSS(pins1,16) → U2 GND(pin7)/GNDIO(pin6) → U3 GND → U4 GND(pin2) → R1/R2 return → C1–C9 return sides → D1 cathode (via R5) → SW1 one leg → J1 shell/GND contact → J2 pin "GND" → J3 pin "GND" → **(new Rev 3, §8) J4 sleeve/GND contact → D2/D3 return sides → U5 GND(pin8)/PGND(pins15,16)/SWGND(pin5) → C10–C15 return sides** → **(new Rev 5, §7.5.10) U6 GND(pin9) *and* PowerPAD (both, per TI's own instruction — the pad is not a substitute for pin 9) → R11/R14/R15/C16/C17 return sides → U6 PGTH(pin16) tie — single common ground net spanning both power domains, §8** |
 | NRST | U1 NRST(pin4) → C5 → GND; also → SW1 → GND (momentary) |
 | SWDIO | U1 PA13(pin?) → J3 pin "SWDIO" |
 | SWCLK | U1 PA14(pin?) → J3 pin "SWCLK" (PA14 also carries this sub-family's BOOT0 mux function — corrected this revision, ISS-006, §4.2; no separate BOOT0 net exists, see §13) |
@@ -2039,7 +2402,14 @@ this revision.
 | (NC) | U4 I/O1(pins1,6), I/O2(pins3,4) — unpopulated, no D+/D− on this board (REQ-105) |
 | (NC) | U2 pins 2(ASDx), 3(ASCx), 4(INT1), 9(INT2), 10(OCSB), 11(OSDO) — unpopulated, aux interface + interrupts unused this cycle (§5.3) |
 | (NC) | J1 D+/D− contacts — present on the physical connector for cable compatibility, not routed to any MCU/protection pin (REQ-105) |
-| **VM_MOTOR** *(new Rev 3, envelope/protection extended Rev 4)* | J4 center-pin(+) contact → **F1 (Littelfuse 30R500U, PTC resettable fuse, new Rev 4, ISS-019)** → D2 anode(STPS3L60, series reverse-polarity protection) → D2 cathode → D3 (SMBJ16A, shunt TVS, cathode-to-VM_MOTOR/anode-to-GND) → U5 VCC(pins23,24) → C10 (10µF, VCC–GND) |
+| **VM_MOTOR** *(new Rev 3, envelope/protection extended Rev 4, U6 supervisory stage implemented Rev 5)* | J4 center-pin(+) contact → **F1 (Littelfuse 30R500UF, PTC resettable fuse — swapped from 30R500U this revision, Rev 5, DS-PROT-006/033)** → D2 anode(STPS3L60, series reverse-polarity protection) → D2 cathode → D3 (SMBJ16A, shunt TVS, cathode-to-VM_MOTOR/anode-to-GND) → **U6 IN(pins1–3)/IN_SYS(pin6, tied to IN) — new Rev 5, §7.5.10** → U6 OUT(pins18–20) → U5 VCC(pins23,24) → C10 (10µF, VCC–GND, reused as U6's own OUT decoupling) |
+| **U6_EN** *(new Rev 5, §7.5.10)* | U1 PA9 → U6 SHDN(pin13) — direct connection, no series resistor; **also → R11 (10kΩ) → GND**, external pull-down inverting U6's internal SHDN pull-up to the required default-OFF/fail-safe direction (REQ-403) |
+| **U6_UVLO_TAP** *(new Rev 5, §7.5.10)* | U6 IN_SYS(pin6) → R12 (887kΩ) → U6 UVLO(pin7) |
+| **U6_OVP_TAP** *(new Rev 5, §7.5.10)* | U6 UVLO(pin7) → R13 (60.4kΩ) → U6 OVP(pin8) → R14 (88.7kΩ) → GND |
+| **U6_ILIM** *(new Rev 5, §7.5.10)* | U6 ILIM(pin11) → R15 (3.57kΩ) → GND |
+| **U6_dVdT** *(new Rev 5, §7.5.10)* | U6 dVdT(pin10) → C17 (22nF) → GND |
+| **U6_IN_BYPASS** *(new Rev 5, §7.5.10)* | U6 IN(pins1–3)/IN_SYS(pin6) → C16 (1µF) → GND |
+| (NC) | U6 B_GATE(pin4), DRV(pin5) — floating, no external reverse-polarity FET used (D2 already covers this upstream, §7.5.10); U6 MODE(pin12) — floating, selects Latch-off overload response (Table 8-1); U6 PGOOD(pin17), FLT(pin15), IMON(pin14) — floating, all explicitly sanctioned by TI's own guidance, §7.5.10; U6 PGTH(pin16) → GND, forces the controlled-ramp turn-on path, §7.5.10 |
 | **SPEED_PWM** *(new Rev 3, external pulldown added Rev 4)* | U1 PA8 (TIM1_CH1, AF2) → U5 SPEED(pin13) — PWM duty-cycle command, `SpdCtrlMd`=1 required (I2C-configured, firmware-owned, REQ-007/REQ-009 scope fence); **also → R10 (1kΩ, new Rev 4, ISS-015) → GND**, a real external pulldown holding SPEED near zero-command whenever PA8 is not actively driven (§7.5.5) |
 | **DIR** *(new Rev 3, §7.5.4)* | U1 PB1 (plain GPIO, push-pull output) → U5 DIR(pin14) |
 | **FG_TACH** *(new Rev 3, §7.5.4)* | U5 FG(pin12, open-drain) → R6 (4.75kΩ, pull-up to U5's own V3P3, pin9) → U1 PA6 (TIM3_CH1 input-capture, AF1, FT_ea 5V-tolerant) |
@@ -2092,7 +2462,15 @@ this revision.
 | **C14** *(new Rev 3)* | 1µF/5V ceramic | U5 V1P8–GND, per DS-MTR-065 Table 11 |
 | **C15** *(new Rev 3)* | 1µF/5V ceramic | U5 V3P3–GND, per DS-MTR-065 Table 11 |
 | **R10** *(new Rev 4, ISS-015)* | 1kΩ, 0603 | SPEED external pulldown to GND — added this revision, reversing Rev 3's "deliberate non-addition" stance; see §7.5.5 |
-| **F1** *(new Rev 4, ISS-019)* | Littelfuse 30R500U | Radial-leaded PTC resettable fuse, Ihold=5.00A/Itrip=10.00A/Vmax=30Vdc, in-line on VM_MOTOR upstream of D2/D3 (DS-PROT-006); see §7.5.9 |
+| **F1** *(new Rev 4, ISS-019; MPN swapped Rev 5)* | Littelfuse 30R500UF | Radial-leaded PTC resettable fuse, Ihold=5.00A/Itrip=10.00A/Vmax=30Vdc/Imax=40A, in-line on VM_MOTOR upstream of D2/D3 (DS-PROT-006/033) — **swapped from 30R500U this revision (Rev 5)**: same datasheet/electrical/mechanical spec, RoHS3-compliant construction, Active/orderable status (30R500U's own manufacturer-recommended direct replacement); see §7.5.9 |
+| **U6** *(new Rev 5, ISS-015/019/021)* | Texas Instruments TPS26631PWPR | eFuse/load-switch supervisory controller, HTSSOP-20 (PWP), exposed pad (PowerPAD) tied to GND in addition to pin 9; Component-Engineer-proposed, human-approved (`bom/component-selection.md`); see §7.5.10 |
+| **R11** *(new Rev 5)* | 10kΩ | U6 SHDN external pull-down (fail-safe-OFF direction), sized against TI's guaranteed 10µA leakage spec; see §7.5.10 |
+| **R12** *(new Rev 5)* | 887kΩ, E96 1% | U6 IN_SYS–UVLO divider leg (top), OVP/UVLO trip-point network; see §7.5.10 |
+| **R13** *(new Rev 5)* | 60.4kΩ, E96 1% | U6 UVLO–OVP divider leg (middle); see §7.5.10 |
+| **R14** *(new Rev 5)* | 88.7kΩ, E96 1% | U6 OVP–GND divider leg (bottom); see §7.5.10 |
+| **R15** *(new Rev 5)* | 3.57kΩ, E96 1% | U6 ILIM current-limit-set resistor, sets I(OL)≈4.69–5.40A; see §7.5.10 |
+| **C16** *(new Rev 5)* | 1µF ceramic | U6 IN/IN_SYS input bypass, per TI's own ≥1µF surge-immunity recommendation; see §7.5.10 |
+| **C17** *(new Rev 5)* | 22nF ceramic | U6 dVdT ramp-rate-setting capacitor, sized against this design's own C(OUT)=10µF (reused C10); see §7.5.10 |
 
 **No BOOT0 pull-down resistor or header is included** — deliberate
 decision, §4.2 (reasoning corrected this revision, ISS-006: BOOT0 is
@@ -2392,6 +2770,89 @@ conclusion actually changed:
     §7.5.10 supervisory load-switch (architecturally significant, routed
     to Component Engineer via Hardware Lead, not added this revision).
 
+### Rev 5 motor-domain re-check (items 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 17 — U6 implementation)
+
+Per this revision's own task (implement the now-human-approved U6 =
+TPS26631PWPR), the following items are re-checked against **U6's own
+addition specifically**, superseding or extending (not silently
+replacing) the "Rev 4 motor-domain re-check" conclusions immediately
+above wherever the conclusion actually changed. Full derivations are in
+§7.5.10 — this subsection summarizes and cross-references rather than
+repeating them.
+
+1. **Supply Voltage (motor domain) — UNCHANGED, U6 checked against the
+   existing envelope.** U6's own IN/IN_SYS pins sit on the same
+   VM_MOTOR node already bounded to 9.0–13.0V (§7.5.9); U6's own ROC
+   floor for IN_SYS (4.5V) sits well below the 9.0V floor, so U6 itself
+   never becomes the binding voltage-margin constraint.
+2. **Logic Voltage — CHECKED, compatible.** U6's SHDN pin ROC is
+   0–5V (**DS-PROT-030**), directly compatible with the MCU's 3.3V logic
+   (PA9) with no level-shifting needed — same single-3.3V-logic
+   principle as the rest of this design (§2.1, REQ-102).
+3. **Absolute Maximum Ratings — CHECKED, clear margin.** U6's IN_SYS AMR
+   is −60V to 67V (75V/10ms transient) (**DS-PROT-030**) — the 9.0–13.0V
+   envelope sits nowhere near either bound; SHDN/UVLO/OVP/dVdT/ILIM/MODE
+   pin AMRs (§7.5.10 pinout) are all satisfied by their respective
+   grounded/biased/logic-level connections.
+4. **Recommended Operating Conditions — CHECKED, clear margin.** IN_SYS
+   ROC 4.5–60V comfortably contains 9.0–13.0V; ILIM resistance ROC
+   3–30kΩ contains R15=3.57kΩ; C(dVdT) ROC ≥10nF is satisfied by
+   C17=22nF (§7.5.10).
+5. **Current (per-pin and total) — RESOLVED, three-tier hierarchy now
+   real.** R15 sets U6's own overload trip at 4.69–5.40A
+   (min/typ/max) — 17.2% above U5's own 3–4A OCP ceiling at U6's
+   worst-case-low corner, and clear of F1's 10A PTC trip — closing the
+   previously-informal "U5 OCP, then F1 PTC" pairing into a real
+   3-tier hierarchy (§7.5.10).
+6. **Thermal (junction temp, derating, power dissipation) — CHECKED, wide
+   margin.** U6's own conduction dissipation at this design's ≤3A
+   worst-case (0.234–0.405W depending on R(ON) test corner) gives
+   ΔTJ≈7.5–13.0°C — TJ≈53°C at REQ-201's 40°C ambient target in the
+   conservative corner, 72°C/97°C/112°C margin below the ROC/AMR/T(TSD)
+   ceilings respectively (§7.5.10).
+7. **Decoupling — RESOLVED, new C16 added.** C16 (1µF, IN/IN_SYS–GND)
+   satisfies three independent TI recommendations simultaneously
+   (§7.5.10); U6's OUT-side decoupling reuses the existing C10 — no new
+   output capacitor needed.
+8. **Pull-up/Pull-down — RESOLVED, new R11 added.** R11 (10kΩ,
+   SHDN–GND) inverts U6's internal SHDN pull-up to the required
+   default-OFF/fail-safe direction, sized against TI's own guaranteed
+   10µA leakage spec with 8×–20× margin against the SHUTF/SHUTR
+   thresholds (§7.5.10 — full derivation, including the SHDN pull-up
+   resistance discrepancy finding).
+9. **Protection — RESOLVED (ISS-019's residual gap closed).** U6's OVP/
+   UVLO divider (R12/R13/R14) closes the "sustained out-of-envelope DC
+   input voltage" gap Rev 4's own re-check (item 9 above) explicitly
+   left open — trip points 8.17–8.51V (UVLO rising) and 13.74–14.30V
+   (OVP rising), both with real margin against the 9.0–13.0V envelope
+   (§7.5.10). U6's MODE=Open latch-off behavior is a **new, additional**
+   protection layer beyond U5's own three auto-recovering mechanisms —
+   still not a full resolution of ISS-021's firmware latch policy (that
+   remains undecided, §7.5.12 unchanged), but it is now the concrete
+   device-level building block that policy would act through.
+10. **Power sequencing — RESOLVED (ISS-015's residual gap closed).**
+    Rev 4's own re-check (item 10 above) explicitly stated "Full
+    ordering enforcement needs the flagged §7.5.10 supervisory
+    load-switch... not added this revision." **This revision adds it**:
+    U6's own default-OFF/fail-safe behavior (SHDN pulled low by R11
+    whenever PA9 is undriven, i.e. whenever the MCU domain is unpowered
+    or not yet initialized) now hardware-enforces that U5's VCC cannot
+    energize ahead of a deliberate MCU-domain command, directly closing
+    the cross-domain power-up-order gap Hardware Reviewer's own
+    Recommended Fix option 2 asked for (§7.5.10).
+13. **MCU pin function — RESOLVED, PA9 committed.** PA9 re-confirmed
+    free and committed to U6's SHDN drive (§11) — no conflict with any
+    alternate function used elsewhere in this design.
+17. **Recommended Application Circuit — CHECKED, adherence confirmed,
+    deviations justified.** IN_SYS tied to IN (no external
+    reverse-polarity FET — D2 already covers this, a justified deviation
+    from TI's optional Q1/Q2 circuit, not an omission); B_GATE/DRV/
+    PGOOD/FLT/IMON floating (all explicitly sanctioned); PGTH tied to
+    GND (a deliberate configuration choice, not TI's only option,
+    justified in §7.5.10); PowerPAD soldered to GND in addition to pin 9
+    (per TI's own instruction, not a substitute). Full detail and
+    citations in §7.5.10.
+
 ## 15. Self-check against the Hardware Reviewer's 16-item checklist (`.github/skills/hardware-review/SKILL.md`)
 
 This is a **self-check only** — it does not substitute for the mandatory
@@ -2675,6 +3136,96 @@ pin, pin-table, or net-list inconsistency was found across §7.5/§11/§12/
 §13 on this pass (§12/§13 cross-checked directly against §7.5.5/§7.5.9's
 new component additions).
 
+**Re-self-check after Rev 5 fixes (U6 implementation)**: per this
+revision's own task instruction, a full, explicit pass of all 16 items
+specifically against the new U6 stage (a new *active* IC — the first one
+this design adds beyond U1–U5 — so every item genuinely applies, not just
+the ones a passive part would typically touch):
+
+1. **Voltage violation** — Not found. U6's IN/IN_SYS sit on VM_MOTOR,
+   already bounded 9.0–13.0V (§7.5.9); U6's own ROC (IN_SYS 4.5–60V)
+   contains this envelope with wide margin on both sides (§14's Rev 5
+   re-check item 1).
+2. **Absolute Maximum Rating violation** — Not found. IN_SYS AMR −60V to
+   67V (75V/10ms transient) is nowhere near the 9–13V envelope; every
+   other pin's AMR is satisfied by its grounded/biased/logic connection
+   (§7.5.10 pinout; §14 item 3).
+3. **Current limit** — Not found; **improved**. New R15 gives U6 its own
+   overload trip (4.69–5.40A) sitting cleanly between U5's OCP (3–4A) and
+   F1's PTC (10A) — a real 3-tier hierarchy where an informal 2-tier
+   pairing existed before (§14 item 5).
+4. **Thermal risk** — Not found. Conduction dissipation 0.234–0.405W
+   (R(ON) test-corner dependent) gives ΔTJ≈7.5–13.0°C; 72°C+ margin below
+   every relevant ceiling at REQ-201's 40°C ambient target (§14 item 6).
+5. **Missing decoupling capacitor** — Not found; **new C16 added**
+   (1µF, IN/IN_SYS–GND), satisfying three independent TI recommendations;
+   OUT-side reuses existing C10 (§14 item 7).
+6. **Floating pin** — **Present by design, each individually justified,
+   not accidental.** B_GATE, DRV, MODE, PGOOD, FLT, and IMON are all left
+   floating — every one of these is an **explicitly TI-sanctioned**
+   floating configuration (§7.5.10 cites the exact datasheet text for
+   each), not an unexamined omission the way a genuinely accidental
+   floating pin would be. This is the one item on this checklist where
+   U6 has more floating pins than any prior part in this design, so it is
+   called out explicitly rather than silently passed.
+7. **Incorrect pull-up/pull-down** — Not found; **new R11 added and
+   independently re-derived from scratch this session** (10kΩ, sized
+   against TI's guaranteed 10µA SHDN leakage spec, 8×–20× margin). The
+   SHDN internal-pull-up-resistance discrepancy (1MΩ per this agent's own
+   datasheet read vs. ≈440kΩ per the task/human's independent web
+   search) is flagged as a residual item (§16) — not blocking, since
+   R11's sizing basis doesn't depend on either figure, but recorded
+   transparently rather than silently resolved in favor of one source.
+8. **Logic voltage mismatch** — Not found. SHDN ROC is 0–5V, directly
+   compatible with the MCU's 3.3V logic (PA9) — same single-3.3V-logic
+   principle used throughout this design (§14 item 2).
+9. **Interface timing** — Not found as a violation; **a deliberate,
+   explained design choice exists**. PGTH tied to GND forces every
+   turn-on through the C(dVdT)-scaled delay path (≈1.83ms with C17=22nF)
+   rather than the faster fixed-delay alternative — negligible in
+   absolute terms, but flagged so Hardware Reviewer can confirm this
+   trade-off (safety/inrush-control over speed) is acceptable given no
+   currently-open issue demands a faster U6 turn-on (§7.5.10).
+10. **Power sequencing** — **Resolved, not just "not found."** This is
+    the item U6 exists specifically to close: ISS-015's cross-domain
+    power-up-order gap, open since Rev 3 and explicitly still open after
+    Rev 4 (§14's own Rev 4 re-check item 10), is now hardware-enforced by
+    U6's default-OFF/fail-safe behavior (§14's Rev 5 re-check item 10).
+11. **Grounding** — Not found. U6 GND (pin 9) **and** the PowerPAD are
+    both tied to the ground plane, per TI's own explicit instruction that
+    the pad is not a substitute for the pin (§7.5.10, §12's GND net row).
+12. **EMI/EMC risk** — Not found; **U6 is itself a mitigant, not a new
+    risk**. TI's own text states the controlled inrush/dVdT function
+    "helps to eliminate conductive and radiative interferences" — this
+    design's own choice to ground PGTH (forcing the controlled-ramp path
+    on every turn-on, not just relying on the fast-path default) leans
+    further into this benefit, not away from it.
+13. **Motor noise** — Not applicable to U6 specifically; U6 does not
+    touch the 3-phase motor lines (§7.5's own MOTOR_PHASE_U/V/W net,
+    unchanged this revision). Rev 3's own finding stands unmodified.
+14. **Sensor noise** — Not applicable to U6; no electrical path between
+    U6 and the IMU domain exists (separate power domains, §8). Rev 3's
+    own finding stands unmodified.
+15. **PCB layout concern** — Two new, concrete layout requirements this
+    revision, both recorded for the Mechanical Lead/layout handoff: (a)
+    all three IN pins and all three OUT pins must be physically ganged
+    together per TI's own explicit instruction (§7.5.10); (b) the
+    PowerPAD must be soldered to the ground plane, item 11 above.
+16. **Datasheet recommendation violation** — Not found. IN_SYS tied to
+    IN, B_GATE/DRV floating, C(IN)≥1µF, PowerPAD-to-GND — all per TI's own
+    recommended application circuit (§7.5.10). The one deliberate
+    **deviation** — omitting TI's optional external reverse-polarity
+    Q1/Q2 FETs — is explicitly justified (D2 already provides that
+    function upstream), not an unexamined gap, satisfying this agent's
+    own instruction that "deviations must be justified and logged."
+
+**No new CRITICAL or HIGH-severity issue is believed to have been
+introduced by U6's own addition.** The one item flagged as genuinely
+open (item 7's SHDN pull-up-resistance discrepancy) does not change any
+sizing decision in this design and is recorded for Hardware Reviewer/
+Component Engineer awareness, not as a blocking defect — full detail and
+five further residual items in §16.
+
 ## 16. Open UNKNOWNs (for Hardware Lead / Hardware Reviewer)
 
 **Annotation convention (new this revision)**: items below are annotated
@@ -2944,26 +3495,35 @@ In priority order:
     Reviewer, to be tightened if a precise figure is later needed (e.g. for
     a sustained-near-stall duty-cycle use case beyond this design's nominal
     ≈1.05A operating point).
-22. **§7.5.10's flagged supervisory motor-rail protection controller is
-    not yet a selected part** (new this revision — ISS-015/019/021). Its
-    required function and ratings are specified (load-switch gating of
-    U5's VCC, a continuous-OVP lockout referenced to the 9.0–13.0V
-    envelope, a firmware-commandable latched cutoff), but no MPN is
-    chosen — this is judged an architecturally significant addition (the
-    first *active* protection element in this design), routed to
-    Component Engineer via Hardware Lead for a real comparison, not
-    selected unilaterally by this agent. Until resolved: ISS-015's
-    cross-domain power-up-ordering gap and ISS-019's continuous-
-    overvoltage gap both remain genuinely open — R10 and F1 (added this
-    revision) bound SPEED's voltage and fault current respectively, but
-    neither enforces power-up ordering nor a continuous-overvoltage
-    lockout.
-23. **The 9.0–13.0V VM_MOTOR input envelope (§7.5.9, new this revision) is
-    not yet recorded in `validation/bring-up-procedure.md`** — that
-    document has no motor-rail section as of this revision and is not
-    edited by this agent (ambiguous ownership between Hardware Reviewer,
-    Hardware Lead, and a future firmware/bring-up owner). Flagged so
-    whoever authors that section includes this bound.
+22. **RESOLVED/IMPLEMENTED this revision (Rev 5) — §7.5.10's supervisory
+    motor-rail protection controller is now U6 = TPS26631PWPR, selected,
+    approved, and wired.** Originally: "§7.5.10's flagged supervisory
+    motor-rail protection controller is not yet a selected part... Its
+    required function and ratings are specified..., but no MPN is
+    chosen... routed to Component Engineer via Hardware Lead for a real
+    comparison, not selected unilaterally by this agent." This is now
+    resolved: Component Engineer proposed TPS26631PWPR; the human Chief
+    Engineer approved it (`bom/component-selection.md`, "Approved —
+    'TPS26631PWPR confirmed.'"); this revision implements the load-switch
+    (ISS-015), OVP/UVLO divider (ISS-019 residual), and PA9/SHDN enable
+    line (also ISS-021's physical enforcement point, §7.5.12) — see
+    §7.5.10 for full derivation. ISS-015's cross-domain power-up-ordering
+    gap and ISS-019's continuous-overvoltage gap are now both closed at
+    the hardware level (§14's Rev 5 re-check, items 9 and 10). **Residual,
+    not fully closed by this item's resolution**: ISS-021's firmware latch
+    *policy* remains entirely undecided — see item 25 below, unchanged in
+    substance this revision.
+23. **The 9.0–13.0V VM_MOTOR input envelope (§7.5.9, new Rev 4) is still
+    not yet recorded in `validation/bring-up-procedure.md`** — unaffected
+    by this revision's U6 addition (U6 hardware-enforces the envelope,
+    §7.5.10, but does not substitute for documenting it in that
+    separately-owned procedure). That document still has no motor-rail
+    section as of this revision and is not edited by this agent
+    (ambiguous ownership between Hardware Reviewer, Hardware Lead, and a
+    future firmware/bring-up owner). Flagged so whoever authors that
+    section includes this bound, and now also U6's own trip points
+    (§7.5.10) as the hardware behavior bring-up testing should expect to
+    observe.
 24. **Maximum commanded speed / overspeed ceiling is undecided** (new
     this revision — ISS-020, §7.5.11). This document proposes ~6000 RPM
     (2× REQ-007's own floor) only as a numeric anchor for discussion, not
@@ -2971,25 +3531,86 @@ In priority order:
     overspeed-response behavior are Firmware Lead's/the human safety
     reviewer's call, and the chosen ceiling must also feed Mechanical
     Lead's flywheel/containment design. Ties to REQ-403's human-review
-    gate — this item cannot be closed by this agent alone.
+    gate — this item cannot be closed by this agent alone. **Unaffected
+    by Rev 5** — explicitly not addressed with a circuit trick this
+    revision, per this revision's own task instruction; remains a
+    firmware-policy gap.
 25. **Firmware latched-fault policy for REQ-404 is undecided/
     unimplemented** (new this revision — ISS-021, §7.5.12). The required
     behavior is specified (count consecutive Lock Detection events,
     Status bit4/`MtrLck`, within a rolling window over the existing I2C1
     bus; force SPEED to a safe/stopped state; require deliberate re-arm),
     but this is a firmware requirement, not something a schematic-level
-    document can itself close. Flagged for Firmware Lead; the flagged
-    §7.5.10 supervisory switch (item 22 above) is a candidate hardware
-    enforcement point, once specified/selected.
+    document can itself close. Flagged for Firmware Lead. **Updated Rev
+    5**: the candidate hardware enforcement point (item 22 above) is now
+    specified and selected — **U6, driven by the already-committed
+    PA9/SHDN line** (§7.5.10/§11) — but the actual retry-counting,
+    rolling-window, and re-arm *policy* remains entirely undecided and is
+    **explicitly not implemented, invented, or defaulted by this hardware
+    revision** (per this revision's own task instruction not to resolve
+    ISS-021 with a circuit trick). A related nuance newly surfaced this
+    revision, also for Firmware Lead's awareness: U6's own MODE=Open
+    setting (§7.5.10) gives U6 *its own*, independent overload latch
+    (distinct from any future firmware-declared latch) — both are reset
+    by the same SHDN low-to-high toggle, which is convenient, but
+    firmware will need to distinguish "U6 latched on its own overload
+    event" from "firmware declared a Lock-Detection-based fault" if the
+    two are ever meant to be logged/handled differently; U6 provides no
+    register or flag (PGOOD/FLT are both left floating) that would let
+    firmware directly tell these apart.
 26. **F1's own added series resistance is an ESTIMATE, not a datasheet-
     sourced figure** (new this revision — ISS-019, §7.5.2/§7.5.9).
     Littelfuse's own datasheet publishes only Rmin (initial) and R1max
     (post-trip) resistance, not a max-initial figure; the ~0.06V drop used
     in this revision's UVLO-margin analysis assumes 0.02Ω in-circuit
     resistance × 3A — a reasonable but unverified estimate, not a sourced
-    figure. Flagged for Hardware Reviewer to confirm or tighten if a more
+    figure. **Confirmed unchanged by the Rev 5 30R500U→30R500UF swap**:
+    the two parts share the same datasheet/electrical specification
+    (§7.5.9, DS-PROT-033), so this estimate applies equally to the new
+    MPN. Flagged for Hardware Reviewer to confirm or tighten if a more
     precise figure becomes available (e.g. a manufacturer datasheet
     revision, or a bench measurement at bring-up).
+27. **U6's internal SHDN pull-up resistance — two different figures in
+    circulation, neither a guaranteed spec** (new this revision, §7.5.10).
+    This agent's own read of TI's Figure 8-1 functional block diagram
+    shows "1 MΩ" (matching the pre-existing DS-PROT-013 TI E2E forum
+    citation and Component Engineer's own datasheet metadata record); the
+    task/human's independent web search instead cites "≈440kΩ". Neither
+    figure appears in TI's formal Electrical Characteristics table (no
+    guaranteed min/typ/max row exists for this specific resistance) —
+    this plausibly explains the discrepancy without requiring either
+    source to be wrong. **Not blocking**: R11's own sizing (§7.5.10) is
+    derived from TI's guaranteed 10µA SHDN leakage spec, independent of
+    either pull-up figure, and dominates the divider by ≈44×–100× either
+    way. Flagged for Hardware Reviewer/Component Engineer awareness —
+    worth a direct TI query or E2E-forum confirmation if a future
+    revision needs a tighter bound (e.g. a lower-power variant design).
+28. **U6's OVP trip point full-stack-worst-case margin against a 4S pack
+    is real but not large** (new this revision, §7.5.10). Reference-
+    tolerance-only worst case (14.2975V) clears a 4S pack's nominal
+    14.8V by 3.4%; full-stack worst case (reference **and** ±1% resistor
+    tolerance both adverse, 13.4881V) clears the 13.0V envelope ceiling
+    by only 3.75%. Both remain positive margins, not violations, but
+    neither is a wide margin — flagged so Hardware Reviewer can judge
+    whether this design's own E96/1% resistor choice is adequate or
+    whether tighter-tolerance (e.g. 0.1%) resistors would be warranted
+    for R12–R14 in a future revision, particularly if a real 4S-pack
+    mis-connection is judged a credible, not just theoretical, field
+    scenario.
+29. **U6's dVdT capacitor (C17) is sized against this design's own real
+    C(OUT), not against either of TI's own worked-example scenarios**
+    (new this revision, §7.5.10). TI's own datasheet illustrates the
+    dVdT/inrush-current equation at C(OUT)=1mF (a 15W-DC-DC-converter
+    buffer-capacitor use case, §9.2.2.3) and, in a separate figure
+    caption, at C(OUT)=30mF — both roughly 100×–3000× larger than this
+    design's own real C(OUT)=10µF (the existing C10, reused, not a new
+    output capacitor). C17=22nF was independently derived from TI's own
+    Equations 1–2 against this design's actual 10µF, not copied from
+    either TI example. Flagged only so Hardware Reviewer can independently
+    verify this distinction was made correctly (an earlier internal draft
+    of this section briefly conflated the two before being caught and
+    corrected this session) — not because the final C17 value itself is
+    in doubt.
 
 ## 17. Power budget (summary — full detail in `hardware/power-budget.md`)
 
@@ -3011,10 +3632,21 @@ called out separately — REQ-103):**
   simultaneous, not the real expected coincidence), the worst-case 3V3
   total becomes **≈19.5mA**; a representative mid-duty (~50%) typical
   addition of ≈1.65mA brings the typical total to **≈8.65mA**.
-- **Margin vs. REQ-103 (≤300mA)**: ≈280.5mA / ≈93.5% margin (was ≈94.6%
-  pre-R10 — negligibly reduced).
-- **Margin vs. TLV75533PDBVR's 500mA rating (DS-PWR-003)**: ≈480.5mA /
-  ≈96.1% margin (was ≈96.8% pre-R10).
+- **New Rev 5: R11 (U6 SHDN pulldown, §7.5.10) adds ≈330µA when PA9 is
+  driven high** (3.3V ÷ 10kΩ) — a static GPIO output (not PWM, unlike
+  PA8/R10), so unlike R10 this is not a duty-cycle-dependent figure: 0mA
+  whenever PA9 is held low (U6 disabled, the fail-safe default state)
+  and a steady ≈330µA whenever PA9 is held high (U6 enabled, the normal
+  motor-running state). Folded into both totals as a continuous addition
+  (the condition under which the motor subsystem is actually usable),
+  bringing the worst-case 3V3 total to **≈19.83mA** and the typical total
+  to **≈8.98mA**. (U6's own IQ and OVP/UVLO-divider bias current draw
+  from **VM_MOTOR**, not 3V3 — tracked separately in the VM_MOTOR rail
+  section below, never folded into this 3V3 total.)
+- **Margin vs. REQ-103 (≤300mA)**: ≈280.2mA / ≈93.4% margin (was ≈93.5%
+  pre-R11 / ≈94.6% pre-R10 — negligibly reduced each time).
+- **Margin vs. TLV75533PDBVR's 500mA rating (DS-PWR-003)**: ≈480.2mA /
+  ≈96.0% margin (was ≈96.1% pre-R11 / ≈96.8% pre-R10).
 - Both still confirm the Component Engineer's own pre-design expectation
   ("MCU+IMU are only ~10-15mA combined") — even including the LED, I2C
   pull-ups, and now R10, total draw remains an order of magnitude below
@@ -3033,14 +3665,41 @@ tracked entirely separately from the 3V3 budget above, never folded in):**
 - **New Rev 4: bounded source envelope, 9.0–13.0V (ISS-019, §7.5.9)** —
   derived from the 3S-only conclusion below (9.0V = 3S near-cutoff) and
   a 3S full-charge ceiling plus headroom (13.0V ≥ 12.6V + ~3%); excludes
-  4S and above. Enforced by new **F1 (Littelfuse 30R500U PTC resettable
-  fuse, DS-PROT-006)** in-line ahead of D2/D3, bounding fault-current
-  magnitude/duration rather than precisely limiting steady-state current
-  (F1's 10.00A Itrip exceeds J4's own 5.0A rating — an honestly-scoped
-  gap, not overclaimed as precision current-limiting). A continuous
-  (non-fault) overvoltage lockout is **not** provided by F1 or by D3 (a
-  transient-only TVS backstop) — flagged, §16 item 22/23, as residual
-  scope for the flagged §7.5.10 supervisory controller.
+  4S and above. Enforced by **F1 (Littelfuse 30R500UF PTC resettable
+  fuse, DS-PROT-006/033 — MPN swapped from the obsolete 30R500U this
+  revision, Rev 5, same datasheet/electrical/mechanical spec, §7.5.9)**
+  in-line ahead of D2/D3, bounding fault-current magnitude/duration
+  rather than precisely limiting steady-state current (F1's 10.00A Itrip
+  exceeds J4's own 5.0A rating — an honestly-scoped gap, not overclaimed
+  as precision current-limiting).
+- **New Rev 5: continuous (non-fault) overvoltage lockout — now
+  provided, closing the gap F1/D3 always left open (ISS-019 residual,
+  §16 item 22 RESOLVED).** New **U6 (TPS26631PWPR, §7.5.10)** adds a
+  continuous OVP comparator referenced to this same 9.0–13.0V envelope
+  via its own resistor divider (R12/R13/R14): OVP trips at 13.7368V
+  (min) / 14.0171V (typ) / 14.2975V (max) referenced-tolerance-only, or
+  13.4881V full-stack worst case (reference **and** resistor tolerance
+  both adverse) — all above the 13.0V ceiling, all below a 4S pack's
+  14.8V nominal (3.4–3.75% clearance, §16 item 28). UVLO trips at
+  8.1721V (min) / 8.3388V (typ) / 8.5056V (max) referenced-tolerance-only,
+  or 8.6527V full-stack worst case — all below the 9.0V floor. U6 also
+  now gives ISS-015's cross-domain power-up ordering gap a hardware
+  enforcement point (default-OFF load-switch, §14's Rev 5 re-check item
+  9) and ISS-021's eventual firmware latch a physical actuation point
+  (PA9/SHDN, §7.5.12) — the firmware latch *policy* itself remains
+  undecided (§16 item 25, unchanged this revision).
+- **New Rev 5: U6's own current draw on VM_MOTOR — small, non-material
+  to the rail margin.** IQ(ON)=1.38mA typ/1.7mA max (device operating,
+  load-switch closed); IQ(OFF)=21µA typ/60µA max (SHDN low, device
+  disabled); OVP/UVLO divider bias current 8.69–12.55µA (continuous,
+  regardless of SHDN state, since the divider taps IN_SYS directly).
+  Combined worst case ≈1.76mA — under 0.06% of J4's 5.0A connector
+  rating and under 0.06% of U5's own 3–4A OCP window; not a material
+  change to any VM_MOTOR margin figure computed elsewhere in this
+  section. (R11's own ≈330µA, when SHDN is driven high by PA9, is a 3V3
+  logic-rail draw, not a VM_MOTOR draw — tracked in the 3V3 rail section
+  above instead, consistent with this budget's own convention of never
+  folding the two rails together.)
 - **Motor+driver worst-case current: ≈1.05A nominal** (derived target for
   5mN·m, Kt≈4.77mN·m/A) **/ ≤3A absolute worst-case** (TI's own
   start-up/locked-motor ceiling, DS-MTR-056) — this 3A figure sits right
@@ -3419,3 +4078,118 @@ No KiCad project exists to run `extract_schematic_netlist` /
 `analyze_schematic_connections` / `validate_project` against (§0) — this
 document, including its Rev 4 additions, is the self-check substitute for
 this revision too, consistent with Rev 1, Rev 2, and Rev 3.
+
+### 18.3 Rev 5 handoff (this revision — U6 supervisory controller implementation, Cycle 4 rework)
+
+Per this cycle's loop-back task: implement the now-human-approved U6 =
+TPS26631PWPR (`bom/component-selection.md` "Motor-Rail Supervisory
+Controller" §Approval), and swap F1's obsolete MPN. Both completed —
+
+1. **ISS-015 (cross-domain power-up ordering, SPEED risk)** — **hardware
+   enforcement point now added.** U6's default-OFF/fail-safe load-switch
+   (R11=10kΩ pull-down dominating SHDN's internal pull-up, §7.5.10) means
+   U5's VCC is only energized once firmware deliberately drives PA9 high
+   — closing the gap R10 alone (Rev 4) could not: R10 only bounded
+   SPEED's *voltage* if U5 was already powered, it never gated *whether*
+   U5 was powered relative to MCU boot order.
+2. **ISS-019 (unbounded VM_MOTOR envelope) — residual continuous-OVP/
+   UVLO gap now closed.** F1 (Rev 4) bounded only fault-current
+   magnitude/duration; U6's own continuous OVP/UVLO comparator, referenced
+   to the identical 9.0–13.0V envelope via R12/R13/R14 (real TI Eq9/Eq10
+   divider design, not an approximation), now also enforces the envelope
+   continuously, independent of any fault event.
+3. **ISS-021 (no latching, REQ-404 not satisfied) — still FLAGGED, not
+   fixed in hardware, exactly as this revision's own task instruction
+   required.** U6 gives firmware a physical actuation point (PA9/SHDN)
+   for an eventual latched cutoff, and MODE=Open gives U6 its own
+   independent overload-latch behavior as a bonus — but the actual
+   retry-counting/rolling-window/re-arm *policy* is not decided, invented,
+   or defaulted by this revision. §16 item 25 is updated to reflect U6's
+   availability as the enforcement point, not to declare the policy gap
+   closed.
+4. **ISS-020 (undecided overspeed ceiling)** — **untouched, as required.**
+   No circuit trick was applied; this remains entirely a firmware/human-
+   safety-review decision (§16 item 24, unchanged in substance).
+5. **F1 obsolescence** — **resolved.** Littelfuse 30R500U → 30R500UF,
+   independently confirmed this session (web search) to be the same
+   datasheet/electrical/mechanical part (Ihold=5A/Itrip=10A/Vmax=30Vdc/
+   Imax=40A/package/footprint identical), differing only in RoHS3-
+   compliant construction, and Active/orderable status — 30R500U's own
+   manufacturer-recommended direct replacement (§7.5.9, DS-PROT-033).
+
+**Artifacts**:
+- This document (`hardware/schematic/bench-imu-01-design.md`), revised
+  to Rev 5 — schematic artifact + design rationale log + self-check
+  results (§14's new "Rev 5 motor-domain re-check" subsection, §15's new
+  "Re-self-check after Rev 5 fixes" subsection — a full, explicit pass of
+  all 16 items against U6 specifically, per this cycle's own task
+  instruction), combined.
+- `hardware/power-budget.md` — **updated this revision**: Supply
+  Capability's VM_MOTOR row's F1 MPN corrected to 30R500UF; Subsystem
+  Load gains U6's IQ/divider-bias-current (VM_MOTOR) and R11's ≈330µA
+  (3V3, mirroring R10's own precedent); a new U6 thermal cross-check
+  added alongside the existing U5/LDO ones; Rail Margin Summary
+  reconciled to note U6's now-continuous OVP/UVLO enforcement.
+- `datasheets/evidence-log.md` — **new rows this revision**: DS-PROT-023
+  through DS-PROT-033 inclusive (U6 pinout/PowerPAD, SHDN thresholds/
+  leakage/design-rule, SHDN pull-up figure + "not a guaranteed spec"
+  finding, UVLO/OVP electrical characteristics + Eq9/10 + 20×-leakage
+  design rule, R(ILIM) Eq8, dVdT/inrush Eq1–2 + Fig 8-3's C(OUT)=1mF
+  citation + PGTH timing, C(IN) triple-citation, MODE/PGOOD/FLT/IMON/AMR/
+  ROC tables, thermal RθJA/R(ON)/T(TSD)/IQ, F1's 30R500UF Active/RoHS3/
+  manufacturer-recommended-replacement swap rationale, and F1's
+  30R500U/30R500UF electrical-and-mechanical identity confirmation) —
+  verified against no duplicate row IDs.
+- `datasheets/texasinstruments_tps26631pwpr_unknown-rev.md` — **"Known
+  gaps" section updated in place** this revision to record which gaps
+  this session's own research closed (SHDN pull-up figure now traced to
+  an illustrative-only diagram, not a missing spec; C(OUT) ambiguity
+  resolved as two distinct, unrelated TI citations) versus which remain
+  open.
+- `datasheets/littelfuse_30r500u_rev-unknown.md` → **renamed** to
+  `datasheets/littelfuse_30r500uf_rev-unknown.md` this revision (`git
+  mv`, preserving file history), content updated in place to record the
+  MPN swap, RoHS3/Active-status confirmation, and the same Evidence IDs
+  this file already served plus DS-PROT-033.
+- Open `UNKNOWN`s: §16 above — **1 pre-existing item resolved in place**
+  (item 22: the flagged supervisory controller is now U6, selected,
+  approved, and implemented — historical original text preserved
+  inline, not deleted), **1 pre-existing item's cross-reference updated
+  for accuracy without changing its substance** (item 25: notes U6 is now
+  the specified/selected enforcement point, but the firmware policy
+  itself remains exactly as undecided as before), **2 pre-existing items
+  confirmed unaffected** (items 24/26, explicitly noted as such), **4 new
+  items appended** (items 27–29 plus this list itself: the SHDN pull-up
+  resistance discrepancy; the OVP full-stack-worst-case margin nuance;
+  the dVdT/C(OUT) sizing-basis distinction) — none renumbered or deleted,
+  per this section's own established "annotate/append, don't renumber"
+  convention.
+
+**Constraints confirmed respected this revision**: `bom/component-
+selection.md`, `requirements/requirements.md`, `hardware/power-
+architecture.md`'s Decision table, `hardware/mechanical-interface.md`,
+`validation/open-issues.md`, `validation/design-review.md`, and
+everything under `hardware/mechanical/`/`firmware/` were read-only
+references, never edited. **No new component was selected outside this
+revision's own task scope**: U6's MPN was fixed by the task instruction
+itself (already Component-Engineer-proposed and human-approved before
+this session began) — this agent's own role this revision was
+implementation (divider/pull-down/R(ILIM)/dVdT sizing, pin allocation,
+net-list/parts-list integration), not part selection; F1's replacement
+MPN (30R500UF) is the same manufacturer's own direct-replacement part for
+an already-approved part, not a new part-selection decision, consistent
+with how this agent's "Out of scope" constraint is scoped to
+*architecturally significant* new selections.
+
+**On the SHDN pull-up discrepancy (§16 item 27)**: this is disclosed, not
+silently resolved in favor of either the task/human's ≈440kΩ figure or
+this agent's own 1MΩ datasheet-diagram read, because neither is a
+guaranteed Electrical Characteristics spec — R11's own sizing rests on a
+different, guaranteed spec (10µA leakage) that is robust regardless of
+which pull-up figure is correct. Flagged for Hardware Reviewer/Component
+Engineer awareness, not as a blocking defect.
+
+No KiCad project exists to run `extract_schematic_netlist` /
+`analyze_schematic_connections` / `validate_project` against (§0) — this
+document, including its Rev 5 additions, is the self-check substitute for
+this revision too, consistent with Rev 1 through Rev 4.

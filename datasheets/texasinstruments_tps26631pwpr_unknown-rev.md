@@ -32,7 +32,21 @@
   tooling, same limitation already logged against several other parts in
   this evidence set, e.g. DS-MTR-040's DRV10983 citation).
 - **Used for Evidence IDs**: DS-PROT-010, DS-PROT-011, DS-PROT-012,
-  DS-PROT-013, DS-PROT-014, DS-PROT-020.
+  DS-PROT-013, DS-PROT-014, DS-PROT-020, DS-PROT-023, DS-PROT-024,
+  DS-PROT-025, DS-PROT-026, DS-PROT-027, DS-PROT-028, DS-PROT-029,
+  DS-PROT-030, DS-PROT-031.
+- **Rev 5 addendum (Circuit Engineer, 2026-09-08)**: this session obtained
+  a directly text-extractable copy of the full combined datasheet
+  (literature number **SLVSE94G**, confirmed from the extracted text
+  itself — resolving the "Revision / Version: UNKNOWN" limitation above
+  for citation purposes going forward, though the field above is left
+  as Component Engineer originally recorded it per this log's
+  point-in-time convention) and cross-verified its internal page
+  numbering against the PDF's own "Submit Document Feedback   N" footer
+  text. This closed several gaps flagged below and is the basis for
+  DS-PROT-023 through DS-PROT-031 (see `datasheets/evidence-log.md`),
+  used for §7.5.10/§7.5.9 of `hardware/schematic/bench-imu-01-design.md`
+  Rev 5.
 
 ## Family variant differences (TPS26630 / 31 / 32 / 33)
 
@@ -94,6 +108,26 @@ does want the switch enabled. This is flagged here as a **required
 external component**, not a hidden assumption — the exact resistor value
 is Circuit Engineer's schematic-level decision, not this record's.
 
+**Rev 5 addendum (Circuit Engineer, 2026-09-08, DS-PROT-025)**: the full
+datasheet's own Figure 8-1 (Functional Block Diagram, page 16) confirms
+the same **1 MΩ** figure as this section's E2E-forum source — but only
+in the illustrative block diagram, with **no corresponding row in the
+formal Electrical Characteristics table**. The human/task independently
+re-confirmed a different figure, **≈440 kΩ**, via a fresh web search this
+same engagement (`bom/component-selection.md` Approval table). Both
+figures point the same direction (native default-ON, needing an external
+pull-down to invert to default-OFF per REQ-403) and neither is a
+guaranteed datasheet spec, so the discrepancy does not change the
+default-OFF requirement itself. Circuit Engineer's actual pull-down
+sizing (R11 = 10 kΩ, this design) is **not** based on either pull-up
+figure — it is based on the datasheet's own separately-guaranteed SHDN
+leakage/pulldown-sizing spec instead (§8.3.13, page 28: pulldown must
+sink ≥10 µA; DS-PROT-024), which is robust regardless of which pull-up
+figure is correct (10 kΩ dominates a 440 kΩ–1 MΩ pull-up by 44–100×).
+The 1 MΩ-vs-440 kΩ discrepancy itself remains an open, non-blocking
+item flagged for Hardware Reviewer/Component Engineer awareness (see
+design doc §16 item 27) — not resolved in favor of either source here.
+
 ## Reference design / EVM
 
 TI's **TPS26630-33EVM** is a real, published evaluation module for this
@@ -115,19 +149,53 @@ this session (DS-PROT-020).
   product page, an alldatasheet.com text mirror of the same combined
   family datasheet, and a TI E2E forum post — multiple independent
   sources, but none is a direct page-numbered PDF read.
+  **RESOLVED (Rev 5, Circuit Engineer, 2026-09-08)**: a directly
+  text-extractable copy of the full SLVSE94G PDF was obtained and its
+  page numbering cross-verified against the PDF's own footer text this
+  session (see Rev 5 addendum above). AMR/ROC tables read directly from
+  page 2; Electrical Characteristics tables read directly from pages
+  6–8. See DS-PROT-023 through DS-PROT-031.
 - Exact UVLO pin threshold range/accuracy and OVP pin threshold
   range/accuracy (needed to size the actual resistor dividers for this
   design's 9.0–13.0 V envelope) are **UNKNOWN this session** — deferred to
   Circuit Engineer's detailed design phase, which will need the full
   primary datasheet (or a working PDF-reading pass) to size the dividers
   correctly.
+  **RESOLVED (Rev 5, Circuit Engineer, 2026-09-08)**: §9.2.2.2 (page 31)
+  read directly, giving Equations 9–10 and the guaranteed
+  V(UVLOR)/V(OVPR) = 1.176/1.200/1.224 V (min/typ/max) reference values,
+  hysteresis, and ±150 nA guaranteed leakage, plus TI's own 20×-leakage
+  divider-current design rule. Used to independently re-derive
+  R12=887 kΩ/R13=60.4 kΩ/R14=88.7 kΩ against this design's own
+  9.0–13.0 V envelope, using the exact guaranteed reference/hysteresis/
+  leakage values directly rather than an assumed placeholder. See
+  DS-PROT-026 and design doc §7.5.10.
 - PGOOD/FLT pin exact fault-reporting behavior (which specific fault
   classes each pin reports, timing) is **UNKNOWN this session** beyond
   the pin names themselves — relevant to how firmware distinguishes an
   OVP-triggered shutdown from a current-limit-triggered one, deferred to
   Circuit Engineer/Firmware Engineer.
+  **PARTIALLY ADDRESSED, still open (Rev 5, Circuit Engineer,
+  2026-09-08)**: Circuit Engineer's Rev 5 design leaves PGOOD/FLT/IMON
+  floating (sanctioned by TI's own standard Electrical Characteristics
+  test condition, which uses IMON=PGOOD=FLT=OPEN throughout — see
+  DS-PROT-030) rather than wiring them to the MCU, because this design's
+  MCU-GPIO budget and the firmware-side fault-differentiation policy are
+  both outside this revision's scope (ISS-020/ISS-021 remain open
+  firmware-policy items per design doc §7.5.11/§7.5.12 — see
+  `validation/open-issues.md`). This sidesteps rather than resolves the
+  original informational gap: the exact per-pin fault-class timing is
+  still not transcribed here, and would need to be if/when firmware
+  wiring to PGOOD/FLT is added in a future revision.
 - Thermal data (θJA, package power dissipation limits) **UNKNOWN this
   session** — should be closed before Circuit Engineer finalizes PCB
   copper-pour/thermal layout, same caveat pattern already applied to
   DRV10983 (DS-MTR-039) and DRV10970 (DS-MTR-048) in the Motor Driver
   section.
+  **RESOLVED (Rev 5, Circuit Engineer, 2026-09-08)**: Thermal
+  Information table (page 2) gives RθJA=32.2°C/W for the PWP
+  (HTSSOP-20) package specifically; Electrical Characteristics table
+  (pages 6–7) gives R(ON)=26/30.44/34.5 mΩ (25°C)/33–45 mΩ (85°C) and
+  T(TSD)=165°C typ. Full conduction-loss/ΔTJ/margin analysis against
+  ROC(125°C)/AMR(150°C)/T(TSD)(165°C) completed in design doc §7.5.10
+  and re-checked in §15's Rev 5 self-check. See DS-PROT-031.
