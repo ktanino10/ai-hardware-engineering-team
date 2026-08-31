@@ -54,6 +54,18 @@ trusting a verbal "it fits."
 10. Interface-value traceability — every dimension traces to an interface
     row/Evidence ID or is explicitly `ASSUMPTION`/`ESTIMATE`
     (`.github/instructions/mechanical-design.instructions.md`).
+11. Manufacturing process specification (safety-critical/structural parts
+    only) — for any part flagged safety-critical or structural (not
+    cosmetic/fit-only), verify a Manufacturing Engineer process
+    specification (infill %/pattern, wall/perimeter count, print
+    orientation, material —
+    `.github/skills/manufacturing-process-specification/SKILL.md`) actually
+    exists and is internally consistent with the part's own disclosed load
+    case, rather than assuming the CAD model's stated wall thickness alone
+    guarantees the fabricated part has that much solid material. This is
+    the independent check on Manufacturing Engineer's own output — do not
+    accept its stated rationale as fact; re-derive whether the specified
+    process plausibly matches the part's actual load path yourself.
 
 ## Failure analysis — for each potential issue found, work out
 

@@ -69,6 +69,7 @@ both write to the same `validation/open-issues.md` (§8).
 | **Mechanical Reviewer** *(Phase 1)* | Independent, adversarial mechanical review; severity-classified findings (shares `validation/open-issues.md` with Hardware Reviewer) | Fixing the design itself |
 | **Firmware Engineer** *(Phase 2)* | Driver-level bring-up firmware from a Design-Complete schematic: peripheral initialization, register-level configuration, design rationale log (`firmware/<board>/`) | Control loops/sensor fusion/unit conversion (Control Engineer's future territory, §14 — not yet triggered); editing Electronics artifacts; marking own work reviewed/complete (self-check stands in for independent review until a Firmware Reviewer trigger is met, `docs/architecture-evolution.md` §32) |
 | **Power Engineer** *(Phase 3)* | System power-tree/rail-topology proposal (`hardware/power-architecture.md`), multi-rail `hardware/power-budget.md` bookkeeping, once engaged (a Hardware Lead judgment call per project/revision, `.github/agents/power-engineer.agent.md`) | Implementing the actual regulator/converter circuit (Circuit Engineer); selecting the specific part (Component Engineer); self-approving a rail/source architecture decision (always HITL, §10) |
+| **Manufacturing Engineer** *(Phase 4)* | Manufacturing PROCESS parameters (infill %/pattern, wall/perimeter count, print orientation vs. load direction, material) for safety-critical/structural mechanical parts, once engaged (a Mechanical Lead / Hardware Lead judgment call per part, `.github/agents/manufacturing-engineer.agent.md`) | The part's CAD geometry itself (Mechanical Lead); declaring its own process specification independently reviewed (Mechanical Reviewer performs that independent cross-check, `.github/skills/mechanical-review/SKILL.md` item 11); certifying FDM plastic as adequate for a hazardous-energy containment purpose without real physical testing |
 
 The Mechanical Lead / Mechanical Reviewer pair was added in Phase 1 of the
 multidisciplinary evolution (`docs/architecture-evolution.md` §7, §10, §27);
@@ -85,10 +86,29 @@ original 4-agent Electronics team to 5, the same way Component Engineer/
 Circuit Engineer/Hardware Reviewer already divide Electronics work, rather
 than a new top-level discipline the way Mechanical/Firmware are), engaged
 only when the Hardware Lead judges a given project's power complexity
-warrants it, not for every future design by default. Hardware Lead
-orchestrates across all disciplines today (§10, §5.3, §5.4) — a separate
-"System Lead" role remains premature until the framework's own discipline
-count grows further (`docs/architecture-evolution.md` §7).
+warrants it, not for every future design by default. The Manufacturing
+Engineer was added in Phase 4 (`docs/architecture-evolution.md` §35) after
+a real gap was found by the human Chief Engineer during review of the
+Bench-IMU-01 Rev 3 flywheel containment cap (a still-draft, unmerged
+design): a CAD model's stated wall thickness is a geometric claim only, and
+this repository had zero coverage of the manufacturing process parameters
+(infill %/pattern, wall/perimeter count, print orientation, material) that
+actually determine whether a fabricated part has that solid material at
+all — confirmed by a repository-wide search for "infill" returning no hits
+before this addition. A Mechanical-adjacent addition (extends the
+Mechanical discipline's Lead/Reviewer pair to 3, the same way Power
+Engineer extends Electronics, rather than a new top-level discipline),
+engaged only when the Mechanical Lead / Hardware Lead judges a specific
+part's safety-critical/structural function warrants it. Its own output is
+independently cross-checked by the Mechanical Reviewer
+(`.github/skills/mechanical-review/SKILL.md` item 11), never
+self-certified — no new independent reviewer agent was introduced for this
+narrow addition, mirroring the same scope-proportionality reasoning §32/§33
+already used for not adding a Firmware Reviewer or Power Reviewer
+immediately. Hardware Lead orchestrates across all disciplines today (§10,
+§5.3, §5.4) — a separate "System Lead" role remains premature until the
+framework's own discipline count grows further
+(`docs/architecture-evolution.md` §7).
 
 Full role specs: `.github/agents/hardware-lead.agent.md`,
 `.github/agents/component-engineer.agent.md`,
@@ -97,7 +117,8 @@ Full role specs: `.github/agents/hardware-lead.agent.md`,
 `.github/agents/mechanical-lead.agent.md`,
 `.github/agents/mechanical-reviewer.agent.md`,
 `.github/agents/firmware-engineer.agent.md`,
-`.github/agents/power-engineer.agent.md`. These are real GitHub Copilot
+`.github/agents/power-engineer.agent.md`,
+`.github/agents/manufacturing-engineer.agent.md`. These are real GitHub Copilot
 custom agent profiles (per
 [docs.github.com/en/copilot/reference/custom-agents-configuration](https://docs.github.com/en/copilot/reference/custom-agents-configuration)),
 each with a required `description` field, so they are selectable directly
@@ -508,6 +529,17 @@ These are **not** created as `.github/agents/*.agent.md` files yet (except
 Firmware Engineer and Power Engineer, now implemented above) — introduce the
 rest only when their trigger condition is met, to avoid role/file
 proliferation ahead of actual need.
+
+**Manufacturing Engineer** (§3, `.github/agents/manufacturing-engineer.agent.md`,
+Phase 4) is a fourth implemented discipline **not previously listed in this
+table at all** — unlike the rows above, it was never a pre-registered future
+role with its own named trigger; it was introduced directly from a concrete
+gap the human Chief Engineer found during review of a real design (a
+CAD-solid enclosure wall's stated thickness has no framework coverage of the
+manufacturing process parameters — infill, wall/perimeter count, print
+orientation, material — that determine whether a fabricated part actually
+has that solid material once printed). See
+`docs/architecture-evolution.md` §35 for the full, dated trigger record.
 
 ## 15. Evaluation
 
