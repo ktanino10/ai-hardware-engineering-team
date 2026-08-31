@@ -2564,3 +2564,96 @@ the same way the existing Cycle 2 precedent did."
   independently dispositioned (one closed, one severity-assigned and
   logged) and do not require another look before a Circuit Engineer rework
   pass addresses ISS-014/ISS-015 specifically.
+
+## Cycle 3 — Rubber-duck premise/assumption review (same Rev 3 handoff, 2026-09-05)
+
+Run per `docs/architecture.md` §5.1, in addition to (not instead of) the
+Hardware Reviewer checklist pass immediately above — same artifact, a
+deliberately different lens (design premises/blind spots, not checklist
+execution). Formed an independent view first before cross-checking against
+the Hardware Reviewer's own Cycle 3 findings, per this project's own
+established practice (the same practice that caught ISS-011 in Rev 2, when
+a checklist-only pass had missed it).
+
+### Premises specifically checked, and confirmed to hold
+
+- **REQ-009's open-loop-only scope fence**: checked whether the I2C1
+  commissioning bus, FG reporting, or U5's own internal BEMF-based
+  commutation smuggle in control-loop-flavored thinking despite the
+  explicit scope fence. They do not — I2C1 configures static motor
+  parameters (Rm/Kt) and a control-mode register, not a runtime control
+  loop; U5's internal commutation is the driver IC's own normal operating
+  function, not this project's control logic. REQ-009 remains intact.
+- **Option A's fault-isolation intent**: the design document is honest that
+  Option A provides rail-level (not galvanic) isolation, and that the two
+  domains deliberately share a ground/signal reference — this matches
+  `hardware/power-architecture.md`'s own stated intent exactly, not an
+  overclaim.
+- **The four human-confirmed provisional defaults** (reaction-wheel target,
+  no motor-type preference, budget ceiling, bare-bench-rig sizing): the
+  approved motor+driver pairing and architecture have not silently drifted
+  from any of these — no disagreement found. The gap found (ISS-020) is
+  that the *target* itself (a floor) was never separately converted into a
+  *maximum/safety envelope*, which is a different, additional question the
+  original four never asked, not a violation of what was asked.
+
+### New findings (see `validation/open-issues.md` for the full schema each)
+
+- **ISS-019 (HIGH)** — New motor input (J4) has no bounded source envelope
+  or coordinated upstream fault containment; every component in its path
+  tolerates far more voltage/current than the recommended motor is
+  actually qualified for. Complements ISS-014 (which is about the input
+  sagging too *low*) with the upper-bound/source-fault-envelope gap.
+- **ISS-020 (HIGH)** — The approved "≥3000 RPM" target has only ever been
+  treated as a functional floor, never converted into a bounded maximum/
+  safety envelope for commanded speed, acceleration, or mechanical
+  containment. A genuine premise-challenge finding: neither Requirements
+  Engineering, Component Selection, nor Circuit Design ever asked "what is
+  the *maximum* speed this design must tolerate/survive," only "what is
+  the minimum it must reach." Directly compounds ISS-015 (that finding is
+  about *unintended* motion at power-up; this one is about *unbounded*
+  motion even during normal, intended operation).
+- **ISS-021 (HIGH)** — REQ-404's "shutdown behavior to prevent sustained
+  overheating" is not actually satisfied by DRV10983's Lock Detection
+  alone — all three of U5's own protection mechanisms (OCP, Lock
+  Detection, Thermal Shutdown) are auto-recovering/auto-retrying, not
+  latching. Directly challenges whether REQ-404 *as currently implemented*
+  is satisfied, a different and sharper question than whether the
+  mechanisms merely *exist* (which Hardware Reviewer's Cycle 3 pass already
+  confirmed).
+- **ISS-022 (MEDIUM)** — FG does not always represent actual RPM (can
+  reflect commanded/drive frequency during open-loop startup); ECO-007's
+  human directive to track the BEMF-degradation caveat in Firmware/FMEA is
+  not yet fulfilled — appropriately, since neither phase has run yet this
+  cycle. Recorded as a checkpoint, not a new circuit-level defect.
+- **ISS-023 (MEDIUM)** — Rev 2's "no vibration/shock, single simple rail"
+  validation-artifact premise (`validation/bring-up-procedure.md`,
+  `validation/fmea.md`) has not yet been updated for the new subsystem —
+  expected to be addressed at this cycle's own planned validation-artifact
+  closeout phase, flagged here so it is not silently skipped.
+
+### Cross-check against Hardware Reviewer's Cycle 3 findings
+
+- **Agree, not duplicated**: ISS-014 (2S UVLO) and ISS-015 (unsafe
+  uncommissioned SPEED/power-up state) — reviewed independently, no
+  disagreement with severity or substance.
+- **Distinct additions**: ISS-019/020/021/022/023 above are genuinely new,
+  not restatements.
+- **No disagreement** with ISS-016/017/018's LOW classification.
+
+### Verdict contribution
+
+- This pass does not issue a separate consolidated verdict (per
+  `docs/architecture.md` §4: exactly one Reviewer pass owns the
+  consolidated verdict — Hardware Reviewer's own Cycle 3 verdict,
+  above, stands as the single verdict for this cycle) — but adds 3
+  further open HIGH findings (ISS-019, ISS-020, ISS-021) to the 2
+  Hardware Reviewer already opened (ISS-014, ISS-015), for **5 open HIGH,
+  0 open CRITICAL** heading into Circuit Engineer's rework pass, plus 2
+  further MEDIUM (ISS-022, ISS-023) tracked as checkpoints for later
+  phases (Firmware Bring-up, validation-artifact closeout) rather than
+  blocking Circuit Design rework specifically.
+- **Next action**: all 5 open HIGH findings (ISS-014, 015, 019, 020, 021)
+  route back to Circuit Engineer for rework before a fresh re-review.
+  ISS-015 and ISS-020 both tie to REQ-403's safety-critical human-review
+  gate regardless of technical mitigation chosen.
