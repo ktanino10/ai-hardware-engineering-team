@@ -156,8 +156,8 @@ scope.
 | Role | Name | Date | Decision |
 |---|---|---|---|
 | Power Engineer | Power Engineer (AI agent) | 2026-08-31 | Proposed — **Option A recommended; no architecture selected** |
-| Hardware Lead | Hardware Lead (this session) | 2026-08-31 | Pending relay to human Chief Engineer at the dedicated Power Architecture HITL gate |
-| Chief Engineer (Human) — required, this is an architecture decision (`docs/architecture.md` §10) | *(pending)* | | *(open — required before Circuit Engineer implements the motor power path)* |
+| Hardware Lead | Hardware Lead (this session) | 2026-08-31 | Concur with Option A recommendation — relayed all 3 options to human Chief Engineer at the dedicated Power Architecture HITL gate |
+| Chief Engineer (Human) — required, this is an architecture decision (`docs/architecture.md` §10) | Human Chief Engineer (via creator/"General Chat" session) | 2026-08-31 | **Approved — Option A**: keep USB 5V logic-only exactly as Rev 2, add a second dedicated ~12V-class motor input (e.g. barrel jack). Rationale: lowest integration risk, best fault isolation between motor and logic rails (relevant given the IMU's noise sensitivity is already a live design concern), consistent with the already-approved bare-bench-test-rig/no-tight-envelope mounting context — no need for USB-PD negotiation complexity (Option B) or to walk back REQ-101's original USB-only framing with a battery (Option C) when a simple second connector solves it cleanly. Circuit Engineer to implement: existing 3.3V logic rail unchanged; new dedicated motor-power input + ~12V motor rail added as a separate power domain. |
 
 ## Handoff & change control
 
