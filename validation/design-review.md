@@ -4915,3 +4915,54 @@ non-gating) — see the Verdict below for why this does not block PASS.
   confirmed RESOLVED this cycle). MISS-011 remains open, non-gating, and
   should travel with the REQ-403 proposal to the human HITL gate rather than
   be resolved or silently dropped before then.
+
+## Addendum — Hardware Lead logging a human-surfaced finding (2026-09-11)
+
+While the REQ-403 containment proposal was under the human Chief
+Engineer's own direct review (via the cross-session HITL channel, not a
+formal review cycle), he raised a sharp question that neither Mechanical
+Lead's own self-check nor either of the 2 Independent Mechanical Review
+cycles above had caught: **`containment_wall_t`=4.0mm is a CAD-geometric
+solid-wall claim only** — whether the physically 3D-printed part actually
+contains 4.0mm of solid material at that location, or a sparse internal
+lattice (typical FDM slicer defaults are 15–25% infill, mostly air),
+depends on manufacturing/print-process parameters (infill %, pattern,
+wall/perimeter count, print orientation) that are specified downstream of
+CAD, at slicing time.
+
+Independently re-verified before logging: a repo-wide
+`grep -rn -i "infill"` returns **zero hits** anywhere in this repository;
+`hardware/mechanical/bench-imu-01-dimensional-spec.md` line 372's own
+`containment_wall_t` justification ("sized above the manufacturability
+floor on purpose... this wall's job is containment") is entirely a
+nominal-solid-geometry argument, with no reference to infill, perimeter
+count, or print orientation anywhere in this document or the `.scad`
+source. Confirmed: this is a real, previously-uncaught gap, not a
+mischaracterization.
+
+Logged as **MISS-012 (HIGH)** in `validation/open-issues.md` — classified
+HIGH rather than CRITICAL because the current design is genuinely
+*incomplete* on this specific parameter (not a demonstrated-wrong, fully-
+specified claim the way MISS-008 was), but realistic-not-remote because
+infill is a parameter every FDM print requires *some* value for, and a
+typical slicer default would apply unless someone deliberately overrides
+it — for a part whose entire purpose is impact/fragment containment, that
+is a credible, not a manufactured, risk. Distinguished from the existing
+MISS-011 (MEDIUM): MISS-011 questions whether an already-agreed geometry
+has been load-verified; MISS-012 questions whether the CAD geometry will
+even correspond to the as-built part at all — a more fundamental gap.
+
+**Not attempted to be resolved ad hoc.** A separate session has been
+dispatched to introduce a new **Manufacturing Engineer** discipline
+(agent + skill + a corresponding Mechanical Reviewer checklist addition
+requiring a process spec for safety-critical/structural parts) as a
+standalone framework PR against `main`, mirroring the Power Engineer
+precedent (framework merged and independently audited before being
+exercised on a real design) — not yet merged. Per explicit instruction,
+this containment cap's own Manufacturing Engineer pass (infill %,
+perimeter count, print orientation, each reasoned against the disposition's
+own disclosed ~99–122J credible-worst-case load) will follow once that
+framework lands, independently cross-checked by Mechanical Reviewer per
+the new checklist item — an additional prerequisite for a *complete*
+REQ-403 sign-off, on top of (not instead of) the human's own separate
+safety-topology review, which may still proceed in parallel.
