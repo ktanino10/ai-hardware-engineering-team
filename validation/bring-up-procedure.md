@@ -59,6 +59,44 @@ physical build.
 
 ## 1. Pre-Power-On Checklist
 
+**Rev 3 note**: the rest of this file (§0 values table, §2 sequencing, §3
+measurement) is still Rev 2-scoped and has not yet been rewritten for the
+Motor Driver + Reaction Wheel subsystem — that full rewrite is tracked
+separately as `validation/open-issues.md` ISS-023 (MEDIUM, non-blocking,
+planned for the `validation-artifacts-rev3` closeout pass, after Mechanical
+Design/Review settle the physical values this file would otherwise cite).
+The single item immediately below is a **targeted advance addition**, not
+an oversight — it is the specific compensating safeguard a human Chief
+Engineer required (2026-09-09, cross-session HITL channel) as the condition
+for accepting ISS-020/ISS-021 as ACCEPTED-RISK rather than leaving Rev 3's
+hardware/mechanical Design Complete blocked on firmware that hasn't been
+written yet. It must remain in force even after the full Rev 3 rewrite
+happens — do not let a future rewrite silently drop it.
+
+- [ ] **MOTOR/REACTION-WHEEL SUBSYSTEM (Rev 3) — MANDATORY, DO NOT SKIP OR
+      DEFER.** Before any power is ever applied to the U6/motor-rail domain
+      (12V J4 input, U6 TPS26631PWPR supervisory switch, U5 DRV10983 driver,
+      M1 T-Motor MN2206-13 + flywheel): confirm Firmware Bring-up has
+      actually implemented, and the flashed firmware build demonstrably
+      enforces, **both** REQ-405 (a bounded maximum operating/fault speed
+      with tach-supervised overspeed shutdown — not just the ≥3000 RPM
+      floor) **and** REQ-406 (a latched fault response — after a
+      fault-retry threshold, force the motor to a safe/stopped state and
+      require a deliberate re-arm, rather than relying on U5/U6's own
+      auto-recovering protections to loop indefinitely). This is the
+      specific, named compensating control for `validation/open-issues.md`
+      **ISS-020** (no bounded speed envelope) and **ISS-021** (no latching
+      fault behavior) — both dispositioned ACCEPTED-RISK, explicitly
+      conditioned on this check, **not** independently resolved by hardware
+      alone (see those findings' full rationale, and
+      `validation/change-log.md` for the corresponding ECO). Do **not**
+      proceed past this line item on the assumption that U5's Lock
+      Detection/Thermal Shutdown or U6's current limit is sufficient by
+      itself — per ISS-021, all of those mechanisms auto-retry/auto-recover
+      by design and do not latch. If REQ-405/406 firmware cannot be
+      confirmed present and functioning, **do not energize the motor rail**;
+      the rest of this procedure's Rev 2 scope (MCU/IMU/logic rail) may
+      still proceed independently.
 - [ ] Visual inspection: correct component population and orientation
       (polarized parts, pin-1 orientation)
 - [ ] Continuity check: no unintended shorts between rails/ground (per
