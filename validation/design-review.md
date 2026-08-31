@@ -3280,3 +3280,183 @@ scratch, per this cycle's re-review scope.
   accepted). ISS-024/025 (LOW) do not block progress but should receive an
   explicit disposition before this subsystem's own Design Complete Gate,
   per `docs/architecture.md` §8, same as ISS-016/017/018 before them.
+
+## Cycle 5 — ISS-026 CRITICAL fix (Rev 6) re-verification: focused pin-reassignment check (2026-09-10)
+
+### Review Cycle Metadata
+
+- **Design revision reviewed**: `hardware/schematic/bench-imu-01-design.md`
+  **Rev 6** (commit `ef5edc4`, "Rev 6: fix ISS-026 CRITICAL — re-route IMU
+  I2C bus PB10/PB11 -> PA11/PA12"). **This is a narrow, focused re-review of
+  one specific CRITICAL fix, not a full re-review** — per the task's own
+  explicit framing, Rev 5's motor-subsystem content (already independently
+  reviewed and passed at Cycles 3/4) is out of scope and not re-litigated
+  here, and ISS-020/ISS-021 correctly remain OPEN/ACCEPTED-RISK pending
+  Firmware Bring-up, untouched by this cycle.
+- **Reviewer**: Hardware Reviewer — see
+  `.github/agents/hardware-reviewer.agent.md`. Independent of the Circuit
+  Engineer session that authored Rev 6 and the Hardware Lead session that
+  relayed/opened ISS-026. Did not accept the changelog's own self-check
+  claims (§14 item 13, §16 item 4) at face value; re-derived each checklist
+  item independently below.
+- **Independence statement**: The core physical fact underlying ISS-026
+  (PB10/PB11 absent from the STM32G031K8T6's actual LQFP-32 package) was
+  re-derived from scratch this cycle directly against ST's own primary
+  datasheet (**DS12992 Rev 4**), fetched fresh via
+  `https://r.jina.ai/https://www.st.com/resource/en/datasheet/stm32g031k8.pdf`
+  — not accepted from the design document's, evidence-log's, or Hardware
+  Lead's own citation/paraphrase (DS-MCU-068). Table 2 (device/peripheral
+  counts), Figure 7 (LQFP32 pinout), Figure 9 (LQFP48 pinout), Table 12
+  (per-pin per-package assignment), and Tables 13/14 (Port A/B
+  alternate-function maps) were each independently located and read. Before
+  trusting my own parsing of Table 12's six-package-column layout, I
+  validated the parsing methodology against a known-good, independently
+  checkable row (PC13: dash×5 then "1" — LQFP48-only, physical pin 1,
+  consistent with Figure 9 but not Figure 7) before applying the same
+  parsing to the PB10/PB11/PA11/PA12 rows under review.
+- **Scope**: Per the task's explicit framing, this cycle checked exactly
+  six things: (1) the core physical fact, from a primary source,
+  independently; (2) completeness — every remaining PB10/PB11 mention in
+  the document is historical/annotated, not a live incorrect claim; (3) no
+  new conflict — PA11/PA12 used nowhere else in the design; (4) R3/R4
+  pull-up sizing (§5.2) genuinely unaffected by the pin move; (5) scope
+  discipline — no file other than the schematic doc touched by the Rev 6
+  commit; (6) the four checklist items specifically relevant to a
+  pin-reassignment (floating pin, pull-up/pull-down, logic voltage
+  mismatch, interface timing). The other 12 checklist items are not
+  relevant to this narrow a change and were not re-run from scratch, per
+  the task's own explicit instruction.
+- **Process-integrity check**: Independently ran `git show --stat` and
+  `git show --name-status` on commit `ef5edc4` rather than relying on the
+  commit message's own self-reported diffstat: confirms **exactly one file
+  touched** — `hardware/schematic/bench-imu-01-design.md` (201 insertions,
+  29 deletions). `firmware/bench-imu-01/`, `bom/component-selection.md`,
+  `requirements/requirements.md`, `hardware/mechanical-interface.md`, and
+  `hardware/mechanical/` are all confirmed untouched by this commit.
+  `git status` independently confirmed a clean working tree with HEAD
+  exactly at `ef5edc4` — no drift between the task's framing and this
+  cycle's execution.
+- **KiCad tool cross-checks used**: None — no KiCad project exists for this
+  repository (consistent with Cycles 1–4); the Markdown schematic-equivalent
+  document remains the correct artifact, reviewed net-by-net (§12) and
+  pin-by-pin (§11) as before.
+
+### Checklist Results
+
+Only the checklist items the task identified as relevant to a
+pin-reassignment change are re-run from scratch; the remaining 12 are
+unaffected by a same-peripheral/same-AF/different-GPIO-port change and are
+carried forward unaffected from the Cycle 3/4 pass on Rev 5 (this fix
+touches no power architecture, motor subsystem, protection, or decoupling
+component).
+
+| # | Checklist item | Result | Notes |
+|---|---|---|---|
+| 1 | Voltage violation | N/A — out of scope, unaffected | No voltage-domain change; same 3.3V MCU, same devices. |
+| 2 | Absolute Maximum Rating violation | N/A — out of scope, unaffected | No AMR-relevant component changed. |
+| 3 | Current limit | N/A — out of scope, unaffected | No current-path change. |
+| 4 | Thermal risk | N/A — out of scope, unaffected | No power-dissipating component changed. |
+| 5 | Missing decoupling capacitor | N/A — out of scope, unaffected | No new device added. |
+| 6 | **Floating pin** | **Pass — independently confirmed** | R3/R4 (I2C pull-ups) travel with the net, not with the specific MCU pin — the bus is pulled up regardless of which GPIO terminates it. PB10/PB11 were removed from §11's pin table entirely (not left as a dangling "used but unconnected" entry), and PA11/PA12 correctly appear in the used-pin table with the pull-up-terminated bus. No floating pin introduced. |
+| 7 | **Incorrect pull-up/pull-down** | **Pass — independently confirmed** | See Finding below (§5.2 re-derivation): `Rp,min=(Vcc−VOL,max)/IOL` and `tr≈0.8473×Rp×Cb` depend only on Vcc/VOL,max/IOL/Cb, none of which reference a physical pin. Independently went further than the design document's own reasoning: Table 12 shows PB10/PB11 and PA11/PA12 (LQFP32/UFQFPN32 row) share the **identical I/O structure designation "FT_fa"** — the datasheet's own basis for VOL,max/IOL — confirming, not merely assuming, that R3=R4=4.7kΩ remains correctly sized. |
+| 8 | **Logic voltage mismatch** | **Pass — independently confirmed** | Port A and Port B share the same single VDD/VDDIO 3.3V I/O supply domain on this MCU; the identical "FT_fa" I/O-structure class (not port letter) is what governs electrical/logic-level behavior in ST's own datasheet. No new logic-level interface introduced by moving from Port B to Port A pins. |
+| 9 | **Interface timing** | **Pass — independently confirmed** | Same I2C2 peripheral instance, same AF6 alternate-function selector (Table 13: PA11/PA12 AF6=I2C2_SCL/I2C2_SDA; Table 14: PB10/PB11 AF6=I2C2_SCL/I2C2_SDA — identical selector value on both ports). Alternate-function pad routing is a signal-routing crossbar operation; it does not alter the peripheral's own internal Fast-mode 400kHz timing-register configuration. No timing impact. |
+| 10 | Power sequencing | N/A — out of scope, unaffected | No sequencing-relevant component changed. |
+| 11 | Grounding | N/A — out of scope, unaffected | No ground-net change. |
+| 12 | EMI/EMC risk | N/A — out of scope, unaffected | No new switching/noise source. |
+| 13 | Motor noise | N/A — out of scope, unaffected | No change to motor subsystem. |
+| 14 | Sensor noise | N/A — out of scope, unaffected | No new coupling path into the IMU's rail. |
+| 15 | PCB layout concern | N/A — out of scope, unaffected | Pre-layout schematic-equivalent document; no board-level layout exists yet to re-check. |
+| 16 | Datasheet recommendation violation | **Pass — independently confirmed** | The fix's own recommended pin choice (PA11/PA12 via AF6) matches ST's own Table 12/13 alternate-function assignment exactly — no unexplained deviation. |
+
+### Findings
+
+#### Re-verification of ISS-026 (IMU I2C bus PB10/PB11 → PA11/PA12) — independently CONFIRMED RESOLVED
+
+- **Claim under review**: PB10/PB11 — where the IMU's I2C2 bus has been
+  documented and firmware-implemented since Rev 2's ISS-011 fix — do not
+  physically exist on the STM32G031K8T6's actual LQFP-32 package, and Rev 6
+  re-routes the bus to PA11(SCL, physical pin 22)/PA12(SDA, physical pin
+  23), same I2C2 peripheral, same AF6 selector, with every reference
+  corrected across the document and no conflict introduced.
+- **Independent verification method**:
+  1. **Core physical fact**, re-derived from ST's primary datasheet
+     (DS12992 Rev 4), fetched fresh this cycle: Table 2 (30 GPIOs, K-suffix/
+     LQFP32-UFQFPN32 vs. 44, C-suffix/LQFP48-UFQFPN48); Figure 7 (LQFP32
+     pinout — no PB10/PB11 anywhere in the 32-pad enumeration; PA11/PA12
+     present); Figure 9 (LQFP48 pinout — PB10/PB11/PB12 present); Table 12
+     (per-pin per-package table, six-package-column parsing independently
+     validated against a known row, PC13, before use) — PB10 shows dash in
+     the LQFP32/UFQFPN32 column and pin **22** only in LQFP48/UFQFPN48; PB11
+     shows the same pattern with pin **23**; PA11 shows physical pin **22**
+     present in the LQFP32/UFQFPN32 column itself; PA12 shows physical pin
+     **23**. Table 13 (Port A AF map) confirms PA11 AF6=I2C2_SCL, PA12
+     AF6=I2C2_SDA; Table 14 (Port B AF map) confirms PB10 AF6=I2C2_SCL, PB11
+     AF6=I2C2_SDA — the identical selector, exactly as claimed.
+  2. **Completeness**: fresh `grep -n "PB10"`/`"PB11"` pass, 43 combined
+     hits across the whole document, each individually reviewed in context
+     — every one is Rev 6/Rev 2 changelog narrative, or a live table/prose
+     entry that correctly states PA11/PA12 as the current value with
+     PB10/PB11 present only as historical/superseded annotation (§2.3 lines
+     737–738, §5.3 lines 1196–1197, §5.5/§6/§7.5.4, §11's table lines
+     2448–2449 plus its Rev 6 note, §12 net list lines 2543–2544, §14 item
+     13, §16 item 4). No live incorrect claim found anywhere.
+  3. **Conflict check**: fresh `grep -n "PA11"`/`"PA12"` pass, 27 hits each,
+     every occurrence tied exclusively to the IMU's I2C2 SCL/SDA function;
+     cross-checked against the motor subsystem's own PA6/PA8/PA9/PB1/PB6/
+     PB7 allocations (§7.5.4) — no overlap found. Free-GPIO inventory
+     arithmetic independently re-added (§11: 11 enumerated free pins +
+     PB8/PB9 = 13, down from 15 with PA11/PA12 now committed) — consistent.
+  4. **R3/R4 pull-up sizing** (§5.2), independently re-read in full:
+     `Rp,min=(Vcc−VOL,max)/IOL` and `tr≈0.8473×Rp×Cb` depend on Vcc=3.3V,
+     VOL,max=0.4V, IOL=3mA (Fast-mode DC spec) and an assumed Cb≈50pF — none
+     of which reference a physical MCU pin. Beyond the design document's own
+     stated reasoning, independently found that Table 12 lists PB10/PB11
+     and PA11/PA12 (LQFP32/UFQFPN32 row) under the **identical I/O structure
+     designation "FT_fa"** — the datasheet's own basis for VOL,max/IOL —
+     confirming the two pin pairs are electrically interchangeable for this
+     purpose, not merely assumed to be. R3=R4=4.7kΩ sizing is unaffected.
+  5. **Scope discipline**: `git show --stat`/`--name-status ef5edc4`
+     independently confirms exactly one file touched
+     (`hardware/schematic/bench-imu-01-design.md`, 201 insertions/29
+     deletions); `firmware/bench-imu-01/`, `bom/component-selection.md`,
+     `requirements/requirements.md`, `hardware/mechanical-interface.md`, and
+     `hardware/mechanical/` all confirmed untouched. `git status` clean,
+     HEAD=`ef5edc4`.
+  6. **Floating pin / pull-up-pull-down / logic-voltage / interface-timing**:
+     see Checklist Results table above — all four independently re-derived
+     as clean, not merely restated from the changelog's own self-check.
+- **Result**: **RESOLVED**. Every element of the fix independently checks
+  out: the core physical fact, completeness of the correction, absence of
+  any new conflict, continued validity of the R3/R4 pull-up sizing, and
+  scope discipline (schematic-only commit, firmware change correctly
+  deferred to the already-planned Firmware Bring-up phase with a
+  forward-reference note already in place).
+- **Datasheet Source**: DS-MCU-068 (independently re-confirmed against the
+  primary ST DS12992 Rev 4 datasheet this cycle, not merely re-cited).
+- **Affected Component**: U1 (STM32G031K8T6) — PA11/PA12 (was PB10/PB11);
+  R3/R4 (I2C pull-ups, endpoint only, sizing unaffected).
+- **Severity**: was **CRITICAL** — now closed, no residual severity.
+
+### Verdict
+
+- **Verdict**: **PASS**, for this narrow, focused review scope.
+- **Open CRITICAL count**: 0 (ISS-026 was the sole open CRITICAL finding on
+  this document; it is independently confirmed RESOLVED this cycle).
+- **Open HIGH count**: 0 net-new from this cycle; ISS-020/ISS-021 remain
+  correctly OPEN/ACCEPTED-RISK pending Firmware Bring-up, per the task's own
+  explicit instruction not to re-litigate them here — unaffected by, and
+  unrelated to, this cycle's scope.
+- **What independently checks out with no further action needed**: the core
+  physical fact (re-derived from ST's primary datasheet, not merely
+  re-cited), completeness of the PB10/PB11→PA11/PA12 correction across the
+  document, absence of any new pin conflict, continued validity of R3/R4
+  pull-up sizing (with an additional independent cross-check — identical
+  "FT_fa" I/O-structure class — beyond what the design document itself
+  argued), and scope discipline (verified via `git show`, not merely
+  trusted from the commit message).
+- **Next action**: Route to Hardware Lead. No further hardware rework
+  identified — this cycle finds nothing to send back to Circuit Engineer.
+  The corresponding firmware GPIO/AF/clock change (GPIOB pins 10/11 → GPIOA
+  pins 11/12, same AF6, same I2C2 peripheral base address) is correctly
+  deferred to, and already flagged for, the Firmware Bring-up phase.
