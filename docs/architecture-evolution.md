@@ -761,3 +761,130 @@ audit trail of what was true before this phase vs. after.
   merge — same process every prior PR in this repository's history went
   through.
 
+## 33. Phase 3 Implementation Status (Addendum — Power Engineer)
+
+Added when Phase 3 (Power) was actually implemented, in a separate PR from
+this document's original merge and the Phase 1 (§31) / Phase 2 (§32)
+addenda — kept as its own addendum for the same reason those are: preserve
+the audit trail of what was true before this phase vs. after.
+
+- **Trigger met**: `docs/architecture.md` §14's Power Engineer trigger
+  ("when subsystem count / power complexity exceeds what Circuit Engineer
+  can track ad hoc") was judged met by the Bench-IMU-01 Rev 3 kickoff
+  (Motor Driver + Reaction Wheel subsystem) — the exact stage that trigger
+  already named as its own example. This is a Hardware Lead judgment call,
+  reasoned explicitly rather than defaulted into: Rev 2's power design was
+  one simple rail (3.3V logic, ~16mA worst-case) that Circuit Engineer
+  tracked ad hoc correctly and proportionately; Rev 3 adds a second,
+  higher-current, likely-different-voltage rail, a genuine system power-
+  architecture choice (the physical source for that rail) that is itself a
+  Human-in-the-loop architecture decision, and motor-specific power concerns
+  (stall/inrush current, possible rail enable/sequencing, brownout coupling
+  between rails) that are qualitatively new, not just "one more line in a
+  table."
+- **Human approval**: given, scoped explicitly to standing up the Power
+  Engineer discipline itself — **as its own standalone PR, implemented and
+  merged before any Rev 3 hardware/mechanical/firmware design work that
+  depends on it** (the human's own explicit sequencing instruction, mirroring
+  how Mechanical Lead/Reviewer were created and merged before ever being
+  exercised on a real design, and how Firmware Engineer was its own scoped
+  PR). Control Engineer, Firmware Reviewer, PCB Engineer, Test Engineer,
+  Datasheet Specialist, and Safety/Compliance Reviewer all remain exactly as
+  `docs/architecture.md` §14 documents them (deferred, untouched triggers),
+  per the kickoff scope for this PR.
+- **Explicit human decision (asked via the Hardware Lead's own plan, not
+  silently assumed)**: Power Engineer is an Electronics-adjacent addition
+  (extends the original 4-agent Electronics team to 5 — Component Engineer/
+  Circuit Engineer/Hardware Reviewer/Power Engineer all divide Electronics
+  work under Hardware Lead — rather than a new top-level discipline the way
+  Mechanical/Firmware are), and is **engaged only when the Hardware Lead
+  judges a given project's power complexity warrants it**, not automatically
+  for every future design — the same scope-proportionality reasoning §32
+  already used to decide against introducing a Firmware Reviewer
+  immediately. No independent "Power Reviewer" is introduced either: Power
+  Engineer's own architecture proposal already routes through the human
+  Chief Engineer as a mandatory HITL architecture-decision gate
+  (`docs/architecture.md` §10) before Circuit Engineer ever implements it —
+  a different, already-adversarial check (a human decision, not a self-
+  approval) exists at exactly the point where Circuit Engineer/Mechanical
+  Lead's own designs instead rely on an independent AI reviewer pass. This is
+  recorded as the considered reason, not an oversight, mirroring how §32
+  recorded its own reasoning for not adding a Firmware Reviewer.
+- **Verified, not assumed, during implementation** (mirroring §31/§32's own
+  "verified, not assumed" bullets, for the same reasons): the GitHub custom
+  agent (`.github/agents/*.agent.md`, required `description`) and agent
+  skill (`.github/skills/<name>/SKILL.md`, required `name`+`description`)
+  specs were re-fetched directly from current GitHub documentation this
+  session — both unchanged since PR #2/#3/§31/§32, no fifth "fix the spec"
+  round was needed. The `tools` frontmatter property, `metadata` property,
+  and the `agent`/`custom-agent` tool alias documented in the current spec
+  were also newly reviewed this session (not previously exercised in this
+  repository) — none required a change to this repository's existing
+  agent-file convention (plain `name`+`description`+free-form extra fields
+  such as `role`/`reports_to`/`handoff_from`/`handoff_to`/`skill`, which the
+  spec neither requires nor forbids, and which `tools/
+  check_agent_frontmatter.py` does not check beyond `description`).
+- **A real, non-obvious reason for keeping `hardware/power-architecture.md`
+  and `hardware/power-budget.md` as two separate files**: the architecture
+  (which rails exist, sourced from where, decided once) and the numeric
+  rollup (every subsystem's load, updated every time one is added) change on
+  genuinely different cadences — collapsing them into one file would mean
+  either re-litigating the architecture decision's own record every time a
+  subsystem's current draw is merely re-tallied, or losing the standalone,
+  audit-friendly decision record `validation/change-log.md` (ECO) entries
+  already point back to for other domains. This mirrors the existing
+  `requirements/requirements.md` vs. `requirements/traceability-matrix.md`
+  split (a stable statement of intent vs. a living per-row status table) —
+  a pattern this repository already established, not a new one invented for
+  Power specifically.
+- **Files added**: `.github/agents/power-engineer.agent.md`,
+  `.github/skills/power-architecture/SKILL.md`,
+  `hardware/power-architecture.md` (template only — no real project has
+  populated it yet, mirroring exactly how `hardware/mechanical-interface.md`
+  was templated in Phase 1 before Bench-IMU-01 existed, §13/§27 item 5).
+- **Files edited, additively only** (nothing existing removed/reworded, no
+  section renumbered): `docs/architecture.md` (§2 diagram, §3 agents table +
+  role-spec list + new paragraph, §12, new Power Engineer row in §14, §16
+  directory map), `docs/workflow.md` (§1 diagram, Phase 4's entry/activities
+  notes, new Phase 12 section, §4 handoff-chain paragraph, §5 agent list),
+  `docs/architecture-evolution.md` (this addendum), `.github/
+  copilot-instructions.md` (Roles section: agent count "Seven"→"Eight", new
+  Power heading + item 8), `.github/CODEOWNERS` (one new line, for the new
+  architecture-decision-bearing file specifically), `README.md` (agent
+  roster table + repository layout note), `docs/commands/make-circuit.md`
+  (the pre-existing "Adding a new subsystem" variant note, extended to
+  mention Power Engineer as an option), `hardware/power-budget.md` (its
+  generic header paragraph only — the "future Power Engineer" framing
+  updated to reflect implementation; the file's own Bench-IMU-01-specific
+  content below that paragraph is untouched, since this PR is deliberately
+  scoped to the framework addition only, not to Rev 3's actual numbers).
+  **No new `.instructions.md` file was created** — `hardware/
+  power-architecture.md` falls under `hardware/**`, already governed by
+  `.github/instructions/hardware-design.instructions.md`'s existing Evidence-
+  citation/Source-of-Truth/ECO rules, which are not a genuinely different
+  rule set the way Mechanical's CONFIRMED/ASSUMPTION/ESTIMATE/UNKNOWN
+  labeling and CAD-tool-honesty rules were — reusing an existing instructions
+  file where the rules are already identical avoids instructions-file
+  proliferation ahead of actual need, the same restraint §9 already applies
+  to Component/Circuit Engineer's own Agent-vs-Skill status.
+- **Confirmed untouched** (verified via `git diff` before opening the PR):
+  all 7 existing `.github/agents/*.agent.md` files, all 8 existing
+  `SKILL.md` files, all 5 existing `.github/instructions/*.instructions.md`
+  files, `.github/workflows/{hardware-gate.yml,agent-frontmatter-lint.yml}`,
+  `tools/{check_open_issues.py,check_agent_frontmatter.py}`,
+  `datasheets/{README.md,evidence-log.md}` (no new Evidence category was
+  needed — Power Engineer reuses the existing `PWR` category
+  `docs/architecture.md` §6.3 already lists), `requirements/**`,
+  `bom/component-selection.md`, every file under `hardware/schematic/`,
+  `hardware/pcb/`, and `hardware/mechanical/` (Power Engineer's own "Out of
+  scope" explicitly forbids editing another discipline's artifacts, the same
+  restraint every other agent's profile already states), `firmware/**`,
+  `validation/{fmea.md,change-log.md,change-impact-matrix.md,open-issues.md,
+  design-review.md,bring-up-procedure.md}`, `docs/evaluation.md`, and
+  `hardware/power-budget.md`'s own Bench-IMU-01-specific content (see above
+  — only its generic header paragraph changed).
+- **Status**: implemented, PR opened as its own standalone change (not
+  bundled with Rev 3 hardware/mechanical/firmware work, per explicit human
+  instruction), awaiting independent audit before merge — same process
+  every prior PR in this repository's history went through.
+

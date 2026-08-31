@@ -2,9 +2,14 @@
 
 Aggregates every subsystem's current/power draw against the supply's
 capability, per rail, with margin. Maintained by the Circuit Engineer as
-part of `.github/skills/schematic-design/SKILL.md` (MVP); a future **Power Engineer**
-role formally owns this once complexity grows past the benchmark
-(`docs/architecture.md` §12/§14).
+part of `.github/skills/schematic-design/SKILL.md` for a simple single-rail
+design; the **Power Engineer** role (Phase 3 of the multidisciplinary
+evolution, `docs/architecture-evolution.md` §33) formally owns this file
+once complexity grows past the benchmark and is engaged for a given
+project/revision (`.github/agents/power-engineer.agent.md` "When this role
+is engaged") — see also `hardware/power-architecture.md` for the rail-
+topology/source decision record that precedes this file's own multi-rail
+numeric rollup.
 
 Update this file every time a subsystem is added (e.g. a Motor Driver /
 Reaction Wheel later on the roadmap, `docs/architecture.md` §11) — do not

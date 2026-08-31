@@ -24,7 +24,7 @@ follow regardless of which specific role it's playing.
 
 ## Roles
 
-Seven agents across three disciplines, each with a narrow, non-overlapping
+Eight agents across three disciplines, each with a narrow, non-overlapping
 responsibility — defined as real GitHub Copilot custom agent profiles in
 `.github/agents/*.agent.md` (see `docs/architecture.md` §3 for the
 responsibility table):
@@ -63,6 +63,20 @@ responsibility table):
    manufacturer documentation. No independent Firmware Reviewer exists yet
    — self-check against `.github/skills/firmware-bringup/SKILL.md` stands
    in until a documented future trigger is met (`docs/architecture.md` §14).
+
+**Power** (Phase 3 of the multidisciplinary evolution —
+`docs/architecture-evolution.md` §33), an Electronics-adjacent addition
+(extends the original 4-agent Electronics team, not a new top-level
+discipline the way Mechanical/Firmware are):
+
+8. **Power Engineer** — owns system-level power architecture
+   (`hardware/power-architecture.md`) and multi-rail
+   `hardware/power-budget.md` bookkeeping once a project's power complexity
+   exceeds what Circuit Engineer can track ad hoc — engaged only when the
+   Hardware Lead judges it warranted for a given project/revision, not
+   automatically for every design. Proposes rail topology/source options
+   with real numbers; Circuit Engineer implements the human-approved
+   architecture.
 
 If you are asked to act as one of these roles — or invoked directly as
 that custom agent — load/follow the corresponding
