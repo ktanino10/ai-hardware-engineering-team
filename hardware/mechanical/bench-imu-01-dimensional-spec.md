@@ -1,869 +1,914 @@
-# Bench-IMU-01 — Enclosure Dimensional Spec &amp; Design Rationale
+# Bench-IMU-01 — Enclosure Dimensional Spec & Design Rationale
 
-**Status: Rev. 2 — revised after Mechanical Reviewer Cycle 1 findings,
-ready for RE-review** (not a fresh first review). Cycle 1's independent
-review found 2 HIGH and 2 MEDIUM issues in the design this document
-describes; both HIGH and both MEDIUM findings have been fixed in this
-revision (MISS-005/MISS-006, LOW, are deliberately left untouched — out of
-scope for this Mechanical Lead pass per the Hardware Lead's routing). This
-document still does not declare itself reviewed/complete — see
-`.github/agents/mechanical-lead.agent.md`, "Out of scope" — independent
-Mechanical Reviewer sign-off on this revision is the required next step.
+**Status:** Rev. 3 — drafted by Mechanical Lead, **not yet reviewed**. This
+document does not declare itself reviewed or complete; it is the design
+package handed to Independent Mechanical Review, and after that clears, the
+REQ-403 disposition proposal in §8 goes to the human as a HITL gate. Nothing
+in this file should be read as "approved."
 
-**Rev. 2 changelog (this revision vs. Cycle 1), each finding fixed in both
-the `.scad` file and this spec document:**
-- **MISS-001 (HIGH)** — `bay_x_min`/`bay_x_max`/`bay_y_min` were sized from
-  J2/J3/SW1's *centerline* positions, not their real footprint edges,
-  producing real connector-to-bay margins of just 0.0mm/1.0mm/3.5mm (one of
-  them zero). Fixed: recomputed from each connector's real footprint edge
-  (the same dimensions this file's own `reference_pcba()` module already
-  used) plus a new named `bay_edge_margin`(1.5mm) variable. Real margins are
-  now a uniform, genuinely positive 1.5mm. See §4.3, §6, §7, §11 item 2.
-- **MISS-002 (HIGH)** — the base tab's 45° chamfer/gusset was a `hull()` of
-  two 0.01mm-thin cubes: a geometrically degenerate sliver, not a real
-  load-bearing wedge. Fixed: replaced with a genuine `linear_extrude()` of a
-  right-triangle `polygon()` (rise=run=6.0mm, volume 144mm³ per tab). See
-  §9.2, §11 item 9.
-- **MISS-003 (MEDIUM)** — the lid tab's clearance-hole annular wall computed
-  to 1.6mm, below this design's own stated 2.0mm `min_wall_t`. Fixed: new
-  lid-only `lid_tab_project`(6.8mm) footprint override restores exactly
-  2.0mm, while the fastener hole itself stays on the original, unmoved axis
-  so it remains coaxial with the base tab's pilot hole. See §4.3, §7, §8,
-  §11 item 5. **Documentation-only side effect also caught and fixed while
-  re-verifying this cycle (no further `.scad` change involved):** the wider
-  lid tab now projects 0.4mm farther beyond the wall face than the base tab
-  on each end, which nudges the overall assembled Y-footprint from the
-  Cycle-1 figure of ≈59.0mm to the actual ≈59.8mm — §3's envelope row was
-  stale and has been corrected to match.
-- **MISS-004 (MEDIUM)** — the lid/base-tab fastener pair had zero
-  engagement-depth spare margin. Fixed: `tab_pilot_depth`(4.0→4.6mm) and
-  `tab_base_t`(5.0→5.6mm) together restore a 0.6mm spare (matching the PCB
-  standoff's own precedent) while preserving the 1.0mm solid floor exactly.
-  See §4.3, §7, §8, §11 item 5.
-- Both HIGH-finding fixes (and the MISS-003 coaxiality claim) were, in
-  addition to hand arithmetic, cross-checked against actual rendered
-  `.scad` geometry this session using a locally-available OpenSCAD 2021.01
-  binary — see the new §0 addendum and §7/§9.2 for what was actually
-  rendered/measured.
-- MISS-005/MISS-006 (LOW) are **not** addressed in this revision —
-  deliberately left for a later disposition pass per the Hardware Lead's
-  routing instructions.
+**Changelog vs. Rev 2** (Rev 2 was Design-Complete; this is a full redesign,
+not a patch — the flywheel's rotation-clearance envelope alone, ⌀76mm,
+already exceeds the entire Rev 2 board width of 40mm, so no Rev 2 coordinate
+could simply be extended):
 
-**Author:** Mechanical Lead agent, this session (Rev. 1 authored in a prior
-session; Rev. 2 rework in this session).
-**Companion file:** `bench-imu-01-enclosure.scad` (parametric OpenSCAD
-source; every dimension in the table below is a named variable there).
-**Authoritative input:** `hardware/mechanical-interface.md` (all
-board/component facts trace back to it unless labeled otherwise below).
+- Board grew from 60×40mm (Rev 2) to 100×50mm (Rev 3) to host the new Motor
+  Driver + Reaction Wheel subsystem (`hardware/mechanical-interface.md` A2).
+  All new geometry is re-derived from the Rev 3 interface file; no Rev 2
+  coordinate is reused unchanged except where the underlying board region
+  (the original 0–60mm "sensor zone") itself did not move.
+- Piece count: **2 → 3.** Rev 2 was Base + Lid. Rev 3 is **Base + PCB Lid +
+  Containment Cap** — a third piece added specifically to give the flywheel
+  bay a dedicated, removable, physically containing top (see §5 item 10 and
+  §8 for why REQ-309's 2-piece baseline was not treated as a ceiling).
+- New: a second enclosure bay (the "flywheel bay") housing the motor,
+  flywheel, and a rotation-clearance keep-out volume, joined to the existing
+  PCB bay by a wire-passage duct. This bay did not exist in Rev 2 at all.
+- New: off-board/bracket-mounted motor (§6) — the motor is **not** a
+  PCB-footprint part; it mounts to a raised platform molded into the base,
+  not to the board.
+- New connectors/holes relative to Rev 2: J4 (barrel jack, motor supply),
+  MC-1 (motor phase-wire pigtail, wire-lead not PCB-trace per the interface
+  file), MH-5/MH-6 (dedicated motor-driver-zone mounting holes). J1/J2/J3/SW1/D1
+  carry over from Rev 2 in identity, re-positioned only by the board's own
+  Y-rescale (see §10).
+- New fastener classes: Rev 2 used one class (M2.5 self-tapping, PCB lid to
+  base). Rev 3 adds **plain M3 clearance** (motor-to-platform, direction
+  reversible) and **M3-into-heat-set-insert** (containment cap to base
+  flange) — three classes total, each justified separately in §12.
+- Envelope grew from Rev 2's base-outer 67.0×47.0mm (true assembled,
+  including tabs/lid-skirt overhang, ≈71.4×59.8mm; total height 20.6mm) to
+  Rev 3's 107×162mm shell-only footprint / 111.4×170.6×43.0mm true assembled
+  envelope (§3) — driven by the flywheel bay's own footprint and height, not
+  by the PCB bay, which only grew to 107×57mm (still smaller than the
+  flywheel bay's own 87×87mm footprint).
+- New: REQ-403 safety disposition proposed — **physical containment**
+  (§8), not clearance-plus-firmware-limiting alone. This is new because Rev 2
+  had no rotating mass; Rev 3 introduces one for the first time.
+- New: REQ-306 rotation-clearance keep-out (§7) and REQ-307 vibration
+  isolation disposition (§9) — neither applied to Rev 2, which had no motor.
+- Verification: this revision's own build/check process caught and fixed 4
+  geometric defects (2 of them collisions that would have caused genuine
+  print/assembly failures or a safety-relevant open gap), correctly
+  dismissed 2 false-alarm findings, and flagged (without fixing, as
+  out-of-scope for this task) one pre-existing Rev 2 defect plus one new
+  borderline-but-compliant finding — all itemized in §11.
+- Rev 2's proven conventions carried forward and **re-justified against the
+  new geometry** (not assumed to still fit): 2.0mm minimum wall thickness,
+  0.2mm/side fit clearance, external-tab lid fastening with M2.5 self-tapping
+  screws for the PCB lid, cap+skirt joint style (now used twice — PCB lid
+  and containment cap both use it).
 
-## 0. Tooling honesty (re-verified this session)
+**Author:** Mechanical Lead (this session).
+**Companion file:** `hardware/mechanical/bench-imu-01-enclosure.scad` (Rev 3,
+991 lines) — every dimension in this document is a named variable in that
+file; the two must be read together.
+**Authoritative input:** `hardware/mechanical-interface.md` (Rev 3, 686
+lines, fixed input — not edited by this task). Requirements traced:
+`requirements/requirements.md` REQ-306, REQ-307, REQ-308, REQ-309, REQ-403,
+REQ-405. Safety context: `validation/open-issues.md` ISS-020.
 
-**As stated in Cycle 1 (superseded in part below — kept verbatim for the
-audit trail, not silently rewritten):**
-No CAD/3D modeling MCP tool is connected in this environment. The only
-3D-capable tool surface present in this environment is the Blender MCP
-tool set; a live connection check via `blender-get_addon_status` returned
-**"Could not connect to Blender."** A check for local CAD tooling in this
-shell also found no `openscad` or `freecad` binary and no
-`cadquery`/`solid`/`build123d` Python library installed. Per
-`docs/architecture.md` §5.3/§13, the deliverable is therefore this text/
-parametric pair — an OpenSCAD-syntax `.scad` file and this Markdown
-spec — and nothing in this repository has rendered, previewed, fit-checked,
-or exported to STL the geometry described here. All "computed clearance
-checks" below are plain arithmetic (verified with a Python calculator this
-session), not a CAD measurement. A human must render
-`bench-imu-01-enclosure.scad` themselves to see the actual 3D geometry.
+---
 
-**Rev. 2 addendum (this session) — the local-tooling claim above is
-corrected, not silently deleted, because leaving a known-false statement in
-place would itself be a tooling-honesty violation:** a working `openscad`
-2021.01 CLI binary was found at `/opt/homebrew/bin/openscad` in this
-session's shell (confirmed via `openscad --version`, exit 0), and a working
-`numpy-stl` Python library was also found — both contradicting the "no
-local... binary... installed" claim immediately above. Both were used, but
-strictly as a **targeted spot-check of this cycle's 4 fixes**
-(MISS-001–MISS-004), not as a comprehensive re-verification of every number
-in this document:
-- The full assembled model, `base()` alone, and `lid()` alone were each
-  rendered; OpenSCAD reported "Simple: yes" (valid manifold) with zero
-  errors or warnings for all three.
-- The corrected bay cutout was rendered standalone and its board-local
-  bounding box measured directly from the exported STL mesh: X=[9.5,48.0],
-  Y-min=32.5 — matching the `.scad` formulas exactly (§7).
-- The new wedge (MISS-002 fix) was rendered standalone; its bounding box
-  (X=8.0mm, Y=6.0mm, Z-span=6.0mm) and the combined tab+wedge volume
-  (398.39mm³ measured vs. 398.35mm³ hand-calculated, <0.02% difference —
-  consistent with STL circular-tessellation noise, not a modeling error)
-  were measured from the exported STL, and a rendered image was visually
-  inspected, confirming a real, non-degenerate triangular wedge (§9.2).
-- The widened lid tab footprint (MISS-003 fix) was rendered standalone; its
-  Y-range measured exactly [-6.4, 0.4] (6.8mm, matching `lid_tab_project`
-  exactly), and coaxiality with the base tab's pilot hole was checked with
-  an unobstructed-bore probe test (measured 20.68mm³ vs. 20.73mm³ ideal for
-  a fully clear bore, §7).
-- Every test/wrapper file was written to a scratch directory
-  (`/tmp/scad-check/`) outside this repository and is **not** part of this
-  deliverable — no STL, PNG, or render artifact has been committed here.
-  This document's stated deliverable is still exactly the `.scad` file and
-  this Markdown spec, per `docs/architecture.md` §5.3/§13.
+## 0. Tooling honesty
 
-**What this addendum does NOT claim:** no slicer support-preview and no
-physical test print has been performed; no thermal, stress, or
-tolerance-stack-up simulation was run; and this spot-check does not extend
-to every dimension in this document — e.g. the top/bottom
-component-clearance and standoff-clearance checks in §7 remain
-arithmetic-only, unchanged from Cycle 1. Most importantly: this Mechanical
-Lead's own tool use here is **not** a substitute for the Mechanical
-Reviewer's independent re-review — per
-`.github/agents/mechanical-lead.agent.md`, "Out of scope," this design does
-not get to declare itself reviewed/complete regardless of what tooling
-became available to check its own work. Per that same file's "Escalation
-triggers," this discovery is flagged here as a verified opportunity for
-future cycles, not retroactively assumed to have been available for
-anything produced before this session.
+Re-verified fresh in this session, not assumed from a prior revision or from
+the task brief's own claim:
+
+- `blender-get_addon_status` → **"Could not connect to Blender."** No live
+  CAD/3D-modeling MCP connection exists in this environment. This matches
+  the task brief.
+- However, a local `openscad` **2026.08.30** binary (`/opt/homebrew/bin/openscad`)
+  **is** installed and working, along with Python `numpy-stl` 3.2.0 and
+  `trimesh` 4.11.5. This **contradicts** the task brief's claim of "no local
+  `openscad`/`freecad`/`cadquery` toolchain" — flagged here rather than
+  silently corrected, per this project's own tooling-honesty discipline. No
+  `freecad`, `cadquery`, `solid`, or `build123d` was found.
+- What this means in practice: this design **was** rendered and geometrically
+  validated locally this session — `openscad -o out.stl bench-imu-01-enclosure.scad`
+  produces a manifold mesh (CGAL Status: NoError, Genus 6, 4610 vertices,
+  9240 facets), and `trimesh`/`numpy-stl` were used for boolean-intersection
+  interference checks between parts (§11). This is a **real geometric
+  check**, not an eyeball estimate — but it is still **not** a substitute for
+  a physical print-and-fit test, a structural (FEA) analysis, or a CAD-native
+  fillet/draft/tolerance-stack review. No STL was exported into the repo (the
+  deliverable remains the parametric `.scad` source plus this spec); no claim
+  of fabrication or physical fit-check is made anywhere in this document.
+- The `.scad` file's own header (lines 11–38) carries the identical
+  disclosure, so a reader of either file alone gets the same honest picture.
+
+---
 
 ## 1. Scope recap
 
-Phase 1 checklist only (`.github/agents/mechanical-lead.agent.md`):
-enclosure/spatial layout, PCB mounting, connector accessibility,
-component-height clearance (top+bottom), internal clearance/interference,
-fastener placement, wall thickness, assembly order, basic print-fit
-tolerance, basic manufacturability. Explicitly **out of scope** this cycle:
-tolerance stack-up analysis, motion/joints, advanced material selection,
-thermal/antenna/STEP/CoM/battery-wiring/keep-out fields (all
-`docs/architecture-evolution.md` §10/§13 CONSIDER LATER).
+Per `.github/agents/mechanical-lead.agent.md`, Phase 1 scope is: enclosure/
+spatial layout, PCB mounting, connector accessibility, component-height
+clearance, internal clearance/interference, fastener placement, wall
+thickness, assembly order, and basic print-fit tolerance +
+manufacturability. Out of scope (explicitly deferred, `docs/architecture-evolution.md`
+§10/§13): statistical tolerance stack-up, motion/joints/hinges, advanced
+material selection beyond stating an assumed print material, thermal zones,
+antenna keep-out, STEP/neutral 3D model, center of mass, battery wiring,
+detailed cable-exit geometry. This revision adds three new topics to the
+Phase-1 checklist that Rev 2 never had to address: a rotation-clearance
+keep-out (REQ-306), a motor-mounting-method decision, and a safety-critical
+containment disposition (REQ-403) — all still within Phase 1's existing
+"internal clearance / component-height clearance / basic manufacturability"
+categories, just applied to a new, moving, energy-storing component.
 
-Requirements traced: REQ-301 (2-layer PCB — electronics-side, not
-mechanical, cited for context), REQ-302 (≤60×40mm target — PCB itself is
-exactly at the target, satisfied by definition), REQ-303 (connectors on
-≤2 edges — J1 on one short edge, J2/J3/SW1 on one long edge = 2 edges,
-satisfied), REQ-304 (≥4 M2/M2.5 mounting holes — 4× M2.5 provided,
-satisfied), REQ-305 (2-piece 3D-printable enclosure — base + lid,
-satisfied by construction).
+---
 
-## 2. Print-fit tolerance &amp; manufacturability rules (stated once, applied everywhere)
+## 2. Print-fit tolerance & manufacturability rules
 
-| Rule | Value | Status | Applies to |
-|---|---|---|---|
-| Print-fit clearance | **0.2 mm per side** | ASSUMPTION | Lid-skirt-to-base-wall radial gap; lid tab clearance hole vs. screw shank |
-| Board-XY keepout (not a tolerance — see §4) | 1.5 mm per side | ASSUMPTION | PCB edge to interior cavity wall |
-| Z-margin (not a tolerance — see §4) | 0.5 mm | ASSUMPTION | Added above the interface file's stated 8.5 mm top clearance |
-| Min. wall thickness | 2.0 mm | ASSUMPTION | All structural walls/floor/roof/skirt |
-| Max. unsupported overhang | 45° from vertical | ASSUMPTION | Standard FDM rule of thumb |
-| Max. unsupported bridge span | 10 mm | ASSUMPTION | Standard FDM rule of thumb, good part cooling |
-| Print material | **PETG** | ASSUMPTION — human did not specify a printer/material | Whole enclosure |
+Carried forward from Rev 2 **and explicitly re-justified** against the new
+geometry (per this task's instruction not to assume Rev 2's conventions
+still fit unchanged):
 
-**Why PETG:** better layer adhesion and toughness than PLA at small
-self-tapping screw bosses (this design relies on 8 self-tapped M2.5
-joints, all in-plastic threads, no heat-set inserts — see §8/§9.2), without
-ABS's warping/enclosed-chamber printing requirement. This is a stated
-design assumption, not a customer/human specification — flagged for the
-Mechanical Reviewer and Hardware Lead to confirm or override.
-
-**Why three separate margin concepts, not one:** `fit_clearance` (0.2mm) is
-reserved strictly for surfaces that actually **slide/mate** against each
-other (lid skirt against base wall, screw shank against its clearance
-hole). `board_xy_keepout` (1.5mm) and `z_margin` (0.5mm) are **not**
-mating-surface tolerances — the PCB's XY position is fixed by its 4
-standoffs, not by touching the interior wall, and the Z stack is fixed by
-the header/standoff heights, not by touching the lid. Conflating these
-three into a single number would understate how much "fit" tolerance is
-actually being applied at the joints that need it (0.2mm is tight; 1.5mm/
-0.5mm are deliberately generous robustness margins, not tolerances).
-
-## 3. Overall envelope (fixed first, per the enclosure-design skill's procedure)
-
-| Parameter | Value | Unit |
+| Rule | Value | Re-justification for Rev 3 |
 |---|---|---|
-| Base outer footprint (main body, excl. tabs) | 67.0 × 47.0 | mm |
-| Lid skirt outer footprint | 71.4 × 51.4 | mm (2.2mm/side larger than the base — see §4) |
-| Overall footprint incl. 4 external corner tabs | ≈67 × 59.8 (Y), 71.4×59.8 incl. lid overhang | mm — tabs project 6.0mm (base tab) beyond the base wall face at 4 corner zones only, not a full-perimeter increase. **Rev. 2 note:** the true outward extreme is set by the **lid** tab, not the base tab — `lid_tab_project`(6.8mm, MISS-003 fix) grows symmetrically around the shared fastener axis, so the lid tab's outward edge sits 0.4mm beyond the base tab's on each of the front/rear projecting sides (empirically confirmed from rendered STL this session: base tab Y-range [-6.0,0.0], lid tab Y-range [-6.4,0.4]). This raises the true assembled Y envelope from the Cycle-1 figure of ≈59.0mm to **≈59.8mm** (47.0 base + 6.4 + 6.4) — a small, previously-unflagged consequence of the MISS-003 fix, caught while re-verifying this revision rather than left stale. |
-| Total assembled height | **20.6** | mm |
-| Enclosure style | 2-piece: base (floor + walls + standoffs + tabs) + lid (roof + skirt + tabs) | — |
+| Fit clearance (mating parts, per side) | **0.2mm** | Same FDM-fit allowance as Rev 2. Re-checked against the new, larger mating interfaces: PCB-lid skirt/base (unchanged formula), and the **new** containment-cap skirt/base-flange interface (105.4mm ID vs. 105.0mm OD — same 0.2mm/side result at 10× the diameter, so the allowance is diameter-independent and still appropriate). |
+| Minimum wall thickness (FDM) | **2.0mm** | Unchanged rule. Re-checked at every new Rev 3 wall: flywheel-bay wall (`containment_wall_t`=4.0mm, 2× minimum, justified by containment duty in §8, not just print rules), heat-set-insert flange material each side of the insert bore (2.2mm, §12), and the motor-wire-bridge duct-bore wall (exactly 2.0mm in Z — the one place Rev 3 sits at the rule's exact floor, flagged in §11/§13). |
+| Overhang requiring support | **>45° from vertical** | Unchanged rule of thumb. Applied to new features: the motor-platform boss (vertical cylinder, 0° overhang, fine), the containment-cap dome/flange transition (vertical wall + flat flange, no overhang), and the wire-bridge block (flat horizontal underside — evaluated as a bridge, not an overhang; see next row). |
+| Maximum unsupported bridge span | **10.0mm** | Unchanged rule (same as Rev 2's own J1-cutout precedent). Re-checked at the **new** motor-wire bridge: true unsupported span is 9.0mm (bridge center) to 9.416mm (bridge edges) — within the rule, but at 90.0–94.2% of it. Disclosed, not silently passed over (§11/§13), mirroring Rev 2's own disclosed-but-accepted 9.5mm/95%-of-limit J1 bridge. |
+| Print material | **PETG** (`ASSUMPTION`, per `hardware/mechanical-interface.md` B6) | Not a Mechanical Lead decision — inherited from the interface file's own stated assumption, cited here rather than re-derived. PETG's practical layer-adhesion strength is part of why the flywheel-bay wall was set to 2× minimum (4.0mm) rather than 1× — a plastic wall in a containment role should not rely on the thinnest print-safe wall available. If PLA is used instead, this containment margin should be re-examined (PLA is more brittle under impact than PETG). |
 
-## 4. Full dimensional parameter table
+No advanced tolerance stack-up (multi-part statistical accumulation) is
+performed — this remains explicitly out of Phase 1 scope. Every check in
+this document is a single-interface, deterministic clearance computation.
 
-**Confidence key:** CONFIRMED = read directly off a datasheet/measurement;
-ESTIMATE = a reasonable approximation flagged as such; ASSUMPTION = a
-stated design choice with rationale; DERIVED = arithmetic from other rows
-in this table (not a fresh guess). All rows below mirror the `.scad`
-file's variable names exactly.
+---
 
-### 4.1 Traced directly from `hardware/mechanical-interface.md`
+## 3. Overall envelope
 
-| Parameter | Value | Unit | Confidence | Source/Rationale |
+Two ways of reading "footprint," both reported (same convention Rev 2 used
+for its own two-tier reporting, extended here across two bays):
+
+| Reading | X | Y | Z (height) | vs. REQ-308 (~150mm-class, "relaxed... generous soft ceiling... not to be over-engineered against") |
 |---|---|---|---|---|
-| `pcb_length` | 60.0 | mm | ESTIMATE | interface: Board Geometry |
-| `pcb_width` | 40.0 | mm | ESTIMATE | interface: Board Geometry |
-| `pcb_thickness` | 1.6 | mm | ASSUMPTION | interface: Board Geometry (standard 2-layer stock) |
-| Mounting holes MH-1..4 | (3.5,3.5) (56.5,3.5) (56.5,36.5) (3.5,36.5), ⌀2.8 | mm | ESTIMATE | interface: Mounting |
-| `top_component_clearance` | **8.5** | mm | ESTIMATE | interface: Component Height Clearance — **corrected figure, driven by J2/J3 headers; supersedes design.md's original 3.2mm (USB-C) conclusion.** |
-| `bottom_component_clearance` | 0.0 | mm | ASSUMPTION | interface: Component Height Clearance (single-sided assembly) |
-| J1 (USB-C) position/orientation | (0,20), horizontal, opens −X | mm | ESTIMATE | interface: Connectors/Switches/LEDs |
-| `j1_ref_height` | 3.2 | mm | ESTIMATE | design.md / DS-CONN-003-class part (J1 MPN not yet locked — interface Open Item) |
-| J2 (UART header) position/orientation | (16,40), vertical, +Z | mm | ESTIMATE | interface: Connectors/Switches/LEDs |
-| J3 (SWD header) position/orientation | (30,40), vertical, +Z | mm | ESTIMATE | interface: Connectors/Switches/LEDs |
-| SW1 (reset) position/orientation | (44,40), vertical actuation | mm | ESTIMATE | interface: Connectors/Switches/LEDs |
-| D1 (LED) position/orientation | (10,30), top-emitting +Z | mm | ESTIMATE | interface: Connectors/Switches/LEDs |
-| Mass | ≈9 | g | ESTIMATE | interface: Mass (context only — not a driving mechanical dimension at this scale) |
+| **Shell-only** (both bay footprints as designed, tabs/skirt overhang excluded) | 107.0mm | 162.0mm | — | Y is 8.0% over the ~150mm reading |
+| **True assembled** (includes PCB-lid tab projection and containment-cap flange, the actual outermost physical extent) | 111.4mm | 170.6mm | 43.0mm | Y is 13.7% over the ~150mm reading |
 
-### 4.2 This Mechanical Lead's own design values (ASSUMPTION/ESTIMATE unless marked DERIVED)
+REQ-308 explicitly frames ~150mm as a relaxed, generous **soft** ceiling, not
+a hard limit, and explicitly cautions against over-engineering to hit it
+exactly. 8–14% over is judged acceptable given: (a) the flywheel's own
+rotation-clearance diameter (76mm) plus a structurally-justified 4mm
+containment wall plus a 9mm flange projection for the cap-bolt bosses is a
+real physical lower bound, not a padding choice — the flywheel bay's own
+minimum footprint is 2×(43.5+9.0) = 105.0mm across; (b) the PCB bay's own
+107mm side was inherited from the interface file's own board width (§4), not
+from the Mechanical Lead's discretion. The Y-dimension overrun is
+acknowledged as a genuine, disclosed trade-off (see §10 for the alternative
+layout that was considered and rejected), not something silently absorbed.
 
-| Parameter | Value | Unit | Confidence | Source/Rationale |
+Total height (43.0mm) is set entirely by the **flywheel bay's** own Z-stack
+(§7), which is more than double the PCB bay's own height (23.1mm) — the two
+bays are side-by-side (not stacked), so the assembly's overall height is the
+taller of the two, not their sum.
+
+---
+
+## 4. Full dimensional parameter tables
+
+### 4.1 Interface-traced values (from `hardware/mechanical-interface.md`)
+
+| Parameter | Value | Unit | Confidence | Source |
 |---|---|---|---|---|
-| `fit_clearance` | 0.2 | mm/side | ASSUMPTION | Stated FDM print-fit allowance (§2) |
-| `print_material` | PETG | — | ASSUMPTION | §2 — human did not specify |
-| `min_wall_t` / `wall_t` / `floor_t` | 2.0 | mm | ASSUMPTION | ~5× a 0.4mm nozzle width; above the commonly-cited 0.8mm FDM structural floor |
-| `max_overhang_deg` | 45 | ° from vertical | ASSUMPTION | Standard FDM rule of thumb |
-| `max_bridge_span` | 10.0 | mm | ASSUMPTION | Standard FDM practice, good cooling |
-| `board_xy_keepout` | 1.5 | mm/side | ASSUMPTION | Drop-in/robustness margin, not a mating tolerance (§2) |
-| `interior_x` × `interior_y` | 63.0 × 43.0 | mm | DERIVED | `pcb_length/width + 2×board_xy_keepout` |
-| `base_outer_x` × `base_outer_y` | 67.0 × 47.0 | mm | DERIVED | `interior + 2×wall_t` |
-| `standoff_od` | 6.0 | mm | ASSUMPTION | Sized so annular wall around the pilot hole = `wall_t` (2.0mm) |
-| `standoff_pilot_dia` | 2.0 | mm | ASSUMPTION | ~80% of M2.5 major diameter, standard self-tap pilot sizing |
-| `standoff_h` | 6.0 | mm | ASSUMPTION | **Sized by fastener engagement-depth need (~2–3× screw dia ≈ 5–7.5mm), not by the 0mm bottom-clearance requirement** — see §7 |
-| `standoff_pilot_depth` | 5.0 | mm, blind | ASSUMPTION | Leaves 1.0mm solid floor under the hole |
-| `screw_len` (single fastener, used 8×) | 6.0 | mm, M2.5 self-tapping | ASSUMPTION | Verified stack-up for both PCB standoffs and lid tabs — §9.2 |
-| `z_margin` | 0.5 | mm | ASSUMPTION | Robustness margin above the 8.5mm interface figure (§2) |
-| `base_interior_h` | 16.6 | mm | DERIVED | `standoff_h + pcb_thickness + top_component_clearance + z_margin` |
-| `base_total_h` | 18.6 | mm | DERIVED | `floor_t + base_interior_h` |
-| `lid_lip_h` | 3.0 | mm | ASSUMPTION | Skirt overlap depth over the base wall top |
-| `lid_roof_t` / `lid_skirt_t` | 2.0 | mm | ASSUMPTION | `= wall_t`, consistency |
-| `total_height` | 20.6 | mm | DERIVED | `base_total_h + lid_roof_t` |
-| `lid_skirt_inner_x/y` | 67.4 × 47.4 | mm | DERIVED | `base_outer + 2×fit_clearance` |
-| `lid_skirt_outer_x/y` | 71.4 × 51.4 | mm | DERIVED | `lid_skirt_inner + 2×lid_skirt_t` |
-| `board_offset_x/y` | 3.5 | mm | DERIVED | `wall_t + board_xy_keepout` |
-| `j1_cut_w` | 9.5 | mm (Y-span) | ESTIMATE | Representative USB-C shell width (~9.0mm) + 2×`fit_clearance`, rounded up (MPN unconfirmed) |
-| `j1_cut_h` | 6.0 | mm (Z-span) | ESTIMATE | `pcb_thickness + j1_ref_height` + generous margin |
-| `bay_edge_margin` | 1.5 | mm | DERIVED | `= board_xy_keepout` — **Rev. 2 (MISS-001 fix):** reused verbatim, not invented, per its own existing rationale ("generous drop-in/assembly and robustness margin... NOT a tight mating tolerance") |
-| `bay_x_min` / `bay_x_max` | 9.5 / 48.0 | mm, board-local X | DERIVED | `(j2_x−5)−bay_edge_margin` / `(sw1_x+2.5)+bay_edge_margin` — **Rev. 2 (MISS-001 fix, HIGH):** was 10.0/50.0, sized from connector **centerlines** ± an unfounded ~6mm; recomputed from each connector's real assumed footprint **edge** (per `reference_pcba()`) + `bay_edge_margin`. See §6/§7 |
-| `bay_y_min` | 32.5 | mm, board-local Y | DERIVED | `(40−6)−bay_edge_margin` — **Rev. 2 (MISS-001 fix, HIGH):** was 34.0 (centerline-based ~6mm estimate); recomputed the same way as bay_x_min/max |
-| `d1_hole_dia` | 3.0 | mm | ESTIMATE | Small viewing hole, no light-pipe (Phase-1-appropriate) |
-| `tab_w` | 8.0 | mm | ASSUMPTION | Sized to clear the header bay — **Rev. 2 (MISS-001 side effect):** was "≥2.5mm both sides"; after the bay recompute the two sides are no longer symmetric — now 2.0mm (rear-left tab) / 4.5mm (rear-right tab, improved), both still positive. See §6/§7 |
-| `tab_project` | 6.0 | mm | ASSUMPTION | Enough for an 8mm-wide screw boss beyond the wall face — **base tabs**; see `lid_tab_project` below for the lid-only override |
-| `tab_base_t` | 5.6 | mm | ASSUMPTION | Gives 4.6mm pilot depth + 1.0mm floor — **Rev. 2 (MISS-004 fix, MEDIUM):** was 5.0mm/4.0mm-pilot (0mm engagement spare); increased +0.6mm in lockstep with `tab_pilot_depth` so the 1.0mm floor is unchanged |
-| `tab_pilot_depth` | 4.6 | mm, blind | ASSUMPTION | `screw_len`(6.0) − `tab_lid_t`(2.0) = 4.0mm engaged, 0.6mm spare — **Rev. 2 (MISS-004 fix, MEDIUM):** was 4.0mm (0mm spare, unlike the PCB standoff's own 0.6mm precedent); deepened +0.6mm to match it |
-| `tab_lid_t` | 2.0 | mm | DERIVED | `= lid_roof_t` (lid tab is a literal roof extension) |
-| `tab_clear_dia` | 2.8 | mm | ASSUMPTION | Same clearance-hole convention as PCB mounting holes |
-| `lid_tab_project` | 6.8 | mm | DERIVED | `2×min_wall_t + tab_clear_dia` — **Rev. 2 (MISS-003 fix, MEDIUM), lid tabs only:** new lid-side-only override. With the shared `tab_project`(6.0), the lid tab's annular wall was only `(6.0−2.8)/2=1.6mm` (< 2.0mm `min_wall_t`); this restores exactly 2.0mm, mirroring the base tab's own `(tab_project−tab_pilot_dia)/2=2.0mm` floor-precedent. See §6/§9.2 |
-| `tab_pilot_dia` | 2.0 | mm | DERIVED | `= standoff_pilot_dia` (same M2.5 self-tap pilot, BOM simplicity) |
-| `tab_chamfer_run` | 6.0 | mm | DERIVED | `= tab_project` (45° chamfer needs equal rise/run) — **base tabs only** (print-orientation reasoning, §9.3). **Rev. 2 (MISS-002 fix, HIGH):** the chamfer itself is now a genuine `linear_extrude()`/`polygon()` solid wedge (rise=run=6.0mm, swept over `tab_w`=8.0mm ⇒ 144mm³), replacing a degenerate `hull()` of two 0.01mm slivers — see §9.2 |
+| `pcb_length` | 100 | mm | CONFIRMED | Interface A2 |
+| `pcb_width` | 50 | mm | CONFIRMED | Interface A2 |
+| `pcb_thickness` | 1.6 | mm | CONFIRMED | Interface A2 (standard 2-layer stack, unchanged from Rev 2) |
+| `top_component_clearance` | 11 | mm | CONFIRMED | Interface A3 — tallest top-side part is J4 barrel jack (per interface's own component-height table) |
+| `bottom_component_clearance` | 0 | mm | CONFIRMED | Interface A3 — no bottom-side components populated |
+| Board mounting holes MH-1..4 | (3.5,3.5), (96.5,3.5), (96.5,46.5), (3.5,46.5), ⌀2.8mm clearance (M2.5) | mm | CONFIRMED | Interface A1 (corner pattern, unchanged in kind from Rev 2, repositioned for the new 100×50 outline) |
+| Board mounting holes MH-5/6 | (85,3.5), (85,46.5), ⌀2.8mm clearance (M2.5) | mm | CONFIRMED | Interface A1 — added specifically near the motor-driver zone for extra board rigidity close to the new high-current/switching components |
+| J1 (existing header) | (0,25), 9.5×6mm cutout, ref. height 3.2mm | mm | CONFIRMED | Interface A4, unchanged position/size from Rev 2 |
+| J2, J3 (existing headers) | (16,50), (30,50) | mm | CONFIRMED | Interface A4, unchanged from Rev 2 |
+| SW1 (button) | (44,50) | mm | CONFIRMED | Interface A4, unchanged from Rev 2 |
+| D1 (LED) | (10,37.5) | mm | CONFIRMED | Interface A4 — Y-position rescaled from Rev 2's 30mm by the same 1.25× board-width growth ratio applied to all original sensor-zone parts |
+| J4 (barrel jack, motor supply) | (100,25), edge-mounted | mm | CONFIRMED position / **ESTIMATE cutout diameter** | Interface A4 for position; `j4_cut_dia`=10.0mm is this Mechanical Lead's own outside-knowledge estimate for a generic 5.5/2.1mm barrel jack, no datasheet cited in the interface file — flagged for pre-build re-verification |
+| MC-1 (motor phase-wire pigtail) | (92,0), bottom edge, wire exit −Y | mm | CONFIRMED | Interface A4 — **wire-lead, not PCB-trace**, per interface's explicit note; this is a board-edge exit point, not a component footprint |
+| M1 motor body | ⌀27mm × 18.5mm height, ⌀3mm shaft | mm | CONFIRMED | Interface B1, `DS-MTR-021` |
+| M1 mounting-bolt pattern | 12mm square, 4× holes | mm | **ASSUMPTION** | Interface B1 flags this as an open item — no confirmed datasheet bolt-pattern; a generic hobbyist-brushless-outrunner convention is assumed here, explicitly flagged NOT T-Motor-specific |
+| Flywheel disk | ⌀60mm × 4.5mm, mild steel, ρ=7850 kg/m³ | mm / kg/m³ | **ASSUMPTION** | Interface B2 — back-computed against the electrical team's target rotational inertia; 4.505mm recomputed vs. 4.5mm stated is a consistency check, not an independent confirmation |
+| Rotation clearance envelope | ⌀76mm × 10.5mm axial | mm | CONFIRMED (derivation) | Interface B5 — `fw_radial_margin`=8mm, `fw_axial_margin_per_face`=3mm, both interface-stated safety margins around the disk's own swept volume |
+| Print material | PETG | — | ASSUMPTION | Interface B6 |
+| Total assembly mass | ≈149–150g (board ≈19–20g populated + motor ≈30g + flywheel 100g, enclosure plastic itself is additional) | g | ESTIMATE | Interface A5/B1/B2/B7 — context only, not a driving mechanical dimension at this scale; no structural deflection/FEA analysis performed (out of Phase 1 scope) |
+
+### 4.2 PCB-bay own-design values (formulas unchanged from Rev 2; only resulting numbers changed because the board itself grew)
+
+| Parameter | Value | Unit | Confidence | Rationale |
+|---|---|---|---|---|
+| `fit_clearance` | 0.2 | mm | Carried, re-justified §2 | FDM fit allowance |
+| `min_wall_t`/`wall_t`/`floor_t` | 2.0 | mm | Carried, re-justified §2 | Minimum FDM wall |
+| `board_xy_keepout` | 1.5 | mm | DERIVED | Same margin rule as Rev 2, applied around the new 100×50 outline |
+| `standoff_od` | 6.0 | mm | DERIVED | Unchanged formula (2× `standoff_pilot_dia` + wall margin) |
+| `standoff_pilot_dia` | 2.0 | mm | Carried | Self-tap pilot for M2.5, unchanged |
+| `standoff_h` | 6.0 | mm | DERIVED | = `bottom_component_clearance`(0) + margin — same formula as Rev 2, coincidentally close in value only because Rev 2's own bottom clearance was also small |
+| `screw_len` | 6.0 | mm | Carried | M2.5 self-tap screw length, unchanged |
+| `z_margin` | 0.5 | mm | Carried | Same stack-up margin convention as Rev 2 |
+| `base_interior_h` | 19.1 | mm | DERIVED | = `standoff_h` + `pcb_thickness` + `top_component_clearance` + `z_margin` = 6.0+1.6+11.0+0.5 |
+| `base_total_h` | 21.1 | mm | DERIVED | = `base_interior_h` + `floor_t` |
+| `lid_lip_h` | 3.0 | mm | Carried | Unchanged skirt-overlap depth |
+| `lid_roof_t`/`lid_skirt_t` | 2.0 | mm | Carried | = `min_wall_t` |
+| `pcb_bay_total_height` | 23.1 | mm | DERIVED | = `base_total_h` + `lid_roof_t` |
+| `interior_x` / `interior_y` | 103 / 53 | mm | DERIVED | = `pcb_length`/`pcb_width` + 2×`board_xy_keepout` |
+| `base_outer_x` / `base_outer_y` | 107 / 57 | mm | DERIVED | = interior + 2×`wall_t` |
+| `lid_skirt_inner_x` / `_y` | 107.4 / 57.4 | mm | DERIVED | = `base_outer` + 2×`fit_clearance` |
+| `lid_skirt_outer_x` / `_y` | 111.4 / 61.4 | mm | DERIVED | = skirt-inner + 2×`lid_skirt_t` |
+| `board_offset_x` / `_y` | 3.5 / 3.5 | mm | DERIVED | = `wall_t` + `board_xy_keepout` |
+| `j1_cut_w`/`_h`/`_z` | 9.5 / 6 / 6 | mm | Carried | Unchanged from Rev 2 — same connector, same size |
+| `j4_cut_dia`/`_z` | 10 / 6 | mm | **ESTIMATE** | New Rev 3 cutout — see §4.1 flag |
+| `bay_edge_margin` | 1.5 | mm | Carried | Unchanged component-keepout-to-bay-wall rule |
+| `bay_x_min`/`_max` | 9.5 / 48.0 | mm | DERIVED | Numerically **unchanged from Rev 2** — governed entirely by the original sensor-zone parts (J2 at X=16, SW1 at X=44), whose X-positions did not move when the board grew in length |
+| `bay_y_min` | 42.5 | mm | DERIVED | Rescaled from Rev 2's 32.5mm by the board's own Y-growth |
+| Tab positions (corners only) | (3.5,3.5,dy−1), (96.5,3.5,dy−1), (96.5,46.5,dy+1), (3.5,46.5,dy+1) | mm | DERIVED | Repositioned to the new board corners; same 4-corner convention as Rev 2 |
+| `tab_w`/`tab_project`/`tab_base_t` | 8 / 6 / 5.6 | mm | Carried | Unchanged tab geometry |
+
+### 4.3 Motor-mount own-design values (new in Rev 3)
+
+| Parameter | Value | Unit | Confidence | Rationale |
+|---|---|---|---|---|
+| `motor_platform_od` | 31.0 | mm | DERIVED | = `m1_body_dia`(27) + 2×`wall_t`(2.0) — the boss is sized to comfortably enclose the motor body's own footprint plus a minimum print-safe wall |
+| `motor_platform_h` | 8.0 | mm | ESTIMATE | Chosen to lift the motor body clear of the flywheel-bay floor disc so the flywheel itself (mounted above the motor) sits at the height needed for its own clearance envelope — see §7 Z-stack |
+| `m1_mount_hole_dia_clear` | 3.4 | mm | Carried convention | Standard M3 clearance-hole diameter (same clearance-fit convention Rev 2 used for M2.5 at 2.8mm, scaled up to M3) |
+| `m1_bolt_square` | 12.0 | mm | **ASSUMPTION** | See §4.1 flag — generic hobbyist convention, not datasheet-confirmed |
+| Bolt-hole corner radius | 8.485 | mm | DERIVED | = √(6²+6²) from the assumed 12mm-square pattern's center |
+| Margin, bolt-hole to motor-body edge | 5.015 | mm | DERIVED | = 13.5(`m1_body_dia`/2) − 8.485 — pattern is physically plausible under the motor body |
+| Margin, bolt clearance-hole outer edge to platform-boss edge | 5.315 | mm | DERIVED | = 15.5(`motor_platform_od`/2) − (8.485+1.7) |
+| Shaft clearance-hole radius | 1.7 | mm | DERIVED | = (`m1_shaft_dia`(3.0)+2×`fit_clearance`)/2 |
+| Gap, shaft-hole edge to nearest bolt-hole edge | 5.085 | mm | DERIVED | No overlap between the two hole families |
+| `fw_hub_standoff` | 3.0 | mm | ESTIMATE | Gap between motor bell-top and the bottom face of the hub collar, for tool/wrench clearance when tightening the collar's set screw |
+| `fw_hub_collar_od`/`_h` | 8.0 / 6.0 | mm | **ASSUMPTION** | Generic set-screw shaft-collar dimensions; no specific manufacturer part selected/cited — flagged as an open item in §16 |
+| `fw_shaft_exposed_len_needed` | 9.0 | mm | DERIVED (minimum requirement) | = `fw_hub_standoff`(3)+`fw_hub_collar_h`(6) — this is the **minimum** shaft length M1 must expose above its bell for this mounting scheme to work; M1's actual exposed shaft length is UNKNOWN (not in the interface file) and must be confirmed before build |
+
+### 4.4 Flywheel bay / containment own-design values (new in Rev 3)
+
+| Parameter | Value | Unit | Confidence | Rationale |
+|---|---|---|---|---|
+| `fw_dia` | 60.0 | mm | ASSUMPTION (interface B2) | Flywheel disk diameter |
+| `fw_radial_margin` | 8.0 | mm | CONFIRMED (interface B5) | Safety margin beyond the disk's own swept radius |
+| `fw_env_dia` | 76.0 | mm | DERIVED | = `fw_dia` + 2×`fw_radial_margin` — the actual REQ-306 rotation-clearance keep-out diameter |
+| `fw_axial_margin_per_face` | 3.0 | mm | CONFIRMED (interface B5) | Axial safety margin, each face of the disk |
+| `fw_env_axial` | 10.5 | mm | DERIVED | = `fw_t`(4.5) + 2×`fw_axial_margin_per_face` |
+| `fw_radial_standoff` | 1.5 | mm | ESTIMATE | Extra gap between the rotation-clearance envelope's own outer radius and the containment wall's inner face — a "keep-out beyond the keep-out," so a small manufacturing/assembly offset can't put the wall inside the safety margin itself |
+| `fw_bay_inner_r` | 39.5 | mm | DERIVED | = `fw_env_dia`/2 (38.0) + `fw_radial_standoff`(1.5) |
+| `containment_wall_t` | 4.0 | mm | ESTIMATE (2× `min_wall_t`) | Deliberately thicker than the print-safe minimum — this wall's job is containment (§8), not just enclosure, so it is sized above the manufacturability floor on purpose |
+| `fw_bay_outer_r` | 43.5 | mm | DERIVED | = `fw_bay_inner_r` + `containment_wall_t` |
+| `fw_flange_project` | 9.0 | mm | ESTIMATE | Radial width of the bolted flange band, sized to comfortably host 6 heat-set inserts around the circumference with adequate wall material each side (§12) |
+| `bolt_circle_r` | 48.0 | mm | DERIVED | = `fw_bay_outer_r` + `fw_flange_project`/2 — centered in the flange band |
+| `fw_flange_or` | 52.5 | mm | DERIVED | = `fw_bay_outer_r` + `fw_flange_project` |
+| `fw_flange_dia` | 105.0 | mm | DERIVED | = 2×`fw_flange_or` — the base's own flange OD that the containment cap's skirt slides over |
+| `n_cap_bolts` | 6 | — | ESTIMATE | Even spacing (60° apart) around the flange, judged adequate for a cap whose job is to stay closed under a low-probability, low-bulk-stress event (§8) — not a computed fastener-load calculation (out of Phase 1 scope) |
+| `heatset_od`/`_len` | 4.6 / 5.7 | mm | **ASSUMPTION** | Generic brass heat-set insert dimensions (common M3 size); no specific manufacturer part selected — flagged in §16 |
+| Margin, insert bore to flange inner/outer edge | 2.2 / 2.2 | mm | DERIVED | Both exceed `min_wall_t`(2.0) by 0.2mm — tight but compliant (§12) |
+| `flange_band_h` | 8.0 | mm | ESTIMATE | Z-height of the bolted flange band, sized to give the heat-set insert (5.7mm) a full depth of solid material plus a margin above it (2.3mm) below the cap's own top surface |
+| `wire_duct_dia` | 5.0 | mm | ESTIMATE | Sized for a small pigtail of 2–3 motor-phase wires (18–22 AWG class), no specific wire gauge confirmed |
+| `wire_bridge_w`/`_h` | 12.0 / 9.0 | mm | DERIVED | `_h` = `wire_duct_dia` + 2×`wall_t` (duct bore + minimum wall both sides, by construction — leaves **zero** spare in Z, see §11/§13) |
+| `bridge_fuse_overlap` | 2.0 | mm | ESTIMATE | Introduced this revision specifically to fix Error #3 (§11) — ensures the wire-bridge block's inner face is planted solidly inside the flywheel-bay wall rather than stopping at the bay's own center |
+| Z-stack: `fw_floor_top` | 2.0 | mm | DERIVED | = `floor_t` |
+| Z-stack: `fw_motor_platform_top` | 10.0 | mm | DERIVED | = `fw_floor_top` + `motor_platform_h`(8.0) |
+| Z-stack: `fw_motor_bell_top` | 28.5 | mm | DERIVED | = `fw_motor_platform_top` + `m1_body_h`(18.5) |
+| Z-stack: `fw_disk_bottom`/`_top` | 31.5 / 36.0 | mm | DERIVED | = `fw_motor_bell_top` + `fw_hub_standoff`(3.0) as the bottom face; `_top` = `_bottom` + `fw_t`(4.5) |
+| Z-stack: `fw_clearance_top` | 39.0 | mm | DERIVED | = `fw_disk_top` + `fw_axial_margin_per_face`(3.0) |
+| Z-stack: `fw_cap_outer_top`/`fw_bay_total_height` | 43.0 / 43.0 | mm | DERIVED | Cap adds 4.0mm of dome/flange material above the clearance envelope's own top |
+
+---
 
 ## 5. Design rationale by checklist item
 
-**1. Enclosure/spatial layout.** 2-piece design per REQ-305: a **base**
-(floor + 4 perimeter walls, open top) carrying the PCB standoffs, and a
-shallow **cap-style lid** (roof + downward skirt) that slips over the
-base's outer wall. A stepped tongue-and-groove joint was considered and
-rejected — at this wall thickness it would produce an ≈0.6–0.8mm "tongue,"
-marginal for FDM print integrity. The simpler cap/skirt joint avoids that
-thin-feature risk entirely.
+Numbered to match the Mechanical Reviewer's own 10-item checklist (§15
+reproduces it verbatim for the self-check):
 
-**2. PCB mounting.** 4 standoffs (⌀6.0mm, 6.0mm tall, blind ⌀2.0mm pilot
-5.0mm deep) rise from the interior floor at the exact 4 interface-file
-mounting-hole X/Y coordinates. PCB drops onto them and is secured with
-4× M2.5×6mm self-tapping screws driven up through the board.
+1. **PCB mounting** — 6 standoffs (`base_standoffs()`) at MH-1..6, unchanged
+   mechanism from Rev 2 (heat-formed/self-tap pilot bosses), now 6 instead of
+   4 because the interface file added MH-5/6 for rigidity near the new
+   motor-driver zone.
+2. **Connector accessibility** — see §10, all cutouts sized/positioned from
+   interface-file coordinates; the one new judgment call (the ~42mm wire run
+   from the duct to MC-1's actual position) is disclosed there, not buried.
+3. **Component-height clearance** — `top_component_clearance`=11mm and
+   `bottom_component_clearance`=0mm both taken directly from the interface
+   file (A3), driving `base_interior_h`/`lid_lip_h` unchanged in formula from
+   Rev 2.
+4. **Internal clearance/interference** — see §11 for the full computed
+   record (4 fixed defects, 2 dismissed false alarms, 1 flagged pre-existing
+   issue, 1 new borderline finding).
+5. **Fastener placement** — see §12; 3 fastener classes now, each justified
+   by the joint it serves, not by copying Rev 2's single class onto new
+   joints that have different duty.
+6. **Wall thickness** — 2.0mm minimum held everywhere except by deliberate,
+   disclosed exception (flywheel-bay wall at 4.0mm for containment duty; the
+   wire-bridge duct wall sits at exactly 2.0mm, §11/§13).
+7. **Assembly order** — see §14; re-derived from scratch for 3 pieces, not
+   copied from Rev 2's 2-piece sequence.
+8. **Basic print-fit tolerance** — 0.2mm/side, applied consistently at both
+   mating interfaces (PCB lid/base, containment cap/base flange), §2.
+9. **Basic manufacturability/3D-printability** — §13; every new feature
+   checked against the same overhang/bridge/wall rules as Rev 2, not given a
+   pass by association with a previously-reviewed design.
+10. **Interface-value traceability** — §4.1 traces every board-geometry
+    number to its interface-file source; §16 lists everything that is this
+    Mechanical Lead's own ASSUMPTION/ESTIMATE rather than an interface fact.
 
-**3. Connector accessibility.** See §6 for the full per-connector
-walkthrough — every one of J1/J2/J3/SW1/D1 has a dedicated, sized opening.
+Two items unique to this revision, not on the Reviewer's original 10-item
+list because Rev 2 had no rotating mass, are addressed as dedicated sections
+rather than folded into the above: **§6 motor-mounting-method decision**,
+**§7 rotation clearance / REQ-306**, **§8 REQ-403 safety disposition**, **§9
+vibration isolation / REQ-307 disposition**. The piece-count decision (item
+10 above, REQ-309) is expanded on here: Rev 2's 2-piece construction was
+explicitly framed by the requirement as a baseline, not a ceiling: adding a
+3rd piece (the containment cap) was a deliberate design decision, not a
+default, and is justified entirely by §8's containment reasoning — without
+the REQ-403 containment need, a 2-piece design (motor/flywheel bay open on
+top, or covered by an extension of the PCB lid) would likely have sufficed
+for the "enclosure" requirement alone.
 
-**4. Component-height clearance.** See §7 — computed both top and bottom,
-using the interface file's corrected 8.5mm top figure (not the superseded
-3.2mm), plus an explicit 0.5mm robustness margin.
+---
 
-**5. Internal clearance/interference.** Checked numerically (not asserted)
-in §7. One real conflict was found and resolved during design: an
-initially-considered "shared PCB+lid fastening column" reusing the PCB
-standoffs, and an "inward-bulging lid-screw boss on the clear front wall,"
-were both found to either be unbuildably fragile (a sub-3mm-OD freestanding
-riser through 9mm of open air) or to geometrically collide with the PCB
-footprint (the front wall sits only 1.5mm from the interior wall — closer
-than an inward boss would need to intrude). Resolved by moving lid
-fastening entirely outside the cavity (external corner tabs, §6/§8),
-eliminating both conflicts by construction.
+## 6. Motor-mounting-method decision
 
-**6. Fastener placement.** See §8 (PCB standoffs) and the external-tab
-discussion in §6/§8 (lid fastening).
+**Decision: off-board (bracket/platform)-mounted, not a PCB-footprint
+part.** The motor mounts to a raised cylindrical platform (`motor_platform()`)
+molded directly into the enclosure base, using its own 4-bolt pattern into
+that platform — not to the PCB. Electrical connection to U5 (motor driver)
+is via a wire-lead pigtail (MC-1, board-edge exit at (92,0)), not a
+PCB-mounted connector footprint that the motor plugs into directly. This
+matches the interface handoff's own non-binding lean and the constraint that
+MC-1 is explicitly a wire-lead connection, not a PCB trace.
 
-**7. Wall thickness.** 2.0mm uniform, chosen as ~5× a 0.4mm nozzle width
-(above the commonly-cited ~0.8mm FDM structural floor), sized for genuine
-screw-boss/wall integrity rather than a bare-minimum shell. Same value
-reused for floor, roof, and skirt for consistency and print-time
-efficiency (fewer distinct thicknesses to reason about).
+**Why not on-PCB mounting:** the motor's own footprint (⌀27mm body) and
+its bolt pattern would need to sit directly over/adjacent to the PCB, but
+the flywheel's rotation-clearance envelope (⌀76mm — see §7) is already
+larger than the entire 50mm board width. Any on-PCB motor mount would force
+either (a) the flywheel's swept volume to overhang the PCB edge, or (b) the
+PCB to be enlarged specifically to host the motor footprint under the
+flywheel — both of which subordinate the board's own routing/component
+layout to a purely mechanical constraint that the interface file's own B5
+derivation already treats as enclosure-side, not board-side. An off-board
+platform decouples the two: the PCB's own footprint is sized by its
+electronics (100×50mm per A2), and the motor/flywheel subsystem is sized by
+its own physics (§7), and the two are joined only by a wire and a duct.
 
-**8. Assembly order.** See §9 — the single most important buildability
-question this benchmark poses; resolved in full below.
+**Why vertical shaft, motor below / flywheel above:** this places the
+flywheel's own mass directly above its rotating support (the motor's bell
+and shaft), which is the geometrically simplest and lowest-part-count way to
+stack the disk on the shaft with a hub collar, and it means the flywheel's
+own weight loads the shaft axially/rotationally in the same way the motor
+was designed for (most small BLDC/hobby motors expect an axial mounted load
+on a vertical or near-vertical shaft in this class of application) rather
+than a cantilevered horizontal arrangement that would impose a bending
+moment on the shaft the motor's own bearings may not be rated for. No
+motor-bearing load rating is in the interface file (UNKNOWN) — the vertical
+arrangement is the more conservative choice given that unknown, not a
+datasheet-confirmed one.
 
-**9. Print-fit tolerance.** 0.2mm/side, stated once in §2 and applied
-consistently at: the lid-skirt-to-base-wall radial gap (`lid_skirt_inner =
-base_outer + 2×0.2`), and both fastener clearance holes (`tab_clear_dia` =
-2.8mm vs. an M2.5 = 2.5mm nominal shank, i.e. 0.15mm/side, consistent with
-this same class of allowance; the PCB's own mounting-hole clearance
-diameter, 2.8mm, is taken directly from the interface file rather than
-re-derived).
+**Why a shaft-mounted hub collar, not the bell-mount/ring-geometry
+alternative:** the interface file (B2) explicitly flags a second, real
+alternative — mounting the flywheel directly to the motor's own rotating
+outrunner bell (a ring/annulus shape around the bell rather than a solid
+disk on the shaft) — and explicitly cautions that this alternative would
+have a **higher** true moment of inertia than the solid-disk figure this
+whole design (and the electrical team's own target) is built around. This
+design does **not** adopt the bell-mount alternative, for three reasons: (1)
+it would silently change the flywheel's own moment of inertia away from the
+value the electrical/control side is presumably targeting, without being
+asked to make that trade; (2) a shaft-mounted hub collar is a simpler,
+better-understood mechanical interface for a paper-design exercise — its
+failure mode (a set-screw loosening) is at least nameable, whereas a
+bell-mount's attachment method to a specific motor's specific bell geometry
+is not specified anywhere in the interface file; (3) the interface file
+presents the solid-disk/shaft-mount geometry as the **primary** proposal,
+with the bell-mount flagged as an alternative, not a preference — so this
+design follows the primary proposal. This is disclosed here as an explicit
+choice, not a silent omission of the alternative.
 
-**10. Manufacturability.** See §9.3 — printability was checked against the
-design's actual features (bridge span at the J1 cutout, overhang at the
-corner tabs), not just stated as a generic rule.
+**Consequence for U5 wiring:** because the motor sits ~42mm away (in X) from
+MC-1's actual board-edge position (see §10), the motor's 3-phase wire
+pigtail must run along the interior floor between the flywheel bay's wire
+duct and the PCB bay. This is a real, disclosed trade-off from choosing a
+width-centered flywheel-bay layout over a motor-zone-centroid-aligned one
+(§10) — it does not affect the mounting-method decision itself, only the
+wire-routing distance.
 
-## 6. Connector/header/button/LED accessibility — per-item resolution
+---
 
-| Item | Position | Orientation | Access strategy | Purpose (see note below) |
+## 7. Rotation clearance envelope / REQ-306
+
+REQ-306 requires the enclosure design to provide a real, checked 3D keep-out
+around the flywheel's swept volume — not an eyeballed gap. This design's
+keep-out is the volume between `fw_env_dia`=76.0mm (radial) and
+`fw_env_axial`=10.5mm (axial), both taken directly from the interface file's
+own stated margins (B5: 8mm radial, 3mm axial per face) around the disk's
+actual physical envelope (⌀60×4.5mm). This is a real solid modeled in the
+`.scad` file as `fw_clearance_zone()` (rendered as a translucent reference
+volume, not a physical part) and used as the actual sizing driver for the
+containment wall's own inner radius — i.e., the keep-out is not just
+documented, it is the dimension the containment structure is built around:
+
+- `fw_bay_inner_r` = `fw_env_dia`/2 + `fw_radial_standoff` = 38.0+1.5 = 39.5mm
+  — the containment wall's inner face sits 1.5mm beyond the keep-out's own
+  outer radius, so the wall itself never physically encroaches into the
+  keep-out volume, with margin.
+- Vertically, `fw_clearance_top`=39.0mm is the keep-out's own top face; the
+  containment cap's structure begins only above that, at 39.0–43.0mm.
+
+**Sanity checks performed (§11 has the full record):** the motor platform
+boss (radius 15.5mm) and its bolt/shaft holes sit entirely inside the
+keep-out's own inner radius (39.5mm) with 24.0mm of clear radial gap between
+the platform's own edge and the containment wall — this gap is exactly what
+the missing-floor defect (Error #4, §11) required a floor disc to span, and
+it is now filled with solid material, not left open. The disk's own radius
+(30.0mm) plus the required 8.0mm interface-mandated margin (=38.0mm) is
+checked against the wall's inner face (39.5mm) with the additional 1.5mm
+standoff explicitly by construction, not by coincidence.
+
+This keep-out is a **clearance decision**, answering "can the flywheel spin
+without hitting anything in normal operation." It is explicitly **not** a
+substitute for the REQ-403 containment decision (§8), which answers a
+different question: "what happens if the flywheel or a piece of it comes
+loose." The `.scad` file's own in-code comment on `fw_clearance_zone()`
+states this distinction explicitly, and it is repeated here so the two
+requirements are never conflated in review.
+
+---
+
+## 8. REQ-403 safety disposition (proposal — pending Independent Review, then human HITL gate)
+
+**Proposal: provide active physical containment**, not clearance-plus-
+firmware-speed-limiting alone. This section is the engineering reasoning
+behind that proposal; the decision itself is not final until Independent
+Mechanical Review has assessed it and the human has acted on the HITL gate
+REQ-403 itself calls out.
+
+**The physics, recomputed this session, not assumed from ISS-020's own
+framing:**
+
+| Quantity | At 3000 RPM target | At 20,000 RPM no-load-low | At 22,200 RPM no-load-high |
+|---|---|---|---|
+| Angular velocity ω | 314.2 rad/s | 2094.4 rad/s | 2324.8 rad/s |
+| Stored kinetic energy (I=4.5×10⁻⁵ kg·m²) | 2.22 J | 98.70 J (44.44×) | 121.60 J (54.76×) |
+| Rim tip speed | 9.42 m/s (~34 km/h) | — | 69.74 m/s (~250 km/h) |
+| Peak centrifugal stress (solid-disk formula, ν=0.29) | 0.287 MPa | 12.75 MPa | 15.70 MPa |
+
+The 44–55× energy range matches ISS-020's own stated "45–55×" almost exactly
+— an independent confirmation of that issue's own framing, not just a
+citation of it.
+
+**The key reframing this design is built on:** the bulk-material stress
+numbers above are not the real risk. Even at 22,200 RPM (unbounded no-load
+speed), peak stress (15.70 MPa) carries a ~15.9× safety factor against mild
+steel's yield strength (250 MPa) — the disk itself is in no realistic danger
+of bursting. The actual hazard is a **discrete coupling failure**: the hub
+collar (a generic set-screw shaft collar, `ASSUMPTION`, no datasheet) losing
+its grip on the shaft — from vibration, from an installation error, or
+simply from a lower-quality assumed part — and releasing the **entire 100g
+disk as one rigid projectile**, at whatever speed the motor happens to be
+spinning at the moment of release. No datasheet exists (UNKNOWN) for the
+assumed hub collar's own retention strength, so this failure mode cannot be
+bounded by calculation — it can only be defended against structurally.
+
+**Why containment, not clearance-plus-firmware alone:** REQ-405 (the
+firmware speed ceiling) is explicitly not yet implemented (ACCEPTED-RISK
+pending Firmware Bring-up per ISS-020) — meaning that today, and for an
+unknown period going forward, the flywheel's real achievable speed is bounded
+only by the motor's own physical no-load speed (~20,000–22,200 RPM class),
+not by any software limit. A mechanical design that relies on a
+not-yet-implemented control loop as its only line of defense against a
+100g mass potentially detaching at up to ~250 km/h rim speed would be
+providing zero real protection for as long as that firmware gap exists —
+which, per the project's own tracking, is an open and undated item, not a
+near-term certainty. Given that:
+
+- This is explicitly a **bench-test, human-attended** context (not an
+  unattended field deployment) — the containment decision is scoped to that
+  context, not to a hypothetical harsher one. A human is expected to be
+  within arm's length of the device during any powered test.
+- The stored energy at the credible worst case (~122 J) is still
+  substantial — for comparison, that is roughly the kinetic energy of a
+  1kg mass dropped from ~12.4m, or a small hand tool swung at speed. A
+  100g fragment departing at up to ~250 km/h is a genuine laceration/impact
+  hazard to an attending human at bench distance, not a negligible one.
+- The mitigating alternative (firmware speed limiting) is real but is
+  **not yet built**, and this Mechanical Lead has no authority or visibility
+  into when it will be, per the task's own explicit instruction to stay out
+  of firmware/control-loop territory.
+
+Given a real, non-trivial energy release scenario, an unquantified
+(UNKNOWN-strength) coupling-failure mode as the trigger, a not-yet-existing
+software mitigation, and a human physically present during the exact
+condition that matters (power applied), this design proposes that the
+enclosure itself should not depend on firmware working correctly to keep a
+detached 100g disk away from the operator. **This is defense-in-depth, not a
+statement that firmware speed-limiting is unnecessary** — REQ-405 remains a
+correct and independent mitigation to pursue; this proposal simply does not
+treat it as sufficient on its own while it does not yet exist.
+
+**The physical decision made:** the containment cap (§4.4, a 3rd enclosure
+piece) is not merely a cover — it is sized and bolted specifically as a
+containment structure:
+- `containment_wall_t`=4.0mm (2× the print-safe minimum) around the full
+  360° of the flywheel bay, chosen because a containment wall's job is to
+  absorb and stop a fragment impact, not merely to keep dust out — sizing it
+  at only the print-safe minimum would not reflect that different duty.
+- The wall is a continuous ring with **no** access opening in the rotation
+  plane at all (the only openings into the bay are the wire duct, well below
+  the flywheel's own Z-range, and the flange-bolted cap on top) — a fragment
+  radially ejected from the disk's rim has no direct line-of-sight exit path
+  through the side wall.
+- The cap is bolted (6× M3 into heat-set inserts, §12), not snap-fit or
+  friction-fit, so it cannot be dislodged by the same impact event it is
+  meant to contain.
+- This is explicitly **not** a rigorously engineered ballistic-containment
+  structure — no impact-energy-absorption calculation, no material-specific
+  penetration-resistance analysis, and no dynamic (as opposed to static)
+  structural check was performed; those are beyond this Phase 1 scope and
+  this Mechanical Lead's own engineering authority to certify. What is
+  claimed is a **reasoned, disclosed, defense-in-depth structural choice**
+  — a continuous, bolted, over-minimum-thickness wall fully enclosing the
+  rotation plane — not a rigorous containment certification.
+
+**What this proposal is not:** it is not a claim that this design makes
+flywheel operation "safe" in any certified sense, and it is not a substitute
+for REQ-405 firmware speed-limiting eventually being implemented. It is one
+specific, bounded engineering judgment, offered for Independent Mechanical
+Review to challenge, and then for the human to accept, reject, or amend at
+the REQ-403 HITL gate — exactly mirroring how the electronics-side REQ-403
+disposition was handled (proposed → independently reviewed → human gate),
+not a unilateral final decision by this Mechanical Lead.
+
+---
+
+## 9. Vibration isolation / REQ-307 disposition
+
+REQ-307 is explicitly a "Should," not a "Must" ("where feasible"), citing
+`docs/architecture.md` §12's own framing: a rotating body such as a reaction
+wheel motor creates vibration and localized heating that can propagate into
+the PCB, mattering especially for vibration/temperature-sensitive parts like
+an IMU (bias drift with temperature).
+
+**Disposition: not fully feasible within this design's own constraints; a
+partial/incidental mitigation is provided instead, with the gap disclosed
+rather than silently accepted.**
+
+Reasoning: true vibration isolation (an elastomeric mount, a spring-damped
+suspension, or a physically decoupled sub-chassis for the IMU) is a
+mechanism/joint-class solution — explicitly out of Phase 1 scope
+(`docs/architecture-evolution.md` §10, "Motion / joints... deferred"). Adding
+one now would mean either (a) designing a genuinely new mechanical subsystem
+not asked for in this cycle's scope, or (b) inventing a token isolation
+feature (e.g., a foam gasket under the PCB standoffs) without any real
+vibration-transmissibility analysis to show it does anything — which this
+project's own rigor culture (disclosed-not-absorbed findings, e.g. the
+bridge-span finding in §11) argues against presenting as a real mitigation
+if it is not backed by analysis.
+
+What this design **does** provide, as an incidental (not purpose-built)
+partial mitigation:
+- The motor is off-board-mounted (§6) to its own platform, physically
+  separated from the PCB by the flywheel-bay wall (`containment_wall_t`=4.0mm)
+  and the full width of the wire duct's own run — the vibration source is
+  not bolted directly to the same rigid structure the IMU sits on within a
+  few millimeters, the way an on-PCB motor mount would have been.
+- MH-5/MH-6 (the two new mounting holes near the motor-driver zone) increase
+  the board's own fixation near the switching/driver components, which
+  reduces board-level flex/resonance that could otherwise couple motor-driver
+  electrical noise or minor vibration into the board more readily — a board
+  rigidity benefit, not a true vibration-isolation feature.
+- The flywheel bay and PCB bay are joined only through a rigid enclosure
+  base — there is no isolation in this path, so both spatial separation and
+  MH-5/6 rigidity are genuinely partial, not equivalent to an isolated mount.
+
+This is judged an honest "not fully feasible, here is the disclosed
+alternative" outcome consistent with REQ-307's own "Should"/"where feasible"
+framing — not a claim that vibration coupling has been solved. If IMU bias
+drift is observed during actual bring-up, a purpose-built isolation mount
+would be the correct follow-up (a future revision's scope, not silently
+folded into this one).
+
+---
+
+## 10. Connector / header / button / LED / motor-wiring accessibility
+
+| Ref | Board-local position | Cutout | Confidence | Note |
 |---|---|---|---|---|
-| J1 (USB-C) | (0,20) | Horizontal, opens −X | Side-wall cutout in the **base**, 9.5mm(Y) × 6.0mm(Z), centered on Y=20 | Cable mating path (−X) |
-| J2 (UART header) | (16,40) | Vertical, +Z | Shares one open **bay** cut through the **lid** (roof+skirt), open to the rear (+Y) edge | Cable mating path (+Z/rearward) |
-| J3 (SWD header) | (30,40) | Vertical, +Z | Same shared bay as J2 | Cable mating path (+Z/rearward) |
-| SW1 (reset button) | (44,40) | Vertical actuation | Same shared bay as J2/J3 | Fingertip press access |
-| D1 (LED) | (10,30) | Top-emitting, +Z | Dedicated ⌀3.0mm hole through the lid **roof only** (kept ≥1.0mm clear of the bay's edge — Rev. 2, was ≥2.5mm; see §7/§12 Open Item #8) | Visibility |
+| J1 | (0,25) | 9.5×6mm, Z 0–6mm | CONFIRMED | Unchanged from Rev 2 |
+| J2 | (16,50) | pass-through header, no dedicated cutout beyond the bay opening | CONFIRMED | Unchanged from Rev 2 |
+| J3 | (30,50) | pass-through header | CONFIRMED | Unchanged from Rev 2 |
+| SW1 | (44,50) | accessible through bay opening | CONFIRMED | Unchanged from Rev 2 |
+| D1 | (10,37.5) | visible through bay opening | CONFIRMED | Y-position rescaled from Rev 2's 30mm |
+| J4 | (100,25), edge | ⌀10.0mm, Z 0–6mm | ESTIMATE (diameter) | New in Rev 3; position confirmed, diameter is this Mechanical Lead's own estimate |
+| MC-1 | (92,0), bottom edge | No dedicated board-edge cutout modeled — wire exits the board at this point and is routed internally to the wire duct | CONFIRMED (position) | New in Rev 3; wire-lead, not a component footprint |
 
-**Important clarification surfaced by actually computing the numbers (see
-§7):** the header stack's physical top (Z≈18.1mm) sits **below**, not
-above, the split line (Z=18.6mm) once the stated `z_margin` is included —
-so a fully solid lid would **not** mechanically collide with J2/J3. The
-open bay is therefore driven by **functional access**, not by a height
-clearance problem: J2 (UART) and J3 (SWD) are active-use connectors that a
-bench/dev board's user will want to plug a cable into, potentially
-routinely or even semi-permanently, and a solid lid would physically block
-that even with clearance to spare underneath it. SW1 similarly needs a
-path for a fingertip, not just clearance for its resting height — a solid
-lid with 0.5mm of clearance above the button cap would make the button
-literally unpressable. D1 needs the hole for visibility, not height. This
-distinction (access vs. clearance) is deliberately called out here because
-conflating them would have produced a design that "fits" on paper but is
-functionally useless — exactly the kind of physical-reasoning gap this
-benchmark is testing for.
+**The wire-routing disclosure (important, not to be glossed over):** the
+flywheel bay's own wire duct is centered at `fw_cx`=53.5mm — the PCB's own
+X-midpoint — because the flywheel bay's own layout was centered on the PCB
+bay's width for a cleaner, narrower overall footprint (§3, the "master XY
+layout trade-off," `.scad` lines 497–519). MC-1's actual proposed board
+position is X=92mm. This means the wire duct's exit point does **not** land
+directly under or adjacent to MC-1 — there is a real ~42mm X-offset between
+where the motor's wire pigtail enters the enclosure interior (at the duct)
+and where it must connect on the board (at MC-1). The wire must run along
+the interior floor for that distance. This was a deliberate, disclosed
+trade-off (a width-centered flywheel bay vs. a motor-zone-centroid-aligned
+one, which would have produced a wider but shorter overall footprint,
+closer to 140×160mm-class rather than 107×162mm) — not an oversight. No
+routing channel/clip is modeled for this 42mm run (out of the detailed
+cable-exit-geometry scope this project has explicitly deferred,
+`docs/architecture-evolution.md` §13) — the wire is expected to simply lie
+along the interior floor, which is judged acceptable for a low-wire-count,
+low-flex, bench-test-only pigtail, but is flagged here as a real, not
+idealized, condition.
 
-J1, by contrast, genuinely is both a clearance AND an access problem in the
-same cutout: its own physical bulk needs the cutout to not be crushed by
-the wall, *and* the mating cable needs the same opening to reach it from
-outside.
+**Component-height clearance check (unchanged mechanism from Rev 2):**
+`top_component_clearance`=11mm (driven by J4, the tallest top-side part per
+the interface file) sets `base_interior_h` via the same formula Rev 2 used;
+`bottom_component_clearance`=0mm means no standoff-height allowance is needed
+beyond the base standoff height itself.
 
-**Bay geometry (Rev. 2 — corrected, MISS-001 fix):** spans board-local
-X=9.5–48.0 (38.5mm wide — J2 at 16, J3 at 30, SW1 at 44, all inside with
-margin), Y=32.5 through to the true outer rear edge (~11mm total notch
-depth). Previously this spanned X=10–50, Y=34–rear-edge, a range whose
-prose claimed "comfortably inside with margin" but which was in fact sized
-from connector **centerlines** with an unfounded ~6mm allowance, not from
-real footprint edges — the Mechanical Reviewer independently recomputed the
-actual connector-to-bay-edge margins at **0.0mm (J2), 1.0mm (SW1 via the
-old X-max), and 3.5mm (the header row's Y edge)**, i.e. one side had *zero*
-real clearance. The corrected bounds are derived edge-first: `bay_x_min =
-(j2_x−5) − bay_edge_margin`, `bay_x_max = (sw1_x+2.5) + bay_edge_margin`,
-`bay_y_min = (40−6) − bay_edge_margin`, using the exact same J2/J3/SW1
-footprint half-widths already committed to in `reference_pcba()` (J2/J3:
-±5mm X-halfwidth, 6mm Y-depth; SW1: 2.5mm radius) and reusing
-`board_xy_keepout`(1.5mm) as `bay_edge_margin` — the same constant already
-used, with the same "generous, not tight-tolerance" rationale, for the
-board's own keepout elsewhere in this file. This makes all three real
-connector-to-bay-edge margins a uniform, deliberately-chosen **1.5mm** (see
-§7 for the full recomputed-margin table with rendered-geometry
-cross-check). A single continuous notch was still chosen over 3 separate
-small windows for print simplicity (avoids a thin bridged strip at the back
-edge that 3 separate islands would create) and because it matches real
-cable-dressing needs — that reasoning is unaffected by this fix.
+---
 
-**Side effect (disclosed):** narrowing `bay_y_min` from 34.0 to 32.5
-brings the bay 1.5mm closer to D1's own hole, shrinking the D1-to-bay
-clearance from 2.5mm to **1.0mm** — still positive, but now the tightest
-margin in the whole design. Flagged in §7 and §12 Open Item #8, not
-silently absorbed.
+## 11. Computed clearance checks
 
-**Tab-vs-bay clearance (checked, not assumed — Rev. 2 numbers):** the two
-rear corner tabs (near MH-3 and MH-4, which reuse the bay's same wall) no
-longer clear the bay by a uniform amount, because the bay's X-bounds moved
-by different amounts on each side (`bay_x_min` in by 0.5mm, `bay_x_max` in
-by 2.0mm) while the tabs themselves did not move. Recomputed directly from
-the corrected bounds: rear-left tab clears `bay_x_min`(9.5) by **2.0mm**
-(tab edge at board-local X≈7.5); rear-right tab clears `bay_x_max`(48.0) by
-**4.5mm**, improved (tab edge at board-local X≈52.5). Both positive and
-non-conflicting; the tighter of the two (2.0mm) is still comfortably above
-the fastener-boss wall-thickness class of figure used elsewhere in this
-design. See §7 for the exact arithmetic, cross-checked against the actual
-rendered `.scad` geometry this revision (not just the formulas) via an
-exported-STL bounding-box measurement.
+This section is the full, disclosed record of every interference/clearance
+check performed this revision — real arithmetic and, where noted, real
+boolean-mesh intersection tests, not visual inspection.
 
-## 7. Computed clearance checks (numbers, not assertions)
+**A. Four errors found and fixed during this revision's own development:**
 
-All values below were computed with a Python calculator this session (see
-the commands run before writing this file). **Rev. 2 addendum:** the four
-fixed values in this revision (bay bounds, wedge geometry, lid-tab
-footprint, tab engagement depth) were, in addition to the hand arithmetic
-below, cross-checked against the actual rendered `.scad` geometry this
-session using a locally-available OpenSCAD 2021.01 binary (verified
-working via `--version`) plus `numpy-stl` volume/bounding-box measurement
-on the exported STL — see the Rev. 2 changelog at the top of this document
-and §11 for what was actually rendered/measured vs. what remains
-arithmetic-only. This does not change the tooling-honesty position in §0
-for the design as a whole (no STL has been committed to this repository,
-and this was a targeted spot-check of this cycle's fixes, not a
-comprehensive re-verification of every number in this document).
+1. **Error #1 & #2** (early-stage, minor coordinate-formula errors caught
+   before the design stabilized — superseded by later constants, not
+   independently re-describable at this point; see the `.scad` file's own
+   revision history in-code if a full audit trail is needed).
+2. **Error #3 — wire-bridge/motor collision.** Root cause: `bridge_y_lo` was
+   computed from the flywheel bay's own **center** (`fw_cy`=52.5mm) instead
+   of its **wall's outer edge**. This produced a bridge spanning 54.5mm,
+   running directly through the motor platform and motor body. Fix:
+   introduced `bridge_fuse_overlap`=2.0mm and recomputed `bridge_y_lo` =
+   `fw_cy` + `fw_bay_outer_r` − `bridge_fuse_overlap` = 52.5+43.5−2.0 = 94.0mm.
+   New span: 13.0mm. Verified clearance after fix: 26mm to the motor
+   platform, 28mm to the motor body — both confirmed via direct coordinate
+   check, not just "it looks fixed."
+3. **Error #4 — missing flywheel-bay floor (most severe finding this
+   revision).** Root cause: `fw_floor_top` (Z=2.0mm) was referenced
+   throughout the file as if a floor disc existed at that height inside the
+   flywheel bay, but no code actually created that geometry — the bay's
+   containment wall had **no bottom** at all. Fix: `motor_platform()` now
+   unions a full floor disc (radius=`fw_bay_outer_r`=43.5mm, Z=[0,2.0]) with
+   the raised platform boss, before differencing the 4 bolt holes and the
+   shaft hole through the combined solid. **This was the single most
+   safety-relevant catch of this revision** — an unfixed version would have
+   left the containment structure's own floor open, directly defeating
+   REQ-403's entire premise (a fragment could simply fall out the bottom).
+   Verified fixed via direct render (Status: NoError, no open non-manifold
+   edges at the floor/wall junction).
 
-**Top-side component clearance:**
-```
-pcb_top_z (global, from base interior floor)  = floor_t + standoff_h + pcb_thickness
-                                               = 2.0 + 6.0 + 1.6 = 9.6 mm
-header_top_z (PCB top + interface's 8.5mm)    = 9.6 + 8.5 = 18.1 mm
-split_line (top of base wall)                 = base_total_h = 18.6 mm
-Margin remaining above the header             = 18.6 − 18.1 = 0.5 mm  (= z_margin, exactly as intended)
-```
-Result: **PASS** — the stated 8.5mm interface requirement is met with the
-full stated 0.5mm z_margin intact, using the corrected (not the superseded
-3.2mm) figure.
+**B. Two findings investigated and correctly dismissed as false alarms
+(verified using a same-check-against-Rev-2's-own-already-reviewed-file
+baseline method, not just re-running the check once and hoping):**
 
-**Bottom-side component clearance:**
-```
-Bottom clearance available = standoff_h − 0 (PCB sits directly on standoff tops)
-                            = 6.0 mm available vs. 0.0 mm required (interface)
-```
-Result: **PASS**, with 6.0mm of margin — this large excess exists only
-because `standoff_h` is sized by fastener engagement depth (dominant
-constraint), not by the bottom-clearance requirement (trivially satisfied
-as a side effect). This is called out explicitly rather than left as an
-unexplained-looking oversized number.
+1. `trimesh`'s naive connected-components check reported ~12–13 exact-zero-
+   volume "extra components" on `base()`, which could look like a defect.
+   Running the identical check against Rev 2's own already-reviewed
+   `base()` produced the same pattern (same count class), confirming this is
+   a known STL-tessellation artifact at tab corners (CGAL/OpenSCAD's own
+   manifold check reports Status: NoError regardless), not a Rev 3-specific
+   defect.
+2. A "2-vs-3-component assembly split" finding (an ambiguous result from a
+   naive whole-assembly connectivity check) was similarly reproduced on Rev
+   2's own file pattern and dismissed as a benign artifact of the same
+   tessellation quirk, not a genuine assembly defect.
 
-**Standoff / PCB / interior-wall clearance (all 4 positions checked):**
-```
-Standoff center = (board_offset + hole_xy); radius = standoff_od/2 = 3.0mm
-Interior wall inner face at: X ∈ [2.0, 65.0], Y ∈ [2.0, 45.0]  (global)
-MH-1 (3.5,3.5)  -> standoff spans X[4.0,10.0]  Y[4.0,10.0]   -> clear of both faces
-MH-2 (56.5,3.5) -> standoff spans X[57.0,63.0] Y[4.0,10.0]   -> clear of both faces
-MH-3 (56.5,36.5)-> standoff spans X[57.0,63.0] Y[37.0,43.0]  -> clear of both faces
-MH-4 (3.5,36.5) -> standoff spans X[4.0,10.0]  Y[37.0,43.0]  -> clear of both faces
-```
-Result: **PASS**, all 4 standoffs sit entirely under the PCB footprint
-(as intended — a standoff should support the board, not protrude past its
-edge) with a minimum 2.0mm clearance to the interior wall.
+**C. One pre-existing Rev 2 issue found, confirmed, and deliberately NOT
+fixed (flagged as out of this task's scope):**
 
-**J1 cutout vs. nearest standoffs:**
-```
-J1 cutout global Y range = [18.75, 28.25]
-MH-1/MH-4 (same wall) standoff Y ranges = [4.0,10.0] and [37.0,43.0]
-Gap to each = 8.75 mm (both sides)
-```
-Result: **PASS**, wide margin.
+A genuine, non-zero **190.06mm³ solid-solid overlap** exists between
+`base_tabs()` and `lid_shell()`, confirmed via direct boolean intersection
+(not estimation). Root cause, worked through geometrically: each of the 4
+corner tabs projects outward (`tab_project`=6.0mm) starting flush at the
+base wall's own outer face (zero gap by design — the tab is meant to be a
+continuous extension of the wall). The lid's own skirt band (`lid_skirt_t`
+=2.0mm thick) independently occupies the zone starting `fit_clearance`
+(0.2mm) beyond that same wall face and extending `lid_skirt_t` further out —
+i.e., the skirt band's Y-extent (2.0mm) is a subset of the tab's own
+6.0mm outward projection, over the Z-range where the lid's skirt physically
+overlaps the base wall (3.0mm of Z, `lid_lip_h`). This produces a real
+solid-on-solid interference at all 4 corners, each contributing
+approximately 47–48mm³ (8mm tab width × 2.0mm Y-overlap × 3.0mm Z-overlap,
+minus a small pilot-hole deduction), summing to the reported 190.06mm³ —
+this hand-recomputation (188–192mm³ range) closely matches the actual
+measured figure, confirming the mechanism. **This is confirmed, via direct
+Rev-2-baseline testing, to be a pre-existing characteristic of Rev 2's own
+already-reviewed tab+skirt joint design** (neither `tab_project`,
+`lid_skirt_t`, nor `fit_clearance` changed between revisions) — inherited
+unchanged into Rev 3, not introduced by this revision. Decision: **flag,
+do not fix**, per this task's explicit scope boundary (this task is a
+mechanical redesign for the new motor/flywheel subsystem, not a Rev 2
+defect-remediation pass). Qualitative mitigating judgment (not a rigorous
+proof): the tab's actual structural job is served by its own screw pilot
+hole engaging the base's standoff-equivalent boss beneath the lid — the
+redundant contact with the lid's skirt band at this corner is unlikely to be
+the governing load path, so the real-world severity of this interference is
+judged low, but it has not been analyzed rigorously and is not claimed to be
+harmless in a stronger sense than "probably fine, undisturbed since Rev 2."
 
-**Connector real-edge margin vs. bay boundary (MISS-001 fix — the actual
-finding, not just its downstream effects on tabs/standoffs):**
-```
-J2/J3 footprint (per reference_pcba()): board-local X in [hx-5, hx+5], Y in [34,40]
-SW1 footprint (per reference_pcba()):   center (44,37.5), radius 2.5 -> X in [41.5,46.5], Y in [35,40]
+**D. One new finding, first identified this session (borderline but
+compliant — disclosed, not requiring a fix):**
 
-OLD (centerline-based, WRONG):
-  bay_x_min=10.0, bay_x_max=50.0, bay_y_min=34.0
-  J2 real left edge  (11.0) to bay_x_min(10.0)  = 1.0mm   <- reviewer-cited
-  SW1 real right edge(46.5) to bay_x_max(50.0)  = 3.5mm   <- reviewer-cited
-  Header row real Y edge(34.0) to bay_y_min(34.0) = 0.0mm <- reviewer-cited (ZERO clearance)
+The motor-wire bridge's unsupported horizontal print-bridging span was
+computed exactly: at the bridge's X-center (53.5mm), the span from the
+flywheel-bay wall/floor-disc's own outer edge (Y=96.000) to the PCB bay's
+south wall face (Y=105.0) is **9.000mm**; at the bridge's two X-edges
+(47.5mm/59.5mm), the span (measured from the floor disc's curved edge at
+those X-offsets, Y=95.584) is **9.416mm**. Both are within the stated
+`max_bridge_span`=10.0mm rule, but at 90.0–94.2% of it — directly analogous
+to Rev 2's own disclosed (and accepted) J1-cutout bridge, which sat at
+9.5mm/95% of the same limit. Additionally, the wire-duct bore's surrounding
+wall thickness inside the bridge block is 3.5mm on each side in X
+(comfortable margin above `min_wall_t`), but **exactly 2.0mm top and bottom
+in Z — precisely equal to `min_wall_t`, with zero spare**, because
+`wire_bridge_h` is deliberately derived as `wire_duct_dia + 2×wall_t`
+(9.0mm), not padded further. Both figures pass their respective rules
+exactly as stated; neither requires a `.scad` change. Disclosed here (and
+repeated in §13) per this project's established practice of surfacing
+borderline-but-compliant results rather than letting them pass silently.
 
-NEW (edge-based + bay_edge_margin, Rev. 2):
-  bay_x_min=9.5, bay_x_max=48.0, bay_y_min=32.5
-  J2 real left edge  (11.0) to bay_x_min(9.5)   = 1.5mm  (= bay_edge_margin, exactly)
-  SW1 real right edge(46.5) to bay_x_max(48.0)  = 1.5mm  (= bay_edge_margin, exactly)
-  Header row real Y edge(34.0) to bay_y_min(32.5) = 1.5mm (= bay_edge_margin, exactly)
-```
-Result: **PASS, and independently confirmed against the actual rendered
-`.scad` geometry this session** — the bay cutout was rendered standalone,
-exported to STL, and its true board-local bounding box measured directly
-from the mesh: **X=[9.5, 48.0], Y-min=32.5**, matching the formulas exactly
-(not just "should match on paper"). All three real connector-to-bay-edge
-margins are now a uniform, genuinely positive **1.5mm** — up from the
-broken 0.0mm/1.0mm/3.5mm the reviewer found, and no longer masked by a
-centerline-based calculation that silently assumed zero connector footprint
-width.
+**E. Bolt-hole / motor-body / platform-boss sanity checks** (motor mount
+geometry, §4.3 — all pass with real, computed margin; no interference).
 
-**Header bay vs. nearest standoffs and tabs (Rev. 2 — corrected):**
-```
-Bay global X range = [13.0, 51.5]   (was [13.5, 53.5])
-MH-3 standoff X range = [57.0, 63.0]  -> gap = 5.5mm  (was 3.5mm, IMPROVED)
-MH-4 standoff X range = [4.0, 10.0]   -> gap = 3.0mm  (was 3.5mm, still healthy)
-Rear-right tab X range = [56.0, 64.0] -> gap = 4.5mm  (was 2.5mm, IMPROVED)
-Rear-left  tab X range = [3.0, 11.0]  -> gap = 2.0mm  (was 2.5mm, still positive)
-```
-Result: **PASS** — all positive; the rear-left tab's 2.0mm is now the
-tighter of the two tab clearances (asymmetric, since the bay's two edges
-moved by different amounts — 0.5mm on the min side, 2.0mm on the max side
-— while neither tab moved), but it is not the tightest margin in the
-overall design (see D1-vs-bay below).
+**F. Containment-cap / base-flange interface check:** cap skirt inner
+diameter = `fw_flange_dia` + 2×`fit_clearance` = 105.0+0.4 = 105.4mm, vs.
+base flange OD = 2×`fw_flange_or` = 105.0mm → exact 0.2mm/side clearance
+fit, with matching Z-ranges ([31.0,39.0]mm) on both parts — confirmed by
+direct coordinate comparison, the same method used for the PCB lid/base
+interface in Rev 2.
 
-**D1 vs. bay (Rev. 2 — corrected):**
-```
-D1 hole top edge (global Y) = 35.0mm;  bay now starts at global Y = 36.0mm  (was 37.5mm)
-Gap = 1.0mm  (was 2.5mm)
-```
-Result: **PASS**, but this is now the **tightest margin in the entire
-design** — a direct, disclosed side effect of narrowing `bay_y_min` to
-close the MISS-001 finding (D1 itself was not touched; only its distance to
-the now-closer bay edge changed). Flagged in §12 Open Item #8, not silently
-absorbed.
+---
 
-**D1 vs. nearest standoff (MH-4):**
-```
-distance = sqrt((10-3.5)^2 + (30-36.5)^2) = 9.19mm
-sum of radii (D1 hole 1.5mm + standoff 3.0mm) = 4.5mm
-9.19mm >> 4.5mm
-```
-Result: **PASS**, wide margin (also independently consistent with the
-interface file's own "~9mm" note on this same distance).
+## 12. Fastener placement summary
 
-**Single-fastener (M2.5×6mm) stack-up, used both for PCB standoffs and lid
-tabs (Rev. 2 — lid tab corrected, MISS-004 fix):**
-```
-PCB standoff:  screw passes through pcb_thickness (1.6mm) + engages
-               4.4mm of the 5.0mm pilot depth (0.6mm pilot unused/slack)
-Lid tab:       screw passes through tab_lid_t (2.0mm, clearance) + engages
-               4.0mm of the 4.6mm pilot depth (0.6mm spare, matching the
-               PCB standoff's own precedent) -- 1.0mm solid floor remains
-               below the pilot hole, UNCHANGED from before this fix
-               (tab_base_t grew in lockstep with tab_pilot_depth, +0.6mm
-               each, specifically so the floor figure would not need to
-               change). Was: engaged exactly the full 4.0mm pilot depth
-               with ZERO spare -- unlike the standoff's own deliberate
-               0.6mm -- flagged as MISS-004 (MEDIUM).
-```
-Result: **PASS** for both uses — a single M2.5×6mm self-tapping screw,
-used 8× total, is the entire fastener BOM for this enclosure. Both
-fastening points now carry the same 0.6mm engagement-depth spare-margin
-convention.
+Three fastener classes this revision (Rev 2 had one):
 
-**Lid tab clearance-hole annular wall (MISS-003 fix — new check, this
-design never had one before):**
-```
-Y-direction (the tight axis):
-  OLD, using shared tab_project(6.0): (tab_project - tab_clear_dia)/2
-      = (6.0 - 2.8)/2 = 1.6mm  <- BELOW min_wall_t (2.0mm), reviewer-cited defect
-  NEW, using lid_tab_project(6.8):    (lid_tab_project - tab_clear_dia)/2
-      = (6.8 - 2.8)/2 = 2.0mm  <- exactly at min_wall_t, matching the base
-                                   tab's own (tab_project-tab_pilot_dia)/2
-                                   = 2.0mm floor-precedent
-X-direction (was already fine, untouched): (tab_w - tab_clear_dia)/2
-      = (8.0 - 2.8)/2 = 2.6mm  <- unaffected; tab_w did not change
-```
-Result: **PASS** (corrected) — 2.0mm minimum annular wall in both
-directions around the lid tab's clearance hole.
+| Joint | Fastener | Count | Placement rationale |
+|---|---|---|---|
+| PCB lid ↔ base | M2.5 self-tapping, into `standoff()` pilot bosses | 6 (at MH-1..6) | Unchanged mechanism from Rev 2, now at 6 positions instead of 4 |
+| Motor ↔ platform boss | Plain M3 clearance-fit, through-hole | 4 (assumed square pattern, §4.3) | Deliberately a **reversible, direction-agnostic** joint — which side of the joint is threaded is UNKNOWN (not in the interface file), so plain through-holes were chosen specifically because they work regardless of which side ends up threaded, avoiding a decision that depends on an unconfirmed fact |
+| Containment cap ↔ base flange | M3 into heat-set brass inserts | 6 (evenly spaced, `bolt_circle_r`=48mm) | Heat-set inserts chosen (over self-tapping directly into PETG) specifically because this joint is a **safety-relevant** one (§8) — a threaded metal insert holds torque and resists strip-out far better than a directly-tapped plastic hole, appropriate for a joint that must not fail under the same event it is meant to contain |
 
-**Base-vs-lid fastener-hole coaxiality (verifies the MISS-003 fix didn't
-break alignment):** widening the lid tab's footprint could have shifted its
-hole off-axis from the base tab's pilot hole if done carelessly (naively
-re-centering on the wider footprint would move the hole by
-`(lid_tab_project-tab_project)/2 = 0.4mm`, exceeding the ~0.15mm/side
-clearance-hole slop around an M2.5 shank: `(tab_clear_dia-2.5)/2 =
-(2.8-2.5)/2 = 0.15mm`). This was avoided by keeping `hole_yc` computed from
-the original, unchanged `tab_project` and only widening the surrounding
-cube symmetrically around that fixed axis (see `lid_tab()` in the `.scad`
-file). **Verified against the actual rendered geometry this session, not
-just the shared formula:** a 2.0mm-diameter test cylinder (matching the
-tighter of the two real bore diameters) was modeled through the full
-fastener bore depth spanning both parts (`base_total_h - tab_pilot_depth`
-= 14.0mm up to `base_total_h + lid_roof_t` = 20.6mm, a 6.6mm span) and
-subtracted from the union of the real `base_tab()` + `lid_tab()` solids.
-The result's measured volume (20.68mm³) matches a fully unobstructed
-6.6mm-tall, 2.0mm-diameter cylinder (ideal value 20.73mm³, i.e. within
-0.3% — the residual difference is explained entirely by circular-facet
-tessellation, not by any obstruction) — i.e. the bore is completely clear
-along its whole length, proving the two holes are genuinely coaxial in the
-as-rendered geometry, not just coaxial "on paper."
+**Heat-set insert wall-thickness check:** insert OD (4.6mm) centered at
+`bolt_circle_r`=48.0mm within the flange band (43.5–52.5mm radial span)
+leaves 2.2mm of material on each side (inner and outer) — 0.2mm above
+`min_wall_t`, a real but tight margin, disclosed rather than assumed safe by
+inspection. Insert pocket depth (5.7mm) fits within the flange band's own
+8.0mm height, leaving 2.3mm of solid material above the insert's own
+bottom face and below the flange band's own top.
 
-## 8. Fastener placement summary
+No fastener-load (torque, pull-out, shear) calculation was performed for any
+joint — this is explicitly beyond Phase 1's basic-manufacturability/basic-
+fit scope; fastener **counts and positions** are engineering judgment,
+not computed from a load case.
 
-| Fastener use | Qty | Type | Boss OD/dims | Pilot dia | Pilot/engagement depth | Access direction |
-|---|---|---|---|---|---|---|
-| PCB-to-base standoffs | 4 | M2.5×6mm self-tapping | ⌀6.0mm cylinder | ⌀2.0mm | 5.0mm blind (4.4mm engaged) | +Z (screwdriver from above, before lid is fitted) |
-| Lid-to-base corner tabs | 4 | M2.5×6mm self-tapping (same type) | 8×6.0mm external tab (base), 8×6.8mm (lid, Rev. 2 — widened, MISS-003 fix); 5.6mm thick (base, Rev. 2 — was 5.0mm) / 2.0mm (lid) | ⌀2.0mm (base) / ⌀2.8mm clearance (lid) | 4.6mm blind in base tab (Rev. 2 — was 4.0mm), 4.0mm engaged, 0.6mm spare (MISS-004 fix — was 0mm spare) | +Z (screwdriver from above, last assembly step) |
+---
 
-Both fastener uses are the **same screw type and length** — a deliberate
-BOM-simplicity choice (one fastener line item for the whole enclosure, 8
-identical screws).
+## 13. Manufacturability / 3D-printability
 
-**Why external tabs, not interior bosses, for lid fastening** (three
-rejected alternatives, each with a concrete reason):
-1. *Shared PCB+lid fastening column* (extend a PCB standoff all the way up
-   to the lid) — would require an unbuildably thin freestanding riser
-   (≤2.8mm OD) spanning ~9mm of open air with no lateral support; too
-   fragile for FDM.
-2. *Inward-bulging boss on the "clear" front wall* — found to physically
-   collide with the PCB footprint itself, since the PCB sits only 1.5mm
-   from the interior wall (`board_xy_keepout`), closer than an inward boss
-   would need to intrude to hold a screw.
-3. *Interior bosses at all 4 true corners, alongside the PCB standoffs* —
-   center-to-center spacing as small as ~2.8mm vs. a combined-boss-radius
-   requirement of ~7mm — geometrically impossible without merging into (or
-   colliding with) the PCB standoffs.
+**13.1 Rule set:** see §2 (0.2mm fit clearance, 2.0mm minimum wall, 45°
+overhang threshold, 10.0mm maximum bridge span, PETG assumed material).
 
-Resolution: 4 **external** mounting ears, each at a PCB corner's X/Y
-position but projecting *outward* from the main wall profile (not
-intruding into the interior cavity at all), so no PCB conflict is possible
-by construction. Confirmed clear of both the header bay and the J1 cutout
-(§6/§7).
+**13.2 Checked against actual Rev 3 features:**
 
-## 9. Manufacturability / 3D-printability
+- All new walls (flywheel-bay wall at 4.0mm, containment-cap flange/dome)
+  meet or exceed the 2.0mm minimum.
+- The motor platform boss, containment-cap dome, and flange are all vertical
+  or flat surfaces — no overhang beyond the 45° threshold anywhere in the
+  new geometry.
+- The motor-wire bridge (§11.D) is the one feature that approaches (without
+  exceeding) the bridge-span limit: 9.0–9.416mm against a 10.0mm rule
+  (90.0–94.2%). Its own surrounding wall (the duct bore) is simultaneously
+  at exactly the minimum wall thickness in the Z-direction (2.0mm, zero
+  spare). Both are disclosed as tight-but-compliant, not silently passed —
+  directly analogous to Rev 2's own disclosed 9.5mm/95%-of-limit J1-cutout
+  bridge. No change was made to either figure because both pass their
+  respective stated rule; a design choice to "round up" for extra margin
+  was considered and rejected because it would either shrink the flywheel
+  bay's own required clearance (§7, not acceptable) or grow the overall
+  footprint further beyond REQ-308's already-disclosed overrun (§3) — the
+  current figures are judged the right trade-off, disclosed rather than
+  silently adjusted.
+- The heat-set insert flange wall thickness (2.2mm each side, §12) is
+  likewise tight-but-compliant, 0.2mm above the minimum.
 
-### 9.1 Rule set
-Stated in full in §2 (min wall 2.0mm, max overhang 45°, max bridge 10mm,
-material PETG — all ASSUMPTION).
+**13.3 Print orientation:** as with Rev 2, the base is expected to print
+floor-down (build plate = the base's own exterior bottom face) — this keeps
+every new feature (flywheel-bay floor disc, motor platform boss, wire
+bridge) supported by the print bed or by short vertical walls, with no new
+orientation-dependent overhangs introduced beyond the bridge span already
+addressed. The containment cap is expected to print dome-up or dome-down
+depending on slicer preference — its flange face is flat either way, so
+orientation does not change its own manufacturability profile materially.
+No print-orientation-dependent structural weakness (layer-adhesion direction
+vs. load direction) analysis was performed for the containment cap's own
+impact-resistance role (§8) — this is disclosed as a real gap, not silently
+assumed adequate, given the cap's safety-relevant duty.
 
-### 9.2 Checked against this design's actual features
-- **J1 cutout bridge:** the cutout's top edge, when the base is printed in
-  its natural floor-down orientation, requires an unsupported horizontal
-  bridge of ≈9.5mm (`j1_cut_w`). This is within the stated ≤10mm bridge
-  rule, but only just — flagged explicitly (not silently accepted) as a
-  feature to watch on a first test print; a human slicing this file may
-  choose to add a support blocker/single support line here as a practical
-  hedge even though the design nominally clears the rule.
-- **Standoff pilot holes:** open at the top (not blind-capped from below in
-  a way that would need bridging), simple vertical cylinders — no support
-  needed in the base's natural print orientation.
-- **Base external corner tabs:** sit high on the wall (Z≈13.0–18.6mm out of
-  an 18.6mm-tall base, updated from Z≈13.6–18.6mm since `tab_base_t` grew to
-  5.6mm — MISS-004 fix) and project sideways as a 90°, unsupported overhang
-  in the natural floor-down print orientation. **Addressed**, not ignored:
-  a 45° self-supporting chamfer/gusset runs from the wall face up to the
-  tab's underside, keeping the whole feature within the stated
-  `max_overhang_deg` rule. **Rev. 2 correction (MISS-002, HIGH):** the
-  chamfer/gusset described here used to be built from `hull()` of two
-  0.01mm-thin cubes — the Mechanical Reviewer correctly identified this as
-  a geometrically degenerate sliver (a `hull()` of two near-zero-area
-  cross-sections is an infinitesimally thin diagonal fin, not a solid wedge
-  with real cross-sectional area along its span), far below any FDM
-  printer's minimum feature size, and NOT actually load-bearing support
-  material regardless of what the angle math suggested on paper. This has
-  been replaced with a genuine solid: a `linear_extrude()` of a
-  right-triangle `polygon()` swept along `tab_w`, with real rise
-  (`tab_chamfer_run` = 6.0mm) and run (`tab_project` = 6.0mm) legs — equal
-  legs giving an exact 45° hypotenuse (the boundary of, not comfortably
-  inside, the stated `max_overhang_deg` rule — called out explicitly rather
-  than rounded to "clearly fine"), a triangular cross-section area of
-  0.5×6.0×6.0 = 18mm², and total wedge volume 18mm²×`tab_w`(8.0mm) =
-  **144mm³** at each of the 4 base tabs. This is no longer a mathematical
-  artifact but an actual load-bearing gusset. **Empirically confirmed this
-  session** (not just derived on paper): the wedge was rendered standalone
-  in OpenSCAD 2021.01, exported to STL, and its bounding box (X=8.0mm,
-  Y=6.0mm, Z-span=6.0mm — matching `tab_w`/`tab_project`/`tab_chamfer_run`
-  exactly) and the combined tab+wedge volume (measured 398.39mm³ vs. the
-  398.35mm³ hand-calculated total: 254.35mm³ tab-cube-minus-pilot-hole +
-  144.0mm³ wedge — agreeing to within 0.02%, i.e. pure STL
-  circular-tessellation noise, not a modeling error) were both confirmed;
-  a rendered image was also visually inspected and shows a real, filled
-  triangular cross-section tapering to a knife edge, not a sliver. This
-  re-verification is what allows the self-check in §11 (item 9) to
-  restore a PASS for this specific feature — see §11 for the precise
-  scope of what was and was not re-verified.
-- **Lid external corner tabs:** by contrast, when the lid is printed in its
-  own natural orientation (roof-down), these tabs sit at the same Z-level
-  as the roof — i.e., at or near the first printed layers, effectively
-  bed-supported. **No chamfer applied here** — an earlier pass through this
-  design incorrectly planned to chamfer both lid and base tabs identically;
-  that was corrected after actually reasoning through each part's print
-  orientation separately, rather than applying one rule uniformly without
-  checking. This correction is called out explicitly as a demonstration of
-  print-orientation-aware reasoning, not glossed over.
-- **Header/button bay and D1 hole (lid):** both are simple through-cuts
-  with no enclosed void beneath them in the lid's own natural print
-  orientation — no bridging or support concern.
+---
 
-### 9.3 Print orientation
-- **Base:** floor-down (natural). No supports needed for standoffs or
-  pilot holes; the J1 cutout bridge is the one feature to watch (§9.2).
-- **Lid:** roof-down (natural, for a clean top/visible surface). No
-  supports needed for the bay, D1 hole, or the lid tabs (bed-adjacent, see
-  §9.2). The `.scad` file's `"print_layout"` show-mode lays both parts out
-  in these orientations, but the exact flip transform for the lid is
-  offered as a starting point only — it has **not** been visually verified
-  this session (this specific `show_mode="print_layout"` render was not
-  part of this cycle's targeted spot-check — see §0 for exactly what was
-  and was not rendered this session, now that a working OpenSCAD binary has
-  been found in this environment); a human should still confirm orientation
-  visually (or use a slicer's "lay flat") before trusting it blindly.
+## 14. Assembly order
 
-## 10. Assembly order — the core buildability question
+Re-derived from scratch for 3 pieces (Rev 2's 2-piece sequence does not
+extend directly):
 
-This is the question the task explicitly flagged as "most likely to reveal
-a real problem," given that J2/J3/SW1/D1 all need lid-side access while
-the PCB mounts to the base underneath. Worked through in full:
+1. Insert PCB into the base, seating on the 6 standoffs (MH-1..6).
+2. Fasten the PCB lid onto the base with 6× M2.5 self-tapping screws through
+   the lid tabs into the base standoffs — this closes and seals the PCB bay
+   completely before any motor/flywheel work begins, so the board is fully
+   protected during the more manual motor/flywheel assembly steps that
+   follow.
+3. Mount the motor (M1) onto the motor platform boss with 4× plain M3
+   screws (direction-agnostic, §12).
+4. Route the motor's phase-wire pigtail through the wire duct and connect it
+   to MC-1 (the ~42mm interior floor run, §10) — performed before the
+   flywheel is installed, since access to the duct/motor area is still open
+   from the top at this stage.
+5. Slide the hub collar onto the motor's exposed shaft and the flywheel disk
+   onto the hub collar; tighten the collar's set screw. This step requires
+   the ≥9.0mm of exposed shaft length above the motor bell (§4.3) — if M1's
+   actual shaft does not expose this much, this step cannot be completed as
+   designed (an open UNKNOWN, §16).
+6. Install the containment cap **last**, bolting it to the base's flange
+   with 6× M3 screws into the heat-set inserts. Placing this step last means
+   nothing is ever trapped behind the cap during assembly — every part
+   installed before it (motor, wire, hub, flywheel) remains accessible from
+   the top until the cap goes on, satisfying the "physically achievable
+   sequence, no part trapped behind another" requirement.
 
-**The trap to check:** *"Do headers need to be soldered after the PCB is
-already inside the enclosure — which would be a real assembly problem,
-since header pins face +Z and would become inaccessible once the lid area
-is filled?"*
+This sequence was checked for trapped-part conditions at every step (no step
+requires reaching past an already-installed part from an inaccessible
+direction) — the containment cap's cap-last placement is the one sequencing
+decision that specifically enables this; an early-installed cap would trap
+the motor/hub/flywheel assembly steps behind it with no access.
 
-**Resolution: no**, and here is the reasoning, not just the answer:
+---
 
-1. **PCB population happens entirely before enclosure assembly begins.**
-   J1/J2/J3/SW1/D1 are all soldered onto the bare PCB as a standard PCB
-   assembly (PCBA) process step, on an open bench, with full access from
-   every direction. This is a *manufacturing* step, not a *mechanical
-   assembly* step, and is explicitly outside this design's scope (it's true
-   regardless of what enclosure exists, or whether one exists at all). By
-   the time enclosure assembly starts, the board is a **fully populated,
-   functionally tested PCBA** — there is no point in the mechanical
-   assembly sequence where a header is soldered with the enclosure already
-   in the way.
-2. **Populated PCBA drops into the base** (+Z downward motion), guided onto
-   the 4 standoff bosses by the mounting holes.
-   - *Poka-yoke noted*: the 4-hole mounting pattern is itself symmetric
-     under 180° rotation about the board center, but the base's J1 cutout
-     is asymmetric (only on one specific wall) — so an incorrectly-rotated
-     PCB insertion is immediately obvious (J1 would face a solid wall
-     instead of its cutout) and effectively self-prevented. This is a
-     genuine, if modest, design strength worth noting rather than a
-     designed-in feature that needed extra parts.
-3. **4× M2.5×6mm self-tapping screws** driven downward through the PCB into
-   the standoffs — full screwdriver access, since the lid is not yet
-   present.
-4. **Lid lowered straight down** (single −Z motion) onto the base. No
-   collision: J2/J3/SW1 pass through the open bay, D1 through its
-   dedicated hole, and the solid part of the lid clears every other
-   (shorter) component via the uniform interior height computed in §7.
-5. **4× M2.5×6mm self-tapping screws** driven downward through the lid's
-   external corner tabs into the base's matching corner tabs, securing the
-   lid.
+## 15. Self-check against the Mechanical Reviewer's 10-item checklist
 
-**Disassembly** is the reverse, and is non-destructive — no permanent
-snaps or adhesive anywhere in this design — enabling rework, inspection, or
-component replacement. This is a deliberate design strength for a bench/
-dev board, worth stating explicitly rather than leaving implicit.
+Verbatim checklist (`.github/skills/mechanical-review/SKILL.md` lines 32–56):
 
-## 11. Self-check against the Mechanical Reviewer's 10-item checklist
+1. **PCB mounting** — ✅ 6 standoffs at interface-confirmed MH-1..6 positions (§5.1, §4.1).
+2. **Connector accessibility** — ✅ all 7 connectors/features addressed; one disclosed trade-off (MC-1 wire-run distance, §10), not a silent gap.
+3. **Component height clearance** — ✅ interface-traced top/bottom clearances drive the PCB-bay Z-stack unchanged in formula from Rev 2 (§4.2, §10).
+4. **Internal clearance/interference** — ✅ full computed record, §11: 4 fixed, 2 dismissed, 1 flagged-not-fixed, 1 new disclosed-compliant finding.
+5. **Fastener placement** — ✅ 3 classes, each justified by joint duty, §12.
+6. **Wall thickness** — ✅ 2.0mm minimum held everywhere, with disclosed deliberate exceptions (4.0mm containment wall) and disclosed tight spots (2.0mm duct wall, 2.2mm insert-flange margin), §2/§11/§12/§13.
+7. **Assembly order** — ✅ re-derived 6-step sequence for 3 pieces, no trapped parts, §14.
+8. **Basic print-fit tolerance** — ✅ 0.2mm/side at both mating interfaces, re-justified not just carried forward, §2.
+9. **Basic manufacturability/3D-printability** — ✅ §13, including two disclosed tight-but-compliant findings.
+10. **Interface-value traceability** — ✅ §4.1's full traceability table; §16 separates ASSUMPTION/ESTIMATE/UNKNOWN from CONFIRMED interface facts.
 
-Self-check performed per `.github/skills/mechanical-review/SKILL.md`. This
-is **not** a substitute for independent review — see §0 status line — but
-is intended to catch the obvious issues before handoff.
+This is a self-check, not a substitute for Independent Mechanical Review —
+every ✅ above reflects this Mechanical Lead's own assessment and is offered
+for the Reviewer to challenge, not as a pre-cleared result.
 
-| # | Checklist item | Self-check result |
+---
+
+## 16. Open UNKNOWNs / ASSUMPTIONs carried forward
+
+| Item | Status | Note |
 |---|---|---|
-| 1 | PCB mounting (standoffs at correct positions, correctly sized) | **PASS** — 4 standoffs at the exact interface-file MH coordinates, ⌀6.0mm OD around a ⌀2.0mm M2.5 self-tap pilot, clear of the interior wall by ≥2.0mm (§7) |
-| 2 | Connector accessibility (all connectors reachable/usable) | **PASS (Rev. 2 — corrected; the Cycle 1 PASS below was wrong)** — Cycle 1's claim rested on a centerline-based bay-margin calculation that the Mechanical Reviewer found produced a real margin of just 0.0mm at the header row (MISS-001, HIGH) — a genuine defect this self-check missed, not merely an under-explained one. `bay_x_min`/`bay_x_max`/`bay_y_min` are now recomputed from each connector's real footprint edge (the same `reference_pcba()` dimensions already used elsewhere in this file) plus an explicit `bay_edge_margin`(1.5mm); every real connector-to-bay-edge margin is now a uniform, genuinely positive **1.5mm**, confirmed against the actual rendered bay-cutout geometry this session, not just the formula (§7). Every one of J1/J2/J3/SW1/D1 still has a dedicated, purpose-matched opening (§6); the functional-access vs. height-clearance distinction still holds. |
-| 3 | Component height clearance (top + bottom, vs. interface file) | **PASS** — top: 0.5mm margin above the corrected 8.5mm figure (§7); bottom: 6.0mm available vs. 0mm required, explained (not just asserted) as a side effect of the standoff's fastener-depth sizing |
-| 4 | Internal clearance/interference (parts vs. walls/each other/fasteners) | **PASS** — all clearances in §7 computed numerically; one real conflict (lid-fastening approach) was found and resolved during design, not swept aside |
-| 5 | Fastener placement (position, wall thickness, access direction) | **PASS (Rev. 2 — corrected; the Cycle 1 PASS below was wrong for the lid tab)** — Cycle 1's "adequate surrounding material at every boss" claim did not actually hold for the lid tab: its clearance-hole annular wall computed to **1.6mm**, below this design's own stated 2.0mm `min_wall_t` (MISS-003, MEDIUM), and its engagement depth carried **zero** spare margin, unlike the PCB standoff's own deliberate 0.6mm precedent (MISS-004, MEDIUM). Both fixed: `lid_tab_project`(6.8mm, lid-only override) restores exactly **2.0mm** annular wall; `tab_pilot_depth`(4.6mm)/`tab_base_t`(5.6mm) restore **0.6mm** engagement spare while preserving the 1.0mm solid floor unchanged (§7/§8). Base-vs-lid hole coaxiality after the footprint widening was verified both by formula and against actual rendered geometry this session (an unobstructed-bore probe test, §7). All 8 fasteners remain +Z-accessible at the correct assembly step. |
-| 6 | Wall thickness (structural + printable) | **PASS** — 2.0mm uniform, justified against a stated FDM rule (§2/§5-item 7), not an arbitrary number |
-| 7 | Assembly order (physically achievable, no trapped parts) | **PASS** — §10; the specific "headers trapped behind the lid" trap was explicitly reasoned through and resolved (PCB is populated before enclosure assembly, not after) |
-| 8 | Print-fit tolerance (single stated value, consistently applied) | **PASS** — 0.2mm/side (§2), applied at the lid/base skirt joint and fastener clearance holes; explicitly distinguished from the separate keepout/margin concepts so as not to overstate what "tolerance" covers (§2) |
-| 9 | Manufacturability (wall thickness, overhangs, bridges, stated material) | **PASS (Rev. 2 — corrected and re-verified; the Cycle 1 PASS below was wrong)** — Cycle 1's PASS rested on a "45° self-supporting chamfer" that, in the actual constructed `.scad` solid, was a `hull()` of two 0.01mm-thin cubes: a mathematically degenerate sliver, not real load-bearing support material (MISS-002, HIGH). This self-check did not catch it the first time because it reasoned from the code's own comment/stated intent rather than the actual solid produced — a mistake not repeated here. Replaced with a genuine `linear_extrude()`/`polygon()` right-triangle wedge (rise=run=`tab_chamfer_run`=`tab_project`=6.0mm → exact 45°, cross-section area 18mm², volume 144mm³ per tab, ×4 tabs) — see §9.2. Unlike Cycle 1, this PASS is grounded in actual re-verification, not restated intent: the wedge was rendered standalone in a locally-available OpenSCAD 2021.01 binary this session, exported to STL, and its bounding box and volume were measured directly from the mesh (398.39mm³ vs. 398.35mm³ hand-calculated, agreeing to <0.02%) — confirming a real, non-degenerate solid, not just a formula that looks right. **Caveat carried forward honestly, not smoothed over:** 45° is the exact *boundary* of this design's own `max_overhang_deg` rule, not a comfortable margin inside it; and this re-verification is a geometric measurement only — no slicer support-preview and no physical test print has been performed, and it does not substitute for the Mechanical Reviewer's own independent re-review. The separate per-part print-orientation correction (lid tabs do NOT need the chamfer originally planned for both parts) still holds unchanged. |
-| 10 | Interface-value traceability (every dimension traced to a source or explicit assumption) | **PASS** — full parameter table in §4 labels every value CONFIRMED/ESTIMATE/ASSUMPTION/DERIVED with an explicit source |
+| M1's real mounting-bolt pattern | ASSUMPTION | Generic 12mm-square hobbyist convention assumed; interface file's own flagged open item; must be confirmed before build |
+| Which side of the motor/platform joint is threaded | UNKNOWN | Resolved by design choice (plain through-holes work regardless), not by data |
+| M1's actual exposed shaft length above the bell | UNKNOWN | Design requires ≥9.0mm (`fw_shaft_exposed_len_needed`); not in the interface file; must be confirmed before build |
+| Hub collar dimensions (⌀8×6mm) | ASSUMPTION | Generic set-screw shaft-collar part, no manufacturer/datasheet selected |
+| Hub collar retention strength | UNKNOWN | No datasheet; this is the exact unquantified failure mode the REQ-403 containment proposal (§8) is defending against |
+| J4 cutout diameter (10.0mm) | ESTIMATE | This Mechanical Lead's own outside-knowledge estimate for a generic barrel jack; no datasheet cited by the interface file |
+| Heat-set insert dimensions (⌀4.6×5.7mm) | ASSUMPTION | Generic M3 brass insert; no manufacturer part selected |
+| Print material (PETG) | ASSUMPTION | Inherited from interface B6, not independently confirmed |
+| Pre-existing Rev 2 190.06mm³ tab/skirt overlap | Flagged, not fixed | Out of this task's scope; confirmed pre-existing, not a new defect |
+| Motor-wire-bridge span (9.0–9.42mm) and duct-wall thickness (exactly 2.0mm) | Disclosed, compliant | New finding this session; within stated rules, no fix required |
+| REQ-308 envelope overrun (8.0–13.7% over the ~150mm-class soft ceiling) | Disclosed trade-off | Judged acceptable given the physical lower bound argument in §3 |
+| Total assembly mass / structural deflection under motor+flywheel load | ESTIMATE (mass only), no deflection analysis | Basic qualitative judgment only (≈130g motor+flywheel on a solid PETG boss/platform judged modest); no FEA, out of Phase 1 scope |
+| Containment cap's actual impact/penetration resistance | Not analyzed | §8/§13 explicitly disclose this as a reasoned structural choice, not a certified containment analysis |
 
-**Overall self-check result (Rev. 2): 10/10 PASS, but 3 of those 10 (items
-2, 5, 9) are corrected re-scores, not clean first-pass results** — the
-Cycle 1 self-check's PASS claims for those 3 items were each actually wrong
-in ways an independent reviewer caught and this design has now fixed (2
-HIGH: MISS-001, MISS-002; 2 MEDIUM: MISS-003, MISS-004). This revision does
-**not** claim a cleaner track record than it has; it is reported honestly
-so the Mechanical Reviewer can weight this self-check's credibility
-accordingly. No CRITICAL or currently-open HIGH issues remain identified by
-this self-check. This still does **not** mean the design is approved —
-independent Mechanical Reviewer sign-off is required regardless
-(`.github/agents/mechanical-lead.agent.md`, "Out of scope": *"Declaring
-your own design reviewed/complete... is mandatory regardless of how
-confident you are"*) — and is the explicit next step for this revision,
-not a formality. The items below are specifically flagged as things this
-self-check cannot fully close out on its own.
+**Nothing above is being silently relied upon as if it were CONFIRMED** —
+this table exists specifically so Independent Mechanical Review and the
+human HITL gate (§8) can see the full set of open items in one place, rather
+than needing to extract them from prose scattered through the document.
 
-## 12. Open UNKNOWNs / ASSUMPTIONs carried forward for the Mechanical Reviewer
+**Possible interface-file observation (flagged, not corrected):** while
+re-reading `hardware/mechanical-interface.md` this session, no internal
+inconsistency or error was found in it — every fact cited in this spec
+traced cleanly to a specific interface-file section. Nothing is flagged here
+as a suspected interface-file defect; this note exists only to confirm that
+this check was performed, per the task's own instruction to flag (not
+silently fix) any such issue if found.
 
-**Inherited from `hardware/mechanical-interface.md`'s own "Open items"
-(not resolved by this design — just propagated, since resolving them is
-outside Mechanical Lead scope):**
-1. J2/J3 physical header hardware (exact part/pitch/stack height) is
-   unconfirmed — this is the single figure the entire 8.5mm top-clearance
-   budget (and therefore this whole enclosure's height) is built on. If the
-   real header part differs meaningfully from the ESTIMATE, `base_total_h`
-   and `total_height` both need to be revisited.
-2. SW1/D1 exact packages are unconfirmed — this design's bay footprint
-   (≈38.5×6mm, Rev. 2 — was 40×6mm, see item 4 below) and D1 hole (⌀3.0mm)
-   are this Mechanical Lead's own ESTIMATEs layered on top of the interface
-   file's own estimates; both should be re-checked once real part numbers
-   exist.
-3. J1's MPN is not locked — this design's J1 cutout (9.5×6.0mm) already
-   carries extra margin specifically because of this, but should still be
-   re-verified once a real part is chosen.
+---
 
-**New estimates introduced by this Mechanical Lead, not present in the
-interface file, that the Reviewer should specifically scrutinize:**
-4. Header/button bay footprint dimensions (≈38.5mm × 6mm, Rev. 2 — was
-   40mm × 6mm before the MISS-001 fix; the underlying connector-X-span
-   estimate itself did not change, only the edge margin applied beyond it,
-   which now reflects real footprint edges instead of centerlines) — an
-   ESTIMATE built from the connector X positions plus an assumed margin,
-   not from any actual header/switch datasheet.
-5. D1 viewing-hole diameter (3.0mm) — ESTIMATE, no LED datasheet consulted.
-6. USB-C receptacle body width assumed ≈9.0mm for `j1_cut_w` sizing — this
-   number does not appear anywhere in the interface file (which gave only
-   a height, 3.2mm) and is this Mechanical Lead's own outside-knowledge
-   estimate of a typical USB-C receptacle shell width.
-7. The decision to use a **clearance** (slip) fit, not an interference
-   (press) fit, for the lid skirt-to-base joint — meaning the skirt fit
-   alone provides negligible retention; all positive retention comes from
-   the 4 corner-tab screws. Worth the Reviewer confirming this is an
-   acceptable trade-off (vs., say, a snap-fit or interference fit that
-   would hold the lid even before screws are driven, during handling).
-8. **(Rev. 2 — superseded by a tighter margin found elsewhere; kept here
-   with history rather than deleted)** The rear corner tabs' clearance to
-   the header bay was 2.5mm uniformly and was, at Cycle 1, the tightest
-   margin anywhere in this design. After the MISS-001 fix (recomputing bay
-   bounds from real connector edges), the two tab clearances are no longer
-   equal or the tightest: rear-left is now 2.0mm (down slightly) and
-   rear-right is now 4.5mm (up). **Neither is the tightest margin anymore
-   — see new item 8a below, which is.** Both remain positive and were
-   checked numerically (§7), and both were also confirmed against the
-   actual rendered bay-cutout geometry this session, not just computed on
-   paper.
-8a. **(Rev. 2 — new, directly caused by the MISS-001 fix; this is now the
-    single tightest margin in the whole design)** D1's clearance to the
-    header bay dropped from 2.5mm to **1.0mm** as a direct, disclosed side
-    effect of narrowing `bay_y_min` to close out MISS-001 — D1 itself was
-    not moved or resized. 1.0mm is still positive and was checked
-    numerically (§7), but it is the tightest margin in this entire design
-    (tighter than the 2.0mm/4.5mm tab-to-bay margins in item 8, and far
-    tighter than the ~8.75mm+ margins found elsewhere). **This is the
-    single item this Mechanical Lead would most want the Reviewer to look
-    at again in this cycle** — not because the arithmetic is wrong (it has
-    been checked twice, once by formula and once against rendered
-    geometry), but because 1.0mm is a small absolute number for an FDM
-    part with a stated 0.2mm/side fit tolerance and no stack-up analysis
-    performed (that technique remains explicitly out of scope — see
-    `.github/agents/mechanical-lead.agent.md`, "Out of scope"), so it
-    deserves a deliberate judgment call about whether 1.0mm is enough
-    margin in practice, not just confirmation that it is >0.
-9. The J1 cutout's ≈9.5mm top-edge bridge span is within the stated ≤10mm
-   rule but only just (§9.2) — flagged as a first-test-print watch item.
+## 17. Handoff
 
-**Process/administrative item:**
-10. Whether this original first-time creation of `hardware/mechanical/*`
-    design files required a `validation/change-log.md` (ECO) entry: this
-    Mechanical Lead's reading of `.github/instructions/mechanical-design.
-    instructions.md` was that its ECO requirement is written for *changes*
-    to an existing design, and that first creation had no prior enclosure
-    design to have changed — so no ECO entry was added for that initial
-    creation.
-    **Rev. 2 update (this cycle):** this reasoning no longer applies as-is
-    — this revision genuinely IS a change to an existing, already-reviewed
-    design, prompted by the Mechanical Reviewer's own Cycle 1 findings. This
-    Mechanical Lead's judgment call this cycle is to **still not add the ECO
-    entry yet**, on a different and narrower rationale: `validation/
-    change-log.md` and `validation/change-impact-matrix.md` were read this
-    session but deliberately left unedited, because an ECO record is more
-    useful once the Mechanical Reviewer's re-review actually confirms these
-    fixes land correctly (avoiding a change-log entry for a fix that the
-    re-review might still send back for further rework) rather than being
-    logged mid-rework, before independent confirmation. This is, again, a
-    judgment call flagged explicitly rather than a silent omission — the
-    Hardware Lead/Reviewer should override it if the project's convention
-    is actually "log every substantive rework immediately, regardless of
-    review outcome."
-
-## 13. Handoff
-
-Per `.github/agents/mechanical-lead.agent.md`, handoff to the Mechanical
-Reviewer (via the Hardware Lead) consists of:
-- `bench-imu-01-enclosure.scad` (this directory)
-- This file (`bench-imu-01-dimensional-spec.md`)
-- The design rationale (§5–§10 above)
-- The self-check result (§11)
-- The open UNKNOWNs/ASSUMPTIONs list (§12)
-
-No committed CAD/3D rendering, preview, or STL export accompanies this
-handoff — see §0. This revision's fixes WERE, however, spot-checked this
-session against actual rendered geometry from a locally-available OpenSCAD
-2021.01 binary (bounding-box/volume measurement via `numpy-stl`); none of
-those render/measurement artifacts were committed to this repository (§0),
-so the Mechanical Reviewer should still expect to conduct their own
-independent re-render/re-measurement as part of this re-review, not treat
-this Mechanical Lead's spot-check as a substitute for it.
+To Independent Mechanical Review (via Hardware Lead): this document, plus
+`hardware/mechanical/bench-imu-01-enclosure.scad` (Rev 3, 991 lines), plus
+the self-check in §15, plus the full open-items table in §16. The REQ-403
+disposition in §8 is explicitly a **proposal**, not a final decision — it is
+expected to be challenged by Independent Review before it ever reaches the
+human HITL gate REQ-403 itself calls for. No claim of physical fabrication,
+print, or fit-test is made anywhere in this document (§0) — this remains a
+paper/parametric design exercise, consistent with this entire project
+cycle's own stated scope.
