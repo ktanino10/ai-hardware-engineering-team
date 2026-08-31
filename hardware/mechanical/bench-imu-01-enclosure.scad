@@ -339,6 +339,35 @@ tab_positions = [
     [ 3.5, 46.5, +1], // near MH-4, rear-left
 ];
 
+// Rev 3.1 FIX (MISS-010, HIGH -- Independent Mechanical Review Cycle 1
+// (Rev 3), validation/design-review.md "Mechanical Reviewer -- Cycle 3",
+// Finding 3): a genuine, non-zero 190.06mm^3 solid-solid overlap between
+// base_tabs() and lid_shell()'s own skirt band exists at all 4 tab corners
+// (confirmed by direct boolean intersection this session -- see the
+// rationale block at lid_shell() below for the full geometric derivation).
+// This was disclosed by this Mechanical Lead as a pre-existing, inherited
+// Rev 2 characteristic in an earlier Rev 3 report ("flagged, not fixed, out
+// of scope") but was not, at that time, entered into
+// validation/open-issues.md's own tracked backlog -- the Reviewer's Cycle 3
+// pass added it there as MISS-010 and required it be fixed this cycle,
+// since this Mechanical Lead is already reworking this exact geometry
+// class. tab_relief_margin below is the fix's only new parameter -- see
+// lid_shell() for how it is used.
+tab_relief_margin = 1.0; // mm. ASSUMPTION: same "small explicit overshoot"
+                  // convention used throughout this file for cut-tool
+                  // oversizing (e.g. the "+1"/"+2" pattern on cylinder/cube
+                  // heights elsewhere) -- guarantees the relief notch (see
+                  // lid_shell()) fully clears the skirt band's own Y-extent
+                  // with margin on the open-air side, so no coincident/
+                  // tangent cut face is left at the skirt's own outer
+                  // (Y=lid_y0 or Y=lid_y0+lid_skirt_outer_y) face. Applied
+                  // only on the open-air side of each notch; the inner-face
+                  // side of the skirt band coincides exactly with the
+                  // notch's own boundary by construction (see derivation),
+                  // which is the same kind of exact-coincident boolean
+                  // face already used safely elsewhere in this file (e.g.
+                  // the flywheel floor/wall Z=fw_floor_top interface).
+
 // ----------------------------------------------------------------------
 // 2b. MOTOR MOUNT (Rev 3 NEW). DECISION: off-board / bracket-mounted to
 //     the enclosure BASE itself (not to the PCB) -- see spec file §5 for
@@ -383,9 +412,23 @@ m1_mount_hole_dia_clear = m1_bolt_dia_clear; // = 3.4mm
 // Hub / shaft interface
 fw_hub_standoff  = fw_axial_margin_per_face; // mm = 3.0. DERIVED: reuses
                     // B5's own axial margin value directly, since this IS
-                    // physically the "motor-bell-top-to-disk-bottom" gap
-                    // that B5's axial margin already describes -- not a
-                    // fresh, separate number.
+                    // physically the SAME clearance gap B5's axial margin
+                    // already describes -- not a fresh, separate number.
+                    // Rev 3.1 correction (MISS-008, see §7 of the companion
+                    // spec file): this is the gap between the TOP of the
+                    // hub collar and the BOTTOM of the flywheel disk --
+                    // i.e. the collar sits directly on fw_motor_bell_top
+                    // (see reference_motor_flywheel() below, unchanged),
+                    // then this standoff gap, then the disk (see
+                    // fw_disk_bottom below). The Rev 3 comment here
+                    // previously (incorrectly) called this "the
+                    // motor-bell-top-to-disk-bottom gap" outright, which is
+                    // what led fw_disk_bottom to omit fw_hub_collar_h
+                    // entirely (MISS-008, CRITICAL) -- the TRUE
+                    // motor-bell-top-to-disk-bottom gap is
+                    // fw_hub_collar_h + fw_hub_standoff (=9.0mm), exactly
+                    // the quantity fw_shaft_exposed_len_needed below
+                    // already, correctly, computes.
 fw_hub_collar_od = 8.0; // mm. ASSUMPTION -- generic off-the-shelf
                     // set-screw shaft-collar class part.
 fw_hub_collar_h  = 6.0; // mm. ASSUMPTION.
@@ -394,7 +437,11 @@ fw_shaft_exposed_len_needed = fw_hub_collar_h + fw_hub_standoff; // DERIVED
                     // M1 part's actual exposed shaft length above its
                     // bell top (interface file does not state this
                     // dimension). Flagged in spec file §12 for pre-build
-                    // verification.
+                    // verification. This formula was ALWAYS correct -- it is
+                    // the formula MISS-008 used as the independent proof
+                    // that fw_disk_bottom (below) was wrong, since the two
+                    // formulas contradicted each other within this same
+                    // file until the Rev 3.1 fix below.
 
 // ----------------------------------------------------------------------
 // 2c. FLYWHEEL BAY / CONTAINMENT (Rev 3 NEW -- the REQ-403 safety
@@ -472,19 +519,28 @@ wire_duct_dia = 5.0; // mm. ASSUMPTION -- sized only for 3 thin motor
                       // phase-lead wires + slack, not a general opening.
 wire_duct_z   = 8.0; // mm, global Z of the duct's own center -- level with
                       // the motor platform's own height band (2.0-10.0mm),
-                      // ~23mm below the disk's rotation zone (31.5-36.0mm).
+                      // ~29.5mm below the disk's rotation zone (37.5-42.0mm
+                      // post Rev-3.1/MISS-008 fix; was ~23mm below the old,
+                      // incorrect 31.5-36.0mm zone -- the duct's own Z
+                      // itself is unaffected by that fix, only the disk's
+                      // position moved further away, i.e. this only grows
+                      // the existing margin, never shrinks it).
 wire_bridge_w = 12.0; // mm, X-span of a short rectangular bridge/gusset
                       // block this Mechanical Lead adds connecting the
                       // flywheel bay's own PLAIN WALL (outer radius
                       // fw_bay_outer_r=43.5mm -- NOT the wider flange band,
                       // which only exists near the very top, nowhere near
                       // this duct's low Z) to the PCB bay's own south wall.
-                      // See motor_wire_bridge() below for the full
-                      // bridge_y_lo/_hi derivation, including a real
+                      // See the bridge_y_lo/bridge_y_hi derivation and
+                      // motor_wire_bridge_solid()/motor_wire_duct_void()
+                      // below (Rev 3.1: split from a single
+                      // motor_wire_bridge() module per the MISS-009 fix)
+                      // for the full derivation, including a real
                       // motor-vs-bridge collision this Mechanical Lead caught
-                      // and fixed this session via render+numeric spot-check
-                      // (an earlier draft anchored this block on the bay's
-                      // own rotation-axis CENTER instead of the wall's outer
+                      // and fixed in an earlier Rev 3 session via
+                      // render+numeric spot-check (an earlier draft anchored
+                      // this block on the bay's own rotation-axis CENTER
+                      // instead of the wall's outer
                       // surface, making it a 54.5mm slab that overlapped the
                       // entire motor platform/body footprint). ASSUMPTION:
                       // sized comfortably larger than duct_dia + 2*wall_t
@@ -559,19 +615,64 @@ assembled_envelope_y  = assembled_envelope_y_north - assembled_envelope_y_south;
                     // rather than further squeezed.
 
 // Absolute Z-stack, flywheel bay (from the TRUE global bottom, Z=0)
+// Rev 3.1 FIX (MISS-008, CRITICAL -- Independent Mechanical Review Cycle 1
+// (Rev 3), validation/design-review.md "Mechanical Reviewer -- Cycle 3",
+// Finding 1): fw_disk_bottom below previously read
+// `fw_motor_bell_top + fw_hub_standoff` (=31.5mm), which OMITTED
+// fw_hub_collar_h (=6.0mm) entirely -- an internal self-contradiction
+// against this same file's own fw_shaft_exposed_len_needed formula above
+// (`fw_hub_collar_h + fw_hub_standoff`), which already, correctly, treats
+// the collar height as additive between the motor bell top and the disk.
+// Empirically confirmed (both by the Reviewer and independently
+// re-confirmed by this Mechanical Lead this revision, via a standalone
+// openscad intersection() of the two literal solids at their pre-fix
+// modeled coordinates: collar Z=[28.5,34.5], disk Z=[31.5,36.0], overlap
+// volume ~150.4mm^3 this session / ~145.0mm^3 Reviewer's trimesh figure /
+// ~150.8mm^3 hand-calc, all within normal STL-facet-discretization
+// tolerance of each other) that the pre-fix disk position physically
+// collided with the hub collar it is supposed to rest on top of, making
+// the flywheel unassemblable per this file's own §14 Assembly Step 5.
+// FIXED by adding the missing `+ fw_hub_collar_h` term below -- every
+// downstream value in this Z-stack is a FORMULA (not a hardcoded number),
+// so the +6.0mm correction cascades automatically through fw_disk_top,
+// fw_clearance_top, fw_cap_outer_top, fw_wall_h and fw_bay_total_height at
+// render time; the trailing "// N.N" comments below have been updated to
+// the new, correct values so they stay human-readable without re-deriving
+// them by hand. This re-verified, corrected Z-stack is re-checked
+// end-to-end against REQ-306 (vertical clearance) and REQ-403 (containment
+// envelope sizing) in dimensional-spec.md §7/§8 -- see that file's own
+// Rev 3.1 changelog entry for the full re-derivation, not just this one
+// formula in isolation.
 fw_floor_top          = floor_t;                                    // 2.0
 fw_motor_platform_top = fw_floor_top + motor_platform_h;            // 10.0
 fw_motor_bell_top     = fw_motor_platform_top + m1_body_h;          // 28.5
-fw_disk_bottom        = fw_motor_bell_top + fw_hub_standoff;        // 31.5
-fw_disk_top           = fw_disk_bottom + fw_t;                      // 36.0
-fw_clearance_top      = fw_disk_top + fw_axial_margin_per_face;     // 39.0
-                        // (= the cap's own inner face, i.e. where the
-                        // rotation-clearance keep-out volume actually ends)
-fw_cap_outer_top      = fw_clearance_top + containment_wall_t;      // 43.0
-fw_wall_h             = fw_clearance_top - fw_floor_top;            // 37.0
-                        // (base's own cylindrical wall height, floor-top
-                        // to the underside where the cap's skirt begins)
-fw_bay_total_height   = fw_cap_outer_top;                           // 43.0mm
+fw_disk_bottom        = fw_motor_bell_top + fw_hub_standoff
+                          + fw_hub_collar_h;                        // 37.5
+                        // (was 31.5 pre-fix, MISS-008 -- see note above.
+                        // This now correctly stacks: motor bell top, then
+                        // the hub collar's own full height, THEN the
+                        // fw_hub_standoff gap, then the disk -- matching
+                        // fw_shaft_exposed_len_needed's own additive
+                        // formula above, order-of-addition doesn't matter.)
+fw_disk_top           = fw_disk_bottom + fw_t;                      // 42.0
+                        // (was 36.0 pre-fix)
+fw_clearance_top      = fw_disk_top + fw_axial_margin_per_face;     // 45.0
+                        // (was 39.0 pre-fix; = the cap's own inner face,
+                        // i.e. where the rotation-clearance keep-out
+                        // volume actually ends)
+fw_cap_outer_top      = fw_clearance_top + containment_wall_t;      // 49.0
+                        // (was 43.0 pre-fix -- the full +6.0mm shift, not
+                        // merely the +2.0mm that would just barely stop
+                        // the clearance envelope from poking out the cap's
+                        // old top; the cap must still have a full
+                        // containment_wall_t of material ABOVE the
+                        // corrected clearance_top, hence the full +6.0mm)
+fw_wall_h             = fw_clearance_top - fw_floor_top;            // 43.0
+                        // (was 37.0 pre-fix; base's own cylindrical wall
+                        // height, floor-top to the underside where the
+                        // cap's skirt begins)
+fw_bay_total_height   = fw_cap_outer_top;                           // 49.0mm
+                        // (was 43.0mm pre-fix)
 
 // ----------------------------------------------------------------------
 // 3. MODULES -- PCB bay (base shell, standoffs, tabs; lid)
@@ -693,6 +794,57 @@ module lid_shell() {
         // D1 viewing hole, through the roof only
         translate([board_offset_x + d1_x, board_offset_y + d1_y, lid_lip_h - 1])
             cylinder(d = d1_hole_dia, h = lid_roof_t + 2);
+
+        // Rev 3.1 FIX (MISS-010, HIGH): tab-relief notches, one per
+        // base_tabs() corner, cut through the skirt band ONLY (not the
+        // roof above it -- unlike the header/button-bay notch above, this
+        // is deliberately NOT a full-height cut). Root cause of the defect
+        // this fixes: base_tab()'s cube starts flush at the base wall's own
+        // outer face (Y=0 or Y=base_outer_y, LOCAL to pcb_bay_base()) and
+        // projects outward the FULL tab_project (6.0mm); independently,
+        // lid_shell()'s own skirt band occupies a fit_clearance (0.2mm) gap
+        // beyond that same wall face plus a further lid_skirt_t (2.0mm) --
+        // i.e. the ENTIRE skirt band footprint at a tab's X position is a
+        // subset of that tab's own 6.0mm outward projection, over the full
+        // lid_lip_h (3.0mm) of shared Z. Confirmed this session via direct
+        // coordinate comparison: tab global Y=[99,105] (front) / [162,168]
+        // (rear) vs. skirt band global Y=[102.8,104.8] (front/south) /
+        // [162.2,164.2] (rear/north, by the same construction on the
+        // opposite side) -- each skirt band is fully contained inside its
+        // corresponding tab's Y-range, over shared Z=[18.1,21.1] (global) =
+        // Z=[0,lid_lip_h] (local to this module) -- a real 8mm(tab width) x
+        // 2.0mm(skirt band width) x 3.0mm(lid_lip_h) = 48.0mm^3 solid-solid
+        // interference at each of the 4 corners (matches the ~190.06mm^3
+        // total reported by the Reviewer, and this Mechanical Lead's own
+        // prior 188-192mm^3 hand-recomputation, to within discretization
+        // noise). Fix: notch out the skirt band's own material at each
+        // tab's X position (widened by tab_relief_margin per side so the
+        // notch is guaranteed slightly larger than the tab itself, the same
+        // "clear the mating part with margin" logic already used for the
+        // containment-cap/base-flange fit elsewhere in this design, see
+        // dimensional-spec.md); a true fastening/alignment joint would
+        // simply route the skirt AROUND each tab rather than colliding with
+        // it -- this is that same relief in solid-model form, not a
+        // reduction of either feature's own functional dimension.
+        for (p = tab_positions) {
+            tx = board_offset_x + p[0];
+            dy = p[2];
+            // Y-span: the skirt band on the SIDE this tab sits on, widened
+            // by tab_relief_margin toward open air only (the inner-cutout
+            // side of the band already coincides exactly with this notch's
+            // own boundary by construction -- an exact coincident face,
+            // the same convention used safely elsewhere in this file).
+            notch_y0 = (dy < 0)
+                ? lid_y0 - tab_relief_margin
+                : lid_y0 + lid_skirt_outer_y - lid_skirt_t - tab_relief_margin;
+            notch_h  = lid_skirt_t + 2*tab_relief_margin;
+            translate([tx - tab_w/2 - fit_clearance, notch_y0, -1])
+                cube([tab_w + 2*fit_clearance, notch_h, lid_lip_h + 1]);
+                // Z: local [-1, lid_lip_h] -- 1mm overshoot below the skirt
+                // band's own bottom (Z=0, already this module's own open
+                // bottom face, so harmless), capped at EXACTLY lid_lip_h on
+                // top so the roof above (Z>lid_lip_h) is never touched.
+        }
     }
 }
 
@@ -796,63 +948,128 @@ module fw_bay_wall() {
     }
 }
 
-module motor_wire_bridge() {
-    // Rev 3 NEW: a short rectangular gusset connecting the flywheel bay's
-    // PLAIN WALL (outer radius fw_bay_outer_r -- NOT the wider flange band,
-    // which per fw_bay_wall() above only exists near the very top,
-    // Z in [fw_clearance_top-flange_band_h, fw_clearance_top], nowhere near
-    // this duct's low Z) out to the PCB bay's own south wall.
+// Rev 3.1 FIX (MISS-009, HIGH -- Independent Mechanical Review Cycle 1
+// (Rev 3), validation/design-review.md "Mechanical Reviewer -- Cycle 3",
+// Finding 2): bridge_fuse_overlap/bridge_y_lo/bridge_y_hi hoisted from
+// motor_wire_bridge()'s own local scope (where they lived pre-fix) to
+// top-level/file scope, so BOTH the solid bridge block
+// (motor_wire_bridge_solid(), below) and the new, separately-and-globally
+// subtracted duct void module (motor_wire_duct_void(), further below) can
+// share the exact same Y-span numbers -- this sharing is the mechanism the
+// fix actually depends on, not just cosmetic reorganization.
+bridge_fuse_overlap = 2.0; // mm. ASSUMPTION: FDM-safe guaranteed-fusion
+                  // margin pulling the bridge's start point in from the
+                  // wall ring's exact (fragile, line-only-contact) tangent
+                  // Y so the two solids genuinely overlap across the
+                  // bridge's full width, not just a mathematical knife-edge.
+                  // (Unchanged value from Rev 3 pre-fix -- this margin
+                  // itself was never wrong; only its SCOPE and the
+                  // separate duct-void span below needed fixing. This was
+                  // originally caught-and-fixed in an earlier Rev 3 session
+                  // per MISS-004: an earlier draft had set bridge_y_lo =
+                  // fw_cy, the flywheel bay's own ROTATION-AXIS CENTER,
+                  // making the "bridge" a 54.5mm-long slab reaching all the
+                  // way back across the motor platform/body footprint --
+                  // that defect is unrelated to and already resolved prior
+                  // to this MISS-009 fix.)
+bridge_y_lo = fw_cy + fw_bay_outer_r - bridge_fuse_overlap; // = 94.0mm
+bridge_y_hi = pcb_bay_y0 + wall_t; // = 107.0mm, a touch into the PCB bay's
+                  // own south wall thickness.
+// Resulting bridge span = 13.0mm -- verified this session (again, distinct
+// from and unaffected by the MISS-009 fix below) to clear the motor
+// platform's own footprint (max Y 68.0mm) by 26.0mm, and the motor body's
+// own footprint (max Y 66.0mm) by 28.0mm: zero interference with the real,
+// physical motor.
+
+// Rev 3.1 FIX (MISS-009 continued): the duct VOID's own Y-span is now
+// derived independently, from the flywheel bay wall's TRUE inner bore
+// (fw_cy + fw_bay_inner_r = 92.0mm) -- NOT from bridge_y_lo (=94.0mm, the
+// BRIDGE BLOCK's own recessed start point, already pulled 2.0mm inside the
+// wall's OUTER face by bridge_fuse_overlap above). The pre-fix void used
+// `bridge_y_lo - 1` (=93.0mm) as its near-end anchor, which is 1.0mm SHORT
+// of the wall's true inner bore at Y=92.0mm. This second, independent
+// defect (found by this Mechanical Lead while implementing the MISS-009
+// fix, distinct from the Reviewer's own literal finding text) means that
+// even after fixing the global-subtraction SCOPE bug below, that 1.0mm
+// shortfall would still have left a thin, un-breached membrane of solid
+// material sealing the duct's mouth exactly where it opens into the
+// flywheel bay's own interior -- still defeating the wire route.
+// duct_breach_margin below is the same KIND of guaranteed-clean-boolean
+// margin as bridge_fuse_overlap above, just applied in the opposite
+// direction: instead of guaranteeing genuine SOLID fusion across a joint,
+// it guarantees a genuine VOID breach past each bounding wall face, not a
+// knife-edge tangency CGAL could render ambiguously.
+duct_breach_margin = 1.0; // mm. ASSUMPTION: same class/size of margin as
+                  // bridge_fuse_overlap's underlying principle (this
+                  // design's existing convention for a "safe/clean
+                  // boolean" margin), applied here so the void genuinely
+                  // breaches past each bounding wall face with margin to
+                  // spare, rather than stopping exactly tangent to it.
+wire_duct_y_lo = fw_cy + fw_bay_inner_r - duct_breach_margin; // = 91.0mm
+                  // (pre-fix anchor was bridge_y_lo - 1 = 93.0mm -- 1.0mm
+                  // SHORT of the wall's true inner bore at Y=92.0mm; see
+                  // note above)
+wire_duct_y_hi = bridge_y_hi + duct_breach_margin; // = 108.0mm (same
+                  // numeric value as pre-fix -- this end was already
+                  // safely past the PCB bay's own interior-facing wall
+                  // surface at Y=107.0mm, so only the near end needed
+                  // correcting)
+// Resulting void length = 17.0mm (was, pre-fix, 15.0mm).
+
+module motor_wire_bridge_solid() {
+    // Rev 3 NEW, renamed + split Rev 3.1 (MISS-009): this is now a
+    // SOLID-ONLY module (no local difference()/void here any more) -- split
+    // out of the old combined motor_wire_bridge() so base() below can union
+    // it with every other solid BEFORE the single, global void subtraction
+    // happens. See motor_wire_duct_void() and base() below.
     //
-    // CAUGHT-AND-FIXED THIS SESSION (see dimensional-spec.md §7, MISS-004):
-    // an earlier draft set bridge_y_lo = fw_cy (the flywheel bay's own
-    // ROTATION-AXIS CENTER, not any wall surface), which made this "bridge"
-    // a 54.5mm-long slab reaching all the way back across the ENTIRE motor
-    // platform (max Y 68.0mm) and motor body (max Y 66.0mm) footprint --
-    // i.e. a real printed-plastic obstruction sitting exactly where the
-    // physical motor needs to seat. Caught by an openscad render+numeric
-    // spot-check this session (echo of bridge_y_lo/_hi against
-    // motor_platform_od/m1_body_dia), NOT by eyeballing the comment (which
-    // already, incorrectly, described the feature as "short"). Fixed below:
-    // bridge_y_lo now starts at the plain wall's OWN outer ring surface,
-    // pulled in by an explicit bridge_fuse_overlap safety margin so the
-    // block overlaps real ring material across its FULL width (not just a
-    // single tangent line down its centerline) -- verified this session:
-    // the ring's outer boundary at the bridge's own X-edges (dx=+-6mm) is
-    // Y=95.58, comfortably above (i.e. further out than) the resulting
-    // bridge_y_lo=94.0, so full-width overlap is guaranteed with ~1.6mm to
-    // spare even at the block's corners.
-    bridge_fuse_overlap = 2.0; // mm. ASSUMPTION: FDM-safe guaranteed-fusion
-                      // margin pulling the bridge's start point in from the
-                      // wall ring's exact (fragile, line-only-contact)
-                      // tangent Y so the two solids genuinely overlap across
-                      // the bridge's full width, not just a mathematical
-                      // knife-edge -- see derivation above.
-    bridge_y_lo = fw_cy + fw_bay_outer_r - bridge_fuse_overlap; // = 94.0mm
-                      // (was, incorrectly, fw_cy=52.5mm -- see caught-and-
-                      // fixed note above)
-    bridge_y_hi = pcb_bay_y0 + wall_t; // = 107.0mm, a touch into the PCB
-                      // bay's own wall (unchanged -- this end was always
-                      // correct)
-    // Resulting bridge span = 13.0mm (was, incorrectly, 54.5mm) -- verified
-    // this session to clear the motor platform's own footprint (max Y
-    // 68.0mm) by 26.0mm, and the motor body's own footprint (max Y 66.0mm)
-    // by 28.0mm: zero interference with the real, physical motor.
-    difference() {
-        translate([fw_cx - wire_bridge_w/2, bridge_y_lo,
-                    wire_duct_z - wire_bridge_h/2])
-            cube([wire_bridge_w, bridge_y_hi - bridge_y_lo, wire_bridge_h]);
-        translate([fw_cx, bridge_y_lo - 1, wire_duct_z])
-            rotate([-90, 0, 0])
-                cylinder(d = wire_duct_dia, h = (bridge_y_hi - bridge_y_lo) + 2);
-    }
+    // A short rectangular gusset connecting the flywheel bay's PLAIN WALL
+    // (outer radius fw_bay_outer_r -- NOT the wider flange band, which per
+    // fw_bay_wall() above only exists near the very top, Z in
+    // [fw_clearance_top-flange_band_h, fw_clearance_top], nowhere near this
+    // duct's low Z) out to the PCB bay's own south wall.
+    translate([fw_cx - wire_bridge_w/2, bridge_y_lo,
+                wire_duct_z - wire_bridge_h/2])
+        cube([wire_bridge_w, bridge_y_hi - bridge_y_lo, wire_bridge_h]);
+}
+
+module motor_wire_duct_void() {
+    // Rev 3.1 FIX (MISS-009, HIGH): the actual wire-passage void, now a
+    // standalone module subtracted GLOBALLY in base() below -- see base()'s
+    // own top-level difference() -- instead of being subtracted only
+    // inside the old combined motor_wire_bridge() module's own LOCAL
+    // difference(), which left fw_bay_wall()'s annulus AND
+    // pcb_bay_base()'s south wall fully solid at this exact location even
+    // though the void geometrically overlapped both (independently
+    // confirmed by the Mechanical Reviewer via a rendered base() +
+    // point-containment sweep, Cycle 3 Finding 2, and independently
+    // re-confirmed by this Mechanical Lead this session -- see the
+    // companion spec file §7 for the empirical point-containment results).
+    // Spans wire_duct_y_lo to wire_duct_y_hi (see derivation above), fully
+    // breaching BOTH the flywheel bay wall's annulus (true inner bore at
+    // Y=92.0mm, outer face at Y=96.0mm) and the PCB bay's south wall
+    // (Y=105.0-107.0mm), not merely the bridge block sitting between them.
+    translate([fw_cx, wire_duct_y_lo, wire_duct_z])
+        rotate([-90, 0, 0])
+            cylinder(d = wire_duct_dia, h = wire_duct_y_hi - wire_duct_y_lo);
 }
 
 module base() {
-    union() {
-        translate([0, pcb_bay_y0, 0]) pcb_bay_base();
-        motor_platform();
-        fw_bay_wall();
-        motor_wire_bridge();
+    // Rev 3.1 FIX (MISS-009, HIGH): base() is now a difference(), not a
+    // flat union() as it was pre-fix -- the wire-passage void
+    // (motor_wire_duct_void()) is subtracted ONCE, globally, from the union
+    // of every solid that occupies its footprint (pcb_bay_base(),
+    // motor_platform(), fw_bay_wall(), motor_wire_bridge_solid()), so the
+    // duct is a real, continuous, open channel through the ENTIRE assembly
+    // at this location, not just through the bridge block in isolation.
+    difference() {
+        union() {
+            translate([0, pcb_bay_y0, 0]) pcb_bay_base();
+            motor_platform();
+            fw_bay_wall();
+            motor_wire_bridge_solid();
+        }
+        motor_wire_duct_void();
     }
 }
 
