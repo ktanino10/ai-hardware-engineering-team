@@ -166,45 +166,63 @@ Summary:
 **This layout is NOT DRC-clean and is explicitly NOT claimed ready to
 fabricate.** After the fixes above (design-rule defaults, pin-cluster
 bridging, layer isolation for GND, MST routing, largest-bbox-first layer
-ordering), `kicad-cli pcb drc` reports **~380-400 violations (real run-to-run
-non-determinism observed -- 6 repeated runs against the identical
-`.kicad_pcb` produced 382/401/384/397/387/388), 0 unconnected items
-(this part IS stable/deterministic across all 6 repeated runs)**
-(updated 2026-09-02, post-Hardware-Reviewer-Cycle-6 fix round — see
-below; was ~370 pre-review). The table below reflects one representative
-run (382):
+ordering) plus the post-review fix round below, `kicad-cli pcb drc`
+reports **365-373 violations (real run-to-run non-determinism observed —
+4 repeated runs against the identical current `.kicad_pcb` produced
+365/373/371/365), 0 unconnected items (stable/deterministic across every
+run in this session, both before and after the fix round)** (updated
+2026-09-02, final state after Hardware Reviewer Cycles 6 and 7 plus two
+same-day PCB Engineer fix rounds — see below; pre-review baseline was
+~370, with a transient regression to ~380-400 mid-fix, now resolved back
+to at-or-below baseline). The table below reflects one representative
+run (365):
 
 | Category | Count | What it means |
 |---|---|---|
-| `solder_mask_bridge` | 205 | Different-net copper close enough that the solder mask openings would merge |
-| `tracks_crossing` | 87 | Different-net traces geometrically crossing on the same layer |
-| `shorting_items` | 68 | Different-net copper items geometrically touching (a true short if fabricated as-is) |
+| `solder_mask_bridge` | 202 | Different-net copper close enough that the solder mask openings would merge |
+| `tracks_crossing` | 78 | Different-net traces geometrically crossing on the same layer |
+| `shorting_items` | 65 | Different-net copper items geometrically touching (a true short if fabricated as-is) |
 | `clearance` | 15 | General spacing below the configured minimum |
-| `hole_clearance` | 7 | Via/drill spacing below the configured minimum |
+| `hole_clearance` | 4 | Via/drill spacing below the configured minimum |
 | `silk_overlap` | 1 | Cosmetic silkscreen-only overlap |
 
-**Post-review fix round (2026-09-02)**: Hardware Reviewer Cycle 6
-(`validation/design-review.md`, commit `84db343`) found the previous "0
-unconnected items" was misleading — a `generate_pcb.py` bug
-(`FindPadByNumber()` nets only the first physical pad when a footprint
-legitimately has several sharing one pad number: U6's 17-sub-pad
-PowerPAD, J1's 4-pad USB shield, SW1's doubled terminal pads) meant
-several physical pads were never netted at all, a defect class DRC's
-`unconnected_items` check cannot see (it only flags a missing
-schematic-to-copper link, not a pad with no net to begin with) —
-ISS-033/034/035. Fixed by enumerating every matching physical pad and
-locally bridging them; **independently re-verified via a standalone
-pad/net audit script** (not just re-trusting the same DRC proxy that
-missed it originally) confirming all of U6's 17 sub-pads, J1's 4 shield
-pads, and SW1's duplicate pads now share their correct single net. The
-violation count rose slightly (370 → ~380-400) as an honest, understood
-side-effect: the new local bridging copper sits close to already-dense
-fine-pitch footprints, adding a handful of new `clearance`/
-`hole_clearance` findings in that immediate vicinity — correctness
-(every physical pad genuinely netted **and** copper-connected) was
-prioritized over raw violation count, and is reported here without
-spin. See `validation/open-issues.md` ISS-033/034/035 (RESOLVED) and
-ISS-036 (still OPEN — updated with the new count).
+**Post-review fix rounds (2026-09-02, two rounds same day)**: Hardware
+Reviewer Cycle 6 (`validation/design-review.md`, commit `84db343`) found
+the previous "0 unconnected items" was misleading — a `generate_pcb.py`
+bug (`FindPadByNumber()` nets only the first physical pad when a
+footprint legitimately has several sharing one pad number: U6's
+17-sub-pad PowerPAD, J1's 4-pad USB shield, SW1's doubled terminal pads)
+meant several physical pads were never netted at all, a defect class
+DRC's `unconnected_items` check cannot see — ISS-033/034/035. **Round
+1** fixed this by enumerating every matching physical pad and locally
+bridging them to an arbitrary representative pad; this introduced a NEW
+defect caught by an independent focused re-review, Hardware Reviewer
+Cycle 7 (`validation/design-review.md`, commit `89a158c`): the bridge
+tracks under U6's PowerPAD were redundant (all pads already share copper
+via the exposed-pad land) yet crossed the unrelated `U6_ILIM` net 12
+times — ISS-038. **Round 2** fixed the actual root cause: the bridging
+step had picked `matching_pads[0]` (an arbitrary small 0.6×0.6mm
+thermal-via pad) as its reference/hub point, so neighbour-to-neighbour
+bounding-box tests against other equally-small vias never intersected
+(vias 1.3mm apart don't touch each other directly), even though all of
+them sit inside the much larger shared F.Cu/B.Cu exposed-pad land pads
+that are also members of the same pad-number group. Selecting the
+largest-bounding-box-area pad as the hub instead correctly recognizes
+the land as the true connection point — U6's PowerPAD group now needs
+**0** bridge tracks (was 16), while J1's shield (3 bridges) and SW1's
+terminal pads (1 bridge each) — which have no single large land pad and
+so still need one — are unaffected. **Independently re-verified after
+each round** via a standalone pad/net audit script (not just re-trusting
+the same DRC proxy that missed the original bug): all of U6's 17
+sub-pads, J1's 4 shield pads, and SW1's duplicate pads share their
+correct single net; `GND`-vs-`U6_ILIM` crossings dropped 12 → 1 (the
+remaining 1 matches Cycle 6's own pre-existing, unrelated crossing in
+that region, confirmed unrelated to bridging). Net result: connectivity
+is now genuinely complete (not just DRC-proxy-silent) **and** the total
+violation count (365-373) is at or below the original ~370 pre-fix
+baseline — a real improvement, not a tradeoff. See
+`validation/open-issues.md` ISS-033/034/035/038 (all RESOLVED) and
+ISS-036 (still OPEN — updated with the current count).
 
 **Root cause, stated plainly**: a from-scratch, scripted routing approach
 (no real autorouter, no interactive push-and-shove router, and
@@ -241,23 +259,44 @@ Reviewer agent — see `validation/design-review.md` for the actual review
 cycle and `validation/open-issues.md` for any findings logged from it. Not
 self-declared complete by this discipline.
 
-**Cycle 6 outcome (2026-09-02) and this fix round**: CONDITIONAL, with 1
-CRITICAL + 5 HIGH + 2 MEDIUM findings (ISS-030 through ISS-037). This
-session fixed and independently re-verified ISS-030 (CRITICAL — U1 pin
-19/PA9 alternate-pin-function omission broke the `/U6_EN` net entirely;
-schematic patched, ERC + netlist re-confirmed), ISS-033/034/035 (HIGH/
-MEDIUM — multi-pad net-assignment bug; PCB script patched, independent
-pad/net audit re-confirmed), and partially addressed ISS-031 (HIGH — U5's
-missing EP/pin-25 schematic definition is now fixed and wired to GND, but
-the footprint's own thermal-via-array gap is unchanged and still open).
-ISS-032 (J4 GND-hijack safety-argument gap) and ISS-036 (bulk DRC
-closure, now ~380-400 violations, run-to-run non-deterministic — see
-DRC status section above) remain untouched/open. **The board is still
-not declared ready to fabricate** — see `validation/open-issues.md` for
-authoritative, current status per finding, and the Design Complete gate
-(`tools/check_open_issues.py`) still correctly fails on the 3 remaining
-open HIGH items. A follow-up re-review pass is recommended once/if the
-remaining findings are addressed, per this project's own convention of
-re-reviewing after a CRITICAL/HIGH loop-back fix — not performed within
-this session given time constraints; flagged here as a recommendation,
-not silently skipped.
+**Cycle 6 outcome (2026-09-02) and the fix rounds that followed**:
+CONDITIONAL, with 1 CRITICAL + 5 HIGH + 2 MEDIUM findings (ISS-030
+through ISS-037). This session fixed and independently re-verified
+ISS-030 (CRITICAL — U1 pin 19/PA9 alternate-pin-function omission broke
+the `/U6_EN` net entirely; schematic patched, ERC + netlist
+re-confirmed), ISS-033/034/035 (HIGH/HIGH/MEDIUM — multi-pad
+net-assignment bug; PCB script patched, independent pad/net audit
+re-confirmed), and partially addressed ISS-031 (HIGH — U5's missing
+EP/pin-25 schematic definition is now fixed and wired to GND, but the
+footprint's own thermal-via-array gap is unchanged and still open).
+
+**Cycle 7 (`validation/design-review.md`, commit `89a158c`)** — a
+focused, narrowly-scoped Hardware Reviewer re-verification pass mirroring
+this project's own Cycle-5 precedent (a CRITICAL/HIGH loop-back fix gets
+an independent focused re-check, not just author self-attestation) —
+**independently confirmed** the ISS-030/033/034/035 fixes were genuinely
+correct (re-derived from its own ERC/netlist/DRC/pad-audit runs, not from
+this session's commit message), and caught a real NEW defect in the
+ISS-033/034/035 fix itself: the bridging tracks added under U6's
+PowerPAD were redundant and crossed the unrelated `U6_ILIM` net 12 times
+— **ISS-038 (HIGH)**. This is exactly the kind of defect an independent
+review step exists to catch, and it worked as intended. ISS-038 was
+fixed the same day (root cause: the bridging logic's hub-pad selection
+picked an arbitrary small via instead of the actual shared copper land;
+fixed by hubbing on the largest-bounding-box-area pad in each group) and
+independently re-verified via the same pad/net-audit + DRC methodology —
+see the DRC status section above for the final numbers (365-373, at or
+below the original ~370 baseline).
+
+ISS-031 (footprint thermal-via-array gap), ISS-032 (J4 GND-hijack
+safety-argument gap), and ISS-036 (bulk DRC closure — the majority of
+category counts remain individually unattributed) remain untouched/open.
+**The board is still not declared ready to fabricate** — see
+`validation/open-issues.md` for authoritative, current status per
+finding, and the Design Complete gate (`tools/check_open_issues.py`)
+still correctly fails on the 3 remaining open HIGH items (ISS-031,
+ISS-032, ISS-036). The ISS-038 fix (this session's second same-day fix
+round) has **not** yet had its own independent follow-up re-verification
+pass — flagged here as a recommended next step, not silently skipped,
+consistent with how Cycle 7 itself was requested after the first fix
+round.

@@ -342,33 +342,92 @@ def build_board(footprints: dict[str, str], nets: dict[str, list[tuple[str, str]
                 continue
             for pad in matching_pads:
                 pad.SetNet(ni)
-            pos = matching_pads[0].GetPosition()
-            pad_positions[(ref, pin)] = (pos.x, pos.y, matching_pads[0].GetLayerSet().Contains(pcbnew.B_Cu))
-            pad_is_tht[(ref, pin)] = matching_pads[0].GetAttribute() == pcbnew.PAD_ATTRIB_PTH
+            # Choose the representative/"hub" pad as the LARGEST-area member
+            # of the group, not simply matching_pads[0] (arbitrary footprint-
+            # file order). This matters when the group mixes small
+            # individually-spaced sub-pads (e.g. a PowerPAD's 0.6x0.6mm
+            # thermal-via array, each pad ~1.3mm from its neighbours, so
+            # neighbour-to-neighbour bounding boxes do NOT intersect) with
+            # one or two much larger pads that represent the actual shared
+            # copper land those vias sit inside (U6: a 3.4x6.5mm F.Cu land +
+            # 3.2x5.8mm B.Cu land, both large enough to contain the whole
+            # via grid). Picking an arbitrary small via as "pad[0]" and
+            # pairwise-testing it against its equally-small neighbours was
+            # exactly the bug behind ISS-038 below: none of those pairwise
+            # tests ever intersect (small vias don't touch each other), so
+            # every one of them was (wrongly) judged to need its own bridge
+            # track. Picking the largest-area pad as the hub instead
+            # correctly recognizes that every small via's bounding box sits
+            # INSIDE the land's much larger bounding box.
+            hub_pad = max(matching_pads, key=lambda p: p.GetBoundingBox().GetArea())
+            pos = hub_pad.GetPosition()
+            pad_positions[(ref, pin)] = (pos.x, pos.y, hub_pad.GetLayerSet().Contains(pcbnew.B_Cu))
+            pad_is_tht[(ref, pin)] = hub_pad.GetAttribute() == pcbnew.PAD_ATTRIB_PTH
             # Fixed alongside the multi-pad net assignment above (Hardware
             # Reviewer Cycle 6, ISS-033/034/035 follow-up): giving every
             # physical pad a net is necessary but not sufficient -- the
             # later MST/Step-A routing below only ever routes to the ONE
             # representative point stored in pad_positions[(ref, pin)]
-            # (matching_pads[0]'s position), so any OTHER physical pad
-            # sharing this number (SW1's doubled terminal pads, J1's other
-            # shield tabs, U6 PowerPAD's other sub-pads) would still end up
+            # (the hub pad's position), so any OTHER physical pad sharing
+            # this number (SW1's doubled terminal pads, J1's other shield
+            # tabs, U6 PowerPAD's other sub-pads) would still end up
             # copper-isolated from its own net -- a real, DRC-visible
             # `unconnected_items` violation, confirmed by re-running DRC
             # after the net-assignment-only fix (2 unconnected SW1 pad-2
             # instances surfaced). Bridge every extra physical pad directly
-            # to the representative pad here, on F.Cu, at each pad's own
-            # position -- independent of and before the later routing
-            # stages, since those operate at (ref, pin) granularity and
-            # have no visibility into same-numbered pad multiplicity.
+            # to the hub pad here, at each pad's own position -- independent
+            # of and before the later routing stages, since those operate
+            # at (ref, pin) granularity and have no visibility into
+            # same-numbered pad multiplicity.
+            #
+            # Revised (Hardware Reviewer Cycle 7, ISS-038, HIGH -- this
+            # bridge step's own first attempt introduced a NEW defect, and
+            # this session's own follow-up fix attempt initially only
+            # partially resolved it -- see below): a PowerPAD/exposed-pad-
+            # plus-thermal-via-array footprint (U6) has every same-numbered
+            # sub-pad's copper shape already geometrically overlapping the
+            # shared land -- the group was already electrically joined by
+            # shared copper before any bridge track existed, so drawing one
+            # anyway was not just redundant, it blindly crossed the
+            # unrelated U6_ILIM net running through that same dense region
+            # (12 new `tracks_crossing` violations, independently reproduced
+            # across 4 DRC runs). Two fixes, both per the finding's own
+            # recommendation: (1) skip the bridge entirely when a pad's
+            # copper already overlaps the hub pad's copper (bounding-box
+            # intersection against the LARGEST/hub pad, not an arbitrary
+            # small pad -- see the hub_pad selection above, which this
+            # session's first attempt at this fix got wrong by testing
+            # against matching_pads[0], an arbitrary small via rather than
+            # the actual shared land, silently reducing but not eliminating
+            # the defect: 12 ILIM/GND crossings became 9, not 0, on the
+            # first re-verification re-run); (2) when a bridge IS drawn,
+            # pick its layer from the actual intersection of both pads' own
+            # layer sets instead of hard-coding F.Cu (the finding's second,
+            # latent defect: a B.Cu-only target pad bridged on F.Cu silently
+            # bridges nothing).
             if len(matching_pads) > 1:
-                x0, y0 = matching_pads[0].GetPosition()
-                for extra in matching_pads[1:]:
+                hub_bbox = hub_pad.GetBoundingBox()
+                x0, y0 = hub_pad.GetPosition()
+                for extra in matching_pads:
+                    if extra is hub_pad:
+                        continue
+                    if hub_bbox.Intersects(extra.GetBoundingBox()):
+                        # Already electrically joined by overlapping copper
+                        # (e.g. a thermal via sitting inside the shared
+                        # exposed-pad land) -- a bridge track here would be
+                        # redundant at best and, per ISS-038, actively
+                        # harmful (crosses unrelated nets) at worst.
+                        continue
                     x1, y1 = extra.GetPosition()
+                    bridge_layer = pcbnew.F_Cu
+                    for candidate in (pcbnew.F_Cu, pcbnew.B_Cu):
+                        if hub_pad.GetLayerSet().Contains(candidate) and extra.GetLayerSet().Contains(candidate):
+                            bridge_layer = candidate
+                            break
                     seg = pcbnew.PCB_TRACK(board)
                     seg.SetStart(pcbnew.VECTOR2I(x0, y0))
                     seg.SetEnd(pcbnew.VECTOR2I(x1, y1))
-                    seg.SetLayer(pcbnew.F_Cu)
+                    seg.SetLayer(bridge_layer)
                     seg.SetWidth(MM(WIDTH_SIGNAL))
                     seg.SetNet(ni)
                     board.Add(seg)
