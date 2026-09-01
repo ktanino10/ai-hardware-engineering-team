@@ -1252,3 +1252,253 @@ candidates below are TI parts, a real research finding, not a shortcut.)*
 | Component Engineer | Component Engineer (AI agent) | 2026-09-08 | Proposed — TI TPS26631PWPR (TPS2663x family), gating U5's VCC, with a required external SHDN pull-down resistor (Escalation flag 4) and Circuit-Engineer-sized OVP/UVLO resistor dividers per §7.5.10. See Escalation flags 1–3 for items requiring Hardware Lead/human confirmation before this is used downstream. |
 | Hardware Lead | Hardware Lead (this session) | 2026-08-31 | Concur — recommend approval. Function coverage (default-OFF/fail-safe load-switch gating, continuous OVP referenced to the 9.0–13.0V envelope, firmware-commandable latch enforcement point) confirmed against §7.5.10's requirements; the SHDN native-bias caveat is real and must be addressed at Circuit Design (external pull-down). |
 | Chief Engineer (Human) — required if architecture-defining/major component | Human Chief Engineer (via creator/"General Chat" session) | 2026-08-31 | **Approved — "TPS26631PWPR confirmed."** Human independently re-verified via fresh web search: TPS25982 confirmed genuinely QFN-only (no HTSSOP variant exists, e.g. TPS259824LNRGET/TPS259827ONRGET); TPS26631PWPR confirmed 20-pin HTSSOP eFuse (4.5–60V, 6A, OVP/UVLO/adjustable current limit) at ≈$4.52/unit (close to this file's ≈$4.70–4.80 figure — a pricing-tier/date difference, not a discrepancy) with a genuine internal ≈440kΩ EN pull-up, independently confirming the "defaults ON, needs external pull-down for fail-safe" caveat exactly as flagged. Circuit Engineer to implement: the load switch + external EN pull-down (fail-safe-OFF direction) + OVP/UVLO dividers, in a new Rev 5. |
+
+## Free-Rotation Support Mechanism (1-Axis Attitude Rig)
+
+> **Rev 4 addition.** This section is a **new mechanism category**, not a
+> new electronic part — the first non-electronic subsystem this file has
+> ever compared. It exists because Rev 3's own mechanical design mounts the
+> board+motor+flywheel assembly **rigidly** to a fixed bench enclosure
+> (confirmed via repo-wide search: zero "pivot"/"gimbal"/"free-rotat[ing]"
+> mentions anywhere in `hardware/mechanical/**` before this revision) — so
+> no reaction-wheel torque could ever produce an observable attitude change
+> under that design. This section compares candidate mechanisms; it does
+> **not** perform Mechanical Design/CAD work on whichever one is chosen —
+> that is explicitly deferred to a future phase, after human architecture
+> approval (`requirements/requirements.md` §1b).
+
+- **Driving requirement(s)**: REQ-011 (the core capability — free rotation
+  about ≥1 axis, friction low enough for a measurable response), REQ-012
+  (angular-travel target, still an open human question), REQ-113 (rotating
+  electrical interface compatible with the chosen mechanism), REQ-310 (real
+  assembly mass/footprint the mechanism must accommodate), REQ-311
+  (integrates additively with the already-Design-Complete Rev 3 enclosure),
+  REQ-407/408 (new hazard shapes; explicit non-extension of REQ-403/
+  MISS-016's disposition), REQ-505 (soft BOM ceiling, proposed ≤$30–50).
+- **Constraints**: bench-test prototype, not flight hardware — a real
+  micro-gravity-style free-floating rig is not required (requirements.md §8
+  Assumptions); total rotating-assembly mass is a fresh ESTIMATE this
+  revision computed since Rev 3 never estimated the enclosure's own plastic
+  mass (worked below); the reaction wheel's own torque output is already
+  fixed by Rev 3's approved Component Selection (REQ-007's ≥5 mN·m
+  continuous target, T-Motor MN2206-13 KV2000, Kt=4.77 mN·m/A — see Motor
+  section above) — not re-litigated here, only used as the "torque budget"
+  candidate mechanisms are compared against; REQ-505's soft ≤$30–50 ceiling
+  is separate from REQ-503's already-spent Rev 3 motor-subsystem budget.
+
+### Worked figures this comparison depends on (shown once, referenced below)
+
+**Total rotating-assembly mass (ESTIMATE, new this revision)**: Rev 3's
+board+motor+flywheel subtotal is ≈149–150g, CONFIRMED-derivation
+(`hardware/mechanical-interface.md` §B7). The enclosure's own plastic mass
+was never estimated in Rev 3 (explicitly excluded there as "additional").
+This revision computes a first fresh estimate: treating the real assembled
+envelope (111.4×170.6×49.0mm, `bench-imu-01-dimensional-spec.md`) as a
+thin bounding-box shell at the design's own established `min_wall_t`=2.0mm
+[`bench-imu-01-enclosure.scad` line 209] —
+
+```
+surface area  = 2×(111.4×170.6) + 2×(111.4×49.0) + 2×(170.6×49.0) mm²
+              = 38009.7 + 10917.2 + 16718.8 = 65645.7 mm² ≈ 656.5 cm²
+volume        = 656.5 cm² × 0.20 cm ≈ 131.3 cm³
+mass          = 131.3 cm³ × 1.27 g/cm³ (Prusament PETG density [DS-MTL-004])
+              ≈ 167g (gross bounding-box figure)
+```
+
+Real cutouts (connector/LED/header-bay openings) reduce this; real internal
+ribs/bosses/tabs add back — judged to roughly offset, so this revision
+proposes **≈130–170g** for the enclosure alone. **Total rotating-assembly
+ESTIMATE: ≈280–320g**, call it **~300g representative**, up to a
+conservative **~350g** bound. This is the same figure recorded in
+`requirements/requirements.md` REQ-310 — shown here with full working since
+Component Selection is where mechanism candidates actually get compared
+against it.
+
+**Platform angular-rate physics finding (ESTIMATE, new this revision,
+independently cross-checked by the creator/"General Chat" session)**: using
+the same conservation-of-angular-momentum relation this project's own Motor
+section already implicitly relies on (ω_platform = −(I_wheel/I_platform)·
+ω_wheel, the identical equation the Charles' Labs precedent below documents
+for its own build) —
+
+```
+I_wheel    = 4.5×10⁻⁵ kg·m² (established, flywheel §9b/B2)
+I_platform ≈ m_platform × r_gyration²   (rectangular-plate approximation,
+             m_platform ≈ 200g = board+motor+enclosure, EXCLUDING the
+             flywheel's own separately-counted inertia;
+             r_gyration = sqrt((a²+b²)/12), a=0.1114m, b=0.1706m
+             = sqrt(0.041514/12) ≈ 0.0588m)
+           ≈ 0.200 kg × (0.0588 m)² ≈ 6.9×10⁻⁴ kg·m²
+
+ratio I_wheel/I_platform ≈ 0.065  (≈1:15)
+```
+
+Illustrative operating points (ω_wheel → ω_platform):
+
+| Commanded wheel speed | ω_wheel (rad/s) | ω_platform (rad/s) | ω_platform (°/s) |
+|---|---|---|---|
+| 30 RPM (≈1% of REQ-007's 3000 RPM ceiling) | 3.14 | 0.204 | ≈12°/s — gentle, easily observed |
+| 300 RPM (≈10% of ceiling) | 31.4 | 2.04 | ≈117°/s — brisk but manageable |
+| 3000 RPM (REQ-007's full ceiling) | 314.2 | 20.4 | ≈1170°/s (≈3.25 rev/s) — extreme if commanded all at once |
+
+The creator/"General Chat" session independently re-derived this across a
+broader 250–450g mass / 0.06–0.08m characteristic-radius sweep, getting
+inertia ratios of ≈1:20–1:64 and platform rates of ≈280–900°/s at the full
+3000 RPM point — same order of magnitude, confirming this is not an
+arithmetic error. **This is why REQ-012/013 propose small, deliberately
+incremented speed commands rather than driving straight to REQ-007's
+ceiling**, and why REQ-407 flags a fast-spinning free platform as a new
+hazard shape. It also answers this task's own question of whether the
+onboard IMU gyro suffices: BMI270's programmable FSR (±125 to ±2000 dps
+across 5 ranges [DS-IMU-002]) comfortably spans the full ≈12–1170°/s
+illustrative range — the sensor is not a gap; FSR range selection (start
+wide, narrow once characterized) is the real practical consideration.
+
+### Candidate Comparison
+
+*(4 candidates compared, across every category this task's own instruction
+named — exceeds the ≥3 minimum, no sole-source justification needed.)*
+
+| Parameter | Candidate A — BC Precision 4LS-3 "Lazy Susan" turntable bearing | Candidate B — Dual 608ZZ ball-bearing vertical-shaft pivot — ✅ RECOMMENDED | Candidate C — Torsion wire/fiber suspension | Candidate D — Air bearing — ⚠ NOT RECOMMENDED THIS CYCLE |
+|---|---|---|---|---|
+| Source / manufacturer | BC Precision (retail turntable-bearing hardware) [DS-BRG-001] | BC Precision (608ZZ miniature ball bearing ×2) [DS-BRG-002] + generic M8 threaded rod/nuts (hardware-store item, not individually sourced) | Generic thin steel/fishing-line wire or fiber (no single manufacturer — a material choice, not a product) | EyasSat (cubesatshop.com), commercial single-axis unit [DS-BRG-005]; or a DIY 3D-printed 1-DoF build + hobbyist air compressor |
+| Type / mechanism | Full-diameter ring ball bearing, two stamped plates + captive ball race, mounts flat under a platform | 2× deep-groove ball bearings on a vertical M8 shaft — a custom-built point pivot | Thin wire/fiber the whole assembly hangs from; twists rather than spins on bearings | Thin compressed-air film between two precision-fit spherical/planar surfaces |
+| Size / bore or race diameter | 4 in (≈101.6mm) nominal OD; race/ball-circle diameter ESTIMATE ≈90mm (not manufacturer-published); 2.170 in center hole; 5/16 in (≈7.9mm) thick [DS-BRG-001] | 8mm bore × 22mm OD × 7mm width each [DS-BRG-002] | Wire diameter a free design choice (thinner = lower friction/stiffness, weaker) — no fixed size | Varies by design; EyasSat is a compact benchtop unit, dimensions not detailed on the product listing [DS-BRG-005] |
+| Load capacity | 300 lb (≈1334.5N) [DS-BRG-001] | Static (basic) load 1370N, dynamic 3300N, **each** [DS-BRG-002] | Depends on wire gauge/material — a real design variable, not fixed | Not a load-capacity-limited mechanism at this mass scale (thin-film air pressure scales with area, not a "rated load" the way a bearing is) |
+| **Load-capacity margin vs. ≈300g (2.943N) representative assembly weight** | ≈453× (1334.5N/2.943N) | ≈466× (1370N/2.943N, static) | N/A (not a bearing-load question) | N/A |
+| **Estimated friction torque** (SKF/Koyo simplified bearing-friction model, M=0.5·μ·P·d, μ≈0.0013 typical for deep-groove ball bearings [DS-BRG-003]; P=2.943N at ~300g representative weight, applied as a simplification — a true thrust-loaded calc is a refinement for the future Mechanical Design phase, not resolved here) | M ≈ 0.5×0.0013×2.943N×90mm ≈ **0.17 mN·m** (ESTIMATE, race-diameter figure itself is an estimate) | M ≈ 0.5×0.0013×2.943N×8mm ≈ **0.015 mN·m** (ESTIMATE) — best of all 4, ≈11× lower than Candidate A because torque scales with bore diameter for the same load | Negligible by physical design (no rolling-element friction at all) — but a **restoring torque** exists instead (wire's own torsional stiffness), a fundamentally different limiting factor, magnitude UNKNOWN until a specific wire is chosen | Negligible by design (the whole point of the mechanism) |
+| **Margin vs. REQ-007's ≥5 mN·m torque budget** | ≈29× (5/0.17) | ≈327× (5/0.015) — best margin of the 2 bearing candidates | Not comparable the same way — see restoring-torque note above; a wire loose enough for negligible restoring torque may not support the ≈300g weight rigidly, a real design trade-off | Not a limiting factor |
+| Continuous/multi-turn rotation capability | Yes — full 360°, unlimited, matches REQ-012's proposed default directly | Yes — full 360°, unlimited (with a suitable tether/slip-ring per REQ-113) | **No** — bounded twist only (a few full turns at most before wire damage/plastic deformation); cannot sustain the extreme ≈1170°/s continuous-spin scenario the physics finding above shows is possible at REQ-007's full ceiling | Yes — full 360°, unlimited |
+| Electrical tether compatibility (REQ-113) | Straightforward — flexible service loop through/around the bearing's own center hole | Straightforward — service loop alongside the M8 shaft | Complicated — the suspension wire itself is often the only mechanical connection to the support structure; a separate flexible tether must be routed without adding meaningful restoring torque of its own | Straightforward for a single-axis unit, but adds compressed-air supply lines as a second service requirement alongside electrical |
+| Custom design/build work required | **None** — bolt-on-ready, complete off-the-shelf assembly; platform simply sits on top | **Real** — needs a Mechanical-Lead-designed shaft/mount in a future phase; the assembly's CG must sit near the shaft axis, a genuine integration constraint given Rev 3's off-center two-bay footprint (flagged, not resolved here) | **Real** — needs a suspension-point fixture above the rig and a way to route the tether; simpler geometry than B but a taller support structure | **Substantial** — precision spherical/planar fit surfaces, an air supply/regulation system; well beyond this project's demonstrated fabrication capability (3D printing only, no machining) |
+| Reference design / prior art | None found for reaction-wheel/attitude-demo use specifically — a generic-purpose turntable bearing | **Exceptionally strong, directly analogous** — Charles' Labs' own "Reaction Wheel Attitude Control" one-axis satellite-simulator build uses exactly this (2× 608ZZ bearings on an M8 threaded rod) for its free-spinning platform [DS-BRG-004] — this is the closest real-world precedent found for this project's own exact goal | General physics-demonstration precedent for angular-momentum conservation exists (torsion-balance-style apparatus), but no specific powered-reaction-wheel bench build using this exact suspension approach was found this session | Real, but at a professional/research scale — EyasSat markets specifically to CubeSat ADCS coursework/testbeds [DS-BRG-005]; commercial full ADCS testbeds (e.g. Tensor Tech) run $90,000–$185,000 [DS-BRG-006], well beyond a hobbyist single-axis unit's own $1,249 |
+| Price | **$13** (qty 1) [DS-BRG-001] | **≈$15.50** (2× $7.75 bearings) + ≈$3–5 hardware store M8 rod/nuts ≈ **$18–21** [DS-BRG-002] | ≈$0–5 (wire/fiber spool, likely already on hand) | **$1,249** commercial (EyasSat) [DS-BRG-005]; DIY 1-DoF still realistically "a few hundred dollars" once a compressor is counted, per published low-cost-testbed literature |
+| % of proposed REQ-505 ≤$30–50 ceiling | ≈26–43% | ≈36–70% (at qty-1, no-discount pricing) | ≈0–17% | **≥2,500%** commercial; DIY still likely 500–1,000%+ |
+| Known risks / disqualifying factors | Oversized/generic for this scale — "suggested top diameter 12–25 in" is a stability *suggestion* for the bearing's typical (much heavier furniture-class) use case, not a hard requirement at ≈300g, but this is an open integration question for the future Mechanical Design phase, not resolved here. No reaction-wheel-specific prior art. | Requires the assembly's CG to sit near the shaft axis — a real, currently-unresolved integration constraint given Rev 3's off-center enclosure footprint. Not disqualifying, but the honest reason this is not a zero-risk "obviously correct" pick either. | **Disqualified for this cycle's primary recommendation**: cannot do continuous/multi-turn rotation, which the physics finding above shows may genuinely be needed at anything beyond the gentlest commanded speeds; also complicates the electrical tether more than either bearing option. Retained as a low-cost fallback for a *first, very gentle* proof-of-concept only. | **Disqualified for this cycle on cost/complexity grounds**, exactly as this task's own instruction anticipated — real, and the actual gold-standard used by professional CubeSat ADCS testbeds, but ≥25–80× this section's proposed BOM ceiling and requiring fabrication capability (precision air-gap surfaces, compressed-air supply) this project has not needed or demonstrated before. |
+
+### Success-probability ranking
+
+| Rank | Candidate | Verdict |
+|---|---|---|
+| 1 | **B — Dual 608ZZ pivot** | Best friction margin (≈327×) of all 4, cheapest bearing-based option, and the only candidate with a **direct, already-adjacent real-world precedent** (Charles' Labs' own one-axis reaction-wheel demo uses this exact approach) — the strongest "this has already been shown to work for this exact purpose" evidence in the whole comparison. Real, honestly-disclosed integration risk: needs a future custom shaft/mount design, CG-alignment constraint not yet resolved. |
+| 2 | **A — Lazy susan bearing** | Still an excellent margin (≈29×) and load capacity, and requires **zero custom design work** — the simpler, lower-integration-risk fallback if B's custom shaft/mount doesn't fit Rev 3's off-center footprint well in the next phase. No reaction-wheel-specific precedent, and somewhat oversized for this scale (not a functional problem, just not a differentiator in B's favor). |
+| 3 | **C — Torsion suspension** | Genuinely useful for a first, very gentle, low-speed proof-of-concept (near-zero friction, near-zero cost) — but the physics finding above suggests the full demonstration may need continuous/multi-turn rotation at higher commanded speeds, which this candidate structurally cannot do. Not recommended as the primary mechanism; worth keeping in mind as a cheap first sanity-check rig if the human wants an even-lower-risk first step before building B or A. |
+| 4 (not recommended this cycle) | **D — Air bearing** | The real gold-standard, used by actual professional CubeSat ADCS testbeds — but honestly, substantially over this project's own budget/complexity precedent (≥25× the proposed ceiling even at commercial-unit pricing, and DIY doesn't close that gap once a compressor is counted). Recorded as the aspirational future option if this project ever needs research-grade fidelity, not a viable pick for this bench cycle. |
+
+### Recommendation
+
+- **Recommended candidate**: **B — Dual 608ZZ ball-bearing vertical-shaft
+  pivot**, with **A — Lazy susan turntable bearing** explicitly designated
+  as the fallback if B's custom shaft/mount integration proves difficult
+  against Rev 3's actual (off-center, two-bay) enclosure geometry once
+  Mechanical Design actually attempts it.
+- **Rationale** (success probability first, peak spec second):
+  1. **Direct, already-adjacent real-world precedent is the strongest
+     differentiator.** Charles' Labs' own "Reaction Wheel Attitude Control"
+     project — a one-axis satellite-attitude-control bench demo, the same
+     class of build this project is attempting — uses exactly this
+     mechanism (2× 608ZZ bearings on a vertical M8 threaded rod) for its
+     free-spinning platform [DS-BRG-004]. This is direct evidence the
+     *category* of solution works for *this exact application*, not just
+     that the bearing's datasheet numbers look adequate on paper — the
+     same standard this project's own Motor section already applied when
+     recommending the T-Motor MN2206 partly on reaction-wheel-project
+     heritage.
+  2. **Friction margin is the best of all bearing/turntable candidates and
+     comfortably clears the torque budget.** ≈0.015 mN·m estimated friction
+     vs. REQ-007's ≥5 mN·m target is a ≈327× margin — even granting real
+     uncertainty in the simplified friction model (a genuine engineering
+     rule-of-thumb, not a manufacturer-published number for this specific
+     load case), the margin is large enough to absorb it.
+  3. **Cheapest realistic option that still meets REQ-011's full-rotation
+     intent.** ≈$18–21 total, comfortably inside the proposed REQ-505
+     ≤$30–50 ceiling, and continuous/unlimited rotation (unlike Candidate
+     C) matches REQ-012's proposed default without requiring a slip ring
+     (REQ-113's proposed tether-first approach).
+  4. **Fits this project's already-demonstrated fabrication capability.**
+     The custom shaft/mount this candidate needs is exactly the kind of
+     3D-printed geometry the Mechanical Lead has already produced twice
+     (Rev 2/Rev 3 enclosures) — no new fabrication capability is required,
+     unlike Candidate D.
+- **Trade-offs accepted**:
+  - *vs. Candidate A (lazy susan)*: gives up a complete, zero-custom-design
+    bolt-on solution — in exchange for an ≈11× better friction margin and
+    the direct Charles' Labs precedent Candidate A does not have. This is
+    the trade-off most worth revisiting if Mechanical Design finds Rev 3's
+    off-center CG genuinely hard to align with a single-point shaft — A is
+    recorded here specifically as that fallback, not dropped.
+  - *vs. Candidate C (torsion suspension)*: gives up near-zero friction and
+    near-zero cost — in exchange for genuine continuous/multi-turn rotation
+    capability, which the physics finding above suggests may actually be
+    needed once commanded speeds rise meaningfully above the gentlest
+    illustrative point (30 RPM).
+  - *vs. Candidate D (air bearing)*: gives up the field's actual
+    gold-standard, near-zero-friction, research-grade fidelity — in
+    exchange for staying inside this project's own established budget/
+    fabrication-capability precedent. Explicitly not a close call at this
+    project's scale and stage.
+- **Open UNKNOWNs** (carried forward explicitly):
+  1. Candidate A's actual ball-race diameter (used as ≈90mm in the friction
+     estimate) is **not manufacturer-published** on the fetched product
+     page — an ESTIMATE, not a confirmed figure; would need direct
+     measurement or a manufacturer spec sheet before a final friction
+     number could be trusted.
+  2. The SKF/Koyo simplified friction-torque model itself (M=0.5·μ·P·d) is
+     a generic engineering rule-of-thumb for *radially*-loaded deep-groove
+     ball bearings under normal lubrication — this application is
+     primarily a **thrust** (axial weight-bearing) load, which a dedicated
+     thrust-bearing friction model would estimate more precisely. Treated
+     here as an order-of-magnitude approximation only, flagged for
+     refinement once the future Mechanical Design phase sizes an actual
+     shaft/mount.
+  3. Candidate B's CG-alignment constraint (the assembly's real center of
+     gravity relative to a single-point shaft axis, given Rev 3's
+     off-center two-bay enclosure footprint) is genuinely unresolved —
+     flagged for the future Mechanical Design phase, not estimated here.
+  4. Candidate C's wire/fiber torsional-stiffness figure is UNKNOWN — no
+     specific wire gauge/material was chosen, since this candidate is not
+     the primary recommendation.
+  5. REQ-012 (angular-travel target) and REQ-505 (BOM ceiling) remain open
+     human questions (`requirements/requirements.md` §9d) — this
+     recommendation is robust to either proposed default holding, but a
+     materially different answer (e.g. a hard requirement for a bounded,
+     small-angle-only demo) could change the ranking, particularly
+     Candidate C's standing.
+
+### Escalation flags
+
+1. **Architecture-defining decision — requires Hardware Lead + human Chief
+   Engineer approval before any Mechanical Design/CAD work starts**
+   (`docs/architecture.md` §10). This recommendation is explicitly **not
+   self-approved** — see Approval table below, human row marked Pending.
+   Mirrors `hardware/power-architecture.md`'s own "recommendation, not a
+   decision" framing, per this task's own explicit instruction.
+2. **Safety-relevant, not merely architecturally-significant.** A
+   free-rotation mechanism is a **new hazard shape** distinct from REQ-403's
+   already-dispositioned flywheel-containment risk (REQ-407/408) — tip-over,
+   pinch points at the pivot, tether entanglement, and (per the physics
+   finding above) a possibly fast-spinning free platform. None of these are
+   resolved by this Component Selection pass; they are flagged for the
+   future Mechanical Design phase and a fresh safety review before physical
+   build, per REQ-407/408.
+3. **New Evidence category introduced — `DS-BRG-NNN` (bearing/mechanical-
+   rotation-hardware), flagged not silently substituted.** No existing
+   category (`MTR`, `CONN`, `FAST`, `MTL`, etc.) is a precise semantic fit
+   for a bearing/pivot/turntable component — mirrors this same file's own
+   precedent of introducing `PROT` in the Motor-Rail Supervisory Controller
+   section above for the same reason (a genuinely new component class, not
+   a role-exclusive naming convention).
+4. **Candidate A's race-diameter figure and the thrust-vs-radial friction
+   model are both flagged ESTIMATEs, not confirmed numbers** (Open UNKNOWNs
+   1–2) — real enough to rank the 4 candidates against each other with
+   confidence (the margins are wide), but not precise enough to be a final
+   engineering sign-off figure without the future Mechanical Design phase's
+   own refinement.
+
+### Approval
+
+| Role | Name | Date | Decision |
+|---|---|---|---|
+| Component Engineer | Component Engineer (AI agent) | 2026-09-01 | Proposed — Candidate B (dual 608ZZ ball-bearing vertical-shaft pivot), with Candidate A (lazy susan turntable bearing) as the named fallback. See Escalation flags 1–3 for items requiring Hardware Lead/human confirmation before either is used downstream. |
+| Hardware Lead | Hardware Lead (this session) | 2026-09-01 | Concur — recommend B as primary, A as fallback, for review. Friction-margin arithmetic independently re-verified (0.5×0.0013×2.943×8 ≈ 0.0153 mN·m for B; 0.5×0.0013×2.943×90 ≈ 0.1722 mN·m for A — both confirmed by direct substitution). This is an architecture-level decision — routed to the human Chief Engineer via cross-session message, not self-approved. |
+| Chief Engineer (Human) — required, architecture decision (`docs/architecture.md` §10) | *(pending)* | *(pending)* | **Awaiting review** — see cross-session message for this revision's summary. No Mechanical Design/CAD work starts until this decision is made. |
