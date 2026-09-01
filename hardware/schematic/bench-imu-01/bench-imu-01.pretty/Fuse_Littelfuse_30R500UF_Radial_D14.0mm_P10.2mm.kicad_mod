@@ -1,0 +1,119 @@
+(footprint "Fuse_Littelfuse_30R500UF_Radial_D14.0mm_P10.2mm"
+	(version 20260206)
+	(generator "bench-imu-01/generate_schematic.py")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(descr "Littelfuse 30R500UF (30R series) radial-leaded PTC resettable fuse -- custom footprint, no matching part exists in any standard KiCad library. Body diameter 14mm, lead spacing 10.2mm, per web-search-derived dimensions (not independently re-pulled from the primary mechanical drawing table this session -- ASSUMPTION, disclosed in hardware/pcb/README.md and this project's footprint-decision log). Lead/pad size (2.2mm pad, 1.2mm drill) is an ESTIMATE sized generously for a 5A-class radial PTC lead, not a datasheet-confirmed lead diameter.")
+	(tags "fuse tht radial ptc littelfuse 30r500uf")
+	(property "Reference" "REF**"
+		(at 5.1 -9.5 0)
+		(layer "F.SilkS")
+		(uuid "7b643432-4dd0-4965-aa35-0fa2cbaca797")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "Fuse_Littelfuse_30R500UF_Radial_D14.0mm_P10.2mm"
+		(at 5.1 9.5 0)
+		(layer "F.Fab")
+		(uuid "d0feef4f-5953-487b-ac0f-b413d5759f77")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" "https://www.littelfuse.com/assetdocs/littelfuse_ptc_30r_datasheet?assetguid=46bd151a-f029-4cec-aeef-2614869244f4"
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "8b04f299-379d-47ef-aeeb-a20587eb3f60")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" "Littelfuse 30R500UF radial PTC resettable fuse, custom footprint (ASSUMPTION on exact lead diameter -- see descr)"
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "4fd92bd6-88b6-4035-b421-2f15967c1a00")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr through_hole)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_circle
+		(center 5.1 0)
+		(end 12.1 0)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.SilkS")
+		(uuid "278b702a-7e66-457b-b54f-ff8b0df2f5dd")
+	)
+	(fp_circle
+		(center 5.1 0)
+		(end 12.25 0)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "276f244a-b244-45ea-b1de-cb15b879a27d")
+	)
+	(fp_circle
+		(center 5.1 0)
+		(end 12.1 0)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.Fab")
+		(uuid "650bce62-f353-4f2a-b07d-520ebc9a2f3a")
+	)
+	(fp_text user "${REFERENCE}"
+		(at 5.1 0 0)
+		(layer "F.Fab")
+		(uuid "9fc2f196-dd67-4756-b52b-a137890ab5b7")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "1" thru_hole circle
+		(at 0 0)
+		(size 2.2 2.2)
+		(drill 1.2)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "8f1e2b3a-1111-4a11-8a11-1a1b2c3d4e5f")
+	)
+	(pad "2" thru_hole circle
+		(at 10.2 0)
+		(size 2.2 2.2)
+		(drill 1.2)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "8f1e2b3a-2222-4a22-8a22-2a2b2c3d4e5f")
+	)
+	(embedded_fonts no)
+)
