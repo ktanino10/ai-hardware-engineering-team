@@ -6636,3 +6636,524 @@ Two independent methods, not a visual diff read alone:
   this cycle. MISS-018 (LOW) is newly logged `OPEN`, `Source:
   mechanical-reviewer`, for the Mechanical Lead to pick up at convenience
   (non-blocking).
+
+## Mechanical Reviewer — Independent Cross-Check of Rev 3.3 Motor-Voltage/RPM Correction (DS-MTR-018 Relabel → §8 Physics-Table Recompute), 2026-09-13
+
+### Review Cycle Metadata
+
+- **Documents reviewed**: `hardware/schematic/bench-imu-01-design.md` §7.5.13
+  (Circuit Engineer's new voltage/RPM derivation, ECO-022); `hardware/
+  mechanical/bench-imu-01-dimensional-spec.md` §8 (Mechanical Lead's Rev 3.3
+  recompute, ECO-023); `datasheets/evidence-log.md` (every cited Evidence ID,
+  read directly at source, not taken from either report's own quotations).
+- **Trigger**: a corrected credible-worst-case M1 no-load speed. DS-MTR-018
+  had labeled its own ~22,200 RPM figure "full-charge 3S (11.1V)" — 11.1V is
+  3S's **nominal** voltage (3.7V/cell), not full-charge (12.6V, 4.2V/cell).
+  Circuit Engineer (ECO-022) corrected the citation and derived a true
+  credible-worst-case VCC(U5)/RPM figure accounting for this design's own
+  13.0V envelope ceiling and real J4→F1→D2→D3→U6→U5 voltage drops. Mechanical
+  Lead (ECO-023) then propagated the corrected RPM into §8's flywheel
+  physics table.
+- **This is an independent, from-primary-sources re-derivation, not a
+  re-read of either report's own claims.** Per this agent's own charter
+  ("do not anchor on the Mechanical Lead's stated rationale — re-derive each
+  checklist item yourself directly"), every Evidence ID was re-read at its
+  exact line in `evidence-log.md`; the voltage-drop/RPM arithmetic and the
+  entire physics table (ω, KE, rim speed, peak stress, safety factor) were
+  recomputed from scratch in a scratch Python session, not checked against
+  the reports' own intermediate numbers until after independent computation;
+  the reasoning-direction choice was scrutinized against this design's own
+  other, opposite-bound drop analyses; the LiPo nominal/full-charge
+  distinction was re-confirmed a 4th and 5th independent way; and a
+  repo-wide sweep was run for any other stale citation of the superseded
+  figures the correction chain itself may have missed.
+- **Scope**: this is a focused independent cross-check of one specific,
+  consequential correction (mirroring the "MISS-011 Closure Attempt" and
+  "MISS-017 Fix" cross-check entries above in kind, not a fresh full
+  10-item checklist pass) — checklist items 1–9 are unaffected by this
+  correction (no new `.scad` geometry, no new component placement, no new
+  fastener/clearance claim); **item 10 (interface-value traceability)** is
+  substantively in scope, plus a direct first-principles physics
+  re-derivation that item 10 alone would not otherwise require.
+
+### Scope discipline check
+
+`git status --short` confirms no `.scad` geometry was touched by either
+ECO-022 or ECO-023 (both are markdown-only changes — `bench-imu-01-design.md`
+new §7.5.13, `bench-imu-01-dimensional-spec.md` §8 Rev 3.2→3.3), and this
+review itself is read-only: nothing under `hardware/mechanical/*.scad`,
+`bench-imu-01-manufacturing-spec.md`, `firmware/`, `bom/`, or
+`requirements/requirements.md` is modified by this entry.
+
+### 1. Independent re-verification of every cited Evidence ID (task item 2, part A)
+
+Each ID was opened directly at its own line in `datasheets/evidence-log.md`
+— not read through either report's paraphrase:
+
+| Evidence ID | Line | Independently confirmed to say |
+|---|---|---|
+| DS-MTR-017 | 235 | T-Motor MN2206-13's own published voltage range **2S–3S LiPo, 7.4–11.1V nominal / 8.4–12.6V full-charge** — the nominal/full-charge split already existed in this very next-door row and was simply never cross-checked against DS-MTR-018 above it. Confirmed genuine. |
+| DS-MTR-018 | 236 | T-Motor no-load current 0.3A at 10V test voltage; this project's own **derived** no-load speed (not manufacturer-published) — now carries the correction annotation in place (original figure kept, not deleted, matching this file's own DS-MCU-062 annotation precedent). Confirmed genuine and correctly annotated. |
+| DS-MTR-079 | 349 | Second, independently-sourced retailer re-fetch corroborating the standard LiPo per-cell voltage convention. Confirmed genuine. |
+| DS-PROT-034 | 350 | Re-fetched STPS3L60 (D2) datasheet; Figure 13's low-current VF curve confirmed to exist in the document but **not numerically extractable this session** — honestly disclosed as such by Circuit Engineer, not silently rounded past. Confirmed genuine, confirmed the honesty of the disclosed limitation. |
+| DS-MTR-080 | 351 | Circuit Engineer's own new §7.5.13 aggregated-derivation citation — an internal citation, not a manufacturer datasheet in its own right, correctly labeled as such. Confirmed genuine. |
+| DS-PROT-005 | 291 | F1 (PTC resettable fuse) minimum-resistance rating. Confirmed genuine, confirmed it is a *minimum*-bound figure (correct direction for this question — see §4 below). |
+| DS-PROT-006 | 296 | F1 datasheet cross-reference used alongside DS-PROT-005. Confirmed genuine. |
+| DS-PROT-031 | 322 | U6 R(ON) minimum rating. Confirmed genuine, confirmed minimum-bound. |
+| DS-PROT-032/033 | 323–324 | U6 datasheet supporting rows. Confirmed genuine. |
+
+**No fabricated, misattributed, or overstated citation found anywhere in
+either §7.5.13 or §8.** Every Evidence ID genuinely supports the specific
+claim made from it.
+
+### 2. Independent re-derivation of the voltage/RPM chain from scratch (task item 2, part B)
+
+Computed independently in a scratch interpreter, using only the primary
+inputs above — **not** transcribed from either report's own intermediate
+arithmetic:
+
+```
+I_noload = 0.3 A          (T-Motor's own tested no-load current, DS-MTR-018/079)
+R_F1,min = 0.010 Ω         (DS-PROT-005/006)          -> drop = 0.003 V
+R_U6(ON),min = 0.026 Ω     (DS-PROT-031/033)          -> drop = 0.0078 V
+V_F,D2 (lowest credible)  = 0.35–0.45 V (ESTIMATE, DS-PROT-034 + Schottky
+                            low-current physics)
+D3 contributes 0V (shunt topology, not series in this path)
+
+Total drop = 0.003 + 0.0078 + [0.35, 0.45] = [0.361, 0.461] V
+V_VCC(U5) = 13.0V (envelope ceiling) − drop = [12.539, 12.639] V, point 12.589V
+RPM = KV × V_VCC = 2000 RPM/V × [12.539, 12.639] = [25,078, 25,278] RPM, point 25,178
+```
+
+**Result**: my own independent low/high/point bounds are **25,078 /
+25,278 / 25,178 RPM** — the reports state **25,060 / 25,280 / 25,180**.
+High end and point estimate agree to within 2 RPM (rounding noise). The
+low end differs by **18.4 RPM (0.073%)** — and this is not a new
+discrepancy this review is discovering: it is the **exact same
+~20 RPM/~0.08% wrinkle Mechanical Lead's own §8 text already disclosed**
+("the true low bound at ≈25,078–25,080 RPM, not exactly 25,060, since only
+the former is consistent with the stated point estimate being the range's
+exact midpoint"). Independently reproducing a discrepancy someone else
+already caught and disclosed — rather than either missing it or being
+handed it — is itself meaningful corroboration of both this Reviewer's own
+arithmetic and Mechanical Lead's disclosed rigor. It is well inside D2's
+own VF `ESTIMATE` band and changes no downstream conclusion.
+
+**Cross-checks independently reproduced exactly**: the naive
+"label-fix-only" recompute (KV×12.6V = 25,200 RPM, confirming the 13.0V
+envelope + drop chain is doing real additional work beyond a bare label
+fix); the old, correctly-arithmetic-but-mislabeled figure (KV×11.1V =
+22,200 RPM, exactly); the %-increase claims — **13.42% RPM increase**
+(reports: "≈13.4%") and, because KE/stress scale with ω², **28.65% KE/
+stress increase** (reports: "≈28.65%", exact match). Doubling the assumed
+no-load current (a sensitivity check reproduced independently) changes
+V_VCC by under 0.02V — the result is genuinely dominated by D2's VF
+uncertainty, not the current assumption, exactly as claimed.
+
+### 3. Independent re-derivation of the physics table from first principles (task item 3)
+
+Not a check against the report's own numbers — derived from Mechanical
+Lead's own stated geometric/material inputs (§4.1/§4.4:
+ρ=7850 kg/m³, r=0.030m, t=4.5mm, I=4.5×10⁻⁵ kg·m², ν=0.29, yield=250MPa)
+using the standard formulas for a rotating disk (ω=2π·RPM/60,
+KE=½Iω², rim speed v=ωr, peak stress at disk center
+σ=[(3+ν)/8]·ρ·ω²·r²):
+
+| RPM | ω (rad/s) | KE (J) | rim speed (m/s) | peak stress (MPa) | safety factor |
+|---|---|---|---|---|---|
+| 3,000 (baseline) | 314.16 | 2.22 | 9.43 | 0.29 | 872× |
+| 22,200 (old, superseded) | 2,324.78 | **121.60** | **69.74** | **15.70** | **15.92×** |
+| 25,060 (reported low) | — | **154.95** | **78.73** | **20.01** | 12.49× |
+| 25,180 (reported point) | 2,636.84 | **156.44** | **79.11** | **20.20** | **12.38×** |
+| 25,280 (reported high) | — | **157.69** | **79.42** | **20.36** | 12.28× |
+
+**Every single figure independently reproduced to the exact stated
+precision** — not approximately, exactly: 121.60J, 69.74 m/s, 15.70 MPa at
+22,200 RPM; 156.44J, 79.11 m/s, 20.20 MPa at 25,180 RPM; 154.95J/78.73 m/s/
+20.01 MPa and 157.69J/79.42 m/s/20.36 MPa at the reported range bounds.
+This also independently confirms the two figures are being compared on an
+apples-to-apples basis (same formula, same I, same r, only RPM changed).
+
+**Safety-factor recomputed independently, not assumed unchanged**:
+250MPa / 15.70MPa = **15.92×** (old) vs. 250MPa / 20.20MPa = **12.38×**
+(new, point), range **12.28×–12.49×** across the reported RPM band —
+matches the reports' "≈15.9×" and "≈12.4× (range 12.3–12.5×)" exactly.
+Disk-burst remains, and was never, the governing/binding failure mode —
+this qualitative conclusion is unchanged at either safety factor and does
+not depend on the exact RPM figure at all (both values sit an order of
+magnitude above 1×).
+
+### 4. Reasoning-direction scrutiny — is "minimum resistance / lowest VF" actually correct here? (task item 4, part A)
+
+Independently re-read the design's own *other* voltage-drop analyses to
+confirm this is not an inconsistent or backwards bounding choice:
+
+- **§7.5.2** (UVLO-margin analysis): uses **max** VF / an assumed 0.02Ω to
+  find the **worst-case-low** voltage — because for that question (could
+  VCC dip below the UVLO threshold?), more drop is the bad direction.
+- **§7.5.10** (U6 thermal analysis): uses R(ON)**max**=45mΩ@85°C to find
+  the **worst-case-high** heat — because for that question (could the
+  driver overheat?), more resistance/more dissipation is the bad direction.
+- **§7.5.13** (this correction): uses **min** R (F1, U6) and the **lowest**
+  credible D2 VF to find the **worst-case-high** RPM/stored-energy —
+  because for *this* question (how much rotational energy could a
+  hub-collar-release event actually release?), *less* drop → higher V_VCC
+  → higher RPM → **more** stored energy is the bad direction.
+
+**Independently confirmed correct, not backwards.** These are three
+different physical questions (voltage floor / thermal ceiling / energy
+ceiling), each with its own genuinely different worst-case direction — this
+is proper engineering practice (select the bounding assumption per the
+specific failure mode under evaluation), not an inconsistency. Verified
+the 13.0V envelope ceiling itself is a genuine, pre-existing, independently
+re-confirmed binding constraint from §7.5.9 (bench-supply headroom plus
+full-charge LiPo), not a figure invented for this handoff.
+
+### 5. LiPo nominal-vs-full-charge distinction — independent 4th/5th confirmation (task item 4, part B)
+
+Given how consequential this distinction is, re-confirmed it independently
+beyond the 3 ways already disclosed in §7.5.13 (DS-MTR-017's own adjacent
+row; the T-Motor metadata file's "Known gaps" section; a web search cited
+in ECO-022) and the 4th way Mechanical Lead's own ECO-023 already performed
+(a separate web search):
+
+- **5th independent confirmation, this cycle**: directly opened
+  `datasheets/tmotor_mn2206-13-2000kv_rev-unknown.md` myself (lines 38–39)
+  and confirmed its "Known gaps" section states, in its own words, "3S full
+  charge (~12.6V)" — not inferred from any report's quotation of it.
+- **6th, independent of the project's own files entirely**: a fresh web
+  search this cycle re-confirmed the standard LiPo convention (3.7V/cell
+  nominal, 4.2V/cell full-charge/fully-charged rest voltage) — 3S nominal =
+  11.1V, 3S full-charge = 12.6V, consistent across independent general
+  sources, not merely this project's own citation chain.
+
+**Independently reconfirmed correct.** 11.1V really is 3S's nominal
+voltage, not its full-charge voltage; DS-MTR-018's original label was
+genuinely wrong, and the correction is genuinely right.
+
+### 6. Completeness sweep — repo-wide search for any remaining stale citation (task item 5)
+
+Ran `grep -rn "121\.60\|22,200\|22200\|69\.74\|15\.70\|45.55\|44.55"` (and
+variants) across the **entire repository**, then triaged every hit
+file-by-file to separate genuine live/current-tense stale citations from
+(a) historical, dated log entries correctly describing what was true when
+written, and (b) the correction chain's own explanatory "old figure was X"
+narrative text (not itself stale — it is *describing* the old figure on
+purpose).
+
+**The 3 already-flagged items, independently confirmed present and
+correctly flagged** — with one small file-attribution correction:
+
+1. `hardware/schematic/bench-imu-01-design.md` §7.5.11 (line ~2160): "M1
+   stores roughly 45–55× the rotational energy at no-load" — confirmed
+   present, confirmed stale, confirmed already flagged (not fixed) by
+   ECO-023. Recomputed: true corrected multiple is (25,180/3,000)²≈70.4×,
+   not 45–55× — a materially larger multiple, consistent with the ≈28.65%
+   KE increase.
+2. **File-attribution correction**: the task describes this as "that same
+   document's §15 item 6" (implying `bench-imu-01-design.md`). Independent
+   check found `bench-imu-01-design.md`'s own §15 is titled "Self-check
+   against the *Hardware Reviewer's* 16-item checklist" and contains no
+   "Rev 3.2 note" quoting 121.60J anywhere. The actual "Rev 3.2 note" (line
+   1750 of `hardware/mechanical/bench-imu-01-dimensional-spec.md`, checklist
+   item 6, "Wall thickness") is in the **Mechanical** self-check section of
+   the **dimensional-spec** document, not the design document — confirmed
+   present and stale ("§8.1's bounded estimate finds the 4.0mm
+   `containment_wall_t` does not carry an affirmative 'adequate against the
+   disclosed 121.60J load case' claim"), confirmed already flagged (not
+   fixed) by ECO-023's own text. A minor relay imprecision, not a
+   substantive gap — noted for the record since precision about exactly
+   which document a claim lives in is this role's entire job.
+3. `requirements/traceability-matrix.md` REQ-403 row (line 53): "the
+   containment wall's local material cannot plausibly absorb the full
+   disclosed **121.60J** hazard energy" — confirmed present, confirmed
+   stale, confirmed already independently flagged in
+   `validation/change-impact-matrix.md`'s own ECO-023 entry (line 71) as
+   well as by the task. No new action needed beyond what follows below.
+
+**Additional stale citations found by this sweep, not in the original list
+of 3:**
+
+4. **`requirements/traceability-matrix.md` REQ-405 row (line 55)** — a
+   *different* row in the same document from the already-flagged REQ-403
+   row: "6000 RPM = 2.0x margin above the ≥3000 RPM floor, **~3.3-3.7x
+   below M1's own ~20,000-22,200 RPM no-load speed**." Recomputed: the true
+   corrected margin is 25,180/6,000 ≈ **4.2×**, i.e. the real margin is
+   *larger* (more conservative) than stated, not smaller — this staleness
+   understates the safety margin rather than overstating it, so it is not
+   itself a new safety concern, but it is a genuinely stale citation the
+   correction chain missed.
+5. **`requirements/requirements.md` line 142** (REQ-405 definition row) —
+   "the recommended motor's own no-load speed (**≈20,000–22,200 RPM**) is
+   6–7× that floor" — same stale figure, same conservative direction of
+   error. In the explicit "do not touch" list for this task; flagged only.
+6. **`validation/fmea.md` FMEA-009 (line 35)** — the systemic risk
+   register's own highest-RPN entry states, as apparently-current risk
+   characterization: "up to **~250 km/h rim speed / ~122J** at M1's
+   unbounded no-load speed," "Bulk-material stress is not the risk (**~15.9x
+   safety factor** vs. yield even at no-load speed)," and "a motor whose
+   real achievable speed is currently bounded only by its own physical
+   no-load limit (**~20,000-22,200 RPM**)." This is the risk register a
+   human would consult for the current hazard magnitude — all three figures
+   are now understated relative to the corrected ≈79.11 m/s/≈156.44J/
+   ≈12.4× basis. Not among the original 3; a genuinely new find.
+7. **`hardware/mechanical/bench-imu-01-manufacturing-spec.md`** (6
+   occurrences: lines 28, 30, 31, 45, 63, 73) — the Manufacturing Engineer's
+   own FDM process-justification narrative repeatedly cites "121.60 J,"
+   "69.74 m/s (~250 km/h)," and "22,200 RPM no-load-high" as the governing
+   hazard figure driving its own 100%-infill recommendation and its own
+   "no claim... has been tested against a 121.60 J containment event"
+   disclaimer. **Not flagged by either ECO-022 or ECO-023** — neither
+   Circuit Engineer's nor Mechanical Lead's own text mentions this document
+   at all, even though it shares the identical stale-figure pattern the
+   other 3 items were caught for. A genuinely new, previously-unflagged
+   find. Directionally, this does **not** undermine the manufacturing
+   spec's own conclusion — a higher real hazard energy only reinforces the
+   case for its already-conservative 100% infill choice and its own
+   "FDM cannot be presented as adequate/validated containment without
+   physical testing" escalation — but the specific cited numbers throughout
+   the document are now inaccurate as a description of the current design
+   basis. Per this task's explicit instruction, this document's substantive
+   content is **not** rewritten here — flagged in `open-issues.md` only.
+8. **`bom/component-selection.md` (lines 495, 498)** — the motor
+   candidate-comparison table states "derived no-load speed ≈20,000 RPM
+   @10V / ≈22,200 RPM @11.1V (derived from KV, not directly published)"
+   and "3000 RPM target is only 13–20% of the ≈20,000–22,200 RPM derived
+   no-load speed." **Distinguished from the other finds**: these figures
+   are not mislabeled (they correctly attribute each RPM to the specific
+   voltage it was computed at, 10V/11.1V, and make no "full-charge" or
+   "credible worst-case" claim) and remain arithmetically true exactly as
+   written — they are simply an earlier-stage, pre-circuit-analysis
+   snapshot from motor-selection research, superseded in *completeness* (not
+   correctness) by the later, circuit-specific §7.5.13 analysis. In the
+   explicit "do not touch" list; flagged only, lowest-priority of the finds
+   below.
+9. **`firmware/bench-imu-01/`** (`README.md` line 53; `src/motor.h` lines
+   125, 128, 130, 146, 226, 276; `src/motor.c` line 29;
+   `bench-imu-01-firmware-design.md` lines 321, 342, 397, 424) — the same
+   "~20,000-22,200 RPM no-load" / "~3.3-3.7x margin" / "45-55x energy"
+   figures recur throughout the firmware discipline's own REQ-405
+   margin-sizing rationale. Same conservative-direction character as finds
+   4/5 above (true corrected margin ≈4.2× is larger, not smaller, than
+   claimed). `firmware/` is in the explicit "do not touch" list — flagged
+   only. This is consistent with, and was already anticipated by, ECO-022's
+   own explicit disclaimer that "Firmware's own REQ-405 work... is
+   conservative in its own, separately-scoped command-ceiling context, the
+   opposite direction of error from this analysis."
+10. **A second, later verification pass on this sweep itself** (re-running
+    the grep after the first round of `open-issues.md`/`design-review.md`
+    edits, to check nothing was missed even by this cycle's own first
+    pass) turned up 4 more files not caught the first time: the local
+    datasheet copies `datasheets/prusament_petg_tds-2021-10.md`
+    (DS-MTL-001), `datasheets/polymaker_polymax-petg_tds-v5.4.md`
+    (DS-MTL-002), `datasheets/fiberlogy_nylon-pa12_tds-rev-unknown.md`
+    (DS-MTL-003), and
+    `datasheets/cnckitchen_petg-threaded-insert-pullout-test_web-article.md`
+    (DS-FAST-002) — **the exact 4 primary evidence sources MISS-016's own
+    Datasheet Source column already cites for Method 1.** Each carries its
+    own "Known gaps" caveat noting that standard quasi-static Charpy/tensile
+    test speeds don't reflect "the REQ-403 event's ≈69.74 m/s effective
+    impact speed" — a legitimate caveat, now citing the superseded rim
+    speed (should become ≈79.11 m/s point / ≈78.73–79.42 m/s range).
+    **Not folded into MISS-019/020/021**: unlike those 3 (unrelated
+    document families, unrelated owners), these 4 files are supporting
+    material *for MISS-016 itself*, already named in its own Datasheet
+    Source column, and will be naturally revisited by the same future
+    Manufacturing Engineer pass that redoes MISS-016's own Method 1/Method 2
+    arithmetic — so this is folded directly into MISS-016's own
+    `open-issues.md` annotation (§8/below) as a scope extension, not spun
+    off as a 4th new ID. Catching this only on a deliberate second pass
+    over my own first-round sweep is itself worth recording: even an
+    "independent, adversarial" review should re-check its own completeness
+    claim, not just the object under review's.
+
+**Checked and confirmed NOT stale (no action needed):**
+
+- `datasheets/evidence-log.md`'s 2 matches are DS-MTR-018 itself (correctly
+  annotated in place) and DS-MTR-080 (Circuit Engineer's own new derivation
+  citation, correctly describing the old figure as superseded in its own
+  explanatory text). Both fine as-is.
+- `validation/change-log.md`'s 5 matches (ECO-017, and ECO-022/023's own
+  entries) are either a dated historical record of Firmware's REQ-405
+  rationale as it stood on 2026-09-11, before this correction existed (a
+  legitimate snapshot, not a live claim), or ECO-022/023's own current,
+  accurate narrative describing the correction itself (including ECO-023's
+  own text already naming 2 of the 3 originally-flagged stale items) — all
+  correctly left untouched; this is a purely additive ledger, not something
+  a Reviewer edits.
+- `validation/change-impact-matrix.md`'s single match (ECO-023's own entry)
+  already documents this exact correction and already flags the
+  traceability-matrix.md REQ-403 row — corroborating, not duplicating,
+  this review's own findings.
+- `validation/design-review.md`'s own historical matches (this file) are
+  dated log entries describing prior cycles' own contemporaneous
+  understanding — not live claims, not edited.
+
+**Net new findings from this sweep**: 3 new backlog IDs (logged as
+MISS-019/020/021 below), covering finds 4/5/8/9 (bundled — same stale
+figure, same conservative direction, same low-priority
+documentation-currency character), find 6 (fmea.md), and find 7
+(manufacturing-spec.md) respectively — plus find 10 (the 4 supporting
+datasheet caveats) folded directly into MISS-016's own annotation rather
+than given a separate ID, for the reason stated above.
+
+### 7. Impact on this Reviewer's own prior verdicts (task item 6)
+
+Reviewed every prior Mechanical Reviewer cycle's own **Verdict** section
+(Cycle 3, Cycle 4, both Manufacturing Process Cross-Checks, MISS-011
+Closure Attempt, MISS-017 Fix) against what each one actually depended on:
+
+- **Cycle 3 (CONDITIONAL) and Cycle 4 (PASS)** — the mechanical-design
+  review cycles — were driven entirely by **MISS-008** (flywheel Z-stack
+  formula omitting the hub-collar height, a pure geometric self-contradiction),
+  **MISS-009** (wire duct solid not void), **MISS-010** (base-tab/lid-skirt
+  interference), and the containment **topology** claim (continuous wall,
+  no rotation-plane opening, bolted not friction-fit cap). **None of these
+  four conclusions depend on the flywheel's RPM or stored energy at all** —
+  they are statements about whether solids overlap in modeled 3D space and
+  whether a cap is bolted, true or false independent of what number goes
+  into §8's physics table. **Unaffected by this correction; nothing to
+  reopen.**
+- **Manufacturing Process Cross-Check (×2, both CONDITIONAL)** — driven by
+  **MISS-012/013** (process-spec scope completeness: does it cover
+  `fw_bay_wall()`/`base()`, not just `containment_cap()`) and **MISS-014/
+  015** (confidence-label correctness, literature-framing honesty). These
+  are questions about document *coverage* and *label taxonomy*, not about
+  whether the specific input energy figure is itself correct. Notably, in
+  resolving MISS-014 this Reviewer's own text **already** described
+  "Credible worst-case flywheel speed" as depending on "a project-derived,
+  not-manufacturer-published rotational-speed estimate (DS-MTR-018)" —
+  i.e., this Reviewer was already treating that figure with appropriate
+  epistemic caution (an `ESTIMATE`, not a `CONFIRMED` fact) well before the
+  specific voltage-label bug inside it was ever caught. **Unaffected by
+  this correction; nothing to reopen.**
+- **MISS-011 Closure Attempt cross-check (CONDITIONAL)** — this Reviewer's
+  own text at the time explicitly frames the ~122J/100g figure as "the
+  disclosed hazard figure" and "already established in §8's pre-existing
+  physics table" — i.e., this cross-check's own scope was the Method 1/
+  Method 2 **wall-margin arithmetic given that energy input**, never a
+  re-derivation of the energy input's own provenance from DS-MTR-018's
+  voltage/RPM chain. That re-derivation is precisely what is new in this
+  correction and is being performed, by this role, for the first time in
+  this very entry. **The wall-margin-shortfall conclusion itself is
+  unaffected in kind** (see §8 below) — MISS-016 was never a "conditional
+  on 121.60J being exactly right" finding; it was a "the wall's local
+  material demonstrably falls short of the disclosed budget" finding, and
+  a higher real budget only strengthens that conclusion.
+- **MISS-017 Fix re-verification (CONDITIONAL)** — a confidence-labeling
+  audit, orthogonal to the RPM figure's own correctness. Unaffected.
+
+**Conclusion: none of this Reviewer's 6 prior cycles require reopening.**
+Every one of them was either (a) about geometry/topology that does not
+depend on the RPM/energy figure at all, or (b) already treated the energy
+figure as an inherited, appropriately-hedged `ESTIMATE` rather than
+independently certifying its provenance — exactly the "framed in a way
+that's robust to this change" pattern this task's own item 6 anticipated.
+
+**One honest self-critical note, not a new backlog finding**: across 6
+prior cycles, this Reviewer's own checklist item 10 (interface-value
+traceability) consistently checked whether a cited value carries the
+confidence label *its own source claims* — and, separately, whether a
+derived table correctly propagates ASSUMPTION/ESTIMATE/DERIVED tags from
+its inputs. It never independently re-derived whether the *cited source's
+own claim was internally self-consistent* (i.e., whether "full-charge 3S
+(11.1V)" is itself a true statement about LiPo chemistry) — a deeper check
+than label-fidelity, and the one that actually caught this bug (via
+Firmware Reviewer, on an unrelated REQ-405 cross-check, not via any
+Mechanical checklist pass). This is not a missed checklist item so much as
+a legitimate new depth of scrutiny this correction chain has now
+established — worth carrying forward into future traceability checks
+(spot-check a datasheet-adjacent claim's own internal consistency, not
+merely its label), not something requiring retroactive reopening of past
+verdicts that were never asked to catch it.
+
+### 8. MISS-016 disposition (task's Output instruction)
+
+MISS-016's own row (`validation/open-issues.md`) states its Failure
+Mechanism/Title against "the disclosed 121.60J flywheel-detachment energy
+budget" and reports Method 1 (0.576–2.880J, ~0.5–2.4% of budget) / Method 2
+(36.38–48.0J, ~30–40% of budget) — both computed against the now-superseded
+121.60J/69.74 m/s/22,200 RPM inputs. Per Mechanical Lead's own already-
+disclosed direction-of-travel logic (independently re-confirmed sound
+above): the wall's local absorption capacity is unchanged (no `.scad`
+geometry touched by ECO-022/023), while the demanded energy rose ≈28.65%
+at the point estimate (≈27–30% across the range) — **the shortfall can
+only widen, not narrow**, once §8.1 is recomputed against the corrected
+≈154.95–157.69J budget. This Reviewer does **not** redo the Method 1/
+Method 2 arithmetic here (Manufacturing Engineer's specialized domain, a
+distinct, separate follow-up dispatch, exactly as the task specifies) —
+only flags the staleness. **Severity re-examined, not merely assumed
+unchanged**: MISS-016's HIGH classification rested on "a bounded `ESTIMATE`
+with genuine two-directional uncertainty... no physical/global-structural
+proof either way" (per `docs/architecture.md` §7.1's HIGH bar — a likely
+failure mode under a realistic/abnormal condition, not CRITICAL's
+normal-operating-condition bar) — this reasoning did not depend on the
+exact 121.60J value and remains equally applicable at the corrected,
+larger figure; if anything the case for HIGH (not something lower) is
+reinforced, not weakened, by a widening shortfall. **HIGH/OPEN is
+reaffirmed, not merely left unchanged by default.** Action taken: MISS-016's
+own row annotated in place in `validation/open-issues.md` (Notes column) —
+original Method 1/Method 2 figures and text preserved unedited (matching
+this project's own DS-MCU-062/DS-MTR-018 "annotate, don't delete"
+precedent) — flagging the staleness, stating the widen-not-narrow
+direction, and explicitly deferring the recompute to Manufacturing
+Engineer's next pass. Status remains **OPEN**, severity remains **HIGH**,
+resolution authority remains the human's, entirely unchanged in kind by
+this annotation.
+
+### Verdict
+
+- **Verdict**: **CONDITIONAL** — not **FAIL** (the reviewed correction
+  chain itself — Circuit Engineer's ECO-022 voltage/RPM derivation and
+  Mechanical Lead's ECO-023 physics-table recompute — is independently
+  re-derived as sound from primary sources with zero errors found beyond
+  the one pre-disclosed, immaterial ~18–20 RPM/0.07% wrinkle; no rework is
+  needed on either). Not a clean **PASS** (MISS-016, HIGH, remains open,
+  and this cycle's own completeness sweep surfaces 3 new findings that must
+  be logged).
+- **Correction-chain soundness**: **independently confirmed sound.** Every
+  cited Evidence ID genuinely supports its claim; the voltage-drop/RPM
+  arithmetic is reproduced from scratch to within rounding noise; the
+  entire physics table (KE, rim speed, peak stress, safety factor)
+  reproduces to the exact stated precision at every cited RPM point,
+  old and new; the "minimum resistance/lowest VF" bounding choice is
+  confirmed correct (not backwards) for this specific worst-case-energy
+  question, properly distinguished from this design's own opposite-bound
+  analyses for genuinely different questions; the 11.1V-nominal-vs-12.6V-
+  full-charge LiPo distinction is independently reconfirmed a 5th and 6th
+  way.
+- **Open CRITICAL count**: 0.
+- **Open HIGH count**: 1 — MISS-016 (carried forward; reaffirmed HIGH per
+  §8 above; shortfall now understood to widen, not narrow, once
+  recomputed — not this Reviewer's arithmetic to redo).
+- **Open MEDIUM count (non-gating)**: 2 new this cycle — **MISS-020**
+  (`validation/fmea.md` FMEA-009's stale hazard-magnitude figures) and
+  **MISS-021** (`bench-imu-01-manufacturing-spec.md`'s 6 stale citations,
+  previously unflagged by either ECO-022 or ECO-023).
+- **Open LOW count (non-gating)**: 1 new this cycle — **MISS-019** (the
+  conservative-direction "~20,000-22,200 RPM"/"~3.3-3.7x margin" staleness
+  bundle across `requirements/requirements.md`, `requirements/
+  traceability-matrix.md`'s REQ-405 row, `bom/component-selection.md`, and
+  `firmware/bench-imu-01/`), plus the pre-existing MISS-018 (untouched by
+  this cycle).
+- **Impact on prior verdicts**: **none require reopening.** Cycles 3/4
+  (mechanical design, geometry/topology-driven) and both Manufacturing
+  Process Cross-Checks (scope-completeness/label-taxonomy-driven) do not
+  depend on the RPM/energy figure's own correctness at all or already
+  treated it as an inherited `ESTIMATE`. The MISS-011 Closure Attempt
+  cross-check's own wall-margin-shortfall conclusion is strengthened, not
+  undermined, by a higher real energy figure. See §7 above for the full
+  per-cycle accounting, plus one honest self-critical process note (not a
+  new finding) on a deeper class of traceability check this correction
+  chain has newly established.
+- **Next action**: Report CONDITIONAL to the Hardware Lead. No loop-back to
+  Circuit Engineer or Mechanical Lead is required for ECO-022/ECO-023
+  themselves (both independently confirmed sound). MISS-016 (HIGH) remains
+  `OPEN`, `Source: mechanical-reviewer`, now annotated with the corrected-
+  figure staleness note, awaiting the human's decision — unaffected in
+  disposition by this cycle. MISS-019 (LOW), MISS-020 (MEDIUM), and
+  MISS-021 (MEDIUM) are newly logged `OPEN`, `Source: mechanical-reviewer`,
+  in `validation/open-issues.md`, none gating, for the respective owning
+  roles (Requirements Engineer/Firmware Lead for MISS-019's citations;
+  whoever owns `validation/fmea.md` for MISS-020; Manufacturing Engineer
+  for MISS-021) to pick up at convenience.
