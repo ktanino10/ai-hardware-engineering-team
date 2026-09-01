@@ -7157,3 +7157,562 @@ this annotation.
   roles (Requirements Engineer/Firmware Lead for MISS-019's citations;
   whoever owns `validation/fmea.md` for MISS-020; Manufacturing Engineer
   for MISS-021) to pick up at convenience.
+
+## Hardware Reviewer — Cycle 6 (Rev 3-5 motor-subsystem schematic transcription, first PCB layout, and flat fab BOM — first review of this scope, 2026-09-14)
+
+### Review Cycle Metadata
+
+- **Artifacts reviewed** (3 commits, all directly preceding HEAD on
+  `ktanino10-bench-imu-01-rev3-pcb-layout`):
+  1. `f58cd2f` ("PCB Engineer: extend KiCad schematic to Rev 3-5 motor
+     subsystem") — extends `hardware/schematic/bench-imu-01/generate_schematic.py`
+     (+319/-formatting, 12370 lines of generated `.kicad_sch` diff) to add
+     the 25 new symbols (U5/U6/M1/J4/D2/D3/F1/R6–R15/C10–C17) implementing
+     the already-approved §7.5 Motor Driver + Reaction Wheel subsystem,
+     which had never before existed in the real KiCad project (only in the
+     Markdown design document). 6 files changed, 9780 insertions / 3252
+     deletions (`git show --stat f58cd2f`, independently re-run this cycle).
+  2. `a454b0c` ("PCB Engineer: Bench-IMU-01 PCB layout (Rev 3-5) --
+     CONDITIONAL, not DRC-clean") — first-ever `.kicad_pcb` for this board,
+     150×95mm 4-layer (F.Cu/In1.Cu-GND/In2.Cu/B.Cu), built programmatically
+     via `hardware/pcb/bench-imu-01/generate_pcb.py` using KiCad 10.0.1's
+     bundled `pcbnew` Python module. 5 files changed, 13999 insertions / 11
+     deletions, including the `bench-imu-01-3d.png` visual snapshot
+     (embedded below).
+  3. `2c62cf5` ("PCB Engineer: flat, order-ready BOM for Bench-IMU-01") —
+     `bom/bench-imu-01-fab-bom.csv`, 51 lines, pulling forward already-approved
+     MPNs from `bom/component-selection.md` for major actives and flagging
+     23 of 50 part lines `OPEN ITEM`.
+  These 3 commits are preceded by `88116cf` (this checklist's own extension
+  to 21 items) and `a0def1d` (introduction of the PCB Engineer discipline,
+  `docs/architecture-evolution.md` §37) — process/framework commits that
+  establish this cycle's mandate but are not themselves under review.
+  HEAD = `2c62cf5`; `git status` independently confirmed a clean working
+  tree at the start of this cycle.
+- **Reviewer**: Hardware Reviewer — see
+  `.github/agents/hardware-reviewer.agent.md`. I did not author the
+  schematic transcription, the PCB layout, or the BOM — all three were
+  produced by a PCB Engineer session this same session/day. Independent of
+  that authorship.
+- **Independence statement**: Read `hardware/schematic/bench-imu-01/README.md`'s
+  "Rev 3-5 extension" section and `hardware/pcb/README.md` in full per the
+  task's own instruction, but treated both as claims to independently
+  verify, not as findings to inherit. Concretely: (1) did not accept the
+  PCB README's own disclosed "~370" DRC violation count at face value —
+  independently re-ran `kicad-cli pcb drc` myself (3 times — see Findings,
+  DRC-count stability note); (2) did not accept either README's "0
+  unconnected items" claim at face value — independently re-derived it via
+  DRC AND went beyond DRC with a whole-board `pcbnew` pad/net audit that
+  found real missing-net defects DRC itself cannot see (see Findings,
+  ISS-031/033/034/035); (3) did not accept the schematic README's own
+  footprint-fidelity claims at face value — independently re-checked F1,
+  R9, and U5/U6's footprints against primary/distributor sources; (4) did
+  not accept the J4/D2 "fails safe even if pin-mapping is swapped" safety
+  claim at face value — independently re-traced the schematic's own wiring
+  and found the claim unsound for internal pin-mapping errors (ISS-032);
+  (5) independently exported the schematic's netlist via `kicad-cli sch
+  export netlist` and cross-checked it against `bench-imu-01-design.md`
+  §12's own net-by-net table rather than assuming the transcription
+  matched it, which is what surfaced this cycle's headline CRITICAL
+  finding (ISS-030).
+- **Scope**: The 3 artifacts listed above, in their dependency order
+  (schematic → PCB → BOM). All 21 checklist items per
+  `.github/skills/hardware-review/SKILL.md`: items 1–16 applied to the
+  schematic extension's new content specifically (Rev 2's already-Design-Complete
+  content is not re-litigated, consistent with Cycles 3–5's own scope
+  discipline); items 17–21 applied to the PCB layout. Explicitly out of
+  scope, per the task's own instruction: `hardware/mechanical/**`,
+  `firmware/**`, and the underlying design intent of §7.5 itself (already
+  human-approved before this session — only its transcription fidelity
+  into KiCad is this cycle's concern).
+- **Parallel sub-scans run**: None dispatched as separate sub-agent scans.
+  Per the agent's own instruction that the verdict is a single serial
+  integration step, this cycle ran as one integrated pass, organized in
+  the order: (1) tooling-status triage, (2) schematic netlist/net-by-net
+  cross-check, (3) whole-board PCB pad/net audit, (4) DRC re-run and
+  category attribution, (5) footprint-fidelity/copper/clearance checks,
+  (6) BOM cross-check.
+- **Rubber-duck premise review run in parallel?**: Not run this cycle. All
+  new rows below are tagged `Source: hardware-reviewer`, not `rubber-duck`
+  (`docs/architecture.md` §5.1).
+- **Tool status disclosure** (independently re-confirmed at the start of
+  this cycle, not assumed from the task framing): `run_drc_check`,
+  `extract_schematic_netlist`, `analyze_schematic_connections`,
+  `generate_pcb_thumbnail`/`generate_project_thumbnail`,
+  `identify_circuit_patterns`/`analyze_project_circuit_patterns`, and
+  `find_component_connections` all confirmed **broken** this session —
+  each call fails with `'ctx' is a required property'` before reaching any
+  project-specific logic. `get_drc_history_tool`, `validate_project`,
+  `get_project_structure`, `list_projects`, and `open_project` confirmed
+  **working**. Workaround used throughout: `kicad-cli` 10.0.1 invoked
+  directly (`pcb drc --format json`, `sch export netlist`, `sch erc
+  --format json`), plus KiCad's own bundled Python 3.9 interpreter and its
+  `pcbnew` module, invoked directly for whole-board pad/net/footprint
+  programmatic audits that go beyond what `kicad-cli` alone exposes (no
+  MCP tool of any kind provides pad-level net-assignment introspection,
+  broken or not).
+- **Process-integrity check**: Independently re-ran `git show --stat` on
+  all 3 commits under review (figures above) rather than relying on their
+  own commit-message summaries. Confirmed each commit's file scope is
+  consistent with its stated purpose and touches no file under
+  `hardware/mechanical/`, `firmware/`, or `requirements/`. `git log
+  --oneline` independently confirms the commit ordering
+  (`a0def1d`→`88116cf`→`f58cd2f`→`a454b0c`→`2c62cf5`=HEAD) with no
+  out-of-order or since-amended history.
+
+### Checklist Results
+
+Full 21-item checklist per `.github/skills/hardware-review/SKILL.md` —
+items 1–16 against the new schematic content, items 17–21 against the PCB
+layout.
+
+| # | Checklist item | Result | Notes |
+|---|---|---|---|
+| 1 | Voltage violation | Pass — independently reconfirmed | VM_MOTOR (2S–3S LiPo), U5/U6 internal rails, and all MCU-domain GPIOs unchanged in voltage from the already-reviewed Cycle 3/4 design content; the transcription introduces no new voltage-domain decision. |
+| 2 | Absolute Maximum Rating violation | Pass — independently reconfirmed | No new AMR-relevant net topology introduced by the transcription beyond what Cycles 3/4 already checked against TI's primary AMR tables. |
+| 3 | Current limit | Pass | U5's OCP/current-limit behavior unchanged from Cycle 3's finding; not re-litigated. |
+| 4 | Thermal risk | **Finding — ISS-031 (HIGH)** | U5's exposed pad (pin 25, primary thermal path per DS-MTR-039/052/055) is not defined in the custom KiCad symbol at all and has no thermal-via array in its footprint — independently confirmed via direct symbol-file/footprint inspection, not merely re-read from the schematic README's own ASSUMPTION disclosure. |
+| 5 | Missing decoupling capacitor | Pass — independently reconfirmed | C10–C17 all present and correctly valued, matching TI's own reference-circuit tables for U5 and U6; no omission found. |
+| 6 | Floating pin | **Finding — ISS-030 (CRITICAL)** | U1 pin 19 (intended: PA9→U6_EN per `generate_schematic.py` line 755 and design-doc §12) is objectively absent from the `/U6_EN` net in the exported netlist — independently confirmed via `kicad-cli sch export netlist`, ERC's own `no_connect_connected` rule, and direct inspection of KiCad's real `MCU_ST_STM32G0.kicad_sym` library file (pin 19's base electrical type is `no_connect`; PA9 exists only as an unassigned alternate function that `kiutils`, this script's dependency, cannot express). |
+| 7 | Incorrect pull-up/pull-down | Pass, with a cross-referenced caveat | R6–R8 (motor-driver FG/I2C pull-ups) and R11/R14/R15 (U6 supervisory biasing) are all independently confirmed correctly valued against TI's own reference tables. The pull-down R11 does establish U6's intended default-OFF fail-safe state correctly on its own terms — but see ISS-030: the MCU-side override this pull-down is meant to be overridden BY does not exist, so the fail-safe direction is right while the intended active-control path is entirely absent. |
+| 8 | Logic voltage mismatch | Pass | No new logic-voltage-domain interface introduced by the transcription beyond Cycle 3/4's already-reviewed 3.3V-referenced GPIOs. |
+| 9 | Interface timing | Pass | No new timing-relevant interface introduced by the transcription itself (peripheral/AF assignments unchanged from the design document). |
+| 10 | Power sequencing | **Finding — cross-refs ISS-030** | The intended MCU-gated power-sequencing control for the motor domain (U1 PA9→U6 SHDN) is the same net broken by ISS-030 — sequencing enforcement is not a new defect distinct from ISS-030, but ISS-030's consequence includes total loss of this sequencing control, not merely the SPEED/DIR floating-pin risk Cycle 3 already flagged (ISS-015, separately tracked, unaffected by this cycle). |
+| 11 | Grounding | **Findings — ISS-031 (HIGH), ISS-033 (HIGH)** | U5's exposed pad (ISS-031) and U6's PowerPAD (ISS-033) are each, independently, not actually netted to GND in the real board despite both being schematically/documentarily intended to be — see Findings for full root-cause detail. The GND net's topology as documented (§12/§8) is otherwise sound and independently reconfirmed single/unsplit. |
+| 12 | EMI/EMC risk | Pass, no new finding | No new EMI-relevant schematic-level decision introduced by the transcription beyond Cycle 3's already-reviewed treatment; PCB-side EMI/EMC considerations are folded into the layout-specific items 17–21 below. |
+| 13 | Motor noise | Pass, no new finding | Unchanged from Cycle 3's already-reviewed treatment (§7.5.7/§8); this cycle found no new motor-noise-specific defect in the transcription or layout beyond the copper-width/stub-segment finding logged under item 19 (ISS-037). |
+| 14 | Sensor noise | Pass | Unchanged from Cycle 3's already-reviewed treatment; VM_MOTOR remains independently sourced from the IMU's own 3V3 rail, confirmed still true in the real KiCad net structure (modulo ISS-030's unrelated defect). |
+| 15 | PCB layout concern (incl. mechanical/thermal co-design) | **Findings — see items 17–21 below** | This is the first cycle a real PCB layout exists to check against this item; folded into the layout-specific items 17–21 rather than duplicated here, per this checklist's own numbering note that items 17–21 extend (not replace) item 15 for the layout stage. |
+| 16 | Datasheet recommendation violation | **Finding — ISS-032 (HIGH)** | J4's disclosed pin-mapping ASSUMPTION (sleeve=GND/tip=+ for a barrel jack whose own datasheet does not resolve this) combines with D2's series-diode topology in a way that does not actually fail safe for an internal pin-mapping error, contrary to the schematic README's own safety claim — independently re-traced from the schematic's own wiring, not accepted from the README's narrative. |
+| 17 | Footprint/package fidelity | **Finding — ISS-031 (HIGH), folds in here too** | F1 (Littelfuse 30R500UF custom footprint) independently reconfirmed correct via live distributor/datasheet cross-check. R9's 1206 (not 0603) footprint choice independently reconfirmed justified by its real ¼W dissipation requirement at U5's SW-VREG operating point — not a cosmetic choice. U6's footprint independently confirmed correct. U5's ASSUMPTION-labeled footprint is the one genuine failure: independently re-derived, its reasoning is incomplete — it addresses pin pitch/count but not the exposed-pad thermal-via requirement, tracked as ISS-031. |
+| 18 | DRC closure | **Finding — ISS-036 (HIGH)** | Independently re-ran `kicad-cli pcb drc` three times this cycle: 366/367/366 violations (see Findings for the run-to-run stability note), reproducing the PCB README's own disclosed "~370" figure. 0 unconnected items independently reconfirmed all three runs — but see ISS-031/033/034/035, which are real missing-net defects invisible to this specific DRC check (explained in Findings). None of the 366 violations are individually triaged/resolved/justified beyond the 9 this review traces to ISS-032/033/034; logged as its own closure-gate finding distinct from the individually-named connectivity defects. |
+| 19 | Copper current-carrying capacity | **Finding — ISS-037 (MEDIUM)** | PCB README's own IPC-2221 citation is internally inconsistent (cites a 10°C-rise trace width that actually corresponds to ~20°C rise on the same chart, and uses DRV10983's fault/OCP current rather than its continuous rating as the sizing basis) — independently re-derived from the IPC-2221 chart directly. The board's actual 1.0mm motor-domain trace width is, despite the flawed citation, independently confirmed adequate (~28% margin on the corrected continuous-current basis). Separately, ~0.25mm narrow stub segments found near pads on 5 motor-domain nets — a routing-script artifact. |
+| 20 | Clearance/creepage (VM_MOTOR vs. 3V3 domain) | Pass — independently reconfirmed | Minimum measured spacing between the two voltage domains ≈22.08mm, independently measured directly from `.kicad_pcb` geometry — passes comfortably against any realistic creepage/clearance requirement for a ≤13V difference at this board's altitude/pollution-degree assumptions. No finding. |
+| 21 | Thermal via-stitching / copper-pour integrity | **Findings — ISS-031 (HIGH), ISS-033 (HIGH)** | U5's footprint has no thermal-via array at all (ISS-031, compounding its undefined EP pin). U6's footprint DOES have a full 17-via thermal array as intended — but a PCB-generation script defect leaves 16 of those 17 physical sub-pads un-netted to GND, so the via array exists physically but is not doing its job electrically (ISS-033). Ground-pour continuity itself, independently checked, is not split/starved elsewhere on the board. |
+
+### Findings
+
+#### ISS-030 — U1 PA9 → U6_EN net is silently absent from the schematic (CRITICAL)
+
+- **Claim under review**: `generate_schematic.py` line 755 and the design
+  document's own §12 net-by-net table both intend U1 (STM32G031K8T6) pin 19
+  to drive U6's SHDN pin (net `U6_EN`), giving MCU-gated control over the
+  entire motor/reaction-wheel subsystem's power enable.
+- **Independent verification method**: Exported the schematic's netlist
+  directly via `kicad-cli sch export netlist` rather than reading the
+  script's source and assuming it worked. Pin 19 is absent from `/U6_EN`
+  in the export — instead present on a synthetic `unconnected-(...)` net.
+  Reproduced this from a completely fresh, isolated `kiutils` virtual
+  environment by re-running the current committed `generate_schematic.py`
+  from scratch, confirming the defect is deterministic and not an artifact
+  of the committed `.kicad_sch` file specifically. Independently ran `sch
+  erc` and confirmed its own `no_connect_connected` rule flags this exact
+  pin and wire. Root-caused by direct inspection of KiCad's real,
+  installed standard library file
+  (`MCU_ST_STM32G0.kicad_sym`): U1 uses the standard `STM32G031K8Tx`
+  symbol, whose pin 19 has base electrical type `no_connect` — PA9 exists
+  on that physical pin only as an unassigned **alternate** function, and
+  `kiutils` (this script's own dependency for schematic authoring) has no
+  mechanism to express KiCad's per-instance alternate-pin-function
+  assignment. Confirmed this is a general tooling limitation, not a
+  one-off oversight, by grepping all 187 occurrences of "alternate" in the
+  committed `.kicad_sch`: every one is a library-definition-level
+  occurrence (ending well before the first placed symbol instance), i.e.
+  no per-instance alternate-pin assignment is used anywhere in this
+  schematic. Independently confirmed pin 19 = PA9 is the objectively
+  correct physical-pin identity (DS-MCU-064), ruling out a
+  wrong-pin-number defect of the ISS-026/ISS-027 kind.
+- **Functional consequence, independently derived from TPS26631's primary
+  datasheet**: SHDN has an internal pull-up (native state = ON); R11's
+  external pull-down forces the correct default-OFF fail-safe state absent
+  any MCU override (REQ-403 satisfied) — but since the intended override
+  path does not exist at all, U6 (and therefore the entire motor/reaction-wheel
+  subsystem downstream of it) is **permanently, unconditionally disabled**,
+  fully defeating REQ-007. The system fails SAFE, not fails FUNCTIONAL —
+  an important distinction, but it does not reduce this finding's severity,
+  since the design's actual required function (motor control availability)
+  is completely absent, not merely degraded.
+- **Important context independently found this cycle**: ISS-021's own
+  Cycle-4 (2026-09-08) notes in `validation/open-issues.md` already
+  independently verified that "PA9 driving U6's SHDN low removes power
+  from U5 entirely" is a sound enforcement mechanism **at the
+  design-document level**, before any KiCad transcription of it existed.
+  This proves the underlying architectural intent was always correct — this
+  is specifically a transcription-tooling defect introduced this session,
+  not a flaw in the original, already-approved design.
+- **Datasheet Source**: DS-MCU-064 (pin identity), DS-PROT-024 (TPS26631
+  SHDN native bias), plus direct citation of KiCad's own installed
+  `MCU_ST_STM32G0.kicad_sym` library file as a primary tool artifact (not a
+  manufacturer datasheet — disclosed as such, consistent with how DRC/ERC
+  tool output is cited directly elsewhere in this repository without a
+  `DS-` evidence-log entry).
+- **Affected Component**: U1 (STM32G031K8T6, pin 19/PA9), U6 (TPS26631PWPR,
+  SHDN pin 13).
+- **Severity**: **CRITICAL** — a required, safety-relevant control path
+  (REQ-403's own fail-safe mechanism depends on the MCU being ABLE to
+  override the default-OFF state, not merely on the default-OFF state
+  existing) is completely non-functional, with no workaround available in
+  the current schematic.
+- Logged as **ISS-030**.
+
+#### ISS-031 — U5's exposed pad (pin 25) is undefined in the schematic symbol and has no thermal vias in its footprint (HIGH)
+
+- **Claim under review**: The schematic README discloses U5's footprint as
+  an ASSUMPTION; DRV10983 is a 24-pin HTSSOP (PWP) package whose exposed
+  pad is its primary thermal path and, per its own datasheet, must be
+  soldered to GND.
+- **Independent verification method**: Direct inspection of
+  `generate_schematic.py`'s custom U5 symbol definition (lines 368–409)
+  confirms it defines pins 1–24 only — **no pin 25/EP is defined at all**,
+  so the exposed pad cannot appear in any exported netlist regardless of
+  intent, and cannot be flagged by any DRC "unconnected" check, since there
+  is no netlist entry for it to be unconnected FROM. Cross-checked
+  `bench-imu-01-design.md` §12's own net-by-net GND row for U5: it lists
+  "GND(pin8)/PGND(pins15,16)/SWGND(pin5)" and — notably, unlike U6's own
+  GND row in the same table, which explicitly states "U6 GND(pin9) *and*
+  PowerPAD (both, per TI's own instruction — the pad is not a substitute
+  for pin 9)" — **never mentions U5's exposed pad at all**. This means the
+  omission traces back further than this session's KiCad transcription
+  alone: the design document's own net-list table never explicitly
+  required this connection in the first place, even though §13's
+  descriptive prose ("exposed pad tied to GND") and DRV10983's own
+  datasheet (DS-MTR-039, DS-MTR-052) do require it. Independently confirmed
+  via DS-MTR-055 (Thermal Information / RθJA) that the exposed pad is
+  DRV10983's dominant thermal path, making this a real, not merely
+  cosmetic, omission. Independently confirmed the assigned footprint has
+  no thermal-via array of any kind (checked directly in the `.kicad_pcb`
+  footprint geometry).
+- **Datasheet Source**: DS-MTR-039 (package/exposed-pad description),
+  DS-MTR-052 (Pin Configuration table), DS-MTR-055 (Thermal
+  Information/RθJA).
+- **Affected Component**: U5 (DRV10983, HTSSOP-24/PWP package, pin 25/EP).
+- **Recommended Fix**: Add pin 25 (EP) to the custom KiCad symbol, wire it
+  to the GND net in the schematic (and update §12's own net-by-net table to
+  explicitly document this, matching the precedent already set by U6's own
+  row), assign/confirm a footprint with an adequate thermal-via array
+  beneath the pad, and re-verify continuity from the pad through to the
+  ground pour once corrected.
+- **Severity**: **HIGH** — DRV10983 drives a real motor at a non-trivial
+  duty cycle; a floating/unstitched thermal pad risks a real thermal
+  derating or shutdown/lock-detection fault under sustained operation, but
+  does not itself create an unsafe condition the way ISS-030's total loss
+  of enable control does.
+- Logged as **ISS-031**.
+
+#### ISS-032 — J4/D2's disclosed "fails safe on pin-mapping error" claim does not hold for internal wiring errors (HIGH)
+
+- **Claim under review**: The schematic README argues that even if J4's
+  ASSUMPTION-labeled sleeve/tip pin-mapping turns out to be wrong, D2's
+  series reverse-polarity Schottky diode protects the board regardless.
+- **Independent verification method**: Re-traced the schematic's own GND
+  net row (§12): "**(new Rev 3, §8) J4 sleeve/GND contact → D2/D3 return
+  sides → U5 GND(pin8)/PGND(pins15,16)/SWGND(pin5)**". This wiring is
+  correct and safe for the specific failure mode the README's argument
+  addresses — an *external* polarity reversal at the barrel-jack plug
+  itself (D2 blocks reverse current on the + leg). It is not sound for an
+  *internal* pin-mapping error — i.e., if J4's own sleeve/tip physical
+  identity is actually the reverse of what this design assumed, then what
+  this schematic calls "GND" is actually wired to the supply's positive
+  terminal, with **no fusing or blocking element of any kind in that
+  return leg** (D2 sits only in the leg the schematic calls the `+` path).
+  In that failure mode, +9–13V would appear directly on the board's GND
+  net with no protection element in its path at all — a materially worse
+  outcome than the "fails safe" framing suggests, and D2's real placement
+  in the circuit does nothing to prevent it.
+- **Datasheet Source**: `datasheets/samesky_pj-102ah_rev1-05.md` (J4's own
+  primary source — its mechanical pin-mapping diagram does not resolve
+  which physical contact is sleeve vs. tip for this design's specific
+  panel-mount orientation, which is why this is an ASSUMPTION in the first
+  place); DS-PROT-005 (D2/STPS3L60 ratings, confirming its unidirectional,
+  single-leg placement).
+- **Affected Component**: J4 (Same Sky PJ-102AH barrel jack), D2 (ST
+  STPS3L60).
+- **Recommended Fix**: Independently confirm J4's actual sleeve/tip
+  physical identity against a verified mechanical drawing or a physical
+  sample/continuity check before fabrication (do not carry the ASSUMPTION
+  forward as-is); alternatively, adopt a polarity-agnostic protection
+  topology (e.g. a full-bridge/ideal-diode input stage, or duplicate
+  series protection in both legs) that does not depend on correctly
+  guessing which physical contact is which.
+- **Severity**: **HIGH** — a wrong internal assumption here creates a real
+  reverse-supply-on-GND hazard with no protective element in the affected
+  path, materially undercutting the specific safety property the schematic
+  README claims to have, even though the failure requires the ASSUMPTION
+  to actually be wrong (not yet independently confirmed either way).
+- Logged as **ISS-032**.
+
+#### ISS-033, ISS-034, ISS-035 — one shared PCB-generation script defect leaves multiple footprints' duplicate physical pads un-netted (HIGH / HIGH / MEDIUM)
+
+- **How this was found**: Sampling individual `shorting_items` DRC
+  violations for root cause (rather than accepting the DRC report's own
+  category labels as self-explanatory) turned up one that did not fit any
+  previously-understood geometry-only category. This led to a systematic,
+  independent whole-board pad/net audit via direct `pcbnew` Python
+  scripting: enumerating every footprint's every physical pad and its
+  assigned net, rather than trusting DRC's own summary. This found **80
+  total no-net pads across 52 footprints** on the board.
+- **Root cause, independently traced to one shared script defect**:
+  `generate_pcb.py`'s net-assignment logic keys purely on (footprint
+  reference, pad NUMBER) and nets only the FIRST physical pad it encounters
+  for a given key — when a footprint legitimately has multiple physical
+  pads sharing one electrical pad number (a normal, common convention for
+  connector shields, thermal-via arrays under an exposed-pad part, and
+  dual-pad through-hole switch terminals), every pad after the first is
+  left with no net assigned at all.
+- **ISS-033 — U6 (TPS26631PWPR) PowerPAD, HIGH**: 17 physical thermal-via
+  sub-pads share one pad number under U6's exposed pad; only 1 of the 17 is
+  actually netted to GND. Per DS-PROT-023 (TI's own exact instruction: the
+  PowerPAD "must be soldered directly to the board GND plane... in
+  addition to the GND pin, not as a substitute"), this directly contradicts
+  `hardware/power-budget.md`'s own grounding claim for this component. The
+  via array exists physically but is not doing its intended thermal/return
+  job electrically. Produces 7 of the 366 DRC `shorting_items` violations.
+- **ISS-034 — J1 (USB-C) mechanical shield, HIGH**: 4 physical shield pads
+  share one pad number; only 1 of 4 is netted to GND. Produces 2 of the 366
+  DRC `shorting_items` violations. Does not fully float the shield (the
+  connector's own metal shell provides some physical continuity through the
+  1 netted pad), but is a genuine, unintended partial connectivity defect
+  degrading the shield's designed low-impedance ESD/EMI return path.
+- **ISS-035 — SW1 (tactile switch), MEDIUM**: each electrical terminal has
+  2 physical pads; one pad per terminal is left unconnected while the other
+  remains correctly netted, so the switch's basic function is not broken —
+  only mechanical solder-joint redundancy/retention is reduced. Produces
+  **zero** DRC violations of any category — found only via the independent
+  whole-board pad/net audit, fully invisible to DRC (no adjacent copper for
+  the no-net pad to short against). This is itself a generalizable
+  methodological point: DRC violation count/category is not a reliable
+  proxy for a board's pad-level connectivity completeness.
+- **Datasheet Source**: DS-PROT-023 (TPS26631 PowerPAD grounding
+  requirement, for ISS-033); the J1/SW1 defects (ISS-034/035) are generic
+  connector/switch mechanical conventions independently confirmed via
+  direct footprint-pad inspection, not part-specific electrical datasheet
+  facts requiring a citation.
+- **Affected Components**: U6 (TPS26631PWPR), J1 (USB-C receptacle), SW1
+  (tactile switch).
+- **Recommended Fix (all three)**: Fix `generate_pcb.py`'s net-assignment
+  logic to enumerate and net ALL physical pads sharing a given
+  (footprint, pad-number) key, not just the first; re-run PCB generation
+  and re-verify via a whole-board pad/net audit (not DRC alone, per
+  ISS-035's own DRC-invisibility) that all physical pads are genuinely
+  netted as intended.
+- **Severities**: ISS-033 and ISS-034 **HIGH** (real loss of an intended
+  thermal or shielding/EMI return path under a component that actively
+  needs it); ISS-035 **MEDIUM** (reliability/robustness degradation, not a
+  functional break, since the switch's basic electrical operation is
+  unaffected).
+- Logged as **ISS-033**, **ISS-034**, **ISS-035**.
+
+#### ISS-036 — 366 open DRC violations, none individually triaged or justified (HIGH)
+
+- **Independent DRC re-run**: `kicad-cli pcb drc` run three independent
+  times this cycle against the unmodified `.kicad_pcb` (confirmed via `git
+  status`/`git diff --stat` to be byte-identical across all three runs).
+  Results: **366 / 367 / 366** total violations — a small (~0.3%),
+  observed run-to-run non-determinism isolated entirely to the
+  `tracks_crossing`/`shorting_items`/`clearance` categories (consistent
+  with floating-point/geometry-epsilon edge cases in KiCad's polygon
+  engine near a threshold boundary); `solder_mask_bridge` (200),
+  `hole_clearance` (3), `silk_overlap` (1), and **`unconnected_items` (0)**
+  were exactly stable across all three runs. Reporting the most
+  recent/typical breakdown: **solder_mask_bridge=200, tracks_crossing=76,
+  shorting_items=72–73, clearance=13–14, hole_clearance=3, silk_overlap=1**;
+  severity 365–366 error / 1 warning. This independently reproduces —
+  rather than contradicts — the PCB README's own disclosed "~370" figure
+  and its own honest CONDITIONAL/not-DRC-clean characterization.
+- **Attribution**: Of the 72–73 `shorting_items` specifically, only 9 (2
+  from ISS-034/J1, 7 from ISS-033/U6) are traced to a known, understood
+  root cause by this review. The remaining ~357 violations (all of
+  solder_mask_bridge/tracks_crossing/clearance/hole_clearance/silk_overlap,
+  plus ~63–64 unattributed `shorting_items`) were **not individually
+  root-caused this cycle** — an explicitly disclosed scope boundary, not an
+  assumption that they are benign. `shorting_items` specifically represents
+  DRC's assessment that two DIFFERENT nets' copper is already geometrically
+  touching as drawn; if fabricated exactly as-is, each unresolved instance
+  of this category would produce an actual physical short on the real
+  board. Whether the ~63–64 unattributed instances are between
+  functionally-equivalent nets (e.g. two GND-referenced items, effectively
+  harmless) or a genuinely harmful cross-functional short was **not
+  verified either way this cycle**.
+- **0 unconnected items claim — independently reconfirmed, but with an
+  important caveat**: DRC's own `unconnected_items=0` was independently
+  reproduced in all three re-runs. However, ISS-031/033/034/035 above are
+  all real missing-net defects that this specific DRC check cannot see —
+  either because the schematic pin was never defined at all (ISS-031, so
+  there is no netlist expectation to be "unconnected" from), or because the
+  no-net pad simply does not happen to physically touch different-net
+  copper (ISS-035). **"0 unconnected items" is therefore independently
+  confirmed accurate as literally reported by DRC, but must not be read as
+  "the board has no missing connections"** — it is a narrower claim than
+  that, and the schematic/PCB READMEs' own framing does not make this
+  distinction clear.
+- **Refutes**: The PCB README's characterization that all outstanding
+  issues are pure routing-density geometry with connectivity itself
+  complete is independently found to be factually incomplete —
+  ISS-030/031/033/034/035 above are genuine connectivity defects, several
+  of which manifest partially within this same 366-violation DRC count.
+- **Datasheet Source**: N/A — evidenced directly by this cycle's own
+  independently-run `kicad-cli pcb drc` tool output.
+- **Affected Component**: Whole-board copper layout.
+- **Recommended Fix**: Individually triage every one of the 366 violations
+  to at least a category-level root cause before this layout is considered
+  for fabrication — in particular, every one of the ~72–73 `shorting_items`
+  should be resolved or individually, explicitly confirmed harmless
+  net-pair-by-net-pair; the large solder_mask_bridge/tracks_crossing counts
+  suggest a design-rule/router-tuning adjustment is likely more efficient
+  than one-by-one manual fixes given their apparent systematic/bulk
+  character.
+- **Severity reasoning**: Classified **HIGH**, not CRITICAL — this
+  reviewer's own affirmative, verified evidence of functional impact from
+  this 366-violation count is limited to the 9 `shorting_items` already
+  separately captured at HIGH under ISS-033/034. The remaining ~357 are
+  unverified either way this cycle; asserting CRITICAL on the basis of
+  unexamined suspicion alone would itself be an unsupported severity
+  inflation, not the "report the real, verified state" standard this
+  review is held to.
+- Logged as **ISS-036**.
+
+#### ISS-037 — IPC-2221 citation error in the PCB README, and narrow stub segments on 5 motor-domain nets (MEDIUM)
+
+- **IPC-2221 citation independently re-derived, found inconsistent**: The
+  PCB README's own justification for its 1.0mm motor-domain trace width
+  cites a 30–35mil figure for a 3A/10°C-rise target — independently
+  re-derived directly from the IPC-2221 external-layer trace-width chart,
+  that 30–35mil figure actually corresponds to roughly a 20°C rise at 3A on
+  the same chart, not 10°C. Separately, the "3A" figure itself is
+  DRV10983's OCP/fault threshold (DS-MTR-058), not its continuous operating
+  current (~2A per DS-MTR-054/056 and this design's own power-budget
+  nominal figure) — using the correct continuous-current basis, the
+  board's actual 1.0mm (~39mil) trace width independently computes to
+  roughly 28% current-carrying margin over a properly-derived 10°C-rise
+  IPC-2221 target, which is adequate despite the citation error. This
+  finding is about the flawed derivation/citation, not a live undersized-trace
+  defect on the corrected basis.
+- **Narrow stub segments, independently measured**: Direct `.kicad_pcb`
+  track-segment geometry inspection found ~0.25mm-wide short segments
+  immediately adjacent to component pads on 5 distinct motor-domain nets —
+  consistent with a routing-script artifact (likely a pad-escape or
+  via-transition segment inheriting a default trace width rather than the
+  intended power-net width), not an intentional design choice.
+- **Datasheet Source**: DS-MTR-054 (continuous-current basis), DS-MTR-058
+  (confirms the 3–4A figure is the OCP/fault threshold, not continuous
+  current).
+- **Affected Component**: Motor-domain copper (VM_MOTOR and related power
+  nets).
+- **Recommended Fix**: Correct the PCB README's IPC-2221 citation to
+  accurately reflect the 10°C-rise target's actual corresponding trace
+  width and explicitly state the continuous-vs-fault-current distinction
+  used for sizing; re-run PCB generation with the routing script's
+  stub-segment behavior fixed so all segments of the 5 affected nets carry
+  the intended full-width copper.
+- **Severity**: **MEDIUM** — a documentation/derivation-quality defect plus
+  minor geometry artifacts, not a live undersized-copper defect on the
+  corrected engineering basis.
+- Logged as **ISS-037**.
+
+#### Additional independently-checked items with no finding (explicitly confirmed, not merely assumed)
+
+- **BOM cross-check** (`bom/bench-imu-01-fab-bom.csv` vs.
+  `bom/component-selection.md`): Spot-checked MPN/price pairs for all major
+  actives (U1 MCU, U2 IMU, U3 LDO, U5 motor-driver IC, U6 supervisory
+  controller, M1 motor) — all match exactly. Of the 23 lines flagged `OPEN
+  ITEM`, each independently confirmed to be an honest, explicit flag (J1
+  MPN genuinely not yet selected per the design document itself; D1/SW1/J2/J3
+  generic parts genuinely not yet sourced; all 17 capacitor lines missing
+  only orderable voltage/tolerance sub-codes, not the core part identity;
+  M2.5 mounting hardware) — no silent placeholder found anywhere in the 50
+  lines.
+- **R9 footprint (1206 vs. 0603)**: Independently reconfirmed R9's real
+  power dissipation at U5's SW–VREG linear-mode operating point genuinely
+  requires ¼W handling, which 0603 packages are not rated for at typical
+  derating curves — the 1206 footprint choice is substantively, not merely
+  cosmetically, justified.
+- **F1 (Littelfuse 30R500UF) custom footprint**: Independently confirmed
+  correct via a live distributor listing and datasheet cross-check this
+  cycle (no library match exists for this part, consistent with the
+  schematic README's own disclosure of why a custom footprint was needed).
+- **Clearance/creepage (VM_MOTOR domain vs. 3.3V logic domain, checklist
+  item 20)**: Minimum spacing independently measured directly from
+  `.kicad_pcb` geometry at ≈22.08mm — passes comfortably for a ≤13V
+  difference; no finding.
+- **Schematic net-by-net fidelity vs. design-doc §12**: Exported the full
+  netlist via `kicad-cli sch export netlist` and cross-referenced it
+  against §12's own table for the new §7.5 motor-subsystem nets
+  specifically. All nets match §12's documented intent with exactly the
+  two exceptions already covered above as findings: `U6_EN` (ISS-030 — the
+  net is not merely mismatched but entirely absent, a tooling limitation)
+  and U5's exposed pad (ISS-031 — where, as detailed above, §12's own table
+  never explicitly required this connection either, a pre-existing gap in
+  the design document itself that predates this session, compounding rather
+  than excusing the schematic symbol's own omission).
+
+### Visual snapshot
+
+![Bench-IMU-01 PCB 3D render](../hardware/pcb/bench-imu-01/bench-imu-01-3d.png)
+
+*First real PCB visual-snapshot artifact produced for this project
+(`hardware/pcb/bench-imu-01/bench-imu-01-3d.png`, committed in `a454b0c`).
+Referenced here per this cycle's task instructions; no prior convention
+exists in this file for visual-artifact attachment beyond "attach it".*
+
+### Verdict
+
+- **Verdict**: **CONDITIONAL** — not a clean PASS (one open CRITICAL
+  finding makes a PASS impossible per this checklist's own verdict rule),
+  and not a FAIL in the sense of "the overall approach must be
+  abandoned" — every defect found this cycle has a narrow, well-understood
+  root cause and a describable fix path; the underlying architecture and
+  topology (already reviewed and approved across Cycles 3–5) remain sound;
+  the PCB's floor-plan and clearance choices are good; and this is
+  explicitly the project's first-ever PCB layout attempt, whose author
+  already honestly disclosed a CONDITIONAL/not-DRC-clean status before this
+  review began. This review's findings exceed that disclosure in severity
+  (the CRITICAL U6_EN defect and the 4 real missing-net PCB defects were
+  not previously known to anyone), but do not change the conclusion that
+  the path forward is continued, targeted rework, not a restart.
+- **Open CRITICAL count**: **1** (ISS-030 — U1 PA9 → U6_EN net silently
+  absent, a `kiutils`/alternate-pin-function tooling limitation).
+- **Open HIGH count**: **5** (ISS-031 — U5 exposed pad undefined/unstitched;
+  ISS-032 — J4/D2 safety-argument gap for internal pin-mapping errors;
+  ISS-033 — U6 PowerPAD un-netted; ISS-034 — J1 shield partially un-netted;
+  ISS-036 — 366 open DRC violations, none individually triaged).
+- **Open MEDIUM count**: **2** (ISS-035 — SW1 duplicate-pad partial
+  connectivity loss; ISS-037 — IPC-2221 citation error + narrow stub
+  segments).
+- **What independently checks out with no further action needed**:
+  clearance/creepage between the VM_MOTOR and 3.3V domains (item 20); the
+  BOM's cross-referencing against already-approved MPNs/pricing, with every
+  `OPEN ITEM` flag independently confirmed honest rather than a silent
+  placeholder; F1's and R9's footprint choices; U6's own footprint;
+  decoupling-capacitor completeness for both U5 and U6; the corrected
+  motor-domain trace width itself (1.0mm, once sized on DRV10983's
+  continuous rather than fault current); and the underlying `U6_EN`/SHDN
+  fail-safe *architecture* (as opposed to its broken KiCad transcription),
+  which independent Cycle-4 review already confirmed sound at the
+  design-document level.
+- **What's blocking a clean PASS, precisely**: ISS-030 (CRITICAL) alone is
+  sufficient to block. ISS-031/032/033/034/036 (HIGH) each independently
+  also block a PASS and must be dispositioned regardless of ISS-030's own
+  resolution. Per `docs/architecture.md` §7.1/§8, a CRITICAL finding cannot
+  be dispositioned as `ACCEPTED-RISK` — it must be genuinely fixed and
+  independently re-verified before this board is fabricated.
+- **Next action**: Route back through the Hardware Lead to (1) **Circuit
+  Engineer** for the schematic-stage findings — ISS-030 (add a
+  per-instance alternate-pin-function assignment for U1 pin 19, or select
+  an MCU variant/pin where PA9-equivalent function is a base rather than
+  alternate assignment, and re-verify via netlist export that `/U6_EN`
+  actually contains the MCU-side pin afterward), ISS-031 (add pin 25/EP to
+  U5's custom symbol and wire it to GND, updating §12's own net table to
+  match U6's own precedent), and ISS-032 (independently confirm J4's real
+  pin-mapping or adopt a polarity-agnostic protection topology); and (2)
+  **PCB Engineer** for the layout-stage findings — ISS-033/034/035 (fix the
+  shared duplicate-physical-pad net-assignment bug in `generate_pcb.py` and
+  re-verify via a whole-board pad/net audit, not DRC alone), ISS-036
+  (individually triage all 366 DRC violations, especially the ~63–64
+  unattributed `shorting_items`, before any fabrication consideration), and
+  ISS-037 (correct the IPC-2221 citation and fix the stub-segment routing
+  artifact). Given the CRITICAL and several HIGH findings both originate in
+  the schematic-transcription stage and propagate into the PCB layout built
+  on top of it, recommend the schematic fixes (ISS-030/031/032) land and
+  are independently re-verified *before* the PCB is re-regenerated from
+  it, to avoid the PCB Engineer re-routing against a netlist that will
+  change again shortly after.
