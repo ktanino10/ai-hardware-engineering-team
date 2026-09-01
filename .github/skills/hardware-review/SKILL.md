@@ -14,18 +14,25 @@ adversarial hardware review — the standard operating procedure behind
 ## When to use
 
 Every time the Circuit Engineer hands off a design (initial or after a
-loop-back fix). Re-review after a fix means re-running the checklist against
-the changed area and anything the change could have affected — not a
-partial spot-check.
+loop-back fix), or the PCB Engineer hands off a completed PCB layout
+(Phase 6, `docs/architecture-evolution.md` §37 — items 17–21 below apply
+at that stage). Re-review after a fix means re-running the checklist
+against the changed area and anything the change could have affected — not
+a partial spot-check.
 
 ## Independence rule
 
-You are not checking your own work. Do not accept the Circuit Engineer's
-stated rationale as fact — verify each claim directly against the
-datasheet/Evidence ID yourself. If a KiCad project exists, verify with tools
-(`extract_schematic_netlist`, `identify_circuit_patterns`,
-`analyze_project_circuit_patterns`, `run_drc_check` —
-`docs/architecture.md` §5.2) rather than only the design rationale log.
+You are not checking your own work. Do not accept the Circuit Engineer's or
+PCB Engineer's stated rationale as fact — verify each claim directly against
+the datasheet/Evidence ID yourself. If a KiCad project exists, verify with
+tools (`extract_schematic_netlist`, `identify_circuit_patterns`,
+`analyze_project_circuit_patterns`, `run_drc_check` — `docs/architecture.md`
+§5.2) rather than only the design rationale log; once a `.kicad_pcb`
+exists, independently re-run DRC yourself rather than trusting the PCB
+Engineer's own reported result. Verify each session whether the MCP tools
+or their `kicad-cli` workaround (`sch erc`, `pcb drc`) are actually
+available before relying on either — don't assume last session's finding
+still holds.
 
 ## Checklist (work through all of these; not a sample)
 
@@ -46,6 +53,26 @@ datasheet/Evidence ID yourself. If a KiCad project exists, verify with tools
 15. PCB layout concern (including mechanical/thermal co-design near
     rotating bodies — `docs/architecture.md` §12)
 16. Datasheet recommendation violation
+
+### Layout-stage items (Phase 6 — apply once a `.kicad_pcb` exists; appended,
+### not renumbered, so existing cross-references to items 1–16 stay valid)
+
+17. Footprint/package fidelity — the assigned footprint genuinely matches
+    the part's real package per a primary source or a real distributor
+    listing, not assumed from a similar part; any ASSUMPTION-labeled
+    footprint has real, independently-checked reasoning behind it.
+18. DRC closure — every violation genuinely resolved or individually,
+    explicitly justified — never accepted as "basically clean" with an
+    unaddressed remainder.
+19. Copper current-carrying capacity — trace width/copper weight sized for
+    each net's real worst-case current, not a uniform default width
+    regardless of net.
+20. Clearance/creepage between different voltage domains sharing the board
+    — real physical spacing adequate for the actual voltage difference,
+    not merely a CAD tool's default net-class clearance.
+21. Thermal via-stitching / copper-pour integrity — exposed-pad packages
+    actually have adequate via stitching to a real copper pour, and
+    ground/power pours are genuinely continuous, not merely present.
 
 Topic-based sub-scans (e.g. power/thermal vs. interface/timing vs.
 protection/EMI) may run in parallel. Consolidating them into one verdict is
@@ -89,9 +116,13 @@ Severity definitions: `docs/architecture.md` §7.1.
 
 - **PASS**: no open CRITICAL finding.
 - **FAIL / CONDITIONAL**: any open CRITICAL or HIGH — route back to Circuit
-  Engineer via the Hardware Lead.
+  Engineer (schematic-stage findings) or PCB Engineer (layout-stage
+  findings, items 17–21) via the Hardware Lead.
 - Design Complete is never declared with an unresolved CRITICAL, regardless
-  of verdict wording (`docs/architecture.md` §8).
+  of verdict wording (`docs/architecture.md` §8). The "before PCB
+  fabrication" Human-in-the-loop gate (`docs/architecture.md` §10) applies
+  the same rule to layout-stage findings — no CONDITIONAL/open CRITICAL or
+  HIGH is waved through just because the board "looks ready."
 
 ## Common failure modes to avoid
 
@@ -102,3 +133,7 @@ Severity definitions: `docs/architecture.md` §7.1.
 - Treating "the reference design does this" as automatically correct — the
   Circuit Engineer's implementation might deviate from the reference design
   in ways that matter.
+- At the layout stage: trusting the PCB Engineer's own DRC/footprint claims
+  without independently re-running/re-checking them; accepting a
+  CAD-tool-default clearance or trace width as automatically adequate
+  without checking it against the net's real voltage/current.
