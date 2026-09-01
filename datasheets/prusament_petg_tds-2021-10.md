@@ -22,7 +22,7 @@
 - **Retrieved Date**: 2026-09-13
 - **Local cache note**: not committed; URL verified live this session, PDF
   content not locally cached/parsed.
-- **Used for Evidence IDs**: DS-MTL-001
+- **Used for Evidence IDs**: DS-MTL-001, DS-MTL-004
 
 ## Key figures used (provenance as disclosed above — treat as ESTIMATE-tier, not directly-verified CONFIRMED)
 
@@ -33,6 +33,16 @@
   print orientations for the same material.
 - Tensile strength at yield (printed-part test, ISO 527-type method):
   **≈46–50 MPa.**
+- **(DS-MTL-004, added 2026-09-01, Rev 4 free-rotation-mechanism task)**
+  Filament density / specific gravity: **1.27 g/cm³**. Same disclosed
+  provenance caveat as the figures above — obtained via an AI-assisted web
+  search citing this same TDS PDF, not by this session directly parsing the
+  rendered table (this PDF's compressed content stream remains unparseable
+  by this session's fetch tool, per the note above). Used in
+  `requirements/requirements.md` REQ-310 and `bom/component-selection.md`'s
+  Free-Rotation Support Mechanism section to estimate the Rev 3 enclosure's
+  own never-previously-computed plastic mass (bounding-shell-volume method,
+  ESTIMATE, not a precise figure).
 
 ## Why this reference matters here
 

@@ -6637,6 +6637,599 @@ Two independent methods, not a visual diff read alone:
   mechanical-reviewer`, for the Mechanical Lead to pick up at convenience
   (non-blocking).
 
+## Mechanical Reviewer — Cycle 5 (Independent Review of Rev 4 Free-Rotation Support Mechanism, 2026-09-14)
+
+### Review Cycle Metadata
+
+- **Design revision reviewed**: `hardware/mechanical/bench-imu-01-enclosure.scad`
+  (1597 lines, up from the Rev 3 baseline's 1208 — the Mechanical Lead's own
+  §18.11 figure, independently confirmed via `wc -l` this cycle) together
+  with its companion `hardware/mechanical/bench-imu-01-dimensional-spec.md`'s
+  new "§18. Rev 4 — Free-rotation support mechanism" section (§18.0–§18.11,
+  2676 lines total) and `hardware/mechanical-interface.md`'s new "Part C —
+  Free-rotation support mechanism" section (C1–C8). This Rev 4 population
+  adds a purchased BC Precision 4LS-3 lazy-susan turntable ball bearing
+  (already human-approved as a component choice, out of this cycle's scope
+  to re-litigate) to the already-Design-Complete Rev 3 enclosure, additively.
+  Author: Mechanical Lead (AI agent). **Status: uncommitted working-tree
+  edits** on top of commit `8e21448` ("Hardware Lead: record Kyosuke's Rev 4
+  decisions...") — independently confirmed via `git status`/`git log` this
+  cycle, not assumed; `git diff --stat HEAD` shows exactly 4 files touched
+  (`datasheets/evidence-log.md`, `hardware/mechanical-interface.md`,
+  `bench-imu-01-dimensional-spec.md`, `bench-imu-01-enclosure.scad`) plus one
+  new untracked evidence file
+  (`datasheets/lily-bearing_lazy-susan-hardware-kit_web-article.md`), for a
+  combined 1457 insertions / 3 deletions. Status at handoff: dimensional-spec
+  §18.7 self-check claims "8 of 10 items ✅ without caveat, 1 N/A, 1 disclosed
+  caveat, 2 items carrying a disclosed-but-non-blocking caveat" (explicitly
+  offered "for the Reviewer to challenge, not a pre-cleared result," per its
+  own text) and §18.10/§18.11 disclose several open items for this review's
+  attention: a mass/CG discrepancy, an internal-overhang manufacturability
+  finding, and an unperformed fastener-load calculation.
+- **Reviewer**: Mechanical Reviewer — see
+  `.github/agents/mechanical-reviewer.agent.md`. Independent of the
+  Mechanical Lead role/session that authored this design. This is the first
+  Mechanical Reviewer cycle to examine the **Rev 4** scope; Rev 3 itself was
+  reviewed and closed out across Cycles 3/4 above (MISS-008 through MISS-011
+  resolved or already tracked; none reopened by this cycle — see Finding 6
+  below on §18.11's own carry-forward claim). Because Rev 4 is disclosed as
+  a **strictly additive** population on top of an already-Design-Complete
+  Rev 3 (REQ-311), this cycle's primary independent-verification burden is
+  (a) confirming that additive-only claim directly against the real diff
+  rather than trusting it, and (b) giving the genuinely new geometry/analysis
+  the same full-scope adversarial treatment Cycles 3/4 gave Rev 3 — not a
+  narrower delta-only pass, because an entire new subsystem (free rotation)
+  is being integrated, with its own new safety-relevant requirements
+  (REQ-407/408) attached.
+- **Independence statement**: No claim in `bench-imu-01-dimensional-spec.md`'s
+  §18 was accepted on the strength of its own stated confidence, its self-
+  check marks, or its own disclosed caveats being labeled "disclosed" (a
+  disclosed caveat is not the same as a correctly-resolved one, and was
+  re-verified as such in every case, not waved through). Independently
+  recomputed from the raw `.scad` source and the dimensional-spec's own
+  named variables, not re-read from prose and nodded along: the flywheel-bay
+  wall-tube volume plausibility check underlying the mass discrepancy; the
+  full 7-row radius-sweep table (`R_stand`/`m_stand`/`W_total`/`d_offset`/
+  static margin/`h_cg`/`F_tip`) row-by-row, not just the chosen R=60.0mm row;
+  the rotation-angle-invariance physics claim; the internal-overhang
+  mechanism via direct Z-range tracing of `bmount_flange()` vs.
+  `motor_platform()`'s pre-existing floor disc; every one of the ~30 new
+  named variables in the `.scad` file's Rev 4 block against
+  `hardware/mechanical-interface.md` Part C's own table, one-to-one; and the
+  REQ-311 additive-only claim, directly against `git diff HEAD` rather than
+  against the Mechanical Lead's own summary of that diff. One class of
+  finding in this cycle (Findings 1 and 2, both HIGH) was **not** flagged
+  anywhere in the Mechanical Lead's own self-check, UNKNOWNs table, or
+  handoff notes — this cycle independently cross-referenced
+  `requirements/requirements.md`'s REQ-407/REQ-408 text (both Must-priority,
+  safety-critical, explicitly scoped to gate on "a fresh safety review" of
+  "the new physical configuration a free-rotation mechanism introduces,"
+  §9g) against the full Rev 4 deliverable and confirmed, via a full-text
+  search for "pinch" (zero hits across all three modified files) plus a
+  complete manual read of every §18 subsection, C1–C8, and the self-check/
+  UNKNOWNs tables, that two of REQ-407's four named hazard shapes are not
+  assessed anywhere in the package — this is disclosed here as a genuinely
+  independent finding, not a re-statement of a Mechanical-Lead-disclosed
+  caveat.
+- **Scope**: Full Rev 4 addition —
+  `hardware/mechanical/bench-imu-01-enclosure.scad`'s new "2B."/"3B." Rev 4
+  sections (`bmount_flange()`, `stand_plate()`, `reference_bearing()`
+  modules, the Rev 4 variable block, and the `show_mode` branch updates) and
+  `bench-imu-01-dimensional-spec.md`'s new §18 (§18.0–§18.11) in full,
+  cross-checked against `hardware/mechanical-interface.md`'s new Part C
+  (C1–C8) in full. `requirements/requirements.md` §1b/§9f/§9g and REQ-011,
+  REQ-012, REQ-013, REQ-113, REQ-205, REQ-310, REQ-311, REQ-407, REQ-408 read
+  in full (exact verbatim text, not recalled from summary) for acceptance-
+  criteria context, together with `bom/component-selection.md`'s "Free-
+  Rotation Support Mechanism" section (to confirm no legitimate hazard-
+  assessment deferral exists past this exact phase). Pre-existing Rev 3
+  geometry was **not** re-reviewed in full detail (already closed out across
+  Cycles 3/4) but **was** diffed byte-for-byte against the working tree to
+  confirm REQ-311's "additive only" claim (Finding 6 addresses the one
+  disclosed exception found). Per this cycle's own explicit task scope, the
+  BC Precision 4LS-3 component selection itself, `requirements/
+  requirements.md`, `requirements/traceability-matrix.md`, and
+  `validation/change-log.md` were read for context only and are **not**
+  edited or re-litigated by this cycle.
+- **Tooling disclosure**: `openscad` 2026.08.30
+  (`/opt/homebrew/bin/openscad`) and a Python geometry stack (`trimesh`
+  4.11.5, `numpy-stl`) were used to independently render and measure the
+  design, not merely to re-run the Mechanical Lead's own cited commands.
+  Rendered both `show_mode`s directly from the live file (`"assembled"` as
+  committed, `"print_layout"` via `-D 'show_mode="print_layout"'`, confirmed
+  to work in this OpenSCAD version) — both reproduced the dimensional-spec's
+  own cited topology exactly (assembled: Genus 8, 5770 vertices/11568 facets;
+  print_layout: Genus 19, 5889 vertices/11850 facets). Additionally built
+  isolated wrapper `.scad` files (using `include <...>` for full variable
+  access, not `use <...>`) to render `bmount_flange()`, `stand_plate()`, and
+  `base()` individually, their union, and their intersection — every
+  topology claim (manifold/NoError/Genus) matched exactly. Independently
+  re-measured all 5 volumes §18.5 cites via `trimesh` on these same renders:
+  topology/CSG-correctness (the inclusion-exclusion identity) reproduces to
+  within 0.01mm³, but the 5 absolute volume figures themselves are all
+  0.2–0.45% higher than the document's own cited numbers under the identical
+  disclosed tool/version/command pattern (Finding 5) — one specific
+  alternative-explanation hypothesis (CGAL vs. Manifold backend) was tested
+  directly and ruled out (CGAL produced an invalid/non-manifold export for
+  this technique, an unrelated failure mode). All arithmetic in this report
+  (mass/CG/static-margin/F_tip/radius-sweep/volume figures) was independently
+  recomputed via short Python scripts against the `.scad` file's own named
+  variables and the dimensional-spec's own stated intermediate values, not
+  taken from the document's final printed answer alone.
+- **Parallel sub-scans run**: None dispatched as separate sub-agent scans
+  this cycle — the full 10-item checklist, the task's 6 specified focus
+  areas, and the independently-initiated REQ-407/408 hazard cross-check were
+  worked as a single integrated pass by this Mechanical Reviewer.
+- **rubber-duck premise review run in parallel?**: Not indicated as run for
+  this cycle on the Mechanical discipline. This report does not rely on or
+  duplicate any such review.
+- **KiCad / CAD tool cross-checks used**: None — no KiCad project exists for
+  Bench-IMU-01 (unchanged since Cycle 1's own note); this cycle's CAD
+  cross-check was performed with the `openscad`/`trimesh` toolchain described
+  above, directly against the actual `.scad` source.
+
+### Checklist Results
+
+Full checklist per `.github/skills/mechanical-review/SKILL.md`, all 10 items
+independently worked (not a partial spot-check), plus the task's 6 specified
+focus areas and the independently-initiated REQ-407/408 hazard cross-check
+folded into the relevant rows below:
+
+| # | Checklist item | Result | Notes |
+|---|---|---|---|
+| 1 | PCB mounting (standoff positions/diameters, boss integrity) | **PASS (N/A)** | Independently confirmed via the full diff: no Rev 4 hunk touches any PCB-mounting geometry (`§5.1`/`§4.1`'s standoffs); Rev 4 additions are confined to the flywheel-bay underside and a new below-Z=0 territory. No finding. |
+| 2 | Connector accessibility (cutout position/size/orientation) | **PASS (cutouts unchanged)**, but see Finding 2 | J1/J4 cutout position/size/orientation independently confirmed byte-for-byte unchanged via diff — this narrow checklist question (is the cutout itself blocked, resized, or reoriented) is a clean PASS. However, J1/J4 are mounted on `base()`'s own side walls, which now **rotate** as part of the bearing's top plate — an unaddressed cable-entanglement/strain consequence of that new fact is Finding 2 (HIGH), a distinct concern from cutout geometry itself. |
+| 3 | Component height clearance (top + bottom vs. interface file) | **PASS** | Independently traced the full Z-stack (`brg_top_z`=-6.0mm, `brg_bottom_z`=-13.9mm, `stand_plate_top_z`=-13.9mm, `stand_plate_bottom_z`=-19.9mm, `.scad` lines 861-869): all new geometry extends exclusively in -Z, entirely below the pre-existing Z=0 floor and outside the internal PCB/lid/flywheel-bay component envelope Parts A/B's max-component-height fields govern. No interaction, no finding. |
+| 4 | Internal clearance/interference (parts vs. walls, parts vs. parts, parts vs. bosses) | **PASS**, with the one disclosed overhang confirmed real (tracked under item 9, not here) | Independently confirmed via direct Z-range tracing: `bmount_flange()`'s bore (r<28.0mm) sits directly beneath `motor_platform()`'s pre-existing solid floor disc (r=43.5mm, unbored) — the fuse-overlap `intersection()` is genuinely non-empty (real fuse, not a floating touch), matching §18.5's own claim. New bolt circle (`bmount_bolt_circle_r`=40.0mm) independently confirmed clear of the flange bore (12.0mm margin) and outer edge (12.5mm margin at `bmount_flange_or`=52.5mm), and clear of `stand_plate`'s own bore (12.0mm margin) and outer edge (20.0mm margin at `stand_plate_or`=60.0mm) — all generous, no interference defect found. |
+| 5 | Fastener placement (wall thickness around bosses; no conflicts) | **PASS** geometrically, with a load-verification gap carried under item 9/Finding 3 | 4 pilot holes (`bmount_pilot_dia`=2.8mm) at `bmount_bolt_circle_r`=40.0mm independently re-checked: generous margin to bore/edge on both new parts (see item 4), and (assuming a 4-hole/90°-spacing layout) ≈56.6mm adjacent-hole chord spacing vastly exceeds the hole diameter — no fastener-to-fastener or fastener-to-component conflict found. The disclosed absence of a pull-out/shear load calculation for this joint is a real, separate rigor gap — Finding 3 (MEDIUM), not a placement defect. |
+| 6 | Wall thickness (structural *and* the Lead's own stated 3D-printability rule) | **PASS** | `bmount_flange_t`/`stand_plate_t` (6.0mm each) independently confirmed to exceed `min_wall_t` (2.0mm) with generous margin. The one localized thin spot (a 1.0mm blind-pilot-hole floor at `bmount_pilot_depth`=5.0mm within the 6.0mm-thick flange) is a direct, faithful reuse of Rev 3's own already-validated `standoff_h`/`standoff_pilot_depth` (6.0/5.0mm) pattern — independently confirmed as such, not a newly-introduced risk, and out of scope to re-litigate an already-validated Rev 3 precedent being faithfully reused. |
+| 7 | Assembly order (physically achievable sequence, nothing trapped) | **PASS** | Independently re-walked §18.9's 4-step addendum (steps 7–10): step 7 (bearing-bottom-to-stand-plate) and step 8 (bearing-top-to-flange, base sub-assembly inverted) are each performed on a separate sub-assembly before step 9 joins them via the bearing's own captive race — confirmed no step reaches past an already-installed part from an inaccessible direction, no part trapped/blind at any point. |
+| 8 | Basic print-fit tolerance (stated clearance allowance applied consistently everywhere) | **PASS** | Independently confirmed Rev 4 introduces no new sliding/press-fit mating diameter requiring `fit_clearance` (0.2mm/side) in the same sense as the existing base-flange/cap-skirt interface — the new bearing joints are flat, bolted-face joints only. The self-check's "not applicable" framing for this item is independently verified true, not merely repeated. |
+| 9 | Basic manufacturability/3D-printability (overhangs/bridges within the Lead's own rule; min wall thickness everywhere) | **Finding confirmed real, but adequately disclosed and reasonably mitigated — no new backlog entry** | Independently confirmed via direct Z-range/radius tracing that the fused base+flange print genuinely creates a ≈56mm-diameter unsupported internal span (the pre-existing floor disc sits solid and un-bored directly above the new flange's hollow bore), exceeding the design's own 10mm max-bridge-span rule by a wide margin — this is real, not overstated. Independently evaluated the 3 rejected alternatives (tapering the bore; printing upside-down; a separate bonded piece) and confirmed each is a genuinely worse trade for the stated reasons. The accept-with-disclosed-slicer-support-material caveat is judged a reasonable, honestly-characterized resolution (mirrors this cycle's own Cycle 3 precedent for a similarly-disclosed borderline item that was independently confirmed correct and not re-flagged) — not elevated to a new MISS-XXX, since it is neither a silent gap nor an inadequately-resolved one. `stand_plate()`'s own "prints flat, no support" claim independently confirmed correct (simple through-hole-only annulus, uniform cross-section). |
+| 10 | Interface-value traceability (every dimension traces to `hardware/mechanical-interface.md` or is explicitly ASSUMPTION/ESTIMATE/DERIVED/DECIDED, never silently blended with CONFIRMED) | **PASS**, with 2 narrower documentation-precision findings carried elsewhere | Cross-checked every one of the ~30 new `.scad` Rev 4 variables (bearing CONFIRMED/ESTIMATE facts, flange/stand-plate ASSUMPTION/DERIVED/DECIDED dimensions, the full Z-stack) against `hardware/mechanical-interface.md` Part C's own table, one-to-one — exact match everywhere, no silent CONFIRMED/ASSUMPTION blending found. Two narrower, separately-tracked precision gaps exist within an otherwise-sound traceability discipline: REQ-310's own compliance comparison uses the less-relevant total-system mass rather than the more-relevant, already-separately-computed rotating-assembly mass (Finding 4, LOW), and §18.5's cited absolute volume figures are not independently bit-reproducible though their topology claims are (Finding 5, LOW). |
+
+### Findings
+
+#### Finding 1 — REQ-407(b) pinch-point/rotating-overhang hazard is not assessed anywhere in the Rev 4 package, despite a concrete, independently-derived physical mechanism
+
+- **Issue**: REQ-407(b) requires that "pinch points at the pivot/mechanism
+  interface" be "assessed and mitigated before physical build" (Must
+  priority, safety-critical). No pinch-point assessment of any kind appears
+  anywhere in the Rev 4 deliverable — confirmed via a full-text search for
+  "pinch" across all three modified files (zero hits) plus a complete manual
+  read of `hardware/mechanical-interface.md` Part C, every subsection of
+  `bench-imu-01-dimensional-spec.md` §18 (§18.0–§18.11), the 10-item
+  self-check (§18.7), and the UNKNOWNs table (§18.10).
+- **Rationale**: This is not merely an absent checkbox — an actual, concrete
+  physical hazard mechanism exists and was independently derived this cycle
+  directly from the real geometry, not asserted abstractly. The rotating
+  assembly's own farthest perimeter point is `assembled_envelope_y_north`
+  (168.4mm, `.scad` lines 639–640) minus the bearing axis's own Y-coordinate
+  `fw_cy` (52.5mm, line 597) = **≈115.9mm** from the rotation axis (the
+  PCB-lid-tab corner, in the +Y direction), while the stationary
+  `stand_plate()`'s own outer radius is only `stand_plate_or` = **60.0mm**
+  (line 830). This means the rotating base overhangs the stand plate's own
+  footprint by up to **≈55.9mm**, sweeping through open space directly above
+  the desk as the platform rotates, with only `-brg_top_z` = 6.0mm to
+  `-stand_plate_bottom_z` = 19.9mm of vertical clearance above the desk/stand
+  (lines 861–869) — i.e., a finger, hand, loose cable, or other object
+  resting on the desk anywhere in the 60.0–115.9mm annular band from the
+  axis sits directly in the swept path of the rotating overhang. REQ-012's
+  own physics finding discloses commanded platform rates up to ≈1170°/s in
+  an aggressive-command scenario, meaning the linear speed of this
+  overhanging edge at its outer radius can reach multiple m/s. REQ-407 and
+  REQ-408 are both Must-priority, safety-critical requirements explicitly
+  tied to "the same gate class as REQ-403" (`requirements/requirements.md`
+  line 200), and REQ-408 explicitly requires "a fresh safety review... before
+  [this configuration's] own Design-Complete-equivalent sign-off" (line
+  201) — i.e., before this exact review cycle can pass this design forward.
+  `bom/component-selection.md`'s own Free-Rotation Support Mechanism section
+  explicitly defers this exact hazard class to "the future Mechanical Design
+  phase" (i.e., to this Rev 4 package specifically) — there is no legitimate
+  later deferral point this gap could be attributed to.
+- **Datasheet Source**: `requirements/requirements.md` REQ-407 (line 200),
+  REQ-408 (line 201), REQ-012 (line 142); `bom/component-selection.md`,
+  Free-Rotation Support Mechanism section (explicit hazard-assessment
+  deferral to this phase); `hardware/mechanical/bench-imu-01-enclosure.scad`
+  lines 596–597 (`fw_cx`/`fw_cy`), 636–641 (`assembled_envelope_y_north`/
+  `_south`/`_y`), 830 (`stand_plate_or`), 861–869 (Rev 4 Z-stack) — all
+  independently traced this cycle, not taken from the Mechanical Lead's own
+  summary.
+- **Failure Mechanism**: A finger, hand, loose cable, or other object
+  resting or reaching on the desk anywhere in the annular band between the
+  stand plate's edge (60.0mm from the axis) and the rotating assembly's true
+  swept radius (≈115.9mm from the axis) is struck or pinched between the
+  rotating overhang and the desk surface as it sweeps past, at a linear
+  speed that scales with the commanded platform rate (up to multiple m/s at
+  the upper end of REQ-012's own disclosed rate range) — with no guard,
+  warning, or mitigation of any kind currently designed or acknowledged in
+  the Rev 4 package.
+- **Affected Component**: The Rev 4 free-rotation assembly as a whole
+  (rotating `base()`+`bmount_flange()` perimeter vs. stationary
+  `stand_plate()`) — a system-level, whole-assembly-geometry hazard, not a
+  defect in any single new part.
+- **Recommended Fix**: Perform the REQ-407(b)-mandated pinch-point
+  assessment explicitly, as its own §18 subsection (not folded into the
+  tip-over analysis, which addresses a different hazard). At minimum,
+  characterize the swept-overhang envelope (as derived above) and select one
+  or more mitigations: (a) a physical guard/skirt extending down from the
+  rotating assembly's own perimeter to reduce accessible finger clearance in
+  the swept zone, (b) enlarging the stand plate's own footprint to more
+  closely match the rotating assembly's true swept radius (this would also
+  improve tip-over static margin — §18.4/C4 rejected over-sizing for
+  tip-over reasons alone, but this is a distinct, additional driver that
+  should be weighed together with the pinch-point finding), or (c) an
+  explicit human-attended-operation warning specific to the swept-overhang
+  zone (REQ-205 already requires human-attended operation generally; this
+  would extend it with a specific, named hazard). Update the self-check and
+  UNKNOWNs table to reflect whichever disposition is chosen.
+- **Severity**: **HIGH**. Per `docs/architecture.md` §7.1 and this project's
+  own MISS-016 precedent (a quantified-but-unconfirmed safety shortfall
+  under a fault-condition-adjacent scenario was classified HIGH, not
+  CRITICAL, because CRITICAL requires a *confirmed* failure/hazard under
+  normal operating conditions "as designed," not an absent analysis): the
+  underlying physical precondition for this hazard (an unguarded overhang
+  sweeping well beyond the stationary stand's footprint) is real and
+  independently confirmed, but whether it actually causes injury under
+  intended/typical operating speeds (REQ-013's own "small, deliberately
+  increasing speed steps" bring-up procedure suggests typical operation may
+  often be well below the ≈1170°/s ceiling) has never been assessed one way
+  or the other — this is a required, Must/safety-critical assessment that is
+  entirely absent, not a confirmed-bad outcome, which places it in HIGH
+  ("likely malfunction/reliability failure under realistic conditions,"
+  a realistic corner being a hand resting near the bench rig during
+  human-attended operation) rather than CRITICAL territory. This is
+  acknowledged as a close call given that "rotating the device" and "a
+  user's hand near the device" are themselves normal, expected, even
+  intended usage conditions for this bench-mounted, human-attended
+  demonstration rig (REQ-201/REQ-205) rather than a rare fault scenario —
+  the Hardware Lead/human are encouraged to weigh this transparency when
+  deciding disposition, rather than this Reviewer silently rounding to a
+  tier that forecloses that discussion.
+
+#### Finding 2 — REQ-407(c)/REQ-113 cable-entanglement/strain hazard is not assessed anywhere in the Rev 4 package for the now-rotating J1/J4 connectors
+
+- **Issue**: REQ-407(c) requires that "cable/tether entanglement or strain
+  at the rotating joint (ties to REQ-113)" be "assessed and mitigated before
+  physical build" (Must priority, safety-critical). REQ-113 itself requires
+  a tether "sized for several full turns before requiring manual
+  re-centering." The Rev 4 package's own §18.6/C6 confirms only that a new
+  coaxial bore is geometrically unobstructed as a *supplementary* path — it
+  does not assess entanglement, strain, service-loop length, or
+  re-centering behavior for J1 (USB-C)/J4 (barrel jack), which the
+  write-up's own reasoning identifies as the actual connectors in use ("a
+  simple hanging service loop from J1/J4... is the simplest reading of the
+  requirement").
+- **Rationale**: J1/J4 are mounted on `base()`'s own PCB-bay side walls.
+  Tracing the physical rotation topology directly: the bearing's **top**
+  plate mates with `bmount_flange()`, which is bolted to the underside of
+  `base()` — so the entire base+PCB+motor+flywheel+flange assembly, J1/J4
+  included, **rotates**. The bearing's **bottom** plate mates with the new
+  `stand_plate()`, which is stationary. The self-check's own claim (§18.7
+  item 2, line 2514–2518) that "J1/J4 remain externally accessible... exactly
+  as in Rev 3, unchanged" is true but conflates two different things: port
+  **accessibility** (unchanged, true) with the actual substance of
+  REQ-113/REQ-407(c) — whether a tether attached to a now-**rotating**
+  connector, subjected to REQ-012's own explicitly-targeted "at least ±180°,
+  ideally continuous/unlimited rotation," can accommodate "several full
+  turns" of winding without entanglement, strain, or connector damage. No
+  winding/wrap/strain-relief/service-loop-length analysis of any kind
+  appears anywhere in the Rev 4 package for this scenario.
+- **Datasheet Source**: `requirements/requirements.md` REQ-113 (line 162),
+  REQ-407(c) (line 200), REQ-408 (line 201), REQ-012 (line 142, "at least
+  ±180°, ideally continuous/unlimited rotation"); `hardware/
+  mechanical-interface.md` C6; `bench-imu-01-dimensional-spec.md` §18.6 and
+  §18.7 self-check item 2 (line 2514–2518, independently re-quoted, not
+  paraphrased).
+- **Failure Mechanism**: A tether/cable connected to J1 or J4 (mounted on
+  the rotating base) and to any external, non-rotating device (a USB host, a
+  bench power supply) winds around the rotation axis as the platform
+  rotates repeatedly in one direction — a mode this project's own REQ-012
+  explicitly targets ("continuous/unlimited rotation" as the ideal). Without
+  a characterized service-loop length, strain-relief, or re-centering
+  procedure, the cable will eventually reach its wound limit and either (a)
+  yank the connector, risking a J1/J4 connector-shell or solder-joint
+  failure, (b) bind or stall the rotation mechanism, defeating REQ-011's own
+  purpose, or (c) entangle a user's hand or nearby objects during the
+  winding process.
+- **Affected Component**: J1 (USB-C receptacle), J4 (barrel jack) — both on
+  `base()`'s PCB-bay side walls, part of the now-rotating assembly; the
+  external tether/cable itself; indirectly, REQ-011's own free-rotation
+  function via stall/bind risk.
+- **Recommended Fix**: Perform the REQ-407(c)-mandated assessment explicitly:
+  define a maximum expected number of turns before requiring manual
+  re-centering (mirroring REQ-113's own "several full turns" language),
+  estimate the resulting cable wrap diameter/length needed to avoid strain
+  at that turn count, and document a re-centering procedure or indicator
+  (a visual mark, a software turn-counter, or a mechanical hard stop),
+  consistent with REQ-012/REQ-013's own already-planned small-speed-step
+  bring-up procedure. Consider whether the already-provisioned coaxial bore
+  (C6) — which does not wind the same way an external, side-mounted J1/J4
+  cable does — is actually the better long-term routing path for this exact
+  reason, rather than treating it as merely a future-revision nice-to-have.
+- **Severity**: **HIGH** — same reasoning as Finding 1: REQ-407/REQ-408 are
+  Must-priority, safety-critical requirements in the same HITL gate class as
+  REQ-403; the assessment is entirely absent (not a confirmed-bad outcome
+  under normal conditions, which would support CRITICAL per the MISS-016
+  precedent's own explicit reasoning), but the underlying exposure
+  (repeated, potentially continuous/unlimited rotation, per this project's
+  own explicitly-targeted REQ-012 goal) is itself a normal/intended
+  operating mode, not a rare corner case — making this a serious,
+  non-deferrable gap rather than a documentation nit.
+
+#### Finding 3 — No fastener-load calculation was performed for the bearing-to-flange/bearing-to-stand-plate joint, despite a self-disclosed different loading character than the precedent it mirrors
+
+- **Issue**: §18.8/C5 discloses that self-tapping screws (`brg_screw_major_
+  dia`=3.5mm reference) into PETG were chosen for both the bearing-to-flange
+  and bearing-to-stand-plate joints, mirroring the existing PCB-lid-tab
+  fastener precedent, but explicitly states no fastener-load (torque/shear/
+  pull-out) calculation was performed — and explicitly flags that this
+  joint's loading character (the full rotating-assembly weight, in
+  shear/tension, across the rotation duty cycle) differs from the lid-tab
+  precedent it otherwise mirrors (which carries only the lid's own small,
+  static mass).
+- **Rationale**: This project's own established precedent (MISS-011, the
+  containment-cap joint) treats "disclosed, no fastener-load-calculation
+  performed" as a real, separately-tracked MEDIUM backlog item — not
+  something to leave as prose-only disclosure inside the design document,
+  even when the design's own reasoning for accepting the gap is plausible.
+  This joint additionally differs from *both* prior fastener-class
+  precedents in this file (PCB-lid tab: low, one-off load; containment cap/
+  MISS-011: safety-relevant but static) in that it is the sole joint holding
+  the *entire* rotating assembly onto the bearing, loaded continuously,
+  every rotation, for the product's service life. A rough independent
+  order-of-magnitude sanity check performed this cycle (using generic FDM
+  PETG self-tap thread-engagement assumptions — not a datasheet citation)
+  suggests the actual loads involved (≈5.9N static weight-shear split across
+  4 screws; ≈9–16N worst-case tip-over impulse per §18.3's own radius-sweep
+  table) are likely well within a #6-class self-tap screw's typical
+  pull-out capacity at the specified ≈5.0mm (`bmount_pilot_depth`) engagement
+  depth — i.e., this gap is plausibly non-blocking in eventual outcome,
+  similar in character to how MISS-011 was ultimately resolved — but this is
+  this Reviewer's own rough estimate using generic, non-cited figures, and
+  does not substitute for the Mechanical Lead actually performing and
+  citing a real calculation.
+- **Datasheet Source**: `bench-imu-01-dimensional-spec.md` §18.8, §18.10
+  UNKNOWNs table; `hardware/mechanical-interface.md` C5; `.scad` lines 741
+  (`brg_screw_major_dia`), 796/801 (`bmount_pilot_dia`/`_depth`); precedent
+  `validation/open-issues.md` MISS-011.
+- **Failure Mechanism**: Without a validated calculation, there is no
+  confirmed margin against pull-out/shear/fatigue failure of the 4 self-tap
+  screws under repeated rotational shear loading plus occasional
+  tip-over-impulse loading over the product's service life; if the joint's
+  true margin is smaller than this Reviewer's own rough estimate assumes,
+  repeated use could progressively strip the PETG threads, eventually
+  allowing the rotating assembly to separate from the bearing.
+- **Affected Component**: Bearing-to-flange joint (4× self-tap screws at
+  `bmount_bolt_circle_r`=40.0mm); bearing-to-stand-plate joint (mirror-case,
+  `stand_bolt_circle_r`).
+- **Recommended Fix**: Perform an actual pull-out/shear calculation
+  (mirroring how MISS-011 should ultimately be resolved) using a citable
+  PETG/FDM thread-engagement shear-strength figure, sized against the actual
+  disclosed loads (§18.3's own mass/`F_tip` table); if margin is thin,
+  consider a heat-set insert (mirroring the containment cap's own
+  higher-duty joint class) instead of a direct self-tap, given this joint's
+  own self-disclosed "different loading character."
+- **Severity**: **MEDIUM** — mirrors MISS-011's own precedent classification
+  for a structurally-analogous "disclosed, unvalidated, plausible-margin"
+  fastener gap. This Reviewer's own rough independent sanity check found no
+  strong reason to believe the joint is confirmed-inadequate (which would
+  support a higher severity), but the gap is real, newly introduced by this
+  revision, and should be tracked and resolved before physical build rather
+  than carried only as prose, consistent with this project's own MISS-011
+  precedent and this file's own explicit self-disclosure.
+
+#### Finding 4 — REQ-310's own mass-compliance comparison uses total-system mass rather than the more relevant, already-separately-computed rotating-assembly mass
+
+- **Issue**: REQ-310 requires the free-rotation mechanism to "accommodate
+  the real, sourced total **rotating-assembly** mass with margin," with its
+  own Notes citing a "≈280–320g" nominal estimate up to "a conservative
+  ~350g bound." The Rev 4 write-up's own table (§18.3) correctly and
+  separately computes a "Rotating assembly total" of **404.5g** (excludes
+  the stationary bearing+stand plate) as a distinct line from "Total system
+  mass" of **601.8g** (includes them) — but every narrative comparison
+  against the human's/REQ-310's own ≈280–320g estimate (the document's own
+  executive-summary bullet at line 84, §18.3's mass-table Notes column at
+  line 2342, and §18.10's UNKNOWNs table at line 2643, plus the mirrored
+  framing in `hardware/mechanical-interface.md` C3/C8) uses the 601.8g
+  total-system figure ("roughly double"), not the more directly-comparable
+  404.5g rotating-assembly figure — a consistent pattern across (at least)
+  4 separate locations in the deliverable, not a one-off slip.
+- **Rationale**: A reader checking REQ-310 compliance who takes the
+  write-up's own repeatedly-used "≈601.8g... roughly double" framing at face
+  value would be comparing against the wrong quantity relative to REQ-310's
+  own explicitly-scoped text. The correct comparison (404.5g rotating-
+  assembly vs. REQ-310's own ~350g conservative bound) shows a smaller, but
+  still real, ≈15.6% overage that is never explicitly checked against
+  REQ-310's own stated bound anywhere in the package. That said,
+  independently re-deriving REQ-310's own actual substantive pass/fail test
+  (per its own Notes column: bearing load-capacity margin, not a raw mass
+  comparison, is "the real test... load capacity is not a differentiator
+  between mechanism candidates") confirms REQ-310 compliance itself is
+  **not** actually threatened by this framing gap: even against the
+  corrected 404.5g figure, the chosen bearing's 136.1kg (`brg_load_cap_kg`)
+  load rating exceeds the true rotating mass by ≈336×, an overwhelming
+  margin either way. This is a documentation-precision finding, not a
+  functional-compliance failure.
+- **Datasheet Source**: `requirements/requirements.md` REQ-310 (line 187,
+  exact text and Notes); `hardware/mechanical-interface.md` C3, C8;
+  `bench-imu-01-dimensional-spec.md` line 84 (executive summary), §18.3 mass
+  table (line 2264, 2342), §18.10 UNKNOWNs table (line 2643).
+- **Failure Mechanism**: A future reader/reviewer relying on the write-up's
+  own repeated "roughly double" framing to assess REQ-310 compliance could
+  be misled about the actual magnitude of the mass overage relative to
+  REQ-310's own specific stated bound (mistaking a ≈15.6% overage against
+  the relevant bound for a ≈2× overage against a less-relevant total), even
+  though the underlying engineering conclusion (bearing load-capacity
+  margin, the actual substantive test) is unaffected either way.
+- **Affected Component**: Documentation/traceability only —
+  `bench-imu-01-dimensional-spec.md` line 84/§18.3/§18.10, `hardware/
+  mechanical-interface.md` C3/C8 narrative text. No `.scad` geometry is
+  implicated.
+- **Recommended Fix**: Add one explicit sentence at each of these citation
+  points stating the more precise comparison: "the rotating-assembly-only
+  mass (404.5g) exceeds REQ-310's own conservative ~350g bound by ≈15.6%,
+  though REQ-310's own substantive pass/fail test (bearing load-capacity
+  margin) remains satisfied by a wide margin (≈336×) regardless."
+- **Severity**: **LOW** — a documentation/traceability precision issue that
+  does not change any compliance outcome or engineering conclusion.
+
+#### Finding 5 — §18.5's cited absolute volume figures are not independently bit-reproducible via a direct re-render, though the topology/CSG-correctness claims are
+
+- **Issue**: §18.5 cites specific absolute STL volume figures as part of its
+  inclusion-exclusion CSG-correctness proof (`bmount_flange`=42,962.45mm³,
+  `base()`=110,364.12mm³, their intersection=3,456.27mm³, their
+  union=149,870.30mm³, `stand_plate`=52,599.94mm³). Independently
+  re-rendering the identical `.scad` file this cycle (same tool,
+  `/opt/homebrew/bin/openscad` v2026.08.30, same `--backend=manifold`
+  command pattern, same file, `$fn`=48) and re-measuring the same 5 solids
+  via `trimesh` reproduced every **topological** claim exactly (NoError/
+  manifold, matching Genus/vertex/facet counts across all configurations)
+  but produced volumes consistently **0.2–0.45% higher** than every one of
+  the document's own cited figures (this cycle's own 5 measurements:
+  110,595.30 / 43,125.49 / 3,471.74 / 150,249.06 / 52,806.09mm³
+  respectively).
+- **Rationale**: The direction and magnitude of the discrepancy is small
+  and consistent (not random or one-off), suggesting an undisclosed
+  methodology or settings difference between this cycle's own render
+  session and the one that produced §18.5's cited figures, rather than a
+  CSG-correctness defect — this cycle's own 5 independently-measured
+  figures *also* satisfy the same inclusion-exclusion identity to within
+  0.01mm³ (110,595.30+43,125.49−3,471.74=150,249.05 predicted vs. 150,249.06
+  measured), confirming the underlying CSG-correctness conclusion is
+  genuinely sound and reproducible, just not the specific absolute numbers
+  cited. One specific hypothesis (CGAL vs. Manifold backend) was tested
+  directly this cycle; the CGAL backend instead produced an invalid/
+  non-manifold export for the isolated-module wrapper technique used, ruling
+  that out as a clean explanation without identifying the true cause.
+- **Datasheet Source**: `bench-imu-01-dimensional-spec.md` §18.5 (the
+  render-verification table and inclusion-exclusion cross-check).
+- **Failure Mechanism**: None — no design defect flows from this. A future
+  reader attempting to bit-for-bit reproduce §18.5's own cited absolute
+  figures (as opposed to its qualitative topology claims) from the committed
+  `.scad` file alone should not expect an exact match, which could cause
+  unnecessary alarm or confusion during a future audit if not understood as
+  a pre-existing, harmless reproducibility quirk rather than a live defect.
+- **Affected Component**: Documentation only — §18.5's cited absolute
+  volume figures; no `.scad` geometry is implicated.
+- **Recommended Fix**: Either disclose the exact resolution/settings/tool
+  invocation used to produce the specific cited figures (beyond "openscad
+  v2026.08.30, --backend=manifold," which was insufficient for this cycle to
+  reproduce them exactly), or reframe §18.5's volume figures as
+  illustrative/order-of-magnitude rather than exact, since the topology
+  claims (the actually load-bearing conclusions) independently reproduce
+  exactly using either set of absolute figures.
+- **Severity**: **LOW** — a minor reproducibility/documentation-precision
+  nit; does not affect any engineering conclusion, since the qualitative
+  CSG-correctness claim independently reproduces exactly regardless of which
+  set of absolute figures is used.
+
+#### Finding 6 — R=80.0mm row of the stand-plate radius-sweep table has an internally-inconsistent static-margin figure
+
+- **Issue**: The 7-row radius-sweep table in §18.3/C4 states a static
+  margin of "9.3×" for the R=80.0mm candidate row, but recomputing static
+  margin = `R_stand`/`d_offset` using that same row's own stated `d_offset`
+  (8.65mm) gives 80.0/8.65 = 9.2486…, which rounds to **9.2×**, not 9.3×.
+- **Rationale**: Independently recomputing all 7 rows' static-margin
+  figures from each row's own stated `R_stand` and `d_offset` values via a
+  Python script confirms this is the *only* inconsistent row — the other 6
+  rows (R=50/55/60/65/70/75mm) all round correctly to their stated margins
+  (e.g. the **chosen** R=60.0mm row: 60.0/9.61=6.2435…≈6.2×, exactly
+  matching the stated "≈6.2×," independently re-confirmed together with its
+  own `F_tip`=`W_total`(kg)×9.81×(`R_stand`−`d_offset`)/`h_cg`
+  =5.9037kg×9.81×0.05039m/0.0326m≈9.126N≈9.13N — also an exact match). This
+  is an isolated arithmetic/rounding slip in one non-selected table row, not
+  a systemic error in the sweep methodology (independently confirmed sound
+  elsewhere in this review, including the rotation-angle-invariance physics
+  claim underlying the entire approach), and it does not affect the chosen
+  R=60.0mm design point.
+- **Datasheet Source**: `bench-imu-01-dimensional-spec.md` §18.3 radius-sweep
+  table (R=50–80mm), mirrored in `hardware/mechanical-interface.md` C4.
+- **Failure Mechanism**: None — cosmetic/arithmetic-precision only; does not
+  affect the R=60.0mm chosen configuration, whose own figures independently
+  check out exactly.
+- **Affected Component**: Documentation only — the radius-sweep table's
+  R=80.0mm row.
+- **Recommended Fix**: Correct "9.3×" to "9.2×" (or re-verify/adjust the
+  underlying `d_offset`/`W_total` intermediate figures for that row if a
+  different rounding convention was intended).
+- **Severity**: **LOW** — isolated documentation arithmetic slip, no
+  functional/design impact, does not affect the chosen configuration.
+
+### Verdict
+
+- **Verdict**: **CONDITIONAL**.
+- **Open CRITICAL count**: 0.
+- **Open HIGH count**: 2 new this cycle — **MISS-023** (Finding 1, REQ-407(b)
+  pinch-point/rotating-overhang hazard unassessed) and **MISS-024**
+  (Finding 2, REQ-407(c)/REQ-113 tether-entanglement/strain hazard
+  unassessed for the now-rotating J1/J4 connectors). Both trace to Must-
+  priority, safety-critical requirements in the same HITL gate class as
+  REQ-403/MISS-016, and both are newly and independently surfaced this
+  cycle (not previously flagged in the Mechanical Lead's own self-check,
+  UNKNOWNs table, or handoff notes).
+- **Open MEDIUM count (non-gating on its own, but tracked)**: 1 new this
+  cycle — **MISS-025** (Finding 3, bearing-joint fastener-load-calculation
+  gap), mirroring the existing MISS-011 precedent.
+- **Open LOW count (non-gating)**: 3 new this cycle — **MISS-026** (Finding
+  4, REQ-310 mass-comparison framing), **MISS-027** (Finding 5, §18.5 volume-
+  figure non-reproducibility), **MISS-028** (Finding 6, R=80.0mm radius-sweep
+  arithmetic slip).
+- **What independently checks out with no error found**: REQ-311's
+  additive-only claim (confirmed via direct `git diff HEAD` read: exactly
+  one disclosed exception, a `print_layout` display-position Z-shift, no
+  Rev 3 module body/wall/dimension/bay touched); the internal-overhang
+  manufacturability finding (§18.4, confirmed real via direct Z-range
+  tracing, and its accept-with-disclosed-caveat resolution judged reasonable
+  given the 3 rejected alternatives); the tip-over/stand-plate sizing
+  methodology in full (the rotation-angle-invariance physics claim
+  independently re-derived and confirmed true; all 7 radius-sweep rows
+  independently recomputed, 6 of 7 self-consistent; the chosen R=60.0mm
+  row's static margin and `F_tip` both exact matches; the 60.0mm/120mm-
+  diameter decision independently confirmed reasonable); every one of the
+  ~30 new `.scad` variables cross-checked one-to-one against `hardware/
+  mechanical-interface.md` Part C with zero mismatches found; checklist
+  items 1, 3, 4, 6, 7, 8 fully clean with no finding; both `show_mode`
+  renders and 5 isolated-module renders reproducing the document's own
+  cited topology exactly; the mass-discrepancy disclosure (≈207.9g analytic
+  vs. ≈130–170g bounding-shell) judged plausible given the flywheel-bay wall
+  tube's real geometry, not silently reconciled and correctly flagged as
+  such by the Mechanical Lead.
+- **What's blocking a clean PASS**: Two open HIGH findings (MISS-023,
+  MISS-024), both tracing to Must-priority, safety-critical requirements
+  (REQ-407(b)/(c), REQ-408) that this exact Rev 4 Mechanical Design +
+  Independent Mechanical Review cycle was explicitly tasked with satisfying
+  — per `requirements/requirements.md` §9g's own language, and per
+  `bom/component-selection.md`'s own explicit deferral of this hazard class
+  to this exact phase — with no legitimate later deferral point available.
+  REQ-407(a) (tip-over) is thoroughly assessed; REQ-407(d) (fast-spin) is
+  judged a legitimate firmware/bring-up-procedure concern (REQ-013's own
+  "small speed steps" language), not a mechanical-design-phase gap, and is
+  not flagged here.
+- **Task-specific assessment of the 6 scrutinized claims**: (1) mass/CG
+  discrepancy — plausible, correctly disclosed, not a finding; (2) tip-over/
+  stand-plate sizing — methodology sound and independently re-derived, one
+  isolated non-selected-row arithmetic slip found (MISS-028, LOW); (3)
+  internal-overhang manufacturability finding — real, honestly characterized,
+  reasonably mitigated, not inadequately resolved; (4) REQ-311 additive-only
+  compliance — confirmed via direct diff read, satisfied; (5) fastener
+  load-calc gap — a real, trackable MEDIUM gap (MISS-025), consistent with
+  the MISS-011 precedent, not a blocking CRITICAL/HIGH gap given this
+  Reviewer's own rough sanity-check of plausible margins; (6) OpenSCAD
+  render verification — performed live this cycle for both `show_mode`s
+  plus 5 isolated-module renders, all topology claims reproduced exactly,
+  volume figures reproduce the CSG-correctness identity but not the exact
+  cited absolute numbers (MISS-027, LOW).
+- **Next action**: Report CONDITIONAL to the Hardware Lead. Loop back to the
+  Mechanical Lead for MISS-023 and MISS-024 (both HIGH, blocking) — the
+  REQ-407(b)/(c) hazard assessments must be performed and a mitigation
+  disposition recorded before this Rev 4 configuration can reach its own
+  Design-Complete-equivalent sign-off, per REQ-408's own explicit gating
+  language. MISS-025 (MEDIUM), MISS-026/MISS-027/MISS-028 (LOW) are newly
+  logged `OPEN`, `Source: mechanical-reviewer`, in `validation/
+  open-issues.md`, non-gating, for the Mechanical Lead to pick up at
+  convenience alongside the HIGH items.
+
 ## Mechanical Reviewer — Independent Cross-Check of Rev 3.3 Motor-Voltage/RPM Correction (DS-MTR-018 Relabel → §8 Physics-Table Recompute), 2026-09-13
 
 ### Review Cycle Metadata
@@ -7157,3 +7750,561 @@ this annotation.
   roles (Requirements Engineer/Firmware Lead for MISS-019's citations;
   whoever owns `validation/fmea.md` for MISS-020; Manufacturing Engineer
   for MISS-021) to pick up at convenience.
+
+## Mechanical Reviewer — Cycle 6 (Independent Re-Review of Rev 4.1 MISS-023/MISS-024 Mitigation Pass, 2026-09-15)
+
+### Review Cycle Metadata
+
+- **Design revision reviewed**: `hardware/mechanical/bench-imu-01-enclosure.scad`
+  (now ~2014 lines, up from Rev 4's 1597 — independently confirmed via
+  `wc -l` this cycle), carrying new "REV 4.1" markers for two new modules
+  (`pinch_guard()`, `cable_anchor_tab()`) and one new witness-mark feature
+  (`rotation_index_pointer()`), together with `bench-imu-01-dimensional-
+  spec.md`'s new §18.12–§18.17 (MISS-023 mitigation design/verification,
+  MISS-024 mitigation design/verification, self-check addendum, UNKNOWNs
+  table, handoff) and `hardware/mechanical-interface.md`'s new "C9. Rev 4.1
+  additions" section plus new Open items 20–27 (both independently confirmed
+  present and matching the claimed content this cycle). This is a **fix pass
+  in direct response to this Reviewer's own Cycle 5 findings** (MISS-023,
+  MISS-024, both HIGH) — not a fresh feature addition — so this cycle's
+  primary burden is re-deriving, independently and adversarially, whether
+  the claimed fixes are geometrically/procedurally real and adequate, not
+  merely confirming "something was added."
+- **Reviewer**: Mechanical Reviewer — see
+  `.github/agents/mechanical-reviewer.agent.md`. Independent of the
+  Mechanical Lead role/session that authored Rev 4.1. This is the same
+  Reviewer role that authored Cycle 5 (a fresh invocation, per this task's
+  own framing) — the loop-back rule in this Reviewer's own agent file
+  requires re-running the relevant checklist items against the changed area
+  on return, not rubber-stamping a claimed fix, and that is the standard
+  applied throughout this cycle. Where this cycle's own re-derivation
+  reveals that Cycle 5's own prior work contained an error (the 115.9mm
+  swept-radius figure — see Finding 1), that error is acknowledged plainly
+  rather than defended.
+- **Independence statement**: No claim in §18.12–§18.17 was accepted on the
+  strength of the Mechanical Lead's own stated confidence, its self-check
+  marks, or its own disclosed "partially closed, not fully closed" honesty —
+  disclosed honesty is not the same as an independently-verified adequate
+  fix, and every load-bearing number was re-derived from the raw `.scad`
+  geometry or raw requirement text, not re-read from prose and nodded along.
+  Independently re-derived from scratch, matching the Mechanical Lead's
+  claims exactly in every case checked: the true maximum swept radius
+  (126.424mm, via both a full-model `trimesh` bounding-sphere measurement
+  and independent raw-variable arithmetic — confirming the Mechanical Lead's
+  own correction of this Reviewer's own Cycle 5 115.9mm figure, which missed
+  an X-offset term); `pinch_guard()`'s own geometry, mass (570.558g), and
+  both critical collision checks (vs. the rotating envelope, vs.
+  `stand_plate()`) via direct OpenSCAD render + boolean CSG `intersection()`
+  in `trimesh`, not hand radial arithmetic alone; the 77.7% hazard-band
+  coverage arithmetic; J1/J4's exact global position (radius 97.073mm,
+  angles 123.44°/56.56°) from raw `.scad` source variables
+  (`board_offset_x/y`, `pcb_width`, `base_outer_x`, `fw_cx/cy`,
+  `pcb_bay_y0`), not accepted from the Mechanical Lead's own report; the
+  full cable-wrap/turn-limit/service-loop arithmetic chain; both the pre-fix
+  (91.752mm) and post-fix (94.311mm) max-radius-contribution figures for the
+  self-disclosed/self-corrected `cable_anchor_tab()` wall-thickness defect,
+  cross-checked against the **live** `.scad` source value
+  (`cable_anchor_project`=8.0mm) rather than the historical flawed draft
+  value, to confirm the fix is actually applied, not merely claimed; the
+  total system mass reconciliation (≈1173.4g, to within 0.05g); a fresh
+  static tip-over margin (≈12.17×) the Mechanical Lead's own report declined
+  to compute, only asserting qualitatively that it "can only improve." One
+  finding this cycle (Finding 3, a stale friction-torque-margin citation in
+  `bom/component-selection.md`) was independently discovered and is **not**
+  mentioned anywhere in the Mechanical Lead's own Rev 4.1 report, self-check,
+  or UNKNOWNs/Open-items tables.
+- **Scope**: The Rev 4.1 addition in full — `bench-imu-01-enclosure.scad`'s
+  new `pinch_guard()`, `cable_anchor_tab()`, `rotation_index_pointer()`
+  modules and associated Section "2C" variable block (lines ~876–1049,
+  independently spot-checked), and `bench-imu-01-dimensional-spec.md`'s new
+  §18.12–§18.17 in full, cross-checked against `hardware/mechanical-
+  interface.md`'s new C9 section and Open items 20–27 in full.
+  `requirements/requirements.md` REQ-012, REQ-113, REQ-205, REQ-310,
+  REQ-407, REQ-408 re-read in full (exact verbatim text, not recalled from
+  Cycle 5's own summary) specifically to adjudicate whether the Mechanical
+  Lead's own "closed for REQ-113, not REQ-012" scope-framing for MISS-024 is
+  honest or a scope-narrowing dodge. `bom/component-selection.md`'s
+  friction-torque calculation was read in full as part of the mass
+  second-order-implications check (task-requested), surfacing Finding 3.
+  Pre-existing Rev 3/Rev 4 geometry was **not** re-reviewed in full detail
+  (already closed out across Cycles 3/4/5) but Rev 4.1's own diff was
+  independently confirmed additive-only against Rev 4 (no Rev 3 or
+  original-Rev-4 module body edited; REQ-311 discipline continued). Per this
+  cycle's own explicit task scope, `requirements/requirements.md`,
+  `requirements/traceability-matrix.md`, and `validation/change-log.md` were
+  read for context only and are **not** edited by this cycle.
+- **Tooling disclosure**: `openscad` 2026.08.30 (`/opt/homebrew/bin/openscad`,
+  `--backend=manifold`) and a Python geometry stack (`trimesh` 4.11.5,
+  `numpy` 2.4.4, `numpy-stl`) were used to independently render and measure
+  Rev 4.1, not merely to re-run the Mechanical Lead's own cited commands.
+  Rendered both `show_mode`s directly from the live file — both reproduced
+  the dimensional-spec's own cited topology exactly (matching Genus/vertex/
+  facet counts for both `"assembled"` and `"print_layout"`, the latter now
+  showing 5 disjoint printable pieces including `pinch_guard`'s own 4
+  quadrants, Genus 17, 6241 vertices, 12546 facets — independently
+  reproduced, not assumed from the document's own table). Built isolated
+  wrapper `.scad` files to render `pinch_guard()`, the complete rotating
+  envelope (`base()`+`bmount_flange()`+`rotation_index_pointer()`+
+  `cable_anchor_tab()`×2), and `stand_plate()` individually and in boolean
+  combination — the two collision checks (`pinch_guard` ∩ rotating envelope;
+  `pinch_guard` ∩ `stand_plate`) both independently confirmed empty/
+  zero-volume, matching the claimed CSG-verification results exactly, not
+  trusted from the document's own §18.12.5 table alone. All arithmetic in
+  this report (max swept radius, hazard-band coverage, J1/J4 position, cable
+  wrap/turn/service-loop figures, wall-thickness-fix radii, mass
+  reconciliation, tip-over margin, friction-torque margin) was independently
+  recomputed via short Python scripts against the `.scad` file's own named
+  variables and/or the requirements' own exact text, not taken from the
+  document's final printed answer alone.
+- **Parallel sub-scans run**: None dispatched as separate sub-agent scans
+  this cycle — the full 10-item checklist and the task's specified focus
+  areas (MISS-023 geometry/disposition, MISS-024 geometry/scope-framing, the
+  new mass finding's second-order implications, render/manifold
+  verification, additive-only diff confirmation) were worked as a single
+  integrated pass by this Mechanical Reviewer.
+- **rubber-duck premise review run in parallel?**: Not indicated as run for
+  this cycle on the Mechanical discipline. This report does not rely on or
+  duplicate any such review.
+- **KiCad / CAD tool cross-checks used**: None — no KiCad project exists for
+  Bench-IMU-01 (unchanged since Cycle 1's own note); this cycle's CAD
+  cross-check was performed with the `openscad`/`trimesh` toolchain described
+  above, directly against the actual `.scad` source.
+
+### Checklist Results
+
+Full checklist per `.github/skills/mechanical-review/SKILL.md`, all 10 items
+independently re-worked against the Rev 4.1 changed area specifically (per
+this Reviewer's own loop-back rule), not a partial spot-check:
+
+| # | Checklist item | Result | Notes |
+|---|---|---|---|
+| 1 | PCB mounting (standoff positions/diameters, boss integrity) | **PASS (N/A)** | Independently confirmed unaffected — Rev 4.1 touches no PCB-mounting geometry; matches the Mechanical Lead's own §18.15 item 1 self-assessment, independently re-confirmed rather than repeated. |
+| 2 | Connector accessibility (cutout position/size/orientation) | **PASS**, closing the item Finding 2/MISS-024 was actually about | Independently re-derived J1/J4's exact global position (radius 97.073mm, angles 123.44°/56.56°) from raw `.scad` variables; independently confirmed the Mechanical Lead's own distinction (Rev 4's "accessible, unchanged" self-check mark was true but incomplete — physical accessibility ≠ entanglement/strain safety) is now backed by a real assessment (turn-limit + service-loop + wrap arithmetic, all independently reproduced) for the bounded/REQ-113 scope specifically. See Finding 2 for the full disposition and the REQ-012-scope caveat. |
+| 3 | Component height clearance (top + bottom vs. interface file) | **PASS** | `pinch_guard_h`=14.9mm independently confirmed via direct arithmetic (19.9mm tool-confirmed rotating-envelope floor − 5.0mm stated margin) and via full render sweep across the complete Z-range/rotation angle (angle-invariant by construction, since guard height doesn't vary with angle) — cannot contact the rotating assembly. `rotation_index_pointer()`/`cable_anchor_tab()` clearance from `pinch_guard`'s own top (claimed 12.0mm, at desk-relative heights 26.9–33.45mm) independently confirmed self-consistent (26.9−14.9=12.0mm exactly) against this cycle's own more fundamental full-envelope floor-clearance check. |
+| 4 | Internal clearance/interference (parts vs. walls, parts vs. parts, parts vs. bosses) | **PASS** | Both collision checks independently re-rendered via direct boolean `intersection()` (not hand radial arithmetic alone): `pinch_guard()` vs. the complete rotating envelope = empty (zero shared volume); `pinch_guard()`/`stand_plate()` boundary = exactly flush at r=60.0mm (zero-volume overlap, confirmed via an additional independent 1mm-thick test-ring boundary check). Matches §18.12.5's own claims exactly. |
+| 5 | Fastener placement (wall thickness around bosses; no conflicts) | **PASS/N/A geometrically — but see Finding 1** | Independently confirmed via direct source read (§18.12.3) that `pinch_guard()` introduces **zero** new fasteners by design — a freestanding, unfastened, desk-resting piece, same category as `stand_plate()`. `cable_anchor_tab()`'s through-hole is a zip-tie hole, not a threaded-fastener boss — no pilot-hole/boss-integrity concern in the traditional sense. However, this Reviewer independently weighs the "unfastened/unkeyed to `stand_plate()`" fact (self-disclosed by the Mechanical Lead, §18.12.7/§18.16, Open Item 20) as **additional supporting rationale for Finding 1's disposition**, not as a non-issue merely because no fastener defect exists per se — see Finding 1. |
+| 6 | Wall thickness (structural *and* the Lead's own stated 3D-printability rule) | **PASS, after independently-reproduced fix** | Independently verified via live-source read (not the historical draft value) that the self-disclosed/self-corrected `cable_anchor_tab()` wall-thickness defect is genuinely fixed: current `cable_anchor_project`=8.0mm (not the flawed 4.0mm draft) gives (8.0−3.0)/2=2.5mm wall each side of the anchor hole, exceeding `min_wall_t`=2.0mm — independently confirmed the pre-fix value would have given only (4.0−3.0)/2=0.5mm, a genuine 4× violation, matching the document's own "0.5mm of wall" disclosure exactly. `pinch_guard()`'s own 55.0mm radial thickness (115.0−60.0mm) independently confirmed to carry no wall-thickness concern (trivially, by direct dimension subtraction). |
+| 7 | Assembly order (physically achievable sequence, nothing trapped) | **PASS** | Independently confirmed via direct source read that `pinch_guard()` requires no new assembly step (rests around the stand plate at the same step the stand plate itself is placed — both stationary/desk-resting, no fastener-order dependency) and `rotation_index_pointer()`/`cable_anchor_tab()` need no separate step (fused into the base+flange print job). No part trapped or blind at any point; existing §18.9 sequence is extended, not reordered. |
+| 8 | Basic print-fit tolerance (stated clearance allowance applied consistently everywhere) | **PASS** | Independently confirmed Rev 4.1 introduces no new sliding/press-fit mating interface — the `pinch_guard()`/`stand_plate()` boundary is a touching-not-mating flush contact (0.00mm gap, independently re-rendered via the 1mm test-ring check), correctly distinguished from a press fit that would require `fit_clearance` (0.2mm/side). The self-check's "unaffected" framing for this item is independently verified true, not merely repeated. |
+| 9 | Basic manufacturability/3D-printability (overhangs/bridges within the Lead's own rule; min wall thickness everywhere) | **PASS for this pass's own new geometry** | Independently confirmed the 4-quadrant print split avoids inventing an undocumented printer-bed-size assumption (each quadrant's own bounding box ≈115×115mm, disclosed as an approximation, not invented as a silent fact); independently confirmed the `cable_anchor_tab()` wall-thickness violation was genuinely caught and fixed pre-handoff (item 6 above), not shipped with a silent caveat. This does not touch or resolve Rev 4's own still-open internal-overhang caveat (§18.7 item 9) — unrelated, pre-existing, out of this pass's own scope, correctly not claimed as resolved by either the Mechanical Lead or this Reviewer. |
+| 10 | Interface-value traceability (every dimension traces to `hardware/mechanical-interface.md` or is explicitly ASSUMPTION/ESTIMATE/DERIVED/DECIDED, never silently blended with CONFIRMED) | **PASS for the `.scad`/interface-file discipline itself; one new downstream gap found outside it** | Independently cross-checked every new Rev 4.1 `.scad` variable (Section "2C" block) against `hardware/mechanical-interface.md`'s new C9 table, one-to-one — exact match, nothing silently blended with a CONFIRMED value; Open items 20–27 independently confirmed present and accurately characterizing the disclosed limitations. However, this cycle's own independently-initiated second-order mass check (task-requested) surfaced a **new, previously-unflagged traceability gap one hop downstream**: `bom/component-selection.md`'s own friction-torque margin citation (`≈29×`) still uses a stale pre-Rev-4 mass input, undiscovered by either the Rev 4 or Rev 4.1 self-checks and not covered by the closest existing tracked item (Open Item 19, confirmed via direct read to address only the general total-mass-vs-estimate growth, not this specific downstream figure) — Finding 3/MISS-029 (LOW, non-blocking). |
+
+### Findings
+
+#### Finding 1 — MISS-023 re-assessment: `pinch_guard()` is a real, independently-verified, substantial mitigation, but does not adequately close a HIGH REQ-407(b)/REQ-408 safety finding — remains OPEN, HIGH
+
+- **Issue**: The Mechanical Lead's Rev 4.1 pass adds `pinch_guard()`, a
+  stationary annular guard (60.0–115.0mm radius, 14.9mm height, split into 4
+  printable quadrants) that is real, geometrically verified, and converts a
+  substantial majority of the previously fully-unguarded pinch/overhang
+  hazard band into a mechanically-guarded zone. This is genuine, confirmed
+  progress against MISS-023. However, independently re-deriving the residual
+  risk profile (not merely re-checking the claimed numbers in isolation)
+  shows the guard's own disposition — "partially closed, not fully closed,"
+  by the Mechanical Lead's own honest self-assessment — still leaves a real,
+  non-trivial, and arguably disproportionately risky gap. This finding is
+  **not** a re-statement of MISS-023's original text; it is a fresh
+  adjudication of whether Rev 4.1's specific fix is an adequate disposition,
+  independently re-derived against the actual current geometry.
+- **Rationale**: Three independent lines of re-derivation, all performed
+  from scratch this cycle (not accepted from the Mechanical Lead's own
+  report):
+  1. **The corrected 126.424mm swept-radius figure is independently
+     confirmed true**, via both a full-model `trimesh` bounding-sphere
+     measurement of the complete rotating envelope and independent raw-
+     variable arithmetic on `.scad` source coordinates — this Reviewer's own
+     Cycle 5 115.9mm figure is confirmed to have missed an X-offset term and
+     is superseded. This is stated plainly: Cycle 5's own number was wrong,
+     the Mechanical Lead's correction is right.
+  2. **The 77.7% hazard-band coverage figure is arithmetically correct as
+     an area statistic**, independently recomputed (hazard annulus area =
+     π·(126.424²−60.0²) = 38,902.4mm²; guarded area to 115.0mm =
+     30,238.3mm²; ratio = 77.73%) — but this Reviewer independently judges
+     that an area-fraction is the wrong risk metric here, because the
+     guard's own protection mechanism is a binary space-exclusion (100%
+     effective within its own footprint, 0% outside it), not a protection
+     level proportional to area. The residual 11.4mm gap sits at the
+     **outer** radius band (115.0–126.424mm) — independently confirmed via
+     direct re-reading of §18.12.6's own keep-clear-zone warning text to be
+     the highest-tangential-velocity, most directly/horizontally-reachable
+     portion of the entire hazard band (no reach-over-a-14.9mm-barrier
+     maneuver required to access it, unlike the guarded 60–115mm band).
+     Concentrating 100% of the residual unmitigated risk in exactly the
+     zone where speed and accessibility are both worst is a materially
+     different (and less favorable) risk picture than "22.3% by area"
+     alone conveys.
+  3. **`pinch_guard()`'s own retention is independently confirmed absent**,
+     via direct source read of §18.12.3/§18.12.7 and cross-referenced
+     against `hardware/mechanical-interface.md` Open Item 20 (both
+     consistent): the guard is a free, unfastened, unkeyed, desk-resting
+     ring, relying entirely on placement and friction with the desk to stay
+     positioned relative to `stand_plate()`/the true rotation axis, with no
+     locating pin, boss, or keying feature of any kind. This fact is
+     **honestly self-disclosed** by the Mechanical Lead as "a disclosed
+     limitation, not an oversight" — but this Reviewer independently judges
+     that its implication was not carried through to the closure-disposition
+     decision: even the nominally-guarded 77.7% zone's real-world protection
+     is contingent on the guard remaining precisely positioned over the
+     product's service life (through bumps, cleaning, incidental handling),
+     a guarantee this design provides no positive mechanism for. This is not
+     a new fact this Reviewer discovered — it is a new *disposition-relevant
+     inference* from a fact the Mechanical Lead already disclosed but did
+     not weigh into "is this an adequate closure."
+  Taken together, this independently reconstructs and **endorses** — with
+  additional adversarial reasoning the Mechanical Lead's own write-up does
+  not develop — the Mechanical Lead's own stated position: "I do not believe
+  this should be marked fully RESOLVED as-is" (§18.12.7). This Reviewer's own
+  independent conclusion goes slightly further: not only is this not a full
+  resolution, it is not yet an adequate disposition for a **HIGH**,
+  Must-priority, safety-critical finding (REQ-407(b)/REQ-408) to be closed
+  out on the strength of geometry alone plus a procedural warning for the
+  highest-risk residual band, given that the guarded portion itself uses a
+  physical/engineering control (the accepted top tier of the hazard-control
+  hierarchy) while the residual portion relies solely on an administrative/
+  procedural control (a lower tier) — the same physical-vs-procedural-
+  control distinction this project's own MISS-024 disposition (Finding 2)
+  independently applies and finds acceptable *there* only because REQ-113's
+  own text explicitly authorizes a procedural fix for that specific hazard;
+  REQ-407(b)/REQ-408 carry no equivalent textual authorization for a
+  procedural-only closure of their own residual risk.
+- **Datasheet Source**: `requirements/requirements.md` REQ-407(b) (line 200),
+  REQ-408 (line 201, both re-read verbatim this cycle); `bench-imu-01-
+  dimensional-spec.md` §18.12.2 (126.424mm re-derivation), §18.12.3
+  (`pinch_guard()` geometry, unfastened/unkeyed disclosure), §18.12.5
+  (verification table), §18.12.6 (keep-clear-zone warning text/residual-gap
+  location), §18.12.7 (Mechanical Lead's own honest closure assessment);
+  `hardware/mechanical-interface.md` C9, Open Items 20–21; this cycle's own
+  independent `openscad`/`trimesh` re-render (both collision checks, mass,
+  coverage-area arithmetic) — all independently reproduced, not taken from
+  the Mechanical Lead's own summary.
+- **Failure Mechanism**: A finger, hand, loose cable, or other object
+  resting/reaching on the desk in the 115.0–126.424mm outer band — the
+  highest-tangential-velocity, most directly-reachable portion of the
+  hazard, requiring no reach-over-guard maneuver — is struck or pinched by
+  the rotating overhang exactly as originally characterized in MISS-023,
+  mitigated only by an operator's own compliance with a procedural
+  keep-clear warning, not by any physical barrier. Independently and
+  separately, even within the nominally-guarded 60–115mm band, protection
+  could degrade if `pinch_guard()` is bumped, shifted, or rotated out of its
+  intended position during handling, since no positive retention feature
+  exists to prevent this.
+- **Affected Component**: `pinch_guard()` (new stationary module) and its
+  relationship to the pre-existing rotating envelope (`base()`+
+  `bmount_flange()`+`rotation_index_pointer()`+`cable_anchor_tab()`×2) and
+  `stand_plate()` — a system-level residual-risk/disposition question, not a
+  geometric defect in `pinch_guard()` itself (which is independently
+  confirmed to be exactly as claimed).
+- **Recommended Fix**: (a) Consider extending `pinch_guard_or` closer to the
+  full 126.424mm envelope if benchtop footprint allows — the Mechanical
+  Lead's own table already shows each 5mm step buys diminishing but real
+  additional coverage (120mm → 87.2%, full 126.424mm closure → 100%); (b)
+  add a simple positive locating/retention feature between `pinch_guard()`
+  and `stand_plate()` (e.g. a shallow keyed tab/boss pair) to remove the
+  drift risk cheaply within the current 115mm footprint, independent of (a);
+  (c) at minimum, if the residual gap and unfastened condition are to be
+  accepted as-is, this requires an explicit human Chief Engineer
+  ACCEPTED-RISK disposition with named sign-off and written rationale
+  (`validation/open-issues.md`'s own Rules section) — a disposition this
+  Reviewer cannot supply. Owner: Mechanical Lead (geometry), Hardware
+  Lead/human (risk-acceptance decision).
+- **Severity**: **HIGH**, unchanged from Cycle 5. Per `docs/architecture.md`
+  §7.1: the underlying physical hazard mechanism remains real (substantially
+  reduced in area, not eliminated), concentrated in a still-accessible,
+  still-unguarded, highest-velocity band, backstopped only by an
+  administrative control — "likely malfunction/reliability failure under
+  realistic conditions," a realistic condition here being an operator's hand
+  or a loose cable near the outer band during ordinary human-attended
+  operation (REQ-201/REQ-205), not a rare fault scenario. Not CRITICAL,
+  because no confirmed injury/failure under normal conditions "as designed"
+  is demonstrated — the underlying reasoning is otherwise identical to
+  Cycle 5's own original HIGH classification and to the MISS-016 precedent
+  it was modeled on.
+
+#### Finding 2 — MISS-024 re-assessment: cable-entanglement/strain mitigation is independently verified complete for REQ-407(c)/REQ-113's actual textual scope — RESOLVED (REQ-012's broader aspiration remains a separate, disclosed, non-blocking trade-off)
+
+- **Issue**: The Mechanical Lead's Rev 4.1 pass adds a 3-turn limit before
+  mandatory manual re-centering, a minimum 2.5m external service-loop cable
+  spec, `rotation_index_pointer()` (a visual turn-counting witness mark),
+  and `cable_anchor_tab()`×2 (zip-tie strain-relief points), with a
+  self-disclosed and self-corrected wall-thickness defect along the way.
+  This finding independently re-verifies both the geometry/arithmetic
+  underlying this fix and — separately — whether the Mechanical Lead's own
+  "closed for REQ-113, not REQ-012" scope-framing is an honest reading of
+  the actual requirement text or a scope-narrowing dodge.
+- **Rationale**: Every load-bearing number independently re-derived from
+  scratch, not accepted from the Mechanical Lead's own report:
+  1. J1/J4's exact global position independently re-derived from raw
+     `.scad` source variables (`board_offset_x/y`=3.5, `pcb_width`=50,
+     `base_outer_x`=107, `fw_cx/cy`=53.5/52.5, `pcb_bay_y0`=105), giving J1
+     at (0.0, 133.5mm) and J4 at (107.0, 133.5mm) globally — both yielding
+     radius **97.073mm** exactly, at angles 123.44°(J1)/56.56°(J4) — an
+     exact match to the claimed figures, computed entirely independently.
+  2. The cable-wrap/turn-limit/service-loop arithmetic chain independently
+     recomputed in full: circumference at the governing 126.424mm envelope
+     radius (the conservative/safer bound, correctly used in place of the
+     smaller 97.073mm connector radius) = 2π×126.424 = 794.345mm/turn
+     (exact match); 3-turn limit = 2383.036mm = 2.383m (exact match); spare
+     vs. the specified 2.5m service loop = 116.96mm ≈ 4.91% (exact match).
+  3. The self-disclosed/self-corrected `cable_anchor_tab()` wall-thickness
+     defect independently verified as genuinely fixed via a **live**
+     `.scad` source read (not the historical draft value):
+     `cable_anchor_project`=8.0mm currently, giving 2.5mm wall each side,
+     exceeding `min_wall_t`=2.0mm. Independently recomputed the associated
+     max-radius-contribution figures for both the pre-fix (4.0mm) and
+     post-fix (8.0mm) values from raw geometry, obtaining 91.752mm and
+     94.311mm respectively — both exact matches to the document's own
+     claimed figures, confirming both the defect's prior existence and the
+     fix's physical reality, not merely its prose claim.
+  4. `requirements/requirements.md` REQ-407(c), REQ-113, and REQ-012
+     independently re-read verbatim (not recalled from Cycle 5's own
+     summary or the Mechanical Lead's characterization of them): REQ-407(c)
+     itself textually cross-references REQ-113 ("cable/tether entanglement
+     or strain at the rotating joint (REQ-113)") — meaning REQ-407(c)'s own
+     hazard-assessment scope is textually defined by REQ-113, not by
+     REQ-012. REQ-113 itself (Must priority) explicitly authorizes, as its
+     own proposed default, "a flexible service-loop tether (sized for
+     several full turns before requiring manual re-centering)...for
+     bounded/near-continuous use," explicitly deferring "a slip-ring/rotary
+     electrical interface...unless bring-up shows genuinely continuous,
+     unlimited multi-turn rotation is required." REQ-012 (Should priority,
+     not Must) separately proposes "at least ±180°, ideally continuous/
+     unlimited rotation" as an aspiration — and REQ-113's own Must-level
+     text already treats the continuous/unlimited case as a *deferred,
+     evidence-contingent* future possibility, not a current mandate.
+  Conclusion: the Mechanical Lead's own framing — "closed for the scope
+  REQ-113 actually mandates; NOT closed for REQ-012's fuller aspiration" —
+  is independently confirmed **honest and technically accurate**, verified
+  against the requirements' own exact text rather than accepted on the
+  Mechanical Lead's characterization of them. This is not a scope-narrowing
+  dodge: REQ-407(c) does not itself impose a broader obligation than REQ-113
+  already defines, and REQ-113 itself does not impose a broader obligation
+  than "several full turns, bounded use, procedural re-centering" absent
+  future bring-up evidence.
+- **Datasheet Source**: `requirements/requirements.md` REQ-113 (line 162),
+  REQ-407(c) (line 200), REQ-408 (line 201), REQ-012 (line 142) — all
+  re-read verbatim this cycle; `bench-imu-01-dimensional-spec.md` §18.13.2
+  (cable-wrap derivation), §18.13.3 (turn-limit/service-loop mitigation),
+  §18.13.5 (`cable_anchor_tab()` + self-caught wall-thickness fix),
+  §18.13.6 (coaxial-bore-alternative rejection), §18.13.7 (REQ-012 scope
+  caveat); `hardware/mechanical-interface.md` C9, Open Items 22–24; this
+  cycle's own independent raw-variable/arithmetic re-derivation (all above).
+- **Failure Mechanism**: N/A — this finding's own original failure mechanism
+  (a tether winding past its limit, yanking J1/J4 or binding the mechanism)
+  is independently confirmed addressed within its actual REQ-113/REQ-407(c)
+  scope: a bounded turn count, an adequately-sized external service loop,
+  and a visual/procedural re-centering trigger are now all in place and
+  independently verified consistent with each other. The residual
+  "unlimited rotation" case (REQ-012 only) is not a failure mechanism this
+  finding's own governing requirements (REQ-113/REQ-407(c)) obligate this
+  design to solve at this phase.
+- **Affected Component**: J1 (USB-C receptacle), J4 (barrel jack) on
+  `base()`'s PCB-bay side walls; `rotation_index_pointer()`;
+  `cable_anchor_tab()`×2 — all independently confirmed present, correctly
+  dimensioned, and correctly positioned.
+- **Recommended Fix**: None required for REQ-113/REQ-407(c)'s own Must
+  scope — this finding closes. For the record (not itself a new
+  MISS-XXX item, since REQ-012 is Should-priority and REQ-113's own text
+  already defers this pending future evidence): if bring-up or future use
+  ever shows genuinely continuous, unlimited multi-turn rotation is
+  required, the already-considered-and-rejected coaxial-bore/slip-ring
+  routing path (§18.13.6, Open Item 24) is the design's own disclosed
+  starting point for that future work — tracked, not lost, in `hardware/
+  mechanical-interface.md`'s own Open items table.
+- **Severity/Disposition**: **RESOLVED**, scoped explicitly to
+  REQ-407(c)/REQ-113's actual Must-priority textual requirement. REQ-012's
+  broader "ideally continuous/unlimited" aspiration remains not achieved by
+  this pass — correctly not logged as a new, separate gap, since it is a
+  disclosed, standing, Should-priority design trade-off already tracked in
+  `hardware/mechanical-interface.md` Open Item 25, for the Hardware
+  Lead/human to weigh if and when continuous rotation is later shown to be
+  required.
+
+#### Finding 3 — New (independently discovered, not in the Mechanical Lead's own Rev 4.1 report): `bom/component-selection.md`'s bearing friction-torque margin citation is stale relative to the actual current rotating-assembly mass
+
+- **Issue**: This cycle's own task-requested second-order check (whether the
+  new `pinch_guard()` mass has any implication for the bearing's own
+  friction-torque margin) led to independently discovering that
+  `bom/component-selection.md`'s own friction-torque margin figure (cited as
+  "≈29×" in both its comparison table, line 1386, and its Recommendation
+  section, lines 1421–1423) is computed using a "~300g representative"
+  rotating-assembly mass that pre-dates Rev 4's bearing/flange/stand-plate
+  mechanism entirely (sourced from REQ-310's own Rev-3-era estimate) — and
+  is therefore now stale by an even larger margin after Rev 4.1's own small
+  mass additions. This is confirmed independently to be unrelated to
+  `pinch_guard()` itself: `pinch_guard()` is structurally independent of the
+  bearing's rotating/thrust-load path (a separate, desk-resting structure),
+  so its own mass does not enter this calculation at all — the staleness
+  predates and is unrelated to this Rev 4.1 pass; it is a pre-existing gap
+  this cycle's own second-order-implications check happened to surface.
+- **Rationale**: Independently recomputing the same formula
+  `bom/component-selection.md`'s own calc already uses (M = 0.5·μ·P·d, with
+  μ=0.0013, d=90mm race diameter, both ESTIMATE): the **original** calc is
+  confirmed to exactly reproduce the document's own on-record figure
+  (M=0.17217mN·m, margin=29.04× against REQ-007's ≥5mN·m target) for its own
+  stated P (2.943N, from ~300g) — the existing figure is not itself
+  arithmetically wrong for the input it uses. However, the actual current
+  rotating-assembly mass — independently reconciled this cycle via the
+  dimensional-spec's own §18.3/C3 figure (404.5g, the official Rev 4 total)
+  plus this cycle's own independent render of Rev 4.1's
+  `rotation_index_pointer()`+`cable_anchor_tab()`×2 (≈1.051g) — totals
+  ≈405.551g, already exceeding even REQ-310's own "conservative ~350g bound"
+  by ≈15.9%, and the 300g figure the friction calc directly uses by ≈35.2%.
+  Recomputing with this actual mass (P=3.9785N) gives **M_new≈0.23274mN·m,
+  margin_new≈21.48×** — still enormously non-blocking against REQ-007's own
+  target, so this is not a functional/safety risk, but it is a genuine
+  instance of exactly the stale-value-blending pattern checklist item 10
+  exists to catch, one hop downstream of the `.scad`/interface-file
+  discipline itself. Checked `hardware/mechanical-interface.md` Open Item 19
+  directly and confirmed it flags only the general "total system mass
+  (~601.8g, now ~1173.4g) vs. the human's own ~280–320g working estimate"
+  growth — it does not trace this through to this specific downstream
+  friction-margin figure in `bom/component-selection.md`, confirming this is
+  a genuinely new, previously-untracked gap, related in spirit to this
+  project's own existing MISS-026 (also a stale/imprecise mass-figure
+  finding) but distinct in specifics (different document, different
+  calculation, different consequence).
+- **Datasheet Source**: `bom/component-selection.md` lines 1386, 1421–1423;
+  `requirements/requirements.md` REQ-310 (line 187, the stale ~300g/~350g
+  source); `bench-imu-01-dimensional-spec.md` §18.3/C3 (404.5g); this
+  cycle's own independent render (≈1.051g for the two Rev 4.1 additions);
+  `hardware/mechanical-interface.md` Open Item 19 (confirmed related but
+  distinct, does not cover this specific figure).
+- **Failure Mechanism**: Not a functional/safety failure mode — margin
+  remains ≈21.48×, nowhere near the 1× binding-constraint threshold either
+  way. The risk is purely one of stale documentation silently understating
+  today's already-eroded margin: a future design change that further
+  increases rotating mass (e.g. a heavier flywheel revision), without
+  anyone first reconciling this specific calculation, would compound an
+  error that already exists today, with no explicit trigger currently in
+  place to catch it.
+- **Affected Component**: Documentation/traceability only —
+  `bom/component-selection.md`'s friction-torque margin figure and
+  Recommendation section. No `.scad` geometry, no physical component,
+  implicated.
+- **Recommended Fix**: Update `bom/component-selection.md`'s friction-torque
+  calculation and both citations of the ≈29× margin to use the current
+  actual rotating-assembly mass (≈405.55g), giving margin ≈21.5×; consider a
+  brief cross-reference note so a future mass change triggers an explicit
+  re-check of this specific downstream figure, not just the mass table
+  itself. Owner: whoever maintains `bom/component-selection.md` (Component
+  Engineer/Hardware Lead) — outside the Mechanical Lead's own `.scad`/
+  dimensional-spec artifact ownership, though within this Reviewer's own
+  cross-cutting mechanical-traceability mandate to flag.
+- **Severity**: **LOW**. Per `docs/architecture.md` §7.1 ("Style/best-
+  practice/documentation improvement, negligible functional risk") — direct
+  precedent in this project's own already-open MISS-026 (also a stale/
+  imprecise-mass-figure-in-a-narrative finding, also LOW, also with the
+  underlying engineering conclusion unaffected since margin stays >>1×
+  regardless of which mass figure is used). Newly logged as **MISS-029**.
+
+### Verdict
+
+- **Verdict**: **CONDITIONAL**.
+- **Open CRITICAL count**: 0.
+- **Open HIGH count**: 1 — **MISS-023** (Finding 1), carried forward from
+  Cycle 5, re-examined in full against Rev 4.1's specific fix, and
+  independently re-affirmed HIGH/OPEN — real, substantial, verified
+  mitigation exists, but this Reviewer's own independent judgment is that it
+  does not yet constitute an adequate disposition for a HIGH, Must-priority,
+  safety-critical finding.
+- **Resolved this cycle**: **MISS-024** (Finding 2), independently
+  re-verified complete for its own actual REQ-407(c)/REQ-113 textual scope —
+  moved from `OPEN` to `RESOLVED` in `validation/open-issues.md`. REQ-012's
+  broader aspiration remains a disclosed, non-blocking, Should-priority
+  trade-off (Open Item 25), not a new gap.
+- **Open MEDIUM count (non-gating, carried forward, unaffected by Rev
+  4.1)**: 1 — **MISS-025** (bearing-joint fastener-load-calculation gap).
+  Independently reconfirmed this cycle that Rev 4.1's changes do not touch
+  the bearing-to-flange/bearing-to-stand-plate joint this finding concerns —
+  status and severity unchanged, no edit made to its row.
+- **Open LOW count (non-gating)**: 4 total — 3 carried forward, unaffected
+  by Rev 4.1 and independently reconfirmed still accurate this cycle
+  (**MISS-026**, REQ-310 mass-comparison framing — its cited §18.3/C3/C8
+  text is untouched by this pass; **MISS-027**, §18.5 volume-figure
+  non-reproducibility — concerns Rev 4's own 5 solids specifically, not Rev
+  4.1's; worth noting this cycle's own Rev 4.1 re-renders reproduced their
+  claimed figures far more precisely than Rev 4's own volumes did, a
+  positive cross-check, not a contradiction of MISS-027; **MISS-028**,
+  R=80.0mm radius-sweep arithmetic slip — an isolated, non-selected-row
+  table entry, untouched by this pass) plus **MISS-029** (Finding 3, new
+  this cycle — stale `bom/component-selection.md` friction-torque margin
+  citation).
+- **What independently checks out with no error found**: The corrected
+  126.424mm max-swept-radius figure (Cycle 5's own 115.9mm figure is
+  confirmed wrong, superseded); `pinch_guard()`'s complete geometry, mass
+  (570.558g), and both collision checks; the 77.7% coverage arithmetic; J1/
+  J4's exact position (97.073mm/123.44°/56.56°); the full cable-wrap/
+  turn-limit/service-loop arithmetic chain; both the pre-fix and post-fix
+  `cable_anchor_tab()` wall-thickness figures (confirming the defect was
+  real and the fix is genuinely applied in the live source, not just
+  claimed); the REQ-407(c)/REQ-113/REQ-012 textual relationship (confirming
+  the Mechanical Lead's own MISS-024 scope-framing is honest, not a dodge);
+  the total system mass reconciliation (≈1173.4g); render/manifold status
+  for both `show_mode`s (exact Genus/vertex/facet match); REQ-311's
+  continued additive-only discipline (independently confirmed via direct
+  `git diff` read — no Rev 3 or original-Rev-4 module body edited).
+  Independently computed a fresh static tip-over margin (≈12.17×, up from
+  Rev 4's own 6.2×) that the Mechanical Lead's own report declined to
+  compute, confirming — not merely asserting — that `pinch_guard()`'s own
+  added stationary footprint/mass can only improve tip-over margin, since it
+  rests independently on the desk around the existing stand plate rather
+  than adding load to the rotating assembly; independently confirmed
+  `pinch_guard()` is structurally outside the bearing's own supported/
+  rotating load path, so the bearing's own friction-torque calculation
+  correctly remains based on the ~405.5g rotating-assembly mass, not the
+  ~1173.4g total — this reasoning checks out, but surfaced Finding 3's own,
+  separate staleness issue in the process.
+- **What's blocking a clean PASS**: One open HIGH finding, MISS-023 —
+  independently re-affirmed after full adversarial re-derivation of Rev
+  4.1's own specific mitigation, not carried forward by default. Per this
+  Reviewer's own agent-file verdict rule, an open HIGH does not by itself
+  block a PASS verdict (only an open CRITICAL does) — but
+  `docs/architecture.md` §8's own Design Complete Gate separately and
+  additionally requires every HIGH finding to be `RESOLVED` or carry a named
+  human Chief Engineer `ACCEPTED-RISK` sign-off before that gate can pass,
+  regardless of this Reviewer's own verdict label. MISS-023 currently
+  satisfies neither condition. This Reviewer states this plainly as
+  information for the Hardware Lead's own gate interpretation, without
+  pre-empting that interpretation or unilaterally assigning
+  `ACCEPTED-RISK` (which requires a named human, per `validation/
+  open-issues.md`'s own Rules section, and which this Reviewer, an AI
+  agent, cannot supply).
+- **Task-specific assessment of the specific claims scrutinized**: (1)
+  MISS-023's 126.424mm re-derivation and `pinch_guard()` geometry —
+  independently re-derived and confirmed correct in every particular; the
+  residual-gap disposition itself is independently judged inadequate for a
+  HIGH finding's full closure, for reasons the Mechanical Lead's own report
+  discloses as facts but does not carry through to a closure recommendation
+  (Finding 1); (2) MISS-024's J1/J4 radius and REQ-113/REQ-407(c)/REQ-012
+  scope-framing — independently re-derived and confirmed correct/honest in
+  every particular; disposition RESOLVED for its actual textual scope
+  (Finding 2); (3) the new mass finding's plausibility and second-order
+  implications — `pinch_guard()`'s ≈570.6g mass independently confirmed
+  plausible against its own stated dimensions and PETG density, and exactly
+  reproduced via direct render; confirmed this **improves** (not worsens)
+  tip-over margin (≈12.17×, independently computed, not merely asserted
+  qualitatively) since the guard is a separate, non-rotating, desk-resting
+  structure; confirmed the bearing's own friction-torque calculation is
+  unaffected by `pinch_guard()`'s mass (structurally independent load path)
+  — but this exact check surfaced a **separate, pre-existing, previously-
+  unflagged** staleness in that same friction-torque figure relative to Rev
+  4's own already-established mass growth (Finding 3, MISS-029); (4) render/
+  manifold status — independently re-rendered for both `show_mode`s, exact
+  match on Genus/vertex/facet counts, not trusted from the reported figures
+  alone; (5) additive-only discipline — independently confirmed via direct
+  `git diff`/file-content read that no Rev 3 or original-Rev-4 module body
+  was edited, only genuinely new Rev 4.1 additions, continuing REQ-311's
+  discipline.
+- **Next action**: Report CONDITIONAL to the Hardware Lead. MISS-024 is
+  newly `RESOLVED` in `validation/open-issues.md`, no further loop-back
+  needed for that item. MISS-023 (HIGH) remains logged `OPEN`, `Source:
+  mechanical-reviewer`, in `validation/open-issues.md`, now carrying this
+  cycle's own additional independent rationale — loop back to the
+  Mechanical Lead if further geometric closure (recommended fix (a)/(b)
+  above) is to be attempted, or escalate to the human Chief Engineer for an
+  explicit `ACCEPTED-RISK` disposition if the residual risk is to be
+  accepted as-is; either path requires a decision this Reviewer cannot make
+  unilaterally. MISS-025 (MEDIUM) and MISS-026/MISS-027/MISS-028 (LOW)
+  remain `OPEN`, unaffected by this cycle, rows not edited. MISS-029 (LOW)
+  is newly logged `OPEN`, `Source: mechanical-reviewer`, non-gating, for
+  whoever maintains `bom/component-selection.md` to pick up at convenience.
