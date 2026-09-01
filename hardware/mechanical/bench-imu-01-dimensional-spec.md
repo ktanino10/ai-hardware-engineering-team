@@ -1,12 +1,19 @@
 # Bench-IMU-01 — Enclosure Dimensional Spec & Design Rationale
 
-**Status: Rev. 3.3 — recomputes §8's REQ-403 physics table against a
-corrected credible-worst-case motor RPM input (independently re-verified,
-not merely accepted from Circuit Engineer's own report); NO `.scad`
-geometry changed this revision, and §8.1 is also unchanged (flagged as
-needing its own follow-up recompute, not performed here — see §8's new
-MISS-016 staleness flag).** Rev 3.2 (previous revision) added a bounded
-MISS-011 estimate attempt (§8.1). Rev 3.1 before that fixed Independent
+**Status: Rev. 3.4 — recomputes §8.1's own Method 1/Method 2 wall-impact and
+fastener pull-out analysis (Charpy/fracture-toughness, yield-strength
+plastic-work, confidence ledger, escalation flag) plus §15 item 6's
+cross-reference against the Rev 3.3-corrected credible-worst-case energy
+figures (≈156.44J/≈79.11 m/s point estimate; range ≈154.95–157.69J/
+≈78.73–79.42 m/s); NO `.scad` geometry changed this revision — this is the
+final piece of the premise-correction chain flagged by Rev 3.3's own
+MISS-016 staleness note, closing out `validation/open-issues.md` MISS-016's
+"actual recompute explicitly deferred" item (the open-issues.md entry itself
+is intentionally left for the Hardware Lead to update, not edited by this
+revision).** Rev 3.3 (previous revision) recomputed §8's own REQ-403 physics
+table against a corrected credible-worst-case motor RPM input but explicitly
+deferred §8.1's own recompute to a follow-up. Rev 3.2 before that added a
+bounded MISS-011 estimate attempt (§8.1). Rev 3.1 before that fixed Independent
 Mechanical Review Cycle 3's 1 CRITICAL (MISS-008) and 2 HIGH (MISS-009,
 MISS-010) findings, in both the `.scad` file and this document. MISS-011
 (MEDIUM, non-gating) was carried forward in Rev 3.1 **disclosed, not
@@ -20,10 +27,100 @@ change, and explicitly **not** a self-certified closure of MISS-011
 Mechanical Lead is not independent of its own estimate). This document still
 does not declare itself reviewed/complete — see
 `.github/agents/mechanical-lead.agent.md`, "Out of scope" — a fresh
-Independent Mechanical Review pass on this revision (now including §8.1) is
+Independent Mechanical Review pass on this revision (now including the
+Rev 3.4-recomputed §8.1) is
 the required next step; after that clears, the REQ-403 disposition proposal
 in §8 goes to the human as a HITL gate. Nothing in this file should be read
 as "approved."
+
+**Rev. 3.4 changelog (this revision, Mechanical Lead, analysis-only — no
+`.scad` change; closes the numeric-recompute portion of MISS-016,
+`validation/open-issues.md`):**
+
+- **Recomputed §8.1.1's sanity-check re-derivation** to use the Rev
+  3.3-corrected v_rim≈79.11 m/s (was 69.74 m/s), reproducing §8's own
+  156.44J/4.5×10⁻⁵ kg·m² table figures (was 121.60J) to rounding — I
+  (moment of inertia) and mass/radius are unchanged, only the RPM-derived
+  rim speed and resulting energy actually moved, as expected.
+- **Recomputed §8.1.2's Method 1 (Charpy/fracture-toughness) table**: same
+  material Charpy figures (2.4–12 kJ/m², unchanged — material properties
+  don't change), same 4.5/15/30/60mm engagement-length sweep, against the
+  new 156.44J denominator. New "% of budget" column: 0.028%–0.14% (4.5mm),
+  0.092%–0.46% (15mm), 0.18%–0.92% (30mm), 0.37%–1.84% (60mm) — every figure
+  moved down from the Rev-3.2/3.3 values (0.036%–0.18%/0.12%–0.59%/
+  0.24%–1.18%/0.47%–2.37%), because the same fixed absorption is now a
+  smaller share of a larger budget. Reverse cross-check (engagement length
+  to consume the entire budget): now 3,259–16,296mm (1,313%–6,566% of the
+  248.19mm wall circumference), up from 2,533–12,667mm (1,021%–5,104%).
+- **Recomputed §8.1.2's Method 2 (yield-strength-limited plastic work)
+  table**: same yield figures (37.9–50 MPa, unchanged), same sweep, against
+  the new 156.44J denominator and 79.11 m/s rim speed where referenced. New
+  "% of budget" column: 1.7%–2.3% (4.5mm), 5.8%–7.7% (15mm), 11.6%–15.3%
+  (30mm), **23.3%–30.7%** (60mm) — down from 2.2%–3.0%/7.5%–9.9%/
+  15.0%–19.7%/**29.9%–39.5%**. Reverse cross-check: now 196–258mm
+  (79%–104% of the wall circumference — the upper bound now *exceeds* 100%,
+  a new qualitative fact not present at the superseded energy figure), up
+  from 152–201mm (61%–81%).
+- **Updated the "Verdict — wall" prose**: "well under half" still holds
+  numerically (if anything more so — 23.3%–30.7% vs. the old 29.9%–39.5%),
+  but the best-case shortfall multiple widened from the previously-stated
+  "~2.5–3×" to a precisely recomputed **≈3.26×–4.30×**, and the
+  typical/localized shortfall widened from "one to somewhat over three
+  orders of magnitude" (≈42×–2,778×) to **≈54×–3,621× (≈1.7 to ≈3.6
+  orders of magnitude)**. The shortfall widened at every
+  engagement length and by both methods — it did not narrow anywhere, as
+  MISS-016 itself predicted.
+- **Updated the "Real-world intuition comparable" baseball paragraph**: the
+  116.0J baseball-pitch comparable was "within 5%" of the old 121.60J
+  budget (≈95.4%); against the corrected 156.44J budget it is now only
+  ≈74.15% of the budget — the credible-worst-case event is now
+  appreciably more energetic than a hard-thrown pitch (≈1.35× one), not a
+  near-match to one.
+- **Recomputed §8.1.3's fastener pull-out section**: the "deliberately
+  pessimistic hypothetical" now applies the full 156.44J (was 121.60J)
+  directly to the cap joint; the force-vs-stopping-distance table's
+  required-force values and break-even distances were recomputed
+  accordingly (e.g. the 6,000N-ideal break-even grew from ≈20.3mm to
+  ≈26.1mm). **New qualitative finding**: at the 50mm stopping distance, the
+  3,000N-reduced-sharing scenario flips from within capacity (≈0.81×) to
+  marginally over capacity (≈1.04×) — the 6,000N-ideal scenario remains
+  within capacity at 50mm (≈0.52×, was ≈0.41×).
+- **Updated §8.1.4's confidence ledger**: the disk-parameter row and the
+  overall-wall-verdict row now cite the Rev 3.4 figures; every other row
+  (wall geometry, insert dimensions, Charpy/tensile figures as published,
+  load-sharing assumptions, etc.) is unchanged, since none of those
+  underlying facts moved.
+- **Updated §8.1.6's escalation flag** to cite the same recomputed shortfall
+  multiples (≈3.26×–4.30× best case; ≈1.7–3.6 orders of magnitude typical).
+- **Updated §15 item 6's "Rev 3.2 note" and its "Rev 3.2 addendum"
+  cross-reference** to the same recomputed figures, completing the
+  cross-reference Rev 3.3 explicitly deferred ("§15 item 6's existing 'Rev
+  3.2 note' and §8.1 itself still quote the superseded 121.60J/69.74 m/s
+  figures — both are necessarily part of the same follow-up recompute...
+  not edited separately here to avoid partially updating §8.1-dependent
+  content piecemeal" — Rev 3.3 changelog, above).
+- **No confidence-marking TYPE was changed** — every `CONFIRMED`/
+  `ASSUMPTION`/`ESTIMATE`/`DERIVED`/`UNKNOWN` label in §8.1 and §15 item 6
+  is exactly as it was before this revision; only the numeric values inside
+  cells that already carried those markings were recomputed.
+- **No `.scad` geometry was changed** and no new design decision was made —
+  this revision is a pure numeric recompute of an existing estimate against
+  an already-corrected input, per this task's explicit scope. The
+  wall-thickness/topology question remains a separate, already-flagged
+  decision for the Hardware Lead/human at the REQ-403 gate (§8.1.6).
+- **Not logged as a new ECO** in `validation/change-log.md`: no `.scad`
+  design change occurs in this revision (analysis-only numeric recompute of
+  an existing estimate), so per this Mechanical Lead's own standing
+  instruction to log an ECO "if the design actually changes," no entry was
+  added — noting this as a judgment call the Hardware Lead may wish to
+  override, since Rev 3.2/3.3 (also analysis-only) were logged as ECO-021/
+  ECO-023 respectively.
+- `validation/open-issues.md` is explicitly **not** touched by this revision
+  (per this task's own scope) — the recomputed figures above are reported
+  back for the Hardware Lead to fold into MISS-016's own row.
+- **Out of this revision's edit scope, unchanged:** `bench-imu-01-manufacturing-
+  spec.md` (already fixed separately for MISS-021), all `.scad` files,
+  `hardware/schematic/`, `firmware/`, `bom/`, `requirements/`.
 
 **Rev. 3.3 changelog (this revision, Mechanical Lead, analysis-only — no
 `.scad` change; consumes Circuit Engineer's DS-MTR-018 correction,
@@ -874,38 +971,43 @@ the REQ-403 HITL gate — exactly mirroring how the electronics-side REQ-403
 disposition was handled (proposed → independently reviewed → human gate),
 not a unilateral final decision by this Mechanical Lead.
 
-**Rev 3.3 staleness flag for MISS-016 (HIGH, OPEN) — follow-up recompute
-required, not performed here:** `validation/open-issues.md` MISS-016 (the
+**Rev 3.3 staleness flag for MISS-016 (HIGH, OPEN) — recompute performed in
+Rev 3.4, see §8.1:** `validation/open-issues.md` MISS-016 (the
 containment-wall energy-absorption shortfall) cites this document's own
-§8.1.2 Method 1/Method 2 wall-impact estimates as its evidence, both
-computed against the now-superseded 121.60 J / 69.74 m/s / 22,200 RPM
-figures. **§8.1 is unchanged by this revision** — recomputing it is a
-separate, already-flagged piece of work, out of this task's own explicit
-scope, not a quick follow-on performed here. Its own Method 1 (~0.5–2.4% of
-budget) and Method 2 (~30–40% of budget) shortfall percentages, and the
-"~2.5–3× short" / "1 to 3+ orders of magnitude short" conclusions, are
-**all now stale**: they were computed against an energy figure this
-revision has just shown to be ≈27.4–29.7% too low (point ≈28.65%). Because
+§8.1.2 Method 1/Method 2 wall-impact estimates as its evidence. As of Rev
+3.3 these were computed against the now-superseded 121.60 J / 69.74 m/s /
+22,200 RPM
+figures; Rev 3.3 itself flagged this as required follow-up, not performed
+in that revision. **Rev 3.4 has since performed that recompute** — see
+§8.1.2 for the full recomputed Method 1/Method 2 tables and reverse
+cross-checks. Summary of what changed: Method 1 (was ~0.5–2.4% of budget,
+now ≈0.03%–1.84%) and Method 2 (was ~30–40% of budget, now
+≈1.7%–30.7%) shortfall percentages, and the "~2.5–3× short" / "1 to 3+
+orders of magnitude short" conclusions (now precisely **≈3.26×–4.30× short
+at best, ≈1.7–3.6 orders of magnitude short typically**), were all stale as
+of Rev 3.3: they had been computed against an energy figure Rev 3.3 itself
+showed to be ≈27.4–29.7% too low (point ≈28.65%). Because
 the containment wall's energy-absorption capacity did not change (no
-`.scad` geometry was touched this revision) while the demanded energy went
-up, **MISS-016's already-quantified shortfall can only widen, not
-narrow**, once §8.1 is recomputed against the corrected ≈154.95–157.69 J
-(point ≈156.44 J) figure — this is a direction-of-travel statement, not a
-substitute for the actual recompute, which is explicitly **not** performed
-in this revision and is flagged here as required follow-up work, per this
-Mechanical Lead's own instruction not to silently leave a known stale
-downstream connection unstated. §15 item 6's existing "Rev 3.2 note" (which
-also quotes the same superseded 121.60J figure) is part of that same
-follow-up and is likewise not edited here, to avoid partially updating
-§8.1-dependent content piecemeal outside this task's scope. (Incidental
+`.scad` geometry was touched in Rev 3.3 or Rev 3.4) while the demanded energy went
+up, **MISS-016's shortfall widened, exactly as this flag predicted it
+would — it did not narrow anywhere**, once §8.1 was recomputed against the
+corrected ≈154.95–157.69 J
+(point ≈156.44 J) figure in Rev 3.4. §15 item 6's existing "Rev 3.2 note"
+(which
+also quoted the same superseded 121.60J figure) was part of that same
+follow-up and was updated together with §8.1 in Rev 3.4, to avoid partially
+updating §8.1-dependent content piecemeal. `validation/open-issues.md`
+itself is intentionally **not** updated by Rev 3.4 either (same scope
+boundary as Rev 3.3) — the recomputed figures are reported back for the
+Hardware Lead to fold into MISS-016's own row. (Incidental
 citation note, not a defect requiring action: the task instruction that
-prompted this revision described MISS-016's Method 1/2 figures as living in
+prompted Rev 3.3 described MISS-016's Method 1/2 figures as living in
 `bench-imu-01-manufacturing-spec.md` §8.1 — that file is untouched and is
 not where MISS-016's analysis actually lives; MISS-016's real cited
 evidence, per `validation/open-issues.md` line 89, is this same document's
 own §8.1.2, consistent with how this flag is written.)
 
-### 8.1 MISS-011 closure attempt: bounded wall-impact and fastener pull-out estimates (Rev 3.2, 2026-09-13)
+### 8.1 MISS-011 closure attempt: bounded wall-impact and fastener pull-out estimates (Rev 3.2, 2026-09-13; **numeric recompute against the corrected energy budget: Rev 3.4, 2026-09-13, MISS-016**)
 
 **What this subsection is and is not.** MISS-011 (MEDIUM, non-gating, see
 §12/§16 and `validation/open-issues.md`) flags that the 4.0mm
@@ -936,15 +1038,21 @@ FEA), exactly as the task scoped it — `CONFIRMED` (tool-absence re-verified
 #### 8.1.1 Threat-model framing used for this estimate
 
 §8 above already establishes the load case: **the entire 100g disk
-detaching as one rigid projectile** (line ~621), at up to 121.60J of stored
-rotational kinetic energy (22,200 RPM no-load-high case), not a small
-fragment. As an independent sanity check before relying on this figure
-further, it was re-derived from first principles rather than copied: for a
-solid disk, KE_rotational = ¼·m·v_rim² (equivalent to ½Iω² with
-I=½mr²). Using the disclosed m=0.100kg, v_rim=69.74 m/s: ¼×0.100×69.74² =
-**121.59 J**, and I=½×0.100×0.030² = **4.5×10⁻⁵ kg·m²** — both reproduce
-the existing table's figures (§8, "The physics" table) to rounding.
-`CONFIRMED` (independently re-derived, matches existing document).
+detaching as one rigid projectile** (line ~621), at up to 156.44J of stored
+rotational kinetic energy (≈25,180 RPM credible-worst-case, point estimate;
+range ≈154.95–157.69J across 25,060–25,280 RPM — **Rev 3.4**, supersedes the
+old 121.60J/22,200-RPM-no-load-high figure per §8's own Rev 3.3 correction),
+not a small fragment. As an independent sanity check before relying on this
+figure further, it was re-derived from first principles rather than copied:
+for a solid disk, KE_rotational = ¼·m·v_rim² (equivalent to ½Iω² with
+I=½mr²). Using the disclosed m=0.100kg, v_rim=79.11 m/s: ¼×0.100×79.11² =
+**156.46 J**, and I=½×0.100×0.030² = **4.5×10⁻⁵ kg·m²** — both reproduce
+the existing table's figures (§8, "The physics" table, Rev 3.3) to rounding,
+the same way the superseded 69.74 m/s check reproduced the old 121.60J
+figure to rounding. `CONFIRMED` (independently re-derived, matches existing
+document; re-verified this cycle against the Rev 3.3-corrected inputs —
+**Rev 3.4**, mass/radius/I unchanged, only the RPM-derived rim speed and
+resulting energy actually moved).
 
 Because the flywheel's rotation axis is vertical (Z) and `fw_bay_wall()` is
 the cylindrical wall surrounding the disk radially, the disk's **rim/edge**
@@ -982,22 +1090,37 @@ multi-contact worst case. Material figures used (`ESTIMATE`-applicability,
 | PETG, Polymaker PolyMax (DS-MTL-002) | 11.6±0.8 kJ/m² (X-Y) / 2.4±0.6 kJ/m² (Z) | Directly fetched & read HTML TDS table |
 | Nylon PA12, Fiberlogy (DS-MTL-003) | ~12 kJ/m² | AI-search-summary; PDF URL confirmed live, content unparsed |
 
-| Engagement `w` | Area (t×w) | E_frac range (all materials above) | % of 121.60J |
+**Rev 3.4 — recomputed against the corrected 156.44J denominator, same
+material Charpy figures (material properties don't change), same
+engagement-length sweep.** The absolute E_frac joule figures below are
+therefore **unchanged** from Rev 3.2/3.3 — only the "% of budget" column
+moves, because the budget itself grew:
+
+| Engagement `w` | Area (t×w) | E_frac range (all materials above) | % of 156.44J |
 |---|---|---|---|
-| 4.5mm (disk thickness) | 18.0mm² | 0.043–0.216 J | 0.036%–0.18% |
-| 15mm | 60.0mm² | 0.144–0.720 J | 0.12%–0.59% |
-| 30mm (disk radius) | 120.0mm² | 0.288–1.440 J | 0.24%–1.18% |
-| 60mm (disk diameter) | 240.0mm² | 0.576–2.880 J | 0.47%–2.37% |
+| 4.5mm (disk thickness) | 18.0mm² | 0.043–0.216 J | 0.028%–0.14% |
+| 15mm | 60.0mm² | 0.144–0.720 J | 0.092%–0.46% |
+| 30mm (disk radius) | 120.0mm² | 0.288–1.440 J | 0.18%–0.92% |
+| 60mm (disk diameter) | 240.0mm² | 0.576–2.880 J | 0.37%–1.84% |
+
+(Was, against the superseded 121.60J: 0.036%–0.18% / 0.12%–0.59% /
+0.24%–1.18% / 0.47%–2.37% respectively — every figure moved down, because a
+larger, unchanged-numerator-over-larger-denominator fraction is smaller, not
+because the wall got any better at absorbing energy.)
 
 Reverse cross-check — engagement length needed to consume the *entire*
-121.60J via fracture toughness alone, at a fixed 4.0mm depth: 2,533–12,667mm,
-i.e. **1,021%–5,104% of the wall's own full inner circumference (248.19mm,
-`DERIVED` from `fw_bay_inner_r`=39.5mm, §4.4 line 410; `.scad` line 467
-agrees)** — several times all the way around the
-wall. This is not a physically meaningful "localized puncture," it is a
-mathematical statement that fracture-toughness-only absorption cannot come
-close to the disclosed energy at any localized footprint. `ESTIMATE`
-(method + range), arithmetic itself `CONFIRMED` by direct computation.
+156.44J via fracture toughness alone, at a fixed 4.0mm depth: **3,259–16,296mm**
+(was 2,533–12,667mm against the superseded 121.60J), i.e. **1,313%–6,566% of
+the wall's own full inner circumference (248.19mm, `DERIVED` from
+`fw_bay_inner_r`=39.5mm, §4.4 line 410; `.scad` line 467
+agrees)** — was 1,021%–5,104% — several times all the way around the
+wall, now more times than before. This is not a physically meaningful
+"localized puncture," it is a mathematical statement that
+fracture-toughness-only absorption cannot come close to the disclosed
+energy at any localized footprint — and comes even less close than
+previously computed, now that the energy denominator is larger and the
+wall's own absorption capacity has not changed. `ESTIMATE` (method + range),
+arithmetic itself `CONFIRMED` by direct computation (**Rev 3.4** recompute).
 
 **Method 2 — yield-strength-limited local plastic work.** Treats the wall
 as absorbing energy through plastic deformation up to its own thickness
@@ -1013,36 +1136,52 @@ before losing containment — a generous assumption in the design's favor).
 | PETG, Polymaker PolyMax X-Y (DS-MTL-002) | 37.9±1.4 MPa | Directly fetched & read HTML TDS table |
 | Nylon PA12, Fiberlogy (DS-MTL-003) | ~45 MPa | AI-search-summary |
 
-| Engagement `w` | Area (t×w) | E_abs range | % of 121.60J |
+**Rev 3.4 — recomputed against the corrected 156.44J denominator, same
+tensile-yield figures.** The absolute E_abs joule figures are **unchanged**
+from Rev 3.2/3.3 — only the "% of budget" column moves:
+
+| Engagement `w` | Area (t×w) | E_abs range | % of 156.44J |
 |---|---|---|---|
-| 4.5mm | 18.0mm² | 2.73–3.60 J | 2.2%–3.0% |
-| 15mm | 60.0mm² | 9.10–12.00 J | 7.5%–9.9% |
-| 30mm | 120.0mm² | 18.19–24.00 J | 15.0%–19.7% |
-| 60mm (disk diameter) | 240.0mm² | 36.38–48.00 J | **29.9%–39.5%** |
+| 4.5mm | 18.0mm² | 2.73–3.60 J | 1.7%–2.3% |
+| 15mm | 60.0mm² | 9.10–12.00 J | 5.8%–7.7% |
+| 30mm | 120.0mm² | 18.19–24.00 J | 11.6%–15.3% |
+| 60mm (disk diameter) | 240.0mm² | 36.38–48.00 J | **23.3%–30.7%** |
+
+(Was, against the superseded 121.60J: 2.2%–3.0% / 7.5%–9.9% / 15.0%–19.7% /
+**29.9%–39.5%** respectively.)
 
 Reverse cross-check — engagement length needed at δ=4.0mm to consume the
-*entire* 121.60J: 152–201mm depending on material, i.e. **61%–81% of the
-wall's full circumference** would need to plastically yield through its
-whole thickness simultaneously — most of the entire wall, not a localized
-hit. `ESTIMATE` (method + range), arithmetic `CONFIRMED` by direct
-computation.
+*entire* 156.44J: **196–258mm** depending on material (was 152–201mm
+against the superseded 121.60J), i.e. **79%–104% of the wall's full
+circumference** would need to plastically yield through its whole thickness
+simultaneously (was **61%–81%**) — the upper bound now *exceeds* the wall's
+entire circumference (104% > 100%), a new qualitative fact: even wrapping
+the assumed-full-depth plastic-yield zone all the way around the wall's
+entire inner circumference would not, at the lower-yield-strength material
+bound, be enough to consume the corrected energy budget. `ESTIMATE` (method
++ range), arithmetic `CONFIRMED` by direct computation (**Rev 3.4**
+recompute).
 
 **Real-world intuition comparable.** A regulation baseball (0.145kg) at
-40 m/s (~144 km/h, a hard-thrown pitch) carries 116.0J — within 5% of the
-disclosed 121.60J. A person would not casually assume a 4mm plastic wall
-reliably stops a baseball-speed/energy impact without testing; this is
-offered as an intuition check, not a calculation. `ESTIMATE` (illustrative
-only).
+40 m/s (~144 km/h, a hard-thrown pitch) carries 116.0J. Against the
+corrected 156.44J budget this is now only **≈74% of the disclosed energy**
+(**Rev 3.4** — was "within 5%" of the superseded 121.60J figure, i.e.
+≈95.4%): the credible-worst-case release is now appreciably more energetic
+than a single hard-thrown pitch, roughly **1.35×** a baseball pitch's energy,
+not a near-match to one. A person would not casually assume a 4mm plastic
+wall reliably stops an impact more energetic than a hard-thrown baseball
+without testing; this is offered as an intuition check, not a calculation.
+`ESTIMATE` (illustrative only).
 
 **Caveats — three simplifications, not all pointing the same direction:**
 1. *High strain rate (non-conservative bias):* the cited Charpy/tensile
    figures are quasi-static or low-rate test data. Most thermoplastics
    (PETG and PA12 included) trend toward **lower** toughness / more
    brittle behavior at high strain rates, and this containment event
-   (69.74 m/s rim speed) is a far higher rate than any standard Charpy or
-   tensile test. Real performance is plausibly **worse** than modeled
-   here. `ASSUMPTION` (directional, not quantified — no high-rate data
-   located for these specific materials).
+   (≈79.11 m/s rim speed, **Rev 3.4** — was 69.74 m/s) is a far higher rate
+   than any standard Charpy or tensile test. Real performance is plausibly
+   **worse** than modeled here. `ASSUMPTION` (directional, not quantified —
+   no high-rate data located for these specific materials).
 2. *FDM print vs. TDS coupon (non-conservative bias):* the cited figures
    are manufacturer TDS values, generally measured on well-controlled
    (often injection-molded or ideally-printed) specimens — not
@@ -1065,23 +1204,34 @@ only).
    `ESTIMATE` (exact trigonometry given the stated simplifying
    assumptions; the assumptions themselves are simplifications).
 
-**Verdict — wall.** Across both methods and the full physically-anchored
+**Verdict — wall (Rev 3.4, recomputed against the corrected 156.44J
+budget).** Across both methods and the full physically-anchored
 engagement-length sweep, local-material energy absorption accounts for
-**well under half of the disclosed 121.60J even in the most generous
-plausible case** (Method 2, 60mm engagement: ~30–40%; Method 1 at the same
-engagement: under 2.5%). The most favorable defensible number these methods
-support is roughly **a factor of ~2.5–3× short of the full budget**
-(Method 2, largest engagement); more typical/localized engagement
-assumptions or fracture-toughness-only reasoning put the shortfall at
-**one to somewhat over three orders of magnitude**. This does not prove the
+**well under half of the disclosed 156.44J even in the most generous
+plausible case** (Method 2, 60mm engagement: ≈23.3%–30.7%, was ≈29.9%–39.5%;
+Method 1 at the same engagement: under ≈1.9%, was under 2.5%) — if anything
+a *stronger* "well under half" than before, since the same fixed absorption
+capacity is now a smaller fraction of a larger budget. The most favorable
+defensible number these methods support is now **precisely ≈3.26×–4.30×
+short of the full budget** (Method 2, largest engagement; was ≈2.53×–3.34×,
+described loosely as "~2.5–3×" against the superseded figure — the
+shortfall widened, as expected, it did not narrow); more typical/localized
+engagement assumptions or fracture-toughness-only reasoning put the
+shortfall at **≈54×–3,621× (≈1.7 to ≈3.6 orders of
+magnitude)** — was ≈42×–2,778× (≈1.6 to ≈3.4 orders). The
+qualitative conclusion is unchanged in kind — "well under half," "several
+times short at best, orders of magnitude short typically" — but every
+underlying number moved in the worse direction, precisely as the larger,
+corrected energy denominator against an unchanged absorption capacity
+requires; none of it narrowed. This does not prove the
 wall fails outright — global structural response (does the whole ring
 flex/redirect the impact rather than a small zone absorbing it locally?),
 strain-rate-specific data, and the actual as-printed material properties
 are all outside what a closed-form estimate can capture, and caveat 3 above
 points the other way for one specific sub-case. But it does **not support
-an affirmative "4.0mm is adequate" claim** either. **This is flagged
-separately to the Hardware Lead in §8.1.6 — it is not resolved by this
-subsection and no geometry has been changed.**
+an affirmative "4.0mm is adequate" claim** either — now less so than before.
+**This is flagged separately to the Hardware Lead in §8.1.6 — it is not
+resolved by this subsection and no geometry has been changed.**
 
 #### 8.1.3 Fastener pull-out estimate
 
@@ -1121,7 +1271,8 @@ first line of defense against a direct radial hit — their realistic loading
 scenario is an **attenuated** one: whatever residual energy/force reaches
 the cap joint after the primary wall has already engaged (deflected,
 locally absorbed, or redirected) some fraction of the event, not
-necessarily the full undiminished 121.60J. Quantifying that attenuation
+necessarily the full undiminished 156.44J (**Rev 3.4** — was 121.60J).
+Quantifying that attenuation
 fraction precisely would require a multi-body impact simulation this
 environment cannot run — `UNKNOWN` (not estimated further here) — but
 qualitatively, **any** realistic secondary/attenuated load is smaller than
@@ -1129,41 +1280,63 @@ the full-direct-hit hypothetical below, so the fastener margin is better
 than the worst-case framing suggests.
 
 **Force vs. assumed stopping/crush distance** (work-energy, `F = E/δ`,
-deliberately pessimistic hypothetical: full 121.60J applied directly to the
-cap joint alone, ignoring any wall attenuation):
+deliberately pessimistic hypothetical: full 156.44J applied directly to the
+cap joint alone, ignoring any wall attenuation; **Rev 3.4** — recomputed
+against the corrected budget, was 121.60J):
 
 | Assumed stopping distance δ | Required force F | vs. 6,000N ideal | vs. 3,000N reduced |
 |---|---|---|---|
-| 1 mm (near-rigid stop) | 121,600 N | 20.3× over | 40.5× over |
-| 5 mm | 24,320 N | 4.05× over | 8.1× over |
-| 20 mm | 6,080 N | ~1.01× (break-even ≈20.3mm) | 2.03× over |
-| 50 mm | 2,432 N | 0.41× (within capacity) | 0.81× (within capacity) |
-| 100 mm | 1,216 N | 0.20× (within capacity) | 0.41× (within capacity) |
+| 1 mm (near-rigid stop) | 156,440 N | 26.1× over | 52.1× over |
+| 5 mm | 31,288 N | 5.21× over | 10.4× over |
+| 20 mm | 7,822 N | 1.30× over | 2.61× over |
+| 50 mm | 3,129 N | 0.52× (within capacity) | **1.04× over** |
+| 100 mm | 1,564 N | 0.26× (within capacity) | 0.52× (within capacity) |
+
+(Was, against the superseded 121.60J: 121,600N/20.3×/40.5× (1mm);
+24,320N/4.05×/8.1× (5mm); 6,080N/~1.01×(break-even≈20.3mm)/2.03× (20mm);
+2,432N/0.41×/0.81× (50mm); 1,216N/0.20×/0.41× (100mm).)
+
+New break-even points (ratio = 1.0×): **≈26.1mm** for the 6,000N
+ideal-sharing capacity (was ≈20.3mm); **≈52.1mm** for the 3,000N
+reduced-sharing capacity (was ≈40.5mm — not previously called out as a
+named break-even in this table because the 50mm row still cleared it).
+**New qualitative finding, not present at the superseded energy figure:**
+at the previously-assumed 50mm stopping distance, the 3,000N-reduced
+scenario is now marginally **over** capacity (≈1.04×) rather than within it
+(was ≈0.81×, within capacity) — the 6,000N-ideal scenario remains within
+capacity at 50mm (≈0.52×, was ≈0.41×).
 
 `δ` (assumed stopping/crush distance) is genuinely `UNKNOWN` without
 physical testing or FEA — swept rather than asserted. `ESTIMATE` (method +
 range); arithmetic `CONFIRMED` by direct computation.
 
-**Verdict — fasteners.** For the deliberately pessimistic full-direct-hit
+**Verdict — fasteners (Rev 3.4, recomputed against the corrected 156.44J
+budget).** For the deliberately pessimistic full-direct-hit
 hypothetical, 6×M3 capacity (ideal sharing) is adequate only if the joint
-can give/crush over ≳20mm before failing — plausible for a joint with some
+can give/crush over ≳26mm before failing (was ≳20mm) — plausible for a joint
+with some
 give (o-ring/gasket compliance, local plastic deformation of the cap or
 skirt) but not `CONFIRMED`. For the **realistic, attenuated secondary-role
 loading** the load-path reasoning above supports, the margin is
 meaningfully better than this worst-case framing, because the actual force
-reaching the cap joint is very likely smaller than the full 121.60J
-hypothetical. Unlike the wall estimate (short by ~2.5× to orders of
-magnitude across all engagement assumptions), the fastener estimate is
+reaching the cap joint is very likely smaller than the full 156.44J
+hypothetical. Unlike the wall estimate (short by ≈3.26×–4.30× at best to
+≈54×–3,621× more typically, across all engagement assumptions — was ~2.5×
+to orders of magnitude), the fastener estimate is
 **plausible for its realistic/secondary loading role**, and only
 **marginal-to-inadequate for a hypothetical, pessimistic full-direct-hit
 scenario that the cap is not actually designed to be the primary defense
-against.**
+against** — the required crush distance for adequacy under that
+hypothetical grew (≳20mm→≳26mm for the ideal-sharing case), and the
+3,000N-reduced-sharing case now turns marginally inadequate at a
+previously-comfortable 50mm crush distance, both consistent with a larger,
+unchanged-capacity-against-larger-demand shortfall, not a narrower one.
 
 #### 8.1.4 Confidence ledger
 
 | Item | Value(s) | Confidence |
 |---|---|---|
-| Disk mass, diameter, thickness, rim speed, stored energy | 100g / 60.0mm / 4.5mm / 69.74 m/s / 121.60J | `ESTIMATE` (mass — §4.1 total-mass row) / `ASSUMPTION` (diameter `fw_dia` — §4.4 line 404) / `ASSUMPTION` (thickness `fw_t` — §4.1 disk row) / `ESTIMATE` (rim speed — derived from the two `ASSUMPTION` values at left) / `ESTIMATE` (stored energy — derived from mass+diameter); the re-derivation arithmetic itself is `CONFIRMED` to match §8's own table (§8.1.1) |
+| Disk mass, diameter, thickness, rim speed, stored energy | 100g / 60.0mm / 4.5mm / 79.11 m/s / 156.44J (**Rev 3.4**, was 69.74 m/s / 121.60J) | `ESTIMATE` (mass — §4.1 total-mass row) / `ASSUMPTION` (diameter `fw_dia` — §4.4 line 404) / `ASSUMPTION` (thickness `fw_t` — §4.1 disk row) / `ESTIMATE` (rim speed — derived from the two `ASSUMPTION` values at left) / `ESTIMATE` (stored energy — derived from mass+diameter); the re-derivation arithmetic itself is `CONFIRMED` to match §8's own Rev-3.3-corrected table (§8.1.1) |
 | `containment_wall_t`, `fw_bay_inner_r`, wall height | 4.0mm / 39.5mm / 43.0mm | `ESTIMATE` (`containment_wall_t` — §4.4 line 411) / `DERIVED` (`fw_bay_inner_r` — §4.4 line 410; `.scad` line 467 agrees) / `DERIVED` (wall height `fw_wall_h` — computed from other `DERIVED` Z-stack values, §4.4) |
 | Heat-set insert dimensions, bolt count | 4.6mm OD / 5.7mm len / 6× M3 | `ASSUMPTION` (insert OD/len — §4.4 line 418; `.scad` lines 485/489 agree) / `ESTIMATE` (bolt count — §4.4 line 417) |
 | Charpy/tensile figures as published (per material) | see §8.1.2 tables | `CONFIRMED`-as-published; `ASSUMPTION`-applicability (final print material/brand not yet chosen) |
@@ -1173,7 +1346,7 @@ against.**
 | Cap-joint attenuation fraction vs. full direct hit | not quantified | `UNKNOWN` (qualitative reasoning only, needs multi-body simulation to bound) |
 | High-strain-rate and FDM-vs-TDS-coupon directional bias | non-conservative (real performance likely worse) | `ASSUMPTION` (directional, not quantified) |
 | Oblique-impact-angle directional bias (small-fragment sub-case) | conservative (real performance for that sub-case likely better) | `ESTIMATE` (exact geometry given stated simplifications) |
-| Overall wall verdict | short by ~2.5× (best case) to 1–3+ orders of magnitude | `ESTIMATE` (engineering judgment, not a pass/fail certification) |
+| Overall wall verdict | short by ≈3.26×–4.30× (best case) to ≈54×–3,621× / ≈1.7–3.6 orders of magnitude (typical) — **Rev 3.4**, was ~2.5× / 1–3+ orders | `ESTIMATE` (engineering judgment, not a pass/fail certification) |
 | Overall fastener verdict | plausible for realistic/secondary role; marginal-to-inadequate for hypothetical full-direct-hit | `ESTIMATE` (engineering judgment, not a pass/fail certification) |
 
 #### 8.1.5 Tooling honesty — what this could not do
@@ -1196,11 +1369,16 @@ Mechanical Lead has NOT changed any `.scad` geometry in response to it —
 per this task's explicit scope, that decision belongs to the Hardware
 Lead / human, not to this agent unilaterally.** §8.1.2's wall estimate
 does not support an affirmative "4.0mm containment_wall_t is adequate for
-the disclosed 121.60J load case" claim under either estimation method,
+the disclosed 156.44J load case" claim under either estimation method
+(**Rev 3.4** — recomputed against the corrected budget; was 121.60J),
 across the full physically-anchored engagement-length range — the best
-defensible case is roughly 2.5–3× short of the full energy budget, and
-more typical assumptions put the shortfall at one to several orders of
-magnitude. This does not prove the wall fails (see caveats and limits
+defensible case is now precisely ≈3.26×–4.30× short of the full energy
+budget (was ≈2.5–3×), and
+more typical assumptions put the shortfall at ≈1.7 to ≈3.6 orders of
+magnitude (was one to several orders of magnitude). The shortfall widened
+across the board, consistent with an unchanged absorption capacity measured
+against a larger, corrected energy denominator — it did not narrow at any
+engagement length or by either method. This does not prove the wall fails (see caveats and limits
 in §8.1.2/§8.1.5), and it does not change the existing REQ-403 disposition
 above (containment is still better than no containment, and this was
 already an explicitly non-certified, human-gated proposal). It is raised
@@ -1747,13 +1925,18 @@ specifically re-checked or changed.
    subtracted, not its bore diameter or surrounding wall dimensions;
    MISS-010 removes material locally at 4 tab positions, §13) — this item's
    figures are unchanged and were re-confirmed unchanged, not left unchecked.
-   **Rev 3.2 note:** this item's own ✅ is about structural-adequacy-in-
+   **Rev 3.2 note (numerically refreshed in Rev 3.4 — see §8.1.2):** this
+   item's own ✅ is about structural-adequacy-in-
    general and manufacturability, not a load-specific certification for
    the containment wall specifically — §8.1's bounded estimate finds the
    4.0mm `containment_wall_t` does **not** carry an affirmative "adequate
-   against the disclosed 121.60J load case" claim (short by roughly 2.5×
-   in the best case to 1–3+ orders of magnitude under more typical
-   assumptions). This is escalated separately to the Hardware Lead (§8.1.6)
+   against the disclosed 156.44J load case" claim (short by precisely
+   ≈3.26×–4.30×
+   in the best case, was "roughly 2.5×", to ≈1.7–3.6 orders of magnitude
+   under more typical
+   assumptions, was "1–3+ orders of magnitude" — the shortfall widened once
+   §8.1 was recomputed against the Rev-3.3-corrected energy figure, it did
+   not narrow). This is escalated separately to the Hardware Lead (§8.1.6)
    and does not itself flip this checklist item's ✅ (2.0mm-minimum/
    manufacturability holds regardless), but the Reviewer should read this
    item together with §8.1, not in isolation.
@@ -1822,7 +2005,7 @@ load-certification neither item ever claimed to provide.
 | Motor-wire-bridge span (9.0–9.42mm) and duct-wall thickness (exactly 2.0mm) | Disclosed, compliant | Identified during Rev 3 authoring; within stated rules, no fix required; unrelated to and unchanged by the Rev 3.1 Cycle-3 rework |
 | REQ-308 envelope overrun (8.0–13.7% over the ~150mm-class soft ceiling) | Disclosed trade-off | Judged acceptable given the physical lower bound argument in §3. **Rev 3.1 note:** this overrun figure was for X/Y footprint only, which is unaffected by the Cycle-3 fixes (all 3 are Z-only/internal/inset); not recomputed, since nothing changed that it depends on. |
 | Total assembly mass / structural deflection under motor+flywheel load | ESTIMATE (mass only), no deflection analysis | Basic qualitative judgment only (≈130g motor+flywheel on a solid PETG boss/platform judged modest); no FEA, out of Phase 1 scope |
-| Wall impact/penetration and cap fastener pull-out under the REQ-403 load case | **Bounded estimate attempted, Rev 3.2 (§8.1)** — still not certified/resolved | §8/§13 disclose the 4.0mm wall / 6×M3 fastener choice as reasoned structural judgment, not a certified containment analysis. **Tagged MISS-011 (MEDIUM, non-gating)** — Independent Mechanical Review Cycle 3 confirmed this gap for both the wall and the fastener side of the containment-cap joint (no pull-out/shear calculation, §12). **Rev 3.2:** a bounded, closed-form wall-impact estimate (two methods) and a fastener pull-out-vs-load estimate were attempted at §8.1, using real published/measured material and fastener data (6 new Evidence IDs, `datasheets/evidence-log.md`). Wall: does not support an affirmative "adequate" claim (short by ~2.5× best case to 1–3+ orders of magnitude, method-dependent) — separately escalated to the Hardware Lead at §8.1.6, no geometry changed. Fasteners: plausible for the realistic/secondary loading role, marginal-to-inadequate only for a hypothetical full-direct-hit worst case. Proposed as ready for Independent Mechanical Review's cross-check; **not self-resolved** — MISS-011 Status remains OPEN in `validation/open-issues.md`. |
+| Wall impact/penetration and cap fastener pull-out under the REQ-403 load case | **Bounded estimate attempted, Rev 3.2 (§8.1); figures numerically refreshed, Rev 3.4** — still not certified/resolved | §8/§13 disclose the 4.0mm wall / 6×M3 fastener choice as reasoned structural judgment, not a certified containment analysis. **Tagged MISS-011 (MEDIUM, non-gating)** — Independent Mechanical Review Cycle 3 confirmed this gap for both the wall and the fastener side of the containment-cap joint (no pull-out/shear calculation, §12). **Rev 3.2:** a bounded, closed-form wall-impact estimate (two methods) and a fastener pull-out-vs-load estimate were attempted at §8.1, using real published/measured material and fastener data (6 new Evidence IDs, `datasheets/evidence-log.md`). **Rev 3.4:** recomputed against the Rev-3.3-corrected 156.44J/79.11 m/s credible-worst-case energy figure (was 121.60J/69.74 m/s); the shortfall widened, it did not narrow. Wall: does not support an affirmative "adequate" claim (short by ≈3.26×–4.30× best case to ≈1.7–3.6 orders of magnitude typical, method-dependent — was ~2.5× best case to 1–3+ orders of magnitude) — separately escalated to the Hardware Lead at §8.1.6, no geometry changed. Fasteners: plausible for the realistic/secondary loading role, marginal-to-inadequate only for a hypothetical full-direct-hit worst case (the required crush distance for adequacy under that hypothetical grew from ≳20mm to ≳26mm, Rev 3.4). Proposed as ready for Independent Mechanical Review's cross-check; **not self-resolved** — MISS-011 Status remains OPEN in `validation/open-issues.md`. |
 
 **Nothing above is being silently relied upon as if it were CONFIRMED** —
 this table exists specifically so Independent Mechanical Review and the
