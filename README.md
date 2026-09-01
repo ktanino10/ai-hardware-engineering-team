@@ -30,16 +30,23 @@ leaves an evidence trail a human can audit later.
 | Electronics | Circuit Engineer | [`.github/agents/circuit-engineer.agent.md`](.github/agents/circuit-engineer.agent.md) |
 | Electronics | Hardware Reviewer (independent) | [`.github/agents/hardware-reviewer.agent.md`](.github/agents/hardware-reviewer.agent.md) |
 | Electronics *(Phase 3)* | Power Engineer | [`.github/agents/power-engineer.agent.md`](.github/agents/power-engineer.agent.md) |
+| Electronics *(Phase 6)* | PCB Engineer | [`.github/agents/pcb-engineer.agent.md`](.github/agents/pcb-engineer.agent.md) |
 | Mechanical *(Phase 1)* | Mechanical Lead | [`.github/agents/mechanical-lead.agent.md`](.github/agents/mechanical-lead.agent.md) |
 | Mechanical *(Phase 1)* | Mechanical Reviewer (independent) | [`.github/agents/mechanical-reviewer.agent.md`](.github/agents/mechanical-reviewer.agent.md) |
+| Mechanical *(Phase 4)* | Manufacturing Engineer | [`.github/agents/manufacturing-engineer.agent.md`](.github/agents/manufacturing-engineer.agent.md) |
 | Firmware *(Phase 2)* | Firmware Engineer | [`.github/agents/firmware-engineer.agent.md`](.github/agents/firmware-engineer.agent.md) |
+| Firmware *(Phase 5)* | Firmware Reviewer (independent) | [`.github/agents/firmware-reviewer.agent.md`](.github/agents/firmware-reviewer.agent.md) |
 
-Electronics is the original 4-agent MVP, extended to 5 with the Power
+Electronics is the original 4-agent MVP, extended to 6 with the Power
 Engineer (Phase 3, engaged only when a project's power complexity warrants
-it — not automatic for every design). Mechanical and Firmware were added
-later as new top-level disciplines, once each one's own trigger condition
-was met (never speculatively) — see `docs/architecture.md` §3/§14 and
-`docs/architecture-evolution.md` §31/§32/§33.
+it) and PCB Engineer (Phase 6, schematic-to-layout handoff — independent
+review is Hardware Reviewer's own extended checklist, not a separate PCB
+Reviewer agent). Mechanical and Firmware were added later as new top-level
+disciplines, once each one's own trigger condition was met (never
+speculatively), and each has since grown its own second agent (Manufacturing
+Engineer extending Mechanical Reviewer's checklist; Firmware Reviewer as a
+genuinely new independent reviewer) — see `docs/architecture.md` §3/§14 and
+`docs/architecture-evolution.md` §31/§32/§33/§35/§36/§37.
 
 ## Repository layout
 
