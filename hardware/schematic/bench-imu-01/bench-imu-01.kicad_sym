@@ -87,7 +87,7 @@
     (property "Value" "DRV10983" (id 1) (at -7.62 21.590000000000003 0)
       (effects (font (size 1.0 1.0)))
     )
-    (property "Footprint" "Package_SO:HTSSOP-24-1EP_4.4x7.8mm_P0.65mm_EP3.2x5mm" (id 2) (at 0 0 0)
+    (property "Footprint" "Package_SO:HTSSOP-24-1EP_4.4x7.8mm_P0.65mm_EP3.4x7.8mm_Mask2.4x4.68mm_ThermalVias" (id 2) (at 0 0 0)
       (effects (font (size 1.0 1.0)) hide)
     )
     (property "Datasheet" "https://www.ti.com/lit/ds/symlink/drv10983.pdf" (id 3) (at 0 0 0)

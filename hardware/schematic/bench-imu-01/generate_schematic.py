@@ -489,7 +489,32 @@ def build_drv10983_symbol() -> Symbol:
                       position=Position(X=-body_w / 2, Y=top_y + 2.54, angle=0), effects=Effects()),
             Property(key="Value", value="DRV10983", id=1,
                       position=Position(X=-body_w / 2, Y=top_y + 5.08, angle=0), effects=Effects()),
-            Property(key="Footprint", value="Package_SO:HTSSOP-24-1EP_4.4x7.8mm_P0.65mm_EP3.2x5mm", id=2,
+            # Footprint corrected (Hardware Reviewer finding ISS-031, HIGH,
+            # continued-iteration round): the original ASSUMPTION-labeled
+            # "EP3.2x5mm" custom-sized footprint had NO thermal via array
+            # under the pad at all -- a bare top-side copper island cannot
+            # achieve TI's own datasheet-stated thermal performance, which
+            # explicitly requires "connected to bottom side of PCB through
+            # vias for better thermal spreading" (DRV10983 datasheet
+            # SLVSCP6H, pin-table section, re-fetched and re-read this
+            # cycle -- not merely a generic SLMA002/SLMA004 app-note
+            # citation this time, the part's OWN datasheet says this).
+            # Switched to a REAL, standard KiCad library footprint that
+            # already has a proper thermal-via array (18 vias at 0.3mm
+            # drill / 0.6mm pad, matching the "0.3-0.33mm" guidance TI's
+            # PowerPAD app notes give) rather than hand-building a custom
+            # one -- safer than a from-scratch via array, and the F.Cu
+            # land (3.4x7.8mm) matches the datasheet's own "as large as
+            # possible" directive better than the previous custom pad's
+            # smaller, ASSUMPTION-derived estimate. Still an ASSUMPTION on
+            # the exact EP size (the primary datasheet's own mechanical
+            # package-outline drawing remains an image, not extractable by
+            # this session's tooling -- disclosed, not silently resolved),
+            # but now backed by a real, via-stitched footprint rather than
+            # a bare pad.
+            Property(key="Footprint",
+                      value="Package_SO:HTSSOP-24-1EP_4.4x7.8mm_P0.65mm_EP3.4x7.8mm_Mask2.4x4.68mm_ThermalVias",
+                      id=2,
                       position=Position(X=0, Y=0, angle=0), effects=Effects(hide=True)),
             Property(key="Datasheet", value="https://www.ti.com/lit/ds/symlink/drv10983.pdf", id=3,
                       position=Position(X=0, Y=0, angle=0), effects=Effects(hide=True)),
@@ -694,7 +719,7 @@ def main() -> None:
     # Sub-block C: U5 DRV10983 motor driver + its own reference-circuit
     # passives (new Rev 3)
     u5 = b.place("U5", "DRV10983", drv10983, 228.6, 220.98,
-                  footprint="Package_SO:HTSSOP-24-1EP_4.4x7.8mm_P0.65mm_EP3.2x5mm",
+                  footprint="Package_SO:HTSSOP-24-1EP_4.4x7.8mm_P0.65mm_EP3.4x7.8mm_Mask2.4x4.68mm_ThermalVias",
                   datasheet="https://www.ti.com/lit/ds/symlink/drv10983.pdf")
     c10 = b.place("C10", "10uF", cap, 203.2, 187.96, footprint="Capacitor_SMD:C_0805_2012Metric")
     c11 = b.place("C11", "0.1uF", cap, 210.82, 187.96, footprint="Capacitor_SMD:C_0603_1608Metric")
