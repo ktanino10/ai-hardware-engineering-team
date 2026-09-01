@@ -5520,3 +5520,351 @@ should proceed to the human — subject to one caveat below.**
   independently assessed as correct and may proceed in parallel — but should
   carry an explicit disclosure of the MISS-013 scope gap if it reaches the
   human before that gap is closed.
+
+## Mechanical Reviewer — Manufacturing Process Cross-Check Re-Verification (MISS-013/014/015 Closure), 2026-09-11
+
+### Review Cycle Metadata
+
+- **Document reviewed**: `hardware/mechanical/bench-imu-01-manufacturing-spec.md`
+  (96 lines — up from 89 lines at the prior cross-check — revised by the
+  Manufacturing Engineer in direct response to MISS-013 (HIGH), MISS-014
+  (MEDIUM), and MISS-015 (MEDIUM), all logged in the entry immediately above
+  this one and in `validation/open-issues.md`).
+- **This is a fresh, independent re-verification, not a re-read of the
+  document's own claims.** Per this task's own explicit framing: "Do not
+  accept that the findings are resolved just because the document now
+  contains different words claiming to address them." Every claimed fix
+  below was independently re-derived from primary sources (live `.scad`
+  source, `datasheets/evidence-log.md`, `requirements/requirements.md`,
+  `bench-imu-01-dimensional-spec.md`, `git log`/`git diff`), not accepted
+  because the manufacturing spec's own prose asserts it.
+- **Scope**: re-verify MISS-013/014/015 closures specifically; re-confirm
+  MISS-012's own status; confirm scope discipline (no `.scad`/dimensional-spec
+  changes); assess overall readiness for the human Chief Engineer escalation
+  packet. Checklist item 11 only (items 1–10 unaffected — no `.scad`/
+  dimensional-spec geometry changed, confirmed below).
+
+### Scope discipline check (task item 5)
+
+- `git log --oneline -5 -- hardware/mechanical/bench-imu-01-enclosure.scad hardware/mechanical/bench-imu-01-dimensional-spec.md`
+  → `2cbe846`, `c5ac653`, `7497bf2`, `208c94e` — identical set to the prior
+  cross-check; no new commits landed against either file.
+- `git status --short` → the **only** entry in the entire working tree is
+  `?? hardware/mechanical/bench-imu-01-manufacturing-spec.md` (untracked).
+  `git diff --stat HEAD` returns **empty** — confirms zero tracked-file
+  changes anywhere in the repository relative to `HEAD`, not just in the two
+  files named above. The entire revision is contained within the
+  manufacturing-spec document itself.
+- **Conclusion: scope discipline holds completely.** No `.scad` geometry, no
+  `bench-imu-01-dimensional-spec.md` value, and no other file was touched.
+
+### Re-verification of MISS-013 — `fw_bay_wall()`/`base()` process-spec scope gap
+
+- **§1 Scope** now explicitly names both `fw_bay_wall()` (within `base()`)
+  and `containment_cap()` as the two parts specified.
+- **§3.1 geometry claims independently re-derived line-by-line against the
+  live `.scad` source**, not accepted from the document's own prose:
+  `base()` (lines 1057–1074) is confirmed to be
+  `difference(union(pcb_bay_base()[752], motor_platform()[868],
+  fw_bay_wall()[922], motor_wire_bridge_solid()[1019]),
+  motor_wire_duct_void()[1036])` — this exactly matches the manufacturing
+  spec's own §3.1 claim ("`base()` also bundles `pcb_bay_base()`,
+  `motor_platform()`, and `motor_wire_bridge_solid()` before the global
+  subtraction of `motor_wire_duct_void()`"), independently confirmed correct,
+  not merely repeated. Every numeric claim in §3.1 was independently
+  recomputed from the live source constants and matches exactly:
+  `fw_bay_inner_r`=39.5mm, `fw_bay_outer_r`=43.5mm (→ 4.0mm =
+  `containment_wall_t`), `fw_wall_h`=`fw_clearance_top`(45.0)−`fw_floor_top`
+  (2.0)=43.0mm, `fw_flange_or`=52.5mm, cap skirt OD =
+  `fw_flange_dia`+2×`fit_clearance`+2×`wall_t` = 105.0+0.4+4.0=109.4mm.
+- **§4 now carries two dedicated rows for `base()`/`fw_bay_wall()`** ("Top/
+  bottom solid layers," "Print orientation") with content specific to this
+  part's own geometry (floor disc, flange band hosting the 6 heat-set
+  inserts, and — independently confirmed named explicitly in the "Top/bottom
+  solid layers" row — the wire-bridge geometry too) — this is not a
+  copy-paste of the cap's rows (which discuss the cap's own flat top, skirt,
+  and bolt circle instead). The two parts' rows are substantively distinct.
+- **Print-orientation reasoning for `base()` independently assessed as
+  genuinely grappling with, not waving away, the multi-feature bundling
+  complexity**: the rationale explicitly names the competing functional
+  needs (PCB-bay-base flatness, motor-platform flatness, flange
+  concentricity vs. the wall's radial-strike-optimal continuous-XY-loop
+  orientation), explicitly considers a "sideways orientation" alternative,
+  and explicitly rejects it with a stated, specific reason (it would
+  sacrifice the broader part's datum flatness and turn the cylindrical wall
+  into layer-to-layer laminations loaded more directly across weaker
+  interlayer bonds). This is genuine trade-off reasoning with a considered
+  alternative and a reasoned rejection, not hand-waving — independently
+  assessed, not accepted on the document's own say-so. The stated
+  orientation ("motor-platform face down, `fw_bay_wall()` rising upward") is
+  also independently confirmed consistent with the `.scad` model's own
+  coordinate frame (Z=0 is the modeled floor, matching "installed
+  orientation").
+- **§4.1 (new) primary/secondary containment-surface determination
+  independently re-derived, not merely repeated**: direct radial-geometry
+  computation confirms `fw_bay_wall()` spans r=39.5–43.5mm while
+  `containment_cap()`'s skirt sits at r=52.7–54.7mm — over 9mm further out,
+  radially behind the flange band. A fragment ejected radially from the
+  disk's rim (r=30mm, the disclosed 69.74 m/s threat) reaches `fw_bay_wall()`
+  first, long before it could reach the cap's skirt. **I independently agree
+  with §4.1's primary/secondary determination** on this basis — it was
+  re-derived from the live `.scad` geometry directly, not accepted because
+  the document asserts it.
+
+**Verdict on MISS-013: independently confirmed RESOLVED.** The process spec
+for `fw_bay_wall()`/`base()` is real, substantive, geometry-specific, and
+correctly reasoned — not a copy-paste of the cap's own numbers relabeled.
+
+### Re-verification of MISS-014 — §3.2 confidence-label overclaims
+
+- **The 3 originally-named rows (stored kinetic energy, rim tip speed,
+  threat mechanism) are now correctly labeled `ESTIMATE`.** Independently
+  re-derived the arithmetic by hand again, from first principles, to confirm
+  nothing changed since the prior cycle: I = 0.5×0.100 kg×(0.030 m)² =
+  4.5×10⁻⁵ kg·m²; KE = 0.5×4.5×10⁻⁵×(2324.8 rad/s)² ≈ 121.60 J ✓ (matches
+  exactly); v = 2324.8×0.030 = 69.74 m/s ✓ (matches exactly, ×3.6 ≈
+  250.7 km/h ✓). Re-traced both geometric inputs to their original labels in
+  `bench-imu-01-dimensional-spec.md`: disk mass=100g is **ESTIMATE** (line
+  311), `fw_dia`=60.0mm is **ASSUMPTION** (line 365) — both correctly cited
+  in the new rows' own Source column. The "Threat mechanism" row's
+  hub-collar-release hypothesis is correctly labeled `ESTIMATE`, consistent
+  with hub-collar retention strength being independently confirmed
+  **UNKNOWN** (dimensional-spec §16).
+- **However, spot-checking the *rest* of the document — as this task
+  explicitly required, rather than trusting the Manufacturing Engineer's own
+  claim that no other instances exist — found the identical overclaim
+  pattern persists on 2 more rows in the same §3.2 table**, neither of which
+  was among the 3 rows named in the original MISS-014 finding text (which
+  explicitly declined to open this specific question: "The rotational-speed
+  input ω is not independently re-traced to a per-row confidence label
+  here… not needed to establish the finding" — leaving exactly this door
+  unopened, which this cycle's task asked me to go back and open):
+  - **"Credible worst-case flywheel speed" = 22,200 RPM no-load-high, still
+    labeled `CONFIRMED`.** Independently traced this figure to its source:
+    `datasheets/evidence-log.md` line 236, Evidence ID **DS-MTR-018**, reads
+    verbatim: *"T-Motor MN2206-13 KV2000 no-load current 0.3 A at 10V test
+    voltage; **this project's own derived no-load speed estimate** ~20,000
+    RPM at 10V / ~22,200 RPM at full-charge 3S (11.1V), from the published KV
+    constant, **not directly published by the manufacturer**."* The motor's
+    own datasheet file
+    (`datasheets/tmotor_mn2206-13-2000kv_rev-unknown.md`) independently
+    confirms *"No formal PDF datasheet found/published for this SKU"* and
+    explicitly parallels this RPM figure to an already-flagged-as-"derived"
+    torque figure elsewhere in the same file. `requirements/requirements.md`
+    REQ-405's own Notes column likewise hedges this figure with "≈"
+    ("the recommended motor's own no-load speed (≈20,000–22,200 RPM)"),
+    consistent with estimate-, not confirmed-, quality. Per
+    `.github/instructions/mechanical-design.instructions.md`'s own
+    definition, `CONFIRMED` requires "an actual…datasheet/measured value —
+    cite the source"; a project-computed estimate explicitly flagged by its
+    own evidence-log entry as "not directly published by the manufacturer"
+    does not meet that bar. This is the identical overclaim pattern MISS-014
+    was raised to fix, on a row the original finding did not examine.
+  - **"Angular velocity" = 2324.8 rad/s, still labeled `CONFIRMED`.** This is
+    a pure, exact unit conversion of the same RPM figure (22,200×2π/60 =
+    2324.8 rad/s, independently re-confirmed by hand) and therefore
+    inherits the RPM row's confidence exactly, by the same "a computed value
+    is no more certain than its least-certain input" rule already applied
+    (correctly) to the other 3 rows in this exact table. It should likewise
+    be `ESTIMATE`, not `CONFIRMED`.
+  - Also independently confirmed: `bench-imu-01-dimensional-spec.md`'s own
+    §8 physics table (lines 568–573) carries **no per-row confidence column
+    at all** — meaning this `CONFIRMED` label, like the other 3 already
+    fixed, is the Manufacturing Engineer's own transcription/labeling choice
+    when building §3.2's table, not something inherited verbatim from
+    upstream.
+- **Exhaustively spot-checked every other `CONFIRMED` instance in the
+  document** (confirmed via `grep` that the document contains exactly 4
+  occurrences of `CONFIRMED` total: lines 11, 28, 29, 82 — no others exist).
+  Lines 28/29 are addressed above. The remaining two are independently
+  assessed as legitimate, non-overclaiming uses:
+  - Line 11, "Classification: safety-critical (`CONFIRMED`)" — independently
+    traced to `requirements/requirements.md` REQ-403's own Notes column,
+    which states verbatim "Safety-critical — ties to the 'safety-critical
+    changes' HITL gate." This is a categorical/procedural classification
+    directly sourced from the governing requirement document itself, not a
+    physical-measurement claim subject to ASSUMPTION/ESTIMATE contamination.
+    Legitimate.
+  - Line 82, "Escalation required (`CONFIRMED`)" — this is the categorical/
+    logical conclusion of the document's own preceding 4-point reasoning (a
+    policy determination that escalation is required given the disclosed
+    uncertainty), not a physical value. Legitimate, and consistent with the
+    prior cycle's own treatment of this exact line.
+
+**Verdict on MISS-014: NOT fully resolved.** 3 of 5 rows in §3.2 were
+correctly fixed; 2 of 5 rows (the "Credible worst-case flywheel speed" and
+"Angular velocity" rows) carry the identical `CONFIRMED`-overclaim defect
+the finding was raised to eliminate, independently confirmed via a primary
+evidence-log source (DS-MTR-018) the document itself does not cite for this
+row. **This finding stays OPEN** and routes back to the Manufacturing
+Engineer for a small, focused, same-pattern fix (relabel both rows
+`ESTIMATE`, exactly as already correctly done for the other 3 rows in the
+identical table).
+
+### Re-verification of MISS-015 — infill literature nuance + Z-axis anisotropy disclosure
+
+- **Infill-percentage row (§4)** now reads, in relevant part: *"...the
+  document's own cited MDPI Eng. Proc. 2024 reference reports a 40% infill
+  sample outperforming both a Hilbert-pattern sample and a 100% solid sample
+  for Charpy energy absorption. 100% infill is retained here anyway as a
+  conservative default under deep load-case uncertainty (hub-collar
+  retention strength remains `UNKNOWN`) and to preserve CAD-fidelity to the
+  already-approved 'solid 4.0 mm containment wall' design intent, not
+  because the literature unambiguously proves 100% infill is always best for
+  this exact goal."* Cross-checked against my own independently-researched
+  figures already on record from the prior cross-check's dedicated
+  literature-investigation section (a Hilbert-curve sample beat 100%-solid
+  by 11% but lost to a 40%-infill plain sample by 20.6%, i.e. 40%-infill beat
+  both) — exactly consistent, no distortion, no re-search needed. Reference
+  #4 (§7) was also revised to state the same nuance ("documenting that some
+  sub-100% infill cases can outperform 100% solid prints for impact-energy
+  absorption"). This is a substantive, accurate disclosure that retains the
+  100%-infill recommendation on the correct (conservative-default/
+  CAD-fidelity) grounds while honestly conceding the literature does not
+  unanimously support it for this specific goal — precisely the required
+  fix, not a cosmetic rewording, and it does **not** simply change the
+  underlying recommendation (which was never the ask).
+- **Print-orientation row for `containment_cap()` (§4)** now ends: *"Residual
+  limitation: the cap's own flat top still contains Z-axis-built layer
+  interfaces through its thickness, so infill/perimeter/orientation choices
+  cannot fully remove anisotropy from that top surface; they only avoid
+  making the cylindrical skirt and bolt-circle region even worse."* This is
+  specific (names the flat top by its actual geometric role, explains *why*
+  the limitation is unavoidable — the top surface's layer-interface
+  orientation is fixed by the very same part-orientation choice made to
+  protect the skirt, so no choice of infill/perimeter/orientation can address
+  both surfaces at once), and correctly distinguishes what *is* helped
+  (skirt/bolt-circle region) from what *is not* (the flat top itself) —
+  consistent with the anisotropy-literature reference's own point that
+  infill/perimeter choices "won't fully compensate" for Z-axis weakness.
+  This is a genuine, substantive, correctly-reasoned disclosure, not a token
+  sentence appended to satisfy the letter of the finding.
+
+**Verdict on MISS-015: independently confirmed RESOLVED.** Both sub-parts of
+the required fix are present, substantive, and accurate.
+
+### Re-confirmation of the escalation-to-human conclusion (§6)
+
+§6's conclusion ("FDM cannot be presented as an adequate, validated
+containment process for REQ-403 on the basis of this document alone"), its
+4-point reasoning, the Manufacturing Engineer disposition, and "Escalation
+required (`CONFIRMED`)" are all read again this cycle and found **unchanged
+in substance** from what the prior cross-check independently assessed and
+endorsed (live `blender-get_addon_status` handshake-failure confirmation of
+no FEA/simulation tool; independently verified UL "Blue Card"/ISO 12100
+references; confirmation that the escalation follows substantive reasoning
+rather than substituting for it). Nothing about this cycle's re-verification
+changes that assessment: **the escalation conclusion is undiminished and
+remains independently endorsed.**
+
+### MISS-012 status re-confirmation
+
+MISS-012's own stated closure criterion (its Notes column, verbatim): *"this
+MISS-012 finding should be considered resolved only once a process spec
+exists (and is independently cross-checked) for `fw_bay_wall()`/`base()` as
+well, not just the cap."* Given MISS-013 is independently re-verified
+RESOLVED this cycle — a genuine, substantive, geometry-specific process spec
+now exists for `fw_bay_wall()`/`base()`, and it has now been independently
+cross-checked twice (first identifying the scope gap, now confirming its
+closure) — **MISS-012's own specific closure criterion is met. I agree
+explicitly: MISS-012 is ready to close.**
+
+This is not undermined by MISS-014 remaining open: MISS-012's own text ties
+its closure specifically to the scope-completeness question MISS-013
+addressed (does a process spec exist, covering both parts, independently
+cross-checked), not to every rigor finding surfaced during the same
+cross-check cycle. MISS-014 and MISS-015 were always tracked as their own
+separate, distinct, lower-severity (MEDIUM) findings — MISS-012's own prior
+update note describes them as "two further rigor findings… also surfaced
+during the same cross-check," not as sub-conditions of MISS-012's own
+closure bar. MISS-014 remaining open is real and should not be minimized,
+but it does not reopen or block MISS-012.
+
+### Positive Findings
+
+- The `fw_bay_wall()`/`base()` process-spec content is genuinely distinct
+  from and not a relabeled copy of the cap's own rows — independently
+  confirmed by direct textual/content comparison, not assumed.
+- The §4.1 primary/secondary containment-surface determination is
+  independently re-derivable from the live `.scad` geometry alone and is
+  confirmed correct on that independent basis.
+- The infill-literature and Z-axis-anisotropy disclosures added for MISS-015
+  are specific, accurate, and non-cosmetic — independently cross-checked
+  against this Reviewer's own prior, separately-conducted literature
+  research, not merely re-read.
+- Scope discipline is complete: zero unauthorized changes anywhere in the
+  repository outside the one file this revision was scoped to touch.
+- The escalation-to-human conclusion is unchanged and remains independently
+  endorsed.
+
+### Verdict
+
+- **Verdict**: **CONDITIONAL** (not a clean PASS, and not a FAIL — this
+  routes back to the **Manufacturing Engineer** once more, via the Hardware
+  Lead, for a small, focused fix; it does not touch the Mechanical Lead's
+  `.scad` geometry, which remains unchanged and not at fault)
+- **Open CRITICAL count**: 0
+- **Open HIGH count**: 0 — **MISS-013 independently confirmed RESOLVED this
+  cycle**; **MISS-012 independently confirmed ready to close this cycle**
+  (its own specific closure criterion is met)
+- **Open MEDIUM count (non-gating)**: 1 — **MISS-014 remains OPEN**
+  (partially fixed: 3 of 5 rows corrected, 2 of 5 rows — "Credible
+  worst-case flywheel speed," "Angular velocity" — still mislabeled
+  `CONFIRMED`, independently discovered this cycle via the exact spot-check
+  this task required, not previously named in the original finding).
+  **MISS-015 independently confirmed RESOLVED this cycle.**
+- **Why CONDITIONAL and not PASS, despite only 1 open MEDIUM finding**:
+  Cycle 4's precedent (`validation/design-review.md`, "Mechanical Reviewer —
+  Cycle 4," 2026-09-12) awarded PASS alongside an open MEDIUM (MISS-011)
+  because that finding was a knowingly-carried-forward, already-disclosed,
+  *unchanged* limitation not itself under active remediation that cycle. The
+  present situation is materially different: MISS-014 was *actively
+  re-examined* as one of this cycle's 3 specific target closures, and the
+  claimed fix was found *incomplete* — the same defect the finding
+  identifies persists on 2 more rows in the identical table. Per this task's
+  own explicit instruction ("If you find any of the three fixes is
+  incomplete… do NOT mark it resolved… this routes back to the Manufacturing
+  Engineer again"), this is a loop-back situation, correctly reflected as
+  CONDITIONAL rather than a pass-with-disclosed-limitation.
+- **What independently checks out**: MISS-012 and MISS-013 (both effectively
+  the same underlying scope-completeness question) are genuinely,
+  substantively resolved — the process spec for `fw_bay_wall()`/`base()` is
+  real, geometry-specific, and independently re-derived as correct, not a
+  copy-paste. MISS-015 is genuinely resolved — both the literature-nuance
+  and Z-axis-anisotropy disclosures are substantive and accurate. Scope
+  discipline is complete (zero unauthorized changes). The escalation
+  conclusion is unchanged and remains independently endorsed.
+- **What remains open, non-gating**: MISS-014 (MEDIUM) — 2 of 5 rows in
+  §3.2's disclosed load-case table remain mislabeled `CONFIRMED` despite
+  depending on a project-derived, not-manufacturer-published rotational-speed
+  estimate (DS-MTR-018). This does not change any physical figure, does not
+  affect the escalation conclusion's substance, and is a fast, same-pattern
+  fix (the identical relabeling exercise already correctly applied 3 times
+  in the same table) — but it should not be silently presented as fully
+  closed.
+- **Independent judgment on readiness for the human Chief Engineer**: the
+  manufacturing-spec document has made **real, substantive, verified
+  progress** since the prior cycle — MISS-012/013 (the structural
+  scope-completeness gap) and MISS-015 (literature-framing honesty) are
+  genuinely closed, not cosmetically closed. The core safety substance —
+  the disclosed load case, the primary/secondary containment-surface
+  determination, and the "FDM is not self-certifying; escalate" conclusion —
+  is intact, correct, and does not depend on the residual MISS-014 gap. **The
+  escalation of the fundamental FDM-adequacy question may proceed** — it
+  should not be held hostage to a 2-row labeling fix. However, this document
+  is **not yet fully clean**, and presenting it to the human Chief Engineer
+  as "manufacturing spec, independently cross-checked, no open findings"
+  would be inaccurate while MISS-014 remains open. **Recommendation**: either
+  (a) have the Manufacturing Engineer apply the same relabeling fix to the 2
+  remaining rows before the packet is presented (this is a fast, low-effort,
+  already-precedented fix within the same document), or (b) if timing
+  requires presenting sooner, carry MISS-014 forward explicitly as a named,
+  disclosed, non-blocking limitation alongside the packet — mirroring
+  exactly how the prior cycle's MISS-013 scope-gap caveat was handled before
+  it was fixed.
+- **Next action**: Report CONDITIONAL to the Hardware Lead. MISS-012,
+  MISS-013, and MISS-015 may be marked RESOLVED in
+  `validation/open-issues.md` on this Reviewer's own independent verification
+  rationale (not the Manufacturing Engineer's say-so). MISS-014 stays OPEN
+  and routes back to the Manufacturing Engineer for the 2 remaining rows
+  specifically — no other rework is required on this document.
