@@ -1,0 +1,42 @@
+name: ID Uniqueness Check
+
+# Guards against a cross-branch merge hazard this repo has hit for real,
+# repeatedly: two branches diverging from the same baseline each
+# independently allocate the same next-available ID (ECO-<NNN>, ISS-<NNN>/
+# MISS-<NNN>, or DS-<CATEGORY>-<NNN>) for unrelated content. Git's own merge
+# does not catch this -- it's a semantic collision (two rows sharing one ID),
+# not a textual conflict -- so it can land on `main` silently. See
+# tools/check_id_uniqueness.py and docs/workflow.md section 4.1 for the
+# resolution convention this check exists to make easy to enforce.
+#
+# This is a separate workflow from hardware-gate.yml on purpose -- it is a
+# deterministic bookkeeping check across three specific shared-namespace
+# files, not part of the Design Complete gate's severity/status logic.
+
+on:
+  pull_request:
+    paths:
+      - "validation/change-log.md"
+      - "validation/open-issues.md"
+      - "datasheets/evidence-log.md"
+      - "tools/check_id_uniqueness.py"
+  push:
+    branches: [main]
+    paths:
+      - "validation/change-log.md"
+      - "validation/open-issues.md"
+      - "datasheets/evidence-log.md"
+      - "tools/check_id_uniqueness.py"
+  workflow_dispatch: {}
+
+jobs:
+  id-uniqueness:
+    name: Check ECO/Issue/Evidence IDs for cross-branch duplicates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Run ID uniqueness check
+        run: python3 tools/check_id_uniqueness.py
