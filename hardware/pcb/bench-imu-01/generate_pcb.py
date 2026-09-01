@@ -182,6 +182,17 @@ PLACEMENT: dict[str, tuple[float, float, float]] = {
     # --- Zone 2: Motor driver + supervisory controller (new Rev 3-5) --
     "J4": (83.0, 30.0, 90.0),     # barrel jack, right board edge area
     "F1": (100.0, 30.0, 0.0),
+    "F2": (83.0, 8.0, 0.0),        # NEW (ISS-032 fix): second PTC fuse,
+                                   # J4 sleeve/GND leg, mirrors F1's role
+                                   # in the tip/VM_MOTOR leg. Moved further
+                                   # from J4 than the first placement
+                                   # attempt (which put its courtyard only
+                                   # 12mm from J4's centre and genuinely
+                                   # collided -- J4's own large, 90-deg-
+                                   # rotated barrel-jack courtyard extends
+                                   # up to Y=23.4, closer to F2 than
+                                   # expected; verified via DRC, not
+                                   # assumed clear by inspection alone).
     "D2": (116.0, 30.0, 0.0),
     "D3": (116.0, 18.0, 0.0),
     "C16": (100.0, 18.0, 0.0),

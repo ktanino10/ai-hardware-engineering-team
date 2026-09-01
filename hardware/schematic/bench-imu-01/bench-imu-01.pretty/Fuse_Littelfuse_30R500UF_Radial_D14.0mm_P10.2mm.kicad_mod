@@ -19,6 +19,7 @@
 	(property "Value" "Fuse_Littelfuse_30R500UF_Radial_D14.0mm_P10.2mm"
 		(at 5.1 9.5 0)
 		(layer "F.Fab")
+		(hide yes)
 		(uuid "d0feef4f-5953-487b-ac0f-b413d5759f77")
 		(effects
 			(font

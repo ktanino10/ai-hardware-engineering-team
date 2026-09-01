@@ -352,3 +352,51 @@ gate additionally still needs `requirements/traceability-matrix.md` fully
 verified/waived, `validation/fmea.md` reviewed, and a
 `validation/change-log.md` (ECO) entry for this revision — none of which
 were in this session's scope to produce.
+
+### Continued iteration (2026-09-02, per Chief Engineer disposition after independently auditing PR #17)
+
+The Chief Engineer independently re-verified the CONDITIONAL PR above (own
+DRC re-run, own status spot-check, own BOM MPN spot-check — all matched)
+and gave explicit authority to keep closing findings rather than stop at
+CONDITIONAL. This round:
+
+- **ISS-031 (HIGH) — RESOLVED.** The remaining half (footprint's missing
+  thermal-via array) is fixed: U5's footprint switched to a real, standard
+  KiCad library part with an 18-via thermal array, independently
+  re-verified (ERC, pad/net audit, DRC). See the ISS-031 fix commit and
+  `validation/open-issues.md` for full detail.
+- **ISS-037 (MEDIUM) — RESOLVED.** Both the IPC-2221 citation math and the
+  5-net trace-width stub-segment bug are fixed and independently
+  re-verified (a standalone per-net trace-width audit, DRC re-run). See
+  the ISS-037 fix commit.
+- **ISS-032 (HIGH) — a genuine design-level fix attempted, NOT yet marked
+  RESOLVED.** Per the Chief Engineer's explicit request, a real circuit
+  fix was attempted before considering escalation: **F2**, a second
+  Littelfuse 30R500UF PTC resettable fuse (identical to F1), now in series
+  between J4's sleeve/GND pin and the shared ground net. This makes the
+  worst case safe regardless of which physical J4 pin actually turns out
+  to be tip vs. sleeve, without needing to resolve that ASSUMPTION —
+  exactly the property the Chief Engineer asked whether a second
+  protective element could achieve. Full reasoning, component selection,
+  and the corrected/narrowed safety-argument text are in
+  `hardware/schematic/bench-imu-01-design.md` §7.5.9. Self-verified this
+  session (ERC clean; a pad/net audit confirms F2's own connectivity; DRC
+  stays within the baseline band, 369-380 violations across repeated
+  runs, 0 unconnected) — but **this project's own established convention
+  is that the fixing author does not self-declare a finding RESOLVED; the
+  independent reviewer does, after their own re-verification** (confirmed
+  this cycle by checking how ISS-026 was actually closed: the Rev 6 fix
+  commit itself left the finding's status untouched, and only the
+  subsequent Cycle-5 reviewer commit set it to RESOLVED). `ISS-032`'s
+  Status is therefore intentionally left **OPEN** in
+  `validation/open-issues.md`, with the fix and this session's own
+  verification recorded in its Notes column, pending independent review.
+  This is a genuine electrical-topology change (normally Circuit-Engineer
+  scope, not PCB Engineer) — made here only because the human Chief
+  Engineer coordinating this cross-branch task explicitly directed it as
+  a deliberate, disclosed exception, not a silent role-boundary violation.
+- **ISS-036 (HIGH) — not yet addressed this round.**
+
+Design Complete gate status after this round: still fails, now on only 2
+open HIGH items (ISS-032 pending review, ISS-036 pending triage), down
+from 3. Board still not declared ready to fabricate.

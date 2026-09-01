@@ -698,6 +698,22 @@ def main() -> None:
     d3 = b.place("D3", "SMBJ16A", d_zener, 104.14, 213.36,
                   footprint="Diode_SMD:D_SMB",
                   datasheet="https://www.littelfuse.com/products/tvs-diodes/automotive-and-commercial-vehicle/smbj/smbj16a")
+    # F2 -- NEW (Hardware Reviewer finding ISS-032, HIGH; Chief Engineer
+    # disposition, 2026-09-02: "take a real crack at a design-level fix
+    # before treating this as an escalation"). Second PTC resettable
+    # fuse, in series in J4's *sleeve/GND* leg -- mirrors F1's own
+    # already-approved role in the tip/VM_MOTOR leg exactly (same MPN,
+    # same footprint, same current-class justification, DS-PROT-006/032/
+    # 033), placed here so an INTERNAL J4 pin-mapping error (this
+    # design's own schematic/footprint choice, independent of what a user
+    # plugs in) cannot hijack the shared GND reference to the barrel
+    # jack's full +9-13V supply rail with zero protection -- which is
+    # exactly what the bare `J4 pin1 -> GND` wire before this fix would
+    # have allowed. See the full reasoning at the GND-leg connect() call
+    # below.
+    f2 = b.place("F2", "30R500UF", fuse, 25.4, 213.36,
+                  footprint="bench-imu-01:Fuse_Littelfuse_30R500UF_Radial_D14.0mm_P10.2mm",
+                  datasheet="https://www.littelfuse.com/assetdocs/littelfuse_ptc_30r_datasheet?assetguid=46bd151a-f029-4cec-aeef-2614869244f4")
     c16 = b.place("C16", "1uF", cap, 104.14, 187.96, footprint="Capacitor_SMD:C_0603_1608Metric")
     # PWR_FLAG for the VM_MOTOR net (fed by an off-board DC source through
     # J4, same convention as PF1/PF2 above for VBUS_5V/GND) -- required so
@@ -830,11 +846,43 @@ def main() -> None:
     # mirror) gives pin1=sleeve, pin2=switch(N.C., unpopulated),
     # pin3=tip/center(+) -- used here, flagged prominently for human
     # verification against the real mechanical drawing before fabrication.
-    # Low blast-radius even if reversed: D2's series reverse-polarity
-    # protection fails safe (blocks conduction) rather than damaging
-    # anything if J4's tip/sleeve assignment is actually swapped.
+    #
+    # **Safety-argument corrected and narrowed (Hardware Reviewer finding
+    # ISS-032, HIGH, fixed this cycle -- do not restate the old, too-broad
+    # claim)**: D2's series reverse-polarity protection only ever covers
+    # an *external* failure mode (a user plugging in a reverse-polarity
+    # adapter) -- it sits in the tip/VM_MOTOR leg and does nothing to
+    # protect the *sleeve/GND* leg. An *internal* pin-mapping error (this
+    # design's own schematic/footprint pin1<->pin3 assignment being wrong,
+    # independent of anything a user does) would previously have applied
+    # the barrel jack's full +9-13V supply directly to the shared GND net
+    # via a bare wire with NO protection at all -- D2 is on the wrong leg
+    # to help with that specific failure mode, and the design documentation
+    # previously overstated what D2 covers. Fixed with a second,
+    # independent protective element (F2, a second Littelfuse 30R500UF PTC
+    # resettable fuse, identical in kind to F1) now in series in the
+    # sleeve/GND leg: this makes the worst case safe *regardless* of which
+    # physical pin turns out to be tip vs. sleeve, without needing to ever
+    # resolve the pin-mapping ASSUMPTION itself. If the mapping is
+    # correct, F2 just passes the normal GND-return current (well within
+    # its 5A hold rating for this design's <=3A worst case, same margin
+    # F1 already relies on, DS-PROT-006) with negligible added impedance
+    # (Rmin=0.010Ω, same as F1 -- not a new voltage-drop term in any
+    # existing calculation, since the GND reference is not part of the
+    # VM_MOTOR series-drop budget at DS-MTR-080). If the mapping is
+    # reversed, F2 sees the full supply rail attempting to drive current
+    # into the low-impedance GND plane, trips within its rated response
+    # (well below its Imax=40A fault rating, DS-PROT-006) and then
+    # strongly current-limits in its tripped high-resistance state --
+    # converting an indefinite, unprotected GND-hijack into a brief,
+    # self-limiting, automatically-resettable fault event. J4's tip/sleeve
+    # ASSUMPTION itself remains open and still flagged for human
+    # verification before fabrication -- this fix does not resolve it, it
+    # removes the need to resolve it before the board can be considered
+    # safe either way.
     b.connect("VM_MOTOR_RAW", [("J4", "3"), ("F1", "1")])
-    b.connect("GND", [("J4", "1")])
+    b.connect("J4_GND_RAW", [("J4", "1"), ("F2", "1")])
+    b.connect("GND", [("F2", "2")])
     b.no_connect("J4", "2")
     b.connect("VM_MOTOR_F1", [("F1", "2"), ("D2", "2")])
     # D2 = D_Schottky, pin1=K(cathode)/pin2=A(anode); D3 = D_Zener (chosen
