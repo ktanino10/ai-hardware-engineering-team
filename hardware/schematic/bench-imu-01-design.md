@@ -1433,16 +1433,62 @@ ground net (§8).
   without needing to resolve that ASSUMPTION first: in normal (correctly-
   mapped) operation it simply passes the board's ordinary ground-return
   current (well within its 5A hold rating for this design's ≤3A worst
-  case, the same margin F1 already relies on, DS-PROT-006); in the fault
-  case (mapping reversed), it sees the full supply rail driving into the
-  low-impedance ground plane, trips well below its 40A fault rating, and
-  then strongly current-limits in its tripped state — turning an
-  indefinite, unprotected hijack into a brief, self-limiting,
-  automatically-resettable event. J4's tip/sleeve pin-mapping itself
+  case, the same margin F1 already relies on, DS-PROT-006).
+
+  **Corrected 2026-09-02 (Hardware Reviewer Cycle 8, ISS-041, LOW)**: the
+  fault-case description below was originally overclaimed relative to
+  F1's own, more honestly-scoped text in the same section — brought in
+  line with it, not a circuit change:
+  in the fault case (mapping reversed), F2 sees the full supply rail
+  driving into the low-impedance ground plane. **Honestly scoped, not
+  overclaimed (matching F1's own adjacent caveat)**: F2's Itrip (10.00A)
+  likewise exceeds J4's own 5.0A connector rating (DS-CONN-005) — a fault
+  current between 5A and 10A would stress J4 beyond its own rating
+  before F2 trips at all, the same unprotected window F1's text already
+  discloses for the supply leg. F2's real protective value, like F1's, is
+  against genuine short-circuit-level fault currents well above 10A,
+  tripping **in seconds per its own time-to-trip curve** — this
+  repository holds no actual time-to-trip numeric data for this part
+  (`datasheets/evidence-log.md` has no time-to-trip citation for
+  DS-PROT-006), so no faster or more specific response time is claimed;
+  the original text's "trips within its rated response" framing implied
+  more precision than this evidence supports and is corrected here.
+  **Thermal derating (ambient)**, same table as F1 (DS-PROT-006/033):
+  F2's derated hold current stays at or above this design's ≤3A worst
+  case through 70°C (3.05A), dropping below 3A somewhere between 70°C
+  and 85°C (≈71.7°C by linear interpolation) — comfortably above REQ-201's
+  40°C ambient design target either way. None of this changes the core
+  conclusion — F2 still converts an indefinite, completely unprotected
+  GND-hijack into a bounded, self-limiting, automatically-resettable
+  fault response, a real improvement over the prior zero-protection
+  state — it only corrects how precisely/broadly that improvement was
+  first described.
+
+  J4's tip/sleeve pin-mapping itself
   remains an open ASSUMPTION, unchanged by this fix, still flagged for
   human verification against the real mechanical drawing before
   fabrication (§7.5.9) — this fix removes the need to resolve it before
   the board can be considered safe either way, it does not resolve it.
+  **Correction (Hardware Reviewer Cycle 8, ISS-040, MEDIUM)**: F2's own
+  0.02Ω assumed in-circuit resistance (same DS-PROT-006-derived figure
+  already used for F1 below) IS a term in U5's UVLO series loop, not
+  outside it — U5's UVLO comparator measures VCC relative to its own GND
+  pins, and current flows around the *whole* loop including the return
+  path through F2, not just the supply-side path through F1/D2. Using
+  this section's own existing methodology, F2 adds the same ~0.06V drop
+  F1 already contributes at the design's binding 3A UVLO corner, eroding
+  the previously-tracked ~0.32V margin (§7.5.2) to ~0.26V — still
+  positive, not unsafe, but the ~0.32V figure quoted elsewhere in this
+  document (lines 163, 1909, 3122, 3870–3871, 4166 as of this writing)
+  is now stale and should be updated to ~0.26V by whoever next revises
+  §7.5.2's UVLO margin derivation — not done as part of this same edit,
+  given the number of cross-referenced locations and because whether a
+  ~0.26V margin remains acceptable is itself a Circuit-Engineer/Chief-
+  Engineer design judgment, not a pure arithmetic correction. At
+  DS-MTR-080's own actual operating point (no-load, ≈0.3A, not the 3A
+  UVLO corner) the effect genuinely is negligible (≈3mV, ≈6 RPM) — that
+  specific conclusion is unaffected; only the general framing needed
+  correcting.
 
 
 

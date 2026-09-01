@@ -866,16 +866,55 @@ def main() -> None:
     # resolve the pin-mapping ASSUMPTION itself. If the mapping is
     # correct, F2 just passes the normal GND-return current (well within
     # its 5A hold rating for this design's <=3A worst case, same margin
-    # F1 already relies on, DS-PROT-006) with negligible added impedance
-    # (Rmin=0.010Ω, same as F1 -- not a new voltage-drop term in any
-    # existing calculation, since the GND reference is not part of the
-    # VM_MOTOR series-drop budget at DS-MTR-080). If the mapping is
-    # reversed, F2 sees the full supply rail attempting to drive current
-    # into the low-impedance GND plane, trips within its rated response
-    # (well below its Imax=40A fault rating, DS-PROT-006) and then
-    # strongly current-limits in its tripped high-resistance state --
-    # converting an indefinite, unprotected GND-hijack into a brief,
-    # self-limiting, automatically-resettable fault event. J4's tip/sleeve
+    # F1 already relies on, DS-PROT-006).
+    #
+    # **Correction (Hardware Reviewer Cycle 8, ISS-040, MEDIUM)**: an
+    # earlier version of this comment claimed F2's Rmin=0.010Ω added "not
+    # a new voltage-drop term in any existing calculation, since the GND
+    # reference is not part of the VM_MOTOR series-drop budget" -- this
+    # was WRONG, and conflated the *reference node* with the *loop*. U5's
+    # UVLO comparator measures its own VCC relative to its own GND pins;
+    # current flows around the WHOLE loop (J4 -> F1 -> D2 -> U5 VCC ->
+    # [internal] -> U5 GND -> board copper -> F2 -> J4 sleeve), so F2's
+    # own IR drop is exactly as much a series-loop term as F1's already-
+    # counted one, using this design's own existing methodology (0.02Ω
+    # assumed in-circuit PTC resistance, DS-PROT-006). At the design's own
+    # binding 3A UVLO-margin corner this is a real, non-negligible further
+    # ~0.06V erosion (from ~0.32V to ~0.26V margin against DRV10983's
+    # VUVLO_R max=8.0V) -- still positive, not unsafe, but the design
+    # doc's own tracked margin figure (currently ~0.32V in 6 locations,
+    # `bench-imu-01-design.md` lines 163/1496/1909/3122/3870-3871/4166) is
+    # now stale and should be updated to ~0.26V by whoever next revises
+    # that section -- not done in this same commit given the number of
+    # cross-referenced locations and the judgment call the reviewer's own
+    # finding correctly identifies (whether ~0.26V remains an acceptable
+    # margin is a Circuit-Engineer/Chief-Engineer design decision, not a
+    # pure documentation mechanics fix). At DS-MTR-080's own actual
+    # operating point (no-load, ≈0.3A, not the 3A UVLO corner) the effect
+    # genuinely is negligible (≈3mV, ≈6 RPM) -- that specific conclusion
+    # was and remains correct; only the general "not a new term" framing
+    # was wrong.
+    #
+    # **Corrected 2026-09-02 (Hardware Reviewer Cycle 8, ISS-041, LOW)**:
+    # if the mapping is reversed, F2 sees the full supply rail attempting
+    # to drive current into the low-impedance GND plane. Matching F1's
+    # own already-honest adjacent text (not overclaiming beyond it): F2's
+    # Itrip (10.00A) exceeds J4's own 5.0A connector rating (DS-CONN-005)
+    # -- a fault between 5A and 10A stresses J4 beyond its own rating
+    # before F2 trips at all, the same disclosed window F1 already has
+    # for the supply leg. F2's real protective value is against genuine
+    # short-circuit-level fault currents well above 10A, tripping in
+    # seconds per its own time-to-trip curve -- this repository holds no
+    # actual time-to-trip numeric data for this part (no such citation
+    # exists under DS-PROT-006 in datasheets/evidence-log.md), so no
+    # faster/more specific response time is asserted here (the previous
+    # "trips within its rated response" wording implied more precision
+    # than the evidence supports). It then strongly current-limits in its
+    # tripped high-resistance state -- converting an indefinite, fully
+    # unprotected GND-hijack into a bounded, self-limiting,
+    # automatically-resettable fault event, still a real improvement over
+    # the prior zero-protection state even with this more precise
+    # scoping. J4's tip/sleeve
     # ASSUMPTION itself remains open and still flagged for human
     # verification before fabrication -- this fix does not resolve it, it
     # removes the need to resolve it before the board can be considered

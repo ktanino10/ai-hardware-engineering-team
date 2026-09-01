@@ -250,6 +250,25 @@ WIDTH_HIGH_CURRENT = 1.0
 HIGH_CURRENT_NETS = {
     "VM_MOTOR_RAW", "VM_MOTOR_F1", "VM_MOTOR", "U5_VCC",
     "MOTOR_PHASE_U", "MOTOR_PHASE_V", "MOTOR_PHASE_W",
+    # J4_GND_RAW -- FIXED (Hardware Reviewer Cycle 8, ISS-039, HIGH): this
+    # is the ISS-032 fix's new intermediate net between J4 pin1 and F2
+    # pin1 -- electrically it is the same board-wide ground RETURN
+    # current path that "GND" itself already gets HIGH_CURRENT width for
+    # (see the width-selection logic below, `net_name == "GND"`), just
+    # renamed because it sits upstream of F2 in this design's own
+    # net-splitting convention (every series element's two terminals are
+    # a distinct net, same convention used throughout this schematic).
+    # Omitting it here left it silently routed at WIDTH_SIGNAL (0.25mm)
+    # instead of WIDTH_HIGH_CURRENT (1.0mm) -- a real regression the
+    # reviewer caught: previously J4 pin1 (as a direct GND member) had
+    # three 1.0mm GND tracks reaching it; the fix had cut that to one
+    # 0.25mm trace, ~12x less copper, undersized ~3.1x against this
+    # design's own 2A continuous basis, and -- worse -- specifically
+    # defeating F2's purpose (a trace this thin could fuse open before
+    # the PTC even trips, losing the automatically-resettable behavior
+    # and creating an uncontrolled burn point instead of a clean,
+    # resettable fault response).
+    "J4_GND_RAW",
 }
 POWER_NETS = {"VBUS_5V", "3V3", "U5_V3P3"}
 
