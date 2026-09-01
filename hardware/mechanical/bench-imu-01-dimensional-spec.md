@@ -1,11 +1,17 @@
 # Bench-IMU-01 — Enclosure Dimensional Spec & Design Rationale
 
-**Status: Rev. 3.2 — adds a bounded MISS-011 estimate attempt (§8.1); NO
-`.scad` geometry changed this revision.** Rev 3.1 (previous revision) fixed
-Independent Mechanical Review Cycle 3's 1 CRITICAL (MISS-008) and 2 HIGH
-(MISS-009, MISS-010) findings, in both the `.scad` file and this document.
-MISS-011 (MEDIUM, non-gating) was carried forward in Rev 3.1 **disclosed,
-not fixed**. This revision (3.2) is a Mechanical-Lead-authored
+**Status: Rev. 3.3 — recomputes §8's REQ-403 physics table against a
+corrected credible-worst-case motor RPM input (independently re-verified,
+not merely accepted from Circuit Engineer's own report); NO `.scad`
+geometry changed this revision, and §8.1 is also unchanged (flagged as
+needing its own follow-up recompute, not performed here — see §8's new
+MISS-016 staleness flag).** Rev 3.2 (previous revision) added a bounded
+MISS-011 estimate attempt (§8.1). Rev 3.1 before that fixed Independent
+Mechanical Review Cycle 3's 1 CRITICAL (MISS-008) and 2 HIGH (MISS-009,
+MISS-010) findings, in both the `.scad` file and this document. MISS-011
+(MEDIUM, non-gating) was carried forward in Rev 3.1 **disclosed, not
+fixed**, then addressed by Rev 3.2's own §8.1 analysis (proposed RESOLVED,
+pending Independent Review). Rev 3.2 itself was a Mechanical-Lead-authored
 **analysis-only** addition attempting MISS-011's Recommended Fix path (a): a
 bounded, order-of-magnitude wall-impact/penetration and fastener pull-out
 estimate against the disclosed REQ-403 hazard figure (§8.1) — not a `.scad`
@@ -18,6 +24,68 @@ Independent Mechanical Review pass on this revision (now including §8.1) is
 the required next step; after that clears, the REQ-403 disposition proposal
 in §8 goes to the human as a HITL gate. Nothing in this file should be read
 as "approved."
+
+**Rev. 3.3 changelog (this revision, Mechanical Lead, analysis-only — no
+`.scad` change; consumes Circuit Engineer's DS-MTR-018 correction,
+`hardware/schematic/bench-imu-01-design.md` §7.5.13):**
+
+- **Independently re-verified** Circuit Engineer's DS-MTR-018
+  voltage-label correction and its derived corrected credible-worst-case
+  motor no-load speed (RPM≈25,060–25,280, point ≈25,180 — supersedes the
+  old, correctly-arithmetic-but-mislabeled 22,200 RPM figure) before using
+  it: re-read DS-MTR-017/018/079/080 and DS-PROT-005/006/031/033/034
+  directly in `datasheets/evidence-log.md`, hand-reproduced the KV×V_VCC
+  and F1/U6/D2 voltage-drop arithmetic, and independently reconfirmed the
+  11.1V-nominal-vs-12.6V-full-charge LiPo convention from a fourth, separate
+  source. **Verdict: agree**, with one immaterial (~20 RPM, ~0.08%)
+  arithmetic wrinkle noted in §8 that changes no conclusion.
+- **Recomputed §8's physics table** (angular velocity, stored kinetic
+  energy, rim tip speed, peak centrifugal stress) at the corrected RPM,
+  from this Mechanical Lead's own rotor inertia/radius data (I=4.5×10⁻⁵
+  kg·m², r=0.030m, §4.1/§4.4, unchanged) — independently derived, not a
+  reuse of Circuit Engineer's own illustrative scaling (which the result
+  closely matches). New point-estimate figures: ω≈2636.8 rad/s, KE≈156.44 J
+  (≈70.4× the 3000 RPM baseline, was 54.76×), rim tip speed≈79.11 m/s
+  (~285 km/h, was ~250 km/h), peak stress≈20.20 MPa. The full range
+  (25,060–25,280 RPM) is disclosed alongside the point estimate, not just
+  the point estimate alone.
+- **Re-checked the disk-burst safety factor**: yield(250 MPa)/peak-stress
+  is now ≈12.3–12.5× (point ≈12.4×), down from the superseded ~15.9× (as
+  expected, since stress rose with the corrected RPM) but still comfortably
+  non-binding — disk-burst was never, and is still not, the governing
+  failure mode; the discrete hub-collar-release/projectile hazard remains
+  the actual reasoning behind the containment proposal.
+- **Updated REQ-403 safety-disposition prose** throughout §8 (the
+  "~20,000–22,200 RPM class"/"~250 km/h" framing, the "~122 J dropped from
+  ~12.4m" illustrative comparison, and the now-false "44–55× matches
+  ISS-020" cross-check) to the corrected figures.
+- **Added an explicit MISS-016 staleness flag** at the end of §8: MISS-016
+  (HIGH, OPEN, `validation/open-issues.md`) cites §8.1's own Method 1/Method
+  2 wall-impact-energy estimates, both computed against the now-superseded
+  121.60J figure — those estimates are now stale and **can only widen, not
+  narrow**, once recomputed against the corrected ≈154.95–157.69J figure.
+  **§8.1 itself is NOT recomputed this revision** (separate, already-flagged
+  scope, per this task's own explicit instruction) — flagged as required
+  follow-up work only.
+- **No `.scad` geometry was changed.** This revision corrects the *load
+  case* the existing geometry is judged against, not the geometry itself —
+  the wall-thickness/topology question raised by MISS-016 remains a
+  separate, already-flagged decision for the human at the REQ-403 gate.
+- Logged as `ECO-023` in `validation/change-log.md`, with a corresponding
+  `validation/change-impact-matrix.md` entry. `validation/open-issues.md`
+  is explicitly **not** touched by this revision (per this task's own
+  scope) — the MISS-016 staleness connection is recorded only in §8's own
+  text above, per this task's explicit instruction not to silently leave it
+  unstated.
+- **Observations flagged, not fixed (out of this revision's edit scope):**
+  (1) `hardware/schematic/bench-imu-01-design.md` §7.5.11's own "roughly
+  45–55×" ISS-020 framing is now stale for the same reason as the sentence
+  fixed in §8 below, but that document is outside this Mechanical Lead's
+  edit scope. (2) §15 item 6's existing "Rev 3.2 note" and §8.1 itself
+  still quote the superseded 121.60J/69.74 m/s figures — both are
+  necessarily part of the same follow-up recompute called out in the new
+  MISS-016 flag in §8, not edited separately here to avoid partially
+  updating §8.1-dependent content piecemeal.
 
 **Rev. 3.2 changelog (this revision, Mechanical Lead, analysis-only — no
 `.scad` change; `validation/open-issues.md` MISS-011):**
@@ -604,51 +672,124 @@ REQ-403 itself calls out.
 **The physics, recomputed this session, not assumed from ISS-020's own
 framing:**
 
-| Quantity | At 3000 RPM target | At 20,000 RPM no-load-low | At 22,200 RPM no-load-high |
-|---|---|---|---|
-| Angular velocity ω | 314.2 rad/s | 2094.4 rad/s | 2324.8 rad/s |
-| Stored kinetic energy (I=4.5×10⁻⁵ kg·m²) | 2.22 J | 98.70 J (44.44×) | 121.60 J (54.76×) |
-| Rim tip speed | 9.42 m/s (~34 km/h) | — | 69.74 m/s (~250 km/h) |
-| Peak centrifugal stress (solid-disk formula, ν=0.29) | 0.287 MPa | 12.75 MPa | 15.70 MPa |
+**Rev 3.3 correction (this revision) — the RPM input is corrected, not the
+formulas below:** the "22,200 RPM no-load-high" column used through Rev 3.2
+is superseded. Circuit Engineer found and fixed a real premise error in
+`datasheets/evidence-log.md` DS-MTR-018 (its own ~22,200 RPM figure was
+mislabeled "full-charge 3S (11.1V)"; 11.1V is actually 3S's *nominal*
+voltage — full-charge is 12.6V) and, accounting for this design's own 13.0V
+`VM_MOTOR` envelope ceiling (§7.5.9) and the real J4→F1→D2→D3→U6→U5 series
+voltage drops, independently re-derived the true credible-worst-case
+no-load speed as RPM≈25,060–25,280 (point ≈25,180) — new §7.5.13,
+`hardware/schematic/bench-imu-01-design.md`, Evidence ID DS-MTR-080.
 
-The 44–55× energy range matches ISS-020's own stated "45–55×" almost exactly
-— an independent confirmation of that issue's own framing, not just a
-citation of it.
+**Independent verification performed before using this input (not accepted
+on report alone):** this Mechanical Lead re-read DS-MTR-017/018/079/080 and
+DS-PROT-005/006/031/033/034 directly in `datasheets/evidence-log.md`,
+hand-reproduced the KV(2000 RPM/V)×V_VCC arithmetic and the F1/U6/D2
+voltage-drop chain from those primary citations, and independently
+re-confirmed the 11.1V-nominal-vs-12.6V-full-charge LiPo convention from a
+fourth, separate source (a web search on standard LiPo per-cell voltages).
+**Verdict: agree** — the derivation is sound, the cited Evidence IDs are
+real (not asserted), and the conclusion holds. One immaterial arithmetic
+wrinkle found on independent recheck: the stated range's low bound
+(25,060 RPM) is very slightly inconsistent with the stated point estimate
+(25,180) — an exact recompute puts the true low bound at ≈25,078–25,080 RPM
+(the point estimate is exactly the midpoint of 25,080 and 25,280, not of
+25,060 and 25,280). This is a ≈20 RPM (≈0.08%) discrepancy, well inside
+D2's own VF `ESTIMATE` uncertainty band, and changes no conclusion below;
+the disclosed 25,060–25,280 RPM bracket is retained throughout this section
+for consistency with the source derivation.
+
+**Every figure below at "≈25,180 RPM" is this Mechanical Lead's own
+independent recomputation**, from its own rotor inertia/radius data
+(I=4.5×10⁻⁵ kg·m², r=0.030m, §4.1/§4.4, unchanged this revision) using the
+same ω/KE/rim-speed/stress formulas already in use in this table since
+Rev 3.1 (re-verified against the old 3000/20,000/22,200 RPM values before
+reuse) — not a reuse of Circuit Engineer's own illustrative "≈156J/≈79.1m/s"
+scaling figures, which independently and closely match this Mechanical
+Lead's own result but are not this section's authoritative source (Circuit
+Engineer is explicitly not authoritative for this section's own rotor
+inertia/radius inputs).
+
+| Quantity | At 3000 RPM target | At 20,000 RPM (M1's 10V-test-condition no-load speed — reference point only, NOT the credible worst case, unaffected by this correction) | At ≈25,180 RPM credible worst case (point estimate; **Rev 3.3**, supersedes the old 22,200 RPM figure — DS-MTR-080, §7.5.13) |
+|---|---|---|---|
+| Angular velocity ω | 314.2 rad/s | 2094.4 rad/s | 2636.8 rad/s |
+| Stored kinetic energy (I=4.5×10⁻⁵ kg·m²) | 2.22 J | 98.70 J (44.44×) | 156.44 J (≈70.4×) |
+| Rim tip speed | 9.42 m/s (~34 km/h) | — | 79.11 m/s (~285 km/h) |
+| Peak centrifugal stress (solid-disk formula, ν=0.29) | 0.287 MPa | 12.75 MPa | 20.20 MPa |
+
+`ESTIMATE` (the entire "≈25,180 RPM" column) — inherits D2's VF `ESTIMATE`
+via the RPM input, combined with this table's own pre-existing
+`ASSUMPTION`/`ESTIMATE` disk mass/geometry inputs (§4.1, §4.4); the same
+confidence class as the figures it supersedes, not a new or weaker
+category. **Range disclosure across the full credible RPM bracket
+(25,060–25,280), not just the point estimate:** KE spans ≈154.95–157.69 J
+(≈69.8×–71.0× the 3000 RPM baseline, point ≈70.4×); rim tip speed spans
+≈78.73–79.42 m/s (≈283.4–285.9 km/h); peak stress spans ≈20.01–20.36 MPa.
+Relative to the superseded 121.60 J / 15.70 MPa / 69.74 m/s / 22,200 RPM
+figures, this is a ≈12.9–13.9% increase in RPM/ω/rim-speed (point ≈13.4%)
+and a ≈27.4–29.7% increase in KE/stress (point ≈28.65%) — energy and stress
+scale with ω², so they move super-linearly relative to the RPM correction
+itself. The ≈29% KE increase independently reproduces Circuit Engineer's
+own "≈29%" figure in §7.5.13, computed here from this Mechanical Lead's own
+data rather than copied from it.
+
+The old "44–55× energy range matches ISS-020's own stated '45–55×' almost
+exactly" cross-check (Rev 3.1–3.2 text) is **stale as of this correction**:
+the credible-worst-case multiplier is now ≈69.8×–71.0× (point ≈70.4×) the
+3000 RPM baseline, not ≈45–55×. Observation, not a fix made here:
+`hardware/schematic/bench-imu-01-design.md` §7.5.11's own "roughly 45–55×"
+framing is now stale for the same reason and is out of this Mechanical
+Lead's edit scope — Circuit Engineer/Hardware Lead own updating that
+document.
 
 **The key reframing this design is built on:** the bulk-material stress
-numbers above are not the real risk. Even at 22,200 RPM (unbounded no-load
-speed), peak stress (15.70 MPa) carries a ~15.9× safety factor against mild
-steel's yield strength (250 MPa) — the disk itself is in no realistic danger
-of bursting. The actual hazard is a **discrete coupling failure**: the hub
-collar (a generic set-screw shaft collar, `ASSUMPTION`, no datasheet) losing
-its grip on the shaft — from vibration, from an installation error, or
-simply from a lower-quality assumed part — and releasing the **entire 100g
-disk as one rigid projectile**, at whatever speed the motor happens to be
-spinning at the moment of release. No datasheet exists (UNKNOWN) for the
+numbers above are not the real risk. **Re-checked at the corrected RPM
+(Rev 3.3):** even at ≈25,180 RPM credible worst case (point estimate; range
+20.01–20.36 MPa across 25,060–25,280 RPM), peak stress (≈20.20 MPa) carries
+a ~12.4× safety factor against mild steel's yield strength (250 MPa) —
+range ≈12.3–12.5× — down from the superseded ~15.9× figure (as expected,
+since stress rose ≈28.65% at the point estimate), but the disk itself
+remains in no realistic danger of bursting: disk-burst was never the
+binding constraint, and this correction does not change that conclusion.
+`ESTIMATE` (inherits the RPM input's `ESTIMATE` class, above). The actual
+hazard is a **discrete coupling failure**: the hub collar (a generic
+set-screw shaft collar, `ASSUMPTION`, no datasheet) losing its grip on the
+shaft — from vibration, from an installation error, or simply from a
+lower-quality assumed part — and releasing the **entire 100g disk as one
+rigid projectile**, at whatever speed the motor happens to be spinning at
+the moment of release — now up to ≈25,280 RPM/≈79.4 m/s credible worst
+case, not ≈22,200 RPM/≈69.7 m/s. No datasheet exists (UNKNOWN) for the
 assumed hub collar's own retention strength, so this failure mode cannot be
 bounded by calculation — it can only be defended against structurally.
 
 **Why containment, not clearance-plus-firmware alone:** REQ-405 (the
 firmware speed ceiling) is explicitly not yet implemented (ACCEPTED-RISK
 pending Firmware Bring-up per ISS-020) — meaning that today, and for an
-unknown period going forward, the flywheel's real achievable speed is bounded
-only by the motor's own physical no-load speed (~20,000–22,200 RPM class),
-not by any software limit. A mechanical design that relies on a
-not-yet-implemented control loop as its only line of defense against a
-100g mass potentially detaching at up to ~250 km/h rim speed would be
-providing zero real protection for as long as that firmware gap exists —
-which, per the project's own tracking, is an open and undated item, not a
-near-term certainty. Given that:
+unknown period going forward, the flywheel's real achievable speed is
+bounded only by the motor's own physical no-load speed, now corrected to
+the **~25,060–25,280 RPM class** (was ~20,000–22,200 RPM class through Rev
+3.2 — see the corrected physics table above), not by any software limit. A
+mechanical design that relies on a not-yet-implemented control loop as its
+only line of defense against a 100g mass potentially detaching at up to
+~285 km/h rim speed (was ~250 km/h) would be providing zero real protection
+for as long as that firmware gap exists — which, per the project's own
+tracking, is an open and undated item, not a near-term certainty. Given
+that:
 
 - This is explicitly a **bench-test, human-attended** context (not an
   unattended field deployment) — the containment decision is scoped to that
   context, not to a hypothetical harsher one. A human is expected to be
   within arm's length of the device during any powered test.
-- The stored energy at the credible worst case (~122 J) is still
-  substantial — for comparison, that is roughly the kinetic energy of a
-  1kg mass dropped from ~12.4m, or a small hand tool swung at speed. A
-  100g fragment departing at up to ~250 km/h is a genuine laceration/impact
-  hazard to an attending human at bench distance, not a negligible one.
+- The stored energy at the credible worst case (~156 J, point estimate;
+  range ≈155–158 J across 25,060–25,280 RPM — was ~122 J through Rev 3.2)
+  is still substantial — for comparison, that is roughly the kinetic
+  energy of a 1kg mass dropped from ~16.0m (was ~12.4m), or a small hand
+  tool swung at speed. A 100g fragment departing at up to ~285 km/h (was
+  ~250 km/h) is a genuine laceration/impact hazard to an attending human at
+  bench distance, not a negligible one — more so, not less so, than
+  previously disclosed.
 - The mitigating alternative (firmware speed limiting) is real but is
   **not yet built**, and this Mechanical Lead has no authority or visibility
   into when it will be, per the task's own explicit instruction to stay out
@@ -732,6 +873,37 @@ Review to challenge, and then for the human to accept, reject, or amend at
 the REQ-403 HITL gate — exactly mirroring how the electronics-side REQ-403
 disposition was handled (proposed → independently reviewed → human gate),
 not a unilateral final decision by this Mechanical Lead.
+
+**Rev 3.3 staleness flag for MISS-016 (HIGH, OPEN) — follow-up recompute
+required, not performed here:** `validation/open-issues.md` MISS-016 (the
+containment-wall energy-absorption shortfall) cites this document's own
+§8.1.2 Method 1/Method 2 wall-impact estimates as its evidence, both
+computed against the now-superseded 121.60 J / 69.74 m/s / 22,200 RPM
+figures. **§8.1 is unchanged by this revision** — recomputing it is a
+separate, already-flagged piece of work, out of this task's own explicit
+scope, not a quick follow-on performed here. Its own Method 1 (~0.5–2.4% of
+budget) and Method 2 (~30–40% of budget) shortfall percentages, and the
+"~2.5–3× short" / "1 to 3+ orders of magnitude short" conclusions, are
+**all now stale**: they were computed against an energy figure this
+revision has just shown to be ≈27.4–29.7% too low (point ≈28.65%). Because
+the containment wall's energy-absorption capacity did not change (no
+`.scad` geometry was touched this revision) while the demanded energy went
+up, **MISS-016's already-quantified shortfall can only widen, not
+narrow**, once §8.1 is recomputed against the corrected ≈154.95–157.69 J
+(point ≈156.44 J) figure — this is a direction-of-travel statement, not a
+substitute for the actual recompute, which is explicitly **not** performed
+in this revision and is flagged here as required follow-up work, per this
+Mechanical Lead's own instruction not to silently leave a known stale
+downstream connection unstated. §15 item 6's existing "Rev 3.2 note" (which
+also quotes the same superseded 121.60J figure) is part of that same
+follow-up and is likewise not edited here, to avoid partially updating
+§8.1-dependent content piecemeal outside this task's scope. (Incidental
+citation note, not a defect requiring action: the task instruction that
+prompted this revision described MISS-016's Method 1/2 figures as living in
+`bench-imu-01-manufacturing-spec.md` §8.1 — that file is untouched and is
+not where MISS-016's analysis actually lives; MISS-016's real cited
+evidence, per `validation/open-issues.md` line 89, is this same document's
+own §8.1.2, consistent with how this flag is written.)
 
 ### 8.1 MISS-011 closure attempt: bounded wall-impact and fastener pull-out estimates (Rev 3.2, 2026-09-13)
 

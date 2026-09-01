@@ -515,6 +515,26 @@ was found to fail the torque margin (back-calculated stall torque only
 not viable, and not added as a formal 5th candidate since it fails on its
 own merits rather than adding a genuinely new trade-off to weigh.*
 
+**Correction note (2026-09-13, MISS-019, LOW, non-safety-degrading):**
+the "≈22,200 RPM @11.1V" and "≈20,000–22,200 RPM" figures in the table
+rows above (lines 495, 498) remain arithmetically correct as *derived
+KV×V* estimates at the specific voltages stated — they are not deleted
+or wrong on their own terms. However, 11.1V was elsewhere mislabeled
+"full-charge 3S" when it is actually 3S's *nominal* voltage (full-charge
+is 12.6V); the design's own later-established, real 9.0–13.0V `VM_MOTOR`
+qualified envelope (`hardware/schematic/bench-imu-01-design.md` §7.5.9)
+implies a corrected, higher credible-worst-case no-load speed of
+≈25,180 RPM once real circuit-path voltage drops are also accounted for
+(§7.5.13, DS-MTR-018 corrected/DS-MTR-080). This does not change this
+section's own Component Selection-era recommendation or trade-off
+analysis (Candidate C remains the correct choice on every criterion
+compared here), and the error direction is non-safety-degrading — REQ-007's
+3000 RPM target is an even *smaller* fraction of the true no-load speed
+than stated ("13–20%" understates how gentle the target operating point
+actually is). See §7.5.13 and `validation/open-issues.md` MISS-019 for
+the full correction; not re-litigated in the table above per this
+document's own convention of preserving the original decision record.
+
 ### Recommendation
 
 - **Recommended candidate**: **C — T-Motor MN2206-13 KV2000 (sensorless

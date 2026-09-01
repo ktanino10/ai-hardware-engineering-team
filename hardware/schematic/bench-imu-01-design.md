@@ -232,9 +232,10 @@ DS-MTR-068/069/071, cited directly below, not re-derived from scratch);
   requirement flagged)** — New **§7.5.11** records the finding as-is (a
   genuine premise-level gap, not a circuit defect): REQ-007's "≥3000 RPM"
   has only ever been a functional floor; M1's own no-load speed
-  (DS-MTR-018, ≈20,000–22,200 RPM) is 6–7× that floor, with stored
-  rotational energy ≈45–55× higher at no-load than at the 3000 RPM
-  target. No component, connection, or protection circuit in this
+  (DS-MTR-018 corrected/DS-MTR-080, §7.5.13, ≈20,000 RPM up to a
+  corrected credible worst-case of ≈25,180 RPM) is 6.7–8.4× that floor,
+  with stored rotational energy ≈44–70× higher at no-load than at the
+  3000 RPM target. No component, connection, or protection circuit in this
   design's own scope can bound a *commanded* maximum speed — that is a
   firmware policy question (a maximum operating/fault speed, a commanded
   ramp-rate limit, and a tach-supervised overspeed shutdown using the
@@ -2154,10 +2155,14 @@ still-undecided firmware latch policy; the dVdT/C(OUT) sizing basis
 here.** REQ-007's "≥3000 RPM" (`bom/component-selection.md`) has only
 ever been stated as a functional floor — a minimum the design must be
 capable of reaching — not a ceiling on *commanded* speed. M1's own
-no-load speed is approximately 20,000–22,200 RPM (component-selection
-research, DS-MTR-018) — 6–7× REQ-007's floor — and because stored
-rotational kinetic energy scales with the square of angular velocity, M1
-stores roughly 45–55× the rotational energy at no-load that it would at
+no-load speed is approximately 20,000 RPM (M1's own 10V-test-condition
+reference point) up to a corrected, path-drop-accounted credible
+worst-case of ≈25,180 RPM at this design's own qualified 13.0V envelope
+ceiling (**DS-MTR-018 corrected/DS-MTR-080, §7.5.13** — supersedes the
+previously-cited, mislabeled "22,200 RPM at full-charge 3S (11.1V)"
+figure) — **6.7–8.4×** REQ-007's floor — and because stored rotational
+kinetic energy scales with the square of angular velocity, M1 stores
+roughly **44–70×** the rotational energy at no-load that it would at
 the 3000 RPM floor. Nothing in this design's own schematic scope (U5,
 M1, J4, D2, D3, F1, R10, the flagged §7.5.10 controller) can bound a
 *commanded* maximum speed — that requires a firmware policy comparing a
