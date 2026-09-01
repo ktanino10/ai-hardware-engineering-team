@@ -166,16 +166,17 @@ Summary:
 **This layout is NOT DRC-clean and is explicitly NOT claimed ready to
 fabricate.** After the fixes above (design-rule defaults, pin-cluster
 bridging, layer isolation for GND, MST routing, largest-bbox-first layer
-ordering) plus the post-review fix round below, `kicad-cli pcb drc`
-reports **365-373 violations (real run-to-run non-determinism observed —
-4 repeated runs against the identical current `.kicad_pcb` produced
-365/373/371/365), 0 unconnected items (stable/deterministic across every
-run in this session, both before and after the fix round)** (updated
-2026-09-02, final state after Hardware Reviewer Cycles 6 and 7 plus two
-same-day PCB Engineer fix rounds — see below; pre-review baseline was
-~370, with a transient regression to ~380-400 mid-fix, now resolved back
-to at-or-below baseline). The table below reflects one representative
-run (365):
+ordering) plus the post-review fix rounds below, `kicad-cli pcb drc`
+reports **~365-380 violations (real run-to-run non-determinism confirmed
+by two independent sets of repeated runs — this session's own 4 runs:
+365/373/371/365; Hardware Reviewer Cycle 7's own independent 4 runs:
+379/379/370/368, against a 377 baseline re-run), 0 unconnected items
+(stable/deterministic across every run by both parties, both before and
+after the fix rounds)** (updated 2026-09-02, final state after Hardware
+Reviewer Cycles 6 and 7 (plus a Cycle 7 follow-up) and two same-day PCB
+Engineer fix rounds — see below; pre-review baseline was ~370-377, with
+a transient regression to ~380-400 mid-fix, now back within the same
+baseline band). The table below reflects one representative run (365):
 
 | Category | Count | What it means |
 |---|---|---|
@@ -213,16 +214,22 @@ the land as the true connection point — U6's PowerPAD group now needs
 terminal pads (1 bridge each) — which have no single large land pad and
 so still need one — are unaffected. **Independently re-verified after
 each round** via a standalone pad/net audit script (not just re-trusting
-the same DRC proxy that missed the original bug): all of U6's 17
-sub-pads, J1's 4 shield pads, and SW1's duplicate pads share their
-correct single net; `GND`-vs-`U6_ILIM` crossings dropped 12 → 1 (the
-remaining 1 matches Cycle 6's own pre-existing, unrelated crossing in
-that region, confirmed unrelated to bridging). Net result: connectivity
-is now genuinely complete (not just DRC-proxy-silent) **and** the total
-violation count (365-373) is at or below the original ~370 pre-fix
-baseline — a real improvement, not a tradeoff. See
-`validation/open-issues.md` ISS-033/034/035/038 (all RESOLVED) and
-ISS-036 (still OPEN — updated with the current count).
+the same DRC proxy that missed the original bug), and this fix round's
+own claims were themselves independently re-fact-checked in a Cycle 7
+follow-up pass (commit `f55d8f7`) rather than accepted at face value:
+all of U6's 17 sub-pads, J1's 4 shield pads, and SW1's duplicate pads
+share their correct single net; `GND`-vs-`U6_ILIM` crossings dropped
+12 → **0** board-wide (this session's own first re-check had
+mis-attributed one nearby, unrelated `GND`-vs-`DIR` violation as an
+`ILIM` crossing — a real error, caught and corrected by the follow-up
+review, not by this session catching it unprompted). Net result:
+connectivity is now genuinely complete (not just DRC-proxy-silent)
+**and** the total violation count (~365-380) is back within the same
+band as the original ~370-377 pre-fix baseline — **not** strictly
+at-or-below it as first (over-confidently) claimed; the honest framing,
+per the follow-up review, is "within the baseline band," not "an
+improvement." See `validation/open-issues.md` ISS-033/034/035/038 (all
+RESOLVED) and ISS-036 (still OPEN — updated with the current count).
 
 **Root cause, stated plainly**: a from-scratch, scripted routing approach
 (no real autorouter, no interactive push-and-shove router, and
@@ -283,10 +290,25 @@ PowerPAD were redundant and crossed the unrelated `U6_ILIM` net 12 times
 review step exists to catch, and it worked as intended. ISS-038 was
 fixed the same day (root cause: the bridging logic's hub-pad selection
 picked an arbitrary small via instead of the actual shared copper land;
-fixed by hubbing on the largest-bounding-box-area pad in each group) and
-independently re-verified via the same pad/net-audit + DRC methodology —
-see the DRC status section above for the final numbers (365-373, at or
-below the original ~370 baseline).
+fixed by hubbing on the largest-bounding-box-area pad in each group).
+
+**Cycle 7 follow-up (`validation/design-review.md`, commit `f55d8f7`)**
+— a second, even more narrowly-scoped re-check of just the ISS-038 fix —
+**confirmed the fix holds up**, but also caught **two factual errors in
+this session's own first self-verification of that fix**: this session
+had claimed `GND`-vs-`U6_ILIM` crossings dropped to 1 remaining
+(actually 0 — the "1" was a different, pre-existing `GND`-vs-`DIR`
+violation, misattributed), and had claimed the resulting violation count
+was "at or below the original baseline" (the reviewer's own independent
+re-runs — 379/379/370/368 against a 377 baseline re-run — show this
+over-read the DRC tool's own run-to-run non-determinism; "back within
+the same baseline band" is the accurate framing). Both corrected in
+`validation/open-issues.md` and above once the independent check flagged
+them — see the DRC status section above for the corrected final numbers.
+This is disclosed plainly rather than quietly fixed, because it is a
+useful, real illustration of exactly why this project requires
+independent review rather than author self-attestation, twice over in
+this same session.
 
 ISS-031 (footprint thermal-via-array gap), ISS-032 (J4 GND-hijack
 safety-argument gap), and ISS-036 (bulk DRC closure — the majority of
@@ -295,8 +317,8 @@ category counts remain individually unattributed) remain untouched/open.
 `validation/open-issues.md` for authoritative, current status per
 finding, and the Design Complete gate (`tools/check_open_issues.py`)
 still correctly fails on the 3 remaining open HIGH items (ISS-031,
-ISS-032, ISS-036). The ISS-038 fix (this session's second same-day fix
-round) has **not** yet had its own independent follow-up re-verification
-pass — flagged here as a recommended next step, not silently skipped,
-consistent with how Cycle 7 itself was requested after the first fix
-round.
+ISS-032, ISS-036). Per the reviewer's own follow-up, §8's Design Complete
+gate additionally still needs `requirements/traceability-matrix.md` fully
+verified/waived, `validation/fmea.md` reviewed, and a
+`validation/change-log.md` (ECO) entry for this revision — none of which
+were in this session's scope to produce.
