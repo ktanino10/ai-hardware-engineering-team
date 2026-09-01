@@ -1958,20 +1958,20 @@ side effect of the MISS-001 fix.
 
 ---
 
-## Hardware Reviewer — Cycle 3 (Fidelity-scoped review of ISS-014 KiCad correction, 2026-09-04)
+## Hardware Reviewer — Cycle 3 (Fidelity-scoped review of ISS-027 KiCad correction, 2026-09-04)
 
 ### Review Cycle Metadata
 
 - **Design revision reviewed**: `hardware/schematic/bench-imu-01-design.md`,
   **"Rev 2, corrected"** status (top-of-document status line) — the
-  ISS-014 pin-bonding correction (`validation/change-log.md` ECO-006)
+  ISS-027 pin-bonding correction (`validation/change-log.md` ECO-006)
   layered on top of the already-Design-Complete Rev 2 (ECO-005, Design
   Complete granted 2026-09-03) — plus `hardware/schematic/bench-imu-01/`,
   this repository's **first-ever real KiCad project**, built on the
   corrected pins.
 - **Reviewer**: Hardware Reviewer — see
   `.github/agents/hardware-reviewer.agent.md`. Independent of the Hardware
-  Lead session that discovered ISS-014, applied the fix to both the design
+  Lead session that discovered ISS-027, applied the fix to both the design
   doc and the new KiCad project, and authored the KiCad project's own
   `README.md` rationale/decisions log.
 - **Independence statement**: Per this cycle's explicit task framing, this
@@ -1986,7 +1986,7 @@ side effect of the MISS-001 fix.
   Markdown design doc says it should be**, checked with the real KiCad
   tools directly — not by re-reading the Hardware Lead's own `README.md`
   claims, the design doc's own self-check language, or
-  `validation/open-issues.md`'s own ISS-014 Notes and accepting any of
+  `validation/open-issues.md`'s own ISS-027 Notes and accepting any of
   them on faith. Every claim below (ERC result, netlist content, MCP tool
   behavior, BOM content, symbol/footprint existence and dimensions) was
   independently re-derived this cycle directly from the real files.
@@ -2004,7 +2004,7 @@ side effect of the MISS-001 fix.
   headline locations named in this cycle's kickoff. Plus:
   `hardware/schematic/bench-imu-01/` (`.kicad_sch`/`.kicad_pro`/
   `.kicad_sym`, `README.md`, `generate_schematic.py`),
-  `validation/open-issues.md` ISS-014, `validation/change-log.md` ECO-006,
+  `validation/open-issues.md` ISS-027, `validation/change-log.md` ECO-006,
   `datasheets/evidence-log.md` DS-MCU-064 through DS-MCU-067, the new
   `datasheets/stmicroelectronics_stm32_open_pin_data_stm32g031k4-6-8tx.md`
   metadata record, and `bom/component-selection.md` (4 primary ICs).
@@ -2013,7 +2013,7 @@ side effect of the MISS-001 fix.
   serial integration step owned by the Hardware Reviewer, not fragmented
   across uncoordinated sub-scans.
 - **rubber-duck premise review run in parallel?**: Not run this cycle.
-  ISS-014 was self-discovered by the Hardware Lead directly through
+  ISS-027 was self-discovered by the Hardware Lead directly through
   independent KiCad tooling verification (checking real symbol/footprint
   pin existence against ST's own pin database before wiring anything), not
   through a rubber-duck premise-review pass — there is no rubber-duck-
@@ -2049,22 +2049,22 @@ already-Design-Complete Rev 2 facts:
 |---|---|---|---|
 | 1 | Voltage violation | Out of scope this cycle (already-settled, Design Complete) | ISS-002's disposition (ACCEPTED-RISK, human-signed per ECO-005) is unrelated to the pin-identity correction; not re-derived this cycle. |
 | 2 | Absolute Maximum Rating violation | Out of scope this cycle (already-settled) | MCU VDD AMR (ISS-010, RESOLVED) is unaffected by *which physical pin* carries VDD/VDDA — same voltage rail, same AMR. Not re-derived. |
-| 3 | Current limit | Out of scope this cycle (unaffected) | `hardware/power-budget.md` figures are pin-identity-independent; ISS-014 adds/removes no current-consuming element. |
+| 3 | Current limit | Out of scope this cycle (unaffected) | `hardware/power-budget.md` figures are pin-identity-independent; ISS-027 adds/removes no current-consuming element. |
 | 4 | Thermal risk | Out of scope this cycle (unaffected) | No package, load, or ambient change from a pin-identity correction. |
 | 5 | Missing decoupling capacitor | Pass — independently confirmed unaffected | C3(VDD)/C4(VDDA) sit on the same combined VDD/VDDA net (physical pin 4) before and after correction — only *which physical pin number* carries this net changed. Independently confirmed via the real exported netlist: `/3V3` net includes `U1` pin `4`, `C3` pin `1`, `C4` pin `1`. |
 | 6 | Floating pin | **Pass — directly relevant, independently re-verified** | Confirmed via the real exported netlist (not `README.md`'s claim) that I2C2_SCL (`U1` pin `22`) and I2C2_SDA (`U1` pin `23`) are each on a real net with `R3`/`R4` pull-ups and `U2` attached — neither is floating/NC. NRST (pin `6`, dual-named `PF2_6`) and every one of the 22 free GPIOs are correctly accounted for in §11 and match the real netlist's `unconnected-(...)` pseudo-nets pin-for-pin (e.g. `PB8`→`unconnected-(U1-PB8-Pad32)`, `PB9`→`unconnected-(U1-PB9-Pad1)`). |
 | 7 | Incorrect pull-up/pull-down | **Pass — directly relevant, independently re-verified** | R3=R4=4.7kΩ (value unchanged, per this cycle's exclusion of already-settled sizing analysis) confirmed via the real netlist to land on the *new*, physically-real pins: `R3` pin `1` / `R4` pin `1` on `/I2C2_SCL` / `/I2C2_SDA` respectively (with `U1` pins `22`/`23`), `R3` pin `2` / `R4` pin `2` both on `/3V3` — not on the old, nonexistent PB10/PB11. |
 | 8 | Logic voltage mismatch | Out of scope this cycle (unaffected) | Single 3.3V rail throughout, untouched by the pin-identity correction. |
 | 9 | Interface timing | **Pass — independently confirmed unaffected, not merely assumed** | Directly re-read §5.2: the pull-up sizing analysis itself (Rp,min≈966Ω, Rp,max≈7.08kΩ, R3=R4=4.7kΩ, actual rise-time≈199ns/≈34% headroom, 75pF sensitivity ceiling) contains **zero numeric change** from the values Cycle 2 already independently reconfirmed — §5.2's only edit this correction touched is a peripheral-instance cross-reference, already covered by ISS-011. Moving I2C2 from PB10/PB11 to PA11/PA12 changes no bus capacitance, no pull-up value, no target speed — the timing analysis is pin-location-independent by construction. |
-| 10 | Power sequencing | Out of scope this cycle (unaffected) | §14 item 10's text ("VDD/VDDA combined into one physical pin, no separate VBAT pin exists — corrected this revision, ISS-014") independently confirmed against the real netlist (single `/3V3` net feeds `U1` pin `4`) — the *sequencing conclusion itself* (moot by construction, single rail) is unchanged; only the underlying pin-count fact was corrected (covered under item 11/§11 cross-check below). |
+| 10 | Power sequencing | Out of scope this cycle (unaffected) | §14 item 10's text ("VDD/VDDA combined into one physical pin, no separate VBAT pin exists — corrected this revision, ISS-027") independently confirmed against the real netlist (single `/3V3` net feeds `U1` pin `4`) — the *sequencing conclusion itself* (moot by construction, single rail) is unchanged; only the underlying pin-count fact was corrected (covered under item 11/§11 cross-check below). |
 | 11 | Grounding | **Pass — directly relevant, independently re-verified** | VSS (pin `5`, corrected from a previously-alleged 2-pin VSS/VSSA split to the real single combined pin) independently confirmed via the real netlist: `/GND` net includes `U1` pin `5` (`VSS_5`). Single ground net/plane statement otherwise unchanged. |
 | 12 | EMI/EMC risk | Out of scope this cycle (unaffected) | No new noise source; a DC-only pin reassignment. |
 | 13 | Motor noise | N/A — unaffected | Still no motor/rotating actuator on this board. |
 | 14 | Sensor noise | Out of scope this cycle (unaffected) | ISS-009 (LDO output cap) is unrelated to MCU pin identity, untouched this cycle. |
 | 15 | PCB layout concern (incl. mechanical/thermal co-design) | **Pass — this cycle's central concern** | This is precisely why a real KiCad project matters here: independently confirmed the `Bosch_LGA-14_3x2.5mm_P0.5mm` footprint genuinely exists with a real F.Fab body outline of exactly **3.000mm × 2.500mm** (matches the claimed 2.5×3.0mm), and that the MCU/IMU/LDO/ESD symbols all resolve to real KiCad official-library parts with correctly-populated footprint fields (BOM cross-check below). No PCB layout file exists yet (schematic-capture-only cycle, correctly self-reported by `kicad-validate_project`); the mechanical/thermal co-design trigger (rotating body) still does not apply. |
-| 16 | Datasheet recommendation violation | **Pass — RESOLVED this cycle (ISS-014), independently confirmed** | This *is* what ISS-014 was: the previously-documented PB10/PB11 pin assignment violated the MCU's own real, physical package pinout — a physical-existence violation, categorically the same "will fail as designed" class this taxonomy's CRITICAL row describes. Independently confirmed fixed: the real KiCad netlist routes I2C2 to PA11/PA12 (`U1` pins `22`/`23`), matching both the corrected design doc and **two** independent primary sources (ST's own GitHub pin-data XML per DS-MCU-064–067, and KiCad's own official `MCU_ST_STM32G0.kicad_sym` symbol, independently parsed this cycle — see below). |
+| 16 | Datasheet recommendation violation | **Pass — RESOLVED this cycle (ISS-027), independently confirmed** | This *is* what ISS-027 was: the previously-documented PB10/PB11 pin assignment violated the MCU's own real, physical package pinout — a physical-existence violation, categorically the same "will fail as designed" class this taxonomy's CRITICAL row describes. Independently confirmed fixed: the real KiCad netlist routes I2C2 to PA11/PA12 (`U1` pins `22`/`23`), matching both the corrected design doc and **two** independent primary sources (ST's own GitHub pin-data XML per DS-MCU-064–067, and KiCad's own official `MCU_ST_STM32G0.kicad_sym` symbol, independently parsed this cycle — see below). |
 
-### Findings — independent verification of the ISS-014 KiCad correction
+### Findings — independent verification of the ISS-027 KiCad correction
 
 Each claim below was independently re-derived this cycle from the real
 `kicad-cli`/MCP tool output or the real library files — not accepted on
@@ -2099,7 +2099,7 @@ their true closing paren) into a full net↔(ref,pin) map.
 
 - **§11 pin table (32/32 MCU pins) — 100% match, no exceptions.** Every
   physical pin 1–32 independently cross-checked against the real netlist,
-  including the headline ISS-014 claims:
+  including the headline ISS-027 claims:
   - Pin `4` (VDD/VDDA, combined) → `/3V3` net. Pin `5` (VSS/VSSA,
     combined, single pin — not two) → `/GND` net. Pin `6` (`PF2_6`,
     dual-named with NRST) → `/NRST` net. **No separate VBAT pin exists
@@ -2200,7 +2200,7 @@ with **no PB10/PB11 anywhere**, and pins 22/23 are literally dual-named
 matching the project's own exported netlist pin-function strings
 exactly.
 
-#### ISS-014 (design doc's own recommendation: CRITICAL) — pin-bonding correction — **independently RE-VERIFIED, fix holds up completely**
+#### ISS-027 (design doc's own recommendation: CRITICAL) — pin-bonding correction — **independently RE-VERIFIED, fix holds up completely**
 
 - **Independent method**: All 6 findings above, combined — real `kicad-cli`
   ERC/netlist/BOM output, a from-scratch 32-pin/19-row exhaustive
@@ -2222,7 +2222,7 @@ exactly.
   `docs/architecture.md` §7.1, **CRITICAL** = "Design will fail or cause
   damage/hazard under normal/expected operating conditions as designed";
   **HIGH** = "Likely malfunction or reliability failure under realistic
-  conditions/corners." ISS-014 is not a probabilistic, corner-case, or
+  conditions/corners." ISS-027 is not a probabilistic, corner-case, or
   marginal-condition risk — it is a **physical/topological
   impossibility**: no amount of correct firmware, layout care, or
   operating-condition control could ever have made the originally
@@ -2234,7 +2234,7 @@ exactly.
   peripheral-instance/firmware-target label correction on pins that were
   always physically real and correctly wired (same silicon pads, same
   pull-ups, zero hardware rework, would have surfaced immediately and
-  harmlessly at firmware bring-up as a "wrong peripheral" bug); ISS-014
+  harmlessly at firmware bring-up as a "wrong peripheral" bug); ISS-027
   means the previously documented pins **physically do not exist**, so no
   hardware rework path could ever have produced a working board from the
   original documentation — independently re-derived from the taxonomy's
@@ -2253,7 +2253,7 @@ exactly.
   `docs/architecture.md` §14/`docs/workflow.md` Phase 11) — not a gap in
   *this* correction's completeness.
 - **Conclusion**: Fix holds up completely under independent re-verification.
-  `validation/open-issues.md` updated: **ISS-014 → RESOLVED** (2026-09-04).
+  `validation/open-issues.md` updated: **ISS-027 → RESOLVED** (2026-09-04).
 
 ### New discrepancies found this cycle (not disclosed by `README.md`) — all LOW, all non-blocking
 
@@ -2290,13 +2290,13 @@ exactly.
 - **Severity**: **LOW** — per `docs/architecture.md` §7.1 ("Style /
   best-practice / documentation improvement, negligible functional
   risk"). Pre-existing (present since this section was authored in the
-  original Rev 2 rework, unrelated to and unchanged by ISS-014), and the
+  original Rev 2 rework, unrelated to and unchanged by ISS-027), and the
   KiCad project itself is unaffected — this is a pure Markdown
   documentation nit.
 
-#### Finding B — `validation/open-issues.md` ISS-014's own Notes column names 5 MCP tools as having "independently tool-verified" the fix; all 5 are confirmed broken in this environment
+#### Finding B — `validation/open-issues.md` ISS-027's own Notes column names 5 MCP tools as having "independently tool-verified" the fix; all 5 are confirmed broken in this environment
 
-- **Issue**: ISS-014's Notes cell (prior to this cycle's edit) and
+- **Issue**: ISS-027's Notes cell (prior to this cycle's edit) and
   `validation/change-log.md` ECO-006 both state the KiCad project was
   "independently tool-verified" via
   `extract_schematic_netlist`/`analyze_schematic_connections`/
@@ -2325,7 +2325,7 @@ exactly.
   defect, which was scored MEDIUM precisely because a residual gap
   remained open after that cycle — no such gap remains here).
 - **Affected Component**: Documentation only —
-  `validation/open-issues.md` ISS-014 Notes column,
+  `validation/open-issues.md` ISS-027 Notes column,
   `validation/change-log.md` ECO-006 tool-attribution language.
 - **Recommended Fix**: Already applied by this cycle's own Notes append
   (below) — the real, working verification method (`kicad-cli` directly)
@@ -2337,7 +2337,7 @@ exactly.
 
 #### Finding C — `validation/change-log.md` ECO-006 is dated *before* the Design Complete grant it explicitly describes itself as following ("post-Design-Complete")
 
-- **Issue**: ECO-006 (the ISS-014 correction) and the design doc's own
+- **Issue**: ECO-006 (the ISS-027 correction) and the design doc's own
   top-of-document status line both carry the date **2026-08-31**. This is
   chronologically **before** ECO-003 (2026-09-01), ECO-004 (2026-09-03),
   and — critically — **ECO-005 (2026-09-03), the entry that actually
@@ -2387,14 +2387,14 @@ exactly.
 ### New/residual observations this cycle
 
 No new CRITICAL, HIGH, or MEDIUM finding was introduced or discovered by
-the ISS-014 KiCad correction — independently checked via the full
+the ISS-027 KiCad correction — independently checked via the full
 16-item re-run, the exhaustive 32-pin/19-row netlist cross-check, and the
 from-scratch 16-tool MCP census above. Three new **LOW** findings were
 surfaced this cycle (Findings A/B/C above), none of which were disclosed
 by `README.md`; all three are documentation-only, none affect the KiCad
 project's correctness, and none block this cycle's fidelity verdict.
 Consistent with this cycle's tightly-scoped `validation/open-issues.md`
-edit list (ISS-014 only), Findings A/B/C are recorded here rather than
+edit list (ISS-027 only), Findings A/B/C are recorded here rather than
 opened as new backlog IDs — a future pass may promote them to tracked
 `ISS-*` rows if the Hardware Lead judges that useful, but their LOW
 severity and self-contained nature do not require it for this verdict.
@@ -2403,14 +2403,14 @@ severity and self-contained nature do not require it for this verdict.
 
 - **Verdict**: **PASS** (fidelity-scoped — this is not a full Design
   Complete re-litigation, and should not be read as one)
-- **Open CRITICAL count (fidelity scope)**: 0 — ISS-014 independently
+- **Open CRITICAL count (fidelity scope)**: 0 — ISS-027 independently
   confirmed fixed and complete, moved to RESOLVED this cycle.
 - **Open HIGH count (fidelity scope)**: 0 new HIGH findings introduced or
   discovered by this correction.
 - **What this verdict covers**: Whether the real KiCad schematic
   (`hardware/schematic/bench-imu-01/`) provably and verifiably matches the
   corrected Markdown design doc, pin-for-pin and net-for-net, and whether
-  ISS-014's fix is complete and correctly classified. Both independently
+  ISS-027's fix is complete and correctly classified. Both independently
   confirmed **yes** this cycle, via real `kicad-cli` output, a from-scratch
   exhaustive cross-check (not a spot check), a from-scratch 16-tool MCP
   census, and a second independent primary source.
@@ -2422,7 +2422,7 @@ severity and self-contained nature do not require it for this verdict.
   (ISS-005/007/008/009/012/013, MISS-005/006/007) are untouched by this
   cycle and remain exactly as any prior cycle left them — this review does
   not re-litigate or re-disposition any of them.
-- **Incidental, not re-litigated, factual observation**: Because ISS-014
+- **Incidental, not re-litigated, factual observation**: Because ISS-027
   was this repository's only OPEN CRITICAL finding project-wide,
   `tools/check_open_issues.py` also now reports the overall gate as
   passing (0 unresolved CRITICAL, 0 un-signed-off-status OPEN HIGH) once
@@ -2430,10 +2430,4730 @@ severity and self-contained nature do not require it for this verdict.
   this narrow fix's disposition, not a claim that this cycle re-reviewed
   or re-blessed the rest of the project's backlog.
 - **Next action**: No further Circuit Engineer rework loop is required for
-  ISS-014, which is closed. Findings A/B/C (all LOW, documentation-only)
+  ISS-027, which is closed. Findings A/B/C (all LOW, documentation-only)
   may be routed to the Circuit Engineer/Hardware Lead for an
   opportunistic cleanup pass, but do not block anything and do not
   require another review cycle to evaluate. `firmware/bench-imu-01/`'s
   still-outstanding GPIOB→GPIOA pin follow-up (flagged by §19, and by
   ECO-006) remains correctly out of scope for Hardware Reviewer sign-off
   (Firmware Bring-up does not gate Design Complete).
+
+## Cycle 3 — Rev 3 Motor Driver + Reaction Wheel subsystem, first review of this scope (2026-09-05)
+
+### Review Cycle Metadata
+
+- **Design revision reviewed**: `hardware/schematic/bench-imu-01-design.md`
+  **Rev 3** (Author: Circuit Engineer (AI agent), commit `3e2c529`), together
+  with its companion `hardware/power-budget.md` (finalized this revision
+  with real motor-rail numbers). **This is a first review of new scope, not
+  a re-review of a prior fix cycle.** Rev 2 (the MCU+IMU+Power board) already
+  passed independent review across Cycle 1 and Cycle 2 above and reached
+  Design Complete/human sign-off — **that content is explicitly out of
+  scope for this cycle and is not re-litigated here.** This cycle's scope is
+  the new Rev 3 addition only: the Motor Driver (TI DRV10983, U5) +
+  Reaction Wheel (T-Motor MN2206-13 KV2000, M1) subsystem, added in a new
+  §7.5, plus the necessary touches to §1, §2.1–§2.3 (rails/ground/pin
+  allocation), §8 (grounding, rewritten), §9 (mechanical/thermal
+  co-design, rewritten from N/A), §10, §11 (free-GPIO inventory), §12/§13
+  (net/parts lists), §14/§15 (checklists), §16/§17 (UNKNOWNs/budget).
+- **Reviewer**: Hardware Reviewer — see
+  `.github/agents/hardware-reviewer.agent.md`. Independent of the Circuit
+  Engineer session that authored Rev 3, and independent of the Hardware
+  Lead session that previously mediated Rev 2 findings.
+- **Independence statement**: I did not author this design, and I did not
+  anchor on the Circuit Engineer's own rationale, the design document's own
+  "RESOLVED"/"CORRECTED" self-annotations, or its own severity framing for
+  either of the two items it explicitly flagged for Hardware Reviewer
+  attention (§16 items 17–18). Every checklist item, both flagged items, and
+  every one of the ten new Rev-3-specific self-flagged UNKNOWNs (§16 items
+  11–21) were independently re-derived this cycle against primary sources —
+  not accepted on the strength of the design document's or evidence-log's
+  own citation formatting. **Primary sources fetched and read directly this
+  cycle** (full-PDF text extraction via an `r.jina.ai` reader proxy, not
+  merely HTML product-page summaries): TI DRV10983 datasheet (SLVSCP6H,
+  Rev H, 59 pages — Pin Functions table, Absolute Maximum Ratings,
+  Recommended Operating Conditions, Thermal Information, full Electrical
+  Characteristics table including UVLO/SPEED-analog/SPEED-PWM/DIR-FG/I2C/
+  OCP/Lock-Detection/BEMF rows, Table 8 Default EEPROM Value, Table 11
+  External Components, Table 6 Current Limit Modes, and the full revision
+  history back to the original 2014 release); ST STPS3L60 datasheet
+  (DS2134 Rev 7, VF electrical characteristics); ST STM32G031x4/x6/x8
+  datasheet (DS12992 Rev 4, Table 11/12/18 GPIO voltage-tolerance
+  classification). Two independent research threads led to concrete,
+  primary-source-grounded corrections/additions to `datasheets/
+  evidence-log.md` this cycle (detailed in Findings below), rather than
+  passively accepting its existing entries.
+- **Scope**: The Rev 3 addition only, per the task's explicit instructions —
+  full new §7.5 (all 8 subsections), plus every other section Rev 3 itself
+  touched (§1, §2.1–§2.3, §8, §9, §10, §11, §12, §13, §14, §15, §16, §17),
+  read in full directly (not just the changelog's summary of them), plus
+  `hardware/power-budget.md` in full and the Motor/Motor-Driver-IC sections
+  of `bom/component-selection.md` for context (component-selection itself
+  already passed Checkpoint B and is out of scope; this review covers the
+  circuit implementation built on top of those approved parts). Relevant
+  Rev 3 requirements (REQ-007 through REQ-010, REQ-108 through REQ-112,
+  REQ-204, REQ-307, REQ-403/404) were read directly in `requirements/
+  requirements.md`, not taken on the design document's paraphrase.
+- **Parallel sub-scans run**: None dispatched as separate sub-agent scans
+  this cycle — worked as a single integrated pass across the full 16-item
+  checklist, consistent with the agent instruction that the verdict is a
+  single serial integration step owned by the Hardware Reviewer, not
+  something to fragment into uncoordinated topic-based opinions.
+  Investigation was organized around the two headline-flagged items first
+  (independently re-derived from raw datasheet numbers before reading how
+  the design document or evidence-log characterized them), then a full
+  16-item checklist sweep of the new §7.5 content and everything else Rev 3
+  touched.
+- **rubber-duck premise review run in parallel?**: Not indicated as run for
+  this cycle. No `rubber-duck`-sourced row is added to `validation/
+  open-issues.md` this cycle; all new rows below are tagged
+  `hardware-reviewer`.
+- **KiCad tool cross-checks used**: None — `kicad-list_projects` was
+  re-run fresh this cycle and returned an empty list (`[]`), independently
+  reconfirming no KiCad project exists for this repository, matching
+  established project convention. The Markdown schematic-equivalent
+  document remains the correct artifact type to review net-by-net and
+  pin-by-pin, as in Cycles 1–2.
+- **Process-integrity check**: Independently ran `git log --oneline` and
+  `git show --stat 3e2c529` to establish exactly which files the Rev 3
+  commit touched, rather than relying on the design document's own
+  changelog summary. Confirmed the commit modified: `bom/
+  component-selection.md` (**exactly one hunk, 2 lines** — the OCP/Lock
+  Detection naming correction only), `datasheets/evidence-log.md` (27
+  lines), three new datasheet metadata files (Littelfuse SMBJ16A, Same Sky
+  PJ-102AH, ST STPS3L60), one updated datasheet metadata file (STM32G031,
+  20 lines), `datasheets/texasinstruments_drv10983_slvscp6h.md` (59 lines),
+  `hardware/power-budget.md` (74 lines), `hardware/schematic/
+  bench-imu-01-design.md` (1287 lines, the bulk of the change),
+  `validation/change-impact-matrix.md` (13 new lines), and `validation/
+  change-log.md` (1 new line). **This single-hunk confirmation on
+  `bom/component-selection.md` is itself load-bearing evidence for Finding
+  ISS-014 below** — it independently proves no corresponding update to the
+  motor's cell-count guidance exists anywhere in the BOM despite the design
+  document's own §16 item 17 flagging a practical 3S-only recommendation.
+  `git log` also confirms no commit after `3e2c529` has touched `bom/`,
+  `requirements/`, `hardware/power-*.md`, `datasheets/evidence-log.md`, or
+  `validation/` other than this review's own two `evidence-log.md` edits
+  made earlier this session (see Findings below).
+
+### Checklist Results
+
+Full 16-item checklist per `.github/skills/hardware-review/SKILL.md`, run
+against the Rev 3 addition specifically (items 13 and 15 are genuinely live
+for the first time in this project and were not treated as pro-forma):
+
+| # | Checklist item | Result | Notes |
+|---|---|---|---|
+| 1 | Voltage violation | **Finding — ISS-014 (HIGH)** | The new VM_MOTOR rail (2S–3S LiPo per J4) combined with the new series reverse-polarity diode D2 creates a real voltage-margin violation against U5's UVLO rising threshold at the 2S end of the approved motor's rated range — independently re-derived from raw datasheet numbers (below), not accepted from the design document's own framing. All other new-rail voltages (U5's internal V1P8/V3P3/VREG regulator outputs, the 5 new MCU-domain GPIOs at 3.3V) independently check out with margin. |
+| 2 | Absolute Maximum Rating violation | Pass — no live AMR violation found, independently reconfirmed | Directly re-read TI's AMR table this cycle: VCC −0.3…30V, SPEED/SCL/SDA/DIR −0.3…4V, V3P3/FG −0.3…4V, V1P8 −0.3…2.5V — all new-rail/new-pin voltages in this design (VM_MOTOR clamped ≤26.0V by D3, all MCU-domain GPIOs at 3.3V) sit inside these ceilings at every corner. ISS-014 above is a **regulation/UVLO-margin problem, not an AMR exceedance** — 2S undervoltage triggers U5's own protective auto-recovering shutdown, it does not stress any pin beyond its AMR. Also independently closed this cycle: STM32G031's PB6/PB7 FT_f 5V-tolerance family-generalization gap (design doc's own §16 item 12, MODERATE confidence) — ST DS12992 Rev4 Table 18 confirms a single `−0.3V to VDD+4.0V` rule applies uniformly across every FT_xx sub-variant (FT_f/FT_fa/FT_ea/etc.), closing this as a clean PASS (not that it changes any design decision, since this design only drives 3.3V-referenced logic regardless). |
+| 3 | Current limit | Pass | U5's OCP is a fixed, non-configurable 3–4A phase-to-phase hardware threshold (independently re-confirmed via the Electrical Characteristics table's own `IOC_limit` row — MIN/MAX only, no TYP column, consistent with a fixed rather than tunable characteristic); `StAccel`/`OpenLCurr` ramp/current-limit settings additionally bound any commutation transient. `hardware/power-budget.md`'s motor-rail current figures (~1.05A nominal operating point, DS-MTR-054/056) are an order of magnitude below the AMR/OCP ceiling. |
+| 4 | Thermal risk | Pass, with a tracked non-blocking gap (design doc's own §16 item 21) | RθJA=36.1°C/W independently reconfirmed via the primary Thermal Information table. Qualitative margin against the 125°C junction-temperature ROC ceiling is wide at the ~1.05A nominal operating point, but a precise worst-case wattage was not computed by either the design document or this review (would require U5's own RDS(on), not independently extracted from the primary datasheet this cycle either — the Electrical Characteristics table's `rDS(on)` row, 0.25 typ/0.4 max Ω at 25°C, 0.325Ω at 85°C, **was captured this cycle** and is available for a future precise-wattage pass, but no such pass was completed here). Reasonable-but-not-exhaustive treatment, consistent with a schematic-review-scope document; not a new finding beyond the design document's own honest flag. |
+| 5 | Missing decoupling capacitor | Pass — independently confirmed exact match to TI's reference circuit | C10 (10µF, VCC–GND), C11 (0.1µF/10V, VCP–VCC), C12 (0.1µF≥VCCx2, CPP–CPN), R9 (39Ω, SW–VREG linear-mode), C13 (10µF/10V, VREG–GND), C14 (1µF/5V, V1P8–GND), C15 (1µF/5V, V3P3–GND) all independently checked against TI's own Table 11 "External Components" and match exactly — no omission. U5 is confirmed the plain DRV10983 (not the Z/sleep-mode variant), so no Zener/sleep-pin-specific component is applicable or missing. |
+| 6 | Floating pin | **Findings — ISS-015 (HIGH) and ISS-016 (LOW)** | **SPEED** (U5 pin 13): floats during any window where the MCU domain has not yet driven PA8, with the factory-default register state (analog mode, see ISS-015 below) making this a live, not inert, condition — the checklist-item-6 trigger for ISS-015. **DIR** (U5 pin 14): independently confirmed via the primary Pin Functions table ("DIR 14 I Direction," no bias noted) and the Electrical Characteristics table's "DIGITAL I/O (DIR INPUT AND FG OUTPUT)" section (VDIR_H/VDIR_L logic thresholds only, no pulldown/pullup parameter of any kind, unlike SPEED's own RPD_SPEED_SL) that DIR has **zero internal bias of any kind, documented or otherwise** — confirming the design document's own §16 item 13 self-flagged concern is accurate, tracked as ISS-016 (LOW, per the design document's own reasonable severity framing, independently reconfirmed — see Findings). |
+| 7 | Incorrect pull-up/pull-down | Pass (no incorrect value added) — cross-refs ISS-015/016 | No pull-up/pull-down was added on SPEED or DIR, matching TI's own Table 11 reference circuit exactly (TI's reference design does not bias these pins either). This is not an "incorrect value" finding — it is a case where TI's own reference circuit's implicit assumption (a single, always-alive host system already actively driving SPEED/DIR at power-up) does not hold for this design's dual-independent-power-domain (Option A) architecture; the consequence is captured under ISS-015/ISS-016 rather than logged again here. |
+| 8 | Logic voltage mismatch | Pass | All five new MCU-domain GPIOs (PA8, PA6, PB1, PB6, PB7) are 3.3V-referenced STM32G031 pins. Independently re-confirmed via the primary DRV10983 Electrical Characteristics table that every digital input threshold on U5's interface side is compatible with 3.3V CMOS drive: DIR/PWM-SPEED `VDIG_IH`≥2.2V/`VDIG_IL`≤0.6V, I2C `VI2C_H`≥2.2V/`VI2C_L`≤0.6V — no level-shifting required in either direction. |
+| 9 | Interface timing | Pass, with a tracked residual already correctly out of this document's scope | PWM SPEED frequency ROC (`fPWM` = 1–100kHz) independently confirmed compatible with a PA8/TIM1_CH1 driver; no specific numeric PWM frequency is committed in this schematic-only document, appropriately deferred to firmware. The FG/BEMF low-RPM signal-reliability caveat (§7.5.7) is correctly and explicitly deferred to Firmware/FMEA per the design document's own cited human ECO-007 directive — not re-litigated here, consistent with the task's scope instructions. |
+| 10 | Power sequencing | **Finding — ISS-015 (HIGH)** | Cross-domain power-up sequencing between the MCU/IMU domain (U3) and the new independently-sourced motor domain (J4→D2→D3→U5, Option A) is not hardware-enforced — the design document's own §16 item 14 already flags this fact; this review's contribution is showing the risk is materially worse than the document's own mitigation argument allows for (see ISS-015 in Findings). |
+| 11 | Grounding | Pass | §8 (rewritten this revision) correctly maintains a single shared ground net/plane across both the existing MCU/IMU domain and the new motor domain under Option A — independently re-read in full, no floating or split ground plane introduced. Physical-separation/star-point layout recommendations are appropriately deferred to the PCB-layout stage, consistent with this being a schematic-equivalent, pre-layout document. |
+| 12 | EMI/EMC risk | Pass | REQ-401 ("No specific regulatory certification target... for this prototype/benchmark iteration... explicitly out of scope") is a blanket waiver of **formal emissions certification**, independently re-read in full this cycle — it is not scoped to exclude motor-related content, and is not stretched by the design document to excuse skipping real schematic-level noise mitigation: §8 already treats motor-commutation switching as a genuine (if bench-prototype-bounded) new noise source and recommends physical separation/grounding practice at the layout stage, which is the practical, proportionate mitigant at this document's own scope. No new finding warranted. |
+| 13 | Motor noise (genuinely live for the first time this project — not treated as pro-forma) | Pass | Commutation/BEMF-related electrical noise is addressed at the appropriate schematic-review depth: §7.5.7 correctly defers the FG signal's low-RPM BEMF-derived reliability question to Firmware/FMEA per an explicit human ECO-007 directive (not re-litigated here), and §8's grounding/physical-separation recommendation is the general mitigant for commutation-switching noise coupling into the shared ground net. No PWM-line-radiation-specific mitigation is separately called out, but the low power level of this bench reaction-wheel application and the existing general layout mitigant are judged adequate at this document's own scope; no new finding. |
+| 14 | Sensor noise (coupling risk from the new motor rail into the existing IMU) | Pass | Supply-noise coupling path independently ruled out via re-reading §5.5's regression check: VM_MOTOR is sourced independently of the IMU's own 3V3 rail (no shared regulator, Option A) — confirmed, not merely re-cited. The remaining path, ground-return coupling through the single shared ground net, is appropriately deferred to the PCB-layout stage per §8, consistent with this document's own scope; not a schematic-level defect. |
+| 15 | PCB layout concern, incl. mechanical/thermal co-design near a rotating body (genuinely live for the first time this project — not treated as pro-forma) | Pass, with two tracked self-flagged research gaps (design doc's own §16 items 19–20, not separately logged as new Hardware-Reviewer findings — see Findings rationale) | §9 (rewritten this revision from Rev 2's N/A) correctly identifies M1 as a genuine rotating body and substantively addresses REQ-204 (vibration effect on IMU bias) and REQ-307 (vibration-isolation mount) at the depth appropriate for a schematic-only document, explicitly deferring actual mechanical mitigation to the Mechanical Lead. Cross-references ISS-015 below as the electrical-side trigger for exactly the uncontrolled-motion hazard this checklist item and REQ-403 are concerned with. |
+| 16 | Datasheet recommendation violation | Pass | TI's Table 11 reference circuit is followed exactly for every decoupling/bias component actually populated (item 5 above). The one nuance — TI's own reference circuit also omits a SPEED/DIR bias resistor, an implicit single-always-alive-host assumption this design's architecture breaks — is framed as context for ISS-015/ISS-016 rather than a separate/duplicate violation, since TI's own recommended circuit would not have caught this either. |
+
+### Findings
+
+#### Flagged item 1 (design doc §16 item 18, §18.1) — OCP/Lock Detection mechanism-name correction — independently CONFIRMED CORRECT, already fixed, no new issue
+
+- **Claim under review**: the design document asserts that `bom/
+  component-selection.md`'s DS-MTR-037 entry mischaracterized DRV10983's
+  overcurrent protection (OCP) as "programmable via I2C…auto-retry," when
+  that description in fact belongs to the separate, genuinely configurable,
+  auto-retry **Lock Detection** feature — OCP itself being a fixed,
+  non-configurable, condition-based-clear hardware threshold.
+- **Independent verification method**: re-read the primary DRV10983
+  datasheet's own Electrical Characteristics table directly this cycle (not
+  the design document's or evidence-log's paraphrase of it). The
+  **"OVERCURRENT PROTECTION"** section lists exactly one row: `IOC_limit`,
+  "phase to phase," MIN=3A / MAX=4A, **no TYP column** — a fixed
+  accuracy-banded threshold with no register/field reference anywhere
+  nearby, consistent with "fixed, non-configurable." The separate
+  **"LOCK DETECTION RELEASE TIME"** section (`tLOCK_OFF`=5s,
+  `tLCK_ETR`=0.3s) is a genuinely distinct set of parameters tied to a
+  register-configurable feature (`HWiLimitThr[2:0]`, `LockEn[5:0]`, per
+  §8.3.2.4/§8.4.7) with an explicit retry timer — a materially different
+  mechanism from OCP's own instantaneous, condition-based-clear behavior.
+  This independently reproduces, from the raw table structure itself
+  (MIN/MAX-only vs. a named retry-timer parameter), the exact distinction
+  the design document and DS-MTR-058/059 already draw — not merely
+  re-trusting their prose.
+- **Already-fixed status independently confirmed**: `bom/
+  component-selection.md`'s current DS-MTR-037 citation (line ~734) reads
+  "TI DRV10983 has overcurrent protection (OCP) — see `datasheets/
+  evidence-log.md` DS-MTR-037/058/059 for the corrected mechanism
+  attribution" — a correction consistent with the primary-source facts
+  above. `datasheets/evidence-log.md`'s own DS-MTR-037 row carries an
+  in-place "CORRECTED at Circuit Design, 2026-09-04" annotation (not a
+  silent overwrite) citing DS-MTR-058/059 and `validation/change-log.md`
+  ECO-008. Independently confirmed via `git show --stat 3e2c529` that this
+  is the **only** change `bom/component-selection.md` received in the Rev
+  3 commit (one hunk, 2 lines) — a clean, minimal, correctly-scoped fix
+  with no collateral edits.
+- **Conclusion**: **Confirmed correct and already fixed.** No new issue
+  opened; REQ-111/REQ-404 remain satisfied (Lock Detection is the genuine
+  configurable auto-retry response this design actually relies on, per
+  §7.5.6). Full credit to the Circuit Engineer's own research (DS-MTR-058/
+  059) and to the Hardware Lead's prior independent web-search confirmation
+  for catching and correctly fixing this before it reached this review.
+
+#### Flagged item 2 (design doc §16 item 17, §7.5.2) — 2S/3S UVLO margin via new diode D2 — independently CONFIRMED, severity independently assigned **HIGH** — logged as **ISS-014**
+
+- **Claim under review**: the design document flags that the new series
+  reverse-polarity protection diode D2 (STPS3L60) may push a 2S LiPo
+  source below U5's UVLO rising threshold, recommending 3S-only operation
+  in practice — but does **not** self-assign a severity, leaving that
+  judgment explicitly to the Hardware Reviewer.
+- **Independent re-derivation from raw datasheet numbers** (not accepted
+  from the design document's arithmetic): D2's forward voltage,
+  independently re-read from the primary STPS3L60 datasheet (DS2134 Rev 7,
+  cited as DS-PROT-005): **VF = 0.53V typ (@3A/100°C) / 0.62V max
+  (@3A/25°C)**. U5's UVLO thresholds, independently re-read from the
+  primary DRV10983 Electrical Characteristics table (DS-MTR-057):
+  **VUVLO_R (rising/power-up) = 7 / 7.4 / 8V (min/typ/max)**; **VUVLO_F
+  (falling/dropout) = 6.7 / 7.1 / 7.5V (min/typ/max)**. The motor's own
+  rated source range, independently re-read from `bom/
+  component-selection.md` line 494: 2S = 7.4V nominal / 8.4V full-charge;
+  3S = 11.1V nominal / 12.6V full-charge.
+  - **2S at nominal voltage, typical corner**: 7.4V − 0.53V = **6.87V**,
+    below VUVLO_R's own **typical** 7.4V threshold — meaning a 2S pack at
+    or near its nominal voltage is expected to fail to power U5 up at all
+    under **typical**, not just worst-case, conditions. This is a stronger
+    conclusion than "marginal": a 2S pack spends most of its practical
+    discharge life at or below nominal voltage, so this is a
+    likely-to-fail, not rare-corner, condition.
+  - **2S at full charge, worst-case corner**: 8.4V − 0.62V = **7.78V**,
+    below VUVLO_R's own **max** 8V threshold — even a freshly-charged 2S
+    pack can fail to clear UVLO at the pessimistic (max-VF, max-UVLO_R)
+    corner.
+  - **2S mid-discharge (≈7.0V, well above a normal ~6.0V/2-cell
+    end-of-discharge cutoff)**: 7.0V − 0.53V = **6.47V**, below VUVLO_F's
+    own **min** 6.7V falling threshold — meaning even a 2S pack that
+    somehow did power up could drop out mid-operation during ordinary,
+    non-critical discharge, not only at end-of-life.
+  - **3S near-cutoff (≈9.0V, ≈3.0V/cell)**: 9.0V − 0.62V (max, pessimistic
+    corner) = **8.38V**, clearing both VUVLO_R's max (8V) and VUVLO_F's max
+    (7.5V) — 3S remains robust throughout its entire practical discharge
+    range, at every corner.
+  - **Conclusion**: this independently reproduces the design document's own
+    headline number (≈6.87V) but goes further — the typical-2S-nominal case
+    fails against the **typical** UVLO_R threshold, not only the worst-case
+    corner, and a mid-discharge dropout mechanism exists independently of
+    the power-up question. **2S is non-viable as a practical matter, not
+    merely "marginal"; 3S is robust throughout.**
+- **Cross-document inconsistency independently found** (beyond what the
+  design document or `power-budget.md` each state in isolation): the design
+  document's own §7.5.2 prose states **"only a freshly-charged 2S pack
+  (~8.4V) clears UVLO with any margin"** — true only when checked against
+  VUVLO_R's **typical** value (7.4V: 8.4−0.53=7.87V>7.4V ✓) but **false**
+  against VUVLO_R's own **max** value (8V: 8.4−0.62=7.78V<8V ✗).
+  `hardware/power-budget.md`'s own Rail Margin Summary row, addressing the
+  identical freshly-charged-2S scenario, reaches the **opposite, more
+  pessimistic** conclusion: **"even a freshly-charged 2S pack (~8.4V, minus
+  drop ≈7.8V) sits under UVLO_R's max (8V)."** Both documents are part of
+  the same Rev 3 revision, authored together — this is a narrow but real,
+  independently-found internal inconsistency in how optimistically the
+  identical scenario is framed across two same-revision documents, worth
+  tightening even though it does not change either document's ultimate
+  "3S-only" recommendation.
+- **Traceability gap independently confirmed via `git show --stat
+  3e2c529`**: `bom/component-selection.md`'s only Rev 3 change is the
+  unrelated OCP/Lock Detection fix (flagged item 1 above) — **no
+  corresponding update exists anywhere in the BOM** capturing that this
+  circuit implementation (as opposed to the motor itself, which remains
+  validly 2S–3S rated in isolation) now has a practical 3S-only
+  constraint. `requirements/requirements.md` was independently grepped for
+  any 2S/3S or cell-count constraint across every Rev 3 requirement
+  (REQ-007–010, REQ-108–112, REQ-204, REQ-307, REQ-403/404) — **none
+  exists**. A future reader consulting only the BOM or requirements (not
+  the schematic document's own prose) would have no way to learn of this
+  constraint.
+- **Why HIGH, not CRITICAL**: per `docs/architecture.md` §7.1, CRITICAL is
+  reserved for a design that "will fail... under normal/expected operating
+  conditions **as designed**." This design's own practical recommendation,
+  once this finding is heeded, is 3S-only operation — under which there is
+  no failure at any corner. The failure mode only manifests if a 2S source
+  is used despite that recommendation, which is a realistic corner (2S is
+  within the originally-approved motor's own 2S–3S rated range, so an
+  operator could plausibly reach for a 2S pack absent a clearly-propagated
+  constraint) rather than the design's own intended condition — squarely
+  HIGH's own framing ("likely malfunction... under realistic conditions/
+  corners"). The failure mechanism itself (UVLO shutdown) is also
+  protective and auto-recovering, not damage-causing, and has a
+  zero-added-component-cost mitigation (use 3S) — mirroring this same
+  file's own precedent for comparable HIGH (not CRITICAL) classifications
+  (ISS-002, ISS-011).
+- **Recommended Fix**: (1) Formally propagate the "3S-only" operational
+  constraint into `bom/component-selection.md` (Motor/Motor-Driver-IC
+  sections) and `requirements/requirements.md` (no current requirement
+  captures a cell-count constraint) so it is discoverable outside the
+  schematic document's own prose; and/or (2) if 2S support is genuinely
+  required, have the Component Engineer evaluate a lower-VF reverse-polarity
+  solution (e.g. an ideal-diode/ORing-FET circuit, which can achieve a
+  near-zero voltage drop instead of a Schottky diode's ~0.5V) — noting the
+  design document itself already correctly rules out simply swapping to a
+  different Schottky, since VF/reverse-leakage/voltage-rating trade off
+  against each other in that same component class. Either path is a
+  bounded, well-scoped fix, not an open-ended rework.
+- **Severity**: **HIGH**.
+
+#### New finding (not one of the two originally-flagged items) — SPEED pin factory-default analog mode + unguaranteed cross-domain mitigation + no hardware-enforced power-up sequencing → uncommanded-motion risk tied to REQ-403 — logged as **ISS-015**
+
+- **Independent discovery path**: investigating checklist items 6
+  (floating pin) and 10 (power sequencing) together, given the design
+  document's own §16 items 13–14 already flag SPEED/DIR bias and
+  cross-domain sequencing as open, unresolved-by-hardware concerns. The
+  design document's own mitigation argument (§7.5.5, quoted below) leans on
+  SPEED's internal pulldown and on the assumption that the register bit
+  selecting SPEED's interpretation is "functionally inert" before firmware
+  configures it — both of which independent re-verification against the
+  primary datasheet **do not fully support**.
+- **Independent fact 1 — the factory-default SPEED interpretation is
+  analog mode, not the PWM mode this design intends, and analog mode is
+  fully active, not inert**: directly decoded Table 8 "Default EEPROM
+  Value" in the primary DRV10983 datasheet: register 0x2B (SysOpt9)
+  defaults to `0x0C` = binary `0000 1100`. SysOpt9's own documented bit
+  layout is bits7:6=`FGOLsel`, bits5:4=`FGcycle`, bits3:2=`KtLckThr`,
+  bit1=`SpdCtrlMd`, bit0=`CLoopDis` — decoding bit1 of `0x0C` gives
+  **`SpdCtrlMd`=0 = analog mode** (not PWM mode, which requires
+  `SpdCtrlMd`=1 and is only reached once firmware performs an I2C/EEPROM
+  write, an explicitly out-of-scope firmware/commissioning task per
+  REQ-009's own scope fence). §8.4.5.2 "Analog Mode Speed Control"
+  independently confirms analog mode is **fully active out of reset**, not
+  inert: "If SPEED > VANA_FS, the speed command is maximum. If VANA_ZS ≤
+  SPEED < VANA_FS the speed command changes linearly... If SPEED < VANA_ZS
+  the speed command is to stop the motor" (VANA_FS=V(V3P3)×0.9,
+  VANA_ZS=100mV). This independently corrects `datasheets/
+  evidence-log.md`'s own pre-existing DS-MTR-068 entry, whose closing
+  phrase asserted SPEED is "functionally inert until this register is
+  configured as PWM mode" — inaccurate for the factory-default (analog)
+  state, which is exactly the state U5 is in during any uncommissioned
+  window. **This evidence-log inaccuracy has been corrected this cycle**
+  (see the Evidence-log correction note below) and a new evidence row
+  (DS-MTR-071) added recording the Table 8/§8.4.5.2 primary-source facts.
+- **Independent fact 2 — the design document's own cited mitigant (SPEED's
+  internal pulldown) is documented under a test condition, and a device
+  variant, this design does not clearly satisfy**: the design document's
+  own §7.5.5 already honestly discloses that `RPD_SPEED_SL` (an internal
+  55kΩ typ SPEED-to-ground pulldown, DS-MTR-069) is "specifically...
+  confirmed for the device's sleep-mode state, not asserted as a universal
+  always-on default-safe bias in every power/reset condition" — correctly
+  distinguishing "sleep mode" from "post-power-on, pre-firmware-init."
+  Independent re-verification this cycle goes one step further and finds
+  an additional gap the design document does not itself identify: in the
+  primary datasheet's own Electrical Characteristics table, the
+  `RPD_SPEED_SL` row is listed under the section header **"SLEEP MODE
+  (DRV10983Z)"** — i.e. this parameter is textually grouped with, and only
+  characterized alongside, the sleep-capable **DRV10983Z** variant's other
+  sleep-mode timing parameters (`VEN_SL`, `VEX_SL`, `tEX_SL_ANA`, etc.).
+  This design specifies the **plain DRV10983** (independently re-confirmed
+  earlier this cycle via the design document's own parts list — no
+  Zener/sleep-pin component populated), which has its own separate
+  "STANDBY MODE (DRV10983)" section in the same table — and that section
+  does **not** list any internal-SPEED-pulldown parameter at all. This is
+  a genuine documentation/guarantee gap (TI's datasheet does not specify or
+  guarantee this pulldown's value, or even confirm its presence, for the
+  plain DRV10983 outside the Z-variant's sleep-mode test condition) — a
+  more specific, independently-found weakening of the design document's own
+  mitigation argument, stated with appropriate hedging (this does not prove
+  the physical pulldown structure is absent on the plain part's silicon,
+  since product variants in one package/pinout are often the same die with
+  different firmware-configured feature sets — only that the datasheet does
+  not document or guarantee it for the part actually specified).
+- **Independent fact 3 — no supervisory gating exists, so the
+  uncommissioned window is not bounded to be transient**: independently
+  re-confirmed via the design document's own §13 parts list and §7.5.3 that
+  the DRV10983 has **no dedicated EN or FAULT pin at all** — SPEED is the
+  *only* on/off control surface on this device. D2/D3 (the new
+  reverse-polarity/TVS protection on the motor rail) are both passive; no
+  supervisory load switch gates U5's own VCC based on the MCU domain's
+  power state. Because J1 (USB/MCU domain) and J4 (motor domain) are
+  physically separate connectors under Option A with no documented required
+  connection order enforced anywhere outside this schematic's own prose,
+  the "uncommissioned" window (U5 powered, MCU either not yet powered or
+  not yet finished with GPIO/I2C init) is not guaranteed to be short — it
+  could persist indefinitely if, for example, a bench operator connects J4
+  well before J1.
+- **Failure mechanism**: if U5's VCC is energized before the MCU domain has
+  actively driven PA8 (SPEED) low and/or completed the `SpdCtrlMd`=1 I2C
+  commissioning write, U5 runs in its factory-default analog mode with an
+  unbiased SPEED input. Any leakage, capacitive coupling, or other stray
+  voltage appearing on SPEED that exceeds `VANA_ZS`=100mV is interpreted as
+  a real, proportional, non-zero commanded speed (per §8.4.5.2's own
+  transfer function above) — commutating M1 (a reaction-wheel rotor) using
+  whatever generic Rm/Kt values happen to be in EEPROM (DS-MTR-070), since
+  the actual T-Motor-specific values are also a firmware/commissioning task
+  not yet performed in this window. This is exactly the uncommanded/
+  uncontrolled rotor motion class of hazard REQ-403 (safety-critical,
+  human-review-gated) is written to prevent.
+- **Bounding factors honestly acknowledged (why this is HIGH, not
+  CRITICAL)**: this is a plausible, evidence-grounded, but not
+  deterministic failure chain — it depends on (a) a specific, non-default
+  bench power-up ordering (motor domain live before or independent of the
+  MCU domain; the reverse ordering, USB/MCU-first, is at least as plausible
+  a bench workflow and is unaffected), (b) an unmeasured real stray voltage
+  on SPEED actually clearing the 100mV threshold, and (c) the resulting
+  motion is explicitly ramped and current-limited (`StAccel`/`OpenLCurr`,
+  Table 6) rather than an instantaneous full-speed event, and would be
+  running on generic (not motor-matched) commutation parameters, which
+  bounds — without eliminating — the realistic severity of the outcome.
+  This conditional, multi-factor-dependent character is squarely
+  consistent with HIGH's own definition ("likely malfunction... under
+  realistic conditions/corners") rather than CRITICAL's deterministic
+  framing (exceeding an AMR, a reverse-voltage path that kills a part) —
+  and is, if anything, a **less certain** failure chain than this
+  project's own existing HIGH-classified precedent (ISS-011, a 100%
+  guaranteed total interface failure under the stated conditions), which
+  still did not warrant CRITICAL.
+- **Recommended Fix**: given REQ-403's own explicit requirement that
+  "final disposition... requires explicit human review before this cycle's
+  Design Complete Gate," this finding should be routed for that human
+  safety review regardless of which technical path is chosen. Concrete
+  options for the Circuit Engineer to evaluate: (1) add a real external
+  pulldown on SPEED sized to dominate over any realistic leakage/coupling
+  and firmly hold SPEED below `VANA_ZS` whenever the MCU domain is not
+  actively driving it — a deliberate, justified deviation from TI's own
+  Table 11 reference circuit, since that reference circuit implicitly
+  assumes a single always-alive host system this design's architecture does
+  not have; (2) add a supervisory load switch gating U5's own VCC,
+  sequenced to enable only once the MCU domain's own rail is confirmed
+  alive, directly enforcing the missing cross-domain ordering (design
+  document's own §16 item 14); or (3), as a documentation/process-only
+  mitigation of last resort, explicitly specify a required operator
+  power-up order and have firmware drive SPEED to a safe state at the
+  earliest possible init step — noted as a weaker mitigant than either
+  hardware option given REQ-403's safety-critical classification.
+- **Severity**: **HIGH** (ties directly to REQ-403; recommend explicit
+  escalation to human safety review given the direct safety-requirement
+  tie, independent of the HIGH/CRITICAL severity-tier classification
+  itself).
+
+#### New finding — DIR floating during MCU reset/init window — logged as **ISS-016**
+
+- **Issue**: DIR (U5 pin 14, direction-select input) has no internal or
+  external bias and is not proven safe while floating during the brief
+  window before the MCU's own GPIO init completes.
+- **Independent verification**: confirmed directly against the primary
+  DRV10983 Pin Functions table ("DIR | 14 | I | Direction" — no bias
+  noted) and the Electrical Characteristics table's "DIGITAL I/O (DIR
+  INPUT AND FG OUTPUT)" section, which lists only `VDIR_H`≥2.2V/
+  `VDIR_L`≤0.6V logic thresholds — no pulldown/pullup parameter of any
+  kind is documented for DIR anywhere in the datasheet (unlike SPEED,
+  which at least has a partial, if caveated, `RPD_SPEED_SL` citation).
+  This independently confirms the design document's own §16 item 13
+  self-flagged claim ("DIR has no internal bias documented in the
+  datasheet") is accurate, not merely asserted.
+- **Rationale**: an undriven digital input can settle to an indeterminate
+  logic level via leakage or coupling, risking a nondeterministic direction
+  selection at first spin-up.
+- **Datasheet Source**: DS-MTR-069 (DRV10983 DIR/FG/I2C digital I/O
+  characteristics, Pin Functions table).
+- **Failure Mechanism**: floating CMOS-style digital input settles to an
+  indeterminate state under leakage/coupling; if U5 begins commutating
+  before PB1 (MCU's DIR driver) is initialized, the resulting rotation
+  direction is unpredictable on that specific spin-up.
+- **Affected Component**: U5 (DRV10983) DIR pin; U1 (STM32G031K8T6) PB1.
+- **Recommended Fix**: as the design document itself notes, TI's own Table
+  11 reference circuit does not bias DIR either, so no datasheet-recommended
+  component exists to add; this is best addressed at the firmware level
+  (initialize PB1 to a known state as early as possible in the boot
+  sequence, before U5's own VCC ramp/EEPROM load can plausibly complete) or
+  accepted as a low-severity residual, since an indeterminate *direction* at
+  first spin-up (as opposed to an indeterminate *speed*, ISS-015) is a
+  narrower, lower-consequence hazard for a reaction-wheel application.
+- **Severity**: **LOW** — bounded consequence (direction ambiguity only,
+  not an uncommanded-motion trigger on its own) and no datasheet-recommended
+  hardware fix exists to omit.
+
+#### New finding — J4 (PJ-102AH) third terminal function unconfirmed — logged as **ISS-017**
+
+- **Issue**: J4's datasheet-derived metadata record shows a 3-terminal
+  barrel-jack drawing (center pin + 2 outer contacts), consistent with a
+  normally-closed switch-contact design common in this connector class, but
+  the specific page fetched this session did not unambiguously label which
+  outer terminal is the switch contact vs. sleeve/GND. This design uses the
+  center pin (+) and one outer terminal (assumed sleeve/GND); the third
+  terminal is left unpopulated with its exact function unconfirmed.
+- **Independent verification**: reviewed `datasheets/
+  metadata` for PJ-102AH (DS-CONN-005)'s own "Known gaps" section, which
+  honestly discloses this exact gap — independently confirmed no
+  contradicting or clarifying information exists elsewhere in this
+  design's own citations.
+- **Rationale**: leaving an unidentified switch-contact terminal
+  unpopulated is a safe default (it simply never activates whatever it
+  would have controlled), but the ambiguity should be closed before layout
+  commits to a specific footprint/pad assignment for that third terminal.
+- **Datasheet Source**: DS-CONN-005 (Same Sky PJ-102AH metadata record,
+  "Known gaps" section).
+- **Failure Mechanism**: none under the current as-designed use (an
+  unpopulated switch contact is inert); the risk is purely that a
+  future/different assumption about which outer terminal is which could be
+  wrong if this is revisited without re-confirming against the connector's
+  own internal schematic.
+- **Affected Component**: J4 (Same Sky PJ-102AH).
+- **Recommended Fix**: obtain and read the connector's own internal
+  schematic diagram (not just its external dimensional drawing) before PCB
+  layout to confirm terminal identity with certainty.
+- **Severity**: **LOW** — no current functional or safety consequence;
+  pre-layout confirmation item only.
+
+#### New finding — `datasheets/evidence-log.md` DS-MTR-059 internal inconsistency (states "5" sub-schemes, enumerates and cites a 6-bit field for 6) — logged as **ISS-018**
+
+- **Issue**: `datasheets/evidence-log.md`'s own DS-MTR-059 entry states Lock
+  Detection has "**5** independently-maskable sub-schemes," then itself
+  enumerates six: Lock0 (current-limit), Lock1 (abnormal speed), Lock2
+  (abnormal Kt), Lock3/Fault3 (no-motor-detected), Lock4 (open-loop-stuck),
+  Lock5 (closed-loop-stuck) — and cites a 6-bit field, `LockEn[5:0]`, which
+  itself implies 6 independently-maskable bits, not 5.
+- **Independent verification**: directly counted the entry's own
+  enumerated list (six named sub-schemes) against its own prose ("5") and
+  its own cited register-field width (`[5:0]` = 6 bits) — a purely
+  internal inconsistency within one evidence-log row, not a datasheet
+  citation error (the design document's own §7.5.6 protection table
+  correctly states "6" and is unaffected).
+- **Rationale**: a future reader relying on the evidence-log's own prose
+  count ("5") rather than its enumeration or register-field citation could
+  under-count the protection scheme, though no design decision in this
+  revision is actually affected (the design document's own count is
+  already correct).
+- **Datasheet Source**: DS-MTR-059 (its own text, self-inconsistent).
+- **Failure Mechanism**: none — a documentation/proofreading defect with
+  no electrical or functional consequence, since the design document itself
+  (the artifact actually used for engineering decisions) already states the
+  correct count.
+- **Affected Component**: N/A (`datasheets/evidence-log.md` documentation
+  only).
+- **Recommended Fix**: correct DS-MTR-059's prose from "5" to "6"
+  independently-maskable sub-schemes to match its own enumeration and cited
+  6-bit field.
+- **Severity**: **LOW** — style/documentation-accuracy nitpick, zero
+  functional or design-decision impact.
+
+#### Evidence-log correction made this cycle (not a `validation/open-issues.md` row — a datasheet-citation correction, following the established DS-MTR-037 precedent)
+
+Independent research into ISS-015 (above) surfaced a genuine, primary-source-
+verifiable inaccuracy in `datasheets/evidence-log.md`'s own pre-existing
+**DS-MTR-068** entry (authored during the Rev 3 design cycle, before this
+review): its closing clause asserted the SPEED pin is "functionally inert
+until this register is configured as PWM mode." This is inaccurate — the
+factory-default (analog-mode) state is not inert (§8.4.5.2, quoted in
+ISS-015 above). Following this file's own established precedent for
+qualifying rather than silently overwriting a prior entry (the existing
+DS-MTR-037 "CORRECTED at Circuit Design" annotation), this cycle:
+
+1. Appended an in-place **"QUALIFIED at Hardware Review, 2026-09-05"**
+   annotation to the existing DS-MTR-068 row, explaining the inaccuracy,
+   citing the new DS-MTR-071 evidence and this file's own ISS-015, and
+   updating the Researcher/Date columns — the original text is preserved,
+   not deleted, so the citation's history stays auditable.
+2. Added a **new DS-MTR-071 row** (after DS-MTR-070) recording the primary
+   Table 8 EEPROM-default decode and §8.4.5.2 analog-mode transfer function
+   directly, attributed to "Hardware Reviewer (AI agent), 2026-09-05."
+
+Both edits were verified structurally sound (consistent 9-field column
+count matching every other row) before this report was written. This is
+the only content edit made outside `validation/design-review.md` and
+`validation/open-issues.md` this cycle, and is explicitly within this
+agent's granted scope for "a genuine additional evidence-log inaccuracy...
+the same way the existing Cycle 2 precedent did."
+
+#### Items independently checked and closed this cycle with no new finding (beyond what the checklist table above already states)
+
+- **PB6/PB7 FT_f 5V-tolerance family generalization** (design doc's own
+  §16 item 12) — independently closed as a clean PASS via ST DS12992
+  Rev4 Table 18 (see checklist item 2 above).
+- **DRV10983 I2C address not extracted** (design doc's own §16 item 16) —
+  independently agree with the design document's own self-assessment that
+  this is correctly non-circuit-relevant: only one I2C1 slave exists on
+  this segment, so no address conflict is possible regardless of the
+  address's actual value. No finding.
+- **U5 precise worst-case wattage/RDS(on)** (design doc's own §16 item 21)
+  — independently attempted to close this gap this cycle by pulling
+  RDS(on) directly from the primary Electrical Characteristics table
+  (0.25 typ/0.4 max Ω @ 25°C, 0.325Ω @ 85°C — now available, see checklist
+  item 4), but did not complete a full worst-case-wattage calculation this
+  cycle. Tracked as a residual, non-blocking gap, consistent with the
+  design document's own honest framing — not elevated to a new finding.
+- **BMI270 bias-vs-temperature coefficient not extracted, and M1's full
+  mechanical outline/mass/mounting pattern not pulled** (design doc's own
+  §16 items 19–20, §9) — reviewed and agree these are genuine residual
+  research gaps, but they are **prerequisites for a future Mechanical Lead
+  engagement with M1's actual mount/enclosure design**, not
+  electrical/schematic-level defects in this document, and no mechanical
+  design for M1 yet exists for a Mechanical Reviewer to check against.
+  Deliberately **not** logged as new `hardware-reviewer`-tagged ISS rows —
+  doing so would overreach this review's own electrical/schematic scope
+  and risk being relabeled or duplicated once the Mechanical Lead/Mechanical
+  Reviewer actually engages with M1. Tracked here by direct cross-reference
+  to the design document's own §16 items 19–20 instead.
+
+### Verdict
+
+- **Verdict**: **CONDITIONAL** (not a clean PASS, and not a FAIL — see
+  "what's blocking" below for why this is a routing decision, not a rework
+  dead-end)
+- **Open CRITICAL count**: 0
+- **Open HIGH count**: 2 (ISS-014, ISS-015 — both newly opened this cycle)
+- **Open MEDIUM count**: 0 (this cycle)
+- **Open LOW count**: 3 (ISS-016, ISS-017, ISS-018 — all newly opened this
+  cycle)
+- **Both originally-flagged headline items, independently resolved**:
+  Flagged item 1 (OCP/Lock Detection naming) is **confirmed correct and
+  already fixed** — no open issue. Flagged item 2 (2S/3S UVLO margin) is
+  **confirmed accurate and, if anything, understated** by the design
+  document's own optimistic framing at one corner — now logged as ISS-014,
+  independently assigned **HIGH** (the design document explicitly left
+  severity assignment to this review).
+- **What's blocking a clean PASS, precisely**: ISS-014 and ISS-015. Both
+  have a clear, bounded, well-scoped recommended-fix path (documentation/
+  requirements propagation or a lower-VF protection topology for ISS-014;
+  an external SPEED pulldown, a supervisory VCC gate, or a
+  documentation/firmware mitigation for ISS-015) — this is not open-ended
+  further engineering exploration, but neither is it a already-settled
+  human-sign-off-only question the way Cycle 2's ISS-002 was. ISS-015
+  additionally ties directly to REQ-403's own explicit human-review gate
+  and should be routed there regardless of which technical mitigation is
+  chosen.
+- **What independently checks out (no further engineering action needed)**:
+  the OCP/Lock Detection naming correction (flagged item 1) is fully closed.
+  All decoupling/bias components for U5 exactly match TI's Table 11
+  reference circuit. No AMR violation exists anywhere in the new Rev 3
+  content. Grounding, current-limit, and thermal treatment are all sound at
+  this document's own schematic-review scope. The PB6/PB7 FT-tolerance gap
+  the design document itself flagged as MODERATE confidence is now
+  independently closed as PASS.
+- **Next action**: Route ISS-014 and ISS-015 back to the Circuit Engineer
+  (via the Hardware Lead) for rework, per the Recommended Fix options
+  above. Given ISS-015's direct REQ-403 tie, also flag it explicitly for
+  human safety review at or before the next Design Complete Gate attempt
+  for this subsystem, independent of whichever technical mitigation the
+  Circuit Engineer implements. ISS-016/017/018 (LOW) do not block progress
+  but should still receive an explicit disposition
+  (`RESOLVED`/`DEFERRED`/`ACCEPTED-RISK`) before this subsystem's own
+  Design Complete, per `docs/architecture.md` §8. No further review-cycle
+  ambiguity exists on the two originally-flagged items — both are now
+  independently dispositioned (one closed, one severity-assigned and
+  logged) and do not require another look before a Circuit Engineer rework
+  pass addresses ISS-014/ISS-015 specifically.
+
+## Cycle 3 — Rubber-duck premise/assumption review (same Rev 3 handoff, 2026-09-05)
+
+Run per `docs/architecture.md` §5.1, in addition to (not instead of) the
+Hardware Reviewer checklist pass immediately above — same artifact, a
+deliberately different lens (design premises/blind spots, not checklist
+execution). Formed an independent view first before cross-checking against
+the Hardware Reviewer's own Cycle 3 findings, per this project's own
+established practice (the same practice that caught ISS-011 in Rev 2, when
+a checklist-only pass had missed it).
+
+### Premises specifically checked, and confirmed to hold
+
+- **REQ-009's open-loop-only scope fence**: checked whether the I2C1
+  commissioning bus, FG reporting, or U5's own internal BEMF-based
+  commutation smuggle in control-loop-flavored thinking despite the
+  explicit scope fence. They do not — I2C1 configures static motor
+  parameters (Rm/Kt) and a control-mode register, not a runtime control
+  loop; U5's internal commutation is the driver IC's own normal operating
+  function, not this project's control logic. REQ-009 remains intact.
+- **Option A's fault-isolation intent**: the design document is honest that
+  Option A provides rail-level (not galvanic) isolation, and that the two
+  domains deliberately share a ground/signal reference — this matches
+  `hardware/power-architecture.md`'s own stated intent exactly, not an
+  overclaim.
+- **The four human-confirmed provisional defaults** (reaction-wheel target,
+  no motor-type preference, budget ceiling, bare-bench-rig sizing): the
+  approved motor+driver pairing and architecture have not silently drifted
+  from any of these — no disagreement found. The gap found (ISS-020) is
+  that the *target* itself (a floor) was never separately converted into a
+  *maximum/safety envelope*, which is a different, additional question the
+  original four never asked, not a violation of what was asked.
+
+### New findings (see `validation/open-issues.md` for the full schema each)
+
+- **ISS-019 (HIGH)** — New motor input (J4) has no bounded source envelope
+  or coordinated upstream fault containment; every component in its path
+  tolerates far more voltage/current than the recommended motor is
+  actually qualified for. Complements ISS-014 (which is about the input
+  sagging too *low*) with the upper-bound/source-fault-envelope gap.
+- **ISS-020 (HIGH)** — The approved "≥3000 RPM" target has only ever been
+  treated as a functional floor, never converted into a bounded maximum/
+  safety envelope for commanded speed, acceleration, or mechanical
+  containment. A genuine premise-challenge finding: neither Requirements
+  Engineering, Component Selection, nor Circuit Design ever asked "what is
+  the *maximum* speed this design must tolerate/survive," only "what is
+  the minimum it must reach." Directly compounds ISS-015 (that finding is
+  about *unintended* motion at power-up; this one is about *unbounded*
+  motion even during normal, intended operation).
+- **ISS-021 (HIGH)** — REQ-404's "shutdown behavior to prevent sustained
+  overheating" is not actually satisfied by DRV10983's Lock Detection
+  alone — all three of U5's own protection mechanisms (OCP, Lock
+  Detection, Thermal Shutdown) are auto-recovering/auto-retrying, not
+  latching. Directly challenges whether REQ-404 *as currently implemented*
+  is satisfied, a different and sharper question than whether the
+  mechanisms merely *exist* (which Hardware Reviewer's Cycle 3 pass already
+  confirmed).
+- **ISS-022 (MEDIUM)** — FG does not always represent actual RPM (can
+  reflect commanded/drive frequency during open-loop startup); ECO-007's
+  human directive to track the BEMF-degradation caveat in Firmware/FMEA is
+  not yet fulfilled — appropriately, since neither phase has run yet this
+  cycle. Recorded as a checkpoint, not a new circuit-level defect.
+- **ISS-023 (MEDIUM)** — Rev 2's "no vibration/shock, single simple rail"
+  validation-artifact premise (`validation/bring-up-procedure.md`,
+  `validation/fmea.md`) has not yet been updated for the new subsystem —
+  expected to be addressed at this cycle's own planned validation-artifact
+  closeout phase, flagged here so it is not silently skipped.
+
+### Cross-check against Hardware Reviewer's Cycle 3 findings
+
+- **Agree, not duplicated**: ISS-014 (2S UVLO) and ISS-015 (unsafe
+  uncommissioned SPEED/power-up state) — reviewed independently, no
+  disagreement with severity or substance.
+- **Distinct additions**: ISS-019/020/021/022/023 above are genuinely new,
+  not restatements.
+- **No disagreement** with ISS-016/017/018's LOW classification.
+
+### Verdict contribution
+
+- This pass does not issue a separate consolidated verdict (per
+  `docs/architecture.md` §4: exactly one Reviewer pass owns the
+  consolidated verdict — Hardware Reviewer's own Cycle 3 verdict,
+  above, stands as the single verdict for this cycle) — but adds 3
+  further open HIGH findings (ISS-019, ISS-020, ISS-021) to the 2
+  Hardware Reviewer already opened (ISS-014, ISS-015), for **5 open HIGH,
+  0 open CRITICAL** heading into Circuit Engineer's rework pass, plus 2
+  further MEDIUM (ISS-022, ISS-023) tracked as checkpoints for later
+  phases (Firmware Bring-up, validation-artifact closeout) rather than
+  blocking Circuit Design rework specifically.
+- **Next action**: all 5 open HIGH findings (ISS-014, 015, 019, 020, 021)
+  route back to Circuit Engineer for rework before a fresh re-review.
+  ISS-015 and ISS-020 both tie to REQ-403's safety-critical human-review
+  gate regardless of technical mitigation chosen.
+
+## Cycle 4 — Rev 5 re-review (U6 Motor-Rail Supervisory Controller): independently re-verifying closure of the 5 open HIGH findings from Cycle 3 (2026-09-08)
+
+### Review Cycle Metadata
+
+- **Design revisions reviewed**: `hardware/schematic/bench-imu-01-design.md`
+  **Rev 4** (commit `7774d4f`, "Circuit rework Rev 4: address 5 HIGH
+  findings from Independent Review Cycle 3") and **Rev 5** (commit
+  `4c812ad`, "Circuit rework Rev 5: wire in TPS26631PWPR supervisory
+  controller"), together with the intervening **Hardware Lead mediation**
+  (commit `9410a9d`, "Hardware Lead mediation + Motor-Rail Supervisory
+  Controller selection") and **human Chief Engineer approval record**
+  (commit `43b3c90`, "Record human approval of TPS26631PWPR supervisory
+  controller"). **This is a re-review, not a first review** — per this
+  role's own skill guidance, scope is the changed areas since my own prior
+  Cycle 3 pass, and anything those changes could affect, not the whole
+  document from scratch. Rev 1–3 content already passed independent review
+  in Cycles 1–3 and is not re-litigated here except where Rev 4/5 changed
+  it (ISS-014's §7.5.2 rewrite) or where a Rev-5 addition creates a new
+  interaction with it (U6 sitting electrically between the existing
+  F1→D2→D3 stage and U5).
+- **Reviewer**: Hardware Reviewer — see
+  `.github/agents/hardware-reviewer.agent.md`. Independent of the Circuit
+  Engineer session(s) that authored Rev 4/5, the Hardware Lead session that
+  mediated ECO-010, the Component Engineer session that selected U6, and
+  the human Chief Engineer who approved it. This is the same reviewer role
+  that opened ISS-014/015 at Cycle 3; I did not treat my own prior findings
+  as self-evidently satisfied by the design document's "RESOLVED"
+  self-annotations and re-derived each one from scratch this cycle (see
+  Findings). For ISS-019/020/021 — opened by the parallel rubber-duck pass
+  at Cycle 3, not by me — I gave them the same independent, ground-up
+  scrutiny as my own findings, not a lighter pass merely because I did not
+  originally author them.
+- **Independence statement**: Every numeric/technical claim in Rev 5's new
+  §7.5.10 (U6) was re-derived this cycle directly against the **primary TI
+  TPS2663x datasheet** (SLVSE94G, Sept 2018 – revised June 2024), fetched
+  fresh this cycle via `curl` (5.6 MB PDF) and text-extracted via
+  `pdftotext -layout` to a local working copy (`/tmp/tps2663.txt`, 3532
+  lines) — not accepted from the design document's or evidence-log's own
+  citation/paraphrase. This includes: the SHDN pin's guaranteed leakage
+  spec and thresholds (§8.3.13, Table 5-1, Electrical Characteristics),
+  the UVLO/OVP divider equations (§9.2.2.2, Equations 9–10) and all six
+  resulting trip-point corners (recomputed independently from the design's
+  actual R12/R13/R14 values, not copied from the design document's own
+  numbers), the R(ILIM) equation (§9.2.2.1, Equation 8) and R15 sizing, the
+  dV/dt inrush and turn-on-delay equations (§8.3.1, Equations 1–2, Figure
+  8-3) against the design's actual C(OUT)=10µF, the Thermal Information
+  table (RθJA, R(ON), IQ) and the full ΔTJ margin arithmetic, the
+  Absolute Maximum Ratings and Recommended Operating Conditions tables
+  (§6.1/§6.3, re-pulled fresh this cycle to independently confirm zero new
+  AMR/ROC exposure — see Checklist item 2), and Table 8-1 (Device
+  Operational Differences Under Different MODE Configurations) confirming
+  MODE=Open→Latch-off specifically for the TPS26631 variant used here. One
+  sub-claim — the STM32G0 GPIO reset-default state, relevant to a new
+  question this cycle raised about PA9's pre-init state — could not be
+  verified against a locally-extractable primary PDF within this cycle's
+  tooling and was instead independently corroborated via `web_search`
+  against ST Community forum posts and ST's own public GPIO training
+  material; this is disclosed as a secondary-source verification, weaker
+  than the PDF-extraction method used for every other claim in this cycle,
+  and is flagged as such rather than silently presented with equal
+  confidence (see Finding: ISS-015 below).
+- **Scope**: Per the task's explicit framing, this cycle re-ran the
+  checklist against the changed areas and anything they could affect, not
+  the whole document from scratch: the Rev 4/5 "Revision changelog" entries
+  themselves (top of file), §7.5.2 (ISS-014 rewrite), §7.5.5 (ISS-015/R10),
+  §7.5.9 (ISS-019/F1), §7.5.10 (U6, entirely new this revision — read in
+  full), §7.5.11 (ISS-020), §7.5.12 (ISS-021), §11 (MCU pin table — PA9
+  commitment), §12 (net list — all new U6 nets), §13 (parts list — U6,
+  R11–R15, C16/C17), §14/§15 (self-check sections, including the
+  Rev-5-specific re-self-check), and §16 (residual items, specifically the
+  three newly-added items 27–29 this task called out for an independent
+  view, plus items 25/26 for context on ISS-020/021/019's own residuals).
+  Also read directly (not paraphrased): `validation/change-log.md`
+  ECO-009/010/011; `validation/open-issues.md` ISS-014/015/019/020/021 full
+  rows (all 13 fields); `bom/component-selection.md`'s "Motor-Rail
+  Supervisory Controller" section in full (Component Engineer comparison,
+  Hardware Lead concurrence, and the human Chief Engineer's own approval
+  note, including the independent ≈440kΩ SHDN-pull-up figure the human's
+  own fresh web search produced); `requirements/requirements.md` REQ-108,
+  REQ-403 through REQ-406 in full.
+- **Parallel sub-scans run**: None dispatched as separate sub-agent scans
+  this cycle. Per this role's own agent instructions, topic-based
+  sub-scans (power/thermal, interface/timing, protection/EMI) may run in
+  parallel, but the five re-assessments were tightly evidentially coupled
+  (all hinge on the same U6 part and the same primary datasheet) and were
+  worked as a single integrated pass, consistent with the verdict being a
+  single serial integration step this role owns.
+- **rubber-duck premise review run in parallel?**: Not run this cycle. Per
+  `validation/open-issues.md`'s own Rules ("never merge/relabel" a row's
+  Source), ISS-019/020/021's `Source` column remains `rubber-duck`
+  unchanged in the updates below even though this Hardware Reviewer cycle
+  is the one re-assessing and transitioning their disposition — the
+  Hardware Lead's own mediation commit (`9410a9d`) independently confirmed
+  this same division of labor in its own commit message ("validation/
+  open-issues.md ISS-014/015/019/020/021 statuses are intentionally left
+  OPEN by this commit — only Hardware Reviewer's own re-review transitions
+  finding status").
+- **KiCad tool cross-checks used**: `kicad-list_projects` re-run fresh this
+  cycle, still returns `[]` — independently reconfirming no KiCad project
+  exists for this repository. The Markdown schematic-equivalent document
+  remains the correct artifact reviewed net-by-net (§12) and pin-by-pin
+  (§11/§13), as in Cycles 1–3.
+- **Process-integrity check**: Independently ran `git log --oneline` and
+  `git show --stat` on all four relevant commits rather than relying on
+  the design document's own changelog summary or the task's framing of
+  "Rev 4"/"Rev 5" as monolithic units:
+  - `7774d4f` (Rev 4) touched only `datasheets/
+    littelfuse_30r500u_rev-unknown.md` (new), `hardware/power-budget.md`,
+    and `hardware/schematic/bench-imu-01-design.md`. **It did not touch
+    `bom/component-selection.md` or `requirements/requirements.md`** —
+    meaning the design document's claim that ISS-014's constraint is
+    "propagated" into those two files is **not** attributable to the Rev 4
+    commit itself.
+  - `9410a9d` ("Hardware Lead mediation…", same day, between Rev 4 and Rev
+    5) is the commit that actually performed that propagation — its own
+    message states this explicitly ("Propagated ISS-014's confirmed
+    3S-only binding constraint into `bom/component-selection.md`… and
+    `requirements/requirements.md` (REQ-108)"), and its diffstat confirms
+    341 new lines in `bom/component-selection.md` and a 4-line change in
+    `requirements/requirements.md`, consistent with a Notes-column/
+    recommendation addition rather than a rewrite. This same commit added
+    REQ-405/406 to `requirements/requirements.md` and
+    `requirements/traceability-matrix.md`, and the entire Component
+    Engineer "Motor-Rail Supervisory Controller" comparison section to the
+    BOM.
+  - `43b3c90` ("Record human approval…") touched only `bom/
+    component-selection.md` (4 lines — the Approval table's human sign-off
+    row) and `validation/change-log.md` (1 line).
+  - `4c812ad` (Rev 5) touched `datasheets/evidence-log.md`, the renamed F1
+    and TPS26631 datasheet metadata files, `hardware/power-budget.md`,
+    `hardware/schematic/bench-imu-01-design.md`, and
+    `validation/change-log.md`. **It did not touch `bom/
+    component-selection.md` or `requirements/requirements.md`** — Circuit
+    Engineer implemented U6 in the schematic but made no further changes to
+    either file, consistent with those files already being correctly
+    updated by the prior mediation commit.
+  - `git log --oneline 4c812ad..HEAD` returns nothing — **Rev 5 is
+    confirmed to be the current HEAD state**; nothing has changed
+    underneath this review between the task's framing and this cycle's
+    execution.
+  - **This precisely reconciles the task's framing**: ISS-014's BOM/
+    requirements propagation is real and independently confirmed present
+    (see Finding below), but is correctly attributed to the Hardware
+    Lead's mediation step, not to Circuit Engineer's Rev 4 rework directly
+    — a correct division of labor (Circuit Engineer has no edit mandate
+    over the BOM or requirements files), not a process gap.
+
+### Checklist Results
+
+Full 16-item checklist re-run against the Rev 4/5 changed areas and their
+downstream effects. Items with no material Rev 4/5 touch-point are marked
+"unaffected — carried forward from Cycle 3" rather than re-litigated from
+scratch, per this cycle's re-review scope.
+
+| # | Checklist item | Result | Notes |
+|---|---|---|---|
+| 1 | Voltage violation | **ISS-014 → RESOLVED; ISS-019 → RESOLVED** | §7.5.2's 2S/3S UVLO corner analysis independently re-verified arithmetically correct (unchanged since Cycle 3 — Rev 4 sharpened wording/framing, not the numbers) and now independently confirmed propagated into both `bom/component-selection.md` and `requirements/requirements.md` (see Process-integrity check above). U6's OVP/UVLO divider independently recomputed from TI's own Equations 9–10 against the design's actual R12/R13/R14 values — reproduces the claimed 8.17–8.51V UVLO / 13.49–14.30V OVP window exactly (see Finding). |
+| 2 | Absolute Maximum Rating violation | Pass — independently reconfirmed, including for the new U6 | Freshly re-pulled TI's own AMR table (§6.1) and Recommended Operating Conditions table (§6.3) this cycle: IN_SYS/IN AMR = −0.3…67V (75V for a 10ms transient), ROC = 4.5–60V; OVP/dVdT/IMON/MODE/SHDN/ILIM/PLIM AMR = −0.3…5.5V. The design's actual VM_MOTOR (≤26V transient-clamped by D3, ≤~14.3V continuous once U6's own OVP acts) sits far inside both ceilings — U6 introduces **zero** new AMR/ROC exposure. R11's SHDN-node voltage (≈100mV driven low, 3.3V driven high via PA9) and the UVLO/OVP sense-pin voltages at trip (≈1.2V, per the divider's own reference-referred design) both sit comfortably inside the ±5.5V pin-group AMR. |
+| 3 | Current limit | Pass — independently reconfirmed, extended to cover U6 | U5's own fixed 3–4A OCP unaffected (unchanged since Cycle 3). U6's own R(ILIM)=R15=3.57kΩ independently re-derived from TI's Equation 8 (R[kΩ]=18/I(OL)[A]) — yields a 5.04A typical / 4.69–5.40A cornered overload trip, sitting between the motor subsystem's ~1.05A nominal operating point and J4/F1's fault-current regime, a sensible defense-in-depth layer additional to F1's own PTC action. |
+| 4 | Thermal risk | Pass — independently reconfirmed, including the new U6's added self-heating | U5's own thermal treatment unaffected (unchanged since Cycle 3, still a tracked non-blocking gap per the design document's own §16 item 21). U6's own ΔTJ independently recomputed from TI's Thermal Information table (RθJA=32.2°C/W for the PWP/HTSSOP-20 package) and Electrical Characteristics R(ON) (26–45mΩ across corners) — **confirms ≈7.5–13.0°C** at the design's actual ~1.05A operating current, matching `hardware/power-budget.md`'s own independent calculation and three of the four locations in the design document itself (§7.5.10, §14, §15). **Found a documentation inconsistency, not a technical one** — see new Finding ISS-024 below. |
+| 5 | Missing decoupling capacitor | Pass — independently reconfirmed, extended to cover U6 | U5's own decoupling unaffected (unchanged since Cycle 3). U6's C16 (IN_SYS bypass) and C17 (dVdT) independently cross-checked against TI's own §9.2.2.5.1/§8.3.11/§9.5 recommendations (DS-PROT-029) and §8.3.1/§9.2.2.3 inrush equations (DS-PROT-028) respectively — both present, both correctly sized, no omission. |
+| 6 | Floating pin | **ISS-015 → RESOLVED, with a new sub-question independently investigated and closed** | R10 (SPEED pulldown, unchanged since Rev 4) still present. New this cycle: independently investigated whether PA9 itself (U6's SHDN drive pin) is floating during the pre-GPIO-init boot window — confirmed via `web_search` (secondary-source, disclosed above) that STM32G0 GPIOs default to high-impedance Analog mode (no internal pull) after any reset, meaning R11's 10kΩ external pulldown cleanly dominates the SHDN node with full margin for the *entire* boot window, not just after firmware configures PA9. **No new floating-pin risk found on PA9.** See Finding below for the full derivation. |
+| 7 | Incorrect pull-up/pull-down | **ISS-015 → RESOLVED** | R11=10kΩ independently re-derived from TI's own guaranteed ≥10µA SHDN-sink instruction (DS-PROT-024) — confirms the design's own claimed ≈8×/≈20× margins against V(SHUTF)=0.8V/V(SHUTR)=2V exactly. Sizing basis is independent of the disputed internal-pull-up-resistance figure (item 27, see Finding on residuals below), so it is robust to that open question either way. Bidirectional sanity-check independently performed: PA9 driving SHDN high (3.3V) draws only ≈330µA through R11 — trivial for any STM32 GPIO output stage, confirming the enable direction also works correctly. |
+| 8 | Logic voltage mismatch | Pass — unaffected, carried forward from Cycle 3 | No new logic-level interface introduced; PA9 is a standard 3.3V STM32G0 GPIO driving a pin group (SHDN) whose own ROC/AMR (0–5V / −0.3…5.5V, confirmed this cycle) is fully compatible. |
+| 9 | Interface timing | Pass — independently reconfirmed for U6's own timing | Turn-on delay independently recomputed from TI's own formula (742+49.5×C(dVdT)[nF] µs, DS-PROT-028) against C17=22nF — ≈1.83ms, an inconsequential addition to the motor domain's own power-up sequencing and well within any reasonable firmware timeout budget. No interface-timing concern found. |
+| 10 | Power sequencing | **ISS-015 → RESOLVED (the cross-domain gap Cycle 3 identified)** | U6 now provides a genuine, MCU-commanded hardware gate on the entire motor domain's power (U6's OUT feeds U5's own VCC) — the MCU domain no longer merely hopes the motor domain powers up in a safe order; PA9 low (the R11-enforced, GPIO-reset-consistent default) holds the whole domain OFF until firmware deliberately enables it. This closes the specific cross-domain sequencing gap Cycle 3's ISS-015 identified, not merely SPEED's own analog level (which R10 alone already addressed at Rev 4). |
+| 11 | Grounding | Pass — unaffected, carried forward from Cycle 3 | U6 sits on the existing single shared ground net; §12's net list independently confirmed U6's GND pin ties to the same ground as the rest of the board, no new ground domain introduced. |
+| 12 | EMI/EMC risk | Pass — unaffected, carried forward from Cycle 3 | No new switching/noise source introduced — U6 is a linear pass-through load switch (not a DC-DC converter) in normal operation; its own inrush/dV\/dt control (Equations 1–2, independently reconfirmed) is itself an EMI-mitigation feature, not a new noise source. |
+| 13 | Motor noise | Pass — unaffected, carried forward from Cycle 3 | No change to U5/M1 commutation-noise treatment. |
+| 14 | Sensor noise | Pass — unaffected, carried forward from Cycle 3 | U6 sits entirely within the motor domain, upstream of U5; no new coupling path into the IMU's own 3V3 rail introduced. |
+| 15 | PCB layout concern (incl. mechanical/thermal co-design) | Pass — independently reconfirmed, extended to cover U6's own thermal footprint | U6's PowerPAD/thermal-pad layout guidance (TI §9.6.2, DS-PROT-023) independently cross-checked present in §7.5.10's own layout notes; ΔTJ margin (item 4 above) confirmed wide enough that PCB copper-area layout practice, not exotic thermal design, is sufficient. No new rotating-body/mechanical interaction introduced by U6 itself (it is upstream, electrical-only). |
+| 16 | Datasheet recommendation violation | Pass — independently reconfirmed | Every U6 support component (C16, C17, R11–R15) independently matches TI's own recommended application circuit and equations (DS-PROT-026 through DS-PROT-029) — no unexplained deviation found. |
+
+### Findings
+
+#### Re-verification of ISS-014 (2S/3S UVLO margin) — independently CONFIRMED RESOLVED
+
+- **Claim under review**: the 2S/3S UVLO margin analysis is now a
+  documented, binding 3S-only constraint, propagated into both
+  `bom/component-selection.md` and `requirements/requirements.md`.
+- **Independent verification method**: (1) Re-derived every corner of
+  §7.5.2's own arithmetic from scratch (U5's UVLO thresholds, D2's forward
+  voltage drop, F1's estimated series resistance) rather than accepting the
+  design document's own restated numbers — **unchanged since my own Cycle
+  3 review found this arithmetic sound**; Rev 4 sharpened the framing
+  (explicitly calling out that 2S nominal fails at U5's own *typical*
+  threshold, not just a worst-case corner) but did not change any
+  underlying number. (2) Independently located and read the actual
+  propagated text in both target files: `bom/component-selection.md` lines
+  749–766 (Motor Driver IC recommendation section, an explicit 3S-only
+  binding note) and `requirements/requirements.md` REQ-108's own Notes
+  column (line 105) — both confirmed present, not merely claimed. (3)
+  Independently used `git show --stat`/`git log` to determine **which
+  commit** actually performed this propagation, rather than accepting Rev
+  4's or Rev 5's own self-description — see the Process-integrity check
+  above; the propagation is real but is correctly attributed to the
+  Hardware Lead's `9410a9d` mediation commit, not to Circuit Engineer's Rev
+  4 commit directly, which never touched either target file.
+- **Result**: **RESOLVED**. Both halves of the original finding (correct
+  arithmetic; binding-constraint propagation into the two places a Circuit
+  Engineer or Component Engineer would actually need to see it) are now
+  independently confirmed true and consistent across three separate files
+  (design document, BOM, requirements).
+- **Datasheet Source**: DS-MTR-023 (motor's own rated cell-count range,
+  unchanged since Cycle 3); TI DRV10983 SLVSCP6H (U5's own UVLO thresholds,
+  unchanged since Cycle 3); DS-PROT-006/033 (F1 series-resistance estimate,
+  confirmed unchanged across the 30R500U→30R500UF swap).
+- **Severity**: was HIGH (Cycle 3) — now closed, no residual severity.
+
+#### Re-verification of ISS-015 (SPEED uncommanded-motion / cross-domain power-up risk) — independently CONFIRMED RESOLVED
+
+- **Claim under review**: R10 (SPEED pulldown) plus the new U6 load switch
+  with R11 (SHDN pulldown) together now provide both a safe SPEED level and
+  a hardware-enforced default-OFF/fail-safe state for the whole motor
+  domain, with PA9 as a real, complete fix (not a new floating-pin risk
+  itself).
+- **Independent verification method**:
+  1. **R10** (§7.5.5): confirmed present and unchanged at 1kΩ since Rev 4 —
+     directly closes SPEED's own analog-mode factory-default risk
+     (checklist item 6/7's original trigger).
+  2. **R11 sizing**: independently re-derived from TI's own guaranteed
+     specification, not the design document's restated numbers. TI's own
+     text (§8.3.13, quoted directly in DS-PROT-024): "a pulldown resistor
+     used at the SHDN pin … must have sinking capability of at least
+     10 µA" — a guaranteed worst-case leakage figure, independent of either
+     of the two disputed internal-pull-up-resistance figures (see residual
+     item 27 below). At R11=10kΩ, worst-case leakage current produces
+     V(SHDN)=10µA×10kΩ=100mV — independently recomputed margins of ≈8×
+     against V(SHUTF)=0.8V (falling/shutdown-confirm) and ≈20× against
+     V(SHUTR)=2V (rising/enable, the tighter constraint for guaranteeing
+     the device cannot self-enable cold), matching the design document's
+     own claimed figures exactly.
+  3. **PA9 pre-init state — the new question this task specifically
+     raised**: independently investigated via `web_search` (ST Community
+     forum threads plus ST's own public GPIO training material) whether
+     STM32G0's GPIOs have a documented reset default that could leave PA9
+     in a low-impedance or actively-driven state before firmware configures
+     it. **Confirmed**: all STM32G0 GPIOs default to Analog mode
+     (MODER=`0b11`) with no internal pull (PUPDR=`0b00`) immediately after
+     any reset (power-on, NRST, or software) — a genuinely high-impedance
+     state. PA9 (plain GPIO/USART1_TX/TIM1_CH2) is not one of the
+     documented reset-default exceptions (unlike SWDIO/SWCLK/BOOT0/NRST).
+     This means R11 cleanly dominates the SHDN node — with the same ≈8×/
+     ≈20× margins computed above — for the *entire* window from power-on
+     until firmware's GPIO-init code runs, not merely after it.
+     **No new floating-pin risk exists on PA9 itself.**
+  4. **Enable-direction sanity check** (not explicitly asked for, but a
+     natural completeness check on a bidirectional pin): confirmed PA9
+     driving SHDN high (3.3V) draws only ≈330µA through R11 — trivial for
+     any STM32 GPIO push-pull output stage (<50Ω typical), confirming the
+     mitigation works correctly in both directions, not just the fail-safe
+     one.
+  5. Cross-checked via TI's own Table 8-1 (DS-PROT-030) that MODE=Open (as
+     wired) gives **Latch-off** specifically for the TPS26631 variant used
+     here (not the auto-retry behavior some sibling TPS2663x variants
+     exhibit) — an independent, chip-level defense-in-depth layer on top of
+     the SHDN-based fail-safe, and confirmed the SHDN low→high toggle is
+     TI's own documented latch-reset mechanism (Table 5-1), consistent with
+     the design document's own claim.
+- **Result**: **RESOLVED**. This closes the finding via the two strongest
+  of the three Recommended Fix options my own Cycle 3 review offered (an
+  external SPEED pulldown, and a supervisory VCC gate) — the third,
+  weaker, documentation-only fallback is correspondingly unnecessary. The
+  one honestly-disclosed residual (the 1MΩ-vs-≈440kΩ pull-up-resistance
+  discrepancy) does not affect this conclusion, since R11's sizing basis
+  is independent of it (see residual-items discussion below).
+- **Datasheet Source**: DS-PROT-024 (SHDN guaranteed leakage/thresholds),
+  DS-PROT-030 (Table 8-1 MODE behavior), plus this cycle's own
+  `web_search`-based STM32G0 GPIO reset-default corroboration — now formally
+  logged as **DS-MCU-067** in `datasheets/evidence-log.md` (MODERATE
+  confidence, same hedge pattern as the pre-existing DS-MCU-044 entry: not
+  independently re-extracted from the raw RM0454 reference-manual PDF this
+  session, corroborated via web search only).
+- **Affected Component**: R10, R11, U6, PA9.
+- **Severity**: was HIGH (Cycle 3) — now closed, no residual severity.
+
+#### Re-verification of ISS-019 (unbounded J4 input envelope) — independently CONFIRMED RESOLVED
+
+- **Claim under review**: F1 (PTC fuse) plus the new U6 OVP/UVLO divider
+  (R12/R13/R14) together now bound the input envelope, both for fault/
+  surge conditions and continuous overvoltage, with OVP/UVLO trip points
+  landing at ≈13.49–14.30V / ≈8.17–8.51V as claimed.
+- **Independent verification method**: Independently extracted TI's own
+  divider equations directly from the primary datasheet (§9.2.2.2,
+  Equations 9–10, DS-PROT-026) rather than accepting the design document's
+  restated formula, and recomputed all **six** resulting corner values
+  from scratch using the design's actual resistor values (R12=887kΩ,
+  R13=60.4kΩ, R14=88.7kΩ, E96 1%) and TI's own guaranteed reference
+  min/typ/max values:
+  - UVLO trip (rising): **8.172V / 8.339V / 8.506V** (min/typ/max)
+  - OVP trip (rising): **13.737V / 14.017V / 14.298V** (min/typ/max)
+
+  These reproduce the design document's own claimed 8.17–8.51V / 13.74–
+  14.30V window to 3+ significant figures at every corner — an exact,
+  independent match, not an approximate one. As a further self-check not
+  explicitly required by the task, I also independently computed the
+  falling (hysteresis) thresholds (UVLO≈7.575–7.991V, OVP≈12.732–13.433V)
+  to confirm internally consistent, chatter-free switching behavior.
+  Additionally cross-checked §12's net list against the equation topology
+  used (IN_SYS→R12→UVLO-tap→R13→OVP-tap→R14→GND) — confirmed to match
+  exactly, not merely assumed from the prose description.
+
+  Separately, F1's own role (upstream fault-current/surge containment, not
+  continuous-overvoltage regulation) was reconfirmed unchanged from Rev 4:
+  the 30R500U→30R500UF swap shares an identical electrical spec
+  (DS-PROT-033), and the honest gap the design document itself discloses
+  — F1's own 10A trip current exceeds J4's 5A connector rating — remains
+  present and correctly disclosed, not silently dropped; it is a
+  **different** gap from the one ISS-019 opened (source/upstream fault
+  coordination vs. continuous-overvoltage regulation), and U6's OVP
+  function is what closes the latter, which is the gap ISS-019 was
+  actually about.
+- **Result**: **RESOLVED**. This closes the previously-missing
+  continuous-overvoltage gap Cycle 3 identified — F1 (a PTC, not a
+  precision comparator) could never have addressed sustained/continuous
+  overvoltage on its own; U6's OVP pin is a true, independently-recomputed,
+  correctly-implemented lockout referenced to the 9.0–13.0V design
+  envelope with genuine (if not enormous — see new Finding ISS-025 below)
+  margin at both ends.
+- **Datasheet Source**: DS-PROT-026 (Equations 9–10, divider architecture);
+  DS-PROT-033 (F1/F1-replacement spec equivalence, unchanged from Rev 4).
+- **Affected Component**: F1, U6, R12, R13, R14.
+- **Severity**: was HIGH (Cycle 3/rubber-duck) — now closed, no residual
+  severity.
+
+#### Re-verification of ISS-020 (no overspeed envelope) — independently CONFIRMED as the correct, honestly-disclosed OPEN disposition (not hardware-fixable)
+
+- **Claim under review**: Circuit Engineer explicitly did not attempt a
+  circuit-level fix, documenting this as a firmware-policy gap in new
+  §7.5.11; Hardware Lead added new requirements REQ-405/406.
+- **Independent verification method**: Read §7.5.11 directly and in full —
+  confirmed the design document states plainly "No circuit-level fix
+  exists for this finding, and none is invented here," correctly routing
+  the gap to firmware rather than papering over it with an unjustified
+  circuit trick. Independently read `requirements/requirements.md` line
+  142 — confirmed REQ-405 exists, is well-formed (Priority: Must, explicit
+  rationale tying the ≥3000 RPM floor to the recommended motor's own
+  6–7× higher no-load speed and the ω² scaling of stored rotational
+  energy, explicit tie to REQ-403's HITL gate and to Mechanical Lead's
+  containment design), and is correctly attributed as "added at
+  Independent Review, ISS-020." Independently confirmed via `git show
+  --stat 9410a9d` that this requirement was added by the Hardware Lead's
+  own mediation commit (with proper authority over that file), not
+  silently invented by Circuit Engineer.
+- **Result**: This finding **cannot be closed by hardware alone** — my own
+  Cycle 3 review, and this cycle's independent re-check, both agree there
+  is no available circuit-level mitigation for a firmware/control-policy
+  question (bounding a *commanded* maximum speed requires the firmware
+  loop that issues speed commands and reads FG feedback; no passive or
+  supervisory-IC circuit addition can substitute for that decision).
+  **Remains OPEN** — this is the correct, honest state, not a defect in
+  Rev 5's hardware work. Recommend Hardware Lead/human Chief Engineer
+  consider a future disposition note along the lines of "OPEN, tracked for
+  Firmware Bring-up phase, hardware enabler not required for this specific
+  gap" — but per `validation/open-issues.md`'s own Rules, a HIGH may only
+  become `ACCEPTED-RISK` with a named human Chief Engineer sign-off,
+  written rationale, and date; I am not making that disposition change
+  unilaterally in this cycle's `open-issues.md` update (see below).
+- **Datasheet Source**: N/A — this is a requirements/firmware-policy gap,
+  not a component-level datasheet question.
+- **Affected Component**: Firmware (motor speed-command loop); no hardware
+  component change applicable.
+- **Severity**: HIGH, unchanged — open, correctly routed, not a hardware
+  defect.
+
+#### Re-verification of ISS-021 (non-latching fault protection) — independently CONFIRMED as the correct, honestly-disclosed OPEN disposition, with a now-confirmed-sufficient hardware enabler
+
+- **Claim under review**: Circuit Engineer flagged this as needing
+  firmware (§7.5.12); U6 now provides the physical enforcement point
+  (PA9/SHDN can cut U6's output) for a future firmware latch policy.
+- **Independent verification method**: Read §7.5.12 directly and in
+  full — confirmed the same honest "no circuit-level fix, none invented
+  here" disclosure pattern as ISS-020. Independently read
+  `requirements/requirements.md` line 143 — confirmed REQ-406 exists, is
+  well-formed (Priority: Should, explicit rationale that none of
+  DRV10983's three protection mechanisms latch, companion to REQ-404), and
+  is correctly attributed to Independent Review/ISS-021. Independently
+  assessed whether the *hardware enabler* itself is real and sufficient —
+  this is the one part of ISS-021 that genuinely is a hardware question,
+  distinct from ISS-020's pure-firmware-policy framing: PA9 driving U6's
+  SHDN low does not merely lower SPEED to a safe level, it **removes power
+  from U5 entirely** (U6's OUT is U5's own VCC supply) — the strongest
+  physical enforcement mechanism available at this design's architecture,
+  confirmed via the same R11/PA9 verification performed for ISS-015 above
+  (§7.5.10/§11 wiring, guaranteed 10µA leakage spec, STM32G0 reset-default
+  behavior). Additionally independently cross-checked §16 item 25's own
+  self-flagged nuance — that U6's own MODE=Open overload latch (Table 8-1,
+  DS-PROT-030) and any future firmware-declared Lock-Detection latch share
+  the same SHDN reset line but are logically distinct fault sources, and
+  that U6 exposes no register/flag (PGOOD/FLT both left floating per
+  §7.5.10) letting firmware tell them apart — confirmed this is an
+  accurate, not overstated, characterization of a genuine future firmware
+  design consideration, not a defect in Rev 5 itself.
+- **Result**: The firmware retry-counting/rolling-window/re-arm *policy*
+  cannot be closed by hardware and correctly **remains OPEN**, same
+  reasoning as ISS-020. The hardware **enabler** (a real, complete,
+  physical means for firmware to cut power to the entire motor domain) is
+  independently confirmed **real and sufficient** for whatever latch
+  policy Firmware Lead eventually implements — nothing further is needed
+  from Circuit Engineer on this point. Recommend the same future
+  human-disposition treatment as ISS-020 (OPEN, tracked for Firmware
+  Bring-up, hardware prerequisite satisfied) rather than an AI-unilateral
+  `ACCEPTED-RISK` change.
+- **Datasheet Source**: DS-PROT-024 (SHDN control), DS-PROT-030 (Table 8-1
+  MODE=Open latch-off behavior, PGOOD/FLT pin description).
+- **Affected Component**: U6, PA9 (hardware enabler, confirmed sufficient);
+  firmware (policy, still undecided — no hardware component change
+  applicable).
+- **Severity**: HIGH, unchanged — open, correctly routed, not a hardware
+  defect.
+
+#### Residual items review (design document's own §16 items 27–29) — independent view
+
+- **Item 27 (SHDN internal pull-up: 1MΩ vs. ≈440kΩ, neither resolved)**:
+  Independently re-read TI's own Figure 8-1 (Functional Block Diagram,
+  page 16 of the primary PDF) this cycle — confirms **"1 MΩ"**, matching
+  the design document's own DS-PROT-025 citation, the pre-existing
+  DS-PROT-013 (TI E2E community-forum citation), **and** Component
+  Engineer's own independent citation in `bom/component-selection.md` line
+  1067 ("internal 1MΩ pull-up to 2.7V, DS-PROT-013") — three independent
+  sources agreeing on 1MΩ. The competing ≈440kΩ figure traces to exactly
+  one source: the human Chief Engineer's own fresh web search, recorded
+  directly in `bom/component-selection.md` line 1234's Approval-table
+  entry. I do not have visibility into what the human's search actually
+  found (a different die revision, a sibling-part datasheet, or a
+  third-party estimate could all produce this), and I am not overruling an
+  independently-conducted human research result on a question that carries
+  no safety consequence either way — TI's own formal Electrical
+  Characteristics table has no guaranteed min/typ/max row for this
+  specific resistance at all, so neither figure is a "guaranteed spec" in
+  the datasheet sense, and R11's own sizing (independently reconfirmed
+  above) uses the guaranteed 10µA leakage spec instead, which dominates by
+  ≈44×–100× regardless of which pull-up figure is correct. **Confirmed
+  non-blocking, no new backlog row warranted** — this is an accurate,
+  appropriately-humble disclosure, not a defect.
+- **Item 28 (OVP margin vs. a hypothetical 4S pack, "3.4%"/"3.75%")**:
+  Independently recomputed both percentages from scratch using the primary
+  datasheet's own equations and adverse reference+resistor-tolerance
+  combinations: reference-tolerance-only worst case (V(OVPR)_max=1.224V,
+  nominal R12/R13/R14) → **14.2975V** OVP trip vs. a 4S nominal 14.8V →
+  **3.4%** margin; full-stack worst case (V(OVPR)_min=1.176V **and**
+  adverse ±1% resistor tolerances on all three resistors) → **13.4881V**
+  OVP trip vs. the 13.0V envelope ceiling → **3.76%** margin (design
+  document rounds to "3.75%" — an immaterial rounding difference,
+  independently reconciled). Both figures independently reproduce exactly.
+  Both are genuine, positive, non-zero margins — not violations — and this
+  residual item is correctly judged non-blocking given 3S is this design's
+  actual, procedurally-enforced envelope (ISS-014's own binding constraint,
+  now independently confirmed propagated into the BOM/requirements this
+  cycle) and 4S is already an out-of-envelope, procedural-exclusion
+  scenario, not a credible normal-operation state. **This margin, while
+  real and correctly computed, is narrow enough to independently warrant
+  its own tracked (not blocking) backlog entry** — see new Finding ISS-025
+  below; this is a considered severity judgment on my part, not a
+  restatement of the design document's own framing.
+- **Item 29 (dV/dt capacitor sizing basis)**: Already independently
+  confirmed correct during this cycle's primary U6 verification pass — the
+  design correctly derives C17=22nF from TI's own Equations 1–2 against
+  this design's actual C(OUT)=10µF, not from either of TI's own worked
+  examples (1mF/30mF, both 100×–3000× larger and drawn from unrelated
+  application contexts). **Confirmed non-blocking, no new backlog row
+  warranted.**
+
+#### New Finding: ISS-024 — Thermal-rise changelog figure inconsistent with its own supporting calculation (LOW)
+
+- **Issue**: The top-of-file Rev 5 "Revision changelog" summary (line 103)
+  states U6's thermal rise as "ΔTJ ≈ 10–16°C," while three other locations
+  within the same document (§7.5.10 line 1974, §14 line 2810, §15 line
+  3158) and `hardware/power-budget.md`'s own detailed calculation all
+  consistently state "≈7.5–13.0°C."
+- **Rationale**: A single document should not present two different
+  numeric answers to the same question; a future reader skimming only the
+  changelog summary would carry away a different (and, as it happens, more
+  conservative) figure than the one the design's own detailed self-checks
+  and the companion power-budget document actually support.
+- **Independent verification**: Independently recomputed ΔTJ from TI's own
+  Thermal Information table (RθJA=32.2°C/W for the PWP/HTSSOP-20 package)
+  and Electrical Characteristics R(ON) values (26/30.44/34.5mΩ min/typ/max)
+  at the design's actual ~1.05A nominal operating current — reproduces
+  **≈7.5–13.0°C**, confirming the *detailed* figure (§7.5.10/§14/§15/
+  power-budget.md) is the technically correct one, and the changelog
+  summary line is the outlier.
+- **Datasheet Source**: DS-PROT-031 (Thermal Information table; R(ON)/IQ
+  Electrical Characteristics rows).
+- **Failure Mechanism**: None — this is a documentation-consistency defect,
+  not a physical/electrical failure mode. The wrong figure, if believed,
+  overstates rather than understates thermal rise, so it carries no safety
+  risk in itself; the risk is purely one of an inconsistent record
+  confusing a future reader or reviewer.
+- **Affected Component**: U6 (documentation only — no schematic/BOM change
+  needed).
+- **Recommended Fix**: Circuit Engineer to correct the single changelog
+  summary line (top-of-file, line 103) to match the three internally
+  consistent, independently-reconfirmed occurrences ("≈7.5–13.0°C").
+  Trivial, single-line, no re-analysis required.
+- **Severity**: **LOW** — documentation-only, non-safety-relevant, easily
+  fixed whenever Circuit Engineer next touches the document; does not
+  block this cycle's verdict.
+
+#### New Finding: ISS-025 — U6 OVP trip-point margin against a hypothetical 4S pack is real but narrow (LOW, tracked)
+
+- **Issue**: U6's OVP trip point, at the worst-case combination of
+  reference tolerance and adverse ±1% resistor tolerances on R12/R13/R14,
+  clears the 13.0V envelope ceiling by only ≈3.76%; at reference-tolerance-
+  only worst case, it clears a hypothetical 4S pack's nominal 14.8V by only
+  ≈3.4%.
+- **Rationale**: Both margins are genuine and positive — this is not a
+  violation of the 9.0–13.0V envelope requirement, and is not, by itself, a
+  defect in Rev 5's design. However, a margin this narrow means that any
+  future revision using looser-tolerance resistors, or any real-world
+  resistor drift/aging beyond the ±1% E96 tolerance assumed here, could
+  erode the safety margin against a genuine field mis-connection (e.g., an
+  operator plugging in a 4S pack by mistake) faster than a wider-margin
+  design would. This is exactly the class of "narrow but not zero margin"
+  finding worth tracking rather than either dismissing or blocking on.
+- **Independent verification**: Independently recomputed both percentages
+  from TI's own primary-datasheet equations (Equations 9–10) using the
+  design's actual resistor values and both plausible worst-case tolerance
+  combinations — reproduces the design document's own §16 item 28 figures
+  (3.4%/3.75%, my own recomputation: 3.4%/3.76%) essentially exactly (see
+  Residual items review above for the full derivation). This is not a new
+  arithmetic finding — it is a considered severity judgment that this
+  residual item, while correctly identified and disclosed by Circuit
+  Engineer, deserves its own tracked backlog entry rather than remaining
+  only inside a self-check narrative paragraph, given that a resistor-
+  tolerance choice in a *future* revision could silently erode this margin
+  without anyone re-deriving it unless it is separately tracked.
+- **Datasheet Source**: DS-PROT-026 (Equations 9–10, divider architecture
+  and guaranteed reference tolerance).
+- **Failure Mechanism**: If a future BOM revision substitutes looser-
+  tolerance (e.g., 5%) resistors for R12/R13/R14 without re-deriving the
+  OVP trip point, or if resistor values drift with age/temperature beyond
+  the ±1% assumed here, the worst-case OVP trip point could shift closer to
+  — though based on this cycle's own arithmetic, not yet past — the 13.0V
+  envelope ceiling or a 4S pack's nominal voltage, narrowing (not yet
+  eliminating) the safety margin against a mis-connected battery pack.
+- **Affected Component**: R12, R13, R14.
+- **Recommended Fix**: No change required for the current Rev 5 E96/1%
+  resistor selection — the margin is real and positive. Track for future
+  consideration: (a) if a real 4S-pack mis-connection is ever judged a
+  credible (not just theoretical) field scenario, consider tighter-
+  tolerance (e.g., 0.1%) resistors for R12–R14 in a future revision; (b) if
+  R12/R13/R14 are ever re-selected for cost or availability reasons, the
+  new tolerance must be re-run through this same margin calculation before
+  being approved, not assumed equivalent.
+- **Severity**: **LOW** — real, quantified, non-blocking; a considered
+  independent severity call (this task's own instruction to "form your own
+  view," not a restatement of the design document's own framing, which
+  left the severity judgment to Hardware Reviewer).
+
+### Verdict
+
+- **Verdict**: **CONDITIONAL** (not a clean PASS, and not a FAIL — this is
+  a routing decision to Firmware Bring-up, not a rework dead-end back to
+  Circuit Engineer, directly mirroring my own Cycle 3 verdict's precedent
+  language for exactly this situation)
+- **Open CRITICAL count**: 0
+- **Open HIGH count**: 2 (ISS-020, ISS-021 — both correctly remain OPEN;
+  neither is a hardware defect, both are honestly-disclosed
+  firmware-policy gaps with now-confirmed-sufficient hardware enablers)
+- **Open MEDIUM count**: 2 (ISS-022, ISS-023 — unaffected by this cycle's
+  scope, not re-litigated; still tracked as checkpoints for Firmware
+  Bring-up and validation-artifact closeout respectively, per Cycle 3)
+- **Open LOW count**: 5 (ISS-016, ISS-017, ISS-018 unaffected/carried
+  forward from Cycle 3; plus 2 new this cycle — ISS-024, ISS-025)
+- **All 3 hardware-closable findings, independently confirmed RESOLVED this
+  cycle**: ISS-014 (2S/3S UVLO margin — arithmetic and propagation both
+  independently reproduced), ISS-015 (SPEED/cross-domain power-up risk —
+  R10+U6/R11/PA9 independently confirmed sufficient, including a fresh,
+  specifically-requested investigation of PA9's own pre-init state that
+  found no new risk), ISS-019 (unbounded J4 envelope — F1+U6 OVP/UVLO
+  independently recomputed from the primary datasheet's own equations,
+  reproducing every claimed trip-point corner exactly).
+- **2 findings correctly remain OPEN, not because of any hardware gap, but
+  because they require a firmware decision hardware cannot substitute
+  for**: ISS-020 (maximum commanded-speed envelope) and ISS-021 (latched-
+  fault policy). Both are honestly disclosed as such in §7.5.11/§7.5.12
+  (independently confirmed, not merely accepted), both have well-formed
+  companion requirements (REQ-405/406, independently confirmed to exist
+  and correctly reference these findings), and — the specific technical
+  question this task asked me to assess for ISS-021 — U6 now independently
+  confirmed to provide a real, complete, sufficient physical enforcement
+  point (full power removal to U5, not merely a signal-level override) for
+  whatever latch policy Firmware Lead eventually implements. **I am not
+  changing either status to `ACCEPTED-RISK` in this cycle's
+  `open-issues.md` update** — per that file's own Rules, only a named
+  human Chief Engineer may make that disposition, with written rationale
+  and a date. My own recommendation (recorded in each row's Notes) is that
+  both are ripe for a human Chief Engineer to consider exactly that
+  disposition — "OPEN, tracked for a specific future phase (Firmware
+  Bring-up)" — precisely the treatment this task's own framing anticipated
+  as reasonable for firmware-policy gaps with a confirmed hardware
+  enabler, but that is a human call, not mine to make unilaterally.
+- **2 new LOW findings opened this cycle, both independently derived, not
+  restated from the design document's own self-flagged items**: ISS-024
+  (a genuine, if minor, thermal-figure documentation inconsistency between
+  the changelog summary and three other internally-consistent locations)
+  and ISS-025 (a considered severity judgment that the design document's
+  own §16 item 28 residual — real but narrow OVP margin against a
+  hypothetical 4S pack — deserves its own tracked backlog row rather than
+  remaining only inside a self-check narrative). Neither blocks this
+  cycle's verdict.
+- **What independently checks out with no further action needed**: every
+  numeric/technical claim associated with U6 (R11 sizing, UVLO/OVP divider
+  trip points at all six corners, R(ILIM)/R15, dV/dt/C17 and turn-on delay,
+  thermal ΔTJ, MODE=Open latch-off behavior, AMR/ROC exposure) was
+  independently re-derived against the primary TI TPS2663x datasheet this
+  cycle and found to match the design document's own claims with zero
+  discrepancies in any safety-critical figure. Residual items 27 and 29
+  (design document's own §16) are both independently confirmed genuinely
+  non-blocking.
+- **Next action**: Route this Rev 5 state, and this review, to Hardware
+  Lead for onward routing to Firmware Bring-up for REQ-405/406 (ISS-020/
+  021's actual policy implementation) — this is not a loop-back to Circuit
+  Engineer, since no further hardware rework is identified as required by
+  this cycle. Recommend Hardware Lead/human Chief Engineer consider explicit
+  `ACCEPTED-RISK`-style human disposition for ISS-020/021's *current,
+  hardware-complete* state (distinct from the underlying firmware policy
+  itself, which remains genuinely open engineering work, not a risk to be
+  accepted). ISS-024/025 (LOW) do not block progress but should receive an
+  explicit disposition before this subsystem's own Design Complete Gate,
+  per `docs/architecture.md` §8, same as ISS-016/017/018 before them.
+
+## Cycle 5 — ISS-026 CRITICAL fix (Rev 6) re-verification: focused pin-reassignment check (2026-09-10)
+
+### Review Cycle Metadata
+
+- **Design revision reviewed**: `hardware/schematic/bench-imu-01-design.md`
+  **Rev 6** (commit `ef5edc4`, "Rev 6: fix ISS-026 CRITICAL — re-route IMU
+  I2C bus PB10/PB11 -> PA11/PA12"). **This is a narrow, focused re-review of
+  one specific CRITICAL fix, not a full re-review** — per the task's own
+  explicit framing, Rev 5's motor-subsystem content (already independently
+  reviewed and passed at Cycles 3/4) is out of scope and not re-litigated
+  here, and ISS-020/ISS-021 correctly remain OPEN/ACCEPTED-RISK pending
+  Firmware Bring-up, untouched by this cycle.
+- **Reviewer**: Hardware Reviewer — see
+  `.github/agents/hardware-reviewer.agent.md`. Independent of the Circuit
+  Engineer session that authored Rev 6 and the Hardware Lead session that
+  relayed/opened ISS-026. Did not accept the changelog's own self-check
+  claims (§14 item 13, §16 item 4) at face value; re-derived each checklist
+  item independently below.
+- **Independence statement**: The core physical fact underlying ISS-026
+  (PB10/PB11 absent from the STM32G031K8T6's actual LQFP-32 package) was
+  re-derived from scratch this cycle directly against ST's own primary
+  datasheet (**DS12992 Rev 4**), fetched fresh via
+  `https://r.jina.ai/https://www.st.com/resource/en/datasheet/stm32g031k8.pdf`
+  — not accepted from the design document's, evidence-log's, or Hardware
+  Lead's own citation/paraphrase (DS-MCU-073, originally logged as
+  "DS-MCU-068" before the 2026-09-11 main-merge renumbering). Table 2 (device/peripheral
+  counts), Figure 7 (LQFP32 pinout), Figure 9 (LQFP48 pinout), Table 12
+  (per-pin per-package assignment), and Tables 13/14 (Port A/B
+  alternate-function maps) were each independently located and read. Before
+  trusting my own parsing of Table 12's six-package-column layout, I
+  validated the parsing methodology against a known-good, independently
+  checkable row (PC13: dash×5 then "1" — LQFP48-only, physical pin 1,
+  consistent with Figure 9 but not Figure 7) before applying the same
+  parsing to the PB10/PB11/PA11/PA12 rows under review.
+- **Scope**: Per the task's explicit framing, this cycle checked exactly
+  six things: (1) the core physical fact, from a primary source,
+  independently; (2) completeness — every remaining PB10/PB11 mention in
+  the document is historical/annotated, not a live incorrect claim; (3) no
+  new conflict — PA11/PA12 used nowhere else in the design; (4) R3/R4
+  pull-up sizing (§5.2) genuinely unaffected by the pin move; (5) scope
+  discipline — no file other than the schematic doc touched by the Rev 6
+  commit; (6) the four checklist items specifically relevant to a
+  pin-reassignment (floating pin, pull-up/pull-down, logic voltage
+  mismatch, interface timing). The other 12 checklist items are not
+  relevant to this narrow a change and were not re-run from scratch, per
+  the task's own explicit instruction.
+- **Process-integrity check**: Independently ran `git show --stat` and
+  `git show --name-status` on commit `ef5edc4` rather than relying on the
+  commit message's own self-reported diffstat: confirms **exactly one file
+  touched** — `hardware/schematic/bench-imu-01-design.md` (201 insertions,
+  29 deletions). `firmware/bench-imu-01/`, `bom/component-selection.md`,
+  `requirements/requirements.md`, `hardware/mechanical-interface.md`, and
+  `hardware/mechanical/` are all confirmed untouched by this commit.
+  `git status` independently confirmed a clean working tree with HEAD
+  exactly at `ef5edc4` — no drift between the task's framing and this
+  cycle's execution.
+- **KiCad tool cross-checks used**: None — no KiCad project exists for this
+  repository (consistent with Cycles 1–4); the Markdown schematic-equivalent
+  document remains the correct artifact, reviewed net-by-net (§12) and
+  pin-by-pin (§11) as before.
+
+### Checklist Results
+
+Only the checklist items the task identified as relevant to a
+pin-reassignment change are re-run from scratch; the remaining 12 are
+unaffected by a same-peripheral/same-AF/different-GPIO-port change and are
+carried forward unaffected from the Cycle 3/4 pass on Rev 5 (this fix
+touches no power architecture, motor subsystem, protection, or decoupling
+component).
+
+| # | Checklist item | Result | Notes |
+|---|---|---|---|
+| 1 | Voltage violation | N/A — out of scope, unaffected | No voltage-domain change; same 3.3V MCU, same devices. |
+| 2 | Absolute Maximum Rating violation | N/A — out of scope, unaffected | No AMR-relevant component changed. |
+| 3 | Current limit | N/A — out of scope, unaffected | No current-path change. |
+| 4 | Thermal risk | N/A — out of scope, unaffected | No power-dissipating component changed. |
+| 5 | Missing decoupling capacitor | N/A — out of scope, unaffected | No new device added. |
+| 6 | **Floating pin** | **Pass — independently confirmed** | R3/R4 (I2C pull-ups) travel with the net, not with the specific MCU pin — the bus is pulled up regardless of which GPIO terminates it. PB10/PB11 were removed from §11's pin table entirely (not left as a dangling "used but unconnected" entry), and PA11/PA12 correctly appear in the used-pin table with the pull-up-terminated bus. No floating pin introduced. |
+| 7 | **Incorrect pull-up/pull-down** | **Pass — independently confirmed** | See Finding below (§5.2 re-derivation): `Rp,min=(Vcc−VOL,max)/IOL` and `tr≈0.8473×Rp×Cb` depend only on Vcc/VOL,max/IOL/Cb, none of which reference a physical pin. Independently went further than the design document's own reasoning: Table 12 shows PB10/PB11 and PA11/PA12 (LQFP32/UFQFPN32 row) share the **identical I/O structure designation "FT_fa"** — the datasheet's own basis for VOL,max/IOL — confirming, not merely assuming, that R3=R4=4.7kΩ remains correctly sized. |
+| 8 | **Logic voltage mismatch** | **Pass — independently confirmed** | Port A and Port B share the same single VDD/VDDIO 3.3V I/O supply domain on this MCU; the identical "FT_fa" I/O-structure class (not port letter) is what governs electrical/logic-level behavior in ST's own datasheet. No new logic-level interface introduced by moving from Port B to Port A pins. |
+| 9 | **Interface timing** | **Pass — independently confirmed** | Same I2C2 peripheral instance, same AF6 alternate-function selector (Table 13: PA11/PA12 AF6=I2C2_SCL/I2C2_SDA; Table 14: PB10/PB11 AF6=I2C2_SCL/I2C2_SDA — identical selector value on both ports). Alternate-function pad routing is a signal-routing crossbar operation; it does not alter the peripheral's own internal Fast-mode 400kHz timing-register configuration. No timing impact. |
+| 10 | Power sequencing | N/A — out of scope, unaffected | No sequencing-relevant component changed. |
+| 11 | Grounding | N/A — out of scope, unaffected | No ground-net change. |
+| 12 | EMI/EMC risk | N/A — out of scope, unaffected | No new switching/noise source. |
+| 13 | Motor noise | N/A — out of scope, unaffected | No change to motor subsystem. |
+| 14 | Sensor noise | N/A — out of scope, unaffected | No new coupling path into the IMU's rail. |
+| 15 | PCB layout concern | N/A — out of scope, unaffected | Pre-layout schematic-equivalent document; no board-level layout exists yet to re-check. |
+| 16 | Datasheet recommendation violation | **Pass — independently confirmed** | The fix's own recommended pin choice (PA11/PA12 via AF6) matches ST's own Table 12/13 alternate-function assignment exactly — no unexplained deviation. |
+
+### Findings
+
+#### Re-verification of ISS-026 (IMU I2C bus PB10/PB11 → PA11/PA12) — independently CONFIRMED RESOLVED
+
+- **Claim under review**: PB10/PB11 — where the IMU's I2C2 bus has been
+  documented and firmware-implemented since Rev 2's ISS-011 fix — do not
+  physically exist on the STM32G031K8T6's actual LQFP-32 package, and Rev 6
+  re-routes the bus to PA11(SCL, physical pin 22)/PA12(SDA, physical pin
+  23), same I2C2 peripheral, same AF6 selector, with every reference
+  corrected across the document and no conflict introduced.
+- **Independent verification method**:
+  1. **Core physical fact**, re-derived from ST's primary datasheet
+     (DS12992 Rev 4), fetched fresh this cycle: Table 2 (30 GPIOs, K-suffix/
+     LQFP32-UFQFPN32 vs. 44, C-suffix/LQFP48-UFQFPN48); Figure 7 (LQFP32
+     pinout — no PB10/PB11 anywhere in the 32-pad enumeration; PA11/PA12
+     present); Figure 9 (LQFP48 pinout — PB10/PB11/PB12 present); Table 12
+     (per-pin per-package table, six-package-column parsing independently
+     validated against a known row, PC13, before use) — PB10 shows dash in
+     the LQFP32/UFQFPN32 column and pin **22** only in LQFP48/UFQFPN48; PB11
+     shows the same pattern with pin **23**; PA11 shows physical pin **22**
+     present in the LQFP32/UFQFPN32 column itself; PA12 shows physical pin
+     **23**. Table 13 (Port A AF map) confirms PA11 AF6=I2C2_SCL, PA12
+     AF6=I2C2_SDA; Table 14 (Port B AF map) confirms PB10 AF6=I2C2_SCL, PB11
+     AF6=I2C2_SDA — the identical selector, exactly as claimed.
+  2. **Completeness**: fresh `grep -n "PB10"`/`"PB11"` pass, 43 combined
+     hits across the whole document, each individually reviewed in context
+     — every one is Rev 6/Rev 2 changelog narrative, or a live table/prose
+     entry that correctly states PA11/PA12 as the current value with
+     PB10/PB11 present only as historical/superseded annotation (§2.3 lines
+     737–738, §5.3 lines 1196–1197, §5.5/§6/§7.5.4, §11's table lines
+     2448–2449 plus its Rev 6 note, §12 net list lines 2543–2544, §14 item
+     13, §16 item 4). No live incorrect claim found anywhere.
+  3. **Conflict check**: fresh `grep -n "PA11"`/`"PA12"` pass, 27 hits each,
+     every occurrence tied exclusively to the IMU's I2C2 SCL/SDA function;
+     cross-checked against the motor subsystem's own PA6/PA8/PA9/PB1/PB6/
+     PB7 allocations (§7.5.4) — no overlap found. Free-GPIO inventory
+     arithmetic independently re-added (§11: 11 enumerated free pins +
+     PB8/PB9 = 13, down from 15 with PA11/PA12 now committed) — consistent.
+  4. **R3/R4 pull-up sizing** (§5.2), independently re-read in full:
+     `Rp,min=(Vcc−VOL,max)/IOL` and `tr≈0.8473×Rp×Cb` depend on Vcc=3.3V,
+     VOL,max=0.4V, IOL=3mA (Fast-mode DC spec) and an assumed Cb≈50pF — none
+     of which reference a physical MCU pin. Beyond the design document's own
+     stated reasoning, independently found that Table 12 lists PB10/PB11
+     and PA11/PA12 (LQFP32/UFQFPN32 row) under the **identical I/O structure
+     designation "FT_fa"** — the datasheet's own basis for VOL,max/IOL —
+     confirming the two pin pairs are electrically interchangeable for this
+     purpose, not merely assumed to be. R3=R4=4.7kΩ sizing is unaffected.
+  5. **Scope discipline**: `git show --stat`/`--name-status ef5edc4`
+     independently confirms exactly one file touched
+     (`hardware/schematic/bench-imu-01-design.md`, 201 insertions/29
+     deletions); `firmware/bench-imu-01/`, `bom/component-selection.md`,
+     `requirements/requirements.md`, `hardware/mechanical-interface.md`, and
+     `hardware/mechanical/` all confirmed untouched. `git status` clean,
+     HEAD=`ef5edc4`.
+  6. **Floating pin / pull-up-pull-down / logic-voltage / interface-timing**:
+     see Checklist Results table above — all four independently re-derived
+     as clean, not merely restated from the changelog's own self-check.
+- **Result**: **RESOLVED**. Every element of the fix independently checks
+  out: the core physical fact, completeness of the correction, absence of
+  any new conflict, continued validity of the R3/R4 pull-up sizing, and
+  scope discipline (schematic-only commit, firmware change correctly
+  deferred to the already-planned Firmware Bring-up phase with a
+  forward-reference note already in place).
+- **Datasheet Source**: DS-MCU-073 (originally logged as "DS-MCU-068",
+  renumbered 2026-09-11 during the main-branch merge, `validation/change-log.md`
+  ECO-014 — independently re-confirmed against the
+  primary ST DS12992 Rev 4 datasheet this cycle, not merely re-cited).
+- **Affected Component**: U1 (STM32G031K8T6) — PA11/PA12 (was PB10/PB11);
+  R3/R4 (I2C pull-ups, endpoint only, sizing unaffected).
+- **Severity**: was **CRITICAL** — now closed, no residual severity.
+
+### Verdict
+
+- **Verdict**: **PASS**, for this narrow, focused review scope.
+- **Open CRITICAL count**: 0 (ISS-026 was the sole open CRITICAL finding on
+  this document; it is independently confirmed RESOLVED this cycle).
+- **Open HIGH count**: 0 net-new from this cycle; ISS-020/ISS-021 remain
+  correctly OPEN/ACCEPTED-RISK pending Firmware Bring-up, per the task's own
+  explicit instruction not to re-litigate them here — unaffected by, and
+  unrelated to, this cycle's scope.
+- **What independently checks out with no further action needed**: the core
+  physical fact (re-derived from ST's primary datasheet, not merely
+  re-cited), completeness of the PB10/PB11→PA11/PA12 correction across the
+  document, absence of any new pin conflict, continued validity of R3/R4
+  pull-up sizing (with an additional independent cross-check — identical
+  "FT_fa" I/O-structure class — beyond what the design document itself
+  argued), and scope discipline (verified via `git show`, not merely
+  trusted from the commit message).
+- **Next action**: Route to Hardware Lead. No further hardware rework
+  identified — this cycle finds nothing to send back to Circuit Engineer.
+  The corresponding firmware GPIO/AF/clock change (GPIOB pins 10/11 → GPIOA
+  pins 11/12, same AF6, same I2C2 peripheral base address) is correctly
+  deferred to, and already flagged for, the Firmware Bring-up phase.
+
+---
+
+## Mechanical Reviewer — Cycle 3 (Independent Review of Rev 3 Motor Driver + Reaction Wheel Enclosure Redesign, 2026-09-11)
+
+### Review Cycle Metadata
+
+- **Design revision reviewed**: `hardware/mechanical/bench-imu-01-enclosure.scad`
+  (full parametric OpenSCAD source, 991 lines, up from Rev 2's 483) together
+  with its companion `hardware/mechanical/bench-imu-01-dimensional-spec.md`
+  (914 lines, up from Rev 2's 570), both at **"Rev. 3"** status — a full
+  redesign adding a Motor Driver + Reaction Wheel subsystem to the previously
+  Design-Complete Rev 2 board. Author: Mechanical Lead (AI agent), commit
+  `c5ac653` ("Mechanical Design (Rev 3): full enclosure redesign for motor +
+  flywheel"), dated 2026-08-31 (independently confirmed via `git log` this
+  cycle, not assumed). Status at handoff: dimensional-spec §15 self-check
+  claims "10/10 ✅" (explicitly disclosed as non-binding), §16 lists open
+  items carried forward, and the design's own report to the Hardware Lead
+  additionally self-discloses two items flagged specifically for this
+  review's attention: a pre-existing Rev 2-origin base-tab/lid-skirt solid
+  interference explicitly left unfixed (out of scope for the Rev 3 task),
+  and a new borderline motor-wire bridge span (9.0–9.42mm against the
+  design's own 10mm max-bridge-span rule, described as "90–94% of limit").
+- **Reviewer**: Mechanical Reviewer — see
+  `.github/agents/mechanical-reviewer.agent.md`. Independent of the
+  Mechanical Lead role/session that authored this design. This is the first
+  Mechanical Reviewer cycle to examine the **Rev 3** scope specifically
+  (Rev 2's own enclosure was reviewed and closed out across Mechanical
+  Reviewer Cycle 1/Cycle 2 above, both fully RESOLVED per `open-issues.md`
+  MISS-001 through MISS-004; MISS-005/006/007 remain open but LOW/MEDIUM and
+  non-gating, carried forward unchanged since Rev 3 did not touch that
+  geometry). Rev 3 is a full redesign adding an entire new subsystem, not a
+  delta on the Rev 2 geometry alone, so this cycle treats it as a full-scope
+  review rather than a changed-area-only pass.
+- **Independence statement**: No claim in
+  `bench-imu-01-dimensional-spec.md`'s own §3/§7/§8/§11/§12/§13/§15 self-check
+  was accepted on the strength of its stated confidence or its "10/10 PASS"
+  self-check claim. Every arithmetic claim in scope for this cycle — REQ-306's
+  radial *and* axial clearance, the full Z-height stack driving overall
+  assembled height, both of the Mechanical Lead's own self-disclosed items,
+  the REQ-403 containment disposition's specific claims, the new 3-piece
+  assembly's joints, and the off-board motor-mounting ASSUMPTION's
+  consistency — was independently re-derived this cycle directly from the
+  raw, line-numbered `.scad` source and cross-checked against
+  `hardware/mechanical-interface.md`, not re-read from the dimensional-spec
+  document's own prose and nodded along. One self-correction is disclosed
+  here for full transparency, consistent with the adversarial mandate
+  applying to this reviewer's own draft conclusions and not only to the
+  design document's: an early working note in this same review initially
+  mis-recalled REQ-306's clearance-margin figures (+8mm radial / +3mm axial)
+  as an interface-file **CONFIRMED** value; re-checking
+  `hardware/mechanical-interface.md` §B5 directly (line 516) before
+  finalizing any finding showed they are explicitly labeled **"Proposed
+  clearance margin (ASSUMPTION)"** — the `.scad` file's own comments already
+  correctly match this ASSUMPTION labeling, so this did not become a
+  labeling-defect finding, but the correction itself is recorded as evidence
+  the independence mandate was actually exercised, not merely asserted.
+- **Scope**: Full Rev 3 design —
+  `hardware/mechanical/bench-imu-01-enclosure.scad` and
+  `hardware/mechanical/bench-imu-01-dimensional-spec.md` in full, cross-checked
+  against `hardware/mechanical-interface.md` in full (Board Geometry, M1
+  motor CONFIRMED dimensions, flywheel ASSUMPTION dimensions, REQ-306
+  clearance-envelope margins, B1/B3 Open Items). `requirements/requirements.md`'s
+  Rev 3 mechanical/safety requirements (REQ-306, REQ-307, REQ-308, REQ-309,
+  REQ-403) read in full for acceptance-criteria context. Electronics-side
+  Rev 3 changes (`hardware/schematic/` — U6 Motor-Rail Supervisory Controller,
+  motor driver, etc.) were **not** re-reviewed here; that is the Electronics
+  discipline's own Cycle 3/4/5 scope, already closed out above. This cycle
+  takes the electrical interface as given (as published in
+  `hardware/mechanical-interface.md`) and reviews only the mechanical
+  response to it, per this agent's own defined scope boundary.
+- **Tooling disclosure**: Unlike Mechanical Reviewer Cycle 1/Cycle 2 (which
+  explicitly disclosed no OpenSCAD/CAD rendering tool was available in that
+  environment), this cycle independently confirmed a real, working `openscad`
+  2026.08.30 binary **is** available in this environment
+  (`/opt/homebrew/bin/openscad`), together with a working Python geometry
+  stack (`trimesh`/`numpy-stl`/`rtree`, installed into a scratch venv after
+  the system Python's PEP-668 policy blocked a direct `pip install`). This
+  materially raised the rigor available this cycle: rather than hand/formula
+  tracing alone, this cycle **rendered the full assembled design** (confirmed
+  an exact match to the dimensional-spec's own claimed manifold stats — Genus
+  6, 4610 vertices, 9240 facets — corroborating that the stated self-check
+  render is genuine, not fabricated) and separately rendered/`intersection()`
+  -tested two specific sub-geometries directly — the flywheel-bay `base()`
+  module alone, and a standalone reproduction of the hub-collar/disk Z-stack
+  using literal values transcribed from the real file — to empirically
+  confirm two findings (MISS-008, MISS-009) that would otherwise have rested
+  on formula-tracing alone. Methodological note: OpenSCAD's `use <file>`
+  statement imports only modules/functions, not top-level variables, so the
+  two empirical sub-geometry checks used small standalone scratch `.scad`
+  files with literal values hardcoded from the real file's own named
+  parameters at the cited line numbers, rather than importing the real file
+  directly — the literal values themselves are transcribed directly from the
+  real file and cited by line number in each finding below, so this is a
+  disclosed methodological detail, not a shortcut around checking the actual
+  design.
+- **Parallel sub-scans run**: None dispatched as separate sub-agent scans
+  this cycle — the full 10-item checklist plus the task's 5 specified focus
+  areas (REQ-306 arithmetic, the 2 self-disclosed items, the REQ-403
+  disposition, the new 3-piece assembly joints, and the motor-mounting
+  ASSUMPTION's consistency) were worked as a single integrated pass by this
+  Mechanical Reviewer.
+- **rubber-duck premise review run in parallel?**: Not indicated as run for
+  this cycle on the Mechanical discipline. This report does not rely on or
+  duplicate any such review.
+- **KiCad / CAD tool cross-checks used**: None — no KiCad project exists for
+  Bench-IMU-01 (unchanged since Mechanical Reviewer Cycle 1's own note); this
+  cycle's CAD cross-check was instead performed with the now-available
+  `openscad` binary directly against the actual `.scad` source, as described
+  in Tooling disclosure above.
+
+### Checklist Results
+
+Full checklist per `.github/skills/mechanical-review/SKILL.md`, all 10 items
+independently worked (not a partial spot-check), plus the 5 task-specified
+focus areas folded into the relevant checklist rows below:
+
+| # | Checklist item | Result | Notes |
+|---|---|---|---|
+| 1 | PCB mounting (standoff positions/diameters, boss integrity) | **PASS** | Independently re-derived against `hardware/mechanical-interface.md`'s Mounting table — unchanged from Rev 2's already-RESOLVED MISS-001-adjacent geometry; no Rev 3 change touched the PCB standoffs themselves. No new finding. |
+| 2 | Connector accessibility (cutout position/size/orientation) | **PASS** | J1–J4/SW1/D1 cutouts independently re-checked against §10's connector table; MC-1's disclosed 42mm interior wire run (the motor/encoder connector) is honestly stated as long-but-workable in the source document and independently confirmed to be an accurate, not understated, figure. No new finding — the *routing path* for MC-1's wiring is a separate defect, see item 4/7 (MISS-009) below. |
+| 3 | Component height clearance (top + bottom vs. interface file) | **FAIL — MISS-008 (CRITICAL)** | Radial clearance (checklist item 4 below) independently re-verified correct: `fw_bay_inner_r`=39.5mm vs. 38.0mm required (REQ-306), genuine +1.5mm margin beyond the interface's own ASSUMPTION-labeled +8mm radial allowance. **Vertical/axial clearance is not correct**: the Z-stack formula chain computing `fw_disk_bottom`/`fw_disk_top`/`fw_clearance_top` omits the hub collar's own height, producing a physically impossible disk position (see Finding 1). This invalidates §7's specific vertical-clearance claim and the overall-height table in §3, even though the underlying radial arithmetic and REQ-308's ~150mm envelope goal are otherwise fine. |
+| 4 | Internal clearance/interference (parts vs. walls, parts vs. parts, parts vs. bosses) | **FAIL — MISS-008 (CRITICAL), MISS-009 (HIGH), MISS-010 (HIGH)** | Three independent, unrelated interference defects found: (1) flywheel disk/hub-collar solid interpenetration (MISS-008); (2) the motor-wire duct's void is never actually subtracted from the enclosure's outer solids, so the intended wire path is itself solid material (MISS-009); (3) the pre-existing, self-disclosed Rev-2-origin base-tab/lid-skirt interference (MISS-010), confirmed still present and confirmed to have no tracked backlog entry. Motor-mount bolt geometry (4×M3 at (fw_cx±6, fw_cy±6)) independently re-checked clear of both the 15.5mm platform edge (5.3mm margin) and the central shaft hole — no defect found there. Cap-fastener bolt-circle (6×M3 at r=48.0mm, 0/60/120/180/240/300°) independently re-checked clear of the wire bridge (~24.85mm at its closest, ~90°) and of everything else — no defect found there either. |
+| 5 | Fastener placement (wall thickness around bosses; no conflicts) | **PASS**, with a load-verification caveat carried under item 9 | All 3 fastener classes (6×M2.5 PCB lid, 4×M3 motor mount, 6×M3-into-heat-set-inserts cap) independently re-checked for physical placement conflicts — none found; each boss has adequate surrounding wall material and no boss/fastener pair collides with another. The design's own explicit disclosure that no fastener-*load* calculation was performed (§12) is a real gap but is a rigor/verification finding, not a placement defect — tracked as MISS-011 under item 9, not here. |
+| 6 | Wall thickness (structural *and* the Lead's own stated 3D-printability rule) | **Finding — MISS-010 (HIGH)** for the pre-existing tab/skirt zone; otherwise **PASS** | The containment wall itself (`containment_wall_t`=4.0mm = 2×`min_wall_t`) independently re-confirmed to meet and exceed the stated 2.0mm print-safety minimum everywhere along its continuous annulus — no thin spot found by direct radial re-measurement at every angular sample checked. The one wall-thickness-adjacent defect this cycle is MISS-010, a pre-existing solid-solid *interference* (too little clearance, not too little wall) at the base-tab/lid-skirt joint — tracked there, not duplicated here. |
+| 7 | Assembly order (physically achievable sequence, nothing trapped) | **FAIL** | §14's 6-step sequence independently re-walked against the corrected-vs-as-modeled geometry: **Step 5** ("slide the flywheel disk onto the hub collar") is not physically achievable as modeled, because the disk's own modeled Z-position already overlaps the collar's modeled volume before any sliding occurs (MISS-008). **Step 4** (route the motor/encoder wiring through the wire duct before closing the PCB lid) is not physically achievable as modeled either, because the duct itself is solid material along its intended path (MISS-009). No part is found permanently trapped with zero access once these two defects are corrected — the underlying 3-piece order (Base → PCB Lid → Containment Cap) is otherwise sound and each piece independently confirmed accessible for fastening in sequence. |
+| 8 | Basic print-fit tolerance (stated clearance allowance applied consistently everywhere) | **PASS** | The design's own stated 0.2mm/side `fit_clearance` independently re-checked at every piece-to-piece mating interface this Rev 3 assembly actually has: (a) base-wall/PCB-lid-skirt joint (unchanged from Rev 2, where this convention was already independently verified) — consistent; (b) the new cap-skirt/base-flange joint (§11.F) — independently re-confirmed the same 0.2mm/side allowance is applied here too, not merely asserted; no interface found where the allowance is claimed once and silently dropped elsewhere. |
+| 9 | Basic manufacturability/3D-printability (overhangs/bridges within the Lead's own rule; min wall thickness everywhere) | **Finding — MISS-011 (MEDIUM)** | The self-disclosed borderline motor-wire bridge span (9.0–9.42mm) was independently re-derived from the `.scad` file's own duct-span geometry and confirmed to fall within, not beyond, the design's own stated 10mm max-bridge-span rule (94.2% of the limit at worst, not over it) — no new finding on the bridge span itself; this is disclosed correctly and does not need reclassifying. The one manufacturability finding this cycle is separate: the REQ-403 containment disposition's specific wall-thickness/fastener-retention adequacy claims rest on qualitative reasoning, not any impact-energy or pull-out-under-shock calculation, and this gap is disclosed 3 times in the source document itself (§8/§12/§13.3) but was not yet entered into the tracked backlog — MISS-011. Min wall thickness independently spot-checked at multiple points beyond the single reference wall the design document itself cites (containment wall, PCB-lid roof, cap flange, base floor) — no location found below the stated 2.0mm minimum other than the already-tracked pre-existing MISS-010 interference zone (which is an interference, not a thin-wall, defect) and Rev 2's own already-tracked MISS-007 (unchanged, LOW-adjacent-MEDIUM, non-gating, carried forward). |
+| 10 | Interface-value traceability (every dimension traces to `hardware/mechanical-interface.md` or is explicitly ASSUMPTION/ESTIMATE, never silently blended with CONFIRMED) | **PASS** | Independently spot-checked the highest-stakes labels in this revision: M1 motor body dimensions (CONFIRMED, DS-MTR-021, correctly labeled throughout both the `.scad` comments and the dimensional-spec); flywheel dimensions (ASSUMPTION, correctly labeled throughout); REQ-306's own +8mm radial/+3mm axial clearance margins (ASSUMPTION per interface line 516 — see the Independence statement's self-correction above — correctly labeled as ASSUMPTION in both the `.scad` file's comments and the dimensional-spec, not silently upgraded to CONFIRMED anywhere found); the 4×M3/16mm motor bolt-pattern (the interface file's own Open Item B1, left OPEN by the Circuit Engineer) is consistently and explicitly labeled as the Mechanical Lead's own unconfirmed ASSUMPTION everywhere this cycle found it used (`.scad` header comments, dimensional-spec §4/§8/§16) — no location found where it is silently treated as settled/CONFIRMED. No mislabeling defect found. |
+
+### Findings
+
+#### Finding 1 — Flywheel disk Z-stack formula omits hub-collar height, producing a physically impossible disk position
+
+- **Issue**: `fw_disk_bottom` — the parameter that positions the bottom face
+  of the flywheel disk — is computed as
+  `fw_motor_bell_top + fw_hub_standoff` (=28.5+3.0=31.5mm), which omits the
+  hub collar's own height (`fw_hub_collar_h`=6.0mm) entirely. As modeled, the
+  disk's bottom 3.0mm occupies the same space as the top 3.0mm of the hub
+  collar it is supposed to rest on top of.
+- **Rationale**: The same `.scad` file, elsewhere, computes the shaft length
+  the motor needs to expose as
+  `fw_shaft_exposed_len_needed = fw_hub_collar_h + fw_hub_standoff` (=9.0mm,
+  line 392) — a formula that only makes sense if the collar sits *above* the
+  standoff and the disk sits *above* the collar (i.e., additively stacked:
+  standoff, then collar, then disk). `fw_disk_bottom`'s own formula
+  contradicts this internally within the same file: it positions the disk as
+  if the collar's height were zero, directly at the top of the standoff,
+  rather than at the top of the collar. This is not a matter of
+  interpretation or a rounding/tolerance question — it is an internal
+  self-contradiction between two formulas in the same source file, one of
+  which (line 392) treats collar height as additive and one of which (line
+  565) does not.
+- **Datasheet Source**: `hardware/mechanical/bench-imu-01-enclosure.scad`
+  lines 384–392 (`fw_hub_standoff`=3.0mm DERIVED, `fw_hub_collar_h`=6.0mm
+  ASSUMPTION, and the file's own
+  `fw_shaft_exposed_len_needed = fw_hub_collar_h + fw_hub_standoff` formula)
+  cross-referenced against lines 561–574 (`fw_disk_bottom`, `fw_disk_top`,
+  `fw_clearance_top` — the Z-stack formula chain containing the omission);
+  `bench-imu-01-dimensional-spec.md` §14 Assembly Step 5 ("slide the flywheel
+  disk onto the hub collar," independently re-quoted from the source text,
+  not paraphrased) and §7 (the REQ-306 vertical-clearance claim, which
+  depends on the now-shown-incorrect `fw_disk_top`/`fw_clearance_top`
+  values).
+- **Failure Mechanism**: Empirically confirmed, not just formula-traced: a
+  standalone `.scad` file was built this cycle with the exact literal Z
+  values the real file's own formulas produce (collar Z=[28.5, 34.5], disk
+  Z=[31.5, 36.0]) and rendered through the real `openscad` binary available
+  in this environment. `intersection()` of the two solids produced a genuine,
+  fully manifold overlap solid — not an empty result, not a degenerate
+  sliver — with volume ≈145.0mm³ via `trimesh` (vs. 150.8mm³ by hand
+  calculation, a difference within normal STL-facet-discretization tolerance,
+  the same tolerance class already precedented by the RESOLVED MISS-002
+  finding's own volume cross-check). The overlap's Z-bounds are exactly
+  [31.5, 34.5] — precisely the disk's bottom 3.0mm and the collar's top
+  3.0mm, matching the hand-derived prediction exactly. A second reading was
+  also independently ruled out this cycle: one might ask whether the collar
+  is simply meant to sit fully *inside* the disk's hollow bore rather than
+  below it — but the collar's own height (6.0mm) exceeds the disk's own
+  thickness (4.5mm), so the collar cannot be fully contained within the
+  disk's Z-envelope either; there is no consistent geometric reading under
+  which both parts occupy their stated positions without interference. As
+  literally modeled — and as the assembly instructions' own wording requires
+  (the disk must slide onto/over the collar's full height before coming to
+  rest on top of it) — the disk cannot occupy the Z-position the file
+  assigns it without physically colliding with the collar first.
+- **Affected Component**: Flywheel disk (`fw_disk_bottom`/`fw_disk_top`);
+  hub collar (`fw_hub_collar_od`/`fw_hub_collar_h`); every parameter
+  downstream of `fw_disk_top` in the Z-stack (`fw_clearance_top`, the
+  containment wall's own height, REQ-306's vertical-clearance claim, and the
+  REQ-403 containment envelope's specific sizing).
+- **Recommended Fix**: Correct `fw_disk_bottom` to
+  `fw_motor_bell_top + fw_hub_standoff + fw_hub_collar_h`
+  (=28.5+3.0+6.0=**37.5mm**, not the current 31.5mm), and propagate the
+  resulting +6.0mm shift through `fw_disk_top` (=**42.0mm**, not 36.0mm) and
+  `fw_clearance_top` (=**45.0mm**, not 39.0mm). Because the corrected
+  `fw_clearance_top` (45.0mm) now exceeds the current `fw_cap_outer_top`
+  (43.0mm) by 2.0mm, the cap's overall height — and therefore the assembly's
+  overall Z-envelope, §3's height table, and the containment wall's own
+  height — must also grow by at least 2.0mm plus wall thickness to keep the
+  flywheel disk actually enclosed under corrected geometry. This is not a
+  local, one-line fix: it cascades through the entire vertical stack above
+  the motor bell and must be re-verified end-to-end (REQ-306 vertical
+  margin, REQ-403 containment envelope, overall assembled height, and the
+  §14 assembly sequence) once corrected, not just patched at the single point
+  of the original error.
+- **Severity**: **CRITICAL** — per `docs/architecture.md` §7.1, this design
+  fails under its own normal, as-documented assembly sequence (Step 5), not
+  under a rare or marginal corner case: the flywheel literally cannot be
+  assembled as the design's own instructions describe without either the
+  collar or the disk being forced into a physically impossible position.
+  Blocks PASS.
+
+#### Finding 2 — Motor-wire duct void is never actually subtracted from the enclosure's outer solids; the documented cable-routing path is solid material
+
+- **Issue**: `motor_wire_bridge()`'s duct-void cylinder is only subtracted
+  from that module's own local bridging cube. It is never differenced
+  against `fw_bay_wall()`'s solid containment-wall annulus or
+  `pcb_bay_base()`'s south wall, both of which independently occupy the same
+  duct footprint along the intended cable path.
+- **Rationale**: `base()` (lines 850–857) is coded as a flat `union()` of 4
+  solids (floor, motor platform, flywheel-bay wall, PCB-bay base) with no
+  top-level `difference()` applied anywhere for the duct void — the void
+  subtraction happens only inside `motor_wire_bridge()`'s own return value,
+  before that module's result is unioned (not differenced) into the rest of
+  `base()`. A `union()` of an already-voided local solid with other,
+  unrelated solid geometry does not project that local void through the
+  other solids; each of those other solids remains fully solid wherever it
+  happens to occupy the same X/Y/Z region as the intended duct.
+- **Datasheet Source**: `hardware/mechanical/bench-imu-01-enclosure.scad`
+  lines 770–857 (`fw_bay_wall()`, `motor_wire_bridge()`, `base()` — the
+  `union()`-only construction independently confirmed directly from the
+  source, not inferred); `bench-imu-01-dimensional-spec.md` §10 (connector
+  accessibility table, MC-1 row, describing this as a functional wire path)
+  and §14 Assembly Step 4 (routing the motor/encoder wiring through this
+  duct before closing the PCB lid).
+- **Failure Mechanism**: Empirically confirmed via a rendered `base()`-only
+  geometry (independently re-rendered this cycle through the real `openscad`
+  binary, matching `Status: NoError, Genus: 6, Vertices: 808, Facets: 1636`)
+  and a `trimesh` point-containment sweep along the duct's own intended air
+  path (Y=92–95mm, r=39.5–42.5mm, taken directly from the duct's own stated
+  span in the source): every sampled point along this path returns **solid**,
+  not void, at two independent locations along the same nominal path — the
+  containment-wall annulus itself (`fw_bay_wall()`), and, a short distance
+  further along the same path, the PCB bay's own south wall
+  (`pcb_bay_base()`) independently re-blocking it a second time. The
+  motor/encoder wiring the design's own assembly instructions direct through
+  this "duct" has no physical passage to travel through as modeled; the wire
+  would have to pass through solid printed plastic, which is not possible
+  without post-print modification (e.g. hand-drilling) not described
+  anywhere in the design.
+- **Affected Component**: `motor_wire_bridge()` (local duct cutout only, not
+  propagated); `fw_bay_wall()` (containment-wall annulus); `pcb_bay_base()`
+  south wall; `base()` (top-level union lacking a corresponding top-level
+  difference); MC-1 motor/encoder wire connector's documented routing path.
+- **Recommended Fix**: Apply the duct-void subtraction at the top level of
+  `base()`'s own construction — e.g. wrap the relevant portion of `base()`
+  in a `difference()` that removes the duct cylinder from the union of
+  `fw_bay_wall()` and `pcb_bay_base()` as well as from
+  `motor_wire_bridge()`'s own local cube — then re-verify via a render plus
+  a containment sweep (as independently performed in this review, not a
+  visual inspection alone) that the full Y=92–95mm / r=39.5–42.5mm path is
+  void end-to-end after the fix, not merely void within
+  `motor_wire_bridge()`'s own local solid as it is today.
+- **Severity**: **HIGH** — per `docs/architecture.md` §7.1, this is a real,
+  likely-to-occur defect under completely normal assembly (not a rare
+  corner case), defeating an explicitly planned wiring path (§10 MC-1, §14
+  Step 4) — but it is neither an unconditional first-power-on failure of the
+  board's core function nor a safety hazard, and a practical (if inferior)
+  workaround exists (routing the motor/encoder wiring external to the
+  enclosure rather than through the intended internal duct), consistent with
+  the HIGH rather than CRITICAL definition.
+
+#### Finding 3 — Pre-existing Rev 2-origin base-tab/lid-skirt solid interference (~190mm³) is disclosed but was never entered into the tracked backlog
+
+- **Issue**: A genuine, ~190.06mm³ solid-solid interference between
+  `base_tabs()` and `lid_shell()`'s skirt band exists at all 4 corners of
+  the primary lid/base joint. This defect pre-dates Rev 3 (it is a Rev
+  2-origin defect, explicitly self-disclosed as out of scope for the Rev 3
+  motor/flywheel task in the design document's own §11.C, and explicitly
+  flagged there for this review's attention) — but a full re-read of this
+  file's entire existing backlog (ISS-001 through ISS-026, MISS-001 through
+  MISS-007) confirms **no entry currently tracks it**.
+- **Rationale**: The overlap sits between `base_tabs()`'s Z=[15.5, 21.1]
+  (global) and `lid_shell()`'s skirt band Z=[18.1, 21.1] (global) — a
+  genuine 2.0mm-deep (Y), 3.0mm-tall (Z) solid-solid interference at each of
+  the 4 corners. Independently reproduced by hand from the disclosed
+  geometry: 2.0mm × 3.0mm × 8mm tab width × 4 corners = 192mm³, matching the
+  disclosed 190.06mm³ within normal fillet/rounding tolerance — the
+  disclosed root-cause narrative and volume figure are independently
+  confirmed accurate, not merely re-cited. Being disclosed in prose inside a
+  design document is not the same as being tracked in
+  `validation/open-issues.md` — the one backlog that actually gates Design
+  Complete per `docs/architecture.md` §8 and is machine-checked by
+  `tools/check_open_issues.py` — and this defect was in neither
+  `ISS-001`–`ISS-026` nor `MISS-001`–`MISS-007` before this cycle.
+- **Datasheet Source**: `bench-imu-01-dimensional-spec.md` §11.C (full
+  root-cause narrative, self-disclosed this revision); `validation/open-issues.md`
+  (full re-read this cycle, ID range ISS-001–ISS-026, MISS-001–MISS-007 —
+  confirmed no existing row references this defect by geometry, component,
+  or volume figure).
+- **Failure Mechanism**: At each of the 4 corners, the base tab's own solid
+  volume and the lid skirt's own solid volume occupy an overlapping
+  2.0mm × 3.0mm region — two solids the design intends to be separate,
+  mating parts cannot occupy the same space. If sliced and printed exactly
+  as modeled, the lid cannot seat fully onto the base at any of the 4
+  corners without either forcibly deforming/crushing ~190mm³ of printed
+  material or the corner remaining proud/unseated — likely surfacing as a
+  visibly non-flush lid-to-base fit and/or interference with that corner's
+  own fastener engagement (the same fastener joint MISS-004 already
+  addresses, RESOLVED in Rev 2). This is directly analogous in class — a
+  real, fit-blocking, mating-face solid interference — to the already-
+  RESOLVED MISS-002 finding (degenerate base-tab gusset, also a base-tab
+  defect), not to the smaller, non-blocking MISS-007 class (a thin-but-
+  independently-usable isthmus with no actual overlap).
+- **Affected Component**: `base_tabs()` and `lid_shell()`'s skirt band, all
+  4 corners (`bench-imu-01-enclosure.scad`) — the same base/lid mating-face
+  joint MISS-002/003/004 already govern.
+- **Recommended Fix**: Apply the same fix pattern already proven on this
+  exact joint this project (MISS-002/003/004's resolution): resize or
+  reposition either `base_tabs()`'s Z-extent/Y-position or `lid_shell()`'s
+  skirt-band Z-extent so the two solids no longer share the same
+  2.0mm × 3.0mm region at any of the 4 corners, then re-verify via a full
+  render plus a boolean `intersection()` check (zero-volume expected)
+  rather than a hand estimate alone — matching the rigor already used to
+  close out MISS-002.
+- **Severity**: **HIGH** — per `docs/architecture.md` §7.1, a real,
+  structurally-blocking mating-face interference at all 4 corners of the
+  primary lid/base joint, not a rare corner case and not merely thin or
+  degraded. Assessed by direct analogy to the already-RESOLVED MISS-002
+  precedent (same defect class: solid-solid interference at a load-bearing
+  mating/fastening feature), not the MEDIUM MISS-007 precedent (a thin-but-
+  usable isthmus, not an actual overlap). Rated HIGH and left OPEN rather
+  than silently treated as already-accepted, since a HIGH finding can only
+  be dispositioned RESOLVED or ACCEPTED-RISK with a named human Chief
+  Engineer sign-off per this file's own Rules section — neither has happened
+  for this specific defect yet, even though it has existed since Rev 2.
+
+#### Finding 4 — REQ-403 containment disposition's specific wall-thickness/fastener-retention claims rest on qualitative reasoning, not an impact/shock calculation
+
+- **Issue**: The REQ-403 safety disposition's reasoning for why a 4.0mm
+  containment wall (=2× the design's own general-purpose print-safety
+  minimum) and 6×M3 heat-set-insert cap fasteners are adequate specifically
+  against a detached-flywheel impact is stated qualitatively — not derived
+  from the disposition's own stated ~122J/100g kinetic-energy hazard figure
+  via any impact-energy-absorption, wall-deflection-under-impact, or
+  fastener-pull-out-under-shock calculation.
+- **Rationale**: The document discloses this gap itself, honestly, in three
+  separate places (§8, §12, §13.3) rather than silently asserting rigor it
+  did not perform — this is a disclosure/verification-rigor gap on a
+  safety-critical claim, not a proven physical defect (no calculation has
+  been performed showing the wall or fasteners are actually inadequate
+  either). REQ-403's own process is explicitly designed to have a human
+  safety reviewer weigh exactly this kind of qualitative-vs-rigorous
+  judgment call before Design Complete — this finding's purpose is to ensure
+  that gap is visible to that reviewer via the tracked backlog, not just
+  buried in three separate footnotes of a design document.
+- **Datasheet Source**: `bench-imu-01-dimensional-spec.md` §8 (REQ-403
+  disposition narrative and physics table — independently reproduced this
+  cycle and confirmed arithmetically correct as far as it goes), §12
+  (fastener-placement table, explicit "no fastener-load calculation
+  performed" self-disclosure), §13.3 (explicit self-disclosed lack of
+  print-orientation-vs-impact-load analysis for the cap).
+- **Failure Mechanism**: Not an active/demonstrated failure — a verification
+  gap. The disposition argues qualitatively ("substantially thicker than
+  structural minimum," "multiple fasteners provide redundancy") rather than
+  quantitatively; if the wall or fasteners were in fact inadequate against
+  the stated hazard energy, the failure mode would be containment breach
+  under a real detachment event — but this review found no basis, either in
+  the source document or independently, to conclude they *are* inadequate,
+  only that adequacy has not been demonstrated by calculation.
+- **Affected Component**: Containment wall (`containment_wall_t`=4.0mm);
+  6×M3 heat-set-insert cap fasteners; the REQ-403 safety disposition
+  (`bench-imu-01-dimensional-spec.md` §8) as a whole.
+- **Recommended Fix**: Before this proposal is brought to the human safety
+  reviewer, either (a) perform a basic impact-energy/wall-deflection or
+  fastener-pull-out-under-shock estimate tied to the disposition's own
+  ~122J/100g figure (even an order-of-magnitude hand calculation would
+  materially strengthen the disposition's credibility), or (b) explicitly
+  carry the qualitative-only status forward as a named, disclosed limitation
+  in the material presented to the human reviewer, so that reviewer's
+  decision is made with full awareness that the specific numbers are not
+  independently load-verified — only the general topology (continuous wall,
+  no rotation-plane opening, independently confirmed true this cycle — see
+  Positive Findings below) is.
+- **Severity**: **MEDIUM** — non-gating. Per `docs/architecture.md` §7.1,
+  this is a disclosed rigor/traceability gap on a proposal still pending
+  human review, not an independently-demonstrated physical defect in the
+  current geometry — no confirmed malfunction or hazard has been shown, only
+  an absence of the calculation that would rule one out. Must still be
+  explicitly surfaced to the human REQ-403 safety-review gate rather than
+  silently dropped, since that gate is exactly where this class of
+  qualitative-vs-rigorous judgment call belongs.
+
+### Positive Findings
+
+Credited explicitly, since an adversarial review should also record what
+independently checks out, not only what does not:
+
+- **REQ-403's containment-topology claim independently verified TRUE**: the
+  claim that the containment design provides "a continuous 4mm wall, no
+  rotation-plane opening, bolted cap" was independently re-derived from the
+  containment wall's own radial/angular geometry (continuous annulus,
+  r=39.5–43.5mm, Z=2.0–39.0, no gap or seam found anywhere in its angular
+  sweep) and from the cap-fastener bolt-circle's own angular positions
+  (0/60/120/180/240/300°, none of which coincide with or require an opening
+  in the rotation plane itself). This specific claim holds up under
+  independent scrutiny — it is the *specific vertical sizing* built on top
+  of this correct topology (Finding 1) and the *specific load-adequacy*
+  claims (Finding 4) that do not yet independently check out, not the
+  topological claim itself.
+- **Two of the Mechanical Lead's own self-check catches, independently
+  re-confirmed as genuine and correctly fixed**: Error #3 (a wire-bridge/
+  motor collision) and Error #4 (a missing floor disc) are both confirmed,
+  by direct inspection of the current source, to be correctly resolved in
+  the geometry as it stands today — good technique on the Mechanical Lead's
+  part, simply not extended to the separate wire-duct defect this cycle
+  found (MISS-009, a bug in the same general area but not the same specific
+  geometry Error #3 addressed).
+- **Interface-value traceability (checklist item 10) is clean**: no
+  ASSUMPTION/CONFIRMED/ESTIMATE mislabeling found anywhere this cycle
+  checked, including at the specific point (REQ-306 margins) where this
+  reviewer's own first-pass note briefly got it wrong before independent
+  re-verification — see the Independence statement above.
+- **Cap-skirt/base-flange fit interface (§11.F) independently re-confirmed
+  correct**: the new 3rd piece's own mating interface (Containment Cap to
+  Base flange) was independently re-derived and found to correctly apply
+  the same 0.2mm/side `fit_clearance` convention already used elsewhere —
+  this is the newest joint in the design (introduced this revision) and it
+  received the same rigor as the older, already-proven base/lid joint (see
+  checklist item 8).
+- **Motor-mount bolt geometry independently confirmed safe**: the 4×M3
+  motor-mount bolt holes (at (fw_cx±6, fw_cy±6), radius 8.485mm from the
+  platform center) are independently re-confirmed clear of both the 15.5mm
+  platform edge (5.3mm margin) and the central shaft hole, and the
+  off-board/bracket-mounted motor-mounting approach's own ASSUMPTION
+  labeling (4×M3/16mm bolt pattern, unconfirmed) is used consistently
+  throughout the design wherever this reviewer checked for it — no location
+  found where it is silently treated as CONFIRMED.
+
+### Verdict
+
+- **Verdict**: **CONDITIONAL**
+- **Open CRITICAL count**: 1 (MISS-008)
+- **Open HIGH count**: 2 (MISS-009, MISS-010)
+- **Open MEDIUM count (non-gating)**: 1 new this cycle (MISS-011), plus
+  Rev 2's own already-open MISS-007 carried forward unchanged (untouched by
+  Rev 3, not re-litigated here).
+- **What independently checks out with no error found**: PCB mounting
+  (item 1), connector accessibility (item 2), radial clearance under
+  REQ-306 (item 3's radial half), fastener *placement* geometry across all
+  3 fastener classes (item 5), print-fit tolerance applied consistently at
+  every piece-to-piece interface including the new cap joint (item 8),
+  interface-value traceability with no mislabeling anywhere checked
+  (item 10), and — critically for the REQ-403 question this cycle was asked
+  to focus on — the containment design's **topological** claim (continuous
+  wall, no rotation-plane opening, bolted cap) independently verified true.
+- **What's blocking a clean PASS**: MISS-008 (CRITICAL — the flywheel disk's
+  own Z-stack formula omits the hub collar's height, producing a physically
+  impossible disk position that is empirically confirmed, not merely
+  formula-traced, and that invalidates the specific vertical-clearance
+  numbers behind both REQ-306's axial claim and REQ-403's containment
+  envelope sizing) and two HIGH findings (MISS-009 — the motor-wire duct is
+  solid, not void, along its intended path; MISS-010 — a pre-existing,
+  self-disclosed but previously untracked ~190mm³ base-tab/lid-skirt
+  interference).
+- **Also open, non-gating but should be dispositioned before Design
+  Complete**: MISS-011 (MEDIUM — REQ-403's specific wall-thickness/
+  fastener-retention claims rest on qualitative, not calculated, reasoning;
+  honestly self-disclosed by the design document 3 times but not previously
+  tracked).
+- **Independent assessment of the REQ-403 containment proposal's
+  credibility** (the specific question this cycle was asked to answer,
+  since a human safety review is gated on it): The proposal's **general
+  topology is credible** — the claim of a continuous, seamless containment
+  wall with no rotation-plane opening and a bolted (not merely friction-fit
+  or snap-fit) cap is independently re-derived from the actual geometry and
+  confirmed true, not just asserted. However, the proposal's **specific
+  numbers are not yet credible to bring to the human gate as currently
+  written**, for two independent reasons found this cycle: first, MISS-008
+  means the flywheel does not actually fit within the modeled/verified
+  clearance envelope at all under the design's own stated assembly sequence
+  — the specific containment-cap height and clearance figures cited in §8's
+  physics table are computed against a Z-stack that is internally
+  self-contradictory, so those specific numbers cannot be trusted until the
+  Z-stack is corrected and the containment envelope is re-verified against
+  the corrected geometry end-to-end (not just patched locally). Second,
+  MISS-011 means that even once MISS-008 is fixed, the specific
+  wall-thickness and fastener-retention numbers going into that human
+  review still rest on qualitative, not calculated, reasoning — a gap the
+  document already discloses honestly but that has not yet been closed or
+  explicitly flagged for the reviewer's attention via the tracked backlog.
+  **Recommendation: do not bring the REQ-403 disposition to the human safety
+  reviewer yet.** Fix MISS-008 first (the containment envelope's own sizing
+  is not currently verifiable at all until the flywheel's true Z-position is
+  corrected), re-verify the containment envelope against the corrected
+  geometry, and carry MISS-011's disclosed qualitative-only status forward
+  explicitly into whatever is ultimately presented to the human — at that
+  point, the topological soundness already confirmed this cycle plus a
+  corrected and re-verified envelope would make for a materially more
+  credible submission than what exists today.
+- **Next action**: Loop back to the Mechanical Lead (routing decision for
+  the Hardware Lead to make) for MISS-008 (fix the `fw_disk_bottom` formula
+  and propagate the correction through the full Z-stack and containment
+  envelope — CRITICAL, must be fixed before any further progress) and the
+  two HIGH findings MISS-009 (make the wire duct actually void along its
+  full intended path) and MISS-010 (resolve the pre-existing base-tab/
+  lid-skirt interference using the same fix pattern already proven on
+  MISS-002/003/004) at minimum — all three should be resolved before this
+  design proceeds toward a physical print or toward the REQ-403 human safety
+  review. MISS-011 (MEDIUM) should also be addressed or explicitly
+  dispositioned, and in either case explicitly carried into the REQ-403
+  human-review material rather than left implicit.
+
+---
+
+## Mechanical Reviewer — Cycle 4 (Focused Independent Re-Review of Rev 3.1 Loop-Back Fixes, 2026-09-12)
+
+### Review Cycle Metadata
+
+- **Design revision reviewed**: Rev 3.1 of
+  `hardware/mechanical/bench-imu-01-enclosure.scad` (1208 lines, up from
+  Cycle 3's 991) and its companion
+  `hardware/mechanical/bench-imu-01-dimensional-spec.md` (1327 lines, up
+  from Cycle 3's 914). Author: Mechanical Lead (AI agent), commit `2cbe846`
+  ("Mechanical rework (Rev 3): fix MISS-008/009/010 from Review Cycle 1"),
+  independently confirmed via `git log` this cycle (not assumed) — a
+  loop-back rework produced directly in response to this Reviewer's own
+  Cycle 3 CONDITIONAL verdict (1 CRITICAL, 2 HIGH). ECO-015 in
+  `validation/change-log.md` documents the Mechanical Lead's own account of
+  the same rework; that account is treated here as a claim to verify, not a
+  fact to accept.
+- **Scope**: per this cycle's task, a **focused** re-review — independently
+  re-verify the 3 gating fixes (MISS-008 CRITICAL, MISS-009/010 HIGH),
+  confirm MISS-011 (MEDIUM, non-gating) was honestly carried forward,
+  regression-check the second-order effects of the +6.0mm Z-stack shift
+  MISS-008's fix drives, and reassess REQ-403 containment-proposal
+  credibility — not a from-scratch full 10-item pass. The checklist table
+  below still reports all 10 items for schema consistency with Cycle 3, but
+  distinguishes items independently **re-verified this cycle** (because
+  Rev 3.1 touched that geometry, directly or via the Z-shift) from items
+  **unaffected and not re-derived from scratch this cycle** (because Rev 3.1
+  provably did not touch that geometry — confirmed via a full `git show
+  --stat`/diff-hunk review of the fix commit, not assumed from the
+  Mechanical Lead's own "only these 3 things changed" claim).
+- **Reviewer**: Mechanical Reviewer — see
+  `.github/agents/mechanical-reviewer.agent.md`. Same reviewer role as
+  Cycle 3, independent of the Mechanical Lead role/session that authored
+  this rework.
+- **Independence statement**: No claim in this rework — not the "Current top
+  level object is empty" render results, not the 7-point/8-point probe
+  sweeps, not the `trimesh` volume computations, not the §11.G "single
+  authoritative fix record," not the §15 self-check table — was accepted on
+  the strength of its own stated confidence. Every one of the 3 gating fixes
+  was independently re-derived this cycle via fresh tool-based checks against
+  the live `.scad` source (OpenSCAD CGAL boolean renders, `trimesh`
+  containment sweeps denser than the Mechanical Lead's own self-check,
+  direct `echo()` of real variables rather than transcribing the spec
+  document's prose), executed from a from-scratch scratch environment set up
+  this cycle, not reusing or trusting any output artifact the Mechanical
+  Lead produced. Where this cycle's independent results are consistent with
+  the Mechanical Lead's own claims, this is reported as corroboration
+  (two independently-arrived-at results agreeing), not as confirmation that
+  the claim was true because it was stated — the distinction matters and is
+  called out explicitly at each finding below.
+
+### Tooling & methodology disclosure
+
+- **Environment**: system `python3` (has `trimesh`/`numpy` but not
+  `rtree`/`scipy`, which `mesh.contains()` ray-casting requires) plus a
+  scratch venv at `/tmp/mechrev2/venv` (`python3 -m venv venv && ./venv/bin/pip
+  install trimesh numpy rtree scipy`, required because this system's Python
+  is PEP-668-managed and blocks direct system-wide `pip install`). All
+  scratch `.scad`/`.stl`/`.py` probe files live under `/tmp/mechrev2/`,
+  entirely outside the repository — disposable, not part of this
+  deliverable.
+- **`include` vs `use`, and an absolute-path gotcha**: OpenSCAD's `include
+  <file>` textually inlines a file's own top-level variable assignments
+  (unlike `use <file>`, which exposes only modules/functions) — this lets a
+  scratch probe file reference the real, live `fw_*`/`wire_duct_*`/etc.
+  variables directly from source, with zero hand-transcription risk.
+  Discovered this cycle: a relative `include` path inside a scratch file
+  resolves relative to *that including file's own directory*, not the CWD of
+  the `openscad` invocation — every probe this cycle used an absolute
+  include path to avoid silently getting `undef` for every real variable.
+- **OpenSCAD `!` (root) modifier**: verified empirically (throwaway test
+  file) that marking any one subtree with `!` anywhere in a document
+  overrides the *entire* render to show only that subtree. This lets a probe
+  `include` the real `.scad` file (which triggers its own default
+  assembled-render side effects) and then cleanly isolate just a custom
+  check geometry (e.g. `intersection()` of two specific real solids) for
+  STL export, without interference from the base/lid/cap the include's own
+  code also produces.
+- **Dense containment sweeps**: for MISS-009, a 2,516-point sweep (0.25mm
+  Y-steps across the full documented Y=[91,108] duct path, multiple radii up
+  to 92% of the duct radius) — chosen deliberately denser than the
+  Mechanical Lead's own disclosed 7-point self-check sweep, since a sparse
+  sweep can miss a localized re-intrusion a dense one would catch. For the
+  REQ-403 topology re-check, a 1,080-point full-360° sweep (180 angles ×
+  6 Z-heights spanning the disk's rotation envelope and beyond) against the
+  containment wall.
+- **Zero-thickness "coincident face" artifact**: independently discovered
+  (before cross-reading §11.C) that intersecting two solids designed to sit
+  exactly flush at a shared parting plane (a base tab's top face and the lid
+  roof's underside, both at Z=21.1mm) can produce a non-empty CGAL boolean
+  result that is actually a degenerate zero-volume, zero-Z-thickness face,
+  not real interference — confirmed via `trimesh` (`volume==0`,
+  `Z_min==Z_max`) and via a Z-restricted re-run of the same intersection
+  excluding the exact parting plane by 0.05mm (empty). This matches, via an
+  independently-arrived-at different method, the Mechanical Lead's own
+  §11.C diagnosis of the same artifact (their method: raw intersection
+  volume + vertex-coordinate spread; this cycle's method: Z-slice exclusion)
+  — reported below as genuine cross-validation, not as "the spec document
+  said so."
+
+### Checklist Results
+
+| # | Checklist item | Result | Notes |
+|---|---|---|---|
+| 1 | PCB mounting | **PASS — unaffected, not re-derived from scratch** | Confirmed via `git show --stat`/diff-hunk review that Rev 3.1's fix commit touches no PCB-bay standoff code; Cycle 3's own independent clearance already stands. |
+| 2 | Connector accessibility | **PASS — MISS-009 re-verified** | The wire-duct route (MC-1) is the one connector-accessibility item this rework touches. Independently re-confirmed open along its full documented path this cycle (see Finding re-verification below) — this checklist item's PASS is now backed by a verified-open path, not a documented-but-solid one. |
+| 3 | Component height clearance | **PASS — MISS-008 re-verified** | `fw_disk_bottom`/`fw_disk_top`/`fw_clearance_top` independently re-derived directly from live source: 37.5/42.0/45.0mm, cascading correctly from the corrected formula. Disk (Z=[37.5,42.0]) and hub collar (Z=[28.5,34.5]) independently confirmed non-overlapping with a clean, measured 3.0mm gap (two independent tool methods, see below). |
+| 4 | Internal clearance/interference | **PASS — MISS-008/009/010 all re-verified** | All 3 gating interferences independently confirmed resolved this cycle via fresh tool-based checks (empty CGAL `intersection()`s, dense containment sweeps, Z-restricted re-checks) — full detail in the Findings section below. No new interference found anywhere probed this cycle. |
+| 5 | Fastener placement | **PASS — heat-set insert margins re-derived, confirmed invariant under the Z-shift** | Independently recomputed both the radial margin (insert OD 4.6mm centered at `bolt_circle_r`=48.0mm inside the flange band's 43.5–52.5mm radial span → 2.2mm each side) and the axial margin (`heatset_len`=5.7mm inside `flange_band_h`=8.0mm → 2.3mm spare) directly from live source constants. Both figures are purely local/relative relationships (bolt-circle-vs-flange-radius, insert-length-vs-band-height) with **zero dependency** on `fw_clearance_top`'s absolute value — independently confirmed structurally invariant under the +6.0mm Z-shift, not just re-stated as still true. |
+| 6 | Wall thickness | **PASS — re-checked for both structural minimum and MISS-010's new notches** | Containment wall (4.0mm) and general 2.0mm minimum independently re-spot-checked, unaffected by this rework. The MISS-010 relief notches were independently checked for new thin-wall risk (see Finding re-verification below) — none found; remaining skirt-band material elsewhere is unchanged at its original 2.0mm. |
+| 7 | Assembly order | **PASS — Steps 4 and 5 re-verified achievable** | Step 5 (disk onto hub collar) and Step 4 (wire routing through the duct) — the two steps Cycle 3 found not physically achievable — independently re-confirmed achievable against the corrected geometry this cycle (MISS-008/009 re-verification below). No part found trapped with no access at any step. |
+| 8 | Basic print-fit tolerance | **PASS — re-checked at the shifted cap/flange joint specifically** | The cap-skirt/base-flange joint's own 0.2mm/side `fit_clearance` independently re-derived from live source (skirt ID 105.4mm vs. flange OD 105.0mm) and confirmed applied identically to this joint post-shift — a diametral (X/Y-plane) relationship, structurally unaffected by the pair's identical +6.0mm Z-shift, confirmed by re-deriving both parts' Z-ranges independently and finding them exactly matched ([37.0,45.0]mm on both). |
+| 9 | Basic manufacturability/3D-printability | **PASS — MISS-010 notch geometry independently re-checked for new print risk** | Notch X-ranges (2.8–11.2mm, 95.8–104.2mm per corner) independently confirmed not overlapping the side-skirt walls; notch is Z-capped below the roof (never exceeds Z=21.1), so roof connectivity and all un-notched skirt segments are preserved; vertical wall segments remain printable in the documented orientation with no new overhang introduced. |
+| 10 | Interface-value traceability | **PASS — new `tab_relief_margin` parameter spot-checked** | Confirmed directly from source (`bench-imu-01-enclosure.scad` line 356): `tab_relief_margin = 1.0; // mm. ASSUMPTION: same "small explicit overshoot"...` — correctly tagged, not silently blended with a CONFIRMED value. No other new parameter introduced by this rework was found untagged. |
+
+### Findings — independent re-verification of the 3 Cycle 3 gating findings
+
+#### Re-verification of Finding 1 / MISS-008 (CRITICAL) — flywheel disk / hub-collar overlap
+
+- **Fix claimed**: `fw_disk_bottom` corrected to include `fw_hub_collar_h`,
+  cascading `fw_clearance_top` 39.0→45.0mm and the containment cap height
+  43.0→49.0mm.
+- **Independent re-derivation performed**: `include`d the real `.scad` file
+  into a scratch probe (absolute path) and `echo()`'d the live variables
+  directly from source rather than transcribing the spec document's table:
+  `fw_disk_bottom`=37.5, `fw_disk_top`=42.0, `fw_clearance_top`=45.0,
+  `fw_cap_outer_top`=49.0, `fw_wall_h`=43.0 — all matching the claimed fix
+  exactly, with zero transcription risk since these came straight from the
+  live formula chain, not a copied number.
+- **Independent geometric re-verification, method 1**: used the OpenSCAD `!`
+  root modifier (semantics empirically confirmed first with a throwaway
+  test) to isolate an `intersection()` of the real hub-collar cylinder and
+  the real disk cylinder, both built from the live included variables →
+  rendered **"Current top level object is empty"** — zero overlap,
+  confirmed by the tool, not asserted.
+- **Independent geometric re-verification, method 2 (cross-check via a
+  different operation)**: `union()` of the same two solids, loaded into
+  `trimesh` → reports **2 disjoint watertight components**: Z=[28.5,34.5]
+  (hub collar, vol≈300.7mm³) and Z=[37.5,42.0] (disk, vol≈12687.1mm³), with
+  an exact measured gap of **3.0mm** between them — confirms neither solid
+  is degenerate (both have real, non-zero volume) and independently
+  measures the clean gap the intersection-emptiness check alone cannot
+  quantify.
+- **Disposition**: **RESOLVED, independently confirmed** via two
+  methodologically distinct tool-based checks, not the Mechanical Lead's own
+  claim alone.
+
+#### Re-verification of Finding 2 / MISS-009 (HIGH) — motor-wire duct solid, not void
+
+- **Fix claimed**: `base()` restructured into a `difference()` with a
+  top-level `motor_wire_duct_void()` module subtracted globally; a separate
+  1mm shortfall at the duct mouth (`wire_duct_y_lo` 93.0→91.0mm) also fixed
+  in the same pass.
+- **Independent re-derivation performed**: `echo()`'d live duct variables
+  directly from source: `wire_duct_y_lo`=91.0, `wire_duct_y_hi`=108.0,
+  `wire_duct_z`=8.0, radius=2.5mm, centered at `fw_cx`=53.5mm.
+- **Independent geometric re-verification, method 1 (dense sweep, exceeding
+  the self-check's own rigor)**: rendered `base()` alone (`base_only.stl`)
+  and ran a 2,516-point `trimesh.contains()` sweep across the **full**
+  documented Y=[91,108] path (0.25mm steps) at multiple radii up to 92% of
+  the duct radius — **0/2,516 points found inside solid material**. This is
+  deliberately denser than the Mechanical Lead's own disclosed 7-point
+  sweep (§11.G), specifically to catch any localized re-intrusion a sparse
+  sweep could miss — none found. (A separate diagnostic confirmed
+  `base_only.stl`'s 16 reported non-manifold edges sit at Z=15.5,
+  X∈{3,11,96,104} — PCB standoff boss tops, geometrically unrelated to the
+  duct region at X≈53.5±2.5 — so this artifact does not undermine the sweep
+  result.)
+- **Independent geometric re-verification, method 2 (different code path,
+  exact boolean)**: OpenSCAD's own CGAL-exact
+  `intersection(base(), tiny_sphere)` at 13 representative points spanning
+  Y=91.2–107.8, including near-boundary radius offsets (±2.3mm) → **"Current
+  top level object is empty"** at all 13 points, independently agreeing with
+  the `trimesh` sweep via a completely different computational method.
+- **Disposition**: **RESOLVED, independently confirmed** — the duct is open
+  along its full documented path, confirmed by two independent methods each
+  individually exceeding the rigor of the Mechanical Lead's own self-check.
+
+#### Re-verification of Finding 3 / MISS-010 (HIGH) — base-tab / lid-skirt interference
+
+- **Fix claimed**: new `tab_relief_margin` (1.0mm) + relief notches cut into
+  `lid_shell()`'s skirt band at each of the 4 `tab_positions`, Z-capped
+  below the roof.
+- **Independent re-derivation performed**: read `base_tab()`/`base_tabs()`/
+  `pcb_bay_base()` and `lid_tab()`/`lid_tabs()`/`lid_shell()` module bodies
+  directly (not just the spec prose) to confirm the real call-site
+  transforms, then `echo()`'d live values: `board_offset_x`=3.5,
+  `base_outer_x`=107, `base_outer_y`=57, `lid_skirt_outer_x`=111.4/`_y`
+  =61.4, `lid_skirt_t`=2, `fit_clearance`=0.2, `tab_w`=8,
+  `tab_relief_margin`=1.0. Computed notch X-ranges independently:
+  [2.8,11.2] and [95.8,104.2] per corner — confirmed **not** overlapping the
+  side-skirt X-ranges ([-2.2,-0.2]/[107.2,109.2]), so the notches affect only
+  the front/rear skirt bands.
+- **Independent geometric re-verification, first pass (initially
+  ambiguous)**: `intersection()` of the real, correctly-transformed
+  `base_tabs()` vs. `lid_shell()` → rendered **non-empty** (64 vertices,
+  genus -3, 4 disjoint components) — alarming on first read.
+- **Diagnosis (before consulting the spec document's own explanation)**:
+  loaded into `trimesh` and found all 4 components have **zero Z-thickness**
+  (min Z = max Z = 21.1 exactly) and **volume = 0.0** — a benign coincident-
+  face artifact at the parting plane where the tab's top face and the lid
+  roof's underside are, by design, exactly flush — not real interference.
+- **Independent geometric re-verification, confirming pass**: re-ran the
+  same `intersection()` restricted to the true former-interference Z-zone
+  ([18.1, 21.05), excluding the flush plane by 0.05mm) → **"Current top
+  level object is empty"** — confirms the real ~190mm³ Cycle 3 interference
+  is genuinely gone, not just re-surfaced by the parting-plane artifact.
+- **Cross-validation**: the Mechanical Lead's own §11.C account independently
+  diagnosed this exact same zero-thickness artifact via a *different*
+  method (raw intersection volume + vertex-coordinate spread, vs. this
+  cycle's Z-slice exclusion) — two independently-arrived-at diagnoses
+  agreeing is reported here as genuine corroboration, not accepted because
+  the spec document said so; this cycle's own conclusion was reached before
+  cross-reading §11.C.
+- **New-risk check on the relief notches themselves**: notch height
+  (`lid_skirt_t`+2×`tab_relief_margin`=4.0mm) exceeds the band's own 2.0mm
+  thickness (a full local removal), but is Z-capped at exactly `lid_lip_h`
+  so the roof (Z>21.1 global) is never touched — the roof slab remains
+  continuous and keeps all skirt segments attached (no fragmentation/
+  floating-piece risk); remaining skirt segments elsewhere keep their full,
+  unchanged 2.0mm thickness; the resulting vertical-wall segments (2mm×3mm
+  cross-section) remain printable in the documented roof-down orientation
+  with no new overhang introduced.
+- **Disposition**: **RESOLVED, independently confirmed** — real interference
+  gone (tool-confirmed via Z-restricted CGAL boolean), and no new
+  wall-thickness/print-safety/fragmentation violation introduced by the
+  relief notches.
+
+### Regression check — second-order effects of the +6.0mm Z-stack shift
+
+MISS-008's fix moves `fw_disk_bottom`/`fw_disk_top`/`fw_clearance_top`/
+`fw_cap_outer_top`/`fw_wall_h`/the flange band/the cap skirt all by the same
+rigid +6.0mm. Independently checked for silent breakage elsewhere, not just
+cited as fine:
+
+- **No stale hardcoded old-Z-value code**: searched the `.scad` file for the
+  pre-fix literal constants (31.5, 36.0, 39.0, 43.0, 37.0) — every hit is
+  inside a comment/historical-narrative line (e.g. lines 524, 629,
+  651/658/660/664/671), never live code. The corrected values are reached
+  exclusively through the formula chain, not a stray leftover literal.
+- **Duct-to-disk clearance only improved, never worsened**: `wire_duct_z`
+  (=8.0mm, fixed, independent of the Z-stack chain) sits far below the
+  disk's own new bottom face (37.5mm); the shift only *increases* the
+  vertical separation between the duct and the disk, confirmed by direct
+  comparison of the two independent values, not merely asserted.
+- **REQ-308 envelope (X/Y footprint) independently confirmed unaffected**:
+  traced the `assembled_envelope_x`/`_y` formulas directly in source and
+  confirmed they depend only on X/Y-plane constants (`fw_cy`, `cap_skirt_od`,
+  `pcb_bay_y0`, `base_outer_y`, `tab_project`, `lid_tab_project`) with
+  **zero dependency** on any Z-stack variable MISS-008 touched — a
+  structural confirmation, not a citation of the spec document's own claim.
+  Cross-checked against a fresh full-assembly render this cycle: `trimesh`
+  bounds X=[-2.2,109.2] (span 111.4), Y=[-2.2,168.4] (span 170.6),
+  Z=[0,49.0] — exactly matching both the dimensional-spec's §3 table and the
+  formula-independence finding. The pre-existing REQ-308 Y-overrun (170.6mm
+  vs. the ~150mm-class soft ceiling, 13.7% over) is a Rev 3 (not Rev 3.1)
+  disclosed trade-off, unrelated to and unworsened by this cycle's fixes;
+  Z's new value (49.0mm) is nowhere near that ceiling regardless.
+- **REQ-306 rotation-clearance envelope correctly re-derived at the new
+  Z-values, not left stale**: independently confirmed
+  `hardware/mechanical/bench-imu-01-dimensional-spec.md` §7 states the
+  keep-out's own top face at the corrected 45.0mm (was 39.0mm) and the
+  containment structure beginning at 45.0–49.0mm (was 39.0–43.0mm) — this is
+  a *second*, independent dependent quantity (distinct from REQ-403's own
+  containment sizing) that correctly cascaded with the fix, confirming the
+  cascade was not narrowly patched only where REQ-403 needed it.
+- **Heat-set insert engagement depth/margin independently re-derived and
+  confirmed shift-invariant** (see Checklist item 5 above for the specific
+  numbers) — both the radial (2.2mm) and axial (2.3mm) margins are
+  local/relative relationships with no dependency on `fw_clearance_top`'s
+  absolute value, so the +6.0mm shift cannot have silently broken them —
+  confirmed structurally, not merely re-stated as unchanged.
+- **Full diff-hunk review**: independently reviewed `git show --stat
+  2cbe846` and every `@@` diff hunk in the `.scad` file (7 hunks, spanning
+  `tab_positions`/`tab_relief_margin`, the hub-collar formula chain, the
+  wire-duct fix, the envelope formulas, `lid_shell()`'s notch cut, and
+  `fw_bay_wall()`/flange band) — confirmed every changed region was directly
+  examined this cycle, and confirmed the diff **stops before**
+  `containment_cap()` (which starts at line 1076): `containment_cap()`
+  itself is unmodified source, correctly inheriting the corrected Z-values
+  purely because it references `fw_cap_outer_top`/`containment_wall_t`
+  symbolically rather than by hardcoded number — a positive sign of the
+  parametric design's own robustness, independently confirmed rather than
+  assumed.
+- **No stale references found** in dimensional-spec §12 (fastener
+  placement), §13 (manufacturability), or §14 (assembly order) to any
+  pre-fix Z-value; `fw_shaft_exposed_len_needed`=9.0mm (a relative, not
+  absolute-Z, quantity) independently confirmed correctly unaffected by the
+  shift.
+
+**No new regression found anywhere checked this cycle.**
+
+### REQ-403 containment envelope — independent re-verification
+
+This is the specific question this cycle was asked to settle: whether the
+corrected geometry now makes the REQ-403 safety proposal credible enough to
+reach the human. Independently re-derived from the actual `.scad` module
+code (not accepted from the dimensional-spec's own §8/§11.F prose):
+
+- **Flange band Z-range independently re-derived from `fw_bay_wall()`**
+  (lines 922–949): the flange band is
+  `translate([fw_cx, fw_cy, fw_clearance_top - flange_band_h])
+  cylinder(d=2*fw_flange_or, h=flange_band_h)` → Z-range =
+  `[fw_clearance_top - flange_band_h, fw_clearance_top]` =
+  **[45.0-8.0, 45.0] = [37.0, 45.0]mm** — computed directly from the live
+  formula, matching the claimed shift from [31.0,39.0]mm exactly.
+- **Cap skirt Z-range independently re-derived from `containment_cap()`**
+  (lines 1076–1111, itself unmodified source — see regression check above):
+  the skirt is `translate([fw_cx, fw_cy, fw_cap_outer_top -
+  containment_wall_t - cap_skirt_h]) ... cylinder(..., h=cap_skirt_h)` with
+  `cap_skirt_h = flange_band_h` (=8.0) → Z-range =
+  `[fw_cap_outer_top - containment_wall_t - cap_skirt_h,
+  fw_cap_outer_top - containment_wall_t]` = `[49.0-4.0-8.0, 49.0-4.0]` =
+  **[37.0, 45.0]mm** — an **exact** match to the flange band's own Z-range,
+  independently confirming the "cap skirt slips over the base flange, both
+  shifted rigidly together" claim from first principles, not from citing
+  the spec document's own arithmetic.
+- **Slip-fit clearance independently confirmed non-interfering**: cap skirt
+  ID = `fw_flange_dia + 2*fit_clearance` = 105.0+0.4 = 105.4mm vs. base
+  flange OD = `fw_flange_dia` = 105.0mm → 0.2mm/side radial clearance,
+  matching the file's own convention used elsewhere, confirmed by direct
+  formula inspection.
+- **Topology re-verified via a dense tool-based sweep, not re-read from
+  prose**: ran a 1,080-point `trimesh.contains()` sweep on the real
+  `base_only.stl` — 180 angles (2° steps) × 6 Z-heights (30.0, 34.5, 37.5,
+  39.75, 42.0, 44.0mm, deliberately spanning and bracketing the disk's own
+  rotation envelope Z=[37.5,42.0]) at radius 41.5mm (midway through the
+  wall's own 39.5–43.5mm thickness) → **1,080/1,080 points confirmed inside
+  solid wall material, 0 exceptions**. This directly and empirically
+  confirms the containment wall is a genuinely continuous, gapless 360°
+  ring at every height spanning the flywheel's own rotation plane — the
+  wire duct (confirmed separately under MISS-009, at Z=8.0mm, well below
+  this sweep's Z-range) is confirmed to be the *only* breach, not one of
+  several.
+- **Bolted, not snap/friction-fit, independently confirmed via code
+  inspection**: `containment_cap()`'s own `difference()` cuts 6× plain M3
+  clearance holes (`d = m1_bolt_dia_clear`) through the disk top, coaxial by
+  construction with the base's 6× heat-set insert pockets (both use the
+  identical `bolt_circle_r`/`i*360/n_cap_bolts` formula and the same
+  `fw_cx,fw_cy` center) — no snap-clip or friction-fit feature exists
+  anywhere in the module. This is a genuinely bolted joint, not merely
+  described as one.
+- **Insert engagement depth confirmed valid at the new Z-position**: see the
+  regression-check section above (2.2mm radial / 2.3mm axial margins,
+  independently re-derived and confirmed structurally invariant under the
+  shift).
+
+**Disposition**: both halves of the REQ-403 credibility question this cycle
+was asked to answer are independently confirmed **true at the corrected,
+post-fix Z-positions**: the containment topology (continuous wall, no
+rotation-plane opening, genuinely bolted cap) and the specific containment
+envelope numbers (flange/skirt Z-range, cap height, clearance fit) are both
+independently re-derived from the live source, not merely re-read from the
+Mechanical Lead's own account.
+
+### MISS-011 (MEDIUM, non-gating) — carry-forward spot-check
+
+Independently confirmed **honestly carried forward, not silently dropped**,
+cited consistently across three separate locations in the current
+dimensional-spec: §8 (REQ-403 disposition, explicitly re-states the
+qualitative-only gap), §12 (fastener placement, "Tagged MISS-011... carried
+forward unresolved this revision"), and §16 (Open UNKNOWNs table,
+"Containment cap's actual impact/penetration resistance... Not analyzed...
+Tagged MISS-011"). No attempt found anywhere to quietly resolve, downgrade,
+or omit it. This cycle found nothing new about MISS-011's own content (the
+underlying qualitative-vs-calculated gap is unchanged and still valid), so
+per this cycle's own task instructions its `validation/open-issues.md` row
+is left completely unchanged (Status remains `OPEN`, `MEDIUM`,
+non-gating) — see the Verdict below for why this does not block PASS.
+
+### Positive Findings
+
+- **All 3 gating findings independently confirmed genuinely fixed**, each
+  via at least two methodologically distinct tool-based checks that
+  individually exceed the rigor of the Mechanical Lead's own disclosed
+  self-check (7-point/8-point sweeps vs. this cycle's 2,516-point and
+  1,080-point sweeps plus independent CGAL cross-checks) — this is a
+  materially more rigorous re-verification than a re-run of the same
+  self-check would have been.
+- **The Mechanical Lead's own §11.G "single authoritative fix record" and
+  §15 self-check table hold up under independent, adversarial scrutiny,
+  item for item** — every specific number this cycle independently
+  re-derived (Z-stack chain, flange/skirt Z-ranges, insert margins,
+  envelope bounds) matched exactly, and the one place where independent
+  diagnosis was performed *before* cross-reading the spec document's own
+  explanation (the MISS-010 coincident-face artifact) arrived at the same
+  conclusion via a different method — genuine corroboration, not rubber-
+  stamping.
+- **The parametric design's own robustness**: `containment_cap()` needed no
+  source edit at all to correctly inherit the corrected Z-values, because it
+  references upstream variables symbolically rather than by hardcoded
+  number — independently confirmed via diff-hunk review, not assumed.
+- **REQ-306's own dependent figures were also correctly re-cascaded**, not
+  just the REQ-403 figures the fix commit's own message highlighted —
+  confirms the fix was applied at the true root (the shared `fw_clearance_top`
+  formula), not patched locally wherever the Mechanical Lead happened to
+  look.
+- **No new regression found anywhere probed this cycle**, despite this
+  being exactly the kind of change (multiple Z-stack variables shifting by
+  the same fixed offset) most likely to silently break an unrelated
+  downstream check.
+
+### Verdict
+
+- **Verdict**: **PASS**
+- **Open CRITICAL count**: 0 (MISS-008 independently confirmed RESOLVED)
+- **Open HIGH count**: 0 (MISS-009, MISS-010 independently confirmed
+  RESOLVED)
+- **Open MEDIUM count (non-gating)**: 1 (MISS-011, honestly carried
+  forward, confirmed unchanged this cycle), plus Rev 2's own already-open
+  MISS-007 (untouched by this rework, not re-litigated here).
+- **What independently checks out**: all 3 previously-gating findings
+  (MISS-008 CRITICAL, MISS-009/010 HIGH) are independently confirmed fixed
+  via fresh tool-based checks, not accepted on the Mechanical Lead's own
+  say-so; the +6.0mm Z-stack shift these fixes drive was independently
+  regression-checked and found to have broken nothing else (REQ-308,
+  REQ-306, heat-set insert margins, assembly order, all independently
+  re-confirmed correct at the new Z-positions); the REQ-403 containment
+  proposal's topology and specific numbers are both independently
+  re-verified true at the corrected geometry.
+- **What remains open, non-gating**: MISS-011 (MEDIUM) — the REQ-403
+  disposition's wall-thickness/fastener-retention adequacy claims still
+  rest on qualitative, not calculated, reasoning. This is honestly disclosed
+  in 3 separate places in the source document and does not block a PASS
+  verdict per `docs/architecture.md` §7.1 (MEDIUM findings are non-gating),
+  but should still be explicitly surfaced to the human REQ-403 safety
+  reviewer as a named, disclosed limitation, not silently omitted from what
+  is presented.
+- **Independent assessment of the REQ-403 containment proposal's
+  credibility** (the specific question this cycle was asked to answer):
+  **the proposal is now credible enough to bring to the human HITL gate.**
+  At Cycle 3, this Reviewer withheld that recommendation specifically
+  because MISS-008 meant the flywheel did not fit within its own modeled
+  clearance envelope at all — no containment sizing built on that Z-stack
+  could be trusted regardless of the topology being sound. This cycle
+  independently re-derives, from the live corrected source (not from the
+  Mechanical Lead's own account), that: (1) the disk now genuinely clears
+  the hub collar with a real, measured 3.0mm gap; (2) the flange band and
+  cap skirt Z-ranges are both independently computed as exactly [37.0,45.0]mm
+  and match each other exactly; (3) the containment wall is empirically
+  confirmed, via a 1,080-point dense sweep, to be a genuinely continuous,
+  gapless 360° ring across the disk's full rotation-plane Z-range; (4) the
+  cap is genuinely bolted, not snap/friction-fit; and (5) nothing else in the
+  design was silently broken by the +6.0mm shift that produced these
+  corrected numbers. The one remaining gap (MISS-011) is a *disclosed rigor
+  gap on a proposal already headed to human review* — not a defect that
+  should block the review itself — and this Reviewer's recommendation is
+  that it accompany the submission as an explicit, named caveat (per its own
+  Recommended Fix), not that it delay the submission further. **Recommendation:
+  the REQ-403 disposition may now be brought to the human safety reviewer,
+  with MISS-011 explicitly carried into the material presented as a
+  disclosed, non-blocking limitation.**
+- **Next action**: Report PASS to the Hardware Lead. No further loop-back to
+  the Mechanical Lead is required for MISS-008/009/010 (all independently
+  confirmed RESOLVED this cycle). MISS-011 remains open, non-gating, and
+  should travel with the REQ-403 proposal to the human HITL gate rather than
+  be resolved or silently dropped before then.
+
+## Addendum — Hardware Lead logging a human-surfaced finding (2026-09-11)
+
+While the REQ-403 containment proposal was under the human Chief
+Engineer's own direct review (via the cross-session HITL channel, not a
+formal review cycle), he raised a sharp question that neither Mechanical
+Lead's own self-check nor either of the 2 Independent Mechanical Review
+cycles above had caught: **`containment_wall_t`=4.0mm is a CAD-geometric
+solid-wall claim only** — whether the physically 3D-printed part actually
+contains 4.0mm of solid material at that location, or a sparse internal
+lattice (typical FDM slicer defaults are 15–25% infill, mostly air),
+depends on manufacturing/print-process parameters (infill %, pattern,
+wall/perimeter count, print orientation) that are specified downstream of
+CAD, at slicing time.
+
+Independently re-verified before logging: a repo-wide
+`grep -rn -i "infill"` returns **zero hits** anywhere in this repository;
+`hardware/mechanical/bench-imu-01-dimensional-spec.md` line 372's own
+`containment_wall_t` justification ("sized above the manufacturability
+floor on purpose... this wall's job is containment") is entirely a
+nominal-solid-geometry argument, with no reference to infill, perimeter
+count, or print orientation anywhere in this document or the `.scad`
+source. Confirmed: this is a real, previously-uncaught gap, not a
+mischaracterization.
+
+Logged as **MISS-012 (HIGH)** in `validation/open-issues.md` — classified
+HIGH rather than CRITICAL because the current design is genuinely
+*incomplete* on this specific parameter (not a demonstrated-wrong, fully-
+specified claim the way MISS-008 was), but realistic-not-remote because
+infill is a parameter every FDM print requires *some* value for, and a
+typical slicer default would apply unless someone deliberately overrides
+it — for a part whose entire purpose is impact/fragment containment, that
+is a credible, not a manufactured, risk. Distinguished from the existing
+MISS-011 (MEDIUM): MISS-011 questions whether an already-agreed geometry
+has been load-verified; MISS-012 questions whether the CAD geometry will
+even correspond to the as-built part at all — a more fundamental gap.
+
+**Not attempted to be resolved ad hoc.** A separate session has been
+dispatched to introduce a new **Manufacturing Engineer** discipline
+(agent + skill + a corresponding Mechanical Reviewer checklist addition
+requiring a process spec for safety-critical/structural parts) as a
+standalone framework PR against `main`, mirroring the Power Engineer
+precedent (framework merged and independently audited before being
+exercised on a real design) — not yet merged. Per explicit instruction,
+this containment cap's own Manufacturing Engineer pass (infill %,
+perimeter count, print orientation, each reasoned against the disposition's
+own disclosed ~99–122J credible-worst-case load) will follow once that
+framework lands, independently cross-checked by Mechanical Reviewer per
+the new checklist item — an additional prerequisite for a *complete*
+REQ-403 sign-off, on top of (not instead of) the human's own separate
+safety-topology review, which may still proceed in parallel.
+
+## Mechanical Reviewer — Manufacturing Process Cross-Check (Containment Cap), 2026-09-11
+
+### Review Cycle Metadata
+
+- **Document reviewed**: `hardware/mechanical/bench-imu-01-manufacturing-spec.md`
+  (89 lines), authored by the newly-introduced Manufacturing Engineer
+  discipline (`.github/agents/manufacturing-engineer.agent.md`,
+  `.github/skills/manufacturing-process-specification/SKILL.md`, both just
+  merged to `main`). This is a manufacturing-**process** specification
+  (infill %/pattern, wall/perimeter count, print orientation, material) for
+  Bench-IMU-01 Rev 3's flywheel `containment_cap()`, not a geometry change —
+  the `.scad` file and `bench-imu-01-dimensional-spec.md` are both unchanged
+  since Cycle 4 (independently confirmed: no diff against the Cycle 4
+  baseline was found in either file).
+- **This is the first-ever exercise of checklist item 11**, newly added to
+  `.github/skills/mechanical-review/SKILL.md`: an independent cross-check of
+  a Manufacturing Engineer's process specification, distinct in kind from
+  Cycles 1–4's pure geometry/interference reviews.
+- **Direct lineage**: this document is the direct response to **MISS-012**
+  (HIGH, OPEN, logged in the Addendum immediately above by the Hardware Lead
+  after a human-surfaced finding) — MISS-012's own Recommended Fix explicitly
+  called for "a Manufacturing Engineer pass on this containment cap
+  specifically..., independently cross-checked by Mechanical Reviewer per
+  the new checklist item, before REQ-403 sign-off is considered ready."
+  Today's review is exactly that cross-check. Independently re-confirmed
+  before starting: MISS-012 is still `OPEN` in `validation/open-issues.md`
+  (not resolved by any other action in the interim).
+- **Scope**: focused on checklist item 11 only — an independent cross-check
+  of the manufacturing-process specification itself, not a from-scratch
+  10-item geometry pass (items 1–10 are unaffected, since no `.scad`/
+  dimensional-spec geometry changed).
+- **Independence statement**: Per checklist item 11's own explicit text, none
+  of the manufacturing spec's own stated rationale, its own confidence
+  labels, or its own citation list was accepted as fact. Every one of the
+  following was independently re-derived or re-checked this cycle, from
+  scratch, against primary sources: the actual radial/axial geometry of
+  `fw_bay_wall()` vs. `containment_cap()` (directly from `.scad` source, not
+  from the spec document's own prose); the §3.2 load-case arithmetic (by
+  hand, from first principles); the confidence labels on that arithmetic's
+  own inputs (traced back to their original rows in
+  `bench-imu-01-dimensional-spec.md`); the manufacturing spec's own most
+  load-bearing literature claim (via independent web search, not by trusting
+  the citation list); and the claimed absence of slicer/FEA/physical-print
+  tooling in this environment (via a live tool call this session, not by
+  trusting the document's own disclosure). Where independent results agree
+  with the document's own claims, this is reported as corroboration, not as
+  confirmation-because-stated.
+
+### Tooling & methodology disclosure
+
+- **CAD/geometry**: `openscad` 2026.08.30 confirmed present locally; used to
+  re-inspect the live `.scad` source directly (targeted `grep`/`view`, not a
+  full re-render, since no geometry changed since Cycle 4 — a full render
+  would re-verify nothing new).
+- **No slicer, no FEA/simulation tool connected**: confirmed no slicer or
+  `cadquery`/`build123d` installed locally. Independently attempted a live
+  `blender-get_addon_status` call this session specifically to test the
+  manufacturing spec's own tooling-absence claim rather than accept it —
+  this returned a genuine handshake failure (Blender/BlenderMCP not reachable
+  from this environment), independently corroborating (not merely repeating)
+  the spec's own §6 disclosure that no FEA/simulation capability is available
+  here. No physical printer or destructive-test capability exists in this
+  environment either (no such tool is exposed to this session).
+- **Literature verification**: ran two independently-phrased web searches
+  targeting the specific question "does 100% infill always maximize
+  impact-energy absorption, or can lower-density infill/patterns outperform
+  it" — both converged on the same reported figures from the manufacturing
+  spec's own cited source (§7 reference #4). Attempted direct primary-source
+  confirmation via `web_fetch` (MDPI article page) and `curl` (with a full
+  browser user-agent string); both returned **HTTP 403** — MDPI blocks
+  direct/bot fetches. This is treated as a genuine, confirmed environment
+  access limitation, not a shortcut: the finding below is explicitly flagged
+  as corroborated via two independent secondary searches converging on
+  identical figures and the identical citation (journal/volume/issue), not
+  as primary-text-confirmed.
+- Independently web-searched and confirmed real/accurately-characterized:
+  reference #3 (3DMag, Z-axis anisotropy content), #5 (MLC CAD, same), #6 (UL
+  "Blue Card" AM certification program — confirmed it genuinely requires
+  physical testing tied to a specific printer+material+process combination),
+  #7 (ISO 12100 — confirmed it genuinely establishes the general principle
+  that ejection/fragment hazards require verification).
+- **Arithmetic**: re-derived the §3.2 load-case numbers by hand from first
+  principles (moment of inertia → kinetic energy → rim speed) and separately
+  traced each geometric input back to its original confidence label in
+  `bench-imu-01-dimensional-spec.md` — full detail under Finding 2 below.
+
+### Checklist Results
+
+Only item 11 is in scope this cycle (items 1–10 are unaffected — no
+`.scad`/dimensional-spec geometry changed since Cycle 4's PASS, so they are
+not re-derived from scratch here).
+
+| # | Checklist item | Result | Notes |
+|---|---|---|---|
+| 11 | Manufacturing-process cross-check (new) | **CONDITIONAL — 1 HIGH + 2 MEDIUM findings** | The specified process for `containment_cap()` itself (100% infill, 6+ perimeters, upright orientation, nylon/PETG) is individually reasonable given the disclosed load case, and the document's own confidence discipline is *mostly* honest (§4's process table correctly uses ESTIMATE/ASSUMPTION throughout, never CONFIRMED). But three independently-verified defects were found: a scope gap that leaves the actual primary radial containment structure (`fw_bay_wall()`) with zero specified process (MISS-013, HIGH); a confidence-marking overclaim on the derived load-case figures in §3.2 (MISS-014, MEDIUM); and a one-sided literature-framing gap on the infill/impact-energy question plus an unaddressed Z-axis anisotropy point for the cap's own flat top (MISS-015, MEDIUM). See Findings below. |
+
+### Findings
+
+#### Finding 1 — MISS-013 (HIGH): manufacturing spec's own scope claim is not met by its substantive analysis — the actual primary radial containment wall (`fw_bay_wall()`) has zero specified process
+
+- **Issue**: The manufacturing spec's own §1 Scope states it specifies the
+  process for "Bench-IMU-01 Rev 3's flywheel Containment Cap **and the
+  associated containment-wall intent already disclosed** in
+  `bench-imu-01-dimensional-spec.md` §8" (line 5, emphasis added — the
+  document's own words). Yet every substantive section (§2 part
+  identification, §3.2 load-case framing, §4 process-parameter table and its
+  rationale text) scopes exclusively to `containment_cap()`. It never names,
+  characterizes, or specifies a single process parameter (infill %,
+  pattern, perimeter count, orientation, material) for `fw_bay_wall()` —
+  the module that is actually unioned into `base()` and shares the identical
+  `containment_wall_t`=4.0mm variable this document exists to convert into a
+  real manufacturing instruction.
+- **Rationale**: Independently re-derived the actual radial geometry
+  directly from `bench-imu-01-enclosure.scad` (not from the manufacturing
+  spec's own prose):
+  - `fw_bay_wall()` (lines 922–949) is the flywheel's real primary radial
+    containment structure: a solid cylindrical wall from `fw_bay_inner_r`
+    (39.5mm) to `fw_bay_outer_r` (43.5mm) — thickness exactly
+    `containment_wall_t` = 4.0mm — spanning the disk's full rotational-plane
+    height (`fw_wall_h` = 43.0mm, line 670), topped by a wider flange band
+    (43.5mm → `fw_flange_or` = 52.5mm, line 504, hosting the 6 heat-set
+    inserts). This entire assembly is unioned into `module base()`
+    (lines 1057–1074, confirmed directly) — the **first** printed piece,
+    alongside `pcb_bay_base()`/`motor_platform()`/`motor_wire_bridge_solid()`.
+  - `containment_cap()` (lines 1076–1111) — the part this document
+    exclusively addresses — is a physically and radially **separate** piece,
+    printed **third**. Its flat top disk is `containment_wall_t`=4.0mm thick
+    (matching the value this document is about), but its downward skirt is a
+    thinner `wall_t`=2.0mm slip-fit collar (line 1079 comment: "SAME
+    cap+skirt joint style reused from the PCB lid") whose own radial position
+    (ID = `fw_flange_dia` + 2×`fit_clearance` = 105.0+0.4 = 105.4mm dia →
+    r=52.7mm; OD = 105.4+2×`wall_t` = 109.4mm dia → r=54.7mm — using
+    `fit_clearance`=0.2mm/side, line 205, and `fw_flange_dia`=105.0mm,
+    line 505) sits **over 9mm radially outside** the flange band, and
+    ~11.2mm outside `fw_bay_wall()`'s own outer face (r=43.5mm).
+  - A fragment ejected radially at the disk's own rim (r = `fw_dia`/2 = 30mm,
+    travelling at the disclosed 69.74 m/s in-plane rim speed) strikes
+    `fw_bay_wall()`'s inner face (r=39.5mm) first — a part of `base()` —
+    long before it could reach `containment_cap()`'s own skirt (r≥52.7mm),
+    and, if `fw_bay_wall()` performs its intended containment function at
+    all, never reaches the cap's skirt under the very failure scenario this
+    document exists to address.
+  - The manufacturing spec's own §4 "Print orientation" rationale (line 48)
+    explicitly frames "the likely radial fragment impact" as landing on
+    "the sidewall/skirt" — but per the geometry above, the cap's skirt is
+    not the primary radial threat-path surface; it is a secondary,
+    radially-recessed assembly joint.
+  - Independently re-confirmed via a repo-wide `grep -rn -i
+    "infill\|perimeter"` across every `.md` file that no other document
+    anywhere in this repository specifies a manufacturing-process parameter
+    for `base()`/`fw_bay_wall()` either — the gap is not filled elsewhere.
+- **Datasheet Source**: `hardware/mechanical/bench-imu-01-enclosure.scad`
+  lines 455 (`containment_wall_t`), 467–468 (`fw_bay_inner_r`/
+  `fw_bay_outer_r`), 501–505 (`bolt_circle_r`/`fw_flange_or`/`fw_flange_dia`),
+  205 (`fit_clearance`), 670 (`fw_wall_h`), 922–949 (`module fw_bay_wall()`),
+  1057–1074 (`module base()`), 1076–1111 (`module containment_cap()`);
+  `hardware/mechanical/bench-imu-01-manufacturing-spec.md` line 5 (§1 scope
+  claim) and line 48 (§4 print-orientation rationale); cross-references
+  `validation/open-issues.md` MISS-012 (the finding this document was
+  produced to address).
+- **Failure Mechanism**: If this document is treated as "the containment
+  manufacturing process is now specified" without independently noticing
+  the gap, `containment_cap()` would be printed per the specified reinforced
+  process while `base()` — containing the actual primary radial containment
+  wall directly in the disclosed threat's path — would be printed under
+  whatever default settings a slicer applies (typically 15–25% infill),
+  since nothing in this repository overrides them for that part. The
+  as-printed primary containment surface could be mostly air at the exact
+  location the design's safety argument depends on being solid, while the
+  secondary/backup surface (the cap) is solid — the reverse of what the
+  disclosed radial-ejection threat actually requires, and a continuation,
+  not a resolution, of MISS-012's own core concern as it applies to the wall
+  specifically.
+- **Affected Component**: `fw_bay_wall()` / `module base()`
+  (`bench-imu-01-enclosure.scad`); manufacturing-spec.md §1/§2/§3/§4
+  (scope statement vs. substantive-coverage mismatch).
+- **Recommended Fix**: Manufacturing Engineer to extend this document (or
+  produce a companion document) specifying infill %/pattern, wall/perimeter
+  count, print orientation, and material for `fw_bay_wall()` specifically
+  (part of `base()`'s own print job), reasoned against the same disclosed
+  121.60J/69.74m/s radial-ejection load case — either by broadening this
+  document's own substantive sections to match its existing §1 claim, or by
+  explicitly narrowing §1's own scope statement to admit the cap-only
+  limitation and opening a distinct tracked item for the wall, so the gap is
+  at minimum honestly disclosed rather than implicitly presented as closed.
+  Independently cross-check the result per checklist item 11 before
+  considering MISS-012 resolved.
+- **Severity**: **HIGH** (per `docs/architecture.md` §7.1: "likely
+  malfunction or reliability failure under realistic conditions/corners" —
+  a realistic, not remote-corner-case, risk that the as-printed primary
+  containment structure differs materially from its CAD-assumed solid
+  geometry; directly mirrors the severity already established for MISS-012
+  itself, of which this is a partial continuation, not a new category of
+  concern).
+
+#### Finding 2 — MISS-014 (MEDIUM): §3.2's disclosed-load-case table labels derived/computed figures `CONFIRMED`, despite depending on inputs the source document itself marks `ASSUMPTION`/`ESTIMATE`
+
+- **Issue**: §3.2 ("Disclosed load case… treated as given") labels all 5
+  rows `CONFIRMED` — including two *derived/computed* physics results
+  (Stored kinetic energy = 121.60 J; Rim tip speed = 69.74 m/s) and a
+  qualitative "Threat mechanism" (hub-collar-release) framing. This is an
+  evidentiary overclaim: at least two of the geometric inputs these figures
+  are computed from are themselves labeled less certain in their own source
+  document.
+- **Rationale**: Independently re-derived the arithmetic by hand from first
+  principles, both to confirm the physics and to identify exactly which
+  inputs it depends on:
+  - Moment of inertia: I = 0.5 × m × r² = 0.5 × 0.100 kg × (0.030 m)² =
+    4.5×10⁻⁵ kg·m²
+  - Kinetic energy: KE = 0.5 × I × ω² = 0.5 × 4.5×10⁻⁵ × (2324.8 rad/s)² ≈
+    121.6 J ✓ (matches the manufacturing spec's stated 121.60 J exactly)
+  - Rim speed: v = ω × r = 2324.8 × 0.030 = 69.74 m/s ✓ (matches exactly)
+  - Traced the two geometric inputs back to their **original** confidence
+    labels in `bench-imu-01-dimensional-spec.md`: disk mass (100g, within
+    the "Total assembly mass" row) is labeled **ESTIMATE** (line 311); disk
+    diameter `fw_dia`=60.0mm (→ r=30mm) is labeled **ASSUMPTION** (line 365,
+    §4.4 table). (The rotational-speed input ω is not independently
+    re-traced to a per-row confidence label here — the source §8 physics
+    table, lines 568–573, carries no explicit per-row confidence column at
+    all — but this is not needed to establish the finding: the mass and
+    radius inputs alone are enough, since both KE and rim speed depend on
+    each.)
+  - Per `.github/instructions/mechanical-design.instructions.md`'s own
+    convention, `CONFIRMED` means sourced from "an actual…datasheet/measured
+    value," while `ASSUMPTION`/`ESTIMATE` are explicitly less-certain,
+    non-measured categories. A quantity computed from a mix of inputs cannot
+    cleanly inherit the most favorable label among them — it is no more
+    certain than its least-certain input. Both 121.60 J and 69.74 m/s depend
+    directly on the ASSUMPTION-labeled radius and the ESTIMATE-labeled mass.
+    Labeling them CONFIRMED silently discards that lineage — precisely the
+    "never silently blend ASSUMPTION/ESTIMATE into CONFIRMED" rule this
+    convention exists to prevent.
+  - The "Threat mechanism" row's hub-collar-release framing is itself a
+    reasoned hypothesis about which failure mode governs — reasonable, but
+    not a confirmed physical fact, since hub collar retention strength is
+    independently confirmed **UNKNOWN** in the same source document
+    (dimensional-spec §16). Labeling this hypothesis CONFIRMED is a second
+    instance of the same overclaim pattern.
+  - By contrast, independently confirmed the process-parameter table (§4)
+    correctly avoids CONFIRMED entirely (all ESTIMATE/ASSUMPTION) — a
+    correct application of the same discipline elsewhere in the very same
+    document, which is why this is flagged as an internal inconsistency,
+    not a systemic failure to understand the convention. Also confirmed
+    §3.1 correctly re-labels `containment_wall_t` ESTIMATE (matching its
+    dimensional-spec source), and that "Classification: safety-critical
+    (CONFIRMED)" / "Escalation required (CONFIRMED)" in §2/§6 are legitimate
+    uses of CONFIRMED for procedural/categorical claims, not
+    physical-measurement claims — not everything CONFIRMED in this document
+    is wrong, only the §3.2 derived-physics rows.
+  - Note: the original dimensional-spec.md §8 table itself carries no
+    per-row confidence column at all — so this specific CONFIRMED-mislabeling
+    is the Manufacturing Engineer's own transcription/labeling choice when
+    building §3.2's table, not something inherited verbatim from upstream.
+- **Datasheet Source**: manufacturing-spec.md §3.2 (lines 25–31);
+  `bench-imu-01-dimensional-spec.md` line 311 (disk mass, ESTIMATE), line 365
+  (`fw_dia`, ASSUMPTION), §8 (lines 568–573, source physics table, no
+  per-row confidence column), §16 (hub collar retention strength, UNKNOWN);
+  `.github/instructions/mechanical-design.instructions.md` (confidence-label
+  definitions).
+- **Failure Mechanism**: A future reader — including the human Chief
+  Engineer at the REQ-403 escalation gate this document is headed toward —
+  skimming the CONFIRMED label on "Stored kinetic energy: 121.60 J" could
+  reasonably conclude this figure is measured/certain, rather than a
+  computed value carrying forward an ASSUMPTION-labeled disk diameter and an
+  ESTIMATE-labeled disk mass — understating the actual uncertainty in the
+  very load figure the document's entire process rationale is anchored to.
+- **Affected Component**: manufacturing-spec.md §3.2 (confidence labeling
+  only — the numbers themselves are independently confirmed arithmetically
+  correct; this is an evidence-discipline finding, not a physics-error
+  finding).
+- **Recommended Fix**: Re-label the two derived rows (Stored kinetic energy,
+  Rim tip speed) and the Threat mechanism row as `ESTIMATE` (matching the
+  least-certain input feeding each), or show each cell's own lineage
+  explicitly (e.g., "121.60 J (ESTIMATE — derived from CONFIRMED ω,
+  ESTIMATE mass, ASSUMPTION radius)"), consistent with how §4's own process
+  table already handles mixed-confidence reasoning correctly.
+- **Severity**: **MEDIUM** (per §7.1: "deviates from recommended practice,
+  raises risk, doesn't clearly break function" — an evidence-discipline
+  violation on safety-critical figures that could mislead a reader about
+  certainty, but doesn't itself change any engineering decision, introduce a
+  physical hazard, or invalidate the document's bottom-line recommendation).
+
+#### Finding 3 — MISS-015 (MEDIUM): one-sided "maximize infill" literature framing, and an unaddressed Z-axis-anisotropy gap for the cap's own flat top
+
+- **Issue**: (a) §4's "Infill percentage" row frames 100% infill as
+  unambiguously maximizing "impact-energy absorption" and minimizing
+  "hidden void volume," without disclosing that the document's own cited
+  source (its own §7 reference #4) reports a non-100%-infill sample
+  outperforming a 100%-infill solid sample for impact-energy absorption
+  specifically; (b) §4's "Print orientation" row's rationale addresses only
+  the skirt's in-plane/radial strength, never flagging that the cap's flat
+  top disk's own through-thickness (Z) direction — its primary axis of
+  exposure to a direct axial/perpendicular impact — is FDM's inherently
+  weakest direction regardless of infill % or perimeter count, a limitation
+  the document's own reference #3 states explicitly.
+- **Rationale**:
+  - Independently researched the manufacturing spec's own reference #4
+    ("Optimizing Impact Toughness in 3D-Printed PLA Structures Using Hilbert
+    Curve and Honeycomb Infill Patterns," MDPI *Eng. Proc.* 2024, 5(1):27)
+    via two independently-phrased web searches, both converging on the same
+    reported figures: a Hilbert-curve-infill sample absorbed **11% more**
+    Charpy impact energy than a 100%-infill solid sample, but **20.6% less**
+    than a 40%-infill plain sample — meaning a sample at well under half of
+    full density (40%) outperformed *both* the exotic pattern *and* the
+    fully-solid sample for impact-energy absorption in this specific
+    published dataset. This is a real, checkable nuance directly
+    contradicting the "maximize infill" framing for the impact-energy-
+    absorption goal specifically (as distinct from the bulk-
+    stiffness/strength goal, where more infill generally does help) — this
+    is exactly the nuance this review cycle was tasked to independently
+    check for. (See the tooling disclosure above for the confirmed HTTP 403
+    primary-source access limitation and the corresponding corroboration
+    caveat.)
+  - Independently verified reference #3 ("3D Print Infill Percentage and
+    Patterns for Maximum Strength," 3DMag) via web search: real, existing
+    source; its own content states FDM Z-axis strength is inherently weaker
+    and that "infill percent and pattern won't fully compensate for this
+    inherent FDM process characteristic." The manufacturing spec cites this
+    same source (§7 reference #3) in support of its perimeter-count
+    reasoning, but its own print-orientation rationale (§4) never applies
+    this same source's own Z-axis-anisotropy point to the cap's flat top
+    disk itself — whose primary threat exposure, for a fragment or shock
+    ejected axially/upward rather than purely radially, would be exactly
+    this through-thickness Z-direction.
+  - Independently verified references #5 (MLC CAD — same Z-axis-anisotropy
+    content), #6 (UL "Blue Card" AM certification program — confirmed it
+    genuinely requires physical testing tied to a specific
+    printer+material+process combination, non-transferable), and #7
+    (ISO 12100 — confirmed it genuinely establishes the general principle
+    that ejection/fragment hazards require verification; the specific test
+    methodology lives in ISO 14120, a minor precision nuance, not itself an
+    overclaim, since the manufacturing spec does not claim ISO 12100
+    supplies the specific test method).
+  - This does not necessarily invalidate the document's bottom-line
+    recommendation: more material remains a defensible conservative default
+    under deep uncertainty, and matching the Mechanical Lead's own
+    already-reviewed solid-CAD-geometry intent is a separate, valid,
+    independent rationale for 100% infill that doesn't depend on the
+    disputed literature point — but the document's own *stated derivation
+    chain* is less rigorous/more one-sided than presented.
+- **Datasheet Source**: manufacturing-spec.md §4 (lines 44, 48) and §7
+  (references #3, #4); independently-verified web search results converging
+  on MDPI *Eng. Proc.* 2024, 5(1):27's own reported 11%/20.6% figures (two
+  independent search sessions; primary text inaccessible — HTTP 403
+  confirmed via both `web_fetch` and `curl`); 3DMag "3D Print Infill
+  Percentage and Patterns for Maximum Strength" (independently confirmed
+  content).
+- **Failure Mechanism**: Presents a one-sided "more infill/more perimeters
+  is always better for this goal" narrative to the human Chief Engineer at
+  the escalation gate, when the document's own cited literature shows a more
+  nuanced picture for the specific goal (impact-energy absorption, not bulk
+  strength) this part actually needs; doesn't itself change the physical
+  part, but weakens the rigor/credibility of the derivation chain the
+  escalation packet presents as support for the specific parameter choices
+  (as distinct from the parameter choices themselves, which remain
+  separately defensible — see Positive Findings below).
+- **Affected Component**: manufacturing-spec.md §4 rationale text (Infill
+  percentage row, Print orientation row); §7 reference list (framing, not
+  the references' own existence/content, which were independently confirmed
+  accurate).
+- **Recommended Fix**: Add an explicit line acknowledging the more nuanced
+  literature picture (e.g., "some published FDM impact-toughness data shows
+  infill densities below 100% can outperform fully-solid prints for energy
+  absorption specifically, though evidence is pattern/material-dependent and
+  not treated as controlling here; 100% infill is retained as the
+  conservative default given deep uncertainty in the load case itself and to
+  match the Mechanical Lead's own already-reviewed solid-CAD-geometry
+  intent, not because the literature unambiguously endorses maximum infill
+  for impact-energy absorption specifically"); add a corresponding line
+  naming the cap top's own Z-axis exposure as a residual,
+  infill/perimeter-independent limitation, consistent with the document's
+  own reference #3.
+- **Severity**: **MEDIUM** (rigor/honesty gap in a stated derivation chain
+  headed to a human safety decision-maker; does not itself invalidate the
+  bottom-line recommendation, which remains separately defensible on
+  conservative-default and CAD-fidelity grounds).
+
+### Independent literature investigation — infill % vs. impact-energy absorption (task-specific deep dive)
+
+This review was specifically tasked with independently checking whether
+"100% infill is always the safest/best choice for impact-energy absorption"
+is actually correct, rather than confirming the document's own framing.
+**Independent finding: the blanket claim is not well-supported, and the
+manufacturing spec's own cited source directly demonstrates the more
+nuanced picture.**
+
+- General FDM literature consensus (multiple independent sources, not just
+  the manufacturing spec's own citation list) indicates that
+  energy-absorption efficiency (as opposed to bulk stiffness/strength) often
+  peaks *below* 100% infill, because some structural compliance/progressive-
+  crush behavior in a partially-infilled lattice can absorb more total
+  impact energy before failure than a fully rigid, fully solid print — a
+  materially different optimization goal from maximizing stiffness or
+  ultimate strength.
+- The manufacturing spec's own §7 reference #4 (MDPI *Eng. Proc.* 2024,
+  5(1):27) is a concrete, checkable, in-scope example of exactly this
+  pattern: independently verified via two separately-phrased web searches
+  that this source reports a **40%-infill plain sample beating both a
+  Hilbert-curve-infill sample (by ~20.6%) and a 100%-infill solid sample
+  (the Hilbert-curve sample itself beat 100%-solid by ~11%, and 40%-infill
+  beat the Hilbert-curve sample, so 40%-infill beat 100%-solid by an even
+  larger margin) for Charpy impact-energy absorption**. This is the
+  document's *own* cited source contradicting its *own* blanket "maximize
+  infill" framing for this specific goal.
+- This finding is corroborated via two independent, differently-phrased
+  searches converging on identical figures and the identical citation
+  (journal/volume/issue) — reasonably solid triangulation — but primary-text
+  confirmation was not achievable in this environment (MDPI blocked both
+  `web_fetch` and a browser-user-agent `curl` attempt with HTTP 403,
+  independently confirmed, not assumed).
+- **This does not mean 100% infill is the wrong choice here.** The disclosed
+  load case carries deep, compounding uncertainty (disk mass ESTIMATE, disk
+  radius ASSUMPTION, hub-collar failure mode itself UNKNOWN per Finding 2
+  above), and matching the Mechanical Lead's own already-reviewed solid-CAD
+  geometry is a legitimate, literature-independent rationale for maximizing
+  bulk material continuity as a conservative default under that uncertainty.
+  What is genuinely wrong is presenting "100% infill maximizes
+  impact-energy absorption" as a settled, one-directional literature
+  conclusion, when the document's own cited source shows the opposite in at
+  least one directly-relevant published dataset. See Finding 3 (MISS-015)
+  above for the formal write-up and recommended fix.
+
+### Independent assessment of the escalation conclusion (task-specific)
+
+The manufacturing spec concludes (§6) that FDM cannot be presented as an
+adequate, validated containment process for REQ-403 without real physical
+testing, and recommends escalating the adequacy question to the human Chief
+Engineer rather than claiming REQ-403 is closed. This review was tasked
+with independently assessing whether this is the correct, honest conclusion
+— not a cop-out — given the real state of this environment's tooling.
+
+**Independent assessment: yes, this conclusion is correct and honest, and
+should proceed to the human — subject to one caveat below.**
+
+- **Tooling-absence claim independently confirmed, not trusted at face
+  value**: this session independently confirmed no slicer is installed, no
+  `cadquery`/`build123d` is installed, and — critically — made a *live* call
+  to `blender-get_addon_status` specifically to test whether any
+  FEA/simulation capability might actually be reachable despite the
+  document's claim otherwise. That call returned a genuine handshake
+  failure. No physical printer or destructive-test capability is exposed to
+  this session. All of this independently corroborates the manufacturing
+  spec's own §6 disclosure through direct, live tool evidence gathered this
+  cycle, not by repeating the document's own words.
+- **The cited certification-body evidence independently checks out**:
+  reference #6 (UL's "Blue Card" additive-manufacturing certification
+  program) was independently web-searched and confirmed to genuinely require
+  physical testing tied to a specific printer + material + process
+  combination, non-transferable to a different combination — directly and
+  accurately supporting the position that a CAD/reasoning-only exercise
+  cannot substitute for physical validation of a safety-critical FDM part.
+  Reference #7 (ISO 12100) was independently confirmed to genuinely
+  establish the general principle that ejection/fragment hazards must be
+  verified.
+- **The escalation is not a way to avoid doing the reasoning work**: the
+  document does substantive, checkable engineering reasoning first (load
+  case, geometry, process-parameter selection, all independently re-derived
+  above) and only *then* concludes that reasoning alone cannot certify a
+  safety-critical containment part without physical testing — that is the
+  correct order of operations, not a shortcut past the reasoning.
+- **The caveat**: the escalation packet, as currently scoped, would present
+  the human Chief Engineer with a manufacturing-process specification that
+  *reads* as covering "the containment cap and the associated
+  containment-wall intent" (its own §1 wording) but in substance only
+  covers one of the two physically separate structures that share the
+  `containment_wall_t` claim (Finding 1 / MISS-013). Escalating the
+  fundamental FDM-adequacy question is correct and should proceed regardless
+  — that conclusion does not depend on Finding 1 being fixed first. But
+  presenting an incompletely-scoped specification at that escalation point
+  risks leaving the human with an inaccurate picture of what fraction of the
+  REQ-403 threat path has actually been assessed. **Recommendation: the
+  scope gap (Finding 1 / MISS-013) should be closed, or at minimum
+  explicitly and prominently disclosed as a known limitation, before or
+  alongside this escalation reaching the human** — not as a precondition for
+  escalating the FDM-adequacy question itself, but as a precondition for the
+  escalation being an honest, complete representation of what has been
+  checked.
+
+### Positive Findings
+
+- The specified process parameters for `containment_cap()` itself (100%
+  infill, minimum 6 perimeters, gyroid/honeycomb-family pattern, nylon/PETG,
+  upright print orientation) are individually reasonable and traceable to
+  the disclosed load case, independent of the literature-framing critique in
+  Finding 3 — the parameter *choices* are defensible even where the *stated
+  rationale* for them is incomplete.
+- §4's process-parameter table correctly uses ESTIMATE/ASSUMPTION
+  throughout and never overclaims CONFIRMED — a correct, good-faith
+  application of the confidence-marking discipline, independently confirmed
+  by direct inspection of every row.
+- §3.1 correctly re-labels `containment_wall_t`=4.0mm as ESTIMATE, matching
+  its dimensional-spec source (line 372) — independently verified, not
+  assumed.
+- §5's explicit list of exclusions (no load/impact simulation performed; no
+  physical print/test performed; not a substitute for the human REQ-403
+  safety sign-off) is itself honest and consistent with what this review
+  independently found to be true of this environment's tooling.
+- §8's own handoff framing ("ready for Mechanical Reviewer's independent
+  cross-check," "not final/approved," "does not self-certify") correctly
+  anticipates and invites exactly the review this cycle performed, rather
+  than presenting itself as already-validated.
+- The escalation conclusion itself (§6) is independently assessed as honest
+  and substantively correct, not a cop-out — see dedicated section above.
+
+### Verdict
+
+- **Verdict**: **CONDITIONAL** (not a clean PASS, and not a FAIL — this
+  routes back to the **Manufacturing Engineer**, via the Hardware Lead, not
+  to the Mechanical Lead: the `.scad` geometry itself is unchanged and not at
+  fault here; only the manufacturing-process specification's scope and
+  rigor need rework)
+- **Open CRITICAL count**: 0
+- **Open HIGH count**: 1 (MISS-013 — new this cycle)
+- **Open MEDIUM count (non-gating)**: 2 (MISS-014, MISS-015 — new this
+  cycle), plus the pre-existing MISS-011 (untouched by this cycle, not
+  re-litigated here)
+- **What independently checks out**: the process parameters specified for
+  `containment_cap()` itself are individually reasonable against the
+  disclosed load case; the confidence-marking discipline is correctly
+  applied everywhere in this document *except* §3.2; the cited UL/ISO
+  certification-body references are real and accurately characterized; the
+  claimed absence of slicer/FEA/physical-test tooling in this environment is
+  independently confirmed true via a live tool call this cycle; the
+  escalation-to-human conclusion is independently assessed as honest and
+  correct on its own terms.
+- **What remains open, gating**: MISS-013 (HIGH) — the manufacturing spec's
+  own §1 scope claim ("the associated containment-wall intent") is not met
+  by its substantive analysis, which addresses `containment_cap()` only and
+  never `fw_bay_wall()`/`base()`, the part that is actually first in the
+  disclosed radial-ejection threat's path. Per this checklist item's own
+  rule and `docs/architecture.md` §7.1, an open HIGH finding precludes a
+  clean PASS.
+- **What remains open, non-gating**: MISS-014 (MEDIUM) — §3.2 overclaims
+  CONFIRMED on derived load-case figures built from ASSUMPTION/ESTIMATE
+  inputs; MISS-015 (MEDIUM) — the infill/impact-energy literature framing is
+  one-sided relative to the document's own cited source, and the cap top's
+  own Z-axis anisotropy is not addressed. Neither blocks a CONDITIONAL
+  routing, but both should travel with the loop-back to the Manufacturing
+  Engineer.
+- **Next action**: Report CONDITIONAL to the Hardware Lead, routed to the
+  Manufacturing Engineer (not the Mechanical Lead) for: (1) extending process
+  coverage to `fw_bay_wall()`/`base()` or explicitly narrowing/disclosing the
+  scope limitation (MISS-013); (2) correcting the §3.2 confidence labels
+  (MISS-014); (3) adding the literature-nuance and Z-axis-anisotropy
+  disclosures (MISS-015). MISS-012 remains **OPEN** — this document makes
+  real, substantive progress toward closing it (a genuine process spec now
+  exists and has been independently cross-checked, where before none existed
+  at all), but does not fully close it, since the gap MISS-012 raised
+  persists for `fw_bay_wall()` specifically. The escalation of the
+  fundamental FDM-adequacy question to the human Chief Engineer is
+  independently assessed as correct and may proceed in parallel — but should
+  carry an explicit disclosure of the MISS-013 scope gap if it reaches the
+  human before that gap is closed.
+
+## Mechanical Reviewer — Manufacturing Process Cross-Check Re-Verification (MISS-013/014/015 Closure), 2026-09-11
+
+### Review Cycle Metadata
+
+- **Document reviewed**: `hardware/mechanical/bench-imu-01-manufacturing-spec.md`
+  (96 lines — up from 89 lines at the prior cross-check — revised by the
+  Manufacturing Engineer in direct response to MISS-013 (HIGH), MISS-014
+  (MEDIUM), and MISS-015 (MEDIUM), all logged in the entry immediately above
+  this one and in `validation/open-issues.md`).
+- **This is a fresh, independent re-verification, not a re-read of the
+  document's own claims.** Per this task's own explicit framing: "Do not
+  accept that the findings are resolved just because the document now
+  contains different words claiming to address them." Every claimed fix
+  below was independently re-derived from primary sources (live `.scad`
+  source, `datasheets/evidence-log.md`, `requirements/requirements.md`,
+  `bench-imu-01-dimensional-spec.md`, `git log`/`git diff`), not accepted
+  because the manufacturing spec's own prose asserts it.
+- **Scope**: re-verify MISS-013/014/015 closures specifically; re-confirm
+  MISS-012's own status; confirm scope discipline (no `.scad`/dimensional-spec
+  changes); assess overall readiness for the human Chief Engineer escalation
+  packet. Checklist item 11 only (items 1–10 unaffected — no `.scad`/
+  dimensional-spec geometry changed, confirmed below).
+
+### Scope discipline check (task item 5)
+
+- `git log --oneline -5 -- hardware/mechanical/bench-imu-01-enclosure.scad hardware/mechanical/bench-imu-01-dimensional-spec.md`
+  → `2cbe846`, `c5ac653`, `7497bf2`, `208c94e` — identical set to the prior
+  cross-check; no new commits landed against either file.
+- `git status --short` → the **only** entry in the entire working tree is
+  `?? hardware/mechanical/bench-imu-01-manufacturing-spec.md` (untracked).
+  `git diff --stat HEAD` returns **empty** — confirms zero tracked-file
+  changes anywhere in the repository relative to `HEAD`, not just in the two
+  files named above. The entire revision is contained within the
+  manufacturing-spec document itself.
+- **Conclusion: scope discipline holds completely.** No `.scad` geometry, no
+  `bench-imu-01-dimensional-spec.md` value, and no other file was touched.
+
+### Re-verification of MISS-013 — `fw_bay_wall()`/`base()` process-spec scope gap
+
+- **§1 Scope** now explicitly names both `fw_bay_wall()` (within `base()`)
+  and `containment_cap()` as the two parts specified.
+- **§3.1 geometry claims independently re-derived line-by-line against the
+  live `.scad` source**, not accepted from the document's own prose:
+  `base()` (lines 1057–1074) is confirmed to be
+  `difference(union(pcb_bay_base()[752], motor_platform()[868],
+  fw_bay_wall()[922], motor_wire_bridge_solid()[1019]),
+  motor_wire_duct_void()[1036])` — this exactly matches the manufacturing
+  spec's own §3.1 claim ("`base()` also bundles `pcb_bay_base()`,
+  `motor_platform()`, and `motor_wire_bridge_solid()` before the global
+  subtraction of `motor_wire_duct_void()`"), independently confirmed correct,
+  not merely repeated. Every numeric claim in §3.1 was independently
+  recomputed from the live source constants and matches exactly:
+  `fw_bay_inner_r`=39.5mm, `fw_bay_outer_r`=43.5mm (→ 4.0mm =
+  `containment_wall_t`), `fw_wall_h`=`fw_clearance_top`(45.0)−`fw_floor_top`
+  (2.0)=43.0mm, `fw_flange_or`=52.5mm, cap skirt OD =
+  `fw_flange_dia`+2×`fit_clearance`+2×`wall_t` = 105.0+0.4+4.0=109.4mm.
+- **§4 now carries two dedicated rows for `base()`/`fw_bay_wall()`** ("Top/
+  bottom solid layers," "Print orientation") with content specific to this
+  part's own geometry (floor disc, flange band hosting the 6 heat-set
+  inserts, and — independently confirmed named explicitly in the "Top/bottom
+  solid layers" row — the wire-bridge geometry too) — this is not a
+  copy-paste of the cap's rows (which discuss the cap's own flat top, skirt,
+  and bolt circle instead). The two parts' rows are substantively distinct.
+- **Print-orientation reasoning for `base()` independently assessed as
+  genuinely grappling with, not waving away, the multi-feature bundling
+  complexity**: the rationale explicitly names the competing functional
+  needs (PCB-bay-base flatness, motor-platform flatness, flange
+  concentricity vs. the wall's radial-strike-optimal continuous-XY-loop
+  orientation), explicitly considers a "sideways orientation" alternative,
+  and explicitly rejects it with a stated, specific reason (it would
+  sacrifice the broader part's datum flatness and turn the cylindrical wall
+  into layer-to-layer laminations loaded more directly across weaker
+  interlayer bonds). This is genuine trade-off reasoning with a considered
+  alternative and a reasoned rejection, not hand-waving — independently
+  assessed, not accepted on the document's own say-so. The stated
+  orientation ("motor-platform face down, `fw_bay_wall()` rising upward") is
+  also independently confirmed consistent with the `.scad` model's own
+  coordinate frame (Z=0 is the modeled floor, matching "installed
+  orientation").
+- **§4.1 (new) primary/secondary containment-surface determination
+  independently re-derived, not merely repeated**: direct radial-geometry
+  computation confirms `fw_bay_wall()` spans r=39.5–43.5mm while
+  `containment_cap()`'s skirt sits at r=52.7–54.7mm — over 9mm further out,
+  radially behind the flange band. A fragment ejected radially from the
+  disk's rim (r=30mm, the disclosed 69.74 m/s threat) reaches `fw_bay_wall()`
+  first, long before it could reach the cap's skirt. **I independently agree
+  with §4.1's primary/secondary determination** on this basis — it was
+  re-derived from the live `.scad` geometry directly, not accepted because
+  the document asserts it.
+
+**Verdict on MISS-013: independently confirmed RESOLVED.** The process spec
+for `fw_bay_wall()`/`base()` is real, substantive, geometry-specific, and
+correctly reasoned — not a copy-paste of the cap's own numbers relabeled.
+
+### Re-verification of MISS-014 — §3.2 confidence-label overclaims
+
+- **The 3 originally-named rows (stored kinetic energy, rim tip speed,
+  threat mechanism) are now correctly labeled `ESTIMATE`.** Independently
+  re-derived the arithmetic by hand again, from first principles, to confirm
+  nothing changed since the prior cycle: I = 0.5×0.100 kg×(0.030 m)² =
+  4.5×10⁻⁵ kg·m²; KE = 0.5×4.5×10⁻⁵×(2324.8 rad/s)² ≈ 121.60 J ✓ (matches
+  exactly); v = 2324.8×0.030 = 69.74 m/s ✓ (matches exactly, ×3.6 ≈
+  250.7 km/h ✓). Re-traced both geometric inputs to their original labels in
+  `bench-imu-01-dimensional-spec.md`: disk mass=100g is **ESTIMATE** (line
+  311), `fw_dia`=60.0mm is **ASSUMPTION** (line 365) — both correctly cited
+  in the new rows' own Source column. The "Threat mechanism" row's
+  hub-collar-release hypothesis is correctly labeled `ESTIMATE`, consistent
+  with hub-collar retention strength being independently confirmed
+  **UNKNOWN** (dimensional-spec §16).
+- **However, spot-checking the *rest* of the document — as this task
+  explicitly required, rather than trusting the Manufacturing Engineer's own
+  claim that no other instances exist — found the identical overclaim
+  pattern persists on 2 more rows in the same §3.2 table**, neither of which
+  was among the 3 rows named in the original MISS-014 finding text (which
+  explicitly declined to open this specific question: "The rotational-speed
+  input ω is not independently re-traced to a per-row confidence label
+  here… not needed to establish the finding" — leaving exactly this door
+  unopened, which this cycle's task asked me to go back and open):
+  - **"Credible worst-case flywheel speed" = 22,200 RPM no-load-high, still
+    labeled `CONFIRMED`.** Independently traced this figure to its source:
+    `datasheets/evidence-log.md` line 236, Evidence ID **DS-MTR-018**, reads
+    verbatim: *"T-Motor MN2206-13 KV2000 no-load current 0.3 A at 10V test
+    voltage; **this project's own derived no-load speed estimate** ~20,000
+    RPM at 10V / ~22,200 RPM at full-charge 3S (11.1V), from the published KV
+    constant, **not directly published by the manufacturer**."* The motor's
+    own datasheet file
+    (`datasheets/tmotor_mn2206-13-2000kv_rev-unknown.md`) independently
+    confirms *"No formal PDF datasheet found/published for this SKU"* and
+    explicitly parallels this RPM figure to an already-flagged-as-"derived"
+    torque figure elsewhere in the same file. `requirements/requirements.md`
+    REQ-405's own Notes column likewise hedges this figure with "≈"
+    ("the recommended motor's own no-load speed (≈20,000–22,200 RPM)"),
+    consistent with estimate-, not confirmed-, quality. Per
+    `.github/instructions/mechanical-design.instructions.md`'s own
+    definition, `CONFIRMED` requires "an actual…datasheet/measured value —
+    cite the source"; a project-computed estimate explicitly flagged by its
+    own evidence-log entry as "not directly published by the manufacturer"
+    does not meet that bar. This is the identical overclaim pattern MISS-014
+    was raised to fix, on a row the original finding did not examine.
+  - **"Angular velocity" = 2324.8 rad/s, still labeled `CONFIRMED`.** This is
+    a pure, exact unit conversion of the same RPM figure (22,200×2π/60 =
+    2324.8 rad/s, independently re-confirmed by hand) and therefore
+    inherits the RPM row's confidence exactly, by the same "a computed value
+    is no more certain than its least-certain input" rule already applied
+    (correctly) to the other 3 rows in this exact table. It should likewise
+    be `ESTIMATE`, not `CONFIRMED`.
+  - Also independently confirmed: `bench-imu-01-dimensional-spec.md`'s own
+    §8 physics table (lines 568–573) carries **no per-row confidence column
+    at all** — meaning this `CONFIRMED` label, like the other 3 already
+    fixed, is the Manufacturing Engineer's own transcription/labeling choice
+    when building §3.2's table, not something inherited verbatim from
+    upstream.
+- **Exhaustively spot-checked every other `CONFIRMED` instance in the
+  document** (confirmed via `grep` that the document contains exactly 4
+  occurrences of `CONFIRMED` total: lines 11, 28, 29, 82 — no others exist).
+  Lines 28/29 are addressed above. The remaining two are independently
+  assessed as legitimate, non-overclaiming uses:
+  - Line 11, "Classification: safety-critical (`CONFIRMED`)" — independently
+    traced to `requirements/requirements.md` REQ-403's own Notes column,
+    which states verbatim "Safety-critical — ties to the 'safety-critical
+    changes' HITL gate." This is a categorical/procedural classification
+    directly sourced from the governing requirement document itself, not a
+    physical-measurement claim subject to ASSUMPTION/ESTIMATE contamination.
+    Legitimate.
+  - Line 82, "Escalation required (`CONFIRMED`)" — this is the categorical/
+    logical conclusion of the document's own preceding 4-point reasoning (a
+    policy determination that escalation is required given the disclosed
+    uncertainty), not a physical value. Legitimate, and consistent with the
+    prior cycle's own treatment of this exact line.
+
+**Verdict on MISS-014: NOT fully resolved.** 3 of 5 rows in §3.2 were
+correctly fixed; 2 of 5 rows (the "Credible worst-case flywheel speed" and
+"Angular velocity" rows) carry the identical `CONFIRMED`-overclaim defect
+the finding was raised to eliminate, independently confirmed via a primary
+evidence-log source (DS-MTR-018) the document itself does not cite for this
+row. **This finding stays OPEN** and routes back to the Manufacturing
+Engineer for a small, focused, same-pattern fix (relabel both rows
+`ESTIMATE`, exactly as already correctly done for the other 3 rows in the
+identical table).
+
+### Re-verification of MISS-015 — infill literature nuance + Z-axis anisotropy disclosure
+
+- **Infill-percentage row (§4)** now reads, in relevant part: *"...the
+  document's own cited MDPI Eng. Proc. 2024 reference reports a 40% infill
+  sample outperforming both a Hilbert-pattern sample and a 100% solid sample
+  for Charpy energy absorption. 100% infill is retained here anyway as a
+  conservative default under deep load-case uncertainty (hub-collar
+  retention strength remains `UNKNOWN`) and to preserve CAD-fidelity to the
+  already-approved 'solid 4.0 mm containment wall' design intent, not
+  because the literature unambiguously proves 100% infill is always best for
+  this exact goal."* Cross-checked against my own independently-researched
+  figures already on record from the prior cross-check's dedicated
+  literature-investigation section (a Hilbert-curve sample beat 100%-solid
+  by 11% but lost to a 40%-infill plain sample by 20.6%, i.e. 40%-infill beat
+  both) — exactly consistent, no distortion, no re-search needed. Reference
+  #4 (§7) was also revised to state the same nuance ("documenting that some
+  sub-100% infill cases can outperform 100% solid prints for impact-energy
+  absorption"). This is a substantive, accurate disclosure that retains the
+  100%-infill recommendation on the correct (conservative-default/
+  CAD-fidelity) grounds while honestly conceding the literature does not
+  unanimously support it for this specific goal — precisely the required
+  fix, not a cosmetic rewording, and it does **not** simply change the
+  underlying recommendation (which was never the ask).
+- **Print-orientation row for `containment_cap()` (§4)** now ends: *"Residual
+  limitation: the cap's own flat top still contains Z-axis-built layer
+  interfaces through its thickness, so infill/perimeter/orientation choices
+  cannot fully remove anisotropy from that top surface; they only avoid
+  making the cylindrical skirt and bolt-circle region even worse."* This is
+  specific (names the flat top by its actual geometric role, explains *why*
+  the limitation is unavoidable — the top surface's layer-interface
+  orientation is fixed by the very same part-orientation choice made to
+  protect the skirt, so no choice of infill/perimeter/orientation can address
+  both surfaces at once), and correctly distinguishes what *is* helped
+  (skirt/bolt-circle region) from what *is not* (the flat top itself) —
+  consistent with the anisotropy-literature reference's own point that
+  infill/perimeter choices "won't fully compensate" for Z-axis weakness.
+  This is a genuine, substantive, correctly-reasoned disclosure, not a token
+  sentence appended to satisfy the letter of the finding.
+
+**Verdict on MISS-015: independently confirmed RESOLVED.** Both sub-parts of
+the required fix are present, substantive, and accurate.
+
+### Re-confirmation of the escalation-to-human conclusion (§6)
+
+§6's conclusion ("FDM cannot be presented as an adequate, validated
+containment process for REQ-403 on the basis of this document alone"), its
+4-point reasoning, the Manufacturing Engineer disposition, and "Escalation
+required (`CONFIRMED`)" are all read again this cycle and found **unchanged
+in substance** from what the prior cross-check independently assessed and
+endorsed (live `blender-get_addon_status` handshake-failure confirmation of
+no FEA/simulation tool; independently verified UL "Blue Card"/ISO 12100
+references; confirmation that the escalation follows substantive reasoning
+rather than substituting for it). Nothing about this cycle's re-verification
+changes that assessment: **the escalation conclusion is undiminished and
+remains independently endorsed.**
+
+### MISS-012 status re-confirmation
+
+MISS-012's own stated closure criterion (its Notes column, verbatim): *"this
+MISS-012 finding should be considered resolved only once a process spec
+exists (and is independently cross-checked) for `fw_bay_wall()`/`base()` as
+well, not just the cap."* Given MISS-013 is independently re-verified
+RESOLVED this cycle — a genuine, substantive, geometry-specific process spec
+now exists for `fw_bay_wall()`/`base()`, and it has now been independently
+cross-checked twice (first identifying the scope gap, now confirming its
+closure) — **MISS-012's own specific closure criterion is met. I agree
+explicitly: MISS-012 is ready to close.**
+
+This is not undermined by MISS-014 remaining open: MISS-012's own text ties
+its closure specifically to the scope-completeness question MISS-013
+addressed (does a process spec exist, covering both parts, independently
+cross-checked), not to every rigor finding surfaced during the same
+cross-check cycle. MISS-014 and MISS-015 were always tracked as their own
+separate, distinct, lower-severity (MEDIUM) findings — MISS-012's own prior
+update note describes them as "two further rigor findings… also surfaced
+during the same cross-check," not as sub-conditions of MISS-012's own
+closure bar. MISS-014 remaining open is real and should not be minimized,
+but it does not reopen or block MISS-012.
+
+### Positive Findings
+
+- The `fw_bay_wall()`/`base()` process-spec content is genuinely distinct
+  from and not a relabeled copy of the cap's own rows — independently
+  confirmed by direct textual/content comparison, not assumed.
+- The §4.1 primary/secondary containment-surface determination is
+  independently re-derivable from the live `.scad` geometry alone and is
+  confirmed correct on that independent basis.
+- The infill-literature and Z-axis-anisotropy disclosures added for MISS-015
+  are specific, accurate, and non-cosmetic — independently cross-checked
+  against this Reviewer's own prior, separately-conducted literature
+  research, not merely re-read.
+- Scope discipline is complete: zero unauthorized changes anywhere in the
+  repository outside the one file this revision was scoped to touch.
+- The escalation-to-human conclusion is unchanged and remains independently
+  endorsed.
+
+### Verdict
+
+- **Verdict**: **CONDITIONAL** (not a clean PASS, and not a FAIL — this
+  routes back to the **Manufacturing Engineer** once more, via the Hardware
+  Lead, for a small, focused fix; it does not touch the Mechanical Lead's
+  `.scad` geometry, which remains unchanged and not at fault)
+- **Open CRITICAL count**: 0
+- **Open HIGH count**: 0 — **MISS-013 independently confirmed RESOLVED this
+  cycle**; **MISS-012 independently confirmed ready to close this cycle**
+  (its own specific closure criterion is met)
+- **Open MEDIUM count (non-gating)**: 1 — **MISS-014 remains OPEN**
+  (partially fixed: 3 of 5 rows corrected, 2 of 5 rows — "Credible
+  worst-case flywheel speed," "Angular velocity" — still mislabeled
+  `CONFIRMED`, independently discovered this cycle via the exact spot-check
+  this task required, not previously named in the original finding).
+  **MISS-015 independently confirmed RESOLVED this cycle.**
+- **Why CONDITIONAL and not PASS, despite only 1 open MEDIUM finding**:
+  Cycle 4's precedent (`validation/design-review.md`, "Mechanical Reviewer —
+  Cycle 4," 2026-09-12) awarded PASS alongside an open MEDIUM (MISS-011)
+  because that finding was a knowingly-carried-forward, already-disclosed,
+  *unchanged* limitation not itself under active remediation that cycle. The
+  present situation is materially different: MISS-014 was *actively
+  re-examined* as one of this cycle's 3 specific target closures, and the
+  claimed fix was found *incomplete* — the same defect the finding
+  identifies persists on 2 more rows in the identical table. Per this task's
+  own explicit instruction ("If you find any of the three fixes is
+  incomplete… do NOT mark it resolved… this routes back to the Manufacturing
+  Engineer again"), this is a loop-back situation, correctly reflected as
+  CONDITIONAL rather than a pass-with-disclosed-limitation.
+- **What independently checks out**: MISS-012 and MISS-013 (both effectively
+  the same underlying scope-completeness question) are genuinely,
+  substantively resolved — the process spec for `fw_bay_wall()`/`base()` is
+  real, geometry-specific, and independently re-derived as correct, not a
+  copy-paste. MISS-015 is genuinely resolved — both the literature-nuance
+  and Z-axis-anisotropy disclosures are substantive and accurate. Scope
+  discipline is complete (zero unauthorized changes). The escalation
+  conclusion is unchanged and remains independently endorsed.
+- **What remains open, non-gating**: MISS-014 (MEDIUM) — 2 of 5 rows in
+  §3.2's disclosed load-case table remain mislabeled `CONFIRMED` despite
+  depending on a project-derived, not-manufacturer-published rotational-speed
+  estimate (DS-MTR-018). This does not change any physical figure, does not
+  affect the escalation conclusion's substance, and is a fast, same-pattern
+  fix (the identical relabeling exercise already correctly applied 3 times
+  in the same table) — but it should not be silently presented as fully
+  closed.
+- **Independent judgment on readiness for the human Chief Engineer**: the
+  manufacturing-spec document has made **real, substantive, verified
+  progress** since the prior cycle — MISS-012/013 (the structural
+  scope-completeness gap) and MISS-015 (literature-framing honesty) are
+  genuinely closed, not cosmetically closed. The core safety substance —
+  the disclosed load case, the primary/secondary containment-surface
+  determination, and the "FDM is not self-certifying; escalate" conclusion —
+  is intact, correct, and does not depend on the residual MISS-014 gap. **The
+  escalation of the fundamental FDM-adequacy question may proceed** — it
+  should not be held hostage to a 2-row labeling fix. However, this document
+  is **not yet fully clean**, and presenting it to the human Chief Engineer
+  as "manufacturing spec, independently cross-checked, no open findings"
+  would be inaccurate while MISS-014 remains open. **Recommendation**: either
+  (a) have the Manufacturing Engineer apply the same relabeling fix to the 2
+  remaining rows before the packet is presented (this is a fast, low-effort,
+  already-precedented fix within the same document), or (b) if timing
+  requires presenting sooner, carry MISS-014 forward explicitly as a named,
+  disclosed, non-blocking limitation alongside the packet — mirroring
+  exactly how the prior cycle's MISS-013 scope-gap caveat was handled before
+  it was fixed.
+- **Next action**: Report CONDITIONAL to the Hardware Lead. MISS-012,
+  MISS-013, and MISS-015 may be marked RESOLVED in
+  `validation/open-issues.md` on this Reviewer's own independent verification
+  rationale (not the Manufacturing Engineer's say-so). MISS-014 stays OPEN
+  and routes back to the Manufacturing Engineer for the 2 remaining rows
+  specifically — no other rework is required on this document.
+
+## Mechanical Reviewer — MISS-011 Closure Attempt Independent Cross-Check + Wall-Margin Escalation Assessment, 2026-09-13
+
+### Review Cycle Metadata
+
+- **Document reviewed**: `hardware/mechanical/bench-imu-01-dimensional-spec.md`
+  Rev 3.2 — specifically the new §8.1 ("MISS-011 closure attempt,"
+  subsections 8.1.1–8.1.7, ~320 new lines), authored by the Mechanical Lead
+  as an **analysis-only** revision (`.scad` unchanged) attempting MISS-011's
+  Recommended Fix path (a): a bounded, hand-derived engineering estimate of
+  whether the 4.0mm `containment_wall_t` wall and 6×M3 heat-set-insert cap
+  fasteners can plausibly absorb/withstand the disclosed REQ-403 load case
+  (121.60J at 69.74 m/s rim speed, 100g disk).
+- **Trigger**: Hardware Lead request, two parts — (1) independently verify
+  whether this closure attempt is sound engineering (method, arithmetic,
+  citations, confidence-honesty), not just whether "the arithmetic checks
+  out"; (2) independently decide how the new "wall falls short of budget"
+  information surfaced at §8.1.6 should be tracked, per this repository's
+  rule that a design role cannot self-log a finding about its own work into
+  `validation/open-issues.md`.
+- **Independence framing**: The Hardware Lead disclosed they had already
+  spot-verified significant parts of this themselves (the core Method 1/
+  Method 2 arithmetic, the CNC Kitchen article's DS-FAST-002 figures, and 5
+  cited `.scad` constants). Per this role's independence mandate, none of
+  that was taken on faith here — every item was independently re-derived
+  from primary sources this cycle, including the two datasheets
+  (DS-MTL-002, DS-FAST-003) the Hardware Lead explicitly flagged as *not*
+  personally re-checked, plus full independent coverage of the other four
+  (DS-MTL-001/003, DS-FAST-001/002), a fresh from-scratch arithmetic
+  re-derivation (not a re-read of the document's own computed tables), and
+  a deeper confidence-labeling audit than either the Mechanical Lead's own
+  self-check or the Hardware Lead's spot-check reached.
+
+### Scope discipline check
+
+- `git status --short` / `git diff --stat HEAD`: `hardware/mechanical/
+  bench-imu-01-enclosure.scad` shows **zero** uncommitted changes — the
+  Mechanical Lead's "no `.scad` geometry changed" claim is independently
+  confirmed, not just trusted.
+- `validation/open-issues.md`'s only diff this revision is a **single
+  in-place edit to MISS-011's own existing row** (its Notes cell gained the
+  "Rev 3.2 update" paragraph; its Status cell is untouched, still `OPEN`) —
+  confirmed via `git diff` showing exactly one 7-line-for-7-line hunk at
+  that row, and independently re-read against the row's current full text.
+  No new row was self-created and no other row's Status/Severity was
+  touched — consistent with the required no-self-tracking convention (a
+  design role may append a status note to its own already-open finding,
+  but may not open or close a tracked finding unilaterally).
+- `hardware/mechanical/bench-imu-01-dimensional-spec.md`'s diff (436 lines
+  changed, 420 insertions/24 deletions) resolves into exactly 6 hunks: a
+  top-of-file Rev 3.2 changelog/status banner, the §8.1 insertion itself,
+  and small cross-reference-only additions to §12, §15 (2 hunks), and §16 —
+  all in the locations the changelog itself discloses, all consistent with
+  what was independently read in full this cycle. No undisclosed edit to
+  §4's authoritative confidence tables, or to any other pre-existing
+  section, was found.
+- **Conclusion: scope discipline holds completely.**
+
+### 1. Independent arithmetic re-derivation
+
+Every computed figure in §8.1 was re-derived from scratch in an independent
+Python session, not re-read from the document's own tables:
+
+- Base physics: `KE = ¼·m·v_rim²` and `I = ½mr²` recomputation — 121.59–
+  121.60J, 69.74 m/s, I=4.5×10⁻⁵ kg·m² — matches exactly.
+- Method 1 (Charpy/fracture-toughness energy density): full
+  `E_frac = specific_toughness × (t × w) / 1000` table across the stated
+  engagement sweep, plus its reverse cross-check (solve for the engagement
+  width `w` needed to absorb the full 121.60J at fixed t=4.0mm) —
+  reproduced 2,533–12,667mm / 1,021%–5,104% exactly.
+- Method 2 (yield-strength-limited local plastic work): full table plus
+  reverse cross-check — reproduced 152.00–200.53mm / 61%–81% exactly, i.e.
+  the document's stated "152–201mm" / "61%–81%."
+- Baseball-comparable sanity check (116.0J / 95.4%), the oblique-impact
+  trigonometry (49.4°), the fastener `F = E/δ` table and its ≈20.3mm
+  breakeven point, and all 5 pull-out-force kg→N conversions — all
+  reproduced exactly.
+- **One self-caught error, disclosed transparently**: my first pass at
+  Method 2's reverse cross-check did not match the document (I had omitted
+  the `t=4.0mm` factor from one line of my own script). Re-deriving the
+  formula from the same first principles stated in the document
+  (`w = KE_full × 1000 / (yield × t × δ)`) rather than assuming either my
+  script or the document was wrong, the corrected computation reproduces
+  the document's stated figures exactly. This was my own transcription
+  bug, not a document error — disclosed here as evidence of how this
+  verification was actually performed (recomputing from first principles
+  until independently consistent, not pattern-matching against the
+  document's own numbers), not to imply residual doubt about this figure.
+- **Result: zero arithmetic discrepancies found anywhere in §8.1.** Every
+  number checks out exactly against an independent, from-scratch
+  recomputation.
+
+### 2. Independent datasheet/citation spot-check
+
+All 6 new Evidence IDs registered this revision were independently
+re-verified against live or freshly-searched primary sources (not merely
+re-read from `datasheets/evidence-log.md`'s own summary text):
+
+| Evidence ID | Source | Method this cycle | Result |
+|---|---|---|---|
+| DS-MTL-002 | Polymaker PolyMax PETG TDS | Direct fetch | Exact match (Charpy Z-direction figure used as the pessimistic anchor) |
+| DS-FAST-003 | Sculpteo insert pull-out guide | Direct fetch | Exact match |
+| DS-MTL-001 | Prusament PETG TDS | Web search | Charpy figure exact; tensile range off by ~1MPa — immaterial, since tensile strength is not the limiting figure either method actually uses |
+| DS-MTL-003 | Fiberlogy PA12 TDS | Web search | Exact match |
+| DS-FAST-002 | CNC Kitchen pull-out test article | Direct fetch (independently re-fetched, not taken on the Hardware Lead's own say-so) | Exact match on all 5 pull-out values (118/119/120/86/166 kg) |
+| DS-FAST-001 | Ruthex RX-M3x5.7 product page | Metadata-file review | Explicitly scoped as illustrative dimensional corroboration only, not a load-bearing numeric input to any calculation; disclosure is appropriately modest ("almost exactly," not overclaiming) |
+
+DS-MTL-002 and DS-FAST-003 were the two the Hardware Lead explicitly
+flagged as not personally re-checked — both are independently confirmed
+here. The remaining four were checked anyway for full independent
+coverage, per this role's mandate not to accept a partial spot-check as
+sufficient just because *some* verification already occurred.
+
+`.scad` constants cited in §8.1 (`fw_dia`=60.0, `fw_t`=4.5, `n_cap_bolts`=6,
+`heatset_od`=4.6, `heatset_len`=5.7) were independently re-grepped from the
+live source file and match as cited in every case.
+
+### 3. Method-validity assessment (the harder Part 1 question)
+
+Verifying the arithmetic is not sufficient. Independently assessed whether
+treating wall failure as **either** pure fracture-toughness-limited (Method
+1) **or** pure yield-limited local plastic work (Method 2) — both
+purely-local/small-zone absorption models — is a reasonable **bounding**
+approach, or whether it misses something more fundamental that would
+change the picture:
+
+- **Print-orientation cross-check (favors the document's framing)**:
+  `bench-imu-01-manufacturing-spec.md` §4 specifies `fw_bay_wall()` printed
+  floor-down specifically so the wall forms continuous XY circumferential
+  loops facing a radial strike, explicitly rejecting a sideways orientation
+  because it "would turn the cylindrical wall into layer-to-layer
+  laminations loaded more directly across weaker interlayer bonds." This
+  is a genuine, already-reasoned mitigation (in a cross-referenced sibling
+  document) for the layer-adhesion-vs-radial-impact-direction concern, and
+  directly supports using XY-direction (not Z-direction) material
+  properties as representative of local puncture initiation — which is
+  what Methods 1 and 2 both do.
+- **Material-property range is not cherry-picked**: Method 1's Charpy
+  sweep still includes the pessimistic Z-direction Polymaker figure as its
+  low anchor and a different, stronger material (PA12) as its high anchor
+  — a legitimate swept range spanning favorable-to-unfavorable print
+  directions, not a range picked to reflect only the favorable case.
+- **Elongation-at-break argument against a hidden "global ductility"
+  reservoir**: Considered whether a global ring/hoop-membrane stretching
+  effect is a favorable factor the document under-weights. The cited
+  material's own low elongation-at-break (~3–5%, DS-MTL-002) rules out a
+  large hidden ductile-stretching reserve — this **supports**, rather than
+  undermines, the document's local/brittle-failure-dominated framing as a
+  reasonable bound, not an oversight.
+- **One reinforcing (not contradicting) nuance identified**: post-initiation
+  crack propagation could preferentially run along the weak Z-axis/
+  interlayer direction ("unzipping" the wall vertically) even if initial
+  puncture resistance is reasonably XY-like. This is a real consideration
+  not named explicitly by that description, but it is already generically
+  covered by the document's own disclosed scope limit ("the punch-through
+  crack front's real combined axial+circumferential geometry is a
+  fracture-mechanics detail beyond this bounded estimate," §8.1.2). It is a
+  pessimistic-leaning elaboration within an already-disclosed limitation,
+  not a hidden gap the document failed to flag at all.
+- **Conclusion: the two-method bounding approach is a reasonable,
+  legitimate first-pass engineering bound**, given no FEA or physical-test
+  tool exists in this environment. No missing favorable argument was found
+  that would meaningfully close the gap — if anything, this independent
+  investigation reinforces the concerning direction of the document's own
+  conclusion rather than undermining it.
+
+### 4. Confidence-labeling audit (deeper than expected — new finding)
+
+The Hardware Lead's own spot-check confirmed the cited `.scad` constants
+*match* what §8.1 says they are; this cycle went one step further and
+independently checked whether §8.1's *confidence labels* on those same
+constants match this document's own established taxonomy — and found a
+systemic defect.
+
+Every `CONFIRMED` occurrence inside §8.1 was independently enumerated (19
+total instances via a full-section grep) and cross-checked against its true
+provenance in §4.1/§4.4 (this document's own authoritative confidence
+tables) and, where present, the `.scad` file's own inline comments:
+
+- **8 of the 19 instances are genuinely mislabeled** — 5 inline prose
+  mentions (§8.1.2 lines ~800 `fw_t`, ~802 `fw_dia`, ~822 `fw_bay_inner_r`;
+  §8.1.3 lines ~917 `heatset_od`/`heatset_len`, ~933 `n_cap_bolts`) plus all
+  **3** rows of §8.1.4's confidence ledger (lines 991–993), bundling
+  roughly 10 distinct parameter values, none of which is actually
+  `CONFIRMED` per §4.1/§4.4:
+  - Ledger row (disk mass/`fw_dia`/`fw_t`/rim speed/stored energy, line
+    991): mass is `ESTIMATE` (§4.1 line 350), `fw_dia` is `ASSUMPTION`
+    (§4.1 line 347, §4.4 line 404, and the `.scad` file's own comment),
+    `fw_t` is `ASSUMPTION` (§4.1 line 347), and rim speed/stored energy are
+    `DERIVED` from these — none independently `CONFIRMED`. These are the
+    **identical** 121.60J/69.74 m/s figures MISS-014 already found
+    mislabeled `CONFIRMED` in the sibling manufacturing-spec document and
+    corrected to `ESTIMATE` (resolved 2026-09-11); the same mistake, on
+    the same figures, has now recurred in this document's own new §8.1.
+  - Ledger row (`containment_wall_t`/`fw_bay_inner_r`/wall height, line
+    992): `containment_wall_t` is `ESTIMATE` (§4.4 line 411), `fw_bay_inner_r`
+    is `DERIVED` (§4.4 line 410, and the `.scad` file's own comment "//
+    DERIVED = 39.5mm"), and wall height (`fw_wall_h`) is a formula of two
+    further `DERIVED` quantities with `ASSUMPTION`-tainted ancestry — none
+    `CONFIRMED`.
+  - Ledger row (heat-set insert dimensions/bolt count, line 993):
+    `heatset_od`/`heatset_len` are `ASSUMPTION` (§4.4 line 418, and the
+    `.scad` file's own comments, verbatim: "ASSUMPTION -- generic brass
+    heat-set insert" / "ASSUMPTION, same sourcing caveat as heatset_od"),
+    and `n_cap_bolts` is `ESTIMATE` (§4.4 line 417) — none `CONFIRMED`.
+- **11 of the 19 instances are legitimate, correctly-scoped uses** —
+  tool-absence disclosure, a genuine `.scad`-level geometric-topology fact
+  (rotation-axis orientation, a structural fact independent of any numeric
+  dimension's own certainty), "arithmetic `CONFIRMED` by direct
+  computation" (used correctly 4 times), and — notably — the Charpy/tensile
+  and pull-out-force citation rows, which correctly separate "is this
+  figure accurately transcribed from a real published/measured source"
+  (`CONFIRMED`) from "does it apply to this project's final, not-yet-chosen
+  print material/insert brand" (`ASSUMPTION`). This proves the document's
+  author does understand the taxonomy's distinctions elsewhere in this
+  same section — the defect is specifically confined to the ~10
+  pure-geometry/kinematic constants named above, not a wholesale
+  misunderstanding.
+- **Supporting evidence for how this slipped through**: §15's Rev 3.2
+  self-check addendum explicitly revisited checklist items 5 (fastener
+  placement) and 6 (wall thickness) to account for the new §8.1 content,
+  but did **not** revisit item 10 (traceability) against that same new
+  content — a process gap that directly explains how a confidence-labeling
+  defect escaped the Mechanical Lead's own self-check while the design
+  arithmetic itself did not.
+
+This is logged as a new finding (MISS-017, MEDIUM) below — see "Findings."
+
+### 5. Other observation (not separately tracked)
+
+While cross-referencing §12/§13/§15/§16 for consistency with §8.1, §13.3
+was found to contain a **stale, now-contradicted disclosure**: it states
+"No print-orientation-dependent structural weakness (layer-adhesion
+direction vs. load direction) analysis was performed for the containment
+cap's own impact-resistance role (§8) — this is disclosed as a real gap."
+`bench-imu-01-manufacturing-spec.md` line 51 now contains exactly this
+analysis for `containment_cap()` ("Print with the cap installed orientation
+preserved... so... the likely radial fragment impact into the sidewall/
+skirt is carried primarily in-layer rather than through Z-layer adhesion,"
+with an explicit FDM-anisotropy rationale) — this document simply was not
+updated to reflect it. **Not elevated to its own tracked `MISS-XXX`
+finding** in this cycle: it is LOW severity under §7.1 (a stale
+cross-reference, not a hazard — if anything the *true* current state is
+*more* analyzed than the stale sentence claims, not less), it is tangential
+to both of the two things this review cycle was specifically asked to
+adjudicate, and elevating every low-severity documentation-currency nit
+found during a full pass to its own permanent backlog row would dilute
+focus on the two substantive findings below out of proportion to its
+severity. Recorded here transparently so it is not lost; Mechanical Lead
+should fix the stale sentence in a future revision touching §13.3.
+
+### Findings
+
+#### Finding 1 — MISS-016 (HIGH): quantified wall energy-absorption shortfall against the disclosed REQ-403 load case
+
+- **Issue**: §8.1.2's two independent hand-calc methods (Charpy/
+  fracture-toughness energy-density scaling, and yield-strength-limited
+  local plastic work), each swept across a physically-anchored engagement-
+  length range (4.5mm = disk thickness, to 60mm = disk diameter), both
+  conclude the 4.0mm `containment_wall_t` wall's local material cannot
+  plausibly absorb the disclosed 121.60J REQ-403 load case. Method 1
+  (Charpy) yields 0.576–2.880J absorbable — only ~0.5%–2.4% of budget, a
+  shortfall of 1 to 3+ orders of magnitude. Method 2 (yield) is more
+  favorable but still short: 36.38–48.0J, i.e. at best ~30%–40% of budget
+  at the largest (60mm, full-disk-diameter) engagement length, falling to a
+  much smaller fraction at the more physically-typical, localized
+  engagement widths closer to the disk's own 4.5mm thickness. Under
+  neither method, across the entire swept range, does the wall's local
+  material plausibly absorb the full disclosed energy budget.
+- **Rationale**: Independently re-derived from scratch (see "1. Independent
+  arithmetic re-derivation" above) — the shortfall is not a document error;
+  it is the actual, correctly-computed result of two independent,
+  method-appropriate hand calculations using real, independently-verified
+  material-property citations (DS-MTL-001/002/003), swept across a range
+  whose endpoints are themselves tied to real, `.scad`-confirmed geometric
+  dimensions (disk thickness/diameter), not arbitrarily chosen. Independently
+  assessed the method itself (see "3. Method-validity assessment" above)
+  and found no missing favorable global-structural argument that would
+  close this gap — the material's own low elongation-at-break argues
+  against a hidden ductile-hoop-stretching reserve, and the print-
+  orientation choice implicitly assumed by the calculation (XY-direction
+  properties) is itself the favorable case already reflected in the
+  cross-referenced manufacturing-spec's actual print plan, not a
+  pessimistic assumption layered on top of it.
+- **Datasheet Source**: `bench-imu-01-dimensional-spec.md` §8.1.2 (Methods
+  1 & 2 tables and verdict prose, independently re-derived this cycle,
+  exact arithmetic match); DS-MTL-001 (Prusament PETG TDS), DS-MTL-002
+  (Polymaker PolyMax PETG TDS), DS-MTL-003 (Fiberlogy PA12 TDS) — all
+  independently re-fetched/re-searched this cycle (see "2. Independent
+  datasheet/citation spot-check" above).
+- **Failure Mechanism**: If a hub-collar-release event occurs as
+  characterized by REQ-403's own disclosed hazard figure (121.60J at
+  69.74 m/s rim speed, 100g disk — the credible no-load-high case already
+  established in §8's pre-existing physics table), the wall's local
+  material at the impact zone must absorb that energy via some combination
+  of elastic deflection, plastic deformation, and fracture-toughness-
+  limited crack growth before punch-through. Both independent bounding
+  methods show the wall's total absorbable energy across its entire
+  physically-plausible engagement footprint falls short of that budget —
+  meaning a full-energy, single-point radial impact as characterized is
+  not shown to be contained by the wall's local material alone, under
+  either estimation method, anywhere in the swept range.
+- **Affected Component**: Containment wall (`fw_bay_wall()`,
+  `containment_wall_t`=4.0mm, `bench-imu-01-enclosure.scad`); REQ-403
+  safety disposition (`bench-imu-01-dimensional-spec.md` §8, §8.1).
+- **Recommended Fix**: Not a decision for Mechanical Reviewer or Hardware
+  Lead to make unilaterally — per §8.1.6's own escalation framing and this
+  project's HITL-gate convention (`docs/workflow.md` §3,
+  `docs/architecture.md` §8). Present this quantified margin transparently
+  to the human alongside the rest of REQ-403's disposition material at the
+  safety-review gate, explicitly disclosing that neither method supports
+  an affirmative "the wall is adequate" conclusion under the disclosed
+  load case. The three substantive resolution paths available to the
+  human — none of which should be selected by an AI agent without explicit
+  human sign-off — are: (1) accept the disclosed, quantified risk and
+  proceed under a named-human `ACCEPTED-RISK` disposition with written
+  rationale (per this file's own convention); (2) commission physical
+  drop-weight/impact testing of a representative printed wall section
+  before relying on this design for REQ-403's safety claim; or (3) revisit
+  `containment_wall_t` (increase thickness) or the containment topology
+  itself, then re-run this same bounded estimate against the revised
+  geometry.
+- **Severity**: **HIGH.** Per `docs/architecture.md` §7.1's literal
+  definitions: the hub-collar-release event this estimate addresses is
+  itself an abnormal/fault condition, not "normal/expected operating
+  conditions as designed" (§7.1's CRITICAL bar) — it matches HIGH's "likely
+  malfunction or reliability failure under realistic conditions/corners"
+  instead. This also matches this project's own established precedent:
+  MISS-008 (CRITICAL) was an independently-*proven*, demonstrated
+  geometric defect (a confirmed solid-solid interpenetration); MISS-011/
+  MISS-012 (MEDIUM/HIGH at their own time) were realistic, quantified risks
+  without physical/FEA proof of actual failure. This finding is a bounded,
+  honestly-caveated `ESTIMATE` with genuine two-directional uncertainty
+  (the document itself discloses it "does not prove the wall fails
+  outright," and at least one identified simplification — square-on vs.
+  true oblique impact geometry — is conservative in the design's favor)
+  and no physical/global-structural proof of failure either way — matching
+  the HIGH epistemic category, not CRITICAL.
+
+#### Finding 2 — MISS-017 (MEDIUM): systemic confidence-mislabeling across §8.1's ledger and inline citations
+
+- **Issue**: §8.1.4's confidence ledger contains 3 rows, each tagged
+  `CONFIRMED` (2 as `CONFIRMED (.scad)`, one as `CONFIRMED (.scad + §8
+  table, independently re-derived)`), bundling roughly 10 distinct
+  parameter values. Cross-referencing each against this same document's
+  own §4.1/§4.4 authoritative confidence tables (and, where present, the
+  `.scad` file's own inline comments) shows **none** of these values is
+  actually `CONFIRMED`. The identical mislabeling pattern recurs at 5
+  further inline prose mentions elsewhere in §8.1.2/§8.1.3 restating these
+  same parameters. Full detail in "4. Confidence-labeling audit" above.
+  This is **not** a claim that §8.1 misuses `CONFIRMED` everywhere — 11 of
+  19 total `CONFIRMED` instances in the section are correct, scoped uses,
+  proving the author understands the taxonomy elsewhere; the defect is
+  specifically confined to the ~10 pure-geometry/kinematic constants named
+  above.
+- **Rationale**: `mechanical-design.instructions.md` prohibits a computed/
+  bundled value from silently inheriting the most-favorable confidence
+  label from a mix of inputs — a rule this same document's own §4 tables
+  (and, per MISS-014's precedent, the sibling manufacturing-spec document,
+  once corrected) already follow correctly elsewhere. §8.1's ledger and its
+  inline echoes do not follow it. §15's Rev 3.2 self-check addendum
+  explicitly revisited checklist items 5 and 6 for the new §8.1 content but
+  not item 10 (traceability) — directly explaining how this escaped the
+  Mechanical Lead's own self-check even though the underlying arithmetic
+  did not have any error.
+- **Datasheet Source**: `bench-imu-01-dimensional-spec.md` §4.1 line 347
+  (`fw_t`/disk description, `ASSUMPTION`) and line 350 (total assembly
+  mass, `ESTIMATE`); §4.4 lines 404 (`fw_dia`, `ASSUMPTION`), 410
+  (`fw_bay_inner_r`, `DERIVED`), 411 (`containment_wall_t`, `ESTIMATE`), 417
+  (`n_cap_bolts`, `ESTIMATE`), 418 (`heatset_od`/`heatset_len`,
+  `ASSUMPTION`); `bench-imu-01-enclosure.scad` lines 467 (`fw_bay_inner_r`,
+  "// DERIVED"), 485 (`heatset_od`, "// mm. ASSUMPTION"), 489
+  (`heatset_len`, "// mm. ASSUMPTION, same sourcing caveat"); §8.1.4 ledger
+  rows (lines 991–993) and inline mentions (lines ~800, 802, 822, 917,
+  933); precedent `validation/open-issues.md` MISS-014 (identical error
+  category, same 121.60J/69.74 m/s figures, in the sibling
+  manufacturing-spec document).
+- **Failure Mechanism**: A reader — including the human at the REQ-403
+  HITL gate this material is headed toward — skimming §8.1.4's ledger or
+  the inline `CONFIRMED` tags could reasonably conclude the disk, wall, and
+  fastener/insert geometry values are independently measured/certain
+  facts, when each is actually an `ASSUMPTION`, `ESTIMATE`, or `DERIVED`
+  value (often `DERIVED` from further `ASSUMPTION`/`ESTIMATE` ancestors).
+  This understates the true compounded uncertainty behind a wall-margin
+  estimate whose own central finding (MISS-016) is already concerning — a
+  reader could mistakenly treat the *inputs* to that estimate as more solid
+  than they are, even though (per the Method-validity assessment above)
+  this mislabeling does not itself change any of MISS-016's computed
+  figures or conclusions.
+- **Affected Component**: `bench-imu-01-dimensional-spec.md` §8.1.4
+  confidence ledger (3 rows) and 5 supporting inline citations in §8.1.2/
+  §8.1.3 (documentation/rigor only — no `.scad` geometry or arithmetic is
+  affected).
+- **Recommended Fix**: Re-label per true provenance, consistent with
+  §4.4's own already-correct labels and the exact pattern MISS-014 already
+  established and applied successfully in the sibling manufacturing-spec
+  document: `ASSUMPTION` for `fw_dia`/`fw_t`/`heatset_od`/`heatset_len`;
+  `ESTIMATE` for disk mass/`containment_wall_t`/`n_cap_bolts`; `DERIVED`
+  (or `ESTIMATE`, showing lineage) for rim speed/stored energy/
+  `fw_bay_inner_r`/wall height. This is a small, focused, same-pattern
+  documentation fix — it does not require re-running any arithmetic in
+  §8.1, since none of MISS-016's actual computed conclusions depend on
+  these labels being correct, only a reader's perception of certainty does.
+- **Severity**: **MEDIUM.** Per `docs/architecture.md` §7.1: "Deviates from
+  recommended practice, raises risk, doesn't clearly break function."
+  Matches MISS-014's own precedent exactly (identical error category, same
+  non-gating disposition) — does not change any physical figure or
+  engineering conclusion, but could mislead a reader about the actual
+  certainty of a safety-adjacent estimate's inputs.
+
+### Positive Findings
+
+- The closure attempt's core engineering substance is sound: two
+  independently-appropriate hand-calc methods, correctly executed, using
+  real (not fabricated) material and fastener property citations, swept
+  across a physically-anchored (not arbitrary) range.
+- Every one of the 6 new Evidence IDs registered this revision corresponds
+  to a real, independently-checkable, accurately-transcribed source — no
+  fabricated or misattributed citation was found anywhere.
+- The caveats disclosed in §8.1.2/§8.1.5/§8.1.6 are honest and
+  appropriately two-out-of-three pessimistic (Charpy-range endpoints span
+  both favorable and unfavorable print directions; the oblique-impact and
+  crack-front-geometry simplifications are explicitly named as scope
+  limits, not silently assumed away).
+- The load-path reasoning distinguishing the wall's primary role from the
+  cap fasteners' realistic secondary/attenuated role (§8.1.3) is
+  independently confirmed consistent with the already-established primary/
+  secondary containment-surface determination in
+  `bench-imu-01-manufacturing-spec.md`.
+- Scope discipline is complete: zero unauthorized `.scad` changes, zero
+  unauthorized `open-issues.md` row creation/closure, and no undisclosed
+  edit anywhere else in the repository.
+- The Mechanical Lead explicitly declined to self-certify MISS-011's
+  closure or unilaterally act on its own concerning result — both left
+  correctly for independent review and human escalation respectively.
+
+### Verdict
+
+- **Verdict**: **CONDITIONAL** (not FAIL — the closure attempt itself, as a
+  piece of engineering work, is sound and requires no rework; not a clean
+  PASS — this cycle surfaces one new HIGH finding that must go to the human
+  and one new MEDIUM finding that loops back to the Mechanical Lead).
+- **Open CRITICAL count**: 0.
+- **Open HIGH count**: 1 — **MISS-016 (new this cycle)**. Resolution
+  authority rests with the human (per §8.1.6 and this project's HITL-gate
+  convention), not with an AI agent in this project.
+- **Open MEDIUM count (non-gating)**: 1 — **MISS-017 (new this cycle)**.
+  Routes back to the Mechanical Lead for a small, same-pattern relabeling
+  fix; does not block presenting REQ-403's material to the human.
+- **MISS-011 disposition**: **RESOLVED.** MISS-011 was about the *absence*
+  of a calculation tying the wall/fastener adequacy claims to the
+  disclosed ~122J/100g hazard figure ("Recommended Fix path (a): perform a
+  basic impact-energy/wall-deflection or fastener-pull-out-under-shock
+  estimate"), not about achieving a reassuring result. A genuine, honest,
+  independently-verified calculation now exists — arithmetic confirmed
+  exactly, citations confirmed accurate, method independently assessed as
+  a defensible bound — and that satisfies MISS-011's own original ask in
+  full, even though the result itself is concerning. This exactly mirrors
+  how MISS-012 was resolved on its own specific closure bar once met, with
+  newly-surfaced substantive concerns (MISS-013/014 at the time) spun off
+  as their own distinct findings rather than keeping MISS-012 open. The
+  same pattern applies here: MISS-011 closes on its own bar; the
+  concerning substance becomes MISS-016; a rigor gap discovered along the
+  way becomes MISS-017.
+- **Why CONDITIONAL and not FAIL**: FAIL would imply the reviewed work
+  product itself — the Mechanical Lead's closure attempt — is deficient
+  and must be redone. It is not: the arithmetic is exactly correct, the
+  citations are accurate, and the bounding method is independently assessed
+  as defensible with no missing favorable argument found. CONDITIONAL
+  correctly reflects "the work is accepted as sound, but this cycle
+  surfaces a new HIGH substantive finding that must go to the human, plus
+  a MEDIUM rigor fix that loops back to the Mechanical Lead" — a
+  fundamentally different situation from a rejected piece of work.
+- **What independently checks out**: 100% of §8.1's arithmetic; all 6 new
+  Evidence ID citations; the `.scad` constant citations; the two-method
+  bounding approach as a reasonable engineering bound given no FEA/testing
+  tool exists; the honesty and completeness of the disclosed caveats; full
+  scope discipline (no `.scad`/tracking-file overreach).
+- **What remains open**: MISS-016 (HIGH) — the quantified wall-margin
+  shortfall itself, now the human's decision to weigh. MISS-017 (MEDIUM) —
+  systemic confidence-mislabeling in §8.1.4's ledger and 5 inline
+  citations, a same-pattern fix already precedented by MISS-014's own
+  resolution.
+- **Independent judgment on readiness for the Hardware Lead / human**: The
+  MISS-011 closure attempt itself is ready — it is genuine, defensible
+  engineering work and should be presented as such, not held back pending
+  MISS-017's cosmetic relabeling fix. However, this document is **not yet
+  fully clean** (MISS-017 open) and, more importantly, now carries a real,
+  independently-confirmed, quantified safety-adequacy question (MISS-016)
+  that has not existed in this tracked form before this cycle. **This
+  should not be presented to the human as "wall thickness independently
+  verified adequate"** — it should be presented as "a genuine, bounded
+  estimate now exists, two independent methods agree the wall's local
+  material falls short of the disclosed energy budget by a substantial
+  margin under every swept assumption, and the human must decide how to
+  proceed" (per MISS-016's Recommended Fix, above).
+- **Next action**: Report CONDITIONAL to the Hardware Lead. MISS-011 may be
+  marked `RESOLVED` in `validation/open-issues.md` on this Reviewer's own
+  independent verification rationale. MISS-016 (HIGH) is logged `OPEN`,
+  `Source: mechanical-reviewer`, awaiting the human's decision per its
+  Recommended Fix. MISS-017 (MEDIUM) is logged `OPEN`, `Source:
+  mechanical-reviewer`, routing back to the Mechanical Lead for a small
+  relabeling fix, and does not block presenting REQ-403's material (with
+  MISS-016 disclosed) to the human.
+
+## Mechanical Reviewer — MISS-017 Fix Independent Re-Verification, 2026-09-13
+
+### Review Cycle Metadata
+
+- **Document reviewed**: `hardware/mechanical/bench-imu-01-dimensional-spec.md`
+  — an **uncommitted working-tree change only** (`git status --short` shows
+  `M hardware/mechanical/bench-imu-01-dimensional-spec.md`, not a new
+  commit). `git diff --stat HEAD` confirms 23 lines changed (13 insertions,
+  10 deletions), entirely within §8.1.
+- **Trigger**: the Mechanical Lead's fix for MISS-017 (MEDIUM), opened in
+  the entry immediately above this one ("Mechanical Reviewer — MISS-011
+  Closure Attempt Independent Cross-Check + Wall-Margin Escalation
+  Assessment," 2026-09-13), which claimed to relabel roughly 10
+  systemically mislabeled `CONFIRMED` values in §8.1 to their correct
+  `ASSUMPTION`/`ESTIMATE`/`DERIVED` tags per §4.1/§4.4's own tables.
+- **This is an independent re-derivation of the fix's correctness, not a
+  re-read of the Mechanical Lead's own fix-report claims.** Every claimed
+  label change below was re-checked directly against §4.1/§4.4's own
+  tables and the `.scad` file's own inline comments; the numeric-change
+  claim was independently verified via whole-document token counts and
+  content-anchored diffs, not accepted because the diff "looks small."
+- **Scope**: a narrowly focused re-verification of the MISS-017 fix
+  specifically, plus an independent judgment on one flagged-but-unfixed
+  `containment_wall_t` discrepancy. Not a full 10-item checklist pass —
+  checklist items 1–9 are unaffected by this cycle (no new `.scad`
+  geometry, no new component placement, no new fastener/clearance claim
+  introduced); only item 10 (interface-value traceability) is
+  substantively in scope here.
+
+### Scope discipline check
+
+- `git status --short` → exactly one modified file in the entire
+  repository: `hardware/mechanical/bench-imu-01-dimensional-spec.md`. No
+  `.scad` geometry, no `bench-imu-01-manufacturing-spec.md`, and nothing
+  under `hardware/schematic/`, `bom/`, `requirements/`, `firmware/`
+  touched.
+- `git diff --stat HEAD` (the Mechanical Lead's own pre-existing change) →
+  1 file changed, 13 insertions(+), 10 deletions(-) — confirms the fix is
+  confined to the single file and is the small, focused change it claims
+  to be.
+
+### 1. Independent re-verification of each specific label change (task item 1)
+
+Each of the 6 named changes was independently checked against §4.1/§4.4's
+own tables and the `.scad` file's own inline comments — not accepted from
+the fix's own diff or commit message.
+
+- **`fw_t` → `ASSUMPTION`**: §4.1's disk-parameters table (line 347) labels
+  `fw_t` `ASSUMPTION`. `.scad` line 178 comment reads `// ... ASSUMPTION`.
+  The fix's new §8.1 citation matches both. **Confirmed correct.**
+- **`fw_dia` → `ASSUMPTION`**: §4.4's table (line 404) labels `fw_dia`
+  `ASSUMPTION`. `.scad` line 177 comment reads `// ... ASSUMPTION`.
+  **Confirmed correct.**
+- **`fw_bay_inner_r` (via 248.19mm circumference) → `DERIVED`**: §4.4's
+  table (line 410) labels `fw_bay_inner_r` `DERIVED`. `.scad` line 467
+  comment reads `// ... DERIVED`. 248.19mm = 2π×39.5mm, a pure arithmetic
+  derivation from an `ASSUMPTION`-labeled radius — `DERIVED` is the
+  taxonomically correct tag (neither a fresh assumption nor a measured/
+  confirmed value). **Confirmed correct.**
+- **`heatset_od`/`heatset_len` → `ASSUMPTION`**: §4.4's table (line 418)
+  labels both `ASSUMPTION`. `.scad` lines 485/489 comments both read
+  `// ... ASSUMPTION`. **Confirmed correct.**
+- **`n_cap_bolts` → `ESTIMATE`**: §4.4's table (line 417) labels
+  `n_cap_bolts` `ESTIMATE`. (`.scad`'s own comment at line 481 carries
+  rationale text but no explicit confidence tag — the markdown table is
+  the correct source of truth here, exactly analogous to how
+  `containment_wall_t` is handled per task item 4 below.) **Confirmed
+  correct.**
+- **The 3 confidence-ledger rows (§8.1.4)**: each row previously carried
+  one blanket `CONFIRMED` tag covering multiple distinct values; each now
+  splits into per-value labels matching the sourcing verified above (disk
+  mass/geometry row, wall/fastener-count row, heat-set-insert row).
+  Independently confirmed each split label traces to the same §4.1/§4.4
+  sourcing already verified — no new or different value was introduced;
+  only the granularity and correctness of the tag changed.
+
+**All 6 specifically-claimed label changes independently confirmed
+correct.**
+
+### 2. Independent zero-numeric-change verification (task item 2)
+
+Two independent methods, not a visual diff read alone:
+
+- **Whole-document token-count sweep**: for every cited figure (100g,
+  60.0mm, 4.5mm, 69.74 m/s, 121.60J, 4.0mm, 39.5mm, 43.0mm, 4.6mm, 5.7mm,
+  6×M3, 248.19mm), `grep -o -F` occurrence counts across the entire
+  pre-fix (`git show HEAD:...`) and post-fix (working tree) file are
+  **identical for every single value** — not just within the touched
+  hunks, across the whole document. This rules out both an accidental
+  edit within the changed hunks and a stray edit elsewhere in the file.
+- **Content-anchored diff** (not line-number-based, since the fix added 3
+  net lines, which would make naive `sed -n 'X,Yp'` line-range comparisons
+  misleading): extracted the Method 1 table, Method 2 table, "Verdict —
+  wall" prose, "Verdict — fasteners" prose, and the full §8.1.6
+  escalation-flag subsection from both versions using unique anchor
+  strings (not absolute line numbers), then diffed the extracted blocks
+  directly. **All five blocks are byte-for-byte identical pre-fix vs.
+  post-fix.**
+- **Conclusion**: MISS-016's substance (its quantified wall-margin
+  shortfall conclusion, both bounding methods, and the escalation flag to
+  the human) is **completely unaffected** by this fix. This was
+  independently re-derived, not accepted from the Mechanical Lead's own
+  scope claim.
+
+### 3. Independent re-scan of remaining `CONFIRMED` instances in §8.1 (task item 3)
+
+- Pre-fix §8.1 contained 19 occurrences of `CONFIRMED`; post-fix contains
+  12 (`git diff HEAD` confirms exactly 5 inline instances + 3 ledger-row
+  instances were touched; the net count drops by 7, not 8, because ledger
+  row 1 — disk mass/geometry — replaced one incorrect blanket `CONFIRMED`
+  with one new, legitimate "arithmetic reproduces §8's own source table"
+  `CONFIRMED`, a like-for-like swap, not a missed fix).
+- All 12 remaining instances independently re-examined and classified —
+  not accepted on the Mechanical Lead's own claim that they are "all
+  legitimate":
+  1. **Tool-absence procedural fact** (1 instance) — a statement that no
+     FEA/testing tool is available in this project, a categorical fact
+     about the project's own tooling, not a physical-value claim.
+  2. **"Arithmetic reproduces the source figure" statements** (5
+     instances) — each re-derives a value from already-tabulated inputs
+     and confirms the arithmetic matches an existing table entry; this
+     confirms the *computation* is correct, not that the underlying
+     physical inputs are certain (those inputs retain their own,
+     correctly-hedged `ASSUMPTION`/`ESTIMATE`/`DERIVED` tags elsewhere).
+  3. **Published/measured citations correctly caveated for applicability**
+     (4 instances) — each cites a real Evidence ID for a published/
+     measured figure and explicitly caveats its applicability to this
+     specific design, which is the correct, non-overclaiming use of
+     `CONFIRMED` for a cited external source.
+  4. **Genuine `.scad`-level topological fact** (1 instance) — a
+     structural/geometric fact about the model, independent of any
+     uncertain dimension's numeric value, that is unconditionally true
+     regardless of which `ASSUMPTION`/`ESTIMATE` values are plugged in.
+  5. **Explicit negation** (1 instance) — a phrase of the form "...but not
+     `CONFIRMED`," i.e. a statement correctly disclaiming certainty, which
+     trivially cannot itself be a case of overclaiming certainty.
+- **No remaining mislabeling found.** This independently corroborates the
+  fix's own stated count of "12 remaining instances, all legitimate" — but
+  the classification above was rebuilt from scratch against the taxonomy
+  in `mechanical-design.instructions.md`, not copied from the fix's own
+  reasoning.
+
+### 4. `containment_wall_t` `.scad`-vs-table discrepancy (task item 4)
+
+- The Mechanical Lead flagged, but did not fix, a pre-existing
+  inconsistency: `hardware/mechanical/bench-imu-01-enclosure.scad` line
+  455 (`containment_wall_t = 2*wall_t; // ... ASSUMPTION`) labels the value
+  `ASSUMPTION`, while `bench-imu-01-dimensional-spec.md` §4.4's own table
+  (line ~411) labels the same 4.0mm value `ESTIMATE`. The fix followed
+  §4.4's `ESTIMATE` label (this document's own authoritative parameter
+  table for the figure) and did not touch `.scad`.
+- Independently traced both labels' provenance via `git blame` and
+  `git log --follow -p` on both files: both the `.scad` `// ASSUMPTION`
+  comment and the markdown `ESTIMATE` table entry were introduced in the
+  **exact same original commit**, `c5ac653` ("Mechanical Design (Rev 3):
+  full enclosure redesign," 2026-08-31). This is a genuine, pre-existing
+  inconsistency dating to Rev 3's inception — not something introduced,
+  or left behind, by the MISS-017 fix cycle. This was independently
+  verified via git history, not accepted from the Mechanical Lead's own
+  characterization.
+- **Assessment**: I agree deferring to §4.4's table value without
+  unilaterally editing `.scad` was the right call for this narrow
+  relabeling fix — it stays in scope, and the underlying value (4.0mm,
+  non-`CONFIRMED` either way) and the practical conclusion drawn from it
+  are unaffected by which of the two sub-labels is used. Taxonomically,
+  per `mechanical-design.instructions.md`'s own definitions (`ASSUMPTION`
+  = a stated design choice made absent confirmed data, state why;
+  `ESTIMATE` = a reasonable approximation, explicitly flagged),
+  `containment_wall_t` is framed throughout the document as a deliberate
+  "2× `min_wall_t`" design-choice multiplier rather than an approximation
+  of an otherwise-unknown target quantity — which arguably fits
+  `ASSUMPTION` more precisely than `ESTIMATE`. But this is a low-stakes
+  textual-fit judgment call, not a substantive error either way, and does
+  not need to be resolved as part of this fix.
+- **Call**: this is a real but minor, already-existing inconsistency
+  between two documents that this narrow labeling fix was correctly not
+  asked, and correctly did not attempt, to unilaterally resolve. However,
+  following the precedent set by ISS-024 (a nearly identical single-figure
+  cross-document inconsistency, LOW severity, tracked as its own item with
+  a trivial one-line recommended fix rather than left as an informal
+  note), I am logging this as its own new tracked finding, **MISS-018
+  (LOW)**, below — worth a paper trail so a future confidence-ledger audit
+  doesn't re-discover and re-flag it as new (as very nearly happened
+  during this very cycle).
+
+### New Finding — MISS-018 (LOW)
+
+- **Issue**: `containment_wall_t`'s confidence label is inconsistent
+  between the `.scad` file's inline comment (`ASSUMPTION`) and
+  `bench-imu-01-dimensional-spec.md` §4.4's own parameter table
+  (`ESTIMATE`), for the same 4.0mm value.
+- **Rationale**: the project's own confidence taxonomy
+  (`mechanical-design.instructions.md`) requires every value to carry one
+  traceable, correct label; carrying two different labels for the
+  identical value in two different authoritative-looking locations
+  creates ambiguity about which is correct, and risks a future audit
+  re-flagging it as a fresh mislabeling (as nearly happened during this
+  very cycle) even though it is already known and low-stakes.
+- **Datasheet Source**: `hardware/mechanical/bench-imu-01-enclosure.scad`
+  line 455 vs. `bench-imu-01-dimensional-spec.md` §4.4 table, line ~411;
+  both traced via `git blame`/`git log --follow -p` to the same original
+  commit `c5ac653` (Rev 3 full enclosure redesign).
+- **Failure Mechanism**: no functional or dimensional failure — purely a
+  documentation-consistency gap. Its practical failure mode is
+  process-level, not physical: a future reader or automated audit trusting
+  only one of the two sources could draw an inconsistent confidence
+  conclusion about the same value, or waste review effort re-discovering
+  an already-known discrepancy.
+- **Affected Component**: `containment_wall_t` (base enclosure containment
+  wall thickness parameter).
+- **Recommended Fix**: harmonize the two labels to agree — pick one of
+  `ASSUMPTION` or `ESTIMATE` and update the other location to match. Per
+  the taxonomy, `ASSUMPTION` arguably fits better (`containment_wall_t` is
+  framed as a deliberate 2×`min_wall_t` design-choice multiplier, not an
+  approximation of an unknown target), but this is the Mechanical Lead's
+  judgment call, not mandated here. No arithmetic re-derivation is
+  needed — the 4.0mm value itself and its non-`CONFIRMED` status are
+  already agreed by both documents.
+- **Severity**: **LOW**, per `docs/architecture.md` §7.1 ("Style /
+  best-practice / documentation improvement, negligible functional risk")
+  — matches the ISS-024 precedent's severity for an analogous
+  single-figure cross-document inconsistency.
+
+### Verdict
+
+- **Verdict**: **CONDITIONAL** — carried forward from the prior cycle,
+  unchanged in kind. Not **FAIL** (nothing reviewed this cycle needs
+  rework — the MISS-017 fix is fully and correctly resolved). Not a clean
+  **PASS** (MISS-016, HIGH, remains open exactly as before this cycle —
+  this document still cannot be presented to the human as unconditionally
+  clean until that decision is made).
+- **This cycle's own specific scope (the MISS-017 fix) independently
+  confirmed fully correct**: all 6 specifically-claimed label changes
+  verified correct against primary sources; zero numeric/arithmetic
+  changes anywhere in the document, confirmed via two independent
+  methods; MISS-016's substance confirmed byte-for-byte unaffected; all 12
+  remaining `CONFIRMED` instances in §8.1 independently re-examined and
+  classified as legitimate, with none waved through on the Mechanical
+  Lead's own say-so.
+- **MISS-017 disposition**: **RESOLVED.** The fix genuinely and completely
+  addresses the finding as originally raised — every named value now
+  carries its taxonomically correct label, traceable to §4.1/§4.4, with
+  zero collateral damage to MISS-016 or any other part of the document.
+- **MISS-016 disposition**: unchanged, still **OPEN (HIGH)**, exactly as
+  before this cycle — this cycle neither resolves nor alters it in any
+  way; independently confirmed byte-for-byte identical. Resolution
+  authority remains with the human, per the prior cycle's own verdict.
+- **New finding this cycle**: **MISS-018 (LOW, non-gating)** — the
+  `containment_wall_t` `.scad`-vs-table label discrepancy, logged for
+  traceability per the ISS-024 precedent; does not block anything.
+- **Open CRITICAL count**: 0.
+- **Open HIGH count**: 1 — MISS-016 (carried forward unchanged from the
+  prior cycle; not this cycle's to resolve).
+- **Open MEDIUM count**: 0 — MISS-017 resolves this cycle's only open
+  MEDIUM.
+- **Open LOW count (non-gating)**: 1 — MISS-018 (new this cycle).
+- **Next action**: report MISS-017 **RESOLVED** to the Hardware Lead /
+  Mechanical Lead, with this independent re-verification rationale.
+  MISS-016 (HIGH) remains logged `OPEN`, `Source: mechanical-reviewer`,
+  awaiting the human's decision — unaffected by, and not a subject of,
+  this cycle. MISS-018 (LOW) is newly logged `OPEN`, `Source:
+  mechanical-reviewer`, for the Mechanical Lead to pick up at convenience
+  (non-blocking).
+
+## Mechanical Reviewer — Independent Cross-Check of Rev 3.3 Motor-Voltage/RPM Correction (DS-MTR-018 Relabel → §8 Physics-Table Recompute), 2026-09-13
+
+### Review Cycle Metadata
+
+- **Documents reviewed**: `hardware/schematic/bench-imu-01-design.md` §7.5.13
+  (Circuit Engineer's new voltage/RPM derivation, ECO-022); `hardware/
+  mechanical/bench-imu-01-dimensional-spec.md` §8 (Mechanical Lead's Rev 3.3
+  recompute, ECO-023); `datasheets/evidence-log.md` (every cited Evidence ID,
+  read directly at source, not taken from either report's own quotations).
+- **Trigger**: a corrected credible-worst-case M1 no-load speed. DS-MTR-018
+  had labeled its own ~22,200 RPM figure "full-charge 3S (11.1V)" — 11.1V is
+  3S's **nominal** voltage (3.7V/cell), not full-charge (12.6V, 4.2V/cell).
+  Circuit Engineer (ECO-022) corrected the citation and derived a true
+  credible-worst-case VCC(U5)/RPM figure accounting for this design's own
+  13.0V envelope ceiling and real J4→F1→D2→D3→U6→U5 voltage drops. Mechanical
+  Lead (ECO-023) then propagated the corrected RPM into §8's flywheel
+  physics table.
+- **This is an independent, from-primary-sources re-derivation, not a
+  re-read of either report's own claims.** Per this agent's own charter
+  ("do not anchor on the Mechanical Lead's stated rationale — re-derive each
+  checklist item yourself directly"), every Evidence ID was re-read at its
+  exact line in `evidence-log.md`; the voltage-drop/RPM arithmetic and the
+  entire physics table (ω, KE, rim speed, peak stress, safety factor) were
+  recomputed from scratch in a scratch Python session, not checked against
+  the reports' own intermediate numbers until after independent computation;
+  the reasoning-direction choice was scrutinized against this design's own
+  other, opposite-bound drop analyses; the LiPo nominal/full-charge
+  distinction was re-confirmed a 4th and 5th independent way; and a
+  repo-wide sweep was run for any other stale citation of the superseded
+  figures the correction chain itself may have missed.
+- **Scope**: this is a focused independent cross-check of one specific,
+  consequential correction (mirroring the "MISS-011 Closure Attempt" and
+  "MISS-017 Fix" cross-check entries above in kind, not a fresh full
+  10-item checklist pass) — checklist items 1–9 are unaffected by this
+  correction (no new `.scad` geometry, no new component placement, no new
+  fastener/clearance claim); **item 10 (interface-value traceability)** is
+  substantively in scope, plus a direct first-principles physics
+  re-derivation that item 10 alone would not otherwise require.
+
+### Scope discipline check
+
+`git status --short` confirms no `.scad` geometry was touched by either
+ECO-022 or ECO-023 (both are markdown-only changes — `bench-imu-01-design.md`
+new §7.5.13, `bench-imu-01-dimensional-spec.md` §8 Rev 3.2→3.3), and this
+review itself is read-only: nothing under `hardware/mechanical/*.scad`,
+`bench-imu-01-manufacturing-spec.md`, `firmware/`, `bom/`, or
+`requirements/requirements.md` is modified by this entry.
+
+### 1. Independent re-verification of every cited Evidence ID (task item 2, part A)
+
+Each ID was opened directly at its own line in `datasheets/evidence-log.md`
+— not read through either report's paraphrase:
+
+| Evidence ID | Line | Independently confirmed to say |
+|---|---|---|
+| DS-MTR-017 | 235 | T-Motor MN2206-13's own published voltage range **2S–3S LiPo, 7.4–11.1V nominal / 8.4–12.6V full-charge** — the nominal/full-charge split already existed in this very next-door row and was simply never cross-checked against DS-MTR-018 above it. Confirmed genuine. |
+| DS-MTR-018 | 236 | T-Motor no-load current 0.3A at 10V test voltage; this project's own **derived** no-load speed (not manufacturer-published) — now carries the correction annotation in place (original figure kept, not deleted, matching this file's own DS-MCU-062 annotation precedent). Confirmed genuine and correctly annotated. |
+| DS-MTR-079 | 349 | Second, independently-sourced retailer re-fetch corroborating the standard LiPo per-cell voltage convention. Confirmed genuine. |
+| DS-PROT-034 | 350 | Re-fetched STPS3L60 (D2) datasheet; Figure 13's low-current VF curve confirmed to exist in the document but **not numerically extractable this session** — honestly disclosed as such by Circuit Engineer, not silently rounded past. Confirmed genuine, confirmed the honesty of the disclosed limitation. |
+| DS-MTR-080 | 351 | Circuit Engineer's own new §7.5.13 aggregated-derivation citation — an internal citation, not a manufacturer datasheet in its own right, correctly labeled as such. Confirmed genuine. |
+| DS-PROT-005 | 291 | F1 (PTC resettable fuse) minimum-resistance rating. Confirmed genuine, confirmed it is a *minimum*-bound figure (correct direction for this question — see §4 below). |
+| DS-PROT-006 | 296 | F1 datasheet cross-reference used alongside DS-PROT-005. Confirmed genuine. |
+| DS-PROT-031 | 322 | U6 R(ON) minimum rating. Confirmed genuine, confirmed minimum-bound. |
+| DS-PROT-032/033 | 323–324 | U6 datasheet supporting rows. Confirmed genuine. |
+
+**No fabricated, misattributed, or overstated citation found anywhere in
+either §7.5.13 or §8.** Every Evidence ID genuinely supports the specific
+claim made from it.
+
+### 2. Independent re-derivation of the voltage/RPM chain from scratch (task item 2, part B)
+
+Computed independently in a scratch interpreter, using only the primary
+inputs above — **not** transcribed from either report's own intermediate
+arithmetic:
+
+```
+I_noload = 0.3 A          (T-Motor's own tested no-load current, DS-MTR-018/079)
+R_F1,min = 0.010 Ω         (DS-PROT-005/006)          -> drop = 0.003 V
+R_U6(ON),min = 0.026 Ω     (DS-PROT-031/033)          -> drop = 0.0078 V
+V_F,D2 (lowest credible)  = 0.35–0.45 V (ESTIMATE, DS-PROT-034 + Schottky
+                            low-current physics)
+D3 contributes 0V (shunt topology, not series in this path)
+
+Total drop = 0.003 + 0.0078 + [0.35, 0.45] = [0.361, 0.461] V
+V_VCC(U5) = 13.0V (envelope ceiling) − drop = [12.539, 12.639] V, point 12.589V
+RPM = KV × V_VCC = 2000 RPM/V × [12.539, 12.639] = [25,078, 25,278] RPM, point 25,178
+```
+
+**Result**: my own independent low/high/point bounds are **25,078 /
+25,278 / 25,178 RPM** — the reports state **25,060 / 25,280 / 25,180**.
+High end and point estimate agree to within 2 RPM (rounding noise). The
+low end differs by **18.4 RPM (0.073%)** — and this is not a new
+discrepancy this review is discovering: it is the **exact same
+~20 RPM/~0.08% wrinkle Mechanical Lead's own §8 text already disclosed**
+("the true low bound at ≈25,078–25,080 RPM, not exactly 25,060, since only
+the former is consistent with the stated point estimate being the range's
+exact midpoint"). Independently reproducing a discrepancy someone else
+already caught and disclosed — rather than either missing it or being
+handed it — is itself meaningful corroboration of both this Reviewer's own
+arithmetic and Mechanical Lead's disclosed rigor. It is well inside D2's
+own VF `ESTIMATE` band and changes no downstream conclusion.
+
+**Cross-checks independently reproduced exactly**: the naive
+"label-fix-only" recompute (KV×12.6V = 25,200 RPM, confirming the 13.0V
+envelope + drop chain is doing real additional work beyond a bare label
+fix); the old, correctly-arithmetic-but-mislabeled figure (KV×11.1V =
+22,200 RPM, exactly); the %-increase claims — **13.42% RPM increase**
+(reports: "≈13.4%") and, because KE/stress scale with ω², **28.65% KE/
+stress increase** (reports: "≈28.65%", exact match). Doubling the assumed
+no-load current (a sensitivity check reproduced independently) changes
+V_VCC by under 0.02V — the result is genuinely dominated by D2's VF
+uncertainty, not the current assumption, exactly as claimed.
+
+### 3. Independent re-derivation of the physics table from first principles (task item 3)
+
+Not a check against the report's own numbers — derived from Mechanical
+Lead's own stated geometric/material inputs (§4.1/§4.4:
+ρ=7850 kg/m³, r=0.030m, t=4.5mm, I=4.5×10⁻⁵ kg·m², ν=0.29, yield=250MPa)
+using the standard formulas for a rotating disk (ω=2π·RPM/60,
+KE=½Iω², rim speed v=ωr, peak stress at disk center
+σ=[(3+ν)/8]·ρ·ω²·r²):
+
+| RPM | ω (rad/s) | KE (J) | rim speed (m/s) | peak stress (MPa) | safety factor |
+|---|---|---|---|---|---|
+| 3,000 (baseline) | 314.16 | 2.22 | 9.43 | 0.29 | 872× |
+| 22,200 (old, superseded) | 2,324.78 | **121.60** | **69.74** | **15.70** | **15.92×** |
+| 25,060 (reported low) | — | **154.95** | **78.73** | **20.01** | 12.49× |
+| 25,180 (reported point) | 2,636.84 | **156.44** | **79.11** | **20.20** | **12.38×** |
+| 25,280 (reported high) | — | **157.69** | **79.42** | **20.36** | 12.28× |
+
+**Every single figure independently reproduced to the exact stated
+precision** — not approximately, exactly: 121.60J, 69.74 m/s, 15.70 MPa at
+22,200 RPM; 156.44J, 79.11 m/s, 20.20 MPa at 25,180 RPM; 154.95J/78.73 m/s/
+20.01 MPa and 157.69J/79.42 m/s/20.36 MPa at the reported range bounds.
+This also independently confirms the two figures are being compared on an
+apples-to-apples basis (same formula, same I, same r, only RPM changed).
+
+**Safety-factor recomputed independently, not assumed unchanged**:
+250MPa / 15.70MPa = **15.92×** (old) vs. 250MPa / 20.20MPa = **12.38×**
+(new, point), range **12.28×–12.49×** across the reported RPM band —
+matches the reports' "≈15.9×" and "≈12.4× (range 12.3–12.5×)" exactly.
+Disk-burst remains, and was never, the governing/binding failure mode —
+this qualitative conclusion is unchanged at either safety factor and does
+not depend on the exact RPM figure at all (both values sit an order of
+magnitude above 1×).
+
+### 4. Reasoning-direction scrutiny — is "minimum resistance / lowest VF" actually correct here? (task item 4, part A)
+
+Independently re-read the design's own *other* voltage-drop analyses to
+confirm this is not an inconsistent or backwards bounding choice:
+
+- **§7.5.2** (UVLO-margin analysis): uses **max** VF / an assumed 0.02Ω to
+  find the **worst-case-low** voltage — because for that question (could
+  VCC dip below the UVLO threshold?), more drop is the bad direction.
+- **§7.5.10** (U6 thermal analysis): uses R(ON)**max**=45mΩ@85°C to find
+  the **worst-case-high** heat — because for that question (could the
+  driver overheat?), more resistance/more dissipation is the bad direction.
+- **§7.5.13** (this correction): uses **min** R (F1, U6) and the **lowest**
+  credible D2 VF to find the **worst-case-high** RPM/stored-energy —
+  because for *this* question (how much rotational energy could a
+  hub-collar-release event actually release?), *less* drop → higher V_VCC
+  → higher RPM → **more** stored energy is the bad direction.
+
+**Independently confirmed correct, not backwards.** These are three
+different physical questions (voltage floor / thermal ceiling / energy
+ceiling), each with its own genuinely different worst-case direction — this
+is proper engineering practice (select the bounding assumption per the
+specific failure mode under evaluation), not an inconsistency. Verified
+the 13.0V envelope ceiling itself is a genuine, pre-existing, independently
+re-confirmed binding constraint from §7.5.9 (bench-supply headroom plus
+full-charge LiPo), not a figure invented for this handoff.
+
+### 5. LiPo nominal-vs-full-charge distinction — independent 4th/5th confirmation (task item 4, part B)
+
+Given how consequential this distinction is, re-confirmed it independently
+beyond the 3 ways already disclosed in §7.5.13 (DS-MTR-017's own adjacent
+row; the T-Motor metadata file's "Known gaps" section; a web search cited
+in ECO-022) and the 4th way Mechanical Lead's own ECO-023 already performed
+(a separate web search):
+
+- **5th independent confirmation, this cycle**: directly opened
+  `datasheets/tmotor_mn2206-13-2000kv_rev-unknown.md` myself (lines 38–39)
+  and confirmed its "Known gaps" section states, in its own words, "3S full
+  charge (~12.6V)" — not inferred from any report's quotation of it.
+- **6th, independent of the project's own files entirely**: a fresh web
+  search this cycle re-confirmed the standard LiPo convention (3.7V/cell
+  nominal, 4.2V/cell full-charge/fully-charged rest voltage) — 3S nominal =
+  11.1V, 3S full-charge = 12.6V, consistent across independent general
+  sources, not merely this project's own citation chain.
+
+**Independently reconfirmed correct.** 11.1V really is 3S's nominal
+voltage, not its full-charge voltage; DS-MTR-018's original label was
+genuinely wrong, and the correction is genuinely right.
+
+### 6. Completeness sweep — repo-wide search for any remaining stale citation (task item 5)
+
+Ran `grep -rn "121\.60\|22,200\|22200\|69\.74\|15\.70\|45.55\|44.55"` (and
+variants) across the **entire repository**, then triaged every hit
+file-by-file to separate genuine live/current-tense stale citations from
+(a) historical, dated log entries correctly describing what was true when
+written, and (b) the correction chain's own explanatory "old figure was X"
+narrative text (not itself stale — it is *describing* the old figure on
+purpose).
+
+**The 3 already-flagged items, independently confirmed present and
+correctly flagged** — with one small file-attribution correction:
+
+1. `hardware/schematic/bench-imu-01-design.md` §7.5.11 (line ~2160): "M1
+   stores roughly 45–55× the rotational energy at no-load" — confirmed
+   present, confirmed stale, confirmed already flagged (not fixed) by
+   ECO-023. Recomputed: true corrected multiple is (25,180/3,000)²≈70.4×,
+   not 45–55× — a materially larger multiple, consistent with the ≈28.65%
+   KE increase.
+2. **File-attribution correction**: the task describes this as "that same
+   document's §15 item 6" (implying `bench-imu-01-design.md`). Independent
+   check found `bench-imu-01-design.md`'s own §15 is titled "Self-check
+   against the *Hardware Reviewer's* 16-item checklist" and contains no
+   "Rev 3.2 note" quoting 121.60J anywhere. The actual "Rev 3.2 note" (line
+   1750 of `hardware/mechanical/bench-imu-01-dimensional-spec.md`, checklist
+   item 6, "Wall thickness") is in the **Mechanical** self-check section of
+   the **dimensional-spec** document, not the design document — confirmed
+   present and stale ("§8.1's bounded estimate finds the 4.0mm
+   `containment_wall_t` does not carry an affirmative 'adequate against the
+   disclosed 121.60J load case' claim"), confirmed already flagged (not
+   fixed) by ECO-023's own text. A minor relay imprecision, not a
+   substantive gap — noted for the record since precision about exactly
+   which document a claim lives in is this role's entire job.
+3. `requirements/traceability-matrix.md` REQ-403 row (line 53): "the
+   containment wall's local material cannot plausibly absorb the full
+   disclosed **121.60J** hazard energy" — confirmed present, confirmed
+   stale, confirmed already independently flagged in
+   `validation/change-impact-matrix.md`'s own ECO-023 entry (line 71) as
+   well as by the task. No new action needed beyond what follows below.
+
+**Additional stale citations found by this sweep, not in the original list
+of 3:**
+
+4. **`requirements/traceability-matrix.md` REQ-405 row (line 55)** — a
+   *different* row in the same document from the already-flagged REQ-403
+   row: "6000 RPM = 2.0x margin above the ≥3000 RPM floor, **~3.3-3.7x
+   below M1's own ~20,000-22,200 RPM no-load speed**." Recomputed: the true
+   corrected margin is 25,180/6,000 ≈ **4.2×**, i.e. the real margin is
+   *larger* (more conservative) than stated, not smaller — this staleness
+   understates the safety margin rather than overstating it, so it is not
+   itself a new safety concern, but it is a genuinely stale citation the
+   correction chain missed.
+5. **`requirements/requirements.md` line 142** (REQ-405 definition row) —
+   "the recommended motor's own no-load speed (**≈20,000–22,200 RPM**) is
+   6–7× that floor" — same stale figure, same conservative direction of
+   error. In the explicit "do not touch" list for this task; flagged only.
+6. **`validation/fmea.md` FMEA-009 (line 35)** — the systemic risk
+   register's own highest-RPN entry states, as apparently-current risk
+   characterization: "up to **~250 km/h rim speed / ~122J** at M1's
+   unbounded no-load speed," "Bulk-material stress is not the risk (**~15.9x
+   safety factor** vs. yield even at no-load speed)," and "a motor whose
+   real achievable speed is currently bounded only by its own physical
+   no-load limit (**~20,000-22,200 RPM**)." This is the risk register a
+   human would consult for the current hazard magnitude — all three figures
+   are now understated relative to the corrected ≈79.11 m/s/≈156.44J/
+   ≈12.4× basis. Not among the original 3; a genuinely new find.
+7. **`hardware/mechanical/bench-imu-01-manufacturing-spec.md`** (6
+   occurrences: lines 28, 30, 31, 45, 63, 73) — the Manufacturing Engineer's
+   own FDM process-justification narrative repeatedly cites "121.60 J,"
+   "69.74 m/s (~250 km/h)," and "22,200 RPM no-load-high" as the governing
+   hazard figure driving its own 100%-infill recommendation and its own
+   "no claim... has been tested against a 121.60 J containment event"
+   disclaimer. **Not flagged by either ECO-022 or ECO-023** — neither
+   Circuit Engineer's nor Mechanical Lead's own text mentions this document
+   at all, even though it shares the identical stale-figure pattern the
+   other 3 items were caught for. A genuinely new, previously-unflagged
+   find. Directionally, this does **not** undermine the manufacturing
+   spec's own conclusion — a higher real hazard energy only reinforces the
+   case for its already-conservative 100% infill choice and its own
+   "FDM cannot be presented as adequate/validated containment without
+   physical testing" escalation — but the specific cited numbers throughout
+   the document are now inaccurate as a description of the current design
+   basis. Per this task's explicit instruction, this document's substantive
+   content is **not** rewritten here — flagged in `open-issues.md` only.
+8. **`bom/component-selection.md` (lines 495, 498)** — the motor
+   candidate-comparison table states "derived no-load speed ≈20,000 RPM
+   @10V / ≈22,200 RPM @11.1V (derived from KV, not directly published)"
+   and "3000 RPM target is only 13–20% of the ≈20,000–22,200 RPM derived
+   no-load speed." **Distinguished from the other finds**: these figures
+   are not mislabeled (they correctly attribute each RPM to the specific
+   voltage it was computed at, 10V/11.1V, and make no "full-charge" or
+   "credible worst-case" claim) and remain arithmetically true exactly as
+   written — they are simply an earlier-stage, pre-circuit-analysis
+   snapshot from motor-selection research, superseded in *completeness* (not
+   correctness) by the later, circuit-specific §7.5.13 analysis. In the
+   explicit "do not touch" list; flagged only, lowest-priority of the finds
+   below.
+9. **`firmware/bench-imu-01/`** (`README.md` line 53; `src/motor.h` lines
+   125, 128, 130, 146, 226, 276; `src/motor.c` line 29;
+   `bench-imu-01-firmware-design.md` lines 321, 342, 397, 424) — the same
+   "~20,000-22,200 RPM no-load" / "~3.3-3.7x margin" / "45-55x energy"
+   figures recur throughout the firmware discipline's own REQ-405
+   margin-sizing rationale. Same conservative-direction character as finds
+   4/5 above (true corrected margin ≈4.2× is larger, not smaller, than
+   claimed). `firmware/` is in the explicit "do not touch" list — flagged
+   only. This is consistent with, and was already anticipated by, ECO-022's
+   own explicit disclaimer that "Firmware's own REQ-405 work... is
+   conservative in its own, separately-scoped command-ceiling context, the
+   opposite direction of error from this analysis."
+10. **A second, later verification pass on this sweep itself** (re-running
+    the grep after the first round of `open-issues.md`/`design-review.md`
+    edits, to check nothing was missed even by this cycle's own first
+    pass) turned up 4 more files not caught the first time: the local
+    datasheet copies `datasheets/prusament_petg_tds-2021-10.md`
+    (DS-MTL-001), `datasheets/polymaker_polymax-petg_tds-v5.4.md`
+    (DS-MTL-002), `datasheets/fiberlogy_nylon-pa12_tds-rev-unknown.md`
+    (DS-MTL-003), and
+    `datasheets/cnckitchen_petg-threaded-insert-pullout-test_web-article.md`
+    (DS-FAST-002) — **the exact 4 primary evidence sources MISS-016's own
+    Datasheet Source column already cites for Method 1.** Each carries its
+    own "Known gaps" caveat noting that standard quasi-static Charpy/tensile
+    test speeds don't reflect "the REQ-403 event's ≈69.74 m/s effective
+    impact speed" — a legitimate caveat, now citing the superseded rim
+    speed (should become ≈79.11 m/s point / ≈78.73–79.42 m/s range).
+    **Not folded into MISS-019/020/021**: unlike those 3 (unrelated
+    document families, unrelated owners), these 4 files are supporting
+    material *for MISS-016 itself*, already named in its own Datasheet
+    Source column, and will be naturally revisited by the same future
+    Manufacturing Engineer pass that redoes MISS-016's own Method 1/Method 2
+    arithmetic — so this is folded directly into MISS-016's own
+    `open-issues.md` annotation (§8/below) as a scope extension, not spun
+    off as a 4th new ID. Catching this only on a deliberate second pass
+    over my own first-round sweep is itself worth recording: even an
+    "independent, adversarial" review should re-check its own completeness
+    claim, not just the object under review's.
+
+**Checked and confirmed NOT stale (no action needed):**
+
+- `datasheets/evidence-log.md`'s 2 matches are DS-MTR-018 itself (correctly
+  annotated in place) and DS-MTR-080 (Circuit Engineer's own new derivation
+  citation, correctly describing the old figure as superseded in its own
+  explanatory text). Both fine as-is.
+- `validation/change-log.md`'s 5 matches (ECO-017, and ECO-022/023's own
+  entries) are either a dated historical record of Firmware's REQ-405
+  rationale as it stood on 2026-09-11, before this correction existed (a
+  legitimate snapshot, not a live claim), or ECO-022/023's own current,
+  accurate narrative describing the correction itself (including ECO-023's
+  own text already naming 2 of the 3 originally-flagged stale items) — all
+  correctly left untouched; this is a purely additive ledger, not something
+  a Reviewer edits.
+- `validation/change-impact-matrix.md`'s single match (ECO-023's own entry)
+  already documents this exact correction and already flags the
+  traceability-matrix.md REQ-403 row — corroborating, not duplicating,
+  this review's own findings.
+- `validation/design-review.md`'s own historical matches (this file) are
+  dated log entries describing prior cycles' own contemporaneous
+  understanding — not live claims, not edited.
+
+**Net new findings from this sweep**: 3 new backlog IDs (logged as
+MISS-019/020/021 below), covering finds 4/5/8/9 (bundled — same stale
+figure, same conservative direction, same low-priority
+documentation-currency character), find 6 (fmea.md), and find 7
+(manufacturing-spec.md) respectively — plus find 10 (the 4 supporting
+datasheet caveats) folded directly into MISS-016's own annotation rather
+than given a separate ID, for the reason stated above.
+
+### 7. Impact on this Reviewer's own prior verdicts (task item 6)
+
+Reviewed every prior Mechanical Reviewer cycle's own **Verdict** section
+(Cycle 3, Cycle 4, both Manufacturing Process Cross-Checks, MISS-011
+Closure Attempt, MISS-017 Fix) against what each one actually depended on:
+
+- **Cycle 3 (CONDITIONAL) and Cycle 4 (PASS)** — the mechanical-design
+  review cycles — were driven entirely by **MISS-008** (flywheel Z-stack
+  formula omitting the hub-collar height, a pure geometric self-contradiction),
+  **MISS-009** (wire duct solid not void), **MISS-010** (base-tab/lid-skirt
+  interference), and the containment **topology** claim (continuous wall,
+  no rotation-plane opening, bolted not friction-fit cap). **None of these
+  four conclusions depend on the flywheel's RPM or stored energy at all** —
+  they are statements about whether solids overlap in modeled 3D space and
+  whether a cap is bolted, true or false independent of what number goes
+  into §8's physics table. **Unaffected by this correction; nothing to
+  reopen.**
+- **Manufacturing Process Cross-Check (×2, both CONDITIONAL)** — driven by
+  **MISS-012/013** (process-spec scope completeness: does it cover
+  `fw_bay_wall()`/`base()`, not just `containment_cap()`) and **MISS-014/
+  015** (confidence-label correctness, literature-framing honesty). These
+  are questions about document *coverage* and *label taxonomy*, not about
+  whether the specific input energy figure is itself correct. Notably, in
+  resolving MISS-014 this Reviewer's own text **already** described
+  "Credible worst-case flywheel speed" as depending on "a project-derived,
+  not-manufacturer-published rotational-speed estimate (DS-MTR-018)" —
+  i.e., this Reviewer was already treating that figure with appropriate
+  epistemic caution (an `ESTIMATE`, not a `CONFIRMED` fact) well before the
+  specific voltage-label bug inside it was ever caught. **Unaffected by
+  this correction; nothing to reopen.**
+- **MISS-011 Closure Attempt cross-check (CONDITIONAL)** — this Reviewer's
+  own text at the time explicitly frames the ~122J/100g figure as "the
+  disclosed hazard figure" and "already established in §8's pre-existing
+  physics table" — i.e., this cross-check's own scope was the Method 1/
+  Method 2 **wall-margin arithmetic given that energy input**, never a
+  re-derivation of the energy input's own provenance from DS-MTR-018's
+  voltage/RPM chain. That re-derivation is precisely what is new in this
+  correction and is being performed, by this role, for the first time in
+  this very entry. **The wall-margin-shortfall conclusion itself is
+  unaffected in kind** (see §8 below) — MISS-016 was never a "conditional
+  on 121.60J being exactly right" finding; it was a "the wall's local
+  material demonstrably falls short of the disclosed budget" finding, and
+  a higher real budget only strengthens that conclusion.
+- **MISS-017 Fix re-verification (CONDITIONAL)** — a confidence-labeling
+  audit, orthogonal to the RPM figure's own correctness. Unaffected.
+
+**Conclusion: none of this Reviewer's 6 prior cycles require reopening.**
+Every one of them was either (a) about geometry/topology that does not
+depend on the RPM/energy figure at all, or (b) already treated the energy
+figure as an inherited, appropriately-hedged `ESTIMATE` rather than
+independently certifying its provenance — exactly the "framed in a way
+that's robust to this change" pattern this task's own item 6 anticipated.
+
+**One honest self-critical note, not a new backlog finding**: across 6
+prior cycles, this Reviewer's own checklist item 10 (interface-value
+traceability) consistently checked whether a cited value carries the
+confidence label *its own source claims* — and, separately, whether a
+derived table correctly propagates ASSUMPTION/ESTIMATE/DERIVED tags from
+its inputs. It never independently re-derived whether the *cited source's
+own claim was internally self-consistent* (i.e., whether "full-charge 3S
+(11.1V)" is itself a true statement about LiPo chemistry) — a deeper check
+than label-fidelity, and the one that actually caught this bug (via
+Firmware Reviewer, on an unrelated REQ-405 cross-check, not via any
+Mechanical checklist pass). This is not a missed checklist item so much as
+a legitimate new depth of scrutiny this correction chain has now
+established — worth carrying forward into future traceability checks
+(spot-check a datasheet-adjacent claim's own internal consistency, not
+merely its label), not something requiring retroactive reopening of past
+verdicts that were never asked to catch it.
+
+### 8. MISS-016 disposition (task's Output instruction)
+
+MISS-016's own row (`validation/open-issues.md`) states its Failure
+Mechanism/Title against "the disclosed 121.60J flywheel-detachment energy
+budget" and reports Method 1 (0.576–2.880J, ~0.5–2.4% of budget) / Method 2
+(36.38–48.0J, ~30–40% of budget) — both computed against the now-superseded
+121.60J/69.74 m/s/22,200 RPM inputs. Per Mechanical Lead's own already-
+disclosed direction-of-travel logic (independently re-confirmed sound
+above): the wall's local absorption capacity is unchanged (no `.scad`
+geometry touched by ECO-022/023), while the demanded energy rose ≈28.65%
+at the point estimate (≈27–30% across the range) — **the shortfall can
+only widen, not narrow**, once §8.1 is recomputed against the corrected
+≈154.95–157.69J budget. This Reviewer does **not** redo the Method 1/
+Method 2 arithmetic here (Manufacturing Engineer's specialized domain, a
+distinct, separate follow-up dispatch, exactly as the task specifies) —
+only flags the staleness. **Severity re-examined, not merely assumed
+unchanged**: MISS-016's HIGH classification rested on "a bounded `ESTIMATE`
+with genuine two-directional uncertainty... no physical/global-structural
+proof either way" (per `docs/architecture.md` §7.1's HIGH bar — a likely
+failure mode under a realistic/abnormal condition, not CRITICAL's
+normal-operating-condition bar) — this reasoning did not depend on the
+exact 121.60J value and remains equally applicable at the corrected,
+larger figure; if anything the case for HIGH (not something lower) is
+reinforced, not weakened, by a widening shortfall. **HIGH/OPEN is
+reaffirmed, not merely left unchanged by default.** Action taken: MISS-016's
+own row annotated in place in `validation/open-issues.md` (Notes column) —
+original Method 1/Method 2 figures and text preserved unedited (matching
+this project's own DS-MCU-062/DS-MTR-018 "annotate, don't delete"
+precedent) — flagging the staleness, stating the widen-not-narrow
+direction, and explicitly deferring the recompute to Manufacturing
+Engineer's next pass. Status remains **OPEN**, severity remains **HIGH**,
+resolution authority remains the human's, entirely unchanged in kind by
+this annotation.
+
+### Verdict
+
+- **Verdict**: **CONDITIONAL** — not **FAIL** (the reviewed correction
+  chain itself — Circuit Engineer's ECO-022 voltage/RPM derivation and
+  Mechanical Lead's ECO-023 physics-table recompute — is independently
+  re-derived as sound from primary sources with zero errors found beyond
+  the one pre-disclosed, immaterial ~18–20 RPM/0.07% wrinkle; no rework is
+  needed on either). Not a clean **PASS** (MISS-016, HIGH, remains open,
+  and this cycle's own completeness sweep surfaces 3 new findings that must
+  be logged).
+- **Correction-chain soundness**: **independently confirmed sound.** Every
+  cited Evidence ID genuinely supports its claim; the voltage-drop/RPM
+  arithmetic is reproduced from scratch to within rounding noise; the
+  entire physics table (KE, rim speed, peak stress, safety factor)
+  reproduces to the exact stated precision at every cited RPM point,
+  old and new; the "minimum resistance/lowest VF" bounding choice is
+  confirmed correct (not backwards) for this specific worst-case-energy
+  question, properly distinguished from this design's own opposite-bound
+  analyses for genuinely different questions; the 11.1V-nominal-vs-12.6V-
+  full-charge LiPo distinction is independently reconfirmed a 5th and 6th
+  way.
+- **Open CRITICAL count**: 0.
+- **Open HIGH count**: 1 — MISS-016 (carried forward; reaffirmed HIGH per
+  §8 above; shortfall now understood to widen, not narrow, once
+  recomputed — not this Reviewer's arithmetic to redo).
+- **Open MEDIUM count (non-gating)**: 2 new this cycle — **MISS-020**
+  (`validation/fmea.md` FMEA-009's stale hazard-magnitude figures) and
+  **MISS-021** (`bench-imu-01-manufacturing-spec.md`'s 6 stale citations,
+  previously unflagged by either ECO-022 or ECO-023).
+- **Open LOW count (non-gating)**: 1 new this cycle — **MISS-019** (the
+  conservative-direction "~20,000-22,200 RPM"/"~3.3-3.7x margin" staleness
+  bundle across `requirements/requirements.md`, `requirements/
+  traceability-matrix.md`'s REQ-405 row, `bom/component-selection.md`, and
+  `firmware/bench-imu-01/`), plus the pre-existing MISS-018 (untouched by
+  this cycle).
+- **Impact on prior verdicts**: **none require reopening.** Cycles 3/4
+  (mechanical design, geometry/topology-driven) and both Manufacturing
+  Process Cross-Checks (scope-completeness/label-taxonomy-driven) do not
+  depend on the RPM/energy figure's own correctness at all or already
+  treated it as an inherited `ESTIMATE`. The MISS-011 Closure Attempt
+  cross-check's own wall-margin-shortfall conclusion is strengthened, not
+  undermined, by a higher real energy figure. See §7 above for the full
+  per-cycle accounting, plus one honest self-critical process note (not a
+  new finding) on a deeper class of traceability check this correction
+  chain has newly established.
+- **Next action**: Report CONDITIONAL to the Hardware Lead. No loop-back to
+  Circuit Engineer or Mechanical Lead is required for ECO-022/ECO-023
+  themselves (both independently confirmed sound). MISS-016 (HIGH) remains
+  `OPEN`, `Source: mechanical-reviewer`, now annotated with the corrected-
+  figure staleness note, awaiting the human's decision — unaffected in
+  disposition by this cycle. MISS-019 (LOW), MISS-020 (MEDIUM), and
+  MISS-021 (MEDIUM) are newly logged `OPEN`, `Source: mechanical-reviewer`,
+  in `validation/open-issues.md`, none gating, for the respective owning
+  roles (Requirements Engineer/Firmware Lead for MISS-019's citations;
+  whoever owns `validation/fmea.md` for MISS-020; Manufacturing Engineer
+  for MISS-021) to pick up at convenience.

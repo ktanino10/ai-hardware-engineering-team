@@ -29,7 +29,12 @@ SRCS = src/startup_stm32g031xx.c \
        src/usart2.c \
        src/i2c2.c \
        src/bmi270.c \
-       src/reset_reason.c
+       src/reset_reason.c \
+       src/i2c1.c \
+       src/tim1_pwm.c \
+       src/tim3_fg.c \
+       src/drv10983.c \
+       src/motor.c
 
 OBJS = $(patsubst src/%.c,$(BUILDDIR)/%.o,$(SRCS))
 

@@ -424,3 +424,831 @@ justification needed.)*
 | Component Engineer | Component Engineer (AI agent) | 2026-08-30 | Proposed — TLV75533PDBVR |
 | Hardware Lead | Hardware Lead (this session) | 2026-08-30 | Concur — recommend approval; not treated as requiring separate Chief Engineer sign-off per Escalation flag 3, but reported alongside MCU/IMU per the human's explicit "report all three" instruction |
 | Chief Engineer (Human) — required if architecture-defining/major component | Human Chief Engineer | 2026-08-30 | **Approved** — "Approve all three as recommended" (Checkpoint B, recorded via ask_user; independently re-confirmed after the worktree-restore incident, see `validation/change-log.md` ECO-001) |
+
+---
+
+## Motor (Reaction Wheel Drive)
+
+> **Rev 3 addition.** This section and "Motor Driver IC" below were produced
+> together in one pass, per this task's own instruction — the motor-type
+> decision and driver-IC decision are coupled (a driver family only makes
+> sense against a specific motor commutation type), so they were reasoned
+> about jointly even though they are recorded as two separate sections
+> mirroring this file's existing per-part-need structure. **The target this
+> comparison is designed against (REQ-007's flywheel mass/radius/RPM/torque
+> figures, and the "no motor-type preference" framing) is itself only a
+> *provisional*, not-yet-human-confirmed default** —
+> `requirements/requirements.md` §9b/§9c. If the human changes those figures
+> materially, the torque-margin conclusions below should be revisited, not
+> assumed to still hold.
+
+- **Driving requirement(s)**: REQ-007 (open-loop PWM/speed-setpoint control
+  of the flywheel — the core functional need), REQ-008 (measure and report
+  actual RPM back to the host, contingent on whatever RPM-sensing capability
+  the selected motor+driver combination actually provides — this is why RPM-
+  sensing capability is scored as its own comparison criterion below, a new
+  criterion specific to this task), REQ-009 (open-loop only — no closed-loop/
+  PID/sensor-fusion control this cycle, which de-weights "smoothest possible
+  commutation for precision control" relative to what a real flight reaction
+  wheel would need), REQ-108/109 (a dedicated power architecture and a
+  separate motor-rail current budget will be defined by the Power Engineer
+  once engaged, directly consuming the real current/voltage numbers in the
+  comparison table below — this is the primary reason these numbers must be
+  datasheet-grounded, not rough guesses), REQ-110 (MCU shall generate a PWM
+  or equivalent drive signal — informs which control interfaces count as a
+  "clean" match), REQ-111/404 (driver-level overcurrent/stall protection —
+  more a driver-selection criterion, but the motor's own stall-current
+  behavior feeds it), REQ-112 (wire any available RPM/tach signal to the
+  MCU), REQ-204/307 (vibration exposure and isolation from the IMU — motor
+  mass and mounting matter), REQ-306/403 (rotation clearance and projectile/
+  pinch-hazard safety — shaft interface and mounting matter), REQ-503 (Rev 3
+  ≤$75–90 USD total subsystem soft budget — this motor is one line item
+  within that, not the whole budget).
+- **Constraints**: bench-test, open-loop-only hardware — not a flight
+  reaction wheel, so real flight-heritage brushless preference is *context*,
+  not a binding constraint (§9b Q2); no motor-type preference stated —
+  brushed DC, BLDC, and stepper are compared on merit; flywheel target
+  ≈100 g at ≈30 mm radius, spin-up to ≥3000 RPM, storing ≈10–15 mN·m·s,
+  motor delivering ≥5 mN·m continuous torque (arithmetic re-verified this
+  session: I = 0.5·m·r² ≈ 4.5×10⁻⁵ kg·m² at 100 g/30 mm, L = I·ω ≈ 14.1
+  mN·m·s at 3000 RPM — consistent with `requirements/requirements.md` §9b's
+  own figures); real bearing/friction losses not yet characterized (per
+  §9b's own caveat) — torque-margin conclusions below assume the datasheet/
+  derived torque figures are available *at the shaft*, before any such
+  losses; Rev 3 soft budget ≤$75–90 total for the whole new subsystem
+  (motor + driver + flywheel + connectors + wiring), not just the motor;
+  no existing rail on this board is assumed adequate for a motor load —
+  that is exactly the open question this comparison's real numbers feed
+  into the Power Engineer's upcoming HITL gate, not an assumption made here.
+
+### Candidate Comparison
+
+*(4 candidates compared, across all 3 motor types per the "no preference"
+constraint — exceeds the ≥3 minimum, no sole-source justification needed.)*
+
+| Parameter | Candidate A — Maxon RE 16 Ø16mm 118725 (Brushed DC) — ⚠ DISQUALIFIED | Candidate B — Anaheim Automation BLY171D-24V-4000 (Sensored BLDC) | Candidate C — T-Motor MN2206-13 KV2000 (Sensorless BLDC) — ✅ RECOMMENDED | Candidate D — SOYO SY28STH32-0674A / Pololu #1205 (Stepper) — ⚠ DISQUALIFIED |
+|---|---|---|---|---|
+| Manufacturer | Maxon Motor AG / maxon group | Anaheim Automation, Inc. | T-Motor (Nanjing Tiger Motor Technology) | SOYO (sold as Pololu item #1205) |
+| Part Number | 118725 | BLY171D-24V-4000 | MN2206-13 KV2000 (Navigator series) | SY28STH32-0674A |
+| Motor type | Brushed DC, graphite brushes | 3-phase BLDC, **sensored** (integrated Hall) | 3-phase BLDC, **sensorless** (outrunner), 12N14P | 2-phase hybrid stepper, NEMA11 |
+| Rated / nominal voltage | 4.8 V nominal [DS-MTR-001] | 24 V DC [DS-MTR-009] | 2S–3S LiPo, 7.4–11.1 V nominal / 8.4–12.6 V full-charge — no single stated max terminal voltage, rated by cell count [DS-MTR-017] | 3.8 V rated [DS-MTR-025] |
+| No-load current / speed | 105 mA / 12,700 RPM @ 4.8 V [DS-MTR-001] | N/A (BLDC rated by load point, not no-load) — derived no-load speed ≈8,889 RPM from Ke [DS-MTR-011] | 0.3 A @ 10 V; derived no-load speed ≈20,000 RPM @10V / ≈22,200 RPM @11.1V (derived from KV, not directly published) [DS-MTR-018] | N/A (stepper — no-load current concept doesn't apply the same way) |
+| Stall / max current | Stall current 7.56 A, stall torque 26.3 mN·m [DS-MTR-002] | Rated current ≈1.08 A **derived** from ~26W/24V, not directly published [DS-MTR-010] | Max continuous current 18 A (180 s rating); theoretical stall current ≈135 A (not a practical operating point) [DS-MTR-019, DS-MTR-020] | Rated current 670 mA/phase [DS-MTR-025] |
+| Torque available at ≥5 mN·m target | Continuous (nominal) rating only 2.15 mN·m @ 11,200 RPM/0.72 A — **below target on a continuous-duty basis**, but ≈20.1 mN·m available at 3000 RPM under short-term spin-up conditions from the speed-torque line, with only ≈2°C estimated winding temperature rise over a 2.83 s spin-up [DS-MTR-003, DS-MTR-004, DS-MTR-006] | Rated **continuous** torque 62.8 mN·m @ 4000 RPM — **12.6× the target**, heavily over-specified [DS-MTR-010]; peak (intermittent) torque ≈219 mN·m also legible on the same spec sheet, though the exact duration/duty-cycle basis defining "peak" was not confirmed this session [DS-MTR-012] | No manufacturer torque figure published (normal for a hobbyist multirotor motor). **Derived** Kt = 60/(2π·KV) = 4.77 mN·m/A ⇒ only ≈1.05 A needed for 5 mN·m — ample headroom vs. the 18 A continuous rating [DS-MTR-020] | **Marginal/unconfirmed.** Holding torque 58.8 mN·m @ 3.8 V/670 mA is a *low-speed/static* figure only [DS-MTR-026]; at the 3000 RPM/10 kHz step rate, winding L/R time constant (0.75 ms) is 7.5× the 0.10 ms step period — only ≈12.5% of holding torque realistically available (≈7.4 mN·m theoretical, borderline) at rated voltage; a 24 V chopper drive improves this to an estimated 5–20 mN·m, "marginal at best" — **no manufacturer torque-speed curve exists to confirm** [DS-MTR-030, DS-MTR-031] |
+| Max rated / mechanical speed | 16,000 RPM max permissible mechanical speed [DS-MTR-004] | 4000 RPM rated (this is the sheet's *rated* operating point, not a hard ceiling) [DS-MTR-011] | No published max; 3000 RPM target is only 13–20% of the ≈20,000–22,200 RPM derived no-load speed — "a very gentle operating condition" [DS-MTR-018] | 200 steps/rev at 1.8°/step; RPM is entirely a function of commanded step rate, not an intrinsic motor ceiling [DS-MTR-026] |
+| Torque/speed constants | Kt = 3.48 mN·m/A, Ke = 2750 RPM/V [DS-MTR-004] | Ke = 2.7 V/kRPM ⇒ derived ≈370 RPM/V KV-equivalent [DS-MTR-009] | KV = 2000 RPM/V (published); Kt = 4.77 mN·m/A (**derived**, not published) [DS-MTR-017, DS-MTR-020] | Coil resistance 5.6 Ω/phase, inductance 4.2 mH/phase [DS-MTR-025] |
+| Mass | 40 g [DS-MTR-005] | ≈299 g (0.66 lb) — **≈3× the 100 g flywheel target alone**, mechanically awkward [DS-MTR-013] | **30 g** — lightest of all 4 candidates [DS-MTR-021] | 110 g [DS-MTR-027] |
+| Package / dimensions / shaft | Body Ø16 mm confirmed; length/shaft/mounting pattern **UNKNOWN this session** — a research sub-agent's figures for these were self-flagged "from training data," not independently re-verified, so they are not repeated here as if confirmed [DS-MTR-005] | 42 mm² NEMA17 frame × 40.4 mm length, pole count **UNKNOWN** [DS-MTR-013] | Ø27 mm × 18.5 mm overall; stator Ø22 mm × 6 mm; 3 mm shaft; outrunner (flywheel can mount directly to the rotating bell, maximizing inertia per gram) [DS-MTR-021] | NEMA11, 28×28 mm × ≈32 mm length; 5 mm D-flat shaft; rotor inertia **UNKNOWN** [DS-MTR-027] |
+| **RPM-sensing capability** (new criterion) | **None integrated** on this base SKU — encoder-combination SKUs exist only as separate paid accessories ($30–80+); external bolt-on encoder (e.g. magnetic AS5600, optical US Digital) is a realistic DIY option [DS-MTR-005] | **Yes — 3× integrated Hall-effect sensors**, 5-wire harness, 5 V logic (needs level-shifting or open-drain/pull-up confirmation for a 3.3 V MCU input) — the only candidate with native integrated sensing [DS-MTR-014] | **None integrated** (sensorless outrunner) — but the paired driver IC (see Motor Driver IC section) supplies a hardware FG output derived from back-EMF; reliable BEMF detection typically degrades below ≈500–1500 RPM, a caveat for spin-up specifically, not the 3000 RPM steady-state point [DS-MTR-022] | **None integrated**; no confirmed encoder-equipped sibling SKU found — a stepper's own commanded step count is a form of "sensing" only if steps are never lost, which the torque-margin finding above makes a real risk at this RPM [DS-MTR-028] |
+| Lifecycle / EOL | **NRND** (Not Recommended for New Designs), verbatim [DS-MTR-007] | Active, no EOL notice found [DS-MTR-015] | Active (older 1400KV sibling appears discontinued; no EOL notice for this 2000KV variant) [DS-MTR-023] | Active/in-stock at Pololu [DS-MTR-029] |
+| Availability / lead time | In stock at maxongroup.us direct store [DS-MTR-008] | Up to 90-day factory-direct lead time; faster 3rd-party (Radwell, eBay) alternates exist [DS-MTR-016] | In stock, ships immediately (Graves RC Hobbies) [DS-MTR-023] | In stock (Pololu direct; cross-listed at DigiKey) [DS-MTR-029] |
+| Reference design / prior art | None found for continuous-spin/reaction-wheel use | None found for this exact SKU; NEMA17-class BLDCs used generically in academic reaction-wheel literature [DS-MTR-016] | **Exceptionally strong** — 2 GitHub CubeSat reaction-wheel projects built around this exact motor or a close sibling, plus a Charles' Labs build and an Embry-Riddle academic platform [DS-MTR-024] | None found for continuous-spin/reaction-wheel use |
+| Ecosystem / driver compatibility | Standard brushed H-bridge driver family (see Motor Driver IC section's footnote) | Compatible with sensored-BLDC drivers (e.g. DRV8313, MCF8315A, A4931 — noted by research, not carried into the formal driver comparison since this motor isn't recommended) | Mature sensorless-BLDC ecosystem: BLHeli_32/AM32 ESCs, VESC, SimpleFOC, and the paired driver IC below | Standard stepper chopper-driver family (not researched in depth this session since this motor is disqualified on physics grounds before reaching driver pairing) |
+| Price @ qty 1 | **$209.52** (qty 1–4); $184.82 (qty 5–19); $155.93 (qty 20–49) [DS-MTR-008] | **$65.00** (qty 1); $62.18 (qty 10); $50.16 (qty 25) [DS-MTR-015] | **$18.99** (qty 1) [DS-MTR-023] | **$39.92** (qty 1); $37.52 (qty 5); $35.27 (qty 25) [DS-MTR-029] |
+| % of Rev 3 $75–90 subsystem budget (qty 1, low end) | ≈279% — **motor alone exceeds the entire subsystem budget** | ≈87% — consumes nearly the whole subsystem budget alone | ≈25% — leaves ≈$50–65 headroom for driver + flywheel + PCB + connectors + wiring | ≈53% |
+| Known risks / disqualifying factors | **DISQUALIFIED**: price ≈2.7× over budget; NRND lifecycle; zero native RPM-sensing path; no reaction-wheel reference design. Continuous torque rating alone reads below target (though short-term spin-up torque and thermal margin are adequate) — not the primary disqualifier, budget/lifecycle are. | Not disqualified on electrical/functional grounds — heavily over-specified on torque, native Hall sensing is a real strength — but mass (≈3× the flywheel itself) and price (≈87% of the whole subsystem budget) make it a poor fit versus Candidate C. Retained as the strongest **fallback** candidate if Candidate C's sensorless RPM-sensing path fails at bring-up. | Low technical risk identified; open items are the derived (not manufacturer-published) torque constant and the sensorless BEMF low-speed detection floor during spin-up (both addressed in Recommendation below). | **DISQUALIFIED**: well-cited physics (L/R time-constant analysis) shows continuous torque at the 3000 RPM target is marginal-to-infeasible with an ordinary driver; zero native RPM-sensing path; no reaction-wheel reference design found; no published torque-speed curve to even confirm the marginal estimate. |
+
+*A cheaper Pololu brushed-DC alternative (item #1117) was informally
+surfaced during research as a potential lower-cost brushed-DC option, but
+was found to fail the torque margin (back-calculated stall torque only
+≈3.6–7 mN·m against the 5 mN·m target) and has no manufacturer datasheet —
+not viable, and not added as a formal 5th candidate since it fails on its
+own merits rather than adding a genuinely new trade-off to weigh.*
+
+**Correction note (2026-09-13, MISS-019, LOW, non-safety-degrading):**
+the "≈22,200 RPM @11.1V" and "≈20,000–22,200 RPM" figures in the table
+rows above (lines 495, 498) remain arithmetically correct as *derived
+KV×V* estimates at the specific voltages stated — they are not deleted
+or wrong on their own terms. However, 11.1V was elsewhere mislabeled
+"full-charge 3S" when it is actually 3S's *nominal* voltage (full-charge
+is 12.6V); the design's own later-established, real 9.0–13.0V `VM_MOTOR`
+qualified envelope (`hardware/schematic/bench-imu-01-design.md` §7.5.9)
+implies a corrected, higher credible-worst-case no-load speed of
+≈25,180 RPM once real circuit-path voltage drops are also accounted for
+(§7.5.13, DS-MTR-018 corrected/DS-MTR-080). This does not change this
+section's own Component Selection-era recommendation or trade-off
+analysis (Candidate C remains the correct choice on every criterion
+compared here), and the error direction is non-safety-degrading — REQ-007's
+3000 RPM target is an even *smaller* fraction of the true no-load speed
+than stated ("13–20%" understates how gentle the target operating point
+actually is). See §7.5.13 and `validation/open-issues.md` MISS-019 for
+the full correction; not re-litigated in the table above per this
+document's own convention of preserving the original decision record.
+
+### Recommendation
+
+- **Recommended candidate**: **C — T-Motor MN2206-13 KV2000 (sensorless
+  BLDC)**.
+- **Motor-type elimination reasoning (the coupling point with the Motor
+  Driver IC section below)**: brushed DC and stepper are **both eliminated
+  as a type**, not just as individual SKUs — brushed DC's best-fitting real
+  candidate (Maxon) is disqualified on budget/lifecycle grounds and brushed
+  DC as a type has zero native RPM-sensing path requiring an added external
+  encoder regardless of which specific brushed motor is chosen; stepper's
+  well-cited L/R time-constant physics makes continuous torque at the 3000
+  RPM target marginal-to-infeasible with an ordinary driver, independent of
+  which specific stepper SKU is chosen, and also has zero native RPM-sensing
+  path. This leaves **BLDC as the only motor type still in contention**,
+  which is why the Motor Driver IC section below formally compares only
+  BLDC/sensorless-BLDC driver ICs (with H-bridge brushed-DC drivers
+  mentioned only as a footnote for process transparency, per this task's own
+  instruction to match the driver comparison to the surviving motor type).
+- **Rationale** (success probability first, peak spec second):
+  1. **Budget fit is decisive, not marginal.** At $18.99, Candidate C
+     consumes only ≈25% of the Rev 3 subsystem's $75–90 soft ceiling,
+     leaving ≈$50–65 for the driver IC, flywheel machining, PCB, connectors,
+     and wiring. Candidates A and B alone consume 279% and 87% of that same
+     budget respectively — either would force cuts elsewhere in the
+     subsystem or blow the ceiling outright.
+  2. **Mass is the lightest of all 4 candidates (30 g)** — directly helps
+     REQ-306 (rotation clearance envelope) and REQ-307 (vibration isolation
+     from the IMU) by keeping the rotating assembly's total mass/inertia
+     budget dominated by the flywheel itself (≈100 g) rather than by the
+     motor, and helps REQ-308's soft desk-scale enclosure bound.
+  3. **Torque margin is real and generous, not assumed.** The derived
+     torque constant (Kt = 4.77 mN·m/A) means only ≈1.05 A is needed to
+     produce the 5 mN·m target — against an 18 A continuous rating, this is
+     roughly 17× current headroom. Even granting meaningful uncertainty in
+     the derivation (it is *derived* from KV, not a manufacturer-published
+     torque figure — see Open UNKNOWNs), the margin is large enough to
+     absorb real bearing/friction losses that requirements.md's own §9b
+     explicitly flags as not yet characterized.
+  4. **Direct, repeated reaction-wheel/CubeSat project heritage is the
+     strongest differentiator versus every other candidate.** Two
+     independent GitHub projects (`yiqiangjizhang/CubeSat-Reaction-Wheel-
+     control`, `Thissp97/Reaction-Wheel-for-CubeSat`) plus a Charles' Labs
+     build and an Embry-Riddle academic platform have already run this
+     exact motor (or a close KV sibling) as a continuous-spin reaction
+     wheel — this is direct evidence the part *works* in this exact
+     application, not just that its datasheet numbers look adequate on
+     paper. None of the other 3 candidates have any reaction-wheel-specific
+     prior art at all.
+  5. **RPM-sensing gap is real but has a credible resolution, not a silent
+     gap.** Candidate C itself has no integrated Hall sensor or encoder —
+     but the recommended paired driver IC (TI DRV10983, see Motor Driver IC
+     section) provides a hardware FG output pin derived from back-EMF
+     sensing, which is judged an adequate REQ-008/112 answer at the 3000
+     RPM steady-state operating point. This is not free of risk — see Open
+     UNKNOWNs below and the Motor Driver IC section's own escalation flags.
+  6. This recommendation deliberately does **not** chase Candidate B's
+     "real" integrated Hall sensors or Candidate A's mature, well-
+     characterized-at-low-speed brushed DC control simplicity, because
+     both lose on cost/mass/lifecycle grounds that matter more for this
+     specific project's success than peak sensing fidelity — consistent
+     with this role's "success probability first, peak spec second"
+     mandate.
+- **Trade-offs accepted**:
+  - *vs. Candidate A (Maxon, brushed DC)*: gives up a mature, simple,
+    well-understood brushed-DC control scheme (no commutation electronics
+    needed beyond a basic H-bridge) — in exchange for eliminating an NRND
+    lifecycle risk and a price point that alone exceeds the entire Rev 3
+    subsystem budget. Not a close call.
+  - *vs. Candidate B (Anaheim, sensored BLDC)*: gives up **native, direct
+    Hall-effect RPM sensing** (a real, meaningful capability Candidate C
+    lacks) and gives up a large, confirmed torque margin (62.8 mN·m
+    continuous vs. Candidate C's ≈1.05 A-derived need) — in exchange for
+    ≈3.4× lower price, ≈10× lower mass, and direct reaction-wheel project
+    heritage that Candidate B does not have. This is the trade-off most
+    worth revisiting if Candidate C's sensorless RPM-sensing path proves
+    unreliable at bring-up (see Escalation flags) — Candidate B is recorded
+    here specifically as that fallback.
+  - *vs. Candidate D (SOYO/Pololu stepper)*: gives up native, precise
+    open-loop position control via commanded step count (in principle, if
+    no steps are ever lost) — in exchange for avoiding a well-cited,
+    unresolved risk that the stepper cannot deliver its target torque at
+    all at the required RPM, and gaining a motor type with an actual
+    continuous-high-speed-spin design intent (BLDC) rather than one
+    optimized for low-speed positioning torque.
+- **Open `UNKNOWN`s**:
+  - The core torque figure this recommendation rests on (Kt = 4.77 mN·m/A,
+    ⇒ ≈1.05 A needed for 5 mN·m) is a **derived** estimate from the
+    published KV constant, not a manufacturer-stated torque number — no
+    stall/peak torque or torque-speed curve is published for this SKU at
+    all (normal for a multirotor-market motor). The margin is large enough
+    (≈17× on current) that this is judged low-risk, but it is not the same
+    confidence level as a directly-published torque figure.
+  - Whether the paired driver's BEMF-derived FG signal will be clean/
+    monotonic specifically during the 0→3000 RPM spin-up ramp for *this*
+    motor+driver combination is not resolvable from datasheets alone — no
+    hardware has been built yet. Flagged as a bring-up validation item for
+    Circuit Engineer/Firmware, not a blocking issue for this recommendation.
+  - Real bearing/friction losses for whatever bearing/shaft/flywheel-mount
+    solution Mechanical Lead eventually designs are not yet characterized
+    (per requirements.md §9b's own caveat) — the ≈17× current margin is
+    judged large enough to absorb a reasonable range of such losses, but
+    this has not been bench-verified (REQ-504 — no physical build this
+    cycle).
+  - Candidate A's package dimensions beyond body diameter (length, shaft,
+    mounting pattern) and Candidate B's pole count are recorded `UNKNOWN`
+    in the table above rather than guessed — not blocking since neither is
+    the recommended candidate, but would need to be closed before either
+    could be seriously re-considered as a fallback.
+
+### Escalation flags
+
+1. **Architecture-defining / major component decision — requires Hardware
+   Lead + human Chief Engineer approval before Circuit Engineer uses this**
+   (`docs/architecture.md` §10). This is explicitly **not self-approved**;
+   see Approval table below.
+2. **The target this comparison is designed against is itself only
+   provisionally adopted, not human-confirmed** — `requirements/
+   requirements.md` §9b/§9c records the flywheel/torque/RPM figures and the
+   "no motor-type preference" framing as the Hardware Lead's own proposed
+   defaults, adopted autonomously after `ask_user` went unanswered this
+   cycle, with the human's real sign-off still open and solicited. If the
+   human changes any of those figures materially, this comparison's torque-
+   margin conclusions (especially the derived-Kt margin analysis for
+   Candidate C) should be re-checked, not assumed to still hold.
+3. **New ~12 V rail requirement for the Power Engineer.** The recommended
+   motor+driver pairing (Candidate C + TI DRV10983, see Motor Driver IC
+   section) needs to run from approximately 12 V to clear the driver's 8 V
+   minimum input with real margin — Candidate C's own 2S-nominal (7.4 V)
+   rating undershoots that minimum. Rev 1/2 of this board has only a single
+   3.3 V rail (via the existing TLV75533 LDO, REQ-102). **This is a
+   structural change to the power architecture, not a decision made here**
+   — it is flagged for the Power Engineer's own HITL-gated rail-topology/
+   sourcing proposal (`hardware/power-architecture.md`,
+   `.github/agents/power-engineer.agent.md`), per REQ-108's own contingency
+   for exactly this kind of finding.
+4. **Fallback path recorded, not silently discarded.** If Candidate C's
+   sensorless RPM-sensing path (BEMF-derived FG signal from the paired
+   driver) proves unreliable at physical bring-up, Candidate B (Anaheim
+   BLY171D-24V-4000, native Hall sensors) is the recorded fallback — at the
+   cost of ≈3.4× price, ≈10× mass, and a driver-IC change (see Motor Driver
+   IC section's DRV10970 comparison, which is Hall-sensor-compatible).
+
+### Approval
+
+| Role | Name | Date | Decision |
+|---|---|---|---|
+| Component Engineer | Component Engineer (AI agent) | 2026-08-31 | Proposed — T-Motor MN2206-13 KV2000 (sensorless BLDC), paired with TI DRV10983 (see Motor Driver IC section) |
+| Hardware Lead | Hardware Lead (this session) | 2026-08-31 | Concur — recommend approval. Independently re-verified the load-bearing arithmetic this candidate rests on: Kt = 60/(2π·2000 RPM/V) = 4.77 mN·m/A (confirmed by direct substitution); current need for 5 mN·m target = 5/4.77 ≈ 1.05 A (confirmed); margin vs. 18 A continuous rating ≈17.1× (confirmed); flywheel target itself (100 g/30 mm/3000 RPM ⇒ I≈4.5×10⁻⁵ kg·m², L=I·ω≈14.1 mN·m·s) independently re-derived and matches both this file's and `requirements/requirements.md` §9b's figures. Toshiba TC78B009FTG evidence-quality disqualifier is well-reasoned (existence not in doubt — 3 simultaneous live distributor listings — but no primary-source datasheet text was actually read this session, correctly not treated as a blocking "no datasheet found" escalation). Escalation flag 3 (new ~12 V rail requirement) is the key finding — routing to Power Engineer now for the architecture proposal before this recommendation goes to the human. |
+| Chief Engineer (Human) — required if architecture-defining/major component | Human Chief Engineer (via creator/"General Chat" session) | 2026-08-31 | **Approved** — "T-Motor MN2206-13 KV2000 + TI DRV10983, as recommended." Human independently re-verified this session: a fresh web search on both parts' specs matched this file's citations exactly, and the Kt/current-margin arithmetic was independently recomputed in Python (Kt=4.77 mN·m/A, 1.05A needed, 17.2× motor margin, 1.9× driver margin — all matching). Directive: the BEMF-sensing-degrades-below-500–1500-RPM caveat must appear as a real, tracked item in the Firmware bring-up plan and/or `validation/fmea.md`, not just this comparison report. |
+
+---
+
+## Motor Driver IC
+
+> **Rev 3 addition, coupled to the Motor section above.** Per the Motor
+> section's own "Motor-type elimination reasoning," brushed DC and stepper
+> are both eliminated as motor *types*, leaving only BLDC in contention —
+> so this comparison covers only sensorless/sensored-BLDC driver ICs, not
+> every driver family that exists. H-bridge (brushed-DC) driver ICs were
+> researched in parallel this session (TI DRV8871, TI DRV8833, Allegro
+> A4950) but are not carried into the formal comparison below and have no
+> assigned Evidence IDs or datasheet metadata records, since no fact about
+> them is actually relied upon anywhere in this file — recorded here only
+> for process transparency, per this task's own instruction that the driver
+> comparison should match whichever motor type(s) survive.
+
+- **Driving requirement(s)**: REQ-110 (MCU shall generate a PWM/commutation
+  drive signal to control the motor driver IC's speed/duty cycle — this is
+  the primary control-interface fit criterion below), REQ-111 (motor driver
+  IC shall include or enable overcurrent/stall protection appropriate for
+  repeated bench testing by hand) together with its companion REQ-404
+  (motor driver/firmware shall implement stall/overcurrent detection and a
+  shutdown behavior to prevent sustained overheating during bench testing —
+  REQ-111/404 are scored together below since they describe the same
+  protection need split across IC vs. firmware), REQ-008/112 (RPM/tach
+  feedback shall be wired to an MCU input where the motor+driver combination
+  provides one — this is why tach/FG output availability is scored
+  explicitly below, directly following on from the Motor section's finding
+  that the recommended motor itself has no integrated sensing), REQ-108/109
+  (the driver's own supply-voltage range and current rating are themselves
+  primary inputs to the Power Engineer's upcoming rail/topology decision —
+  same "real numbers, not guesses" mandate as the Motor section), REQ-503
+  (Rev 3 ≤$75–90 USD total subsystem soft budget — the driver is a second
+  line item within that, alongside the motor).
+- **Constraints**: must be electrically and functionally compatible with
+  the motor type(s) still in contention after the Motor section's own
+  comparison — concretely, this means **sensorless-BLDC-capable** drivers
+  are the primary fit (matching the recommended T-Motor MN2206-13), with
+  Hall-sensored-BLDC-only drivers scored but expected to be a poor fit
+  given the recommended motor has no Hall sensors to wire to one; supply
+  voltage range must cover a realistic operating point for the recommended
+  motor (2S–3S LiPo range, 7.4–12.6V, with an actual target rail still
+  pending the Power Engineer's own decision — see Motor section Escalation
+  flag 3); control interface should map cleanly onto a bare MCU PWM output
+  (REQ-110) without requiring protocol translation hardware for basic
+  open-loop operation (REQ-007/009); package must be at least partially
+  hand-solderable given this project's small-batch/bench-assembly context
+  (mirrors the MCU/Regulator sections' own package-assembly scoring);
+  Rev 3 soft budget shared with the motor, not a separate ceiling.
+
+### Candidate Comparison
+
+*(3 candidates compared — meets the ≥3 minimum; all 3 are sensorless-or-
+Hall-sensored 3-phase BLDC driver ICs, the only motor type still in
+contention per the Motor section above.)*
+
+| Parameter | Candidate A — TI DRV10983 — ✅ RECOMMENDED | Candidate B — TI DRV10970 | Candidate C — Toshiba TC78B009FTG |
+|---|---|---|---|
+| Manufacturer | Texas Instruments | Texas Instruments | Toshiba Electronic Devices & Storage |
+| Part Number | DRV10983 | DRV10970 | TC78B009FTG |
+| Motor-type compatibility | **Sensorless** 3-phase BLDC — direct match to the recommended T-Motor MN2206-13 (sensorless, DS-MTR-022) [DS-MTR-035] | **Requires Hall-effect sensors** on the motor — hard incompatibility with the recommended sensorless T-Motor MN2206-13 [DS-MTR-045] | Sensorless 3-phase BLDC per secondary-source claim — would also match the T-Motor, but this claim is **not primary-source-confirmed this session** [DS-MTR-050] |
+| Supply voltage range (VM) | 8–28 V [DS-MTR-032] | 5–18 V — **hard ceiling incompatible with a 24V-nameplate motor** such as the Anaheim BLY171D-24V-4000, though not with the recommended T-Motor [DS-MTR-042] | Up to 30 V operating (36 V absolute maximum per a distributor listing) — the widest range of the 3, would cover either motor candidate [DS-MTR-049] |
+| Max current rating (per phase) | 2 A continuous / 3 A peak — against the T-Motor's derived ≈1.05 A need (DS-MTR-020), this is ≈2× continuous-current margin [DS-MTR-034] | 1 A RMS continuous / 1.5 A peak — the most current-limited of the 3 candidates [DS-MTR-044] | 3 A maximum — highest of the 3, but continuous-vs-peak distinction **UNKNOWN this session** [DS-MTR-049] |
+| Integrated power stage | Fully-integrated on-die power MOSFETs for all 6 switches — no external FETs needed [DS-MTR-035] | Integrated FETs, combined R_DS(on) ≈400 mΩ [DS-MTR-044] | On-die MOSFET integration **not independently confirmed this session** (typical for this device class, but not verified against a primary source) [DS-MTR-050] |
+| Integrated logic regulator | **Yes** — integrated buck regulator generates the device's own 3.3V or 5V logic supply, confirming direct compatibility with this project's existing 3.3V MCU domain with no separate level-shifting hardware needed [DS-MTR-033] | Dedicated VIO pin confirms 3.3V logic-level compatibility, but no evidence of an integrated regulator generating that supply on-die [DS-MTR-043] | **UNKNOWN this session** — not extractable from secondary sources |
+| Control interface | PWM duty cycle, analog voltage, or I2C — PWM path maps directly onto REQ-110 with no protocol translation needed; I2C available for optional tuning/telemetry, not required for basic open-loop speed control (REQ-007/009) [DS-MTR-036] | Hardware PWM + FR (direction) pins only — no I2C [DS-MTR-046] | PWM, analog, or I2C per secondary-source claim — **not primary-source-confirmed** [DS-MTR-050] |
+| Overcurrent / stall / thermal protection (REQ-111/404) | **Two distinct mechanisms, corrected at Circuit Design (2026-09-04) — see `datasheets/evidence-log.md` DS-MTR-037's own correction annotation and DS-MTR-058/059**: (1) OCP is a **fixed, non-configurable** hardware trip (3 MIN/4 MAX A phase current), Hi-Z output, auto-clears once the fault condition itself clears — not a timed retry [DS-MTR-058]; (2) **Lock Detection** is the genuinely programmable-via-I2C, auto-retry (5s) mechanism this row originally (incorrectly) attributed to OCP — it covers stall/locked-rotor and 4 other fault classes [DS-MTR-059]. Both together satisfy REQ-111/404's substantive protection requirement; only the original mechanism-to-feature-name mapping was wrong, not the underlying "protection exists" conclusion. Exact thermal-shutdown threshold/behavior remains **UNKNOWN** (not extractable from the fetched pages this session) [DS-MTR-037] | Overcurrent protection plus locked-rotor/stall detection via absence of expected Hall-switching transitions, auto-retry timing set by an external capacitor on a RETRY pin [DS-MTR-046] | ALERT pin reported for abnormality/lock detection per secondary-source claim; specific OCP/TSD thresholds **UNKNOWN this session**, **not primary-source-confirmed** [DS-MTR-050] |
+| Tach / FG output (REQ-008/112) | **Yes — hardware FG pin**, TI's own page states verbatim: "Motor speed feedback is available through either the FG pin or I2C." This is the key finding resolving REQ-008/112 for the sensorless T-Motor, since the motor itself has no integrated sensor — the driver supplies the RPM path instead. Low-RPM (spin-up) FG reliability below the BEMF-detection floor is a residual, datasheet-unresolvable integration risk [DS-MTR-038] | **Yes — hardware FG pin plus a separate dedicated RD (rotor-lock) output** — arguably the richest fault/speed signal set of the 3, but only usable given this part's own Hall-sensor requirement [DS-MTR-047] | FG output reported (open-drain, ≈5 mA sink, needs an external pull-up) plus a separate ALERT pin, per secondary-source claim — **not primary-source-confirmed** [DS-MTR-050] |
+| Package / hand-solderability | 24-pin HTSSOP w/ exposed pad, 0.65mm lead pitch — leads hand-solderable with a fine-tip iron and flux; exposed pad itself needs reflow/hot-air for full rated thermal performance (partial, not full, hand-assembly constraint). θJA and exact body dimensions **UNKNOWN this session** [DS-MTR-039] | 24-pin TSSOP w/ exposed pad — same hand-solderability profile as Candidate A [DS-MTR-048] | WQFN-36 — no exposed leads at all, the **hardest to hand-solder of all 3 candidates** (realistically needs a reflow oven or hot-air rework station, not a hand iron) |
+| Lifecycle / EOL | Active / "PRODUCTION DATA" per TI's own product page [DS-MTR-040] | Active [DS-MTR-048] | Active — confirmed only via simultaneous distributor stock, not a manufacturer lifecycle statement (no primary Toshiba page read this session) [DS-MTR-051] |
+| Availability / lead time | In stock: DigiKey 6,500 units, Mouser 6,316 units (checked 2026-08-31) [DS-MTR-040] | In stock: DigiKey 5,130 units, Mouser 2,186 units (checked 2026-08-31) [DS-MTR-048] | In stock: DigiKey 3,808 units, Mouser 693 units, Arrow 4,000 units (checked 2026-08-31) — this 3-distributor stock breadth is itself the strongest evidence the part and its datasheet genuinely exist, despite this session's inability to read the datasheet's primary text [DS-MTR-051] |
+| Reference design / EVM | **DRV10983EVM confirmed** — supports 8–28V input, PWM/analog speed control, USB2ANY-based I2C GUI for configuration/telemetry [DS-MTR-041] | **DRV10970EVM confirmed** [DS-MTR-048] | No confirmed evaluation board found this session |
+| Price @ qty 1 | **≈$2.58** (DigiKey, PWPR cut-tape); ≈$2.57 (qty 100) [DS-MTR-040] | **≈$1.48–1.53** (DigiKey) — cheapest of the 3 [DS-MTR-048] | ≈$2.66 (DigiKey/Mouser); ≈$1.50 (qty 100) [DS-MTR-051] |
+| Known risks / disqualifying factors | Thermal-shutdown threshold and θJA not confirmed this session (flagged, not blocking — see Open UNKNOWNs) | **DISQUALIFIED for this pairing**: hard Hall-sensor requirement is incompatible with the recommended sensorless T-Motor MN2206-13; also its 18V ceiling would exclude the Anaheim fallback motor's 24V nameplate rating if that fallback were ever exercised. Not a flaw in the IC itself — simply the wrong sensing-topology fit for this cycle's recommended motor. | **Not selected as primary recommendation.** Raw specs (widest voltage range, highest current rating) look competitive or better than Candidate A on paper, but the entire electrical/functional profile rests on a **secondary-source synthesis** this session could not independently verify against a primary Toshiba document (404 on the direct PDF link, a Mouser page timeout, and a JS-rendered Toshiba product page unreadable to this session's tooling) — see `datasheets/toshiba_tc78b009ftg_rev-unknown.md`'s own "Confidence flag" section. This is an evidence-quality gap, not a specification gap, and is why Candidate A is recommended over Candidate C despite comparable on-paper specs. |
+
+### Recommendation
+
+- **Recommended candidate**: **A — TI DRV10983**, paired with the Motor
+  section's recommended **T-Motor MN2206-13 KV2000**.
+- **Compatibility reasoning (motor+driver pairing, not two independent
+  picks)**:
+  1. **Voltage match**: the T-Motor is rated for 2S–3S LiPo operation
+     (7.4–12.6V across nominal-to-full-charge). The DRV10983's 8–28V input
+     range comfortably covers the upper half of that window with margin,
+     but **undershoots the T-Motor's 2S-nominal 7.4V** — this pairing is
+     only sound at a **≈12V-class operating point** (3S-equivalent), which
+     is why the Motor section's Escalation flags explicitly call out a new
+     ~12V rail requirement for the Power Engineer, rather than assuming the
+     motor's own "nominal" voltage is what will actually be supplied.
+     **Binding constraint confirmed at Circuit Design/Independent Review
+     (2026-09-05/06, ISS-014, `hardware/schematic/bench-imu-01-design.md`
+     Rev 4 §7.5.2)**: the reverse-polarity protection diode Circuit Design
+     added to the motor input (D2) narrows this further — a 2S source
+     fails to clear the DRV10983's own UVLO threshold at *typical*, not
+     just worst-case, conditions once D2's forward drop is accounted for.
+     **This design is 3S-only in practice, not merely "3S-equivalent
+     preferred"** — 2S operation is not a supported configuration for this
+     specific implementation, even though the T-Motor itself remains
+     independently rated for 2S in isolation. See `hardware/
+     power-budget.md`'s Rail Margin Summary for the exact corner-by-corner
+     numbers.
+  2. **Current match**: the T-Motor's derived torque-current need (≈1.05A
+     for the 5 mN·m target, Kt = 4.77 mN·m/A) sits well inside the
+     DRV10983's 2A continuous / 3A peak rating — roughly 2× continuous
+     headroom on top of the ≈17× headroom already identified against the
+     motor's own 18A continuous rating in the Motor section. Two
+     independent margins, both generous.
+  3. **Control-interface match**: the DRV10983 accepts a bare PWM duty-
+     cycle input, which is exactly what REQ-110 specifies the MCU shall
+     generate — no protocol-translation hardware (e.g. a separate I2C
+     level shifter) is required for basic open-loop operation, keeping
+     REQ-009's open-loop-only scope fence easy to honor in firmware.
+  4. **Commutation-scheme match**: both parts are sensorless (180°
+     sinusoidal BEMF on the driver side, standard outrunner BEMF on the
+     motor side) — no Hall-sensor wiring harness is needed between the two,
+     simplifying the physical interconnect versus the disqualified
+     Candidate B pairing.
+  5. **RPM-sensing resolution**: the DRV10983's hardware FG pin is the
+     mechanism that resolves REQ-008/112 for this pairing, since the
+     T-Motor itself has no integrated sensor (established in the Motor
+     section). This is the single most load-bearing cross-section finding
+     in this whole task — it is why the motor and driver had to be chosen
+     together rather than independently.
+  6. **Logic-supply convenience**: the DRV10983's integrated buck regulator
+     can generate 3.3V/5V logic on-die, which may simplify (though does not
+     eliminate the need for) the Power Engineer's new-rail design — this is
+     offered as a data point for that HITL gate, not a decision made here.
+- **Rationale** (success probability first, peak spec second):
+  1. **Evidence quality, not raw specs, is the deciding factor between
+     Candidate A and Candidate C.** Candidate C (Toshiba) has a nominally
+     wider voltage range (up to 30V vs. 28V) and higher current rating (3A
+     vs. 2A) — on paper, arguably the "stronger" part. But every one of
+     those figures rests on a secondary-source synthesis this session could
+     not verify against Toshiba's own primary documentation (three
+     independent access failures: a 404 on the direct PDF, a Mouser page
+     timeout, and a JS-rendered product page this session's tooling could
+     not read). Candidate A's equivalent facts (voltage range, current
+     rating, control interface, FG output) were all confirmed via a
+     directly-fetched, readable TI page this same session. For a
+     recommendation feeding directly into the Power Engineer's HITL gate,
+     confirmed-primary-source numbers are judged more valuable than
+     nominally-higher but secondary-source-only numbers.
+  2. **Package/assembly risk favors Candidate A.** Candidate C's WQFN-36
+     package has no exposed leads at all and realistically needs a reflow
+     oven or hot-air rework station — a meaningfully worse fit for this
+     project's small-batch/hand-assembly context than Candidate A's
+     HTSSOP-24, whose leads are hand-solderable even though its exposed pad
+     still benefits from reflow.
+  3. **Reference design availability favors Candidate A decisively.** A
+     confirmed DRV10983EVM exists with documented PWM/analog/I2C support;
+     no evaluation board could be confirmed for Candidate C this session.
+     For a first-time motor-driver bring-up on bench-test hardware, a real
+     EVM meaningfully de-risks firmware/hardware bring-up.
+  4. **Candidate B is disqualified on a hard compatibility fact, not a
+     preference.** Its Hall-sensor requirement is incompatible with the
+     recommended sensorless T-Motor; pairing them would require either
+     switching to the Anaheim BLY171D fallback motor (see Motor section
+     Escalation flag 4) or abandoning Candidate B, not a tunable trade-off.
+     Its lowest-of-the-3 price (≈$1.48–1.53) and richest fault-signal set
+     (FG **and** RD pins) are real strengths, recorded here specifically as
+     the paired fallback if the Anaheim motor is ever substituted in.
+- **Trade-offs accepted**:
+  - *vs. Candidate B (TI DRV10970)*: gives up the lowest price of the 3
+    candidates and the richest fault-signal set (FG **and** RD pins) — in
+    exchange for sensorless compatibility with the recommended motor, which
+    Candidate B cannot provide at all without a motor substitution.
+  - *vs. Candidate C (Toshiba TC78B009FTG)*: gives up a nominally wider
+    voltage range and higher current rating — in exchange for confirmed
+    primary-source data, a meaningfully easier hand-assembly package, and a
+    confirmed EVM. If a future session obtains and reads Toshiba's primary
+    datasheet PDF and the figures hold up, Candidate C would be worth
+    re-scoring — it is not disqualified on a hard technical fact the way
+    Candidate B is, only on an evidence-quality and assembly-risk basis.
+- **Open `UNKNOWN`s**:
+  - DRV10983's exact thermal-shutdown threshold/behavior and θJA/package
+    body dimensions were not extractable from the pages fetched this
+    session — not judged blocking given the generous current margin
+    already identified, but should be closed before Circuit Engineer
+    finalizes thermal layout.
+  - Whether the DRV10983's FG signal will be clean/monotonic specifically
+    during this pairing's 0→3000 RPM spin-up ramp (below the typical BEMF-
+    detection floor of ≈500–1500 RPM) is not resolvable from a datasheet —
+    flagged as a bring-up validation item for Circuit Engineer/Firmware,
+    cross-referenced from the Motor section.
+  - Toshiba TC78B009FTG's entire profile in this comparison is secondary-
+    source-only and explicitly not relied upon for the final
+    recommendation — see this section's Escalation flags below and
+    `datasheets/toshiba_tc78b009ftg_rev-unknown.md`'s own Confidence flag
+    section.
+
+### Escalation flags
+
+1. **Architecture-defining / major component decision — requires Hardware
+   Lead + human Chief Engineer approval before Circuit Engineer uses this**
+   (`docs/architecture.md` §10), same as the Motor section — this is one
+   coupled motor+driver recommendation, not two independent ones, and is
+   explicitly **not self-approved**; see Approval table below.
+2. **Evidence-confidence gap for Candidate C (Toshiba TC78B009FTG) — flagged
+   explicitly, not treated as a silent gap or as a full "no datasheet
+   found" escalation.** This session could not read Toshiba's primary
+   datasheet PDF (404 on the direct link), a Mouser distributor page
+   (request timeout), or Toshiba's own product page (JavaScript-rendered,
+   unreadable to this session's fetch tooling). All of Candidate C's
+   figures in the table above instead come from a secondary, AI-synthesized
+   web-search source cross-referencing an alldatasheet.jp mirror. This is
+   **not** escalated as a "no datasheet can be found" stop condition per
+   this role's own escalation triggers, because the part and a genuine
+   datasheet demonstrably exist — three independent live distributors
+   (DigiKey, Mouser, Arrow) stock it as an active production part, which
+   would not be true of a fictitious or unavailable part. The gap is
+   recorded as a confidence/verification gap, not an existence gap, and is
+   the deciding reason Candidate C was not recommended over Candidate A
+   despite nominally competitive specs. A future session with working
+   access to Toshiba's primary PDF should re-verify before this part is
+   reconsidered for anything beyond a documented fallback.
+3. **New ~12V rail requirement — repeated from the Motor section, applies
+   equally to this driver.** The DRV10983's 8–28V input range only clears
+   its own minimum with real margin at a ≈12V-class operating point, not at
+   the T-Motor's 2S-nominal 7.4V. Rev 1/2 of this board has only a single
+   3.3V rail. Flagged for the Power Engineer's own HITL-gated rail-topology
+   proposal, not decided here.
+4. **Thermal numbers remain partially incomplete for all 3 candidates**
+   (θJA UNKNOWN for Candidate A/B, full thermal profile UNKNOWN for
+   Candidate C) — flagged explicitly because the Power Engineer's own
+   agent definition calls for real thermal data per candidate, and this is
+   the one dimension where this comparison could not fully deliver it from
+   the sources available this session. Does not block the recommendation
+   given the generous current margins already identified, but should be
+   closed before Circuit Engineer finalizes the driver's PCB thermal
+   layout (copper pour sizing, via stitching under the exposed pad).
+
+### Approval
+
+| Role | Name | Date | Decision |
+|---|---|---|---|
+| Component Engineer | Component Engineer (AI agent) | 2026-08-31 | Proposed — TI DRV10983, paired with T-Motor MN2206-13 KV2000 (see Motor section) |
+| Hardware Lead | Hardware Lead (this session) | 2026-08-31 | Concur — recommend approval. The motor+driver compatibility reasoning (voltage/current/control-interface/commutation-scheme match) is sound and the DRV10983's FG-pin RPM path is a well-justified resolution for REQ-008/112 given the motor itself has no integrated sensor. Same evidence-quality-over-raw-spec reasoning against Candidate C (Toshiba) as the Motor section — agree this is the right call for a first-time bring-up. Routing the ~12V rail requirement (Escalation flag 3) to Power Engineer now. |
+| Chief Engineer (Human) — required if architecture-defining/major component | Human Chief Engineer (via creator/"General Chat" session) | 2026-08-31 | **Approved** — "T-Motor MN2206-13 KV2000 + TI DRV10983, as recommended" (same sign-off as the Motor section above — one coupled decision, independently re-verified by the human this session). |
+
+---
+
+## Motor-Rail Supervisory Controller
+
+> **Rev 4 addition — routed by Circuit Engineer via Hardware Lead, not
+> self-selected.** Independent Review of the Rev 3 motor driver subsystem
+> found 3 HIGH findings (ISS-015 uncommanded-motion risk, ISS-019 unbounded
+> input envelope, ISS-021 non-latching faults — `validation/open-issues.md`).
+> Circuit Engineer's Rev 4 update (`hardware/schematic/bench-imu-01-design.md`
+> §7.5.10) specifies the required function and ratings for a resolving part
+> in full, but deliberately does not select a specific MPN — judging an
+> *active* supervisory switch (the first active, not passive, protection
+> element in this design) to be "a more architecturally significant choice"
+> than the single-part, no-full-comparison class used for D2/D3/F1, and
+> routing the selection here instead. This section is that routed selection.
+
+- **Driving requirement(s)** (verified against `requirements/requirements.md`
+  and `validation/open-issues.md` directly, not just this task's summary):
+  1. **REQ-403** (Rev 3, **Must**, safety-critical/human-review-gated — the
+     flywheel + mount shall not present a projectile or pinch/contact
+     hazard). This part's **function #1** (default-OFF/fail-safe load-switch
+     gating) is the hardware fix for **ISS-015**'s uncommanded-motion
+     finding, which ties directly to REQ-403 in that finding's own text:
+     DRV10983's SPEED pin factory-defaults to *active* analog-mode
+     interpretation, not inert (DS-MTR-068/071), and nothing in the current
+     design bounds cross-domain power-up sequencing. ISS-015's own
+     Recommended Fix option 2 reads, verbatim: "add a supervisory load
+     switch gating U5's VCC, enabled only once the MCU domain's own rail is
+     confirmed alive" — precisely this part's role.
+  2. **REQ-404** (Rev 3, Should — motor driver/firmware shall implement
+     stall/overcurrent detection and a shutdown behavior to prevent
+     sustained overheating). **ISS-021** found none of U5's 3 internal
+     protections (OCP, Lock Detection, Thermal Shutdown) actually latch, so
+     REQ-404's "shutdown" clause is not genuinely satisfied by the driver IC
+     alone — this part's **function #3** (firmware-commandable latched
+     cutoff) is the literal fix ISS-021's own Recommended Fix proposes:
+     "...and/or a supervisory switch cuts U5's VCC ... requiring a
+     deliberate re-arm." **ISS-019**'s finding (no coordinated input
+     overvoltage protection upstream of U5) also bears on REQ-404, since an
+     unbounded input voltage is itself a latent overheating/damage risk —
+     this part's **function #2** closes that gap.
+  3. **REQ-405** (Rev 3, Must, new at Independent Review from ISS-020 —
+     firmware shall enforce a maximum commanded speed and command the motor
+     to a safe/stopped state on exceeding it). An indirect but real tie:
+     this part's enable pin is what gives firmware a genuine **physical**
+     mechanism to enforce "safe/stopped state," rather than relying solely
+     on a soft SPEED=0 PWM command that may not survive every fault path.
+     Closing ISS-020's own max-speed/ramp-rate logic remains a Firmware/
+     Mechanical Lead deliverable (§7.5.11) — not something this component
+     alone resolves.
+  4. **REQ-406** (Rev 3, Should, new at Independent Review **directly from
+     ISS-021** — firmware shall implement a latched-fault policy on
+     repeated Lock Detection events, forcing a safe/stopped state requiring
+     deliberate re-arm). The most direct tie of the four: REQ-406 was
+     written specifically to codify ISS-021's finding, and this part's
+     function #3 is the hardware enabler §7.5.12 cross-references for
+     REQ-406's firmware policy to have physical teeth, not just a software
+     no-op against a driver that would auto-retry regardless.
+  5. **REQ-503** (Rev 3, Should — ≤$75–90 USD **whole-board** soft budget).
+     This part is a new incremental line item against that same ceiling —
+     see the Recommendation section's headroom calculation below.
+- **Constraints** (from §7.5.10, re-verified against the primary document
+  this session, not just this task's own summary of it):
+  - **Function coverage**: a single part (or a small, clearly-justified
+    2-part combination) must provide all 3 of: (1) load-switch gating of
+    U5's VCC with default-OFF/fail-safe logic when the enable input is
+    undriven or the MCU domain is unpowered; (2) continuous overvoltage
+    lockout referenced to the 9.0–13.0V binding envelope (§7.5.9),
+    disabling the switch if VM_MOTOR is sensed outside it; (3) a
+    firmware-commandable enable input the latched-cutoff policy (§7.5.12)
+    can drive low on a declared fault, requiring deliberate re-arm.
+  - **Ratings**: continuous current ≥3A (this design's own ≤3A worst-case
+    operating current, §7.5.4 item 5, with margin); voltage rating ≥16V
+    minimum, ideally ≥30V (covering the 9.0–13.0V envelope with margin and
+    ideally matching U5's own 30V VCC absolute maximum, DS-MTR-053, so the
+    switch itself is never the weakest link); low on-resistance, target
+    ≤35mΩ or so, to avoid eroding the already-narrow 3S/UVLO margin
+    (§7.5.2, ≈0.32V) any further than F1/D2 already do; default-OFF/
+    fail-safe logic sense (enable HIGH=ON) — a hard requirement per §7.5.10,
+    not a preference, given REQ-403.
+  - **Package / hand-solderability**: this project's own established,
+    repeatedly-applied preference for hand-solderable leaded packages
+    (every Rev 1–3 part selection has scored this explicitly — see e.g. the
+    Motor Driver IC section's WQFN-36 disqualification-adjacent finding
+    above) applies with the same weight here.
+  - **Budget**: REQ-503's ≤$75–90 soft ceiling is a **whole-board** figure,
+    confirmed via REQ-503's own requirements.md text and surrounding
+    rationale — not a motor-subsystem-only ceiling. The Recommendation
+    section's headroom calculation below therefore accounts for
+    MCU+IMU+Regulator+Motor+Driver+J4+D2+D3+F1, not just this new part in
+    isolation.
+  - **Lifecycle/availability/reference-design**: scored per this role's
+    standard process (`.github/skills/component-selection/SKILL.md`).
+
+### Candidate Comparison
+
+*(3 candidates compared — meets the ≥3 minimum. Candidates A and B are
+dedicated eFuse/power-load-switch ICs with integrated OVP, the first real
+candidate class this task's own framing called for; Candidate C is a
+discrete high-side MOSFET plus a separate hot-swap/sequencing controller
+(functionally the "separate comparator/OVP IC" the task's framing named),
+the second class. Vendor diversity was genuinely attempted, not just
+formally gestured at, but did not survive contact with the actual spec
+set: onsemi's NIS5132 was ruled out as 18V-max/NRND, its NCV891330 as the
+wrong device class (not a load-switch/eFuse), and its FPF2700 as lacking
+adjustable OVP and being current-limited to 2A; ADI/Maxim's MAX17608/
+MAX17615 were ruled out as too low-current, and its MAX17525 as
+VQFN/TDFN-only with thin OVP documentation. No viable cross-vendor
+single-chip alternative meeting the full spec set was found — all 3 final
+candidates below are TI parts, a real research finding, not a shortcut.)*
+
+| Parameter | Candidate A — TI TPS26631PWPR — ✅ RECOMMENDED | Candidate B — TI TPS259822ONRGER (TPS25982 family) | Candidate C — TI LM5069MM-1/NOPB + Infineon IRLZ44NPBF |
+|---|---|---|---|
+| Device class | Integrated eFuse / power-load-switch IC (single chip) [DS-PROT-010] | Integrated eFuse / power-load-switch IC (single chip) [DS-PROT-015] | Discrete high-side N-channel MOSFET (IRLZ44NPBF) switched/sequenced by a separate hot-swap controller (LM5069MM-1/NOPB) — a 2-part combination [DS-PROT-017][DS-PROT-019] |
+| Operating voltage / absolute max | 4.5–60V operating / 67V AMR — wide margin over both the 9.0–13.0V envelope and U5's own 30V VCC AMR [DS-PROT-010] | 2.7–24V operating / 30V AMR — closely matches, essentially without margin, U5's own 30V VCC AMR; narrowest margin of the 3 [DS-PROT-015] | LM5069: 9–80V operating, widest range of the 3; IRLZ44N: 55V VDS — both comfortably exceed the envelope with margin [DS-PROT-017][DS-PROT-019] |
+| Integrated / effective R_DS(on) | 31mΩ (integrated FET) — meets the ≤35mΩ target with headroom [DS-PROT-010] | 2.7mΩ — best-in-class of all 3 by a wide margin [DS-PROT-015] | ≈22mΩ @ VGS≈10V (IRLZ44N, gate charge-pumped by LM5069's own drive output) — also comfortably under target [DS-PROT-019] |
+| Adjustable current-limit range | 0.6–6A via RILIM resistor — comfortably spans this design's ≥3A need [DS-PROT-010] | 2–15A — widest range of the 3 [DS-PROT-015] | Fully adjustable via an external current-sense resistor — any limit achievable, at the cost of an added sense resistor and its own power dissipation [DS-PROT-017] |
+| Continuous OVP mechanism (**function #2**) | Adjustable "OVP Cut Off" via external resistor divider on a **separate, independent OVP pin** — a true lockout, not a clamp; optional factory-preset 34.3V alternative exists but is not used here (this design needs its own ≈13V threshold) [DS-PROT-011] | Adjustable, but via the **same physical EN/UVLO pin** as the enable/UVLO function — a combined, dual-purpose node, not 2 independent pins [DS-PROT-015] | Adjustable via a **separate, independent** external resistor divider referenced to LM5069's internal 2.5V reference — a true lockout, genuinely independent of the UVLO divider [DS-PROT-017] |
+| UVLO mechanism | Adjustable, separate/independent pin from OVP [DS-PROT-010][DS-PROT-011] | Same EN/UVLO pin as OVP — less independent; interacting resistor-divider design [DS-PROT-015] | Adjustable via a second, fully independent external resistor divider (separate from OVLO) [DS-PROT-017] |
+| Autonomous overload fault-response (secondary/defense-in-depth layer — see Recommendation for the primary function #3 mechanism) | MODE pin selects latch-off vs. auto-retry; TPS26631 specifically defaults to auto-retry with 2×IOL pulse-current tolerance (≤25.5ms) — a genuine fit for motor-inrush current profiles [DS-PROT-011][DS-PROT-012] | Latch-off / auto-retry selectable [DS-PROT-015] | LM5069-1 variant **natively latches** on an overload fault (the sibling "-2" variant auto-restarts instead, not used here) [DS-PROT-017] |
+| Default-OFF/fail-safe native pin bias (**function #1** — the hard REQ-403-driven requirement) | SHDN pin: internal 1MΩ pull-up to 2.7V, **floating defaults ON** — needs an external pull-down resistor to invert (standard, low-risk, well-precedented mitigation; Circuit Engineer's job to size) [DS-PROT-013] | EN/UVLO pin: **no internal bias at all** — floating is **undefined**, not merely wrong-direction; also needs an external pull-down, complicated by the pin's dual EN+UVLO duty [DS-PROT-016] | LM5069's enable/UVLO comparator: **floating natively defaults OFF** — the cleanest native match of the 3, no external resistor needed purely to invert an opposing bias [DS-PROT-018] |
+| Function coverage summary (per §7.5.10's 3 functions) | **All 3 met.** #1 via SHDN + a required external pull-down resistor; #2 via the independent OVP pin/divider; #3 via SHDN driven low by firmware (MODE-pin auto-retry as a secondary layer) | **All 3 met**, but #1's mitigation is less clean (undefined float, not just wrong-direction) and #2 shares a pin with UVLO — both real design-cleanliness costs vs. Candidate A | **All 3 met**, with #1 satisfied **natively** (no extra resistor needed purely for default-off) and #2/UVLO on fully independent dividers — the most "by-the-book" hot-swap-controller implementation of the 3, at the cost of 2 parts instead of 1 and a higher unit price |
+| Package / hand-solderability | HTSSOP-20 ("PWP") — leaded, hand-solderable, matches this project's established package preference [DS-PROT-014] | **VQFN-24 ("RGE") ONLY — no HTSSOP/SOIC/other leaded option exists for this family**, independently confirmed via a dedicated search this session — a real DFM/hand-assembly risk per this project's repeatedly-applied preference [DS-PROT-016] | LM5069 in VSSOP-10 ("MME") + IRLZ44N in TO-220 — both leaded/through-hole; TO-220 is arguably the single easiest package to hand-solder anywhere in this whole comparison [DS-PROT-018][DS-PROT-019] |
+| Lifecycle / availability | In stock at DigiKey, ships same day (checked 2026-09-08); no explicit manufacturer "Active"/"NRND" statement independently re-read this session [DS-PROT-014] | Live TI ordering/part-details page found and in stock per prior research; no explicit "Active"/"NRND" statement independently re-read this session [DS-PROT-016] | LM5069MM-1/NOPB: live DigiKey listing found and priced [DS-PROT-018]; IRLZ44NPBF: Active/current, widely available, not obsolete, per Infineon's own product page [DS-PROT-019] |
+| Reference design / EVM | **TPS26630-33EVM confirmed** — TI's own EVM documentation explicitly states TPS26631RGE can be substituted onto this board "when specifically evaluating the TPS26631," a direct, named-part confirmation [DS-PROT-020] | **No exact-part EVM found.** TPS259824OEVM (a close sibling device) is the nearest published stand-in, described as "pin- and function-compatible for most use cases" — real but secondary evidence, not a named-part confirmation [DS-PROT-021] | **LM5069EVM-627 confirmed** for the controller portion, with onboard UVLO/OVLO/current-limit/fault-timer adjustment jumpers directly relevant to this design's divider-sizing needs — covers LM5069 only, not the complete 2-part combination as this design would build it [DS-PROT-022] |
+| Price @ qty 1 | **$4.52** (TPS26631PWPR, DigiKey, cut-tape) + ≈$0.15–0.30 in low-value support resistors (SHDN pull-down, RILIM, OVP/UVLO dividers) ⇒ **≈$4.7–4.8 total**; $3.43 (qty 10), $2.86 (qty 100) for the chip alone [DS-PROT-014] | **$4.29** (TPS259822ONRGER, DigiKey) + similar support-resistor cost ⇒ **≈$4.4–4.6 total** [DS-PROT-016] | **$4.39** (LM5069MM-1/NOPB) + **$1.80** (IRLZ44NPBF) + ≈$0.30–0.60 in passives (2 independent resistor dividers + a current-sense resistor — more parts than Candidates A/B need) ⇒ **≈$6.5–6.8 total**, priciest and highest parts-count of the 3 [DS-PROT-018][DS-PROT-019] |
+| Known risks / disqualifying factors | Required external pull-down resistor for default-OFF is a real, but low-risk and well-precedented, added mitigation (see Escalation flags). Exact UVLO/OVP threshold ranges, PGOOD/FLT fault-reporting granularity, and thermal data (θJA) not confirmed this session (flagged, not blocking — see Open UNKNOWNs) | **Package is a real, project-relevant disadvantage**: VQFN-24-only, no leaded option, against this project's own repeated hand-solderability preference. Combined EN/UVLO pin is a design-cleanliness cost (harder to tune UVLO and default-off state independently). Best raw R_DS(on)/current-limit-range of the 3, but not enough to outweigh the package risk given this project's own established precedent (mirrors the WSON regulator and WQFN-36 driver non-selections) | **Not disqualified on any hard technical fact** — every function is met, several more cleanly than Candidate A (native default-off, fully independent dividers). Not recommended primarily on **parts-count and price**: 2 ICs instead of 1, more passives (2 full dividers + a current-sense resistor vs. Candidate A's simpler pull-down/RILIM/one divider set), and the highest unit price of the 3 (≈$6.5–6.8 vs. ≈$4.7–4.8) — a real but not dramatic (~$2/unit, not ~2×) price gap that was weighed carefully, not glossed over |
+
+### Recommendation
+
+- **Recommended candidate**: **A — TI TPS26631PWPR** (TPS2663x family),
+  gating U5's (TI DRV10983) VCC supply.
+- **Whole-board BOM budget headroom (REQ-503)**: REQ-503's ≤$75–90 USD
+  ceiling is scoped to the **whole board**, not just this new part or even
+  just the motor subsystem (confirmed directly against `requirements.md`'s
+  own text and surrounding rationale). Summing the parts already committed
+  and priced elsewhere in this file — MCU ≈$2.83 [DS-MCU-018], IMU ≈$4.23
+  [DS-IMU-012], Regulator ≈$0.45 [DS-PWR-009], Motor ≈$18.99 [DS-MTR-023],
+  Motor Driver IC ≈$2.58 [DS-MTR-040] — plus the motor-rail parts already
+  specified in the design document's own parts list and freshly priced
+  this cycle — J4 ≈$0.77 [DS-CONN-006], D2 ≈$0.48 [DS-PROT-007], D3
+  ≈$0.273 [DS-PROT-008], F1 ≈$1.62 (a **pricing proxy** via the active
+  30R500UF replacement, since the document's own specified 30R500U appears
+  obsolete — Escalation flag 5) [DS-PROT-009] — gives a **whole-board
+  committed subtotal of ≈$32.22** before this new part. Adding Candidate
+  A's own **≈$4.7–4.8** total (chip + support resistors, from the
+  Candidate Comparison table's Price row) brings the running whole-board
+  subtotal to **≈$37.0**, leaving **≈$38–53 of headroom** against REQ-503's
+  $75–90 ceiling. This figure explicitly **excludes**: (1) not-yet-itemized
+  trivial passives elsewhere on the board (a real but likely small, <$2–3,
+  unaccounted gap — honestly flagged, not guessed away); (2) PCB
+  fabrication, enclosure, and any connectors/wiring beyond J4; (3)
+  assembly/labor. None of these are judged large enough to threaten even
+  the $75 floor of REQ-503's range, but they are not zero, and are
+  recorded here rather than silently assumed away.
+- **Function-coverage confirmation (the 3 required functions from §7.5.10,
+  addressed explicitly since this is the safety-relevant crux of the whole
+  task)**:
+  1. **Function #1 — load-switch gating, default-OFF/fail-safe**: **Met,
+     with one required added part.** TPS26631's SHDN pin natively biases
+     the switch **ON** when floating (internal 1MΩ pull-up to 2.7V,
+     DS-PROT-013) — the *opposite* of REQ-403's fail-safe direction. This
+     is not a disqualifying flaw, but it does mean Circuit Engineer **must**
+     add an external pull-down resistor from SHDN to GND, sized to reliably
+     override the internal pull-up, so that an unpowered MCU domain or a
+     tri-stated/unconfigured GPIO reliably reads SHDN low (switch OFF) while
+     an active-high GPIO drive can still easily override it (switch ON).
+     This is a standard, low-risk, well-understood biasing technique — not
+     a novel workaround — but it is a genuinely required schematic addition,
+     not something to silently assume away. **Flagged explicitly in
+     Escalation flags below.**
+  2. **Function #2 — continuous OVP referenced to 9.0–13.0V**: **Met
+     natively.** TPS26631's OVP pin supports an adjustable "OVP Cut Off"
+     via an external resistor divider — a true lockout (the switch
+     disables outside the programmed window), not merely a transient
+     clamp, and **independent** of the UVLO pin (unlike Candidate B). This
+     directly closes ISS-019's residual gap (no coordinated input
+     overvoltage protection existed upstream of U5). Exact divider values
+     to hit the 9.0–13.0V window are Circuit Engineer's to size — the
+     mechanism itself is confirmed present and adjustable.
+  3. **Function #3 — firmware-commandable latched cutoff**: **Met, via a
+     reframing worth stating explicitly.** This function is fundamentally a
+     **firmware-implemented policy** — the MCU drives SHDN low and holds it
+     low until a deliberate re-arm event, exactly as REQ-406/§7.5.12
+     describe — not necessarily an autonomous hardware-native latch feature
+     of the chip itself. All 3 candidates in this comparison satisfy this
+     via nothing more than a simple, always-available enable/SHDN/UVLO
+     pin; TPS26631's own MODE-pin-selectable auto-retry behavior is a
+     valuable **secondary, defense-in-depth** layer (it independently
+     bounds the inrush/overload response even before firmware ever gets
+     involved), not the primary mechanism this function relies on. This
+     reframing matters because it means function #3 does **not** meaningfully
+     differentiate the 3 candidates — Candidate C's native hardware latch
+     (LM5069-1) is a nice-to-have, not a requirement-closing advantage,
+     since firmware has to implement the counted-retries/deliberate-re-arm
+     policy (REQ-406) regardless of which candidate is chosen.
+- **Rationale** (success probability first, peak spec second):
+  1. **Package/hand-solderability is the single most decisive factor
+     against Candidate B.** TPS25982's best-in-class 2.7mΩ R_DS(on) and
+     2–15A current-limit range are genuinely superior on paper, but it is
+     **only available in a 24-pin VQFN package** — no leaded alternative
+     exists for this family. This project has repeatedly, consistently
+     scored leadless QFN/WSON/DFN packages as a real hand-assembly risk
+     (the WSON regulator candidate and the WQFN-36 motor-driver candidate
+     were both scored down partly on this same basis) — this is not a new
+     standard invented for this part, it is this project's own established
+     precedent applied consistently.
+  2. **Single-chip simplicity favors Candidate A over Candidate C.**
+     Candidate C (LM5069 + IRLZ44N) meets every function, several of them
+     more cleanly than Candidate A (a natively default-OFF enable pin, and
+     fully independent UVLO/OVLO dividers instead of Candidate A's
+     independent-but-still-two-pins design) — it is a genuinely strong,
+     not merely "adequate," alternative. But it is 2 ICs instead of 1, needs
+     more passives (2 full resistor dividers plus a current-sense resistor,
+     versus Candidate A's pull-down + RILIM + one divider set), and is the
+     most expensive of the 3 (≈$6.5–6.8 vs. ≈$4.7–4.8 per unit) — more BOM
+     lines and more resistor-divider engineering surface for Circuit
+     Engineer to get right, for a price premium that is real (~$2/unit)
+     though not dramatic (not ~2× as an earlier, less-precisely-sourced
+     LM5069 price estimate had suggested — see the LM5069 datasheet
+     record's own correction note).
+  3. **Direct applications-section fit is corroborating, not decisive,
+     evidence.** TI's own TPS2663x datasheet Applications section names
+     "Motor drives – CNC, encoder supply" explicitly (DS-PROT-012) — a
+     genuine, on-point signal this device class is marketed for exactly
+     this use case. This is treated as supporting evidence alongside the
+     package/simplicity/price reasoning above, not as the primary
+     justification on its own.
+  4. **Reference design availability favors Candidate A over Candidate B.**
+     A real, TI-published EVM (TPS26630-33EVM) exists and explicitly names
+     TPS26631 as a supported substitution (DS-PROT-020) — stronger evidence
+     than Candidate B's close-sibling-only EVM stand-in (DS-PROT-021).
+     Candidate C's LM5069EVM-627 (DS-PROT-022) is also real and relevant,
+     but covers only the controller half of a 2-part combination.
+- **Trade-offs accepted**:
+  - *vs. Candidate B (TI TPS259822ONRGER / TPS25982)*: gives up
+    substantially better R_DS(on) (31mΩ vs. 2.7mΩ) and a wider adjustable
+    current-limit range (0.6–6A vs. 2–15A, though both comfortably cover
+    this design's actual ≥3A need) — in exchange for a hand-solderable
+    leaded package instead of a VQFN-only part, and independent (not
+    shared) OVP/UVLO pins.
+  - *vs. Candidate C (TI LM5069MM-1/NOPB + Infineon IRLZ44NPBF)*: gives up
+    a natively default-OFF enable pin (requiring an added external
+    pull-down resistor instead) and fully independent UVLO/OVLO dividers
+    (Candidate A's UVLO and OVP pins are independent of each other, but
+    each individually still shares board-level design attention with the
+    same single-chip architecture) — in exchange for a single-chip
+    solution with fewer BOM lines, less resistor-divider engineering
+    surface, and a lower unit price (≈$4.7–4.8 vs. ≈$6.5–6.8).
+- **Open `UNKNOWN`s** (deferred to Circuit Engineer's detailed design
+  phase, not blocking this recommendation):
+  - Exact UVLO pin threshold range/accuracy and OVP pin threshold
+    range/accuracy for TPS26631 — needed to actually size the resistor
+    dividers for the 9.0–13.0V envelope — **UNKNOWN this session**; a
+    working primary-PDF read (this session's tooling could not
+    text-extract the datasheet PDF) would close this.
+  - Exact resistor-divider topology — whether OVP/UVLO can reasonably share
+    any sense network or need fully separate dividers — is a genuine
+    Circuit-Engineer-level schematic decision, explicitly **not** decided
+    here.
+  - PGOOD/FLT pin exact fault-reporting granularity (which specific fault
+    classes each pin reports, timing) — **UNKNOWN this session**, relevant
+    to how firmware distinguishes an OVP-triggered shutdown from a
+    current-limit-triggered one.
+  - Thermal data (θJA, package power dissipation limits) — **UNKNOWN this
+    session**, same caveat pattern already applied to DRV10983/DRV10970 in
+    the Motor Driver IC section above.
+  - Exact SHDN pull-down resistor value — intentionally left to Circuit
+    Engineer, since it depends on board-level leakage/coupling assumptions
+    this role has no basis to guess at.
+
+### Escalation flags
+
+1. **Architecture-defining / major component decision — requires Hardware
+   Lead + human Chief Engineer approval before Circuit Engineer uses this**
+   (`docs/architecture.md` §10). This recommendation is explicitly **not
+   self-approved** — see Approval table below, both rows marked Pending.
+2. **Safety-relevant, not merely architecturally-significant** — this part
+   directly closes 3 HIGH Independent Review findings (ISS-015/019/021)
+   tied to REQ-403 (safety-critical, human-review-gated) and its companion
+   REQ-404/405/406. The same elevated scrutiny REQ-403's own HITL gate
+   calls for elsewhere in this design applies to this component choice.
+3. **Evidence-category taxonomy deviation — flagged, not silently
+   substituted.** This task's own framing suggested filing new Evidence IDs
+   under `PWR` or `MTR`. This section instead uses a **new `PROT` category**
+   (DS-PROT-007 through DS-PROT-022 this cycle), for a specific, stated
+   reason: `PWR` has, in this project's history to date, been used
+   exclusively for voltage-conversion parts (LDO/buck regulators); `MTR`
+   has been used exclusively for parts intrinsic to the motor's own drive
+   electronics (the motor and its driver IC, per `docs/architecture.md`
+   §6.3's own "MTR (motor driver)" definition). `PROT` was already
+   established in this same design cycle specifically for this same
+   VM_MOTOR rail's protection components (D2/D3/F1) — a supervisory
+   gating/OVP controller is a more precise semantic fit there than either
+   suggested option. Category codes are not role-exclusive in this
+   project's history (multiple agent roles have added rows to the same
+   category before), so this is a considered judgment call, not a process
+   violation — **flagged here explicitly for Hardware Lead to confirm or
+   override**, not treated as a foregone conclusion.
+4. **Required external pull-down resistor on SHDN — a real, required
+   schematic addition, not a hidden assumption.** TPS26631's native SHDN
+   bias is backwards relative to this design's fail-safe requirement (see
+   Recommendation, function #1). The mitigation is standard and low-risk,
+   but it must actually appear in Circuit Engineer's schematic — recorded
+   here so it cannot be silently dropped between this recommendation and
+   implementation.
+5. **Incidental finding — F1 (Littelfuse 30R500U) appears obsolete.**
+   Discovered while sourcing real prices for the already-committed
+   motor-subsystem parts to compute this section's BOM headroom figure
+   (below); no live distributor stock/pricing could be found for the exact
+   30R500U part number specified in the design document's parts list. The
+   active replacement, 30R500UF, was used only as a **pricing proxy**
+   (DS-PROT-009) — this is **not** a substitution of the design document's
+   own specified part, which is out of this role's edit scope to change.
+   Flagged for Hardware Lead/Circuit Engineer awareness; may warrant a
+   future-revision part re-selection.
+6. **Remaining technical UNKNOWNs must be closed before Circuit Engineer
+   finalizes the schematic** (see Recommendation's Open UNKNOWNs list) —
+   most notably the exact UVLO/OVP threshold ranges needed to size the
+   9.0–13.0V divider network, and thermal data for PCB layout purposes.
+
+### Approval
+
+| Role | Name | Date | Decision |
+|---|---|---|---|
+| Component Engineer | Component Engineer (AI agent) | 2026-09-08 | Proposed — TI TPS26631PWPR (TPS2663x family), gating U5's VCC, with a required external SHDN pull-down resistor (Escalation flag 4) and Circuit-Engineer-sized OVP/UVLO resistor dividers per §7.5.10. See Escalation flags 1–3 for items requiring Hardware Lead/human confirmation before this is used downstream. |
+| Hardware Lead | Hardware Lead (this session) | 2026-08-31 | Concur — recommend approval. Function coverage (default-OFF/fail-safe load-switch gating, continuous OVP referenced to the 9.0–13.0V envelope, firmware-commandable latch enforcement point) confirmed against §7.5.10's requirements; the SHDN native-bias caveat is real and must be addressed at Circuit Design (external pull-down). |
+| Chief Engineer (Human) — required if architecture-defining/major component | Human Chief Engineer (via creator/"General Chat" session) | 2026-08-31 | **Approved — "TPS26631PWPR confirmed."** Human independently re-verified via fresh web search: TPS25982 confirmed genuinely QFN-only (no HTSSOP variant exists, e.g. TPS259824LNRGET/TPS259827ONRGET); TPS26631PWPR confirmed 20-pin HTSSOP eFuse (4.5–60V, 6A, OVP/UVLO/adjustable current limit) at ≈$4.52/unit (close to this file's ≈$4.70–4.80 figure — a pricing-tier/date difference, not a discrepancy) with a genuine internal ≈440kΩ EN pull-up, independently confirming the "defaults ON, needs external pull-down for fail-safe" caveat exactly as flagged. Circuit Engineer to implement: the load switch + external EN pull-down (fail-safe-OFF direction) + OVP/UVLO dividers, in a new Rev 5. |

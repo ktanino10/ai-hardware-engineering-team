@@ -1,15 +1,27 @@
 /*
- * i2c2.h -- I2C2 polling-mode driver for the IMU bus (PA11=SCL, PA12=SDA --
- * corrected this revision, ISS-014; was previously PB10/PB11, which do not
- * exist as physical pins on this package's real LQFP-32 package, see
- * gpio.c/gpio.h and stm32g031_regs.h for the full correction),
- * hardware/schematic/bench-imu-01-design.md Section 5. Fast-mode, 400 kHz,
- * matching the schematic's own R3/R4 pull-up sizing target (Section 5.2).
+ * i2c2.h -- I2C2 polling-mode driver for the IMU bus (PA11=SCL, PA12=SDA,
+ * hardware/schematic/bench-imu-01-design.md Section 5/7.5.4/Section 11).
+ * Fast-mode, 400 kHz, matching the schematic's own R3/R4 pull-up sizing
+ * target (Section 5.2).
+ *
+ * CORRECTED PIN ASSIGNMENT (ISS-027, CRITICAL, RESOLVED): this bus's pins
+ * were originally PB10(SCL)/PB11(SDA), which was a defect -- those two pads
+ * do not physically exist on the STM32G031K8T6's actual LQFP-32 package.
+ * The corrected, real pins are PA11(SCL)/PA12(SDA), same I2C2 peripheral
+ * instance, same AF6 alternate-function value -- only the GPIO port/pin
+ * changed (see gpio.c's PA11/PA12 AF6 comment and stm32g031_regs.h's
+ * I2C2_BASE comment). This file itself (the I2C2 protocol layer: TIMINGR/
+ * CR2/ISR/TXDR/RXDR register sequencing) needed ZERO changes for this fix
+ * -- it is entirely GPIO-agnostic; only gpio.c/gpio.h/clock.c/clock.h
+ * (pin muxing and clock enables) needed the actual pin-level correction.
  *
  * Deliberately I2C2, not I2C1 -- see stm32g031_regs.h's I2C2_BASE comment
- * and gpio.c's PA11/PA12 AF6 comment for why this specific fact gets triple
- * emphasis in this codebase: it is the exact class of defect (ISS-011,
- * ISS-014) an independent review caught in the schematic itself.
+ * for why this specific fact gets emphasis in this codebase: it is the
+ * exact class of defect (ISS-011) an independent Hardware Reviewer caught
+ * in the schematic itself. (Rev 3 also added a *second*, textually-similar
+ * but functionally distinct I2C1 bus, i2c1.c/h, for the motor driver U5's
+ * own commissioning/status interface on PB6/PB7 -- do not confuse the two;
+ * they are different peripheral instances serving different subsystems.)
  *
  * Polling-mode (no interrupts), matching the schematic's own polled-
  * acquisition design decision (Section 5.3: "this design uses I2C polling

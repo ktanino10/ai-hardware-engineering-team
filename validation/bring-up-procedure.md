@@ -32,7 +32,7 @@ this copy, if a number ever needs re-confirming.
 | Power sequencing | None required — single 3.3V rail, no sequencing dependency between subsystems (MCU/IMU/LED all share the one rail) | `bench-imu-01-design.md` §2.1 |
 | Boot-mode check (do this BEFORE first power-on) | Confirm BOOT0/nBOOT_SEL state matches documented intent (user Flash boot, not System Memory) — see FMEA-002/ISS-006 | `bench-imu-01-design.md` §4.2, DS-MCU-050/051 |
 | Polarity-sensitive items to check | U3 LDO orientation (SOT-23-5, pin 1 marking); D1 LED polarity; J1 USB-C VBUS/GND (note: ISS-004/FMEA-005 — no discrete reverse-polarity protection exists, so a miswired cable is NOT caught by the circuit itself; visual/continuity check is the only safeguard against this specific risk) | parts list, ISS-004 |
-| Interface to sanity-check | I2C2 (not I2C1 — see ISS-011) on PB10 (SCL)/PB11 (SDA), 4.7kΩ pull-ups (R3/R4), IMU (U2, BMI270) at its I2C address | `bench-imu-01-design.md` §5, DS-MCU-053 |
+| Interface to sanity-check | I2C2 on **PA11 (SCL)/PA12 (SDA)** — corrected 2026-09-11 per ISS-027 (was documented as PB10/PB11 through Rev 5/6, but those pins do not physically exist on this LQFP-32 package), 4.7kΩ pull-ups (R3/R4), IMU (U2, BMI270) at its I2C address | `bench-imu-01-design.md` §5, DS-MCU-073 |
 | Debug/programming access | SWD via J3 (VDD/SWCLK/GND/SWDIO) | `bench-imu-01-design.md` §4.4, DS-CONN-002 |
 | Known accepted residual risk | ISS-002 (LDO ROC margin, ACCEPTED-RISK) — if bench-measuring at a deliberately worst-case ~5.5V input, expect this is a known, human-accepted edge case, not a new finding | `validation/change-log.md` ECO-003 |
 | Enclosure fit check (once PCB exists) | Enclosure geometry is fit to `hardware/mechanical-interface.md`'s estimates, not a confirmed real PCB layout (FMEA-007) — verify physical board dimensions/connector positions against the enclosure BEFORE final assembly, not after | `hardware/mechanical-interface.md`, `hardware/mechanical/bench-imu-01-dimensional-spec.md` |
@@ -53,12 +53,79 @@ physical build.
 |---|---|---|
 | Debug/programming access | SWD via J3 (VDD/SWCLK/GND/SWDIO) — same header row already listed above | `bench-imu-01-design.md` §4.4 |
 | Flashing tool | Not part of this repository's tooling today (`docs/architecture.md` §13) — use a generic SWD programmer/debugger appropriate for an Arm Cortex-M0+ part (e.g. an ST-LINK or equivalent) with the built `firmware/bench-imu-01/build/bench-imu-01.hex` or `.elf` | `docs/architecture.md` §5.4/§13 |
-| Expected first-boot UART output (at 115200 8N1, on the J2 header) | A boot banner, one `RESET_REASON:` line (decoding `RCC_CSR` — expect `POWER_ON` on a first-ever flash, or `NRST_PIN(SW1_or_debugger)` if reset via SWD/reset line), then either `BMI270_INIT_OK` followed by continuous `millis,ax,ay,az,gx,gy,gz` CSV lines at ~100 Hz, or a `BMI270_INIT_FAILED: ...` line if the IMU didn't come up (check I2C2/PB10-PB11 wiring and the BMI270's solder joints first) | `firmware/bench-imu-01/src/main.c`, `reset_reason.c` |
+| Expected first-boot UART output (at 115200 8N1, on the J2 header) | A boot banner, one `RESET_REASON:` line (decoding `RCC_CSR` — expect `POWER_ON` on a first-ever flash, or `NRST_PIN(SW1_or_debugger)` if reset via SWD/reset line), then either `BMI270_INIT_OK` followed by continuous `millis,ax,ay,az,gx,gy,gz` CSV lines at ~100 Hz, or a `BMI270_INIT_FAILED: ...` line if the IMU didn't come up (check I2C2/PA11-PA12 wiring — corrected 2026-09-11, ISS-027; was PB10/PB11 through Rev 5/6 — and the BMI270's solder joints first) | `firmware/bench-imu-01/src/main.c`, `reset_reason.c` |
 | Pre-flash checklist addition | Confirm the SWD debugger is configured for a Cortex-M0+ target at the expected VDD (3.3V, from J3's own VDD reference pin) before connecting — same polarity/orientation care as the rest of §1's checklist | `bench-imu-01-design.md` §4.4 |
 | Known residual, non-blocking item | The I2C_TIMINGR value used by the firmware (DS-MCU-063) was cross-checked via two independent web-search-derived sources but not directly re-verified against the primary ST AN4235 PDF this session — low-risk for a bench link, worth a direct check before this firmware is considered final | `datasheets/stmicroelectronics_an4235_i2c-timing-configuration-tool.md` |
 
 ## 1. Pre-Power-On Checklist
 
+**Rev 3 note**: the rest of this file (§0 values table, §2 sequencing, §3
+measurement) is still Rev 2-scoped and has not yet been rewritten for the
+Motor Driver + Reaction Wheel subsystem — that full rewrite is tracked
+separately as `validation/open-issues.md` ISS-023 (MEDIUM, non-blocking,
+planned for the `validation-artifacts-rev3` closeout pass, after Mechanical
+Design/Review settle the physical values this file would otherwise cite).
+The single item immediately below is a **targeted advance addition**, not
+an oversight — it is the specific compensating safeguard a human Chief
+Engineer required (2026-09-09, cross-session HITL channel) as the condition
+for accepting ISS-020/ISS-021 as ACCEPTED-RISK rather than leaving Rev 3's
+hardware/mechanical Design Complete blocked on firmware that hasn't been
+written yet. It must remain in force even after the full Rev 3 rewrite
+happens — do not let a future rewrite silently drop it.
+
+- [ ] **MOTOR/REACTION-WHEEL SUBSYSTEM (Rev 3) — MANDATORY, DO NOT SKIP OR
+      DEFER.** Before any power is ever applied to the U6/motor-rail domain
+      (12V J4 input, U6 TPS26631PWPR supervisory switch, U5 DRV10983 driver,
+      M1 T-Motor MN2206-13 + flywheel): confirm Firmware Bring-up has
+      actually implemented, and the flashed firmware build demonstrably
+      enforces, **both** REQ-405 (a bounded maximum operating/fault speed
+      with tach-supervised overspeed shutdown — not just the ≥3000 RPM
+      floor) **and** REQ-406 (a latched fault response — after a
+      fault-retry threshold, force the motor to a safe/stopped state and
+      require a deliberate re-arm, rather than relying on U5/U6's own
+      auto-recovering protections to loop indefinitely). This is the
+      specific, named compensating control for `validation/open-issues.md`
+      **ISS-020** (no bounded speed envelope) and **ISS-021** (no latching
+      fault behavior) — both dispositioned ACCEPTED-RISK, explicitly
+      conditioned on this check, **not** independently resolved by hardware
+      alone (see those findings' full rationale, and
+      `validation/change-log.md` for the corresponding ECO). Do **not**
+      proceed past this line item on the assumption that U5's Lock
+      Detection/Thermal Shutdown or U6's current limit is sufficient by
+      itself — per ISS-021, all of those mechanisms auto-retry/auto-recover
+      by design and do not latch. If REQ-405/406 firmware cannot be
+      confirmed present and functioning, **do not energize the motor rail**;
+      the rest of this procedure's Rev 2 scope (MCU/IMU/logic rail) may
+      still proceed independently.
+- [ ] **FLYWHEEL CONTAINMENT STRUCTURE (Rev 3) — MANDATORY, DO NOT SKIP OR
+      DEFER.** Before the flywheel is ever spun (i.e. before any nonzero
+      `SPD` command is issued, even at low duty), physically confirm: (1)
+      the containment cap (`containment_cap()`) is installed and its 6×M3
+      fasteners are torqued into the base's heat-set inserts — **not**
+      merely rested in place; (2) the base's own cylindrical wall
+      (`fw_bay_wall()`, the primary containment surface per
+      `validation/open-issues.md` **MISS-013**'s own determination) shows no
+      visible print defect (delamination, layer separation, a short/aborted
+      print) at the flywheel-bay location; (3) the as-built print actually
+      matches `hardware/mechanical/bench-imu-01-manufacturing-spec.md`'s
+      specified process (material, infill %, perimeter count) as closely as
+      the actual printer/slicer allows — **do not spin the flywheel on a
+      print sliced with unverified/default settings**, since the entire
+      REQ-403 safety argument depends on this. This is the physical
+      precondition for the human Chief Engineer's own **REQ-403**
+      ACCEPTED-RISK disposition (`validation/open-issues.md` **MISS-016**,
+      `validation/change-log.md` **ECO-025**): that disposition explicitly
+      accepts the containment structure as a **defense-in-depth mitigation,
+      not validated/certified containment** — a calculated, human-accepted
+      energy-absorption shortfall of ≈3.26–4.30× (best case) to ≈1.7–3.6
+      orders of magnitude (typical) remains open and unresolved by physical
+      testing (**MISS-022**, tracked, not yet performed). Do **not** treat a
+      clean Design Complete Gate as evidence the containment has been proven
+      adequate — it has explicitly not been. If the containment structure
+      cannot be visually/physically confirmed installed and matching its
+      specified process, **do not spin the flywheel at any commanded speed**
+      — even REQ-007's own 3000 RPM floor already carries real stored
+      rotational energy (§8's own physics table).
 - [ ] Visual inspection: correct component population and orientation
       (polarized parts, pin-1 orientation)
 - [ ] Continuity check: no unintended shorts between rails/ground (per
