@@ -5,9 +5,13 @@ self-checked, compiles cleanly with `arm-none-eabi-gcc` 16.2.0 (re-verified
 present this session) — not run on real hardware (none exists in this
 environment). Mirrors the evidence-citation and rationale discipline of
 `hardware/schematic/bench-imu-01-design.md`, adapted for firmware.
+**Updated in a later session** to add REQ-405's command-side ceiling (a
+Firmware Reviewer Finding 1 fix) — that later session's own tooling
+re-verification and build result are recorded separately in §12, rather
+than silently blended into this paragraph's own "this session" claims.
 
-**Revision covered by this document**: two deliverables landed together in
-this pass:
+**Revision covered by this document**: three deliverables landed across two
+sessions:
 
 1. A fix for a CRITICAL, now-hardware/schematic-confirmed IMU I2C2 GPIO
    defect (§3) — unrelated to item 2, bundled into the same bring-up pass
@@ -30,6 +34,18 @@ this pass:
    narrower scope, removed GPIOB support entirely; that removal is NOT
    carried into this document or this firmware, since Rev 3's motor
    subsystem genuinely uses GPIOB (PB1/PB6/PB7, §7.5).
+3. A fix for **Finding 1 (HIGH)** from the first-ever Firmware Reviewer
+   cycle (PR #14, `bench-imu-01-firmware-review.md`): REQ-405's
+   command-side clause ("reject/clamp any command exceeding [the
+   ceiling]") was not implemented — only the feedback-side (reactive,
+   FG-measured) trip was. This is a **separate, later session** from
+   items 1–2 above (added after this document's own §0/§9/§10/§11 were
+   written, which is why those sections' own "this session" language is
+   left as the accurate historical record of *that* session, not silently
+   edited to describe this one). The resulting technical content is
+   folded directly into §4.3/§7.6 (where a reader looking for "the
+   REQ-405 section" would already look); that later session's own
+   tooling/build/self-check account lives in **§12**.
 
 ## 0. Tooling honesty statement
 
@@ -362,7 +378,78 @@ unchanged from a prior mechanical-interface revision.
 
 **Enforcement logic** (`motor.c`'s `check_overspeed()`) — see §7.6 below for
 the full detail, including the coast-down case and the spin-up FG-validity
-grace period this required.
+grace period this required. This is the **feedback-side** enforcement only
+— see below for the command-side layer added in a later session.
+
+**Command-side ceiling, added in a later session** (closes Firmware
+Reviewer Finding 1, HIGH, PR #14, `bench-imu-01-firmware-review.md` — see
+§12 for that session's own tooling/build account): REQ-405's own literal
+text has **two** distinct clauses — (a) **command-side**, "enforce a
+maximum commanded flywheel speed and reject/clamp any command exceeding
+it"; (b) **feedback-side**, "using the already-wired FG tachometer
+feedback to verify actual speed does not exceed a defined ceiling...
+command the motor to a safe/stopped state." Everything above in this
+section is clause (b) — **reactive**, triggered only after FG measurement
+confirms an actual overspeed. Clause (a) was not implemented until this
+later session: `SPD` accepted any 0–100 duty-cycle value with no RPM-tied
+ceiling of its own, so a host commanding `SPD 100` would drive the motor
+open-loop toward whatever RPM that duty cycle produces — potentially far
+above 6000 RPM if lightly/un-loaded, given M1's own ~20,000–22,200 RPM
+no-load speed above — before `check_overspeed()` eventually caught it
+after the fact.
+
+**Decision: `MOTOR_MAX_CMD_DUTY_PCT` = 23%**, enforced by a new check
+inside `cmd_spd()` (`motor.c`) that **rejects**
+(`SPD_REJECTED reason=exceeds_cmd_duty_ceiling`) — not silently clamps —
+any `SPD` command above it, **in addition to** (never instead of) the
+existing reactive `check_overspeed()` path above. The full derivation
+(with Evidence IDs) also lives in `motor.h`'s own header comment, this
+document's established convention for where the detailed, primary-
+source-quoted rationale lives (see §7.6); in summary:
+
+- TI DRV10983 §8.4.5.3 "Digital PWM Input Mode Speed Control" (pages
+  29–30, **DS-MTR-077**, new this session): "The speed command is
+  proportional to the PWM input duty cycle" — the firmware's existing
+  0–100 `SPD` value already maps linearly onto U5's own internal Speed
+  Command, with no nonzero offset in this digital-PWM mode.
+- TI DRV10983 §8.3.3 "Motor Speed Control" (pages 16–17, **DS-MTR-078**,
+  new this session): peak output amplitude = VCC × (PWM_DCO/100); the
+  same section discloses that U5's own AVS/acceleration-current-limit/
+  closed-loop-accelerate functions can only **reduce** actual output
+  relative to this linear estimate, never increase it — so treating
+  amplitude as exactly proportional is a conservative upper bound, not an
+  optimistic one.
+- Combined with this project's own already-established KV-based
+  no-load-speed convention (**DS-MTR-017/018**: KV=2000 RPM/V, no extra
+  derating, matching M1's own published ~20,000–22,200 RPM no-load
+  figures exactly) and this design's own binding worst-case `VM_MOTOR`
+  envelope of **13.0V** (`hardware/schematic/bench-imu-01-design.md`
+  §7.5.9 — U6's OVP does not trip anywhere within this envelope per
+  §7.5.10, so 13.0V is a real, reachable worst case, not a theoretical
+  one): `RPM(duty%)` is bounded above by approximately `KV × 13.0V ×
+  (duty%/100) = 260 × duty%`. Solving `260 × duty% ≤ 6000` gives `duty% ≤
+  23.08` → **23%** (floored for conservatism; 24% → 6240 RPM would exceed
+  the ceiling).
+
+**Confidence, marked explicitly**: the DRV10983 proportionality
+statements, M1's KV rating, and the 13.0V worst-case envelope are each
+**HIGH-confidence, directly-cited primary-source facts**. The
+**arithmetic combination** of these facts into a single 23% duty ceiling
+is a **reasoned engineering derivation**, not itself a number printed in
+any one source — disclosed as such, not presented as a datasheet-quoted
+figure.
+
+**Honest limitation, disclosed**: duty-to-RPM is load-dependent for a
+sensorless BLDC — real (loaded, non-worst-case-voltage) operation will
+reach a lower RPM at a given duty than this no-load/worst-case estimate,
+so this ceiling is a **defense-in-depth bound, not a guarantee** (the same
+sense in which a fuse rating is a bound, not a promise) and may in
+practice be more restrictive than strictly necessary. REQ-007's own ≥3000
+RPM floor remains comfortably inside the 23%-duty no-load-equivalent
+estimate (5980 RPM), so no required characterization capability is lost.
+The existing reactive `check_overspeed()` path remains the authoritative,
+measurement-based enforcement of the actual 6000 RPM limit, completely
+unaffected by this new, additional, pre-emptive layer.
 
 ### 4.4 REQ-406 latched-fault policy: 3 events / 30 s rolling window, unified REARM
 
@@ -706,14 +793,23 @@ now_ms)`. See `motor.h`'s own extensive header comment for the full design
 rationale (this document summarizes it; `motor.h` is the more detailed
 reference) and `motor.c`'s inline comments for the exact state machine.
 
-**`check_overspeed(now)`** (REQ-405), runs every `motor_tick()` while armed,
-regardless of commanded duty (§4.7):
+**`check_overspeed(now)`** (REQ-405, feedback-side/reactive), runs every
+`motor_tick()` while armed, regardless of commanded duty (§4.7):
 ```
 if FG valid:      remember "FG has been valid this spin-up"; trip if RPM > 6000.
 if duty == 0:      benign at-rest case, no action.
 if FG was valid earlier this spin-up, now invalid: trip immediately (zero grace).
 else (FG never valid yet this spin-up): trip only after MOTOR_FG_SPINUP_GRACE_MS (3000 ms) of continued invalidity.
 ```
+
+**`cmd_spd()`'s command-side ceiling** (REQ-405, pre-emptive — added in a
+later session, closes Firmware Reviewer Finding 1; see §4.3/§12): rejects
+(`SPD_REJECTED reason=exceeds_cmd_duty_ceiling`) any `SPD` value above
+`MOTOR_MAX_CMD_DUTY_PCT`=23 **before** it is ever applied to
+`tim1_pwm_set_duty_pct()` — independent of, and in addition to,
+`check_overspeed()`'s own post-hoc, FG-measurement-based trip above. See
+§4.3 for the full duty-to-RPM derivation and its disclosed confidence and
+limitations.
 
 **`check_lock_faults(now)`** (REQ-406), rate-limited to `MOTOR_STATUS_POLL_MS`
 =50 ms while armed: polls U5's Status register over I2C1, edge-detects a
@@ -742,7 +838,7 @@ argument, `STOP`/`REARM` bare):
 
 | Command | Effect | Rejected when |
 |---|---|---|
-| `SPD <0-100>` | Sets PWM duty %; a 0→nonzero transition (re)starts the REQ-405 spin-up grace window | Not armed |
+| `SPD <0-100>` | Sets PWM duty %; a 0→nonzero transition (re)starts the REQ-405 spin-up grace window | Not armed, or requested duty > `MOTOR_MAX_CMD_DUTY_PCT`=23 (REQ-405 command-side ceiling, §4.3/§7.6 — added in a later session) |
 | `DIR <0\|1>` | Sets direction (0=forward, 1=reverse) | Not armed, or duty≠0 (firmware-only policy — commutation-direction-reversal-under-load has not been verified safe this bring-up pass) |
 | `STOP` | Zeroes duty only — does NOT disarm/drop SHDN/require REARM | Never (always allowed, idempotent no-op if already stopped) |
 | `REARM` | SHDN low→high, `delay_ms(100)`, re-commission U5, reset all latch/spin-up/fault-history state, arm | Reports `REARM_FAILED reason=i2c_error\|verify_mismatch` on commissioning failure; does not itself latch a new fault |
@@ -983,3 +1079,83 @@ document's own edit scope to re-verify further here.
 
 I have not declared this firmware "tested" or "hardware-verified" anywhere
 in this document — per §0, no physical board exists this session.
+
+## 12. Addendum: REQ-405 command-side ceiling (Firmware Reviewer Finding 1 fix, later session)
+
+**This section covers a separate, later session** from the rest of this
+document (§§0–11 above), responding to the first-ever Firmware Reviewer
+cycle's own review of the firmware §§0–11 describe (PR #14,
+`firmware/bench-imu-01/bench-imu-01-firmware-review.md`) — the exact
+"Firmware Reviewer role" §10/§11 above flagged as not-yet-existing. §§0, 9,
+10, and 11 above are left exactly as that earlier session wrote them — an
+accurate record of what was verified/self-checked/handed off *then* —
+rather than silently edited to describe a different session's own work;
+this addendum is where *this* session's own tooling re-verification, fix,
+and build result are recorded, following this document's own "disclosed
+revision, not silently substituted" convention (§4.3's 8000→6000 RPM
+revision is this document's own precedent for that pattern).
+
+**Finding addressed**: Finding 1 (HIGH) — REQ-405's own literal text has
+two clauses, command-side ("reject/clamp any command exceeding [the
+ceiling]") and feedback-side ("verify actual speed does not exceed a
+defined ceiling... command the motor to a safe/stopped state"). Only the
+feedback-side clause was implemented (`check_overspeed()`); the
+command-side clause was not — `cmd_spd()` accepted any 0–100 duty-cycle
+value with no RPM-tied ceiling of its own. Full technical content
+(derivation, Evidence IDs, confidence marking, honest limitation) is
+folded directly into §4.3 above and `motor.h`'s own header comment, not
+duplicated here — §4.3 is "the REQ-405 section" a future reader would look
+at first, so that is where it belongs.
+
+**Tooling honesty, re-verified fresh this session** (not assumed from §0's
+own prior-session result, per this project's own tooling-honesty
+discipline): `arm-none-eabi-gcc` 16.2.0 confirmed present again (same
+toolchain/version as §0). `make clean && make` re-run over the full
+source tree. **Result: succeeded, zero warnings, zero errors** —
+stdout/stderr both checked directly for "warning"/"error" text, not
+inferred from exit code alone. Still not flashed to real hardware — none
+exists in this environment (unchanged from §0).
+
+**Self-check against `.github/skills/firmware-bringup/SKILL.md`'s
+checklist, for this change specifically** (not a full re-run of every item
+in §10, which remains that earlier session's own accurate account of its
+own, different, deliverables — only the items this specific change
+actually touches):
+- **Register bitfield/datasheet correctness**: the two new register-level
+  facts this change relies on (DS-MTR-077, DS-MTR-078) trace to specific
+  DRV10983 datasheet sections and page numbers, added to
+  `datasheets/evidence-log.md` — no uncited numeric claim introduced. ✅
+- **Scope-boundary compliance**: the new check is a static threshold
+  compare against a fixed constant (`val > MOTOR_MAX_CMD_DUTY_PCT` inside
+  `cmd_spd()`) with no error term, no integrator, and no continuous
+  adjustment of output based on measured feedback — a clamp/reject on the
+  *input* command, categorically distinct from closed-loop control,
+  matching `motor.h`'s own scope-fence framing (top of that file, "no
+  controller, no error term, no integrator"). ✅
+- **Existing behavior preserved**: the existing reactive
+  `check_overspeed()`/`trip_safe_state()` path and all REQ-406 logic were
+  confirmed byte-for-byte unchanged by direct re-read of the modified
+  files, not assumed from the size of the diff alone. ✅
+- **Evidence traceability**: `datasheets/evidence-log.md` and
+  `datasheets/texasinstruments_drv10983_slvscp6h.md`'s own metadata record
+  both updated for the two new Evidence IDs this change introduces. ✅
+- **Not self-declared resolved**: this finding is **not** marked RESOLVED
+  in `bench-imu-01-firmware-review.md` by this session — that document is
+  the Firmware Reviewer's own artifact, not this role's to edit. A fresh,
+  independent Firmware Reviewer confirmation pass is the correct next
+  step, per this project's standard reviewer-loop-back-then-reverify
+  pattern, flagged to the Hardware Lead in this session's own final report
+  rather than decided here. ✅
+
+**Handoff addendum**: new Evidence ID rows `DS-MTR-077`/`DS-MTR-078`
+(`datasheets/evidence-log.md`), plus a corresponding update to
+`datasheets/texasinstruments_drv10983_slvscp6h.md`'s own metadata record.
+No file outside `firmware/bench-imu-01/src/motor.c`,
+`firmware/bench-imu-01/src/motor.h`, this document, and the evidence-log
+files above was modified by this session. **Open item, same as flagged in
+§11 above and not yet resolved**: no independent Firmware Reviewer role
+existed when §§0–11 were written; one now does (it is what produced
+Finding 1 in the first place), and the Hardware Lead is expected to
+dispatch a fresh instance of it to confirm this specific fix before
+Finding 1 is marked resolved — this session does not make that
+determination itself.

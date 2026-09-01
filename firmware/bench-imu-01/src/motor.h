@@ -49,9 +49,14 @@
  * tool an operator drives from a plain serial terminal):
  *
  *   SPD <0-100>   Set commanded duty cycle (percent). Rejected (no PWM
- *                 change) if disarmed or fault-latched. A true 0->nonzero
- *                 transition resets REQ-405's spin-up grace-period
- *                 bookkeeping (see check_overspeed() in motor.c).
+ *                 change) if disarmed, fault-latched, or above
+ *                 MOTOR_MAX_CMD_DUTY_PCT -- REQ-405's COMMAND-SIDE
+ *                 ceiling (see the dedicated section below for its
+ *                 derivation), a check distinct from and in addition to
+ *                 the 0-100 syntax-range check, which is unchanged. A
+ *                 true 0->nonzero transition resets REQ-405's spin-up
+ *                 grace-period bookkeeping (see check_overspeed() in
+ *                 motor.c).
  *   DIR <0|1>     Set direction (0=forward, 1=reverse per gpio.c's
  *                 motor_dir_set() polarity). Rejected unless duty_pct==0
  *                 -- a firmware-only policy (no datasheet requires this;
@@ -202,6 +207,144 @@
  * specifically so a flywheel coasting down above the ceiling after a plain
  * STOP command (SHDN still high, U5 still powered, FG still valid) is
  * still caught even though duty is already 0.
+ *
+ * REQ-405 COMMAND-SIDE CEILING (NEW -- closes Firmware Reviewer Finding 1,
+ * HIGH, first-ever Firmware Reviewer cycle, PR #14,
+ * bench-imu-01-firmware-review.md):
+ *
+ * REQ-405's own literal text has TWO distinct clauses: (a) COMMAND-side --
+ * "enforce a maximum commanded flywheel speed and reject/clamp any
+ * command exceeding it"; (b) FEEDBACK-side -- "using the already-wired FG
+ * tachometer feedback to verify actual speed does not exceed a defined
+ * ceiling... command the motor to a safe/stopped state". Everything above
+ * this point (CEILING DECISION, RESPONSE, COAST-DOWN) is clause (b) --
+ * REACTIVE, triggered only after FG measurement confirms an actual
+ * overspeed. Before this revision, clause (a) was NOT implemented:
+ * cmd_spd() accepted any 0-100 duty-cycle value with no RPM-tied ceiling
+ * of its own, so a host commanding SPD 100 would drive the motor
+ * open-loop toward whatever RPM that duty cycle produces -- potentially
+ * far above 6000 RPM if lightly/un-loaded, per M1's own ~20,000-22,200
+ * RPM no-load speed above -- before check_overspeed() eventually caught it
+ * after the fact. This section adds clause (a) as a genuinely new,
+ * PRE-EMPTIVE layer, in ADDITION to (never instead of) clause (b).
+ *
+ *   MOTOR_MAX_CMD_DUTY_PCT = 23 (percent, see motor.c). Any SPD command
+ *   above this is REJECTED (SPD_REJECTED reason=exceeds_cmd_duty_ceiling)
+ *   by cmd_spd(), not silently clamped to it -- consistent with this
+ *   module's own existing convention of rejecting an out-of-policy
+ *   request explicitly (e.g. DIR) rather than silently substituting a
+ *   different value, and satisfying REQ-405's own "reject/clamp" wording
+ *   (the requirement's own "/" permits either; reject was chosen for
+ *   host-visible auditability -- a host that queries what happened gets
+ *   an explicit answer, not a silently-substituted number it might not
+ *   notice).
+ *
+ *   DERIVATION (this fix's own task framing offered two options -- derive
+ *   a real, evidence-grounded duty-to-RPM ceiling, or escalate honestly
+ *   if none could be derived; this derivation was judged sufficiently
+ *   evidence-grounded, so no escalation was made):
+ *
+ *   1. TI DRV10983 (U5) Section 8.4.5.3 "Digital PWM Input Mode Speed
+ *      Control" (datasheets/texasinstruments_drv10983_slvscp6h.md, pages
+ *      29-30, DS-MTR-077): verbatim, "The PWM duty cycle applied to the
+ *      SPEED pin can be varied from 0 to 100%. The speed command is
+ *      proportional to the PWM input duty cycle." I.e. this firmware's
+ *      existing 0-100 SPD command (applied verbatim to the SPEED pin via
+ *      tim1_pwm_set_duty_pct(), unchanged by this fix) drives a DIRECTLY
+ *      PROPORTIONAL internal Speed Command -- TI's own explicit
+ *      statement, not an assumption this firmware invents.
+ *   2. TI DRV10983 Section 8.3.3 "Motor Speed Control" (same datasheet,
+ *      pages 16-17, DS-MTR-078): verbatim, "The output amplitude is
+ *      determined by the magnitude of VCC and the PWM duty cycle output
+ *      (PWM_DCO)... The maximum amplitude is reached when PWM_DCO is at
+ *      100%. The peak output amplitude is VCC. When the PWM_DCO is at
+ *      50%, the peak amplitude is VCC/2." I.e. peak motor phase-voltage
+ *      amplitude = VCC x (PWM_DCO/100), a direct, datasheet-stated
+ *      proportionality.
+ *      CAVEAT, from the same DS-MTR-078 section, disclosed rather than
+ *      glossed over: "The Speed Command may not always be equal to the
+ *      PWM_DCO because DRV10983 has implemented the AVS function..., the
+ *      acceleration current limit function..., and the closed loop
+ *      accelerate function... These functions can limit the PWM_DCO."
+ *      All three named functions can only REDUCE actual output relative
+ *      to what commanded duty cycle implies, never increase it -- so
+ *      treating amplitude as if it were exactly proportional (this
+ *      derivation's own simplification) is a worst-case/upper-bound
+ *      assumption on the SAFE side, not an optimistic one.
+ *   3. Standard BLDC steady-state physics, the SAME method already used
+ *      and accepted elsewhere in this project for M1's own no-load-speed
+ *      figures (DS-MTR-018: ~20,000 RPM @10V / ~22,200 RPM @11.1V, both
+ *      exactly KV x V with KV=2000 RPM/V, DS-MTR-017, no extra derating):
+ *      at low/no load current, applied voltage amplitude approximately
+ *      equals BEMF, so RPM_no_load ~= KV x V_applied. (DRV10983's own
+ *      Section 8.4.3.6 Equation 2, "BEMF = Kt x speed (Hz)", page 27,
+ *      confirms the same underlying physical relationship in the
+ *      driver's own terms -- not a new assumption introduced here.)
+ *   4. Combining 1-3: RPM(duty_pct) is bounded above by KV x
+ *      VCC_worst_case x (duty_pct/100) -- an upper bound, not an
+ *      equality, per item 2's own caveat.
+ *   5. VCC_worst_case = 13.0V -- this design's OWN already-established,
+ *      binding, qualified VM_MOTOR input envelope ceiling
+ *      (hardware/schematic/bench-imu-01-design.md Section 7.5.9: binding
+ *      voltage envelope 9.0V to 13.0V, "a binding constraint, not a
+ *      description"; U6's own OVP does not trip anywhere within this
+ *      envelope per Section 7.5.10, so 13.0V is a real, reachable
+ *      worst-case operating voltage, not a theoretical one). Using the
+ *      FULL J4-connector envelope ceiling as the assumed VCC at U5,
+ *      rather than a lower post-series-drop estimate (F1/D2/U6 all drop
+ *      some additional voltage per the schematic), is a further
+ *      deliberate conservatism: real delivered voltage at U5 is somewhat
+ *      LOWER than 13.0V, so using 13.0V un-reduced over-estimates (never
+ *      under-estimates) achievable RPM for a given duty -- the safe
+ *      direction for a ceiling.
+ *   6. KV = 2000 RPM/V, M1's own T-Motor-published rating (DS-MTR-017),
+ *      used at face value (not derated) -- the same convention already
+ *      established by DS-MTR-018, not a new methodology invented for
+ *      this fix.
+ *
+ *   ARITHMETIC: ceiling_duty_pct = floor(MOTOR_OVERSPEED_CEILING_RPM /
+ *   (KV x VCC_worst_case) x 100) = floor(6000 / (2000 x 13.0) x 100) =
+ *   floor(6000/26000 x 100) = floor(23.0769...) = 23. Sanity check: 23%
+ *   -> 2000x13.0x0.23 = 5980 RPM (<=6000, OK); 24% -> 2000x13.0x0.24 =
+ *   6240 RPM (>6000, correctly rejected) -- 23 is the largest integer
+ *   percent that clears the ceiling.
+ *
+ *   CONFIDENCE, MARKED EXPLICITLY (.github/instructions/
+ *   firmware.instructions.md's evidence-citation discipline, applied to a
+ *   derived value exactly as it would be to a raw register field):
+ *     - HIGH confidence, directly-cited primary-source facts: the
+ *       duty-proportional-to-speed-command statement (DS-MTR-077); the
+ *       VCC/PWM_DCO output-amplitude relationship (DS-MTR-078); M1's own
+ *       published KV=2000 RPM/V (DS-MTR-017); this design's own
+ *       schematic-derived 13.0V worst-case envelope (Section 7.5.9).
+ *     - REASONED ENGINEERING JUDGMENT, not a number printed in any single
+ *       source: the ARITHMETIC COMBINATION of the above (steps 3-6) --
+ *       the 23% figure itself is DERIVED, not directly published.
+ *       Disclosed here exactly that way: neither TI nor T-Motor publish
+ *       "23%" themselves, this module's own reasoning does.
+ *
+ *   HONEST LIMITATION, DISCLOSED (this is a DEFENSE-IN-DEPTH bound, NOT a
+ *   guarantee -- exactly like a fuse rating is a bound, not a promise):
+ *   duty-to-RPM is fundamentally LOAD-DEPENDENT for a sensorless BLDC --
+ *   the real reaction-wheel flywheel load, and any real supply voltage
+ *   below the assumed 13.0V worst case, will make ACTUAL RPM at a given
+ *   duty LOWER than this ceiling's own no-load/worst-case-voltage
+ *   estimate, likely significantly so. In practice this command-side
+ *   ceiling may therefore be noticeably MORE RESTRICTIVE than strictly
+ *   necessary to characterize up to 6000 RPM under typical (loaded,
+ *   non-worst-case-voltage) bench conditions -- an accepted cost of a
+ *   conservative bound, not a defect: under-permitting is far safer than
+ *   over-permitting here. REQ-007's own >=3000 RPM floor remains
+ *   comfortably inside this ceiling's own no-load-equivalent estimate
+ *   (5980 RPM at duty=23%), so no characterization capability required by
+ *   an approved requirement is lost -- only some amount of exploratory
+ *   headroom between the floor and this design's own 6000 RPM ceiling
+ *   that REQ-405 never promised in the first place. check_overspeed()'s
+ *   existing FG-measured REACTIVE path (documented above) remains the
+ *   authoritative, closed-loop-measurement-based enforcement of the
+ *   actual 6000 RPM limit and is completely unaffected by (and
+ *   independent of) this command-side layer -- this ceiling is a SECOND,
+ *   pre-emptive line of defense, not a replacement for the first.
  *
  * =========================================================================
  * REQ-406 (latched lock-fault policy) -- POLICY IN FULL:

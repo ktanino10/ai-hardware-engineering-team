@@ -33,6 +33,20 @@
  * first-pass draft of 8000 RPM before that anchor was found and weighed. */
 #define MOTOR_OVERSPEED_CEILING_RPM 6000u
 
+/* REQ-405 COMMAND-SIDE ceiling (Firmware Reviewer Finding 1, HIGH, PR #14,
+ * bench-imu-01-firmware-review.md): a pre-emptive REJECT on the commanded
+ * duty cycle itself, layered ON TOP OF (never replacing) the FG-measured
+ * REACTIVE check_overspeed() trip below. See motor.h for the full,
+ * Evidence-ID-cited derivation and confidence marking -- summary: 23% is
+ * the largest integer duty percentage for which KV=2000 RPM/V (DS-MTR-017)
+ * x this design's own 13.0V worst-case VM_MOTOR envelope (schematic
+ * Section 7.5.9) x duty% stays <=6000 RPM (23% -> 5980 RPM; 24% ->
+ * 6240 RPM, correctly rejected). This is a DERIVED, conservative,
+ * defense-in-depth bound (like a fuse rating), not itself a datasheet-
+ * printed number and not a guarantee -- duty-to-RPM is load-dependent for
+ * a sensorless BLDC; see motor.h for the honest limitation this implies. */
+#define MOTOR_MAX_CMD_DUTY_PCT 23u
+
 /* REQ-406 policy: 3 consecutive qualifying Lock-Detection edges within a
  * rolling 30 s window. Sanity-checked against U5's own tLOCK_OFF=5s
  * auto-retry period (DS-MTR-059): 3 retry cycles need >=15s, leaving
@@ -442,6 +456,21 @@ static void cmd_spd(uint32_t val)
     if (!s_armed)
     {
         usart2_write_str("SPD_REJECTED reason=not_armed\r\n");
+        return;
+    }
+
+    if (val > MOTOR_MAX_CMD_DUTY_PCT)
+    {
+        /* REQ-405 command-side ceiling (Firmware Reviewer Finding 1) --
+         * see MOTOR_MAX_CMD_DUTY_PCT's own comment above and motor.h for
+         * the full derivation. A REJECT (not a silent clamp), matching
+         * this file's own existing convention of rejecting an
+         * out-of-policy request explicitly (e.g. cmd_dir() below) rather
+         * than silently substituting a different value in its place. The
+         * FG-measured REACTIVE check_overspeed() path is completely
+         * unaffected by this check and remains the authoritative,
+         * closed-loop-measurement-based backstop. */
+        usart2_write_str("SPD_REJECTED reason=exceeds_cmd_duty_ceiling\r\n");
         return;
     }
 

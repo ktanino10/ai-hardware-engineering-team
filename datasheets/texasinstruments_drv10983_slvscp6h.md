@@ -29,7 +29,10 @@
   Reviewer during Bench-IMU-01 Rev 3 schematic design, 2026-09-04/05 — see
   the Update note below), plus DS-MTR-072 through DS-MTR-076 (added by the
   Firmware Engineer during Bench-IMU-01 Rev 3 motor bring-up firmware,
-  2026-09-10 — see the second Update note near the end of this file)
+  2026-09-10 — see the second Update note near the end of this file), plus
+  DS-MTR-077/DS-MTR-078 (added by the Firmware Engineer closing Firmware
+  Reviewer Finding 1, HIGH, PR #14, 2026-09-12 — see the third Update note
+  at the end of this file)
 
 ## Update (Circuit Engineer, 2026-09-04, Bench-IMU-01 Rev 3)
 
@@ -99,3 +102,27 @@ enforcement measurement), and the full Op2ClsThr numeric table (DS-MTR-076,
 supplementing DS-MTR-063's already-established qualitative mechanism with
 the concrete Hz range and this part's factory-default value). All five new
 rows cite this same datasheet record; no new metadata file was needed.
+
+## Update (Firmware Engineer, 2026-09-12, Firmware Reviewer Finding 1 loop-back fix)
+
+Re-read the already-cached primary-PDF text (same `r.jina.ai` extraction
+already used for the 2026-09-10 Update above, same URL) to source two more
+register-level facts needed for REQ-405's **command-side** ceiling — the
+fix for the first-ever Firmware Reviewer cycle's Finding 1 (HIGH, PR #14,
+`firmware/bench-imu-01/bench-imu-01-firmware-review.md`): §8.4.5.3
+"Digital PWM Input Mode Speed Control" (pages 29–30), confirming the
+firmware's `SPD` value maps **linearly, with no offset**, onto U5's own
+internal Speed Command (DS-MTR-077, new); and §8.3.3 "Motor Speed Control"
+(pages 16–17), confirming peak output amplitude = VCC × (PWM_DCO/100) with
+AVS/current-limit/closed-loop-accelerate only ever able to *reduce* actual
+output relative to that linear estimate, never increase it (DS-MTR-078,
+new). Combined with this datasheet's own already-cited DS-MTR-017 (M1's
+KV=2000 RPM/V rating) and this design's own 13.0V worst-case `VM_MOTOR`
+envelope (`hardware/schematic/bench-imu-01-design.md` §7.5.9/§7.5.10, not
+part of this datasheet record), these two new rows are the primary
+evidence behind `motor.c`'s new `MOTOR_MAX_CMD_DUTY_PCT`=23 command-side
+reject threshold — see `firmware/bench-imu-01/src/motor.h` and
+`firmware/bench-imu-01/bench-imu-01-firmware-design.md` §4.3 for the full
+derivation, its confidence marking, and its disclosed load-dependence
+limitation. Both new rows cite this same datasheet record; no new metadata
+file was needed.
