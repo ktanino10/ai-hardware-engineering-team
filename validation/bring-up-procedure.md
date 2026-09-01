@@ -97,6 +97,35 @@ happens — do not let a future rewrite silently drop it.
       confirmed present and functioning, **do not energize the motor rail**;
       the rest of this procedure's Rev 2 scope (MCU/IMU/logic rail) may
       still proceed independently.
+- [ ] **FLYWHEEL CONTAINMENT STRUCTURE (Rev 3) — MANDATORY, DO NOT SKIP OR
+      DEFER.** Before the flywheel is ever spun (i.e. before any nonzero
+      `SPD` command is issued, even at low duty), physically confirm: (1)
+      the containment cap (`containment_cap()`) is installed and its 6×M3
+      fasteners are torqued into the base's heat-set inserts — **not**
+      merely rested in place; (2) the base's own cylindrical wall
+      (`fw_bay_wall()`, the primary containment surface per
+      `validation/open-issues.md` **MISS-013**'s own determination) shows no
+      visible print defect (delamination, layer separation, a short/aborted
+      print) at the flywheel-bay location; (3) the as-built print actually
+      matches `hardware/mechanical/bench-imu-01-manufacturing-spec.md`'s
+      specified process (material, infill %, perimeter count) as closely as
+      the actual printer/slicer allows — **do not spin the flywheel on a
+      print sliced with unverified/default settings**, since the entire
+      REQ-403 safety argument depends on this. This is the physical
+      precondition for the human Chief Engineer's own **REQ-403**
+      ACCEPTED-RISK disposition (`validation/open-issues.md` **MISS-016**,
+      `validation/change-log.md` **ECO-025**): that disposition explicitly
+      accepts the containment structure as a **defense-in-depth mitigation,
+      not validated/certified containment** — a calculated, human-accepted
+      energy-absorption shortfall of ≈3.26–4.30× (best case) to ≈1.7–3.6
+      orders of magnitude (typical) remains open and unresolved by physical
+      testing (**MISS-022**, tracked, not yet performed). Do **not** treat a
+      clean Design Complete Gate as evidence the containment has been proven
+      adequate — it has explicitly not been. If the containment structure
+      cannot be visually/physically confirmed installed and matching its
+      specified process, **do not spin the flywheel at any commanded speed**
+      — even REQ-007's own 3000 RPM floor already carries real stored
+      rotational energy (§8's own physics table).
 - [ ] Visual inspection: correct component population and orientation
       (polarized parts, pin-1 orientation)
 - [ ] Continuity check: no unintended shorts between rails/ground (per
