@@ -395,8 +395,29 @@ CONDITIONAL. This round:
   scope, not PCB Engineer) — made here only because the human Chief
   Engineer coordinating this cross-branch task explicitly directed it as
   a deliberate, disclosed exception, not a silent role-boundary violation.
-- **ISS-036 (HIGH) — not yet addressed this round.**
+- **ISS-036 (HIGH) — real root-cause analysis added, not yet individually
+  triaged/fixed.** Used `kicad-cli pcb drc --format json`, parsed
+  programmatically, to break the bulk violation counts down by net-pair
+  and item-type rather than leave them as one undifferentiated number.
+  Headline finding: **61% of `shorting_items` involve GND** and would
+  very likely be genuine electrical faults if fabricated as-is (e.g. 8x
+  `VBUS_5V`-vs-`GND`, 5x `3V3`-vs-`GND`) — confirming the HIGH severity
+  classification is evidence-backed, not an unexamined suspicion. Of
+  those, **48% are a specific, identified root cause**: ordinary
+  through-vias (any non-GND net) physically crossing In1.Cu — the
+  dedicated GND layer — at points where a GND track also runs there,
+  because GND is routed as discrete tracks (not a filled zone with
+  automatic net-based via clearance, since `ZONE_FILLER.Fill()` still
+  segfaults in this environment). Getting that tool working, or adding a
+  dedicated post-routing via-relocation pass, is the single most
+  tractable next step — **not attempted this session**: moving an
+  already-placed via risks silently disconnecting whatever track
+  segments terminate there, a real regression risk judged not worth
+  taking without a wider verification budget than remained this session.
+  See `validation/open-issues.md` ISS-036 for the full breakdown
+  (net-pair table, item-type percentages, and the `tracks_crossing`
+  100%-track-vs-track finding).
 
 Design Complete gate status after this round: still fails, now on only 2
-open HIGH items (ISS-032 pending review, ISS-036 pending triage), down
-from 3. Board still not declared ready to fabricate.
+open HIGH items (ISS-032 pending review, ISS-036 root-caused but not yet
+fixed), down from 3. Board still not declared ready to fabricate.
