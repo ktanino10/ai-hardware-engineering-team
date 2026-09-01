@@ -70,6 +70,72 @@ def snap(v: float) -> float:
     return round(v, 4)
 
 
+def patch_alternate_pin_function(sch_path: Path, ref: str, pin_number: str, alternate: str) -> None:
+    """Activate a real per-instance KiCad "alternate pin function"
+    (`(pin "<num>" (alternate "<name>") (uuid ...))`) on one specific
+    placed symbol instance, as a raw text post-process of an already-
+    written `.kicad_sch` file.
+
+    Why this exists (Hardware Reviewer Cycle 6, ISS-030): `kiutils`
+    1.4.8's `SchematicSymbol.pins` model is a bare `{pin_number: uuid}`
+    mapping (confirmed by reading its own source) with no way to express
+    this real, needed-here KiCad 7+ per-instance mechanism. Some MCU
+    library symbols shared across a whole silicon family (e.g.
+    `MCU_ST_STM32G0:STM32G031K8Tx`) declare a physical pin's *base*
+    electrical type as `no_connect` with the real, in-use function
+    (e.g. "PA9") only selectable as an alternate -- without activating
+    it, KiCad's netlist compiler places that pin on a synthetic
+    `unconnected-` net regardless of any wire/label visually drawn to
+    it, silently dropping it from every net it was actually meant to
+    join. Scoped narrowly to the named component's own symbol-instance
+    block (found by its `(property "Reference" "<ref>"` line) so the
+    same pin number on a *different* component is never touched.
+
+    The `(alternate ...)` token must be a CHILD of the `(pin ...)`
+    s-expression, not a sibling appended after its closing paren (an
+    earlier version of this function inserted it as a new line after the
+    pin block instead of inside it, which produces a structurally invalid
+    file KiCad refuses to load at all -- caught immediately by re-running
+    `kicad-cli sch erc` on the result, exactly the kind of tool-based
+    self-verification this project's own conventions require before
+    trusting any generated-file edit). `kiutils` writes each pin as a
+    single physical line, `(pin "<num>" (uuid <uuid>))` -- this patch
+    does an in-place string replacement on that exact line rather than
+    inserting a new one.
+    """
+    text = sch_path.read_text()
+    lines = text.splitlines(keepends=True)
+
+    ref_marker = f'(property "Reference" "{ref}"'
+    start = next((i for i, ln in enumerate(lines) if ref_marker in ln), None)
+    if start is None:
+        raise ValueError(f"patch_alternate_pin_function: no symbol instance found for ref={ref!r}")
+    # This component's own instance block runs until the next symbol
+    # instance's "Reference" property (or end of file).
+    end = next(
+        (i for i in range(start + 1, len(lines)) if '(property "Reference" "' in lines[i]),
+        len(lines),
+    )
+
+    pin_open = f'(pin "{pin_number}" '
+    pin_idx = next(
+        (i for i in range(start, end) if pin_open in lines[i]),
+        None,
+    )
+    if pin_idx is None:
+        raise ValueError(
+            f"patch_alternate_pin_function: no pin {pin_number!r} found on ref={ref!r}"
+        )
+    if lines[pin_idx].count(pin_open) != 1:
+        raise ValueError(
+            f"patch_alternate_pin_function: ambiguous match for pin {pin_number!r} on ref={ref!r}"
+        )
+
+    lines[pin_idx] = lines[pin_idx].replace(pin_open, f'{pin_open}(alternate "{alternate}") ', 1)
+    sch_path.write_text("".join(lines))
+    print(f"Patched {ref} pin {pin_number}: activated alternate function {alternate!r}")
+
+
 # ---------------------------------------------------------------------------
 # Library symbol loading helpers
 # ---------------------------------------------------------------------------
@@ -462,6 +528,23 @@ def build_drv10983_symbol() -> Symbol:
     add_side(left_pins, left_x, 0, first_y)
     add_side(right_pins, right_x, 180, first_y)
 
+    # Pin 25 = EP (exposed thermal pad) -- ADDED (Hardware Reviewer Cycle 6,
+    # ISS-031, HIGH): the real 24-pin HTSSOP/PWP package has a 25th
+    # electrical contact, the exposed pad, per TI's own datasheet Pin
+    # Configuration table (DS-MTR-052) -- this custom symbol previously
+    # defined only pins 1-24, omitting it entirely (unlike U6's real
+    # library symbol, which does model its own exposed pad as pin 21).
+    # Drawn as a bottom-edge pin (matching how KiCad's own library symbols
+    # conventionally represent an EP distinct from the 4-sided lead pins),
+    # wired to GND alongside U5's other GND-family pins (5/8/15/16).
+    pin_unit.pins.append(SymbolPin(
+        electricalType="power_in", graphicalStyle="line",
+        position=Position(X=0, Y=bottom_y - 2.54, angle=90),
+        length=2.54, name="EP", number="25",
+        nameEffects=Effects(font=Font(height=1.27, width=1.27)),
+        numberEffects=Effects(font=Font(height=1.27, width=1.27)),
+    ))
+
     sym.units = [body_unit, pin_unit]
     return sym
 
@@ -782,7 +865,7 @@ def main() -> None:
     # U5's own V3P3 output biases the FG/I2C1 pull-ups (a different domain
     # from the board's main 3V3 rail, per Option A).
     b.connect("U5_V3P3", [("U5", "9"), ("R6", "2"), ("R7", "2"), ("R8", "2"), ("C15", "1")])
-    b.connect("GND", [("C15", "2"), ("U5", "8"), ("U5", "5"), ("U5", "16"), ("U5", "15")])
+    b.connect("GND", [("C15", "2"), ("U5", "8"), ("U5", "5"), ("U5", "16"), ("U5", "15"), ("U5", "25")])
     # MCU <-> U5 signal pins: SPEED (PA8/TIM1_CH1, PWM), DIR (PB1), FG
     # (PA6/TIM3_CH1), I2C1 SCL/SDA (PB6/PB7) -- pin numbers per the
     # corrected design doc section 11 pin table.
@@ -820,13 +903,34 @@ def main() -> None:
                 "26", "27", "28", "29", "32"):
         b.no_connect("U1", num)
 
-    b.sch.to_file(str(HERE / f"{PROJECT_NAME}.kicad_sch"))
+    sch_path = HERE / f"{PROJECT_NAME}.kicad_sch"
+    b.sch.to_file(str(sch_path))
+
+    # --- Post-process: activate U1 pin 19's "PA9" alternate pin function
+    # (Hardware Reviewer Cycle 6, ISS-030, CRITICAL). Root cause: the real
+    # MCU_ST_STM32G0 library symbol (shared across the whole STM32G031x4/
+    # 6/8 family) declares physical pin 19's *base* electrical type as
+    # `no_connect`, name "NC/PA9" -- PA9 is only a selectable *alternate*
+    # pin function, a real per-instance KiCad 7+ mechanism
+    # (`(pin "19" (alternate "PA9"))`) that `kiutils` 1.4.8's
+    # `SchematicSymbol.pins` object model does not expose (confirmed by
+    # reading its own source -- only a bare {pin_number: uuid} mapping).
+    # Previously mis-classified in this project's own README as a benign,
+    # cosmetic ERC warning; Cycle 6 independently proved the wire is not
+    # actually recognized by KiCad's netlist compiler at all without this
+    # activation (U1 pin 19 lands on a synthetic `unconnected-` net, and
+    # `/U6_EN` silently lacks its MCU-driven member), permanently disabling
+    # the entire motor/reaction-wheel subsystem. Patched here as a raw
+    # text post-process (not the object model, which cannot express this)
+    # so the fix is reproducible by re-running this script, not a one-off
+    # hand-edit of the generated file that would silently drift from it.
+    patch_alternate_pin_function(sch_path, ref="U1", pin_number="19", alternate="PA9")
 
     # --- Write the project-local symbol library (BMI270 + DRV10983) --
     bmi_lib = SymbolLib(symbols=[build_bmi270_symbol(), build_drv10983_symbol()])
     bmi_lib.to_file(str(HERE / f"{PROJECT_NAME}.kicad_sym"))
 
-    print(f"Wrote {HERE / (PROJECT_NAME + '.kicad_sch')}")
+    print(f"Wrote {sch_path}")
     print(f"Wrote {HERE / (PROJECT_NAME + '.kicad_sym')}")
     print(f"Placed {len(b.placed)} symbols, {b._nc_count} no-connects")
 

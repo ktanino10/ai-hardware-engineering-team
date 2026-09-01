@@ -321,14 +321,57 @@ def build_board(footprints: dict[str, str], nets: dict[str, list[tuple[str, str]
             if fp is None:
                 print(f"WARNING: {ref} not placed, cannot assign net {net_name}")
                 continue
-            pad = fp.FindPadByNumber(pin)
-            if pad is None:
+            # Hardware Reviewer Cycle 6 (ISS-033/034/035): some real
+            # footprints legitimately have MULTIPLE physical copper pads
+            # sharing one pad NUMBER -- a PowerPAD's thermal-via sub-pad
+            # array (U6: 17 sub-pads on "21"), a USB-C shield's multiple
+            # mechanical tabs (J1: 4 pads on "SH"), or a THT switch's
+            # doubled per-terminal pads (SW1: 2 pads per terminal number).
+            # `FindPadByNumber` returns only the FIRST match -- using it
+            # alone left every other same-numbered physical pad genuinely
+            # unconnected (no net at all), invisible to DRC's
+            # `unconnected_items` check (a real, independently-reproduced
+            # 0 throughout this script's own DRC iterations) since that
+            # check only flags a missing schematic-to-copper connection,
+            # not a footprint pad that was never assigned a net to begin
+            # with. Enumerate and net EVERY physical pad with this number,
+            # not just the first.
+            matching_pads = [p for p in fp.Pads() if p.GetNumber() == pin]
+            if not matching_pads:
                 print(f"WARNING: {ref} pin {pin} has no matching pad (net {net_name})")
                 continue
-            pad.SetNet(ni)
-            pos = pad.GetPosition()
-            pad_positions[(ref, pin)] = (pos.x, pos.y, pad.GetLayerSet().Contains(pcbnew.B_Cu))
-            pad_is_tht[(ref, pin)] = pad.GetAttribute() == pcbnew.PAD_ATTRIB_PTH
+            for pad in matching_pads:
+                pad.SetNet(ni)
+            pos = matching_pads[0].GetPosition()
+            pad_positions[(ref, pin)] = (pos.x, pos.y, matching_pads[0].GetLayerSet().Contains(pcbnew.B_Cu))
+            pad_is_tht[(ref, pin)] = matching_pads[0].GetAttribute() == pcbnew.PAD_ATTRIB_PTH
+            # Fixed alongside the multi-pad net assignment above (Hardware
+            # Reviewer Cycle 6, ISS-033/034/035 follow-up): giving every
+            # physical pad a net is necessary but not sufficient -- the
+            # later MST/Step-A routing below only ever routes to the ONE
+            # representative point stored in pad_positions[(ref, pin)]
+            # (matching_pads[0]'s position), so any OTHER physical pad
+            # sharing this number (SW1's doubled terminal pads, J1's other
+            # shield tabs, U6 PowerPAD's other sub-pads) would still end up
+            # copper-isolated from its own net -- a real, DRC-visible
+            # `unconnected_items` violation, confirmed by re-running DRC
+            # after the net-assignment-only fix (2 unconnected SW1 pad-2
+            # instances surfaced). Bridge every extra physical pad directly
+            # to the representative pad here, on F.Cu, at each pad's own
+            # position -- independent of and before the later routing
+            # stages, since those operate at (ref, pin) granularity and
+            # have no visibility into same-numbered pad multiplicity.
+            if len(matching_pads) > 1:
+                x0, y0 = matching_pads[0].GetPosition()
+                for extra in matching_pads[1:]:
+                    x1, y1 = extra.GetPosition()
+                    seg = pcbnew.PCB_TRACK(board)
+                    seg.SetStart(pcbnew.VECTOR2I(x0, y0))
+                    seg.SetEnd(pcbnew.VECTOR2I(x1, y1))
+                    seg.SetLayer(pcbnew.F_Cu)
+                    seg.SetWidth(MM(WIDTH_SIGNAL))
+                    seg.SetNet(ni)
+                    board.Add(seg)
         netcode += 1
 
 

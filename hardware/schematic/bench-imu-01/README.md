@@ -103,7 +103,7 @@ rationale.
 
 | Ref | Part | Symbol | Footprint | Confidence |
 |---|---|---|---|---|
-| U5 | TI DRV10983 | **custom**, `bench-imu-01:DRV10983` | `Package_SO:HTSSOP-24-1EP_4.4x7.8mm_P0.65mm_EP3.2x5mm` | Pin count/names/body **CONFIRMED** — independently re-verified this session directly against TI's own primary datasheet (SLVSCP6H, fetched live), not merely copied from the design doc. Footprint body size (4.4×7.8mm, 24-pin thermally-enhanced HTSSOP) CONFIRMED against the same primary source; exact exposed-pad sub-variant is **ASSUMPTION** — a web-search-derived pad estimate (~4.4×2.45mm) didn't exactly match any installed KiCad EP-mask variant, so the smallest/most conservative discrete-pad option was chosen (mirrors this project's own "CONFIRMED-via-standard, not part-specific" precedent already used for the MCU/LDO Rev 2 footprints, design doc §10) |
+| U5 | TI DRV10983 | **custom**, `bench-imu-01:DRV10983` | `Package_SO:HTSSOP-24-1EP_4.4x7.8mm_P0.65mm_EP3.2x5mm` | Pin count/names/body **CONFIRMED** — independently re-verified this session directly against TI's own primary datasheet (SLVSCP6H, fetched live), not merely copied from the design doc. Footprint body size (4.4×7.8mm, 24-pin thermally-enhanced HTSSOP) CONFIRMED against the same primary source; exact exposed-pad sub-variant is **ASSUMPTION** — a web-search-derived pad estimate (~4.4×2.45mm) didn't exactly match any installed KiCad EP-mask variant, so the smallest/most conservative discrete-pad option was chosen (mirrors this project's own "CONFIRMED-via-standard, not part-specific" precedent already used for the MCU/LDO Rev 2 footprints, design doc §10). **Corrected 2026-09-02 (Hardware Reviewer Cycle 6, ISS-031, HIGH, partially fixed):** the custom symbol originally omitted pin 25 (EP/exposed pad) entirely — the schematic never modeled the pad as an electrical node at all, unlike U6's real library symbol which does. Fixed by adding pin 25 to `build_drv10983_symbol()` and wiring it to GND; the chosen footprint's own pad numbering (`(pad "25" smd rect ...)`, independently confirmed by inspecting the `.kicad_mod` file directly) already matches. **Still open**: the footprint itself has no thermal-via array stitching the pad to an internal/bottom GND layer (required per TI's own SLMA002/SLMA004 PowerPAD guidance to actually achieve the datasheet's rated RθJA) — a bare-pad footprint under-performs the datasheet's thermal figure even with the net now correctly assigned. Not fixed this session; see `validation/open-issues.md` ISS-031 |
 | U6 | TI TPS26631PWPR | `Power_Management:TPS26631PWP` (real library symbol) | `Package_SO:HTSSOP-20-1EP_4.4x6.5mm_P0.65mm_EP3.4x6.5mm_Mask2.96x2.96mm_ThermalVias` | **CONFIRMED** — real library symbol with the footprint pre-associated by KiCad's own library maintainers (not independently chosen); pin numbers cross-checked against the design doc's own §7.5.10 pinout table, exact match including the symbol's pin 21 = PowerPAD (exposed-pad virtual pin) |
 | J4 | Same Sky PJ-102AH | `Connector:Barrel_Jack_Switch` (3-pin, matching the real 3-terminal part) | `Connector_BarrelJack:BarrelJack_CUI_PJ-102AH_Horizontal` | Footprint **CONFIRMED** (part-specific, name match, 3 pads). Pin-to-function mapping (sleeve/switch/tip) is **ASSUMPTION** — the primary datasheet's own mechanical drawing/schematic diagram could not be rendered by this session's tooling (PDF diagram lost in text extraction); used pin1=sleeve/GND, pin2=switch(N.C., unpopulated), pin3=tip/VM_MOTOR per a web search citing the primary datasheet + a DigiKey mirror. **Flagged for human verification against the real mechanical drawing before fabrication** — low blast-radius if wrong, since D2's series reverse-polarity protection fails safe (blocks conduction) rather than damaging anything if J4's tip/sleeve assignment is actually reversed |
 | D2 | ST STPS3L60 | `Device:D_Schottky` | `Diode_SMD:D_SMB` | CONFIRMED — SMB package explicitly stated in design doc §13; standard K/A Schottky symbol |
@@ -263,29 +263,68 @@ errors**, 2 warnings — both disclosed, non-blocking:
 1. `lib_symbol_mismatch` on U3 (`TLV75533PDBV`) — pre-existing, already
    explained above (a benign `lib_symbols`-caching artifact, not an
    electrical defect).
-2. `no_connect_connected` on U1 pin 19 (shown as `NC/PA9`) — **new this
-   revision, disclosed, not fixed.** The real `MCU_ST_STM32G0` library
-   symbol is shared across the whole STM32G031x4/6/8 family; pin 19's
-   *default* pin-type designation is `no_connect` (`NC/PA9`), with `PA9`
-   available only as a selectable *alternate* pin function — a real KiCad
-   7+ per-instance feature (`(pin "19" (alternate "PA9"))`) that `kiutils`
-   1.4.8 does not expose in its `SchematicSymbol.pins` model (confirmed by
-   reading its own source this session, not assumed). The wiring itself is
-   electrically **correct** — PA9 is a real, bonded-out GPIO on the actual
-   STM32G031K8T6 part, independently re-confirmed via ST's own official
-   pin database (DS-MCU-064, already used to correct several other pins in
-   this same project). This is a metadata-completeness gap (KiCad's own
-   GUI would close it in seconds via right-click → assign the alternate
-   pin function), not a connectivity defect — flagged for Hardware
-   Reviewer awareness and as a trivial future GUI-side fix, not chased
-   further here given the disproportionate `kiutils`-patching effort a
-   fully scripted fix would require for a purely cosmetic ERC finding.
+2. ~~`no_connect_connected` on U1 pin 19 (shown as `NC/PA9`) — new this
+   revision, disclosed, not fixed.~~ **CORRECTED 2026-09-02 (Hardware
+   Reviewer Cycle 6, ISS-030, CRITICAL — then fixed same session):** this
+   was originally (incorrectly) assessed below as a purely cosmetic
+   metadata gap. The independent Hardware Reviewer found that assessment
+   wrong: because `kiutils` 1.4.8 cannot express KiCad's real per-instance
+   `(pin "19" (alternate "PA9"))` mechanism, the wire drawn to U1 pin 19 in
+   the schematic **never actually joined the `/U6_EN` net at all** — pin
+   19's un-patched *default* pin-type (`no_connect`) meant KiCad's own
+   netlister silently excluded it, so U6 (and the entire downstream motor
+   + reaction wheel subsystem) could never be enabled by firmware under
+   any condition. This was a real CRITICAL connectivity defect, not a
+   cosmetic one — the original framing below under-stated its severity.
+   **Fixed** via a `patch_alternate_pin_function()` post-processing step
+   in `generate_schematic.py` that edits the raw `.kicad_sch` text to
+   inject `(alternate "PA9")` *inside* U1 pin 19's own `(pin "19" ...)`
+   s-expression (the critical gotcha: inserting it as a sibling line
+   after the closing paren instead breaks the file's S-expression
+   structure and KiCad refuses to load it — caught via `kicad-cli sch
+   erc` failing to parse the file during the fix). **Verified** two ways:
+   `kicad-cli sch erc` now reports only the one pre-existing U3 warning
+   above (0 errors, this warning gone); `kicad-cli sch export netlist`
+   independently re-confirms U1 pin 19 is now a genuine member of the
+   `/U6_EN` net. See `validation/open-issues.md` ISS-030 (RESOLVED).
+   The paragraph immediately below is preserved as originally written,
+   for an honest record of the (incorrect) reasoning at the time — do not
+   trust its "not a connectivity defect" conclusion:
+   > The real `MCU_ST_STM32G0` library symbol is shared across the whole
+   > STM32G031x4/6/8 family; pin 19's *default* pin-type designation is
+   > `no_connect` (`NC/PA9`), with `PA9` available only as a selectable
+   > *alternate* pin function — a real KiCad 7+ per-instance feature
+   > (`(pin "19" (alternate "PA9"))`) that `kiutils` 1.4.8 does not expose
+   > in its `SchematicSymbol.pins` model (confirmed by reading its own
+   > source this session, not assumed). The wiring itself is electrically
+   > **correct** — PA9 is a real, bonded-out GPIO on the actual
+   > STM32G031K8T6 part, independently re-confirmed via ST's own official
+   > pin database (DS-MCU-064, already used to correct several other pins
+   > in this same project). ~~This is a metadata-completeness gap (KiCad's
+   > own GUI would close it in seconds via right-click → assign the
+   > alternate pin function), not a connectivity defect~~ — flagged for
+   > Hardware Reviewer awareness and as a trivial future GUI-side fix, not
+   > chased further here given the disproportionate `kiutils`-patching
+   > effort a fully scripted fix would require for a purely cosmetic ERC
+   > finding.
 
 Every new footprint decision (CONFIRMED vs. ASSUMPTION, with reasoning) is
 in the table above. One genuinely open, human-verification-recommended item:
 **J4's exact pin-to-function (sleeve/switch/tip) mapping** — see that row's
 own entry for the full reasoning and the fail-safe backstop (D2) that keeps
 this a low-blast-radius open item, not a blocking one.
+
+**Correction (Hardware Reviewer Cycle 6, ISS-032, HIGH, still OPEN):** the
+"D2 keeps this low-blast-radius" framing above is only partially correct.
+The independent Hardware Reviewer found D2 (a series reverse-polarity diode
+on J4's supply-side path) only protects against a *supply*-side pin-mapping
+reversal — it does not cover a scenario where J4's mapping error instead
+swaps a *GND*-side pin with a switch/signal pin, which D2's own topology
+cannot backstop. This is a real gap in the original safety argument, not
+yet fixed or otherwise dispositioned this session — see
+`validation/open-issues.md` ISS-032 for the full finding and recommended
+fix options. Treat the claim above as superseded until that item is
+resolved.
 
 ## Explicit scope boundaries
 
