@@ -41,6 +41,22 @@ file and related layout documents). Structured per-board, mirroring
   *filled* copper pour. GND connectivity in the delivered board is instead
   realized via explicit routed tracks/vias (electrically valid and
   DRC-checkable, just not yet a solid continuous copper region).
+  **Correction/nuance (Chief Engineer, 2026-09-02, independently testing
+  during the ISS-036 review)**: running `pcbnew.ZONE_FILLER(board).Fill(...)`
+  against the *committed* board — which has one small pre-existing F.Cu
+  zone, distinct from the GND-on-In1.Cu-as-discrete-tracks situation this
+  session's own ISS-036 analysis is about — succeeded 4/4 times, no
+  segfault. So the segfault is not universally reproducible across every
+  possible zone/board state; it may be more state- or environment-dependent
+  than "hard tooling wall" implies, similar to this project's own already-
+  disclosed DRC run-to-run non-determinism. The Chief Engineer also
+  confirmed filling that one pre-existing (unrelated) zone doesn't move
+  the DRC needle either way (378 vs 380, noise-band) — so this is a real,
+  useful data point about reproducibility, not a missed fix: the actual
+  GND-on-In1.Cu zone this design would need filled to solve ISS-036's
+  via-through-GND-layer root cause was not the zone tested, and remains
+  unverified either way. Recorded here for whoever picks this up next,
+  rather than left as a stale, overstated "confirmed segfault" claim.
 - **No autorouter is used or assumed available.** `pcbnew.ExportSpecctraDSN`/
   `ImportSpecctraSES` do exist (confirming a Freerouting-style external
   round-trip is technically possible), but no such external tool is
