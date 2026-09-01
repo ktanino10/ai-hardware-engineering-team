@@ -1,18 +1,57 @@
 # Bench-IMU-01 — Enclosure Dimensional Spec & Design Rationale
 
-**Status: Rev. 3.1 — revised after Independent Mechanical Review Cycle 3
-findings, ready for RE-review** (not a fresh first review). Cycle 3's
-independent review of Rev 3 returned a **CONDITIONAL** verdict — 1 CRITICAL
-(MISS-008) and 2 HIGH (MISS-009, MISS-010) findings blocking; all three have
-been fixed in this revision, in both the `.scad` file and this document.
-MISS-011 (MEDIUM, non-gating) is deliberately carried forward **disclosed,
-not fixed** — it was never gating and this revision does not attempt the
-impact/pull-out calculation it would require (§8/§12/§16). This document
-still does not declare itself reviewed/complete — see
+**Status: Rev. 3.2 — adds a bounded MISS-011 estimate attempt (§8.1); NO
+`.scad` geometry changed this revision.** Rev 3.1 (previous revision) fixed
+Independent Mechanical Review Cycle 3's 1 CRITICAL (MISS-008) and 2 HIGH
+(MISS-009, MISS-010) findings, in both the `.scad` file and this document.
+MISS-011 (MEDIUM, non-gating) was carried forward in Rev 3.1 **disclosed,
+not fixed**. This revision (3.2) is a Mechanical-Lead-authored
+**analysis-only** addition attempting MISS-011's Recommended Fix path (a): a
+bounded, order-of-magnitude wall-impact/penetration and fastener pull-out
+estimate against the disclosed REQ-403 hazard figure (§8.1) — not a `.scad`
+change, and explicitly **not** a self-certified closure of MISS-011
+(proposed only, pending independent Mechanical Reviewer cross-check — this
+Mechanical Lead is not independent of its own estimate). This document still
+does not declare itself reviewed/complete — see
 `.github/agents/mechanical-lead.agent.md`, "Out of scope" — a fresh
-Independent Mechanical Review pass on this revision is the required next
-step; after that clears, the REQ-403 disposition proposal in §8 goes to the
-human as a HITL gate. Nothing in this file should be read as "approved."
+Independent Mechanical Review pass on this revision (now including §8.1) is
+the required next step; after that clears, the REQ-403 disposition proposal
+in §8 goes to the human as a HITL gate. Nothing in this file should be read
+as "approved."
+
+**Rev. 3.2 changelog (this revision, Mechanical Lead, analysis-only — no
+`.scad` change; `validation/open-issues.md` MISS-011):**
+
+- Added **§8.1** ("MISS-011 closure attempt"): a bounded, order-of-magnitude
+  engineering estimate for (1) whether the 4.0mm `containment_wall_t` is in
+  a plausible/implausible range for absorbing the disclosed 121.60J impact
+  locally, via two independent hand-calc methods across a sensitivity range
+  of engagement-width assumptions, and (2) whether the 6×M3 heat-set-insert
+  fastener capacity is adequate against a reasoned range of loading
+  scenarios for `containment_cap()`. Every number is confidence-marked
+  (CONFIRMED/ASSUMPTION/ESTIMATE/UNKNOWN) per
+  `.github/instructions/mechanical-design.instructions.md`. 6 new Evidence
+  IDs registered (`DS-FAST-001`..`DS-FAST-003`, `DS-MTL-001`..`DS-MTL-003`)
+  in `datasheets/evidence-log.md` for the real, independently-checkable
+  third-party sources used (manufacturer filament TDS data, an independent
+  physical fastener pull-out test, a real commercial insert part number).
+- **No `.scad` geometry was changed.** `containment_wall_t` remains 4.0mm,
+  `n_cap_bolts` remains 6 — this Mechanical Lead does not unilaterally
+  redesign geometry on the strength of its own estimate. §8.1 ends with a
+  clearly-labeled "Escalation flag for Hardware Lead" callout — a distinct,
+  separately-routed concern this estimate surfaced, not a MISS-011 closure
+  claim.
+- §12 and §16 updated with minimal cross-references to §8.1 (their own
+  existing content otherwise unchanged). §15's Rev 3.1 self-check items 5
+  and 6 (fastener placement, wall thickness) each got a short "Rev 3.2 note"
+  pointing to §8.1's margin finding, plus a short addendum after the
+  section's closing paragraph — the pre-existing Rev 3.1 self-check content
+  itself is otherwise unchanged.
+- `validation/open-issues.md` MISS-011's Notes column updated to describe
+  this attempt and its result; **Status intentionally left OPEN, not
+  self-resolved** — proposed only as ready for Mechanical Reviewer's
+  independent cross-check, exactly as the Circuit Engineer never self-closes
+  a Hardware Reviewer finding (`docs/workflow.md` §3).
 
 **Rev. 3.1 changelog (this revision vs. Cycle 3), each finding fixed in both
 the `.scad` file and this spec document — `validation/design-review.md`
@@ -694,6 +733,322 @@ the REQ-403 HITL gate — exactly mirroring how the electronics-side REQ-403
 disposition was handled (proposed → independently reviewed → human gate),
 not a unilateral final decision by this Mechanical Lead.
 
+### 8.1 MISS-011 closure attempt: bounded wall-impact and fastener pull-out estimates (Rev 3.2, 2026-09-13)
+
+**What this subsection is and is not.** MISS-011 (MEDIUM, non-gating, see
+§12/§16 and `validation/open-issues.md`) flags that the 4.0mm
+`containment_wall_t` / 6×M3 fastener adequacy judgment above is qualitative,
+not backed by any impact-energy or pull-out calculation. Its own Recommended
+Fix names two legitimate closure paths: (a) a basic impact-energy/
+wall-deflection or fastener-pull-out-under-shock-load estimate, or (b)
+explicitly carrying the qualitative-only status forward as a disclosed
+limitation. Path (b) has already been satisfied since Rev 3.1 — this
+subsection is a bounded attempt at path (a). It is **not** a certification,
+**not** a FEA/simulation result, and **not** authority to change
+`containment_wall_t`, the fastener count, or any other `.scad` geometry — no
+`.scad` file was touched to produce this subsection. Every number below is
+individually confidence-marked per `.github/instructions/mechanical-design.
+instructions.md`; the full ledger is in §8.1.6.
+
+**Tooling honesty, re-verified this session.** No CAD/3D/FEA MCP tool is
+connected in this environment: `blender-get_addon_status` was called again
+this session and returned "Could not connect to Blender," matching every
+prior check in this project. No local `openscad` Python-scriptable solid-
+modeling library, `cadquery`, `build123d`, or FEA solver is available either.
+This subsection is therefore hand-derived closed-form engineering estimation
+(energy-density scaling and yield-limited work, both textbook-level, not
+FEA), exactly as the task scoped it — `CONFIRMED` (tool-absence re-verified
+2026-09-13, mirrors every earlier check in this document and in
+`hardware/mechanical/bench-imu-01-manufacturing-spec.md`).
+
+#### 8.1.1 Threat-model framing used for this estimate
+
+§8 above already establishes the load case: **the entire 100g disk
+detaching as one rigid projectile** (line ~621), at up to 121.60J of stored
+rotational kinetic energy (22,200 RPM no-load-high case), not a small
+fragment. As an independent sanity check before relying on this figure
+further, it was re-derived from first principles rather than copied: for a
+solid disk, KE_rotational = ¼·m·v_rim² (equivalent to ½Iω² with
+I=½mr²). Using the disclosed m=0.100kg, v_rim=69.74 m/s: ¼×0.100×69.74² =
+**121.59 J**, and I=½×0.100×0.030² = **4.5×10⁻⁵ kg·m²** — both reproduce
+the existing table's figures (§8, "The physics" table) to rounding.
+`CONFIRMED` (independently re-derived, matches existing document).
+
+Because the flywheel's rotation axis is vertical (Z) and `fw_bay_wall()` is
+the cylindrical wall surrounding the disk radially, the disk's **rim/edge**
+faces this wall — a radial-ejection event striking `fw_bay_wall()` is
+naturally an edge-on (rim-first) impact against that wall, not a flat/
+broadside one (a flat/broadside impact would instead load the axial
+surfaces — `base()` below and `containment_cap()` above — a materially
+different scenario already reflected in `bench-imu-01-manufacturing-spec.md`
+treating `fw_bay_wall()` as the **primary** containment surface for radial
+ejection and `containment_cap()` as **secondary/backup**. `CONFIRMED`
+(geometric fact from the `.scad` axis/wall layout) feeding an `ASSUMPTION`
+(edge-on is the representative failure geometry modeled here, not a
+guarantee no other release geometry is possible).
+
+#### 8.1.2 Wall impact / penetration estimate
+
+**Method 1 — notched-impact (Charpy) energy-density scaling.** Treats the
+wall as absorbing energy only through fracture toughness across a local
+punch-through area: `E_frac[J] = specific_toughness[kJ/m²] ×
+(containment_wall_t[mm] × w[mm]) / 1000`, where `w` is an assumed
+characteristic engagement length (the punch-through crack front's real
+combined axial+circumferential geometry is a fracture-mechanics detail
+beyond this bounded estimate — `w` is swept across a physically-anchored
+range rather than picked as one number). Lower anchor `w`=4.5mm = the
+disk's own thickness (`fw_t`, `CONFIRMED` from `.scad`) — the minimum a
+clean edge-on hit engages. Upper anchor `w`=60mm = the disk's own diameter
+(`fw_dia`, `CONFIRMED`) — a generous stand-in for a smeared/tumbling/
+multi-contact worst case. Material figures used (`ESTIMATE`-applicability,
+`CONFIRMED`-as-published — see §8.1.6):
+
+| Material (source) | Notched Charpy | Provenance |
+|---|---|---|
+| PETG, Prusament (DS-MTL-001) | ~6 kJ/m² (X-Y) / ~3 kJ/m² (Z) | AI-search-summary; PDF URL confirmed live, content unparsed |
+| PETG, Polymaker PolyMax (DS-MTL-002) | 11.6±0.8 kJ/m² (X-Y) / 2.4±0.6 kJ/m² (Z) | Directly fetched & read HTML TDS table |
+| Nylon PA12, Fiberlogy (DS-MTL-003) | ~12 kJ/m² | AI-search-summary; PDF URL confirmed live, content unparsed |
+
+| Engagement `w` | Area (t×w) | E_frac range (all materials above) | % of 121.60J |
+|---|---|---|---|
+| 4.5mm (disk thickness) | 18.0mm² | 0.043–0.216 J | 0.036%–0.18% |
+| 15mm | 60.0mm² | 0.144–0.720 J | 0.12%–0.59% |
+| 30mm (disk radius) | 120.0mm² | 0.288–1.440 J | 0.24%–1.18% |
+| 60mm (disk diameter) | 240.0mm² | 0.576–2.880 J | 0.47%–2.37% |
+
+Reverse cross-check — engagement length needed to consume the *entire*
+121.60J via fracture toughness alone, at a fixed 4.0mm depth: 2,533–12,667mm,
+i.e. **1,021%–5,104% of the wall's own full inner circumference (248.19mm,
+`CONFIRMED` from `.scad` r=39.5mm)** — several times all the way around the
+wall. This is not a physically meaningful "localized puncture," it is a
+mathematical statement that fracture-toughness-only absorption cannot come
+close to the disclosed energy at any localized footprint. `ESTIMATE`
+(method + range), arithmetic itself `CONFIRMED` by direct computation.
+
+**Method 2 — yield-strength-limited local plastic work.** Treats the wall
+as absorbing energy through plastic deformation up to its own thickness
+before local failure: `E_abs[J] = yield[MPa] × (t×w) × δ[mm] / 1000`, with
+deformation depth δ optimistically bounded at the full 4.0mm wall thickness
+(i.e. assumes the material can plastically work through its *entire* depth
+before losing containment — a generous assumption in the design's favor).
+
+| Material (source) | Tensile yield | Provenance |
+|---|---|---|
+| PETG, Prusament (DS-MTL-001) | ~46–50 MPa | AI-search-summary |
+| PETG, measured (DS-FAST-002, CNC Kitchen) | ~50 MPa | Directly fetched & read (cross-validates Prusament) |
+| PETG, Polymaker PolyMax X-Y (DS-MTL-002) | 37.9±1.4 MPa | Directly fetched & read HTML TDS table |
+| Nylon PA12, Fiberlogy (DS-MTL-003) | ~45 MPa | AI-search-summary |
+
+| Engagement `w` | Area (t×w) | E_abs range | % of 121.60J |
+|---|---|---|---|
+| 4.5mm | 18.0mm² | 2.73–3.60 J | 2.2%–3.0% |
+| 15mm | 60.0mm² | 9.10–12.00 J | 7.5%–9.9% |
+| 30mm | 120.0mm² | 18.19–24.00 J | 15.0%–19.7% |
+| 60mm (disk diameter) | 240.0mm² | 36.38–48.00 J | **29.9%–39.5%** |
+
+Reverse cross-check — engagement length needed at δ=4.0mm to consume the
+*entire* 121.60J: 152–201mm depending on material, i.e. **61%–81% of the
+wall's full circumference** would need to plastically yield through its
+whole thickness simultaneously — most of the entire wall, not a localized
+hit. `ESTIMATE` (method + range), arithmetic `CONFIRMED` by direct
+computation.
+
+**Real-world intuition comparable.** A regulation baseball (0.145kg) at
+40 m/s (~144 km/h, a hard-thrown pitch) carries 116.0J — within 5% of the
+disclosed 121.60J. A person would not casually assume a 4mm plastic wall
+reliably stops a baseball-speed/energy impact without testing; this is
+offered as an intuition check, not a calculation. `ESTIMATE` (illustrative
+only).
+
+**Caveats — three simplifications, not all pointing the same direction:**
+1. *High strain rate (non-conservative bias):* the cited Charpy/tensile
+   figures are quasi-static or low-rate test data. Most thermoplastics
+   (PETG and PA12 included) trend toward **lower** toughness / more
+   brittle behavior at high strain rates, and this containment event
+   (69.74 m/s rim speed) is a far higher rate than any standard Charpy or
+   tensile test. Real performance is plausibly **worse** than modeled
+   here. `ASSUMPTION` (directional, not quantified — no high-rate data
+   located for these specific materials).
+2. *FDM print vs. TDS coupon (non-conservative bias):* the cited figures
+   are manufacturer TDS values, generally measured on well-controlled
+   (often injection-molded or ideally-printed) specimens — not
+   necessarily this project's own eventual print run. `bench-imu-01-
+   manufacturing-spec.md` already documents this gap in detail (6-
+   perimeter/100%-infill recommendations exist specifically because a
+   real print can otherwise underperform bulk material figures). Real
+   performance is plausibly **worse** than modeled here, compounding
+   caveat 1. `ASSUMPTION`.
+3. *Impact angle, small-fragment sub-case only (conservative bias):* for
+   a small rim fragment released tangentially (not the whole-disk case
+   above) and traveling in a straight line to the wall, basic tangent-
+   geometry gives an impact angle of asin(30mm/39.5mm) ≈ **49.4° from the
+   wall's local normal** — an oblique, not square, hit. An oblique hit
+   delivers a smaller normal (penetrating) energy fraction than a square
+   hit; Methods 1–2 above assume a square hit throughout, so are
+   plausibly **conservative** (pessimistic) relative to this specific
+   sub-case. This is illustrative geometry for one simplified sub-case,
+   not a correction factor applied to the whole-disk numbers above.
+   `ESTIMATE` (exact trigonometry given the stated simplifying
+   assumptions; the assumptions themselves are simplifications).
+
+**Verdict — wall.** Across both methods and the full physically-anchored
+engagement-length sweep, local-material energy absorption accounts for
+**well under half of the disclosed 121.60J even in the most generous
+plausible case** (Method 2, 60mm engagement: ~30–40%; Method 1 at the same
+engagement: under 2.5%). The most favorable defensible number these methods
+support is roughly **a factor of ~2.5–3× short of the full budget**
+(Method 2, largest engagement); more typical/localized engagement
+assumptions or fracture-toughness-only reasoning put the shortfall at
+**one to somewhat over three orders of magnitude**. This does not prove the
+wall fails outright — global structural response (does the whole ring
+flex/redirect the impact rather than a small zone absorbing it locally?),
+strain-rate-specific data, and the actual as-printed material properties
+are all outside what a closed-form estimate can capture, and caveat 3 above
+points the other way for one specific sub-case. But it does **not support
+an affirmative "4.0mm is adequate" claim** either. **This is flagged
+separately to the Hardware Lead in §8.1.6 — it is not resolved by this
+subsection and no geometry has been changed.**
+
+#### 8.1.3 Fastener pull-out estimate
+
+**Single-insert pull-out capacity.** Real, checkable published/measured
+data for M3 brass heat-set inserts in PETG-class plastic (dimensions
+matching this design's assumed `heatset_od`=4.6mm/`heatset_len`=5.7mm,
+`CONFIRMED` from `.scad`, closely matching the real Ruthex RX-M3x5.7 part,
+DS-FAST-001):
+
+| Source | Insert / plastic | Pull-out (avg) | Provenance |
+|---|---|---|---|
+| CNC Kitchen (DS-FAST-002) | Ruthex M3 heat-set, PETG | ≈119 kg ≈ **1,167 N** (n=3) | Directly fetched & read primary source |
+| CNC Kitchen (DS-FAST-002) | Direct-thread-into-PETG (no insert) | ≈1,157 N | Same article, same read |
+| CNC Kitchen (DS-FAST-002) | Heli-coil, PETG | ≈1,177 N | Same article, same read |
+| Sculpteo guide (DS-FAST-003) | M3-class insert, MJF PA12 | ≈1,258 N | AI-search-summary; page fetched, table not renderable |
+
+A conservative round figure of **1,000 N per insert** is used below
+(below all four cited values, so it does not cherry-pick the best case).
+`CONFIRMED` (as published/measured for the cited real products); `ASSUMPTION`
+for applicability (this project has not finalized its actual insert brand
+or print material).
+
+**6-insert capacity scenarios** (`n_cap_bolts`=6, `CONFIRMED` from `.scad`):
+
+| Load-sharing assumption | Total capacity | Basis |
+|---|---|---|
+| Ideal / even sharing across all 6 | 6,000 N | `ASSUMPTION` (no data on real sharing efficiency for this joint) |
+| Reduced / ~3-bolt-effective (uneven load, cap flex) | 3,000 N | `ASSUMPTION` (engineering judgment, not a citation) |
+| Pessimistic / ~2-bolt-effective | 2,000 N | `ASSUMPTION` (engineering judgment, not a citation) |
+
+**Load-path reasoning.** `bench-imu-01-manufacturing-spec.md` establishes
+`fw_bay_wall()` as the **primary** containment surface for radial ejection
+and `containment_cap()` as **secondary/backup** (its skirt is only 2.0mm vs.
+the wall's 4.0mm, §8 above). This means the cap's fasteners are not the
+first line of defense against a direct radial hit — their realistic loading
+scenario is an **attenuated** one: whatever residual energy/force reaches
+the cap joint after the primary wall has already engaged (deflected,
+locally absorbed, or redirected) some fraction of the event, not
+necessarily the full undiminished 121.60J. Quantifying that attenuation
+fraction precisely would require a multi-body impact simulation this
+environment cannot run — `UNKNOWN` (not estimated further here) — but
+qualitatively, **any** realistic secondary/attenuated load is smaller than
+the full-direct-hit hypothetical below, so the fastener margin is better
+than the worst-case framing suggests.
+
+**Force vs. assumed stopping/crush distance** (work-energy, `F = E/δ`,
+deliberately pessimistic hypothetical: full 121.60J applied directly to the
+cap joint alone, ignoring any wall attenuation):
+
+| Assumed stopping distance δ | Required force F | vs. 6,000N ideal | vs. 3,000N reduced |
+|---|---|---|---|
+| 1 mm (near-rigid stop) | 121,600 N | 20.3× over | 40.5× over |
+| 5 mm | 24,320 N | 4.05× over | 8.1× over |
+| 20 mm | 6,080 N | ~1.01× (break-even ≈20.3mm) | 2.03× over |
+| 50 mm | 2,432 N | 0.41× (within capacity) | 0.81× (within capacity) |
+| 100 mm | 1,216 N | 0.20× (within capacity) | 0.41× (within capacity) |
+
+`δ` (assumed stopping/crush distance) is genuinely `UNKNOWN` without
+physical testing or FEA — swept rather than asserted. `ESTIMATE` (method +
+range); arithmetic `CONFIRMED` by direct computation.
+
+**Verdict — fasteners.** For the deliberately pessimistic full-direct-hit
+hypothetical, 6×M3 capacity (ideal sharing) is adequate only if the joint
+can give/crush over ≳20mm before failing — plausible for a joint with some
+give (o-ring/gasket compliance, local plastic deformation of the cap or
+skirt) but not `CONFIRMED`. For the **realistic, attenuated secondary-role
+loading** the load-path reasoning above supports, the margin is
+meaningfully better than this worst-case framing, because the actual force
+reaching the cap joint is very likely smaller than the full 121.60J
+hypothetical. Unlike the wall estimate (short by ~2.5× to orders of
+magnitude across all engagement assumptions), the fastener estimate is
+**plausible for its realistic/secondary loading role**, and only
+**marginal-to-inadequate for a hypothetical, pessimistic full-direct-hit
+scenario that the cap is not actually designed to be the primary defense
+against.**
+
+#### 8.1.4 Confidence ledger
+
+| Item | Value(s) | Confidence |
+|---|---|---|
+| Disk mass, diameter, thickness, rim speed, stored energy | 100g / 60.0mm / 4.5mm / 69.74 m/s / 121.60J | `CONFIRMED` (`.scad` + §8 table, independently re-derived) |
+| `containment_wall_t`, `fw_bay_inner_r`, wall height | 4.0mm / 39.5mm / 43.0mm | `CONFIRMED` (`.scad`) |
+| Heat-set insert dimensions, bolt count | 4.6mm OD / 5.7mm len / 6× M3 | `CONFIRMED` (`.scad`) |
+| Charpy/tensile figures as published (per material) | see §8.1.2 tables | `CONFIRMED`-as-published; `ASSUMPTION`-applicability (final print material/brand not yet chosen) |
+| Insert pull-out figures as published/measured | 1,157–1,258 N range, 1,000N used | `CONFIRMED`-as-published/measured; `ASSUMPTION`-applicability |
+| Engagement length `w`, deformation depth δ, stopping distance δ (fastener) | swept ranges, §8.1.2/§8.1.3 | `UNKNOWN` (true values need physical testing/FEA) — swept, not asserted |
+| 6-bolt load-sharing efficiency (ideal/reduced/pessimistic) | 6,000 / 3,000 / 2,000 N | `ASSUMPTION` (engineering judgment, no citation) |
+| Cap-joint attenuation fraction vs. full direct hit | not quantified | `UNKNOWN` (qualitative reasoning only, needs multi-body simulation to bound) |
+| High-strain-rate and FDM-vs-TDS-coupon directional bias | non-conservative (real performance likely worse) | `ASSUMPTION` (directional, not quantified) |
+| Oblique-impact-angle directional bias (small-fragment sub-case) | conservative (real performance for that sub-case likely better) | `ESTIMATE` (exact geometry given stated simplifications) |
+| Overall wall verdict | short by ~2.5× (best case) to 1–3+ orders of magnitude | `ESTIMATE` (engineering judgment, not a pass/fail certification) |
+| Overall fastener verdict | plausible for realistic/secondary role; marginal-to-inadequate for hypothetical full-direct-hit | `ESTIMATE` (engineering judgment, not a pass/fail certification) |
+
+#### 8.1.5 Tooling honesty — what this could not do
+
+No physical testing and no FEA/simulation tool exists in this environment
+(re-confirmed §8.1 opening). This means: no actual stress concentration,
+dynamic/high-rate material response, global structural (whole-ring)
+response, real print-quality effect, or multi-body cap-attenuation
+fraction could be computed — only closed-form, textbook-level estimates
+bounded by sensitivity sweeps. This mirrors the Manufacturing Engineer's
+own honest "cannot certify without physical testing" conclusion in
+`bench-imu-01-manufacturing-spec.md` — this subsection reaches the same
+kind of honest, bounded (not falsely precise) conclusion for the mechanical
+side specifically, rather than forcing an unsupported pass/fail number.
+
+#### 8.1.6 Escalation flag for the Hardware Lead (distinct from MISS-011)
+
+**This is a new finding, separate from MISS-011's own closure, and this
+Mechanical Lead has NOT changed any `.scad` geometry in response to it —
+per this task's explicit scope, that decision belongs to the Hardware
+Lead / human, not to this agent unilaterally.** §8.1.2's wall estimate
+does not support an affirmative "4.0mm containment_wall_t is adequate for
+the disclosed 121.60J load case" claim under either estimation method,
+across the full physically-anchored engagement-length range — the best
+defensible case is roughly 2.5–3× short of the full energy budget, and
+more typical assumptions put the shortfall at one to several orders of
+magnitude. This does not prove the wall fails (see caveats and limits
+in §8.1.2/§8.1.5), and it does not change the existing REQ-403 disposition
+above (containment is still better than no containment, and this was
+already an explicitly non-certified, human-gated proposal). It is raised
+here so the Hardware Lead can decide, with the human, whether this
+warrants: (a) proceeding as-is with this margin now disclosed
+quantitatively rather than only qualitatively, (b) commissioning actual
+physical drop/impact testing before relying on this design for powered
+operation above a certain speed, or (c) revisiting `containment_wall_t`
+or the containment topology — a decision this Mechanical Lead is
+deliberately not making unilaterally.
+
+#### 8.1.7 Disposition and handoff
+
+This subsection is a **proposed, bounded engineering estimate**, offered
+for Independent Mechanical Review to challenge — it is not self-certified
+or self-resolved. Per the same convention used throughout this project
+(no discipline closes its own reviewer-sourced finding), **MISS-011's
+Status remains OPEN**; `validation/open-issues.md` is updated only to
+note that a defensible estimate now exists and is proposed as ready for
+the Mechanical Reviewer's independent cross-check (see also §8.1.6's
+distinct escalation, which is a new item for the Hardware Lead, not part
+of MISS-011 itself).
+
 ---
 
 ## 9. Vibration isolation / REQ-307 disposition
@@ -1023,15 +1378,21 @@ inspection. Insert pocket depth (5.7mm) fits within the flange band's own
 8.0mm height, leaving 2.3mm of solid material above the insert's own
 bottom face and below the flange band's own top.
 
-No fastener-load (torque, pull-out, shear) calculation was performed for any
-joint — this is explicitly beyond Phase 1's basic-manufacturability/basic-
-fit scope; fastener **counts and positions** are engineering judgment,
-not computed from a load case. **(Tagged MISS-011, MEDIUM, non-gating —
-Independent Mechanical Review Cycle 3:** the Reviewer separately flagged
-this exact gap for the containment-cap joint specifically, given its safety-
-relevant duty (§8); the finding confirms this disclosure was already
-accurate rather than revealing a new one, and it is explicitly carried
-forward unresolved this revision — see §8's MISS-011 paragraph and §16.)
+No fastener-load (torque, shear) calculation was performed for any joint —
+this is explicitly beyond Phase 1's basic-manufacturability/basic-fit scope;
+fastener **counts and positions** are engineering judgment, not computed
+from a load case. **(Tagged MISS-011, MEDIUM, non-gating — Independent
+Mechanical Review Cycle 3:** the Reviewer separately flagged this exact gap
+for the containment-cap joint specifically, given its safety-relevant duty
+(§8); the finding confirms this disclosure was already accurate rather than
+revealing a new one, and it is explicitly carried forward unresolved this
+revision — see §8's MISS-011 paragraph and §16.) **Rev 3.2 update:** a
+bounded, non-certifying **pull-out** estimate for the containment cap's 6×M3
+heat-set-insert joint specifically has since been attempted at §8.1 (real
+published/measured pull-out data compared against a work-energy force
+estimate for the disclosed REQ-403 load case). Torque and shear still have
+no calculation of any kind for any joint — §8.1 narrows, but does not close,
+this gap.
 
 ---
 
@@ -1195,7 +1556,14 @@ specifically re-checked or changed.
    as originally computed — re-confirmed, not silently assumed still true.
    MISS-011 (fastener-load calculation gap, MEDIUM, non-gating) is now
    explicitly tagged in §12/§8 and carried forward, not resolved this
-   revision.
+   revision. **Rev 3.2 note:** a bounded, non-certifying pull-out-vs-load
+   estimate for this specific joint has since been attempted at §8.1 —
+   result: plausible for the joint's realistic/secondary loading role,
+   marginal-to-inadequate only for a hypothetical full-direct-hit worst
+   case. This narrows but does not close MISS-011 (still OPEN, proposed
+   for Mechanical Reviewer cross-check, not self-resolved) and does not
+   upgrade this checklist item's own ✅, which remains about placement/
+   duty-justification, not load-certification.
 6. **Wall thickness** — ✅ 2.0mm minimum held everywhere, with disclosed
    deliberate exceptions (4.0mm containment wall) and disclosed tight spots
    (2.0mm duct wall, 2.2mm insert-flange margin), §2/§11/§12/§13. **Rev 3.1
@@ -1204,6 +1572,16 @@ specifically re-checked or changed.
    subtracted, not its bore diameter or surrounding wall dimensions;
    MISS-010 removes material locally at 4 tab positions, §13) — this item's
    figures are unchanged and were re-confirmed unchanged, not left unchecked.
+   **Rev 3.2 note:** this item's own ✅ is about structural-adequacy-in-
+   general and manufacturability, not a load-specific certification for
+   the containment wall specifically — §8.1's bounded estimate finds the
+   4.0mm `containment_wall_t` does **not** carry an affirmative "adequate
+   against the disclosed 121.60J load case" claim (short by roughly 2.5×
+   in the best case to 1–3+ orders of magnitude under more typical
+   assumptions). This is escalated separately to the Hardware Lead (§8.1.6)
+   and does not itself flip this checklist item's ✅ (2.0mm-minimum/
+   manufacturability holds regardless), but the Reviewer should read this
+   item together with §8.1, not in isolation.
 7. **Assembly order** — ✅ re-derived 6-step sequence for 3 pieces, no
    trapped parts, §14. **Rev 3.1 re-check:** Steps 4 (wire routing) and 5
    (disk-onto-collar) — the two steps Cycle 3 specifically called into
@@ -1239,6 +1617,18 @@ so the Reviewer can see this Mechanical Lead did not silently skip checking
 whether the 3 fixes had second-order effects on the other 7 checklist items,
 not because those items themselves were expected to change.
 
+**Rev 3.2 addendum to this self-check:** the "unaffected/still-valid" framing
+above describes items 5 and 6's status **against the 3 Rev-3.1 fixes**
+specifically (MISS-008/009/010) — that part remains true. It does **not**
+mean items 5/6 are unaffected by Rev 3.2's own new §8.1 content: both now
+carry a "Rev 3.2 note" (above) flagging that §8.1's bounded estimate finds a
+real, disclosed margin concern on the containment wall, separately escalated
+to the Hardware Lead. Read items 5 and 6 together with §8.1, not as still
+fully "clean" in the load-adequacy sense — their ✅ marks continue to certify
+only what this checklist item has always meant (placement/duty-justification
+for item 5; minimum-thickness/manufacturability for item 6), not a new
+load-certification neither item ever claimed to provide.
+
 ---
 
 ## 16. Open UNKNOWNs / ASSUMPTIONs carried forward
@@ -1257,7 +1647,7 @@ not because those items themselves were expected to change.
 | Motor-wire-bridge span (9.0–9.42mm) and duct-wall thickness (exactly 2.0mm) | Disclosed, compliant | Identified during Rev 3 authoring; within stated rules, no fix required; unrelated to and unchanged by the Rev 3.1 Cycle-3 rework |
 | REQ-308 envelope overrun (8.0–13.7% over the ~150mm-class soft ceiling) | Disclosed trade-off | Judged acceptable given the physical lower bound argument in §3. **Rev 3.1 note:** this overrun figure was for X/Y footprint only, which is unaffected by the Cycle-3 fixes (all 3 are Z-only/internal/inset); not recomputed, since nothing changed that it depends on. |
 | Total assembly mass / structural deflection under motor+flywheel load | ESTIMATE (mass only), no deflection analysis | Basic qualitative judgment only (≈130g motor+flywheel on a solid PETG boss/platform judged modest); no FEA, out of Phase 1 scope |
-| Containment cap's actual impact/penetration resistance | Not analyzed | §8/§13 explicitly disclose this as a reasoned structural choice, not a certified containment analysis. **Tagged MISS-011 (MEDIUM, non-gating)** — Independent Mechanical Review Cycle 3 separately confirmed this exact gap for the fastener side of the same joint (6×M3/heat-set-insert adequacy, no pull-out/shear calculation, §12); carried forward explicitly disclosed, not resolved this revision. |
+| Wall impact/penetration and cap fastener pull-out under the REQ-403 load case | **Bounded estimate attempted, Rev 3.2 (§8.1)** — still not certified/resolved | §8/§13 disclose the 4.0mm wall / 6×M3 fastener choice as reasoned structural judgment, not a certified containment analysis. **Tagged MISS-011 (MEDIUM, non-gating)** — Independent Mechanical Review Cycle 3 confirmed this gap for both the wall and the fastener side of the containment-cap joint (no pull-out/shear calculation, §12). **Rev 3.2:** a bounded, closed-form wall-impact estimate (two methods) and a fastener pull-out-vs-load estimate were attempted at §8.1, using real published/measured material and fastener data (6 new Evidence IDs, `datasheets/evidence-log.md`). Wall: does not support an affirmative "adequate" claim (short by ~2.5× best case to 1–3+ orders of magnitude, method-dependent) — separately escalated to the Hardware Lead at §8.1.6, no geometry changed. Fasteners: plausible for the realistic/secondary loading role, marginal-to-inadequate only for a hypothetical full-direct-hit worst case. Proposed as ready for Independent Mechanical Review's cross-check; **not self-resolved** — MISS-011 Status remains OPEN in `validation/open-issues.md`. |
 
 **Nothing above is being silently relied upon as if it were CONFIRMED** —
 this table exists specifically so Independent Mechanical Review and the

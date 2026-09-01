@@ -5868,3 +5868,507 @@ but it does not reopen or block MISS-012.
   rationale (not the Manufacturing Engineer's say-so). MISS-014 stays OPEN
   and routes back to the Manufacturing Engineer for the 2 remaining rows
   specifically — no other rework is required on this document.
+
+## Mechanical Reviewer — MISS-011 Closure Attempt Independent Cross-Check + Wall-Margin Escalation Assessment, 2026-09-13
+
+### Review Cycle Metadata
+
+- **Document reviewed**: `hardware/mechanical/bench-imu-01-dimensional-spec.md`
+  Rev 3.2 — specifically the new §8.1 ("MISS-011 closure attempt,"
+  subsections 8.1.1–8.1.7, ~320 new lines), authored by the Mechanical Lead
+  as an **analysis-only** revision (`.scad` unchanged) attempting MISS-011's
+  Recommended Fix path (a): a bounded, hand-derived engineering estimate of
+  whether the 4.0mm `containment_wall_t` wall and 6×M3 heat-set-insert cap
+  fasteners can plausibly absorb/withstand the disclosed REQ-403 load case
+  (121.60J at 69.74 m/s rim speed, 100g disk).
+- **Trigger**: Hardware Lead request, two parts — (1) independently verify
+  whether this closure attempt is sound engineering (method, arithmetic,
+  citations, confidence-honesty), not just whether "the arithmetic checks
+  out"; (2) independently decide how the new "wall falls short of budget"
+  information surfaced at §8.1.6 should be tracked, per this repository's
+  rule that a design role cannot self-log a finding about its own work into
+  `validation/open-issues.md`.
+- **Independence framing**: The Hardware Lead disclosed they had already
+  spot-verified significant parts of this themselves (the core Method 1/
+  Method 2 arithmetic, the CNC Kitchen article's DS-FAST-002 figures, and 5
+  cited `.scad` constants). Per this role's independence mandate, none of
+  that was taken on faith here — every item was independently re-derived
+  from primary sources this cycle, including the two datasheets
+  (DS-MTL-002, DS-FAST-003) the Hardware Lead explicitly flagged as *not*
+  personally re-checked, plus full independent coverage of the other four
+  (DS-MTL-001/003, DS-FAST-001/002), a fresh from-scratch arithmetic
+  re-derivation (not a re-read of the document's own computed tables), and
+  a deeper confidence-labeling audit than either the Mechanical Lead's own
+  self-check or the Hardware Lead's spot-check reached.
+
+### Scope discipline check
+
+- `git status --short` / `git diff --stat HEAD`: `hardware/mechanical/
+  bench-imu-01-enclosure.scad` shows **zero** uncommitted changes — the
+  Mechanical Lead's "no `.scad` geometry changed" claim is independently
+  confirmed, not just trusted.
+- `validation/open-issues.md`'s only diff this revision is a **single
+  in-place edit to MISS-011's own existing row** (its Notes cell gained the
+  "Rev 3.2 update" paragraph; its Status cell is untouched, still `OPEN`) —
+  confirmed via `git diff` showing exactly one 7-line-for-7-line hunk at
+  that row, and independently re-read against the row's current full text.
+  No new row was self-created and no other row's Status/Severity was
+  touched — consistent with the required no-self-tracking convention (a
+  design role may append a status note to its own already-open finding,
+  but may not open or close a tracked finding unilaterally).
+- `hardware/mechanical/bench-imu-01-dimensional-spec.md`'s diff (436 lines
+  changed, 420 insertions/24 deletions) resolves into exactly 6 hunks: a
+  top-of-file Rev 3.2 changelog/status banner, the §8.1 insertion itself,
+  and small cross-reference-only additions to §12, §15 (2 hunks), and §16 —
+  all in the locations the changelog itself discloses, all consistent with
+  what was independently read in full this cycle. No undisclosed edit to
+  §4's authoritative confidence tables, or to any other pre-existing
+  section, was found.
+- **Conclusion: scope discipline holds completely.**
+
+### 1. Independent arithmetic re-derivation
+
+Every computed figure in §8.1 was re-derived from scratch in an independent
+Python session, not re-read from the document's own tables:
+
+- Base physics: `KE = ¼·m·v_rim²` and `I = ½mr²` recomputation — 121.59–
+  121.60J, 69.74 m/s, I=4.5×10⁻⁵ kg·m² — matches exactly.
+- Method 1 (Charpy/fracture-toughness energy density): full
+  `E_frac = specific_toughness × (t × w) / 1000` table across the stated
+  engagement sweep, plus its reverse cross-check (solve for the engagement
+  width `w` needed to absorb the full 121.60J at fixed t=4.0mm) —
+  reproduced 2,533–12,667mm / 1,021%–5,104% exactly.
+- Method 2 (yield-strength-limited local plastic work): full table plus
+  reverse cross-check — reproduced 152.00–200.53mm / 61%–81% exactly, i.e.
+  the document's stated "152–201mm" / "61%–81%."
+- Baseball-comparable sanity check (116.0J / 95.4%), the oblique-impact
+  trigonometry (49.4°), the fastener `F = E/δ` table and its ≈20.3mm
+  breakeven point, and all 5 pull-out-force kg→N conversions — all
+  reproduced exactly.
+- **One self-caught error, disclosed transparently**: my first pass at
+  Method 2's reverse cross-check did not match the document (I had omitted
+  the `t=4.0mm` factor from one line of my own script). Re-deriving the
+  formula from the same first principles stated in the document
+  (`w = KE_full × 1000 / (yield × t × δ)`) rather than assuming either my
+  script or the document was wrong, the corrected computation reproduces
+  the document's stated figures exactly. This was my own transcription
+  bug, not a document error — disclosed here as evidence of how this
+  verification was actually performed (recomputing from first principles
+  until independently consistent, not pattern-matching against the
+  document's own numbers), not to imply residual doubt about this figure.
+- **Result: zero arithmetic discrepancies found anywhere in §8.1.** Every
+  number checks out exactly against an independent, from-scratch
+  recomputation.
+
+### 2. Independent datasheet/citation spot-check
+
+All 6 new Evidence IDs registered this revision were independently
+re-verified against live or freshly-searched primary sources (not merely
+re-read from `datasheets/evidence-log.md`'s own summary text):
+
+| Evidence ID | Source | Method this cycle | Result |
+|---|---|---|---|
+| DS-MTL-002 | Polymaker PolyMax PETG TDS | Direct fetch | Exact match (Charpy Z-direction figure used as the pessimistic anchor) |
+| DS-FAST-003 | Sculpteo insert pull-out guide | Direct fetch | Exact match |
+| DS-MTL-001 | Prusament PETG TDS | Web search | Charpy figure exact; tensile range off by ~1MPa — immaterial, since tensile strength is not the limiting figure either method actually uses |
+| DS-MTL-003 | Fiberlogy PA12 TDS | Web search | Exact match |
+| DS-FAST-002 | CNC Kitchen pull-out test article | Direct fetch (independently re-fetched, not taken on the Hardware Lead's own say-so) | Exact match on all 5 pull-out values (118/119/120/86/166 kg) |
+| DS-FAST-001 | Ruthex RX-M3x5.7 product page | Metadata-file review | Explicitly scoped as illustrative dimensional corroboration only, not a load-bearing numeric input to any calculation; disclosure is appropriately modest ("almost exactly," not overclaiming) |
+
+DS-MTL-002 and DS-FAST-003 were the two the Hardware Lead explicitly
+flagged as not personally re-checked — both are independently confirmed
+here. The remaining four were checked anyway for full independent
+coverage, per this role's mandate not to accept a partial spot-check as
+sufficient just because *some* verification already occurred.
+
+`.scad` constants cited in §8.1 (`fw_dia`=60.0, `fw_t`=4.5, `n_cap_bolts`=6,
+`heatset_od`=4.6, `heatset_len`=5.7) were independently re-grepped from the
+live source file and match as cited in every case.
+
+### 3. Method-validity assessment (the harder Part 1 question)
+
+Verifying the arithmetic is not sufficient. Independently assessed whether
+treating wall failure as **either** pure fracture-toughness-limited (Method
+1) **or** pure yield-limited local plastic work (Method 2) — both
+purely-local/small-zone absorption models — is a reasonable **bounding**
+approach, or whether it misses something more fundamental that would
+change the picture:
+
+- **Print-orientation cross-check (favors the document's framing)**:
+  `bench-imu-01-manufacturing-spec.md` §4 specifies `fw_bay_wall()` printed
+  floor-down specifically so the wall forms continuous XY circumferential
+  loops facing a radial strike, explicitly rejecting a sideways orientation
+  because it "would turn the cylindrical wall into layer-to-layer
+  laminations loaded more directly across weaker interlayer bonds." This
+  is a genuine, already-reasoned mitigation (in a cross-referenced sibling
+  document) for the layer-adhesion-vs-radial-impact-direction concern, and
+  directly supports using XY-direction (not Z-direction) material
+  properties as representative of local puncture initiation — which is
+  what Methods 1 and 2 both do.
+- **Material-property range is not cherry-picked**: Method 1's Charpy
+  sweep still includes the pessimistic Z-direction Polymaker figure as its
+  low anchor and a different, stronger material (PA12) as its high anchor
+  — a legitimate swept range spanning favorable-to-unfavorable print
+  directions, not a range picked to reflect only the favorable case.
+- **Elongation-at-break argument against a hidden "global ductility"
+  reservoir**: Considered whether a global ring/hoop-membrane stretching
+  effect is a favorable factor the document under-weights. The cited
+  material's own low elongation-at-break (~3–5%, DS-MTL-002) rules out a
+  large hidden ductile-stretching reserve — this **supports**, rather than
+  undermines, the document's local/brittle-failure-dominated framing as a
+  reasonable bound, not an oversight.
+- **One reinforcing (not contradicting) nuance identified**: post-initiation
+  crack propagation could preferentially run along the weak Z-axis/
+  interlayer direction ("unzipping" the wall vertically) even if initial
+  puncture resistance is reasonably XY-like. This is a real consideration
+  not named explicitly by that description, but it is already generically
+  covered by the document's own disclosed scope limit ("the punch-through
+  crack front's real combined axial+circumferential geometry is a
+  fracture-mechanics detail beyond this bounded estimate," §8.1.2). It is a
+  pessimistic-leaning elaboration within an already-disclosed limitation,
+  not a hidden gap the document failed to flag at all.
+- **Conclusion: the two-method bounding approach is a reasonable,
+  legitimate first-pass engineering bound**, given no FEA or physical-test
+  tool exists in this environment. No missing favorable argument was found
+  that would meaningfully close the gap — if anything, this independent
+  investigation reinforces the concerning direction of the document's own
+  conclusion rather than undermining it.
+
+### 4. Confidence-labeling audit (deeper than expected — new finding)
+
+The Hardware Lead's own spot-check confirmed the cited `.scad` constants
+*match* what §8.1 says they are; this cycle went one step further and
+independently checked whether §8.1's *confidence labels* on those same
+constants match this document's own established taxonomy — and found a
+systemic defect.
+
+Every `CONFIRMED` occurrence inside §8.1 was independently enumerated (19
+total instances via a full-section grep) and cross-checked against its true
+provenance in §4.1/§4.4 (this document's own authoritative confidence
+tables) and, where present, the `.scad` file's own inline comments:
+
+- **8 of the 19 instances are genuinely mislabeled** — 5 inline prose
+  mentions (§8.1.2 lines ~800 `fw_t`, ~802 `fw_dia`, ~822 `fw_bay_inner_r`;
+  §8.1.3 lines ~917 `heatset_od`/`heatset_len`, ~933 `n_cap_bolts`) plus all
+  **3** rows of §8.1.4's confidence ledger (lines 991–993), bundling
+  roughly 10 distinct parameter values, none of which is actually
+  `CONFIRMED` per §4.1/§4.4:
+  - Ledger row (disk mass/`fw_dia`/`fw_t`/rim speed/stored energy, line
+    991): mass is `ESTIMATE` (§4.1 line 350), `fw_dia` is `ASSUMPTION`
+    (§4.1 line 347, §4.4 line 404, and the `.scad` file's own comment),
+    `fw_t` is `ASSUMPTION` (§4.1 line 347), and rim speed/stored energy are
+    `DERIVED` from these — none independently `CONFIRMED`. These are the
+    **identical** 121.60J/69.74 m/s figures MISS-014 already found
+    mislabeled `CONFIRMED` in the sibling manufacturing-spec document and
+    corrected to `ESTIMATE` (resolved 2026-09-11); the same mistake, on
+    the same figures, has now recurred in this document's own new §8.1.
+  - Ledger row (`containment_wall_t`/`fw_bay_inner_r`/wall height, line
+    992): `containment_wall_t` is `ESTIMATE` (§4.4 line 411), `fw_bay_inner_r`
+    is `DERIVED` (§4.4 line 410, and the `.scad` file's own comment "//
+    DERIVED = 39.5mm"), and wall height (`fw_wall_h`) is a formula of two
+    further `DERIVED` quantities with `ASSUMPTION`-tainted ancestry — none
+    `CONFIRMED`.
+  - Ledger row (heat-set insert dimensions/bolt count, line 993):
+    `heatset_od`/`heatset_len` are `ASSUMPTION` (§4.4 line 418, and the
+    `.scad` file's own comments, verbatim: "ASSUMPTION -- generic brass
+    heat-set insert" / "ASSUMPTION, same sourcing caveat as heatset_od"),
+    and `n_cap_bolts` is `ESTIMATE` (§4.4 line 417) — none `CONFIRMED`.
+- **11 of the 19 instances are legitimate, correctly-scoped uses** —
+  tool-absence disclosure, a genuine `.scad`-level geometric-topology fact
+  (rotation-axis orientation, a structural fact independent of any numeric
+  dimension's own certainty), "arithmetic `CONFIRMED` by direct
+  computation" (used correctly 4 times), and — notably — the Charpy/tensile
+  and pull-out-force citation rows, which correctly separate "is this
+  figure accurately transcribed from a real published/measured source"
+  (`CONFIRMED`) from "does it apply to this project's final, not-yet-chosen
+  print material/insert brand" (`ASSUMPTION`). This proves the document's
+  author does understand the taxonomy's distinctions elsewhere in this
+  same section — the defect is specifically confined to the ~10
+  pure-geometry/kinematic constants named above, not a wholesale
+  misunderstanding.
+- **Supporting evidence for how this slipped through**: §15's Rev 3.2
+  self-check addendum explicitly revisited checklist items 5 (fastener
+  placement) and 6 (wall thickness) to account for the new §8.1 content,
+  but did **not** revisit item 10 (traceability) against that same new
+  content — a process gap that directly explains how a confidence-labeling
+  defect escaped the Mechanical Lead's own self-check while the design
+  arithmetic itself did not.
+
+This is logged as a new finding (MISS-017, MEDIUM) below — see "Findings."
+
+### 5. Other observation (not separately tracked)
+
+While cross-referencing §12/§13/§15/§16 for consistency with §8.1, §13.3
+was found to contain a **stale, now-contradicted disclosure**: it states
+"No print-orientation-dependent structural weakness (layer-adhesion
+direction vs. load direction) analysis was performed for the containment
+cap's own impact-resistance role (§8) — this is disclosed as a real gap."
+`bench-imu-01-manufacturing-spec.md` line 51 now contains exactly this
+analysis for `containment_cap()` ("Print with the cap installed orientation
+preserved... so... the likely radial fragment impact into the sidewall/
+skirt is carried primarily in-layer rather than through Z-layer adhesion,"
+with an explicit FDM-anisotropy rationale) — this document simply was not
+updated to reflect it. **Not elevated to its own tracked `MISS-XXX`
+finding** in this cycle: it is LOW severity under §7.1 (a stale
+cross-reference, not a hazard — if anything the *true* current state is
+*more* analyzed than the stale sentence claims, not less), it is tangential
+to both of the two things this review cycle was specifically asked to
+adjudicate, and elevating every low-severity documentation-currency nit
+found during a full pass to its own permanent backlog row would dilute
+focus on the two substantive findings below out of proportion to its
+severity. Recorded here transparently so it is not lost; Mechanical Lead
+should fix the stale sentence in a future revision touching §13.3.
+
+### Findings
+
+#### Finding 1 — MISS-016 (HIGH): quantified wall energy-absorption shortfall against the disclosed REQ-403 load case
+
+- **Issue**: §8.1.2's two independent hand-calc methods (Charpy/
+  fracture-toughness energy-density scaling, and yield-strength-limited
+  local plastic work), each swept across a physically-anchored engagement-
+  length range (4.5mm = disk thickness, to 60mm = disk diameter), both
+  conclude the 4.0mm `containment_wall_t` wall's local material cannot
+  plausibly absorb the disclosed 121.60J REQ-403 load case. Method 1
+  (Charpy) yields 0.576–2.880J absorbable — only ~0.5%–2.4% of budget, a
+  shortfall of 1 to 3+ orders of magnitude. Method 2 (yield) is more
+  favorable but still short: 36.38–48.0J, i.e. at best ~30%–40% of budget
+  at the largest (60mm, full-disk-diameter) engagement length, falling to a
+  much smaller fraction at the more physically-typical, localized
+  engagement widths closer to the disk's own 4.5mm thickness. Under
+  neither method, across the entire swept range, does the wall's local
+  material plausibly absorb the full disclosed energy budget.
+- **Rationale**: Independently re-derived from scratch (see "1. Independent
+  arithmetic re-derivation" above) — the shortfall is not a document error;
+  it is the actual, correctly-computed result of two independent,
+  method-appropriate hand calculations using real, independently-verified
+  material-property citations (DS-MTL-001/002/003), swept across a range
+  whose endpoints are themselves tied to real, `.scad`-confirmed geometric
+  dimensions (disk thickness/diameter), not arbitrarily chosen. Independently
+  assessed the method itself (see "3. Method-validity assessment" above)
+  and found no missing favorable global-structural argument that would
+  close this gap — the material's own low elongation-at-break argues
+  against a hidden ductile-hoop-stretching reserve, and the print-
+  orientation choice implicitly assumed by the calculation (XY-direction
+  properties) is itself the favorable case already reflected in the
+  cross-referenced manufacturing-spec's actual print plan, not a
+  pessimistic assumption layered on top of it.
+- **Datasheet Source**: `bench-imu-01-dimensional-spec.md` §8.1.2 (Methods
+  1 & 2 tables and verdict prose, independently re-derived this cycle,
+  exact arithmetic match); DS-MTL-001 (Prusament PETG TDS), DS-MTL-002
+  (Polymaker PolyMax PETG TDS), DS-MTL-003 (Fiberlogy PA12 TDS) — all
+  independently re-fetched/re-searched this cycle (see "2. Independent
+  datasheet/citation spot-check" above).
+- **Failure Mechanism**: If a hub-collar-release event occurs as
+  characterized by REQ-403's own disclosed hazard figure (121.60J at
+  69.74 m/s rim speed, 100g disk — the credible no-load-high case already
+  established in §8's pre-existing physics table), the wall's local
+  material at the impact zone must absorb that energy via some combination
+  of elastic deflection, plastic deformation, and fracture-toughness-
+  limited crack growth before punch-through. Both independent bounding
+  methods show the wall's total absorbable energy across its entire
+  physically-plausible engagement footprint falls short of that budget —
+  meaning a full-energy, single-point radial impact as characterized is
+  not shown to be contained by the wall's local material alone, under
+  either estimation method, anywhere in the swept range.
+- **Affected Component**: Containment wall (`fw_bay_wall()`,
+  `containment_wall_t`=4.0mm, `bench-imu-01-enclosure.scad`); REQ-403
+  safety disposition (`bench-imu-01-dimensional-spec.md` §8, §8.1).
+- **Recommended Fix**: Not a decision for Mechanical Reviewer or Hardware
+  Lead to make unilaterally — per §8.1.6's own escalation framing and this
+  project's HITL-gate convention (`docs/workflow.md` §3,
+  `docs/architecture.md` §8). Present this quantified margin transparently
+  to the human alongside the rest of REQ-403's disposition material at the
+  safety-review gate, explicitly disclosing that neither method supports
+  an affirmative "the wall is adequate" conclusion under the disclosed
+  load case. The three substantive resolution paths available to the
+  human — none of which should be selected by an AI agent without explicit
+  human sign-off — are: (1) accept the disclosed, quantified risk and
+  proceed under a named-human `ACCEPTED-RISK` disposition with written
+  rationale (per this file's own convention); (2) commission physical
+  drop-weight/impact testing of a representative printed wall section
+  before relying on this design for REQ-403's safety claim; or (3) revisit
+  `containment_wall_t` (increase thickness) or the containment topology
+  itself, then re-run this same bounded estimate against the revised
+  geometry.
+- **Severity**: **HIGH.** Per `docs/architecture.md` §7.1's literal
+  definitions: the hub-collar-release event this estimate addresses is
+  itself an abnormal/fault condition, not "normal/expected operating
+  conditions as designed" (§7.1's CRITICAL bar) — it matches HIGH's "likely
+  malfunction or reliability failure under realistic conditions/corners"
+  instead. This also matches this project's own established precedent:
+  MISS-008 (CRITICAL) was an independently-*proven*, demonstrated
+  geometric defect (a confirmed solid-solid interpenetration); MISS-011/
+  MISS-012 (MEDIUM/HIGH at their own time) were realistic, quantified risks
+  without physical/FEA proof of actual failure. This finding is a bounded,
+  honestly-caveated `ESTIMATE` with genuine two-directional uncertainty
+  (the document itself discloses it "does not prove the wall fails
+  outright," and at least one identified simplification — square-on vs.
+  true oblique impact geometry — is conservative in the design's favor)
+  and no physical/global-structural proof of failure either way — matching
+  the HIGH epistemic category, not CRITICAL.
+
+#### Finding 2 — MISS-017 (MEDIUM): systemic confidence-mislabeling across §8.1's ledger and inline citations
+
+- **Issue**: §8.1.4's confidence ledger contains 3 rows, each tagged
+  `CONFIRMED` (2 as `CONFIRMED (.scad)`, one as `CONFIRMED (.scad + §8
+  table, independently re-derived)`), bundling roughly 10 distinct
+  parameter values. Cross-referencing each against this same document's
+  own §4.1/§4.4 authoritative confidence tables (and, where present, the
+  `.scad` file's own inline comments) shows **none** of these values is
+  actually `CONFIRMED`. The identical mislabeling pattern recurs at 5
+  further inline prose mentions elsewhere in §8.1.2/§8.1.3 restating these
+  same parameters. Full detail in "4. Confidence-labeling audit" above.
+  This is **not** a claim that §8.1 misuses `CONFIRMED` everywhere — 11 of
+  19 total `CONFIRMED` instances in the section are correct, scoped uses,
+  proving the author understands the taxonomy elsewhere; the defect is
+  specifically confined to the ~10 pure-geometry/kinematic constants named
+  above.
+- **Rationale**: `mechanical-design.instructions.md` prohibits a computed/
+  bundled value from silently inheriting the most-favorable confidence
+  label from a mix of inputs — a rule this same document's own §4 tables
+  (and, per MISS-014's precedent, the sibling manufacturing-spec document,
+  once corrected) already follow correctly elsewhere. §8.1's ledger and its
+  inline echoes do not follow it. §15's Rev 3.2 self-check addendum
+  explicitly revisited checklist items 5 and 6 for the new §8.1 content but
+  not item 10 (traceability) — directly explaining how this escaped the
+  Mechanical Lead's own self-check even though the underlying arithmetic
+  did not have any error.
+- **Datasheet Source**: `bench-imu-01-dimensional-spec.md` §4.1 line 347
+  (`fw_t`/disk description, `ASSUMPTION`) and line 350 (total assembly
+  mass, `ESTIMATE`); §4.4 lines 404 (`fw_dia`, `ASSUMPTION`), 410
+  (`fw_bay_inner_r`, `DERIVED`), 411 (`containment_wall_t`, `ESTIMATE`), 417
+  (`n_cap_bolts`, `ESTIMATE`), 418 (`heatset_od`/`heatset_len`,
+  `ASSUMPTION`); `bench-imu-01-enclosure.scad` lines 467 (`fw_bay_inner_r`,
+  "// DERIVED"), 485 (`heatset_od`, "// mm. ASSUMPTION"), 489
+  (`heatset_len`, "// mm. ASSUMPTION, same sourcing caveat"); §8.1.4 ledger
+  rows (lines 991–993) and inline mentions (lines ~800, 802, 822, 917,
+  933); precedent `validation/open-issues.md` MISS-014 (identical error
+  category, same 121.60J/69.74 m/s figures, in the sibling
+  manufacturing-spec document).
+- **Failure Mechanism**: A reader — including the human at the REQ-403
+  HITL gate this material is headed toward — skimming §8.1.4's ledger or
+  the inline `CONFIRMED` tags could reasonably conclude the disk, wall, and
+  fastener/insert geometry values are independently measured/certain
+  facts, when each is actually an `ASSUMPTION`, `ESTIMATE`, or `DERIVED`
+  value (often `DERIVED` from further `ASSUMPTION`/`ESTIMATE` ancestors).
+  This understates the true compounded uncertainty behind a wall-margin
+  estimate whose own central finding (MISS-016) is already concerning — a
+  reader could mistakenly treat the *inputs* to that estimate as more solid
+  than they are, even though (per the Method-validity assessment above)
+  this mislabeling does not itself change any of MISS-016's computed
+  figures or conclusions.
+- **Affected Component**: `bench-imu-01-dimensional-spec.md` §8.1.4
+  confidence ledger (3 rows) and 5 supporting inline citations in §8.1.2/
+  §8.1.3 (documentation/rigor only — no `.scad` geometry or arithmetic is
+  affected).
+- **Recommended Fix**: Re-label per true provenance, consistent with
+  §4.4's own already-correct labels and the exact pattern MISS-014 already
+  established and applied successfully in the sibling manufacturing-spec
+  document: `ASSUMPTION` for `fw_dia`/`fw_t`/`heatset_od`/`heatset_len`;
+  `ESTIMATE` for disk mass/`containment_wall_t`/`n_cap_bolts`; `DERIVED`
+  (or `ESTIMATE`, showing lineage) for rim speed/stored energy/
+  `fw_bay_inner_r`/wall height. This is a small, focused, same-pattern
+  documentation fix — it does not require re-running any arithmetic in
+  §8.1, since none of MISS-016's actual computed conclusions depend on
+  these labels being correct, only a reader's perception of certainty does.
+- **Severity**: **MEDIUM.** Per `docs/architecture.md` §7.1: "Deviates from
+  recommended practice, raises risk, doesn't clearly break function."
+  Matches MISS-014's own precedent exactly (identical error category, same
+  non-gating disposition) — does not change any physical figure or
+  engineering conclusion, but could mislead a reader about the actual
+  certainty of a safety-adjacent estimate's inputs.
+
+### Positive Findings
+
+- The closure attempt's core engineering substance is sound: two
+  independently-appropriate hand-calc methods, correctly executed, using
+  real (not fabricated) material and fastener property citations, swept
+  across a physically-anchored (not arbitrary) range.
+- Every one of the 6 new Evidence IDs registered this revision corresponds
+  to a real, independently-checkable, accurately-transcribed source — no
+  fabricated or misattributed citation was found anywhere.
+- The caveats disclosed in §8.1.2/§8.1.5/§8.1.6 are honest and
+  appropriately two-out-of-three pessimistic (Charpy-range endpoints span
+  both favorable and unfavorable print directions; the oblique-impact and
+  crack-front-geometry simplifications are explicitly named as scope
+  limits, not silently assumed away).
+- The load-path reasoning distinguishing the wall's primary role from the
+  cap fasteners' realistic secondary/attenuated role (§8.1.3) is
+  independently confirmed consistent with the already-established primary/
+  secondary containment-surface determination in
+  `bench-imu-01-manufacturing-spec.md`.
+- Scope discipline is complete: zero unauthorized `.scad` changes, zero
+  unauthorized `open-issues.md` row creation/closure, and no undisclosed
+  edit anywhere else in the repository.
+- The Mechanical Lead explicitly declined to self-certify MISS-011's
+  closure or unilaterally act on its own concerning result — both left
+  correctly for independent review and human escalation respectively.
+
+### Verdict
+
+- **Verdict**: **CONDITIONAL** (not FAIL — the closure attempt itself, as a
+  piece of engineering work, is sound and requires no rework; not a clean
+  PASS — this cycle surfaces one new HIGH finding that must go to the human
+  and one new MEDIUM finding that loops back to the Mechanical Lead).
+- **Open CRITICAL count**: 0.
+- **Open HIGH count**: 1 — **MISS-016 (new this cycle)**. Resolution
+  authority rests with the human (per §8.1.6 and this project's HITL-gate
+  convention), not with an AI agent in this project.
+- **Open MEDIUM count (non-gating)**: 1 — **MISS-017 (new this cycle)**.
+  Routes back to the Mechanical Lead for a small, same-pattern relabeling
+  fix; does not block presenting REQ-403's material to the human.
+- **MISS-011 disposition**: **RESOLVED.** MISS-011 was about the *absence*
+  of a calculation tying the wall/fastener adequacy claims to the
+  disclosed ~122J/100g hazard figure ("Recommended Fix path (a): perform a
+  basic impact-energy/wall-deflection or fastener-pull-out-under-shock
+  estimate"), not about achieving a reassuring result. A genuine, honest,
+  independently-verified calculation now exists — arithmetic confirmed
+  exactly, citations confirmed accurate, method independently assessed as
+  a defensible bound — and that satisfies MISS-011's own original ask in
+  full, even though the result itself is concerning. This exactly mirrors
+  how MISS-012 was resolved on its own specific closure bar once met, with
+  newly-surfaced substantive concerns (MISS-013/014 at the time) spun off
+  as their own distinct findings rather than keeping MISS-012 open. The
+  same pattern applies here: MISS-011 closes on its own bar; the
+  concerning substance becomes MISS-016; a rigor gap discovered along the
+  way becomes MISS-017.
+- **Why CONDITIONAL and not FAIL**: FAIL would imply the reviewed work
+  product itself — the Mechanical Lead's closure attempt — is deficient
+  and must be redone. It is not: the arithmetic is exactly correct, the
+  citations are accurate, and the bounding method is independently assessed
+  as defensible with no missing favorable argument found. CONDITIONAL
+  correctly reflects "the work is accepted as sound, but this cycle
+  surfaces a new HIGH substantive finding that must go to the human, plus
+  a MEDIUM rigor fix that loops back to the Mechanical Lead" — a
+  fundamentally different situation from a rejected piece of work.
+- **What independently checks out**: 100% of §8.1's arithmetic; all 6 new
+  Evidence ID citations; the `.scad` constant citations; the two-method
+  bounding approach as a reasonable engineering bound given no FEA/testing
+  tool exists; the honesty and completeness of the disclosed caveats; full
+  scope discipline (no `.scad`/tracking-file overreach).
+- **What remains open**: MISS-016 (HIGH) — the quantified wall-margin
+  shortfall itself, now the human's decision to weigh. MISS-017 (MEDIUM) —
+  systemic confidence-mislabeling in §8.1.4's ledger and 5 inline
+  citations, a same-pattern fix already precedented by MISS-014's own
+  resolution.
+- **Independent judgment on readiness for the Hardware Lead / human**: The
+  MISS-011 closure attempt itself is ready — it is genuine, defensible
+  engineering work and should be presented as such, not held back pending
+  MISS-017's cosmetic relabeling fix. However, this document is **not yet
+  fully clean** (MISS-017 open) and, more importantly, now carries a real,
+  independently-confirmed, quantified safety-adequacy question (MISS-016)
+  that has not existed in this tracked form before this cycle. **This
+  should not be presented to the human as "wall thickness independently
+  verified adequate"** — it should be presented as "a genuine, bounded
+  estimate now exists, two independent methods agree the wall's local
+  material falls short of the disclosed energy budget by a substantial
+  margin under every swept assumption, and the human must decide how to
+  proceed" (per MISS-016's Recommended Fix, above).
+- **Next action**: Report CONDITIONAL to the Hardware Lead. MISS-011 may be
+  marked `RESOLVED` in `validation/open-issues.md` on this Reviewer's own
+  independent verification rationale. MISS-016 (HIGH) is logged `OPEN`,
+  `Source: mechanical-reviewer`, awaiting the human's decision per its
+  Recommended Fix. MISS-017 (MEDIUM) is logged `OPEN`, `Source:
+  mechanical-reviewer`, routing back to the Mechanical Lead for a small
+  relabeling fix, and does not block presenting REQ-403's material (with
+  MISS-016 disclosed) to the human.
