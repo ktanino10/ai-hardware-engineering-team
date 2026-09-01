@@ -208,8 +208,8 @@ mark it `Withdrawn` instead, so history stays intact.
 | REQ-502 | Schedule target | Won't / N/A | This is a paper/document design exercise this cycle, not a production schedule — no physical PCB fabrication or physical power-on happens in this session |
 | REQ-503 *(Rev 3)* | Rev 3 total BOM cost target: proposed ≤ $75–90 USD (soft, not a hard ceiling) | Should | REQ-501 (~$15) is retained verbatim above as Rev 2's historical record; a motor+driver+flywheel subsystem realistically costs $20–50+ alone (2026 web-search-grounded ballpark, not yet datasheet-confirmed for specific candidates) — see §9b for confirmation |
 | REQ-504 *(Rev 3)* | Schedule/physical-build framing unchanged from REQ-502 — this remains a paper/document design exercise this cycle: no physical PCB fabrication, no physical 3D print, no physical spin test, no physical power-on happens in this session | Won't / N/A | Mirrors REQ-502 exactly, restated for Rev 3 clarity since a spinning mass makes "no physical test" worth restating explicitly |
-| REQ-505 *(Rev 4)* | Free-rotation mechanism BOM ceiling: propose **≤$30–50 USD** soft target (separate from REQ-503's already-spent Rev 3 motor-subsystem budget) | Should | No prior anchor exists (mirrors REQ-503's own situation) — proposed default; see §9d. Both leading Component Selection candidates (≈$13 and ≈$15–20, see `bom/component-selection.md`) comfortably clear this even before confirmation |
-| REQ-506 *(Rev 4)* | Mirrors REQ-502/504 exactly: this remains a paper/document design exercise this cycle — no physical build, no physical mechanism fabrication/purchase, no physical spin test happens in this session | Won't / N/A | Restated for Rev 4 clarity per this task's own explicit instruction to stop after Requirements + Component Selection, before any Mechanical Design/CAD work |
+| REQ-505 *(Rev 4)* | Free-rotation mechanism BOM ceiling: **no ceiling imposed this cycle** — Human Chief Engineer explicitly waived the originally-proposed ≤$30–50 soft target (2026-09-01, via creator/"General Chat" session, §9g), separate from REQ-503's already-spent Rev 3 motor-subsystem budget | Won't (this cycle) | **Explicitly waived by the human, not silently dropped or overlooked** — mirrors this project's own anti-silent-drop discipline for a withdrawn/superseded requirement (e.g. REQ-005/006's "Won't" pattern; REQ-501/502 retained verbatim as historical record when superseded, not deleted). The originally-proposed ≤$30–50 default (§9d) is retained above/in history, not edited away — Candidate A's actual $13 price remains far under it regardless, so the waiver has no practical effect on the already-made mechanism choice; it confirms cost is not a gating factor for any future mechanism-adjacent decision this cycle |
+| REQ-506 *(Rev 4)* | Mirrors REQ-502/504 exactly, **narrowed scope**: this requirement governs *physical* fabrication/purchase/testing only — no physical mechanism purchase, no physical 3D print, no physical spin test happens yet | Won't / N/A | Restated for Rev 4 clarity. **Does not block Mechanical Design/CAD work itself** — per Kyosuke's own explicit direction (2026-09-01, §9g), Mechanical Design (integrating the human-approved Candidate A mechanism into a new enclosure revision) is now authorized as the next phase; this requirement's original Notes text ("before any Mechanical Design/CAD work") is superseded by that direction and restated here accurately, not silently left stale |
 
 ## 8. Assumptions
 
@@ -466,6 +466,35 @@ restatement of anything already written:
   themselves biased toward what can actually be built quickly once a choice
   is made.
 
+## 9g. Rev 4 — Human decisions received: mechanism choice + Open Questions resolved (new)
+
+Kyosuke's actual decisions on §9d's two Open Questions and the Free-Rotation
+Support Mechanism candidate choice, received directly and relayed via the
+creator/"General Chat" session, 2026-09-01:
+
+1. **REQ-012 (angular-travel target)**: **Approved as proposed** — ≥180°,
+   ideally continuous/unlimited rotation. No wording change to REQ-012
+   itself.
+2. **REQ-505 (mechanism BOM ceiling)**: **Waived** — no ceiling imposed
+   this cycle; cost is not to gate this decision. REQ-505's own row above
+   is updated to `Won't (this cycle)` recording this as an explicit human
+   waiver, not a silent drop.
+3. **Mechanism choice**: **Candidate A — BC Precision 4LS-3 lazy-susan
+   turntable bearing — confirmed**, matching the Hardware Lead's own
+   revised (post-§9f) recommendation. See `bom/component-selection.md`'s
+   Free-Rotation Support Mechanism Approval table for the full record.
+
+**Kyosuke also authorized the next phase**: Mechanical Design — integrating
+Candidate A into a new revision of the Bench-IMU-01 enclosure — is now
+in scope (it was explicitly out of scope for this task through §9f). The
+other scope fences remain active and unchanged: no control loop/PID/
+attitude estimation, no 2nd/3rd reaction wheel, no Control Engineer
+introduction (REQ-014 continues to govern). Mechanical Lead + Independent
+Mechanical Review are to be used per this repo's established process,
+mirroring Rev 3's own mechanical rigor — with a plan reported back before
+substantial CAD work begins, the same Human-in-the-loop pattern already
+used throughout this revision.
+
 ## 10. Approval
 
 | Role | Name | Date | Decision |
@@ -479,7 +508,7 @@ restatement of anything already written:
 | Hardware Lead | Hardware Lead (this session) | 2026-08-31 | Provisionally adopted all four §9b defaults after `ask_user` went unreachable this cycle (see §9c) — superseded by the real human confirmation below, received via the creator/"General Chat" session (the channel that has actually reached the human this cycle) |
 | Chief Engineer (Human) | Human Chief Engineer (via creator/"General Chat" session, who relayed to and confirmed with the human directly) | 2026-08-31 | **Approved — "all four provisional defaults are approved as proposed, no changes."** This is the human's real Rev 3 Requirements sign-off, not a provisional placeholder — REQ-007's target figures, no motor-type preference, REQ-503's ≤$75–90 ceiling, and REQ-308's bare-bench-rig/~150mm sanity bound are now confirmed requirements, not open questions. Component Selection (motor + driver) proceeded against these targets and is recorded in `bom/component-selection.md`. Process note recorded for the rest of this design cycle: since `ask_user` is not reliably reaching the human this cycle, every remaining HITL gate is routed through the cross-session message channel instead (report the gate content there, wait for a reply there) rather than falling back to provisional-autonomous adoption. |
 
-## 10b. Rev 4 Approval (pending — proposed, not yet human-reviewed)
+## 10b. Rev 4 Approval (real human sign-off received — supersedes the "pending" framing above)
 
 | Role | Name | Date | Decision |
 |---|---|---|---|
@@ -487,4 +516,4 @@ restatement of anything already written:
 | Creator/"General Chat" session | — | 2026-09-01 | Reviewed the plan for this revision before drafting began, independently re-verified the REQ-012 physics finding (§9e), and approved proceeding — this is process endorsement of the approach, not the human Chief Engineer's own Requirements sign-off |
 | Chief Engineer (Human), via creator/"General Chat" session | Human Chief Engineer | 2026-09-01 | Priority clarification received (§9f): speed to a physical, demonstrable result is the actual goal; do not reopen the motor/flywheel selection; favor the simplest/fastest-to-source mechanism; keep the deliverable lean. **Not yet the Requirements sign-off itself** — §9d's two Open Questions and the mechanism choice remain open |
 | Hardware Lead | Hardware Lead (this session) | 2026-09-01 | Revised the Component Selection recommendation accordingly (Candidate A now primary — see `bom/component-selection.md`) and trimmed the deliverable per §9f. Still routed to the human for the actual mechanism decision, not self-approved |
-| Chief Engineer (Human) — required, Requirements sign-off is a HITL checkpoint (`.github/skills/requirements-engineering/SKILL.md` step 7) | *(pending)* | *(pending)* | **Awaiting review** — see the cross-session message reporting this revision's summary for the specific items needing a decision |
+| Chief Engineer (Human) — real Requirements sign-off, via creator/"General Chat" session | Human Chief Engineer (Kyosuke) | 2026-09-01 | **Approved.** REQ-012: approved as proposed (≥180°, ideally continuous), no change. REQ-505: waived — no BOM ceiling this cycle (row updated to `Won't (this cycle)`, explicit waiver recorded, not a silent drop). **Mechanism choice: Candidate A (BC Precision 4LS-3 lazy-susan bearing) confirmed** — see `bom/component-selection.md`'s own Approval table. Full record: §9g. **Also authorized the next phase**: Mechanical Design (integrating Candidate A into a new enclosure revision) is now in scope — other scope fences (no control loop/PID/attitude estimation, no 2nd/3rd wheel, no Control Engineer) remain active. This is the human's real Rev 4 Requirements sign-off, not a provisional placeholder. |
