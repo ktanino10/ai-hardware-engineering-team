@@ -2245,6 +2245,165 @@ to reduce the obligation to address this HIGH finding explicitly,
 consistent with this agent's own instructions to address every HIGH
 finding regardless of the underlying requirement's own priority tier.
 
+### 7.5.13 M1 true credible-worst-case no-load speed — DS-MTR-018 voltage-label correction and a required new input for Mechanical Lead (new, Circuit Engineer independent cross-check of the Firmware Reviewer's REQ-405 verification)
+
+**Trigger, and this agent's own discipline applied, not a borrowed
+conclusion.** While independently verifying the Firmware Engineer's REQ-405
+command-side duty-cycle-ceiling derivation (§12 addendum,
+`firmware/bench-imu-01/bench-imu-01-firmware-design.md` — correctly cites
+"this design's own 13.0V worst-case `VM_MOTOR` envelope," §7.5.9 above), the
+Firmware Reviewer flagged that **DS-MTR-018** (`datasheets/evidence-log.md`,
+Component Selection era) may mislabel its own voltage basis. Per this
+agent's own "Process" step 1 (confirm parts/datasheet facts independently,
+never proceed on an unconfirmed claim) and this task's own explicit
+instruction not to just accept another role's analysis, every figure below
+was independently re-derived from primary sources this session — the
+Firmware Reviewer's report was a trigger to look, not a substitute for
+looking.
+
+**Finding, independently confirmed:** DS-MTR-018 labels its own ~22,200 RPM
+figure "at full-charge 3S (11.1V)". That label is wrong — **11.1V is 3S's
+nominal voltage** (3.7V/cell × 3 cells), **not** its full-charge voltage.
+Full-charge 3S is **12.6V** (4.2V/cell × 3 cells). This is independently
+confirmed three ways this session (not merely taken on the Reviewer's own
+report): (1) this evidence log's own very next row, **DS-MTR-017**, already
+states the correct range ("7.4-11.1V nominal, 8.4-12.6V full-charge") — the
+error was never cross-checked against the entry immediately above it; (2)
+the T-Motor metadata record's own "Known gaps" section independently states
+"3S full charge (~12.6V)"; (3) a fresh web search this session, plus a
+second independent retailer re-fetch (**DS-MTR-079**), both confirm the
+standard 3.7V-nominal/4.2V-full-charge per-cell LiPo convention. The 22,200
+RPM figure itself was never arithmetically wrong (it is exactly
+KV×11.1V=22,200) — only its label was. **Fixed in `datasheets/evidence-log.md`
+this session**: DS-MTR-018 annotated in place (original figure kept, not
+deleted, per this file's own evidence-integrity convention — see
+DS-MCU-062 for the established precedent this follows).
+
+**Why this matters beyond a label fix, and why it is this role's place to
+carry it further:** DS-MTR-018 predates this design's own motor
+power-input circuit (F1/D2/D3/U6, all added later, §7.5.2/§7.5.9/§7.5.10) —
+it is a simple `KV × V` estimate with no circuit-path accounting at all,
+because at the time it was written there was no circuit path yet to
+account for. Today there is one, and it is this role's own place (not
+Component Engineer's, not Mechanical Lead's) to re-derive what voltage
+actually reaches M1's terminals through it. §7.5.11 above already flags
+that Mechanical Lead's flywheel/containment design needs a real no-load-
+speed input — a corrected, but still label-only, 12.6V figure would give
+KV×12.6V=25,200 RPM, but that still is not this design's own real answer:
+it ignores both (a) the 13.0V envelope this design actually qualifies
+inputs against (12.6V **plus** ~3% bench-supply headroom, §7.5.9 — a wider,
+binding ceiling, not merely 12.6V), and (b) the real series voltage drops
+between J4 and U5's actual VCC pin that only exist because F1/D2/U6 do.
+Both are corrected together below.
+
+**Direction of conservatism — the opposite bound from §7.5.2/§7.5.10's own
+existing drop analyses, stated explicitly so this is not misread as
+duplicating or contradicting them.** §7.5.2's UVLO-margin analysis and
+§7.5.10's thermal analysis both deliberately use *maximum* VF/resistance at
+this design's *worst-case operating current* (≤3A) — because those
+analyses ask "could voltage dip too low / could heat rise too high."
+This question is the mirror image: "what is the *most* voltage that could
+credibly reach M1, for a worst-case stored-energy/containment estimate" —
+which requires *minimum* resistance, the *lowest* credible VF, and the
+motor's actual (much lower) no-load current, not the ≤3A figure used
+elsewhere. Reusing the 0.53–0.62V/"0.02Ω assumed" figures from §7.5.2 here
+would *understate* true worst-case RPM, the wrong direction of error for
+this specific question — so they are deliberately not reused as-is.
+
+**Path and inputs, each confidence-marked (`CONFIRMED` / `ASSUMPTION` /
+`ESTIMATE` / `UNKNOWN`, this project's convention):**
+
+| Step | Value used | Confidence | Basis |
+|---|---|---|---|
+| J4 input ceiling | 13.0V | `CONFIRMED` | This design's own established, binding `VM_MOTOR`/J4 envelope ceiling (§7.5.9) |
+| F1 (Littelfuse 30R500UF) resistance | Rmin = 0.010Ω | `CONFIRMED` | DS-PROT-006/033 — minimum (not R1max/"0.02Ω assumed"), since this question wants the least drop, opposite of §7.5.2's own use of this same part |
+| D2 (STPS3L60) forward drop | VF ≈ 0.35–0.45V | `ESTIMATE` | DS-PROT-005 (curve exists, 3A-only tabulated) + DS-PROT-034 (Figure 13 low-level curve confirmed to exist this session, but its exact values could not be extracted from the vector graphic) — reasoned low-current estimate, not a pixel-read value; see below |
+| D3 (SMBJ16A) | 0V series drop | `CONFIRMED` | Shunt TVS topology, not series — confirmed directly from the schematic net list (§7.5.2/§2.1) |
+| U6 (TPS26631) on-resistance | R(ON)min = 0.026Ω | `CONFIRMED` | DS-PROT-031, TJ=25°C row minimum (not the 85°C/45mΩ conservative-thermal corner used at §7.5.10) |
+| M1 true no-load current | ≈0.3A (sensitivity-checked to 0.6A) | `CONFIRMED` (0.3A figure) / `ASSUMPTION` (that true operating-voltage no-load current does not exceed ~2× that) | T-Motor's own stated Io=0.3A at its 10V test condition (DS-MTR-018, independently re-confirmed via a second retailer, DS-MTR-079); no manufacturer Io-vs-voltage curve exists for this SKU, so a 2× sensitivity bound is used rather than assuming the 10V-test-point figure holds unchanged at ~12.6V |
+| M1 KV | 2000 RPM/V | `CONFIRMED` | DS-MTR-017, independently re-confirmed via DS-MTR-079 |
+| VCC→output-voltage relationship | Linear, no further correction needed at 100% duty (the no-load-speed convention) | `CONFIRMED` | TI's own DRV10983 equation, "peak output amplitude = VCC × (PWM_DCO/100)" (DS-MTR-078, already established by Firmware's own REQ-405 work) |
+
+**Resulting computation:** total series drop (F1 + D2 + U6, D3 contributing
+0V) ≈ 0.36–0.46V across the D2-VF `ESTIMATE` range, essentially unaffected
+by the current sensitivity check (F1+U6 together contribute only 11–22mV
+even at the 0.6A upper bound — the answer is dominated by the D2-VF
+uncertainty, not the current assumption). This gives:
+
+- **V_VCC(U5) ≈ 12.54–12.64V, point estimate ≈12.59V** (13.0V minus the
+  ≈0.36–0.46V total drop).
+- **RPM = KV × V_VCC ≈ 25,060–25,280, point estimate ≈25,180 RPM.**
+
+**Cross-check (reassuring, not the primary derivation):** a naive
+label-fix-only recompute — KV × 12.6V (full-charge voltage, no envelope
+headroom, no path drops at all) — gives 25,200 RPM, landing within ~20 RPM
+of this section's own detailed point estimate. This is a coincidence (the
+~3% envelope headroom §7.5.9 deliberately adds happens to be of similar
+magnitude to the real path drop this section subtracts), not a
+substitute for the detailed derivation above, which remains the
+authoritative figure because it is the only one that actually accounts for
+both real effects rather than cancelling them out by omitting both.
+
+**Comparison to the existing (corrected-label) DS-MTR-018 figure:** the
+point estimate (≈25,180 RPM) is **≈13.4% higher** than 22,200 RPM (range
+≈12.9–13.9% across the confidence bounds above). Because stored rotational
+kinetic energy scales with ω² (already the convention §7.5.11/ISS-020 and
+Mechanical Lead's own §8 use), this is **≈29% more stored kinetic energy**
+at the credible worst case (range ≈27–30%), not merely a proportional
+13–14% increase. Illustratively, against Mechanical Lead's own already-
+published §8 figures at 22,200 RPM (I=4.5×10⁻⁵kg·m², rim speed 69.74m/s,
+121.60J) — offered here only as a courtesy cross-reference, **not as a
+substitute for Mechanical Lead's own recomputation**, since the rotor
+inertia and rim radius are that role's own data, not this role's to
+assert: the corrected point estimate scales to ≈156J stored energy
+(range ≈155–158J) and ≈79.1m/s rim speed (range ≈78.7–79.4m/s, ≈283–286
+km/h) at the same rotor geometry.
+
+**Relationship to Firmware's own REQ-405 work — complementary, not
+contradictory, and not this role's to touch.** DS-MTR-078 (Firmware's own
+evidence) uses the 13.0V J4-envelope figure directly as "VCC" in its own
+command-ceiling derivation, without subtracting the F1/D2/U6 path drops
+derived here. That is not an error in Firmware's own, separately-scoped
+work — REQ-405's command-side ceiling is a firmware policy constant with
+its own conservatism margin (`motor.h`/§4.3), and treating the
+higher-than-actual J4 figure as VCC there is itself conservative in
+*that* context (it only makes Firmware's own commanded-ceiling more, not
+less, conservative). This section's more precise, path-drop-corrected VCC
+figure is a *distinct* number for a *distinct* question (the physical,
+uncommanded no-load speed the motor can reach on its own, for a
+containment/energy estimate) — not a claim that Firmware's file needs a
+fix, and `firmware/bench-imu-01/` is not touched by this section or this
+session.
+
+**Handoff to Mechanical Lead — required new input, not applied by this
+role.** Mechanical Lead's flywheel physics table
+(`hardware/mechanical/bench-imu-01-dimensional-spec.md` §8) currently uses
+the pre-correction 20,000/22,200 RPM figures from DS-MTR-018 for its own
+"no-load-low"/"no-load-high" columns, feeding stored energy, rim speed,
+and peak centrifugal stress — which in turn is the physics basis for the
+open REQ-403 containment-wall disposition and the open MISS-016 HIGH
+finding on containment-wall margin. **This section's corrected
+credible-worst-case figure (V_VCC(U5)≈12.54–12.64V, point ≈12.59V;
+RPM≈25,060–25,280, point ≈25,180 — DS-MTR-080) is a required new input for
+that table.** Consistent with this agent's own "Out of scope" boundary
+(mechanical/enclosure files are Mechanical Lead's domain, not edited here),
+`hardware/mechanical/bench-imu-01-dimensional-spec.md`,
+`bench-imu-01-manufacturing-spec.md`, and every `.scad` file are left
+untouched by this section — Mechanical Lead (or Hardware Lead, dispatching
+Mechanical Lead) is expected to consume the figures above, recompute §8's
+table and any downstream REQ-403/MISS-016 disposition text against them,
+and independently verify the rotor-inertia/rim-radius scaling shown
+illustratively above rather than trusting it uncross-checked, mirroring
+this section's own "don't just trust a report" discipline.
+
+**Evidence IDs newly recorded or relied on this section**: DS-MTR-017
+(KV, `CONFIRMED`), DS-MTR-018 (annotated/corrected this session), DS-MTR-079
+(new — independent T-Motor re-confirmation), DS-PROT-005/034 (D2 VF,
+`ESTIMATE` at low current), DS-PROT-006/033 (F1 Rmin, `CONFIRMED`),
+DS-PROT-031 (U6 R(ON)min, `CONFIRMED`), DS-MTR-078 (VCC×duty relationship,
+`CONFIRMED`), DS-MTR-080 (new — this section's own aggregated derivation,
+the single citation Mechanical Lead's handoff should trace back to).
+
 ## 8. Block 6 — Grounding
 
 **Single ground plane/net for this entire design, now explicitly spanning

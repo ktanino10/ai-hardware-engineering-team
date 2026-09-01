@@ -17,7 +17,7 @@
   `r.jina.ai` text-extraction proxy this session, full Absolute Maximum
   Ratings / thermal / electrical characteristics tables captured directly
   from the primary document; not cached to any local disk.
-- **Used for Evidence IDs**: DS-PROT-005
+- **Used for Evidence IDs**: DS-PROT-005, DS-PROT-034
 
 ## Why this part
 
@@ -60,3 +60,17 @@ bottleneck at the motor's real worst-case operating current (§7.5.2,
   somewhat lower VF than the 3A figures used) — this makes the design's
   own power/margin numbers conservative (an overestimate of diode loss),
   not optimistic.
+- **Addendum (2026-09-13, DS-PROT-034, Circuit Engineer independent
+  re-derivation)**: re-fetched this same PDF directly this session and
+  confirmed Figure 13 ("Forward voltage drop versus forward current, low
+  level", 0–5A, Tj=25°C/100°C) does exist, i.e. ST itself does publish a
+  below-3A characterization curve, not just the 3A tabulated point noted
+  above — but this session's text-extraction tooling still could not read
+  precise numeric values off that vector graphic. Needed this time for a
+  different (not merely conservative-in-the-same-direction) reason: a
+  credible-worst-case *maximum-delivered-voltage* calculation for M1's true
+  no-load speed (`hardware/schematic/bench-imu-01-design.md` §7.5.13) needs
+  the **lowest** credible VF at low current, which is the opposite direction
+  from this record's existing conservative-for-thermal-margin framing above
+  — used a reasoned ESTIMATE (≈0.35–0.45V) instead of a pixel-read value;
+  see DS-PROT-034/DS-MTR-080 for the full disclosure.

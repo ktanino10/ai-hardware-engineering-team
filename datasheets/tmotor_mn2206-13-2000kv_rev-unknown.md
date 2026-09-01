@@ -19,7 +19,7 @@
 - **Local cache note**: not committed; content read live via web fetch/search
   this session, not cached to any local disk.
 - **Used for Evidence IDs**: DS-MTR-017, DS-MTR-018, DS-MTR-019, DS-MTR-020,
-  DS-MTR-021, DS-MTR-022, DS-MTR-023, DS-MTR-024
+  DS-MTR-021, DS-MTR-022, DS-MTR-023, DS-MTR-024, DS-MTR-079
 
 ## Known gaps (honestly flagged, not guessed)
 
