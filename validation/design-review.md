@@ -8060,3 +8060,100 @@ schematic/footprint choice — ISS-031's remaining half, for which the
 unfilled `In1.Cu` GND zone is pre-existing and pre-disclosed, but a human
 should fill zones in the KiCad GUI and confirm plane copper actually appears
 in gerber output before any fabrication release.
+
+---
+
+### Cycle 7 follow-up addendum — ISS-038 fix re-verification (commit `6353fa6`, 2026-09-02, same day)
+
+**Not a new numbered cycle.** A narrow, five-item confirmation check of the
+PCB Engineer's same-day ISS-038 fix, appended to the Cycle 7 section above.
+Nothing else was re-run or re-litigated; the 21-item checklist was not
+re-executed. Same independence discipline: every number below is from this
+reviewer's own tool invocations against the committed artifact.
+
+**1. Is the fix's reasoning actually correct?** **Yes**, and it is broader
+than the commit subject implies — three distinct changes, matching all of
+ISS-038's own Recommended Fix: (a) the hub/reference pad is now
+`max(matching_pads, key=lambda p: p.GetBoundingBox().GetArea())` instead of
+`matching_pads[0]`; (b) a bridge is skipped entirely when the hub pad's
+bounding box intersects the extra pad's; (c) when a bridge *is* drawn, its
+layer comes from the intersection of both pads' layer sets instead of a
+hard-coded `F.Cu`. The stated root cause is independently correct: U6's
+thermal vias are 0.6 × 0.6 mm on a 1.3 mm pitch, so via-to-via bounding boxes
+genuinely never intersect, whereas the 3.40 × 6.50 mm F.Cu land (area
+22.1 mm², the largest member) contains every via centre — so picking the
+largest-area member as hub is the right discriminator, not merely a
+plausible-looking one.
+*Latent limitation, recorded but not logged as a finding*: the skip test is
+bounding-box-only and does **not** check that the two pads share a copper
+layer. On this board that is benign — the skipped B.Cu land shares no layer
+with the F.Cu hub and is joined only through the 15 PTH vias, so the skip is
+correct in outcome though not by the logic used — and `bridge_layer` also
+silently falls back to `F.Cu` when no common layer exists. Both are caught in
+practice by `unconnected_items`, which is 0 (below). Flagged for the next time
+this generator meets a non-overlapping, non-coplanar pad group.
+
+**2. ISS-033/034/035 not regressed — confirmed.** Own `pcbnew` audit of the
+current `.kicad_pcb`: U6 pad `"21"` = 17 pads, all net `GND`; J1 pad `"SH"` =
+4 pads, all `GND`; SW1 pad `"1"` = 2 pads, both `NRST`; SW1 pad `"2"` = 2
+pads, both `GND` — **all PASS**. Widened board-wide: all 7 multi-pad groups
+on the board are net-consistent, **0 mismatches**. No-net pads remain **57**,
+identical to Cycle 7 — nothing was disconnected by this change. Bridge tracks
+now: **U6 `"21"` = 0** (was 16), J1 `"SH"` = 3, SW1 `"1"` = 1, SW1 `"2"` = 1 —
+exactly the claimed outcome.
+
+**3. DRC — claim CONFIRMED in substance, one specific REFUTED (in the fix's
+favour), one over-claimed.** Four independent `kicad-cli pcb drc --format
+json` runs: `unconnected_items` = 0 and `schematic_parity` = 0 on all four.
+- **GND-vs-`U6_ILIM` `tracks_crossing` = 0 board-wide on all four runs**, not
+  1. Better than claimed; the 12 crossings ISS-038 was raised for are gone.
+  Board-wide `tracks_crossing` is 78, versus 87–88 at `e63e62c` and 77 at the
+  `84db343` baseline.
+- **The "remaining 1 matches Cycle 6's documented pre-existing crossing"
+  claim is inaccurate as stated, though right in substance.** The single
+  remaining violation in the U6 exposed-pad region (x 107.5–112.5,
+  y 48.0–56.0) is a `shorting_items` between `GND` (2.8809 mm F.Cu) and
+  **`DIR`** (the 74.0750 mm F.Cu trace) — not `U6_ILIM`, and not a
+  `tracks_crossing`. The baseline `84db343` region violation was likewise
+  `GND` vs **`DIR`** (as a `tracks_crossing`, GND segment 5.1193 mm). So the
+  underlying conflict — a long `DIR` trace routed straight through U6's
+  exposed-pad region — is genuinely pre-existing and genuinely unrelated to
+  the bridging step, but it was never a `U6_ILIM` crossing. It belongs to
+  ISS-036's aggregate triage; no new finding is raised for it.
+- **Totals: my four runs give 379 / 379 / 370 / 368**, and re-running DRC on
+  the `84db343` baseline board this cycle gives **377** (Cycle 7's two
+  baseline runs gave 370 and 374). The claimed "365–373, at or below the
+  ~370 baseline" is therefore narrower than what this reviewer reproduces,
+  and "a net improvement over baseline" over-reads the noise: the honest
+  statement is that the count is **back within the baseline's own
+  non-determinism band** — the ISS-038 regression is undone, which is what
+  was asked, but it is a wash versus baseline rather than a measured
+  improvement. Recommend softening that sentence in the ISS-038 Notes.
+
+**4. Scope — clean.** `git diff 89a158c 6353fa6 --stat` shows exactly the five
+claimed files: `hardware/pcb/README.md`,
+`hardware/pcb/bench-imu-01/{bench-imu-01-3d.png, bench-imu-01.kicad_pcb,
+generate_pcb.py}`, `validation/open-issues.md`. No additions or deletions;
+nothing under `firmware/`, `hardware/mechanical/`, `bom/`, `requirements/`,
+`datasheets/` or `.github/`.
+
+**5. ISS-038 → RESOLVED is honest.** Not a bare status flip: the row carries a
+correct root-cause explanation, the real code change, and its own verification
+evidence, all of which this reviewer independently reproduced. Two wording
+corrections are owed (the "remaining 1 GND-vs-U6_ILIM crossing", and the
+"365–373 / at or below baseline / net improvement" framing), but neither
+changes the disposition — **this reviewer confirms ISS-038 as RESOLVED**. The
+commit's own disclosure that this fix had not yet been independently
+re-verified was accurate at the time of writing, and is what this addendum
+now closes. `check_id_uniqueness.py` → OK, 409 IDs; `check_open_issues.py` →
+gate still correctly FAILS on ISS-031, ISS-032, ISS-036 (ISS-038 correctly no
+longer listed).
+
+**Verdict: the ISS-038 fix holds up — YES.** Correct reasoning, correct
+implementation, no regression to ISS-030/033/034/035, and the defect it
+targeted is fully (not partially) eliminated by my own measurement.
+**Overall board status is unchanged: CONDITIONAL — NOT ready to fabricate**,
+and this reviewer agrees with that framing: ISS-031, ISS-032 and ISS-036
+remain OPEN at HIGH, ISS-037 remains open, and `docs/architecture.md` §8 still
+additionally requires the traceability matrix, FMEA review and a
+`validation/change-log.md` ECO entry for this revision.
