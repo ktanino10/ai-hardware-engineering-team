@@ -1001,7 +1001,9 @@ contention per the Motor section above.)*
     ideally matching U5's own 30V VCC absolute maximum, DS-MTR-053, so the
     switch itself is never the weakest link); low on-resistance, target
     ≤35mΩ or so, to avoid eroding the already-narrow 3S/UVLO margin
-    (§7.5.2, ≈0.32V) any further than F1/D2 already do; default-OFF/
+    (§7.5.2, ≈0.26V — corrected 2026-09-02, ISS-040: was ≈0.32V before
+    F2's own added series drop, ISS-032 loop-back fix) any further than
+    F1/D2/F2 already do; default-OFF/
     fail-safe logic sense (enable HIGH=ON) — a hard requirement per §7.5.10,
     not a preference, given REQ-403.
   - **Package / hand-solderability**: this project's own established,

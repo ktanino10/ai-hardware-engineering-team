@@ -162,7 +162,11 @@ DS-MTR-068/069/071, cited directly below, not re-derived from scratch);
   corner alone). New §7.5.9's F1 (PTC fuse, below) adds further series
   resistance, narrowing the 3S margin from ≈0.38V to ≈0.32V at the
   near-cutoff corner — still adequate, quantified explicitly rather than
-  left unstated. **Flagged, not self-resolved** (per this agent's own
+  left unstated. **Corrected 2026-09-02 (ISS-040)**: F2 (§7.5.9, added
+  this revision in the ISS-032 loop-back fix) sits in the same series
+  loop and adds a further, identical ≈0.06V estimated drop, narrowing the
+  margin again to **≈0.26V** — still positive/adequate, not unsafe.
+  **Flagged, not self-resolved** (per this agent's own
   "Out of scope" instructions): (a) propagating the 3S-only constraint
   into `bom/component-selection.md`/`requirements/requirements.md` — both
   outside this agent's edit scope, routed to Hardware Lead; (b) the
@@ -1477,14 +1481,13 @@ ground net (§8).
   path through F2, not just the supply-side path through F1/D2. Using
   this section's own existing methodology, F2 adds the same ~0.06V drop
   F1 already contributes at the design's binding 3A UVLO corner, eroding
-  the previously-tracked ~0.32V margin (§7.5.2) to ~0.26V — still
-  positive, not unsafe, but the ~0.32V figure quoted elsewhere in this
-  document (lines 163, 1909, 3122, 3870–3871, 4166 as of this writing)
-  is now stale and should be updated to ~0.26V by whoever next revises
-  §7.5.2's UVLO margin derivation — not done as part of this same edit,
-  given the number of cross-referenced locations and because whether a
-  ~0.26V margin remains acceptable is itself a Circuit-Engineer/Chief-
-  Engineer design judgment, not a pure arithmetic correction. At
+  the previously-tracked ~0.32V margin (§7.5.2) to ~0.26V. **Propagated
+  2026-09-02 (Chief Engineer disposition: a routine margin judgment, not
+  an escalation-class question — margin stays positive, and the design's
+  actual no-load operating point sees only a negligible ~3mV effect)**:
+  the ~0.32V figure previously quoted elsewhere in this document (§7.5.2,
+  §7.5.9's own F1 paragraph, and the §14/§16 self-check sections) is now
+  updated to ~0.26V at each location. At
   DS-MTR-080's own actual operating point (no-load, ≈0.3A, not the 3A
   UVLO corner) the effect genuinely is negligible (≈3mV, ≈6 RPM) — that
   specific conclusion is unaffected; only the general framing needed
@@ -1541,7 +1544,14 @@ R1max post-trip resistance, not a max-initial figure; 0.02Ω assumed
 in-circuit resistance × 3A is a reasonable estimate, not a sourced
 figure), narrowing the 3S margin to **≈0.32V (8.32V vs. 8.0V VUVLO_R
 max)** — still adequate, and now stated quantitatively rather than left
-unstated.
+unstated. **Corrected 2026-09-02 (Hardware Reviewer ISS-040)**: F2, a
+second PTC fuse added later (§7.5.9, ISS-032 loop-back fix) in J4's
+ground-return leg, is in the same series loop as F1 (U5's UVLO
+comparator measures VCC relative to its own GND pins, and current flows
+around the whole loop, not just the supply-side path) — it contributes
+an identical further ≈0.06V estimated drop, narrowing the true current
+margin to **≈0.26V (8.26V vs. 8.0V VUVLO_R max)** — still positive/
+adequate, not unsafe.
 
 **Cross-document consistency, corrected this revision**: `hardware/
 power-budget.md`'s Rail Margin Summary previously stated the opposite
@@ -1952,7 +1962,9 @@ concern**: F1 adds an estimated ~0.06V further worst-case series drop
 (ESTIMATE, no Evidence ID — the datasheet publishes only Rmin initial and
 R1max post-trip resistance, not a max-initial figure; 0.02Ω assumed
 in-circuit resistance × 3A) — already folded into §7.5.2's corrected
-3S-margin figure (≈0.32V), not double-counted here.
+3S-margin figure. **Corrected 2026-09-02 (ISS-040)**: that figure is now
+≈0.26V (was ≈0.32V before F2's own identical further drop, §7.5.9
+below, was also folded in) — not double-counted here.
 
 **Flagged in Rev 4, resolved this revision (a) / still flagged (b)**:
 (a) a true hardware-enforced continuous input overvoltage lockout — F1
@@ -3165,7 +3177,11 @@ conclusion actually changed:
    typ VF = 6.87V, below U5's 7.4V typ VUVLO_R, DS-MTR-057) — not merely
    a rare worst case. 3S clears UVLO at every corner, margin ≈0.38V
    (near-cutoff 9.0V − 0.62V max VF = 8.38V vs. 8V max VUVLO_R), narrowing
-   to ≈0.32V once new F1's own estimated ≈0.06V added drop is included.
+   to ≈0.32V once new F1's own estimated ≈0.06V added drop is included,
+   and further to **≈0.26V** once F2's own identical estimated ≈0.06V
+   added drop is also included (corrected 2026-09-02, ISS-040 — F2 was
+   added later, in the ISS-032 loop-back fix, and sits in the same
+   series loop as F1).
    **New binding envelope: 9.0–13.0V (§7.5.9, ISS-019)**, replacing the
    previously-unbounded source assumption; enforced by new F1 in-line
    ahead of D2/D3.
@@ -3914,7 +3930,10 @@ In priority order:
     practical constraint**, not a soft recommendation; `hardware/
     power-budget.md`'s Rail Margin Summary is reconciled to state the
     identical conclusion. New F1 (§7.5.9, ISS-019) narrows the 3S margin
-    further, from ≈0.38V to ≈0.32V — quantified, not left unstated. Still
+    further, from ≈0.38V to ≈0.32V — quantified, not left unstated.
+    **Corrected 2026-09-02 (ISS-040)**: F2 (§7.5.9, added later in the
+    ISS-032 loop-back fix, same series loop as F1) narrows it further
+    still, to **≈0.26V**. Still
     flagged for Hardware Reviewer/Hardware Lead to confirm the operational
     recommendation, and **flagged, not self-resolved**, for propagation
     into `bom/component-selection.md`/`requirements/requirements.md`
@@ -4210,7 +4229,11 @@ tracked entirely separately from the 3V3 budget above, never folded in):**
   previously stated here — this revision corrects that understatement.
   3S clears UVLO at every corner (near-cutoff 9.0V − 0.62V max VF =
   8.38V > 8V max VUVLO_R), with margin narrowing from ≈0.38V to ≈0.32V
-  once F1's own estimated ≈0.06V added drop is included. This remains a
+  once F1's own estimated ≈0.06V added drop is included, and further to
+  **≈0.26V** once F2's own identical estimated ≈0.06V added drop is also
+  included (corrected 2026-09-02, ISS-040 — F2 was added later, in the
+  ISS-032 loop-back fix, and sits in the same series loop as F1). This
+  remains a
   consequence of this design's own added series protection diode, not a
   flaw in the Component-Engineer-approved motor selection (M1 is validly
   rated 2S–3S) — flagged for propagation into `bom/component-
