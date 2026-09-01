@@ -797,9 +797,10 @@ characteristic engagement length (the punch-through crack front's real
 combined axial+circumferential geometry is a fracture-mechanics detail
 beyond this bounded estimate — `w` is swept across a physically-anchored
 range rather than picked as one number). Lower anchor `w`=4.5mm = the
-disk's own thickness (`fw_t`, `CONFIRMED` from `.scad`) — the minimum a
-clean edge-on hit engages. Upper anchor `w`=60mm = the disk's own diameter
-(`fw_dia`, `CONFIRMED`) — a generous stand-in for a smeared/tumbling/
+disk's own thickness (`fw_t`, `ASSUMPTION` — §4.1 disk row; `.scad` line 178
+agrees) — the minimum a clean edge-on hit engages. Upper anchor `w`=60mm =
+the disk's own diameter (`fw_dia`, `ASSUMPTION` — §4.4 line 404; `.scad`
+line 177 agrees) — a generous stand-in for a smeared/tumbling/
 multi-contact worst case. Material figures used (`ESTIMATE`-applicability,
 `CONFIRMED`-as-published — see §8.1.6):
 
@@ -819,7 +820,8 @@ multi-contact worst case. Material figures used (`ESTIMATE`-applicability,
 Reverse cross-check — engagement length needed to consume the *entire*
 121.60J via fracture toughness alone, at a fixed 4.0mm depth: 2,533–12,667mm,
 i.e. **1,021%–5,104% of the wall's own full inner circumference (248.19mm,
-`CONFIRMED` from `.scad` r=39.5mm)** — several times all the way around the
+`DERIVED` from `fw_bay_inner_r`=39.5mm, §4.4 line 410; `.scad` line 467
+agrees)** — several times all the way around the
 wall. This is not a physically meaningful "localized puncture," it is a
 mathematical statement that fracture-toughness-only absorption cannot come
 close to the disclosed energy at any localized footprint. `ESTIMATE`
@@ -914,8 +916,8 @@ subsection and no geometry has been changed.**
 **Single-insert pull-out capacity.** Real, checkable published/measured
 data for M3 brass heat-set inserts in PETG-class plastic (dimensions
 matching this design's assumed `heatset_od`=4.6mm/`heatset_len`=5.7mm,
-`CONFIRMED` from `.scad`, closely matching the real Ruthex RX-M3x5.7 part,
-DS-FAST-001):
+`ASSUMPTION` — §4.4 line 418; `.scad` lines 485/489 agree — closely
+matching the real Ruthex RX-M3x5.7 part, DS-FAST-001):
 
 | Source | Insert / plastic | Pull-out (avg) | Provenance |
 |---|---|---|---|
@@ -930,7 +932,8 @@ A conservative round figure of **1,000 N per insert** is used below
 for applicability (this project has not finalized its actual insert brand
 or print material).
 
-**6-insert capacity scenarios** (`n_cap_bolts`=6, `CONFIRMED` from `.scad`):
+**6-insert capacity scenarios** (`n_cap_bolts`=6, `ESTIMATE` — §4.4 line 417;
+`.scad` line 481):
 
 | Load-sharing assumption | Total capacity | Basis |
 |---|---|---|
@@ -988,9 +991,9 @@ against.**
 
 | Item | Value(s) | Confidence |
 |---|---|---|
-| Disk mass, diameter, thickness, rim speed, stored energy | 100g / 60.0mm / 4.5mm / 69.74 m/s / 121.60J | `CONFIRMED` (`.scad` + §8 table, independently re-derived) |
-| `containment_wall_t`, `fw_bay_inner_r`, wall height | 4.0mm / 39.5mm / 43.0mm | `CONFIRMED` (`.scad`) |
-| Heat-set insert dimensions, bolt count | 4.6mm OD / 5.7mm len / 6× M3 | `CONFIRMED` (`.scad`) |
+| Disk mass, diameter, thickness, rim speed, stored energy | 100g / 60.0mm / 4.5mm / 69.74 m/s / 121.60J | `ESTIMATE` (mass — §4.1 total-mass row) / `ASSUMPTION` (diameter `fw_dia` — §4.4 line 404) / `ASSUMPTION` (thickness `fw_t` — §4.1 disk row) / `ESTIMATE` (rim speed — derived from the two `ASSUMPTION` values at left) / `ESTIMATE` (stored energy — derived from mass+diameter); the re-derivation arithmetic itself is `CONFIRMED` to match §8's own table (§8.1.1) |
+| `containment_wall_t`, `fw_bay_inner_r`, wall height | 4.0mm / 39.5mm / 43.0mm | `ESTIMATE` (`containment_wall_t` — §4.4 line 411) / `DERIVED` (`fw_bay_inner_r` — §4.4 line 410; `.scad` line 467 agrees) / `DERIVED` (wall height `fw_wall_h` — computed from other `DERIVED` Z-stack values, §4.4) |
+| Heat-set insert dimensions, bolt count | 4.6mm OD / 5.7mm len / 6× M3 | `ASSUMPTION` (insert OD/len — §4.4 line 418; `.scad` lines 485/489 agree) / `ESTIMATE` (bolt count — §4.4 line 417) |
 | Charpy/tensile figures as published (per material) | see §8.1.2 tables | `CONFIRMED`-as-published; `ASSUMPTION`-applicability (final print material/brand not yet chosen) |
 | Insert pull-out figures as published/measured | 1,157–1,258 N range, 1,000N used | `CONFIRMED`-as-published/measured; `ASSUMPTION`-applicability |
 | Engagement length `w`, deformation depth δ, stopping distance δ (fastener) | swept ranges, §8.1.2/§8.1.3 | `UNKNOWN` (true values need physical testing/FEA) — swept, not asserted |

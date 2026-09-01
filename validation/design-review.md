@@ -6372,3 +6372,267 @@ should fix the stale sentence in a future revision touching §13.3.
   mechanical-reviewer`, routing back to the Mechanical Lead for a small
   relabeling fix, and does not block presenting REQ-403's material (with
   MISS-016 disclosed) to the human.
+
+## Mechanical Reviewer — MISS-017 Fix Independent Re-Verification, 2026-09-13
+
+### Review Cycle Metadata
+
+- **Document reviewed**: `hardware/mechanical/bench-imu-01-dimensional-spec.md`
+  — an **uncommitted working-tree change only** (`git status --short` shows
+  `M hardware/mechanical/bench-imu-01-dimensional-spec.md`, not a new
+  commit). `git diff --stat HEAD` confirms 23 lines changed (13 insertions,
+  10 deletions), entirely within §8.1.
+- **Trigger**: the Mechanical Lead's fix for MISS-017 (MEDIUM), opened in
+  the entry immediately above this one ("Mechanical Reviewer — MISS-011
+  Closure Attempt Independent Cross-Check + Wall-Margin Escalation
+  Assessment," 2026-09-13), which claimed to relabel roughly 10
+  systemically mislabeled `CONFIRMED` values in §8.1 to their correct
+  `ASSUMPTION`/`ESTIMATE`/`DERIVED` tags per §4.1/§4.4's own tables.
+- **This is an independent re-derivation of the fix's correctness, not a
+  re-read of the Mechanical Lead's own fix-report claims.** Every claimed
+  label change below was re-checked directly against §4.1/§4.4's own
+  tables and the `.scad` file's own inline comments; the numeric-change
+  claim was independently verified via whole-document token counts and
+  content-anchored diffs, not accepted because the diff "looks small."
+- **Scope**: a narrowly focused re-verification of the MISS-017 fix
+  specifically, plus an independent judgment on one flagged-but-unfixed
+  `containment_wall_t` discrepancy. Not a full 10-item checklist pass —
+  checklist items 1–9 are unaffected by this cycle (no new `.scad`
+  geometry, no new component placement, no new fastener/clearance claim
+  introduced); only item 10 (interface-value traceability) is
+  substantively in scope here.
+
+### Scope discipline check
+
+- `git status --short` → exactly one modified file in the entire
+  repository: `hardware/mechanical/bench-imu-01-dimensional-spec.md`. No
+  `.scad` geometry, no `bench-imu-01-manufacturing-spec.md`, and nothing
+  under `hardware/schematic/`, `bom/`, `requirements/`, `firmware/`
+  touched.
+- `git diff --stat HEAD` (the Mechanical Lead's own pre-existing change) →
+  1 file changed, 13 insertions(+), 10 deletions(-) — confirms the fix is
+  confined to the single file and is the small, focused change it claims
+  to be.
+
+### 1. Independent re-verification of each specific label change (task item 1)
+
+Each of the 6 named changes was independently checked against §4.1/§4.4's
+own tables and the `.scad` file's own inline comments — not accepted from
+the fix's own diff or commit message.
+
+- **`fw_t` → `ASSUMPTION`**: §4.1's disk-parameters table (line 347) labels
+  `fw_t` `ASSUMPTION`. `.scad` line 178 comment reads `// ... ASSUMPTION`.
+  The fix's new §8.1 citation matches both. **Confirmed correct.**
+- **`fw_dia` → `ASSUMPTION`**: §4.4's table (line 404) labels `fw_dia`
+  `ASSUMPTION`. `.scad` line 177 comment reads `// ... ASSUMPTION`.
+  **Confirmed correct.**
+- **`fw_bay_inner_r` (via 248.19mm circumference) → `DERIVED`**: §4.4's
+  table (line 410) labels `fw_bay_inner_r` `DERIVED`. `.scad` line 467
+  comment reads `// ... DERIVED`. 248.19mm = 2π×39.5mm, a pure arithmetic
+  derivation from an `ASSUMPTION`-labeled radius — `DERIVED` is the
+  taxonomically correct tag (neither a fresh assumption nor a measured/
+  confirmed value). **Confirmed correct.**
+- **`heatset_od`/`heatset_len` → `ASSUMPTION`**: §4.4's table (line 418)
+  labels both `ASSUMPTION`. `.scad` lines 485/489 comments both read
+  `// ... ASSUMPTION`. **Confirmed correct.**
+- **`n_cap_bolts` → `ESTIMATE`**: §4.4's table (line 417) labels
+  `n_cap_bolts` `ESTIMATE`. (`.scad`'s own comment at line 481 carries
+  rationale text but no explicit confidence tag — the markdown table is
+  the correct source of truth here, exactly analogous to how
+  `containment_wall_t` is handled per task item 4 below.) **Confirmed
+  correct.**
+- **The 3 confidence-ledger rows (§8.1.4)**: each row previously carried
+  one blanket `CONFIRMED` tag covering multiple distinct values; each now
+  splits into per-value labels matching the sourcing verified above (disk
+  mass/geometry row, wall/fastener-count row, heat-set-insert row).
+  Independently confirmed each split label traces to the same §4.1/§4.4
+  sourcing already verified — no new or different value was introduced;
+  only the granularity and correctness of the tag changed.
+
+**All 6 specifically-claimed label changes independently confirmed
+correct.**
+
+### 2. Independent zero-numeric-change verification (task item 2)
+
+Two independent methods, not a visual diff read alone:
+
+- **Whole-document token-count sweep**: for every cited figure (100g,
+  60.0mm, 4.5mm, 69.74 m/s, 121.60J, 4.0mm, 39.5mm, 43.0mm, 4.6mm, 5.7mm,
+  6×M3, 248.19mm), `grep -o -F` occurrence counts across the entire
+  pre-fix (`git show HEAD:...`) and post-fix (working tree) file are
+  **identical for every single value** — not just within the touched
+  hunks, across the whole document. This rules out both an accidental
+  edit within the changed hunks and a stray edit elsewhere in the file.
+- **Content-anchored diff** (not line-number-based, since the fix added 3
+  net lines, which would make naive `sed -n 'X,Yp'` line-range comparisons
+  misleading): extracted the Method 1 table, Method 2 table, "Verdict —
+  wall" prose, "Verdict — fasteners" prose, and the full §8.1.6
+  escalation-flag subsection from both versions using unique anchor
+  strings (not absolute line numbers), then diffed the extracted blocks
+  directly. **All five blocks are byte-for-byte identical pre-fix vs.
+  post-fix.**
+- **Conclusion**: MISS-016's substance (its quantified wall-margin
+  shortfall conclusion, both bounding methods, and the escalation flag to
+  the human) is **completely unaffected** by this fix. This was
+  independently re-derived, not accepted from the Mechanical Lead's own
+  scope claim.
+
+### 3. Independent re-scan of remaining `CONFIRMED` instances in §8.1 (task item 3)
+
+- Pre-fix §8.1 contained 19 occurrences of `CONFIRMED`; post-fix contains
+  12 (`git diff HEAD` confirms exactly 5 inline instances + 3 ledger-row
+  instances were touched; the net count drops by 7, not 8, because ledger
+  row 1 — disk mass/geometry — replaced one incorrect blanket `CONFIRMED`
+  with one new, legitimate "arithmetic reproduces §8's own source table"
+  `CONFIRMED`, a like-for-like swap, not a missed fix).
+- All 12 remaining instances independently re-examined and classified —
+  not accepted on the Mechanical Lead's own claim that they are "all
+  legitimate":
+  1. **Tool-absence procedural fact** (1 instance) — a statement that no
+     FEA/testing tool is available in this project, a categorical fact
+     about the project's own tooling, not a physical-value claim.
+  2. **"Arithmetic reproduces the source figure" statements** (5
+     instances) — each re-derives a value from already-tabulated inputs
+     and confirms the arithmetic matches an existing table entry; this
+     confirms the *computation* is correct, not that the underlying
+     physical inputs are certain (those inputs retain their own,
+     correctly-hedged `ASSUMPTION`/`ESTIMATE`/`DERIVED` tags elsewhere).
+  3. **Published/measured citations correctly caveated for applicability**
+     (4 instances) — each cites a real Evidence ID for a published/
+     measured figure and explicitly caveats its applicability to this
+     specific design, which is the correct, non-overclaiming use of
+     `CONFIRMED` for a cited external source.
+  4. **Genuine `.scad`-level topological fact** (1 instance) — a
+     structural/geometric fact about the model, independent of any
+     uncertain dimension's numeric value, that is unconditionally true
+     regardless of which `ASSUMPTION`/`ESTIMATE` values are plugged in.
+  5. **Explicit negation** (1 instance) — a phrase of the form "...but not
+     `CONFIRMED`," i.e. a statement correctly disclaiming certainty, which
+     trivially cannot itself be a case of overclaiming certainty.
+- **No remaining mislabeling found.** This independently corroborates the
+  fix's own stated count of "12 remaining instances, all legitimate" — but
+  the classification above was rebuilt from scratch against the taxonomy
+  in `mechanical-design.instructions.md`, not copied from the fix's own
+  reasoning.
+
+### 4. `containment_wall_t` `.scad`-vs-table discrepancy (task item 4)
+
+- The Mechanical Lead flagged, but did not fix, a pre-existing
+  inconsistency: `hardware/mechanical/bench-imu-01-enclosure.scad` line
+  455 (`containment_wall_t = 2*wall_t; // ... ASSUMPTION`) labels the value
+  `ASSUMPTION`, while `bench-imu-01-dimensional-spec.md` §4.4's own table
+  (line ~411) labels the same 4.0mm value `ESTIMATE`. The fix followed
+  §4.4's `ESTIMATE` label (this document's own authoritative parameter
+  table for the figure) and did not touch `.scad`.
+- Independently traced both labels' provenance via `git blame` and
+  `git log --follow -p` on both files: both the `.scad` `// ASSUMPTION`
+  comment and the markdown `ESTIMATE` table entry were introduced in the
+  **exact same original commit**, `c5ac653` ("Mechanical Design (Rev 3):
+  full enclosure redesign," 2026-08-31). This is a genuine, pre-existing
+  inconsistency dating to Rev 3's inception — not something introduced,
+  or left behind, by the MISS-017 fix cycle. This was independently
+  verified via git history, not accepted from the Mechanical Lead's own
+  characterization.
+- **Assessment**: I agree deferring to §4.4's table value without
+  unilaterally editing `.scad` was the right call for this narrow
+  relabeling fix — it stays in scope, and the underlying value (4.0mm,
+  non-`CONFIRMED` either way) and the practical conclusion drawn from it
+  are unaffected by which of the two sub-labels is used. Taxonomically,
+  per `mechanical-design.instructions.md`'s own definitions (`ASSUMPTION`
+  = a stated design choice made absent confirmed data, state why;
+  `ESTIMATE` = a reasonable approximation, explicitly flagged),
+  `containment_wall_t` is framed throughout the document as a deliberate
+  "2× `min_wall_t`" design-choice multiplier rather than an approximation
+  of an otherwise-unknown target quantity — which arguably fits
+  `ASSUMPTION` more precisely than `ESTIMATE`. But this is a low-stakes
+  textual-fit judgment call, not a substantive error either way, and does
+  not need to be resolved as part of this fix.
+- **Call**: this is a real but minor, already-existing inconsistency
+  between two documents that this narrow labeling fix was correctly not
+  asked, and correctly did not attempt, to unilaterally resolve. However,
+  following the precedent set by ISS-024 (a nearly identical single-figure
+  cross-document inconsistency, LOW severity, tracked as its own item with
+  a trivial one-line recommended fix rather than left as an informal
+  note), I am logging this as its own new tracked finding, **MISS-018
+  (LOW)**, below — worth a paper trail so a future confidence-ledger audit
+  doesn't re-discover and re-flag it as new (as very nearly happened
+  during this very cycle).
+
+### New Finding — MISS-018 (LOW)
+
+- **Issue**: `containment_wall_t`'s confidence label is inconsistent
+  between the `.scad` file's inline comment (`ASSUMPTION`) and
+  `bench-imu-01-dimensional-spec.md` §4.4's own parameter table
+  (`ESTIMATE`), for the same 4.0mm value.
+- **Rationale**: the project's own confidence taxonomy
+  (`mechanical-design.instructions.md`) requires every value to carry one
+  traceable, correct label; carrying two different labels for the
+  identical value in two different authoritative-looking locations
+  creates ambiguity about which is correct, and risks a future audit
+  re-flagging it as a fresh mislabeling (as nearly happened during this
+  very cycle) even though it is already known and low-stakes.
+- **Datasheet Source**: `hardware/mechanical/bench-imu-01-enclosure.scad`
+  line 455 vs. `bench-imu-01-dimensional-spec.md` §4.4 table, line ~411;
+  both traced via `git blame`/`git log --follow -p` to the same original
+  commit `c5ac653` (Rev 3 full enclosure redesign).
+- **Failure Mechanism**: no functional or dimensional failure — purely a
+  documentation-consistency gap. Its practical failure mode is
+  process-level, not physical: a future reader or automated audit trusting
+  only one of the two sources could draw an inconsistent confidence
+  conclusion about the same value, or waste review effort re-discovering
+  an already-known discrepancy.
+- **Affected Component**: `containment_wall_t` (base enclosure containment
+  wall thickness parameter).
+- **Recommended Fix**: harmonize the two labels to agree — pick one of
+  `ASSUMPTION` or `ESTIMATE` and update the other location to match. Per
+  the taxonomy, `ASSUMPTION` arguably fits better (`containment_wall_t` is
+  framed as a deliberate 2×`min_wall_t` design-choice multiplier, not an
+  approximation of an unknown target), but this is the Mechanical Lead's
+  judgment call, not mandated here. No arithmetic re-derivation is
+  needed — the 4.0mm value itself and its non-`CONFIRMED` status are
+  already agreed by both documents.
+- **Severity**: **LOW**, per `docs/architecture.md` §7.1 ("Style /
+  best-practice / documentation improvement, negligible functional risk")
+  — matches the ISS-024 precedent's severity for an analogous
+  single-figure cross-document inconsistency.
+
+### Verdict
+
+- **Verdict**: **CONDITIONAL** — carried forward from the prior cycle,
+  unchanged in kind. Not **FAIL** (nothing reviewed this cycle needs
+  rework — the MISS-017 fix is fully and correctly resolved). Not a clean
+  **PASS** (MISS-016, HIGH, remains open exactly as before this cycle —
+  this document still cannot be presented to the human as unconditionally
+  clean until that decision is made).
+- **This cycle's own specific scope (the MISS-017 fix) independently
+  confirmed fully correct**: all 6 specifically-claimed label changes
+  verified correct against primary sources; zero numeric/arithmetic
+  changes anywhere in the document, confirmed via two independent
+  methods; MISS-016's substance confirmed byte-for-byte unaffected; all 12
+  remaining `CONFIRMED` instances in §8.1 independently re-examined and
+  classified as legitimate, with none waved through on the Mechanical
+  Lead's own say-so.
+- **MISS-017 disposition**: **RESOLVED.** The fix genuinely and completely
+  addresses the finding as originally raised — every named value now
+  carries its taxonomically correct label, traceable to §4.1/§4.4, with
+  zero collateral damage to MISS-016 or any other part of the document.
+- **MISS-016 disposition**: unchanged, still **OPEN (HIGH)**, exactly as
+  before this cycle — this cycle neither resolves nor alters it in any
+  way; independently confirmed byte-for-byte identical. Resolution
+  authority remains with the human, per the prior cycle's own verdict.
+- **New finding this cycle**: **MISS-018 (LOW, non-gating)** — the
+  `containment_wall_t` `.scad`-vs-table label discrepancy, logged for
+  traceability per the ISS-024 precedent; does not block anything.
+- **Open CRITICAL count**: 0.
+- **Open HIGH count**: 1 — MISS-016 (carried forward unchanged from the
+  prior cycle; not this cycle's to resolve).
+- **Open MEDIUM count**: 0 — MISS-017 resolves this cycle's only open
+  MEDIUM.
+- **Open LOW count (non-gating)**: 1 — MISS-018 (new this cycle).
+- **Next action**: report MISS-017 **RESOLVED** to the Hardware Lead /
+  Mechanical Lead, with this independent re-verification rationale.
+  MISS-016 (HIGH) remains logged `OPEN`, `Source: mechanical-reviewer`,
+  awaiting the human's decision — unaffected by, and not a subject of,
+  this cycle. MISS-018 (LOW) is newly logged `OPEN`, `Source:
+  mechanical-reviewer`, for the Mechanical Lead to pick up at convenience
+  (non-blocking).
