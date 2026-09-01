@@ -531,15 +531,34 @@ def build_board(footprints: dict[str, str], nets: dict[str, list[tuple[str, str]
             if (ref, pin) in pad_positions:
                 by_ref.setdefault(ref, []).append((ref, pin))
         reps = []
+        # Fixed (Hardware Reviewer finding ISS-037, MEDIUM): this bridging
+        # step previously hard-coded WIDTH_SIGNAL (0.25mm) for every
+        # same-component cluster bridge regardless of which net it
+        # belonged to -- so a fine-pitch IC's multi-pin-same-net cluster
+        # on a HIGH_CURRENT_NET (e.g. U5's two physical pins per motor
+        # phase, 17/18=U, 19/20=V, 21/22=W, and its two VCC pins 23/24)
+        # got a narrow 0.25mm "stub" immediately at the pad, even though
+        # the net's intended, DRC-checked, current-class-sized width
+        # elsewhere is 1.0mm (`WIDTH_HIGH_CURRENT`) for these up-to-3A
+        # nets. A trace is only as good as its narrowest point -- sizing
+        # the whole net for 3A but leaving a 0.25mm neck right at the pad
+        # defeats the purpose. Use the same per-net-class width selection
+        # the main routing step below already uses, so every segment of a
+        # given net (including these local bridges) is sized consistently
+        # for its real current class, not just the long runs.
+        bridge_width = MM(
+            WIDTH_HIGH_CURRENT if net_name in HIGH_CURRENT_NETS or net_name == "GND"
+            else WIDTH_POWER if net_name in POWER_NETS
+            else WIDTH_SIGNAL
+        )
         for ref, pin_list in by_ref.items():
             pts = [pad_positions[k] for k in pin_list]
             tht_flags = [pad_is_tht[k] for k in pin_list]
             order = sorted(range(len(pts)), key=lambda i: (not tht_flags[i], pts[i][0], pts[i][1]))
             pts = [pts[i] for i in order]
             tht_flags = [tht_flags[i] for i in order]
-            width = MM(WIDTH_SIGNAL)
             for (x1, y1, _), (x2, y2, _) in zip(pts, pts[1:]):
-                add_track(x1, y1, x2, y2, f_cu, width, net_items[net_name])
+                add_track(x1, y1, x2, y2, f_cu, bridge_width, net_items[net_name])
             reps.append((pts[0][0], pts[0][1], pts[0][2], tht_flags[0]))
         net_repr_points[net_name] = reps
 

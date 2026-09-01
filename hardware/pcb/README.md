@@ -153,11 +153,41 @@ Summary:
   `solder_mask_bridge`/`shorting_items` findings against components the
   net had no real reason to route near.
 - Trace widths sized per net current class (Hardware Reviewer checklist
-  item 19): 1.0mm for this design's up-to-3A worst-case nets (VM_MOTOR
-  chain, U5_VCC, motor phase outputs) — a standard 1oz-external-copper
-  rule-of-thumb figure for ~30-35 mil at a 10°C rise, not a fully worked
-  per-net IPC-2221 calculation (ESTIMATE, disclosed); 0.4mm for other
-  power rails; 0.25mm for logic/bias signals.
+  item 19): 1.0mm for this design's motor-domain nets (VM_MOTOR chain,
+  U5_VCC, motor phase outputs) — sized against DRV10983's **continuous**
+  2A/phase rating (DS-MTR-034), not its 3A start-up/locked-rotor figure
+  (DS-MTR-056), a real continuous-vs-fault distinction, not an
+  interchangeable pair. Per the IPC-2221 external-layer formula
+  (`I = 0.048 x dT^0.44 x A^0.725`, 1oz copper), 2A at a 10°C rise needs
+  ≈31 mil (≈0.79mm) — 1.0mm (≈39mil) provides real margin above that,
+  independently re-derived and cross-checked against a published
+  IPC-2221 reference table this cycle (ESTIMATE/rule-of-thumb, not a
+  fully worked per-net thermal/copper-pour-proximity calculation, but
+  now with the correct current basis and rise target, not conflated with
+  each other). **Corrected (Hardware Reviewer finding ISS-037, MEDIUM)**:
+  this section previously cited "~30-35 mil at a 10°C rise" for a 3A
+  worst-case current — that specific figure is actually closer to the
+  width needed at a ~20°C rise for 3A (independently verified: ≈35.5 mil
+  at 3A/20°C vs. ≈54 mil at 3A/10°C), a real internal inconsistency, not
+  a rounding difference; 0.4mm for other power rails; 0.25mm for
+  logic/bias signals.
+- **Trace-width consistency, not just magnitude (also ISS-037)**: the
+  routing script's same-component pin-cluster bridging step (used for
+  fine-pitch multi-pin-same-net clusters, e.g. U5's two physical pins per
+  motor phase and its two VCC pins) previously hard-coded a flat 0.25mm
+  width for every bridge regardless of net class, producing a narrow
+  ~0.25mm "stub" immediately at the pad on 5 motor-domain nets
+  (`MOTOR_PHASE_U/V/W`, `U5_VCC`, `VM_MOTOR`) even though the rest of
+  each net was correctly sized at 1.0mm — a trace is only as strong as
+  its narrowest point, so this defeated the sizing above. Fixed: the
+  bridging step now selects its width the same way the main routing step
+  already does (by net current class), so every segment of a given net
+  is sized consistently. Independently re-verified via a standalone
+  per-net trace-width audit: all 5 previously-affected nets are now
+  uniformly 1.0mm end to end (one apparent "0.6mm" segment on
+  `VM_MOTOR_F1` found during this audit is a via's drill/annular
+  diameter, not a track segment — confirmed by object type, not a
+  stub-width defect).
 - 4x M2.5 mounting holes (`MountingHole_2.7mm_M2.5`, no electrical net,
   matching the schematic's own established convention).
 
