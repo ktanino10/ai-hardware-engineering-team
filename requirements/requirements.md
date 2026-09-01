@@ -426,6 +426,46 @@ but is **not** the same thing as the human Chief Engineer's own Requirements
 sign-off (§9d's two Open Questions, and the Component Selection candidate
 choice, remain genuinely open) — see §10b.
 
+## 9f. Rev 4 — Human priority clarification: speed to a physical result (new)
+
+After the above was drafted and reported back, the human (relayed via the
+creator/"General Chat" session, 2026-09-01) confirmed the actual driving
+goal for this stage of the roadmap: **speed to a real, physical,
+demonstrable 1-axis attitude-response result**, not the most thorough or
+elaborate mechanism. He had initially considered starting directly at
+3-axis, and was talked out of it — correctly, per real-world CubeSat ADCS
+testbed precedent, which itself recommends starting with 1-axis — but
+specifically **because 1-axis is the *faster* path to something real
+working**, not merely the more careful/cautious one. This is recorded here
+precisely (mirrors §9c/9e's own practice of recording human input exactly,
+not paraphrased into something else) because it is a real steer, not a
+restatement of anything already written:
+
+- **Do not reopen or second-guess Rev 3's already-approved motor+flywheel
+  selection** (`bom/component-selection.md` Motor/Motor Driver sections) —
+  unaffected by this clarification, use as-is.
+- **Favor the cheapest/simplest-to-source free-rotation mechanism that is
+  good enough**, over anything requiring specialized fabrication or long
+  lead times — this directly affects which Component Selection candidate is
+  recommended primary (see the updated Recommendation in
+  `bom/component-selection.md`'s Free-Rotation Support Mechanism section:
+  Candidate A, a bolt-on-ready off-the-shelf bearing needing zero custom
+  design work, is now primary over Candidate B, which has a better friction
+  margin but needs a future custom shaft/mount design step first — slower
+  to an actual physical result).
+- **Keep the Requirements + Component Selection deliverable itself lean and
+  focused**, not an exhaustive survey of every possible option — Candidate
+  D (air bearing)'s treatment was trimmed accordingly; the core comparison
+  and worked figures (mass ESTIMATE, friction margins, physics finding) are
+  unchanged, since those are reusable engineering facts, not "extra options
+  exploration".
+- **The existing scope fence is unchanged**: no control loop/PID/attitude
+  estimation this round (REQ-014), and the actual mechanism choice remains
+  an explicit human decision point (§10b), not decided here — "faster" does
+  not mean "AI decides for you," it means the options presented are
+  themselves biased toward what can actually be built quickly once a choice
+  is made.
+
 ## 10. Approval
 
 | Role | Name | Date | Decision |
@@ -445,4 +485,6 @@ choice, remain genuinely open) — see §10b.
 |---|---|---|---|
 | Hardware Lead | Hardware Lead (this session) | 2026-09-01 | **Proposed** — Rev 4 free-rotation-support requirements (REQ-011–014, REQ-113, REQ-205, REQ-310–311, REQ-407–408, REQ-505–506) drafted per `.github/skills/requirements-engineering/SKILL.md`. Both §9d Open Questions (angular-travel target, mechanism BOM ceiling) and the Component Selection mechanism choice (`bom/component-selection.md`'s new Free-Rotation Support Mechanism section) are explicitly routed to the human Chief Engineer for review, not silently adopted — reported via cross-session message per this file's own §10a-established process note (`ask_user` not reliably reaching the human this cycle). |
 | Creator/"General Chat" session | — | 2026-09-01 | Reviewed the plan for this revision before drafting began, independently re-verified the REQ-012 physics finding (§9e), and approved proceeding — this is process endorsement of the approach, not the human Chief Engineer's own Requirements sign-off |
+| Chief Engineer (Human), via creator/"General Chat" session | Human Chief Engineer | 2026-09-01 | Priority clarification received (§9f): speed to a physical, demonstrable result is the actual goal; do not reopen the motor/flywheel selection; favor the simplest/fastest-to-source mechanism; keep the deliverable lean. **Not yet the Requirements sign-off itself** — §9d's two Open Questions and the mechanism choice remain open |
+| Hardware Lead | Hardware Lead (this session) | 2026-09-01 | Revised the Component Selection recommendation accordingly (Candidate A now primary — see `bom/component-selection.md`) and trimmed the deliverable per §9f. Still routed to the human for the actual mechanism decision, not self-approved |
 | Chief Engineer (Human) — required, Requirements sign-off is a HITL checkpoint (`.github/skills/requirements-engineering/SKILL.md` step 7) | *(pending)* | *(pending)* | **Awaiting review** — see the cross-session message reporting this revision's summary for the specific items needing a decision |
