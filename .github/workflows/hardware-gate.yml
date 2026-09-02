@@ -5,14 +5,21 @@ name: Hardware Gate
 # CRITICAL finding, or a HIGH finding without RESOLVED/ACCEPTED-RISK status,
 # in validation/open-issues.md.
 
+# NOTE (pull_request trigger is deliberately NOT path-filtered): this job's
+# name, "Check open-issues.md for unresolved CRITICAL/HIGH findings", is one of
+# three REQUIRED status checks on `main`. GitHub never reports a required check
+# that a path filter skipped -- it stays "Expected" forever, leaving the PR
+# permanently mergeStateStatus=BLOCKED, landable only via an admin override.
+# Because all three required checks were path-filtered, a PR had to touch all
+# three disjoint path sets to be mergeable at all; PR #25 hit exactly this and
+# was merged by admin bypass. This check validates the whole of
+# validation/open-issues.md regardless of which files a PR touched, and runs in
+# ~15s, so running it on every PR is both cheap and strictly safer. The `push`
+# trigger below keeps its path filter -- required-check semantics don't apply
+# there, and a targeted signal on `main` is still useful.
+
 on:
   pull_request:
-    paths:
-      - "validation/**"
-      - "hardware/**"
-      - "bom/**"
-      - "requirements/**"
-      - "tools/check_open_issues.py"
   push:
     branches: [main]
     paths:
