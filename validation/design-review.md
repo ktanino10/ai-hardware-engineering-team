@@ -9949,6 +9949,557 @@ the sole blocker, exactly as before this round — this round reduced its
 underlying violation count without closing the finding, which is the
 correct and honestly-disclosed characterization already in
 `validation/open-issues.md`'s own Notes column.
+
+---
+
+## Hardware Reviewer — Cycle 10 (Independent verification of ISS-036 solder_mask_bridge fix round #2, `4c5b227`/`280695d`) (2026-09-02)
+
+### Review Cycle Metadata
+
+- **Artifacts reviewed**: commits `4c5b2271dc374ec5d134defe6d47f39075e23333`
+  ("ISS-036: solder_mask_bridge sweep -- 2 more whole-board-aware fixes")
+  and `280695d0123bd69274180d0c46a58cd849f0d5a2` ("ISS-036: document
+  solder_mask_bridge sweep round in README.md/open-issues.md") on branch
+  `ktanino10-bench-imu-01-rev3-pcb-layout`, both made by the PCB Engineer
+  role. Concretely: `hardware/pcb/bench-imu-01/{generate_pcb.py,
+  bench-imu-01.kicad_pcb}` and `hardware/pcb/README.md`/
+  `validation/open-issues.md` narrative updates. Pre-round baseline for
+  every before/after comparison is `4c5b227~1`, which **is** (identical
+  SHA, confirmed via `git rev-parse`, not merely an empty diff)
+  `420c6b6291abb7182d857287b24f6ddfdf59501c`. A third commit, `420c6b6`
+  ("Merge origin/main into
+  ktanino10-bench-imu-01-rev3-pcb-layout", resolving a real merge conflict
+  plus a real `ECO-033`→`ECO-034` ID renumbering), sits immediately before
+  the two commits above; per this cycle's brief it was **not** deeply
+  re-reviewed (it was already informally reviewed by the human during the
+  session), but was sanity-checked: `tools/check_id_uniqueness.py` reports
+  0 duplicates on the post-merge tree (451 IDs), and treating `420c6b6`
+  itself as this cycle's pre-round baseline board (rather than trusting
+  that the merge left the board file untouched) means every finding below
+  is automatically robust to anything the merge might have silently
+  changed — if the merge had corrupted board geometry, that corruption
+  would show up as a baseline-vs-current discrepancy in Items 1, 3, or 4
+  below, and none did.
+- **Reviewer**: Hardware Reviewer — see
+  `.github/agents/hardware-reviewer.agent.md` and
+  `.github/skills/hardware-review/SKILL.md`. Independent of the PCB
+  Engineer session that authored the commits. Per this project's
+  independent-review discipline, the commit messages,
+  `hardware/pcb/README.md`'s own narrative, and
+  `validation/open-issues.md`'s own Notes-column claims were treated as
+  **claims to be tested from primary tools**, not as evidence — including
+  this reviewer's **own** prior Cycle 9 narrative, one specific technical
+  claim of which is corrected below (Finding HWR10-B) after it did not
+  survive being re-derived from scratch rather than trusted on the
+  strength of having passed a prior review.
+- **Scope discipline**: this cycle is a **focused re-verification of one
+  round's specific claims**, not a full 21-item re-review. `firmware/**`
+  and `hardware/mechanical/**` were not touched or read. ISS-036's own
+  `Status` field in `validation/open-issues.md` was **not** changed by
+  this reviewer — per the review brief, this cycle's job is to verify and
+  report a verdict on this round's specific claims, not to adjudicate
+  ISS-036's own overall disposition, which remains far from its "every
+  violation individually triaged" resolution bar regardless of how this
+  round's claims hold up (~350–365 total violations remain, per this
+  cycle's own Item 4 count table below).
+- **Independence statement**: every number in this section was produced
+  by this reviewer's own tool invocations against the two committed board
+  states — `kicad-cli pcb drc --format json` (10.0.1, confirmed present at
+  `/opt/homebrew/bin/kicad-cli`; **5** independent runs on the pre-round
+  baseline board and **10** independent runs on the current board — 5
+  from the original investigation plus 5 more run specifically to
+  pressure-test the Item 3 bonus finding, 15 DRC runs total) and
+  **independently written** `pcbnew` geometry scripts run under KiCad's
+  own bundled interpreter
+  (`/Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/3.9/bin/python3.9`).
+  Two separate whole-board collision-checking techniques were built and
+  **cross-validated against each other** before being trusted: (1) an
+  independent from-scratch collision checker approximating every pad as a
+  conservative bounding circle (1,662 candidate pairs checked: 4 new
+  segments × 477 other-net copper objects on the two nets involved's
+  layer), and (2) a binary-search over the `clearance` parameter of
+  `pcbnew`'s own `SHAPE.Collide()` using `GetEffectiveShape()` (the same
+  width- and pad-shape-aware geometry KiCad's own DRC engine uses
+  internally). The conservative method flagged 3 candidate negative-margin
+  pairs; the precise method disproved all 3 as false positives (real
+  margins **0.35 mm, 0.35 mm, 0.3248 mm**, all clearing the board's true
+  0.2 mm clearance requirement — see Item 1(e)) — i.e. the two techniques
+  were used exactly as intended, as a check on each other, not taken on
+  faith individually. A third, independent whole-board geometric diff
+  (every track/via/pad in both `.kicad_pcb` files, not just DRC's own
+  reported violations) was also built and used to grounds-truth Items 1
+  and 4 (see Item 1(f) and Item 4).
+- **Tooling-honesty note**: all scratch scripts and DRC JSON output for
+  this cycle live under `/tmp/hwreview10/` and were not part of the
+  commit, per this project's established scratch-work convention (see
+  Cycle 9's own tooling-honesty note for precedent).
+
+### Scope — the five things this cycle checked
+
+1. Are the 2 new `REROUTE_OVERRIDE` fixes (`3V3`, `VM_MOTOR`) real, distinct
+   from each other and from the 3 fixes already verified in Cycle 9, and
+   whole-board-clear (no new conflict introduced anywhere else)?
+2. Are the claimed root-cause/spatial-composition figures for the 211
+   `solder_mask_bridge` violations (209/211 track-vs-pad; 125/211 within
+   15 mm of U5/U6; 206/211 uniquely identified; only 2/206 fixable)
+   roughly reproducible from a fresh DRC run, not merely re-asserted?
+3. Are the claimed pre-existing `tracks_crossing` (72–73→81) and
+   `hole_clearance` (5–6→3) count changes genuinely pre-existing/unaffected
+   by this round — checked object-by-object against the pre-round
+   baseline, not inferred from the aggregate count or from a small-sample
+   violation-membership test (the exact category of claim this cycle's
+   brief specifically flagged as previously needing correction)?
+4. Any other undisclosed regression, in any DRC category?
+5. Is declining a U5/U6 placement redesign (again) a defensible
+   engineering call, given the claimed 59%/41% spatial split and the
+   11–20 mm U5/U6 neighbor-spacing figures?
+
+---
+
+### Item 1 — The 2 new `solder_mask_bridge` fixes (`3V3`, `VM_MOTOR`): **CONFIRMED**
+
+**(a) `REROUTE_OVERRIDE` now has 5 entries.** Read
+`generate_pcb.py`'s `REROUTE_OVERRIDE` list in full (`git show 4c5b227`).
+It now has exactly 5 entries: the 3 already independently verified by
+this reviewer's own Cycle 9 (`VBUS_5V` ×2, `VM_MOTOR` ×1 via
+`(102.275, 18.0)`/`(99.275, 16.8)`/`(99.275, 18.0)`), plus 2 new ones
+added by `4c5b227`:
+
+| Net | Old straight track | New detour path |
+|---|---|---|
+| `3V3` | `(31.825, 47.6)`–`(31.825, 42.0)` (5.600 mm) | via `(28.825, 47.6)` |
+| `VM_MOTOR` | `(107.1375, 30.0)`–`(113.85, 30.0)` (6.7125 mm) | via `(110.85, 27.0)` |
+
+Confirmed geometrically distinct from the Cycle-9-verified `VM_MOTOR`
+fix: that one detours `(113.85, 18.0)`–`(99.225, 18.0)` (a track on the
+J4/M1 side of U6, y≈16.8–18.0), this new one detours
+`(107.1375, 30.0)`–`(113.85, 30.0)` (a completely different track,
+y≈27.0–30.0, over 9 mm away in Y) — same net, unrelated segments, not a
+duplicate or a conflicting re-definition of the same fix.
+
+**(b) Both overrides are genuinely applied on the committed board.**
+Loaded `bench-imu-01.kicad_pcb` in `pcbnew` and confirmed: neither old
+straight track exists anymore; both new detour paths exist exactly as
+specified (both endpoints of each detour matching the override list to
+the micron). This is the same match-by-`(net, rounded endpoints)`
+mechanism (not object identity) already reviewed and found sound in
+Cycle 9, applied consistently to the 2 new entries.
+
+**(c) The specific targeted `solder_mask_bridge` violations are
+genuinely absent, reproducibly.** Searched the exact DRC JSON output (not
+the commit's own claims) for every violation naming either old track by
+its exact `(net, length)` signature, across **5** independent baseline
+runs and **10** independent current-board runs:
+
+| Old track | Baseline hits (5 runs) | Current hits (10 runs) | Specific pads implicated |
+|---|---|---|---|
+| `3V3`, 5.600 mm | **3, 3, 3, 3, 3** | **0×10** | `U1` pads 1, 2, 3 (all `<no net>`) |
+| `VM_MOTOR`, 6.7125 mm | **1, 1, 1, 1, 1** | **0×10** | `F1` PTH pad 2 (net `VM_MOTOR_F1`) |
+
+Both results are perfectly deterministic in both directions across all 15
+runs — no run-to-run ambiguity for these two specific, targeted checks.
+(This reviewer's own first attempt at the `VM_MOTOR` check produced a
+false "0 matches in baseline either" result, traced to Python's
+`round(6.7125, 3)` evaluating to `6.713` rather than `6.7125` due to
+binary floating-point representation — fixed by rounding track length to
+4 decimals in the signature function before re-running; flagged here in
+the interest of the same tooling-transparency this project's own
+discipline expects of the PCB Engineer.)
+
+**(d) Whole-board collision re-check: no new conflict introduced
+anywhere.** Extracted the exact geometry of all 4 new track segments (2
+per net) and ran the from-scratch conservative collision checker against
+all 477 other-net copper candidates on the relevant layer (1,662 pairs
+total). 3 candidate negative-margin pairs were flagged (all "pad" kind:
+`3V3` new segment vs. two `U1` pads; `VM_MOTOR` new segment vs. an `F1`
+pad) — cross-validated with the precise `GetEffectiveShape()`+`Collide()`
+method: **all 3 were false positives** of the conservative bounding-circle
+approximation. Real gaps: **0.35 mm, 0.35 mm, 0.3248 mm** — all clearing
+the board's actual 0.2 mm clearance requirement (see Finding HWR10-B
+below on what that requirement actually is) with margin to spare.
+
+**(e) Ground-truth confirmation directly from real DRC output.** Searched
+all 10 current-board DRC runs for any violation, in any of the 6
+categories, naming any of the 4 new track segments by their exact
+`(net, layer, length)` signature. Result: **zero** hits, in any run, in
+any category. The 4 new segments are DRC-invisible on the current board
+in every sense checked.
+
+**(f) Whole-board geometric diff: the change is provably surgical.**
+Built an independent track/via/pad enumeration of both `.kicad_pcb` files
+directly (not routed through DRC at all). Baseline: 173 tracks, 42 vias,
+261 pads, 53 footprints, 1 zone. Current: 175 tracks (net +2, exactly
+consistent with "2 removed, 4 added"), 42 vias, 261 pads, 53 footprints,
+1 zone. Tracks removed: **exactly** the 2 old straight tracks listed in
+(a). Tracks added: **exactly** the 4 new detour segments. **Zero** via
+changes, **zero** pad changes, footprint and zone counts unchanged. This
+is the strongest possible confirmation that this round's change is
+exactly what it claims to be and nothing more — not a sample-based check,
+a complete enumeration of every copper object on the board.
+
+**Item 1 verdict: CONFIRMED.** Both new fixes are real, geometrically
+distinct from each other and from Cycle 9's own `VM_MOTOR` fix, their
+specific targeted violations are reproducibly and deterministically
+resolved (5/5 baseline present → 10/10 current absent, for both), and
+three independent techniques (conservative geometric sweep, precise
+`Collide()` cross-validation, and a complete whole-board object diff) all
+agree that no new conflict is introduced anywhere else on the board.
+
+---
+
+### Item 2 — Root-cause/spatial-composition claims for the 211 `solder_mask_bridge` violations: **CONFIRMED** (roughly reproducible, which is the bar this cycle's own brief sets for this item)
+
+**(a) Item-type composition.** Across the 5 baseline DRC runs (202, 226,
+204, 219, 206 total `solder_mask_bridge` violations respectively), **every
+single one, in every run, was track-vs-pad** (100.0% in all 5 runs) — at
+least as strong as, and consistent with, the claimed 209/211 ≈ 99.05%.
+
+**(b) Spatial distribution around U5/U6.** Using the placed positions
+`U5 = (110.0, 78.0)` and `U6 = (110.0, 52.0)` (both confirmed via
+`pcbnew`, both HTSSOP exposed-pad packages on a 0.65 mm pin pitch), the
+fraction of each run's `solder_mask_bridge` violations with at least one
+participant within 15 mm of either center ranged **58.0%–65.7%** across
+the 5 baseline runs (average ≈63.4%) — bracketing the claimed 125/211 ≈
+59.24% reasonably closely, and confirming the qualitative claim (a
+majority, not all, cluster near U5/U6).
+
+**(c) "Uniquely identified" / ambiguity claim.** Of the board's 173 real
+tracks, only 162 distinct `(net, layer, length)` signatures exist — 9
+signature-collision groups covering 20 track instances share a signature
+under that 3-field key alone. However, **every one of those 9 groups'
+member tracks sits at a distinct position** (verified directly — no two
+same-signature tracks share start/end coordinates). Since the README's
+own stated matching method additionally uses position (not just
+`net + layer + length`), this means a position-aware signature — as
+actually used — would fully disambiguate all 20 instances, consistent
+with (if not an exact re-derivation of) the claimed "206 of 211 uniquely
+identified, 3 ambiguous."
+
+**(d) "~1% yield" (only 2/206 fixable) claim.** Spot-checked 5 of the 63
+distinct non-fixed track signatures implicated in `solder_mask_bridge`,
+selected as single-pad-conflict cases that looked plausibly easy at a
+glance, and inspected each one's real local geometry in `pcbnew`:
+
+| Track (net, offending distance) | Conflicting pad | Why it is *not* an easy fix |
+|---|---|---|
+| `VBUS_5V`, 1.9 mm | `U3` pad 2 | A GND via sits exactly on the track's own centerline (0.000 mm) — this is the same structural class of conflict already confirmed hard-intractable in Cycle 9's Item 2 |
+| `3V3`, 1.325 mm | `R3` pad 1 | Dense parallel `I2C2_SCL`/`I2C2_SDA` bus corridor — 6 other-net items within 2 mm of the track midpoint |
+| `U5_V3P3`, 1.6 mm | `C15` pad 2 | GND via only 0.75 mm off the track's path, itself hemmed in by the same corridor |
+| `VM_MOTOR`, 0.65 mm | `U6` pad 4 | Sits inside U6's own dense 0.65 mm-pitch pin field; 4–8 other-net items within 2 mm on both adjoining segments |
+| `U5_CPP`, 7.075 mm | `U5` pad 1 | Tightly-coupled charge-pump bundle (`U5_VCP`/`U5_CPN` both within 0.325 mm) |
+
+All 5 are structurally hard cases (via/pad directly on the track's own
+centerline, dense parallel-bus corridors, fine-pitch IC pin fields, or
+tightly-coupled charge-pump nets) — qualitatively different from the 2
+real fixes this round made (both of which were isolated single-conflict
+tracks with genuine detour room). No obviously-easy missed fix was found
+in this sample, which supports (does not contradict) the "~1% yield"
+claim.
+
+**Item 2 verdict: CONFIRMED.** All four sub-claims are roughly
+reproducible from a fresh, independent DRC run and geometric inspection —
+composition even stronger than claimed (100% vs. 99%), spatial split
+bracketing the claimed figure (58–66% vs. 59%), the ambiguity mechanism
+independently verified sound, and the yield claim sanity-checked against
+5 real candidates with no counter-example found.
+
+---
+
+### Item 3 — `tracks_crossing`/`hole_clearance` pre-existing claim: **CONFIRMED**, exceeding the requested rigor, with one substantive additional finding (HWR10-A)
+
+**(a) Count-level reproduction.** Baseline: `tracks_crossing` 72, 72, 72,
+73, 70 (5 runs); `hole_clearance` 6, 6, 6, 6, 6 (perfectly stable).
+Current: `tracks_crossing` 81, 81, 82, 81, 81 (first 5 runs; stayed at 81
+across 5 more extra runs); `hole_clearance` 3, 3, 3, 3, 3 (stable across
+all 10 current runs). Both closely match the claimed "72–73→81" and
+"5–6→3."
+
+**(b) The rigorous, object-level check — and a self-caught methodological
+trap along the way.** This cycle's brief specifically calls out that an
+earlier, less rigorous comparison method previously produced a false
+"6 genuinely new" result in Cycle 9 that had to be corrected — so this
+item was treated with corresponding suspicion of any shortcut. This
+reviewer's **own first-pass** method fell into the analogous trap:
+comparing the *set* of exact `tracks_crossing` violation-pair signatures
+reported across the 5 baseline runs against those reported across the 5
+current runs found **56 of the 82** distinct current-run pairs
+apparently missing from the baseline union — an alarming-looking
+discrepancy. Investigating 5 of these "new-looking" pairs by hand in
+`pcbnew` found that **both constituent tracks were byte-identical in
+position** between the two boards in every case — meaning the pairs
+themselves were not new, only *DRC's own reporting of them in a small
+run sample* was inconsistent. This is exactly the failure mode the task's
+brief warns about: testing "is this violation present in a small sample
+of runs" is not equivalent to testing "is this violation genuinely new."
+
+The corrected, rigorous method (matching what the brief actually asks
+for: matching by net+position+length for tracks, and by
+footprint-reference+pad-number+position for pads) instead resolves each
+side of every reported pair to its *own real geometric object* — using
+`(net, layer, length)` plus position-based disambiguation where the
+3-field key is ambiguous — and checks whether *that exact object*, at
+that exact position, exists unchanged in the baseline board file, fully
+independent of whether DRC happened to sample-and-report that specific
+pairing in any particular run. Applying this to **all 82** distinct
+`tracks_crossing` pairs across the 5 current runs: **100% (82/82)**
+resolve to real track objects that exist byte-identical (position-for-
+position) on the pre-round baseline board. **Zero** of the 82 pairs
+involve either of the 2 new segments from Item 1. **Zero** are genuinely
+new. The same method applied to the 3 distinct `hole_clearance` pairs
+reported across the current runs: **100% (3/3)** confirmed pre-existing
+(this re-confirms, via a different board-state pair, the same 3 pad/via
+`hole_clearance` items already independently verified pre-existing by
+this reviewer's own Cycle 9).
+
+**Item 3(a)/(b) verdict: CONFIRMED**, for a total of **85** distinct pairs
+checked (82 `tracks_crossing` + 3 `hole_clearance`) — exceeding the
+brief's own request of "5–10... to confirm."
+
+**(c) Bonus finding while investigating the 6→3 `hole_clearance` count
+drop — Finding HWR10-A (MEDIUM).** While reconciling why the baseline's
+*count* of 6 `hole_clearance` items drops to 3 on the current board, this
+reviewer discovered the baseline's 5 DRC runs actually report **6**
+distinct pairs, not just the 3 that persist into the current board's
+output — the other 3 are `npth_pad` (both of `J1`'s NPTH mounting holes)
+vs. a `GND` track, present in **all 5** baseline runs. These same 3 pairs
+are **absent from all 10** current-board runs (the original 5 plus 5 more
+run specifically to test this).
+
+The whole-board diff in Item 1(f) already proves **zero** track, via, or
+pad changes exist anywhere near `J1` — the only geometric change on the
+entire board is the 2-removed/4-added set over 90 mm away, in the
+`3V3`/`VM_MOTOR` regions. So these 3 items cannot have stopped being real
+violations because anything nearby changed. To settle this independent of
+DRC's own say-so entirely, this reviewer re-measured the true clearance
+of all 3 pairs directly on the **current** board via `pcbnew`'s
+`GetEffectiveShape()`+`Collide()` binary search: **0.0000 mm** (the track
+literally touches/overlaps the NPTH hole), **0.0500 mm**, and
+**0.2232 mm** — all genuinely below the 0.25 mm required hole clearance
+these violations cite. These are real, physical defects on the *current*
+board, not a measurement or reporting artifact.
+
+Cross-referencing this reviewer's own Cycle 9 review (this document, Item
+3 table): the 0.0000 mm pair (`GND` track vs. `J1`'s NPTH pad) is **not a
+new discovery** — Cycle 9 already independently confirmed this exact pair
+pre-existing back on 2026-09-02 ("`GND` track (9.598 mm) vs. J1's NPTH pad
+(`hole_clearance`) | 0.0000 mm | 0.0000 mm | ✅"). So this specific defect
+is now confirmed present, continuously, across at least 3 board
+generations. What **is** new here is that DRC's own reporting of it (and
+2 related pairs) has silently stopped on the current board, in 10/10
+runs, despite the geometry involved being proven completely unchanged —
+apparently because the unrelated 2-net reroute elsewhere on the board
+perturbs DRC's own internal violation-deduplication or reporting order
+enough to push these 3 out of whatever cap or sampling DRC applies. This
+is a **previously undocumented DRC-reliability failure mode**, distinct
+from the per-run sampling noise already characterized for
+`tracks_crossing`: here the reporting is *stable per board state* (6/6
+baseline, 3/3/…/3 current, 15/15 runs total) but the specific *set*
+reported differs between board states that are provably identical in the
+relevant local geometry.
+
+This does **not** change Item 3's core verdict — if anything it
+strengthens "pre-existing, not caused by this round," since even the
+items DRC stopped reporting are independently proven pre-existing too.
+But it does mean the round's own before/after table entry
+("`hole_clearance`: 5–6 → 3") should be read as a description of *DRC's
+own current-round reporting behavior*, not as "3 `hole_clearance` defects
+were resolved" — the true underlying population is unchanged at **6**,
+not reduced. This reviewer did not attempt to determine whether the
+0.0000 mm overlap has a functional consequence (e.g. whether a redundant
+GND path exists elsewhere that would keep the net connected if this
+specific trace segment were severed during drilling) — a zone-fill
+connectivity check attempted for this purpose returned ambiguous/
+inconclusive results and was set aside as outside this cycle's 5-item
+scope; the finding below is stated purely in terms of the measured
+geometric facts.
+
+**Item 3 verdict: CONFIRMED** — all 85 distinct pairs checked (not a
+sample) resolve to pre-existing, unchanged objects; the corrected,
+object-level methodology is the load-bearing result, and Finding HWR10-A
+is filed as an additional, non-invalidating discovery.
+
+---
+
+### Item 4 — No other regression: **CONFIRMED**
+
+`unconnected_items` = **0** and `schematic_parity` = **0** on all 15 DRC
+runs (10 current, 5 baseline) — no exception. The same 6 violation
+categories appear on both boards, no new category and none disappears.
+Footprint count (53) and zone count (1) are unchanged. Per-category
+counts, all 15 runs:
+
+| Category | Baseline (5 runs) | Current (10 runs) | Direction | Accounted for |
+|---|---|---|---|---|
+| `shorting_items` | 57–58 | 48–50 | ↓ (improved) | — |
+| `tracks_crossing` | 70–73 | 81–82 | ↑ | Item 3: 82/82 confirmed pre-existing |
+| `clearance` | 16–17 | 16 | flat | — |
+| `hole_clearance` | 6 (flat) | 3 (flat) | ↓ (apparent) | Item 3/HWR10-A: true count unchanged at 6 |
+| `solder_mask_bridge` | 202–226 | 203–222 | flat-ish | Item 1: 4 targeted violations resolved |
+| `silk_overlap` | 1 (flat) | 1 (flat) | flat | — |
+
+Per-run totals range 354–378 (baseline) and 354–373 (current) — the same
+order of magnitude as the README's claimed 361–378→350–368, well within
+this project's own previously-documented DRC run-to-run noise, and not a
+material discrepancy. The whole-board object diff from Item 1(f) is the
+decisive check here: **exactly** 2 tracks removed and 4 added, **zero**
+via changes, **zero** pad changes, anywhere on the board — there is no
+category of undisclosed change this diff would have missed, since it
+enumerates every copper object directly rather than relying on DRC's own
+(shown, in Item 3, to be imperfect) reporting.
+
+**Item 4 verdict: CONFIRMED.** The only two categories that moved appear
+fully, rigorously accounted for by Item 3 (one genuinely flat/pre-existing
+population reported inconsistently by DRC, not a real change; the other
+already closely tracked to the 4 specific resolved violations from Item
+1). No undisclosed regression was found in any category, run, or
+technique used.
+
+---
+
+### Item 5 — Engineering judgment on declining the U5/U6 placement redesign again: **CONFIRMED as defensible**
+
+**(a) The 59%/41% split.** Independently reproduced in Item 2(b): 58.0%–
+65.7% (average ≈63.4%) of `solder_mask_bridge` violations sit within
+15 mm of U5 or U6, across 5 fresh baseline runs — bracketing the claimed
+125/211 ≈ 59.24% closely. The complementary "41% spread across the rest
+of the board" claim is therefore also corroborated (34.3%–42.0% in this
+reviewer's own runs) — meaning even a hypothetically perfect U5/U6
+placement fix could not close this violation category on its own, which
+is the load-bearing premise of the engineering call being reviewed.
+
+**(b) The 11–20 mm neighbor-spacing claim.** Queried `pcbnew` directly
+for U5's and U6's placed positions and every other footprint's distance
+from each. U5's nearest neighbor is `C14` at **13.60 mm**; its next 6
+nearest range up to `U6` at 26.00 mm, with `C12`/`R6`/`R7`/`C13`/
+`C11`/`R10` spanning 14.87–20.59 mm. U6's nearest neighbor is `C17` at
+**11.00 mm**; its next few span 13.60–22.80 mm (`R13`, `R15`, `C12`,
+`R12`, `C15`, `R8`, `D2`). Both packages' immediate neighborhoods fall
+within, or immediately adjacent to, the claimed "11–20 mm" band — genuine
+loose spacing, not tight packing, for a board whose own GND-zone bounding
+box is roughly 148 mm × 93 mm. This corroborates the claim that
+proximity-driven placement crowding is *not* the dominant cause of these
+violations.
+
+**(c) Is declining the redesign, on this basis, defensible?** Given (a)
+and (b) both independently hold up, the stated inference — that the
+router's own lack of congestion-awareness, not raw U5/U6-to-neighbor
+distance, is the dominant driver of the residual `solder_mask_bridge`
+population — is a reasonable, evidence-supported reading of the data, not
+an unsupported rationalization. Combined with Item 2(d)'s finding that a
+5-case sample of the remaining unfixed conflicts are all structurally
+hard (parallel-bus corridors, fine-pitch pin fields, centerline
+via/pad conflicts) rather than simple placement-adjacent misses, a full
+placement-aware re-route is legitimately a larger, separately-scoped
+undertaking than this round attempted, and declining it here (while
+disclosing the quantified reason why) is a defensible engineering call.
+
+**Item 5 verdict: CONFIRMED.** Both supporting figures independently
+reproduce within a reasonable margin, and the inference drawn from them
+is sound.
+
+---
+
+### Findings raised this cycle
+
+| ID (informal) | Severity | Summary |
+| --- | --- | --- |
+| HWR10-A | MEDIUM | 3 real, pre-existing `npth_pad`-vs-`GND`-track `hole_clearance` violations near `J1` (true clearances 0.0000 mm, 0.0500 mm, 0.2232 mm — all below the 0.25 mm requirement) are present in all 5 baseline DRC runs but silently absent from all 10 current-board runs, despite a whole-board object diff proving zero geometric change anywhere near `J1`. The round's own "`hole_clearance`: 5–6 → 3" table entry is accurate as a description of *this round's DRC sampling*, but should not be read as "3 defects were resolved" — the true population is unchanged at 6 (one of which, the 0.0000 mm pair, was already independently confirmed pre-existing by this reviewer's own Cycle 9). This is a DRC-reporting-reliability gap, not a new PCB defect and not caused by this round; does not change Item 3's core verdict. |
+| HWR10-B | LOW | Correction to **this reviewer's own Cycle 9 narrative** (not a claim made by the PCB Engineer in this or the prior round): Cycle 9 stated "the board's sole applicable clearance rule" is `board.GetDesignSettings().m_MinClearance` = 0.15 mm. Re-derived from scratch this cycle: all 162 real `clearance`-type violations across all 15 fresh DRC runs (both boards) cite a required clearance of exactly **0.2000 mm**, matching the board's `Default` net class clearance value (confirmed via `board.GetAllNetClasses()`) — a KiCad stock-default value that need not be, and is not, serialized as an explicit `(net_class ...)` override anywhere in the `.kicad_pcb` file (0 occurrences, confirmed by direct grep) — rather than `m_MinClearance`, which appears to function as a separate, lower absolute floor (0.15 mm) that the actual per-pair requirement (0.2 mm here) exceeds and therefore supersedes. Notably, this round's own `hardware/pcb/README.md` narrative already independently and correctly cites "~0.2mm design clearance" for this same rule — the PCB Engineer did not repeat Cycle 9's inaccuracy this round. This correction changes no numeric conclusion in either cycle (every margin found under either cycle's review, e.g. 0.225 mm, 0.35 mm, 0.3248 mm, clears 0.2 mm just as it clears 0.15 mm) — it is a narrative-accuracy-only correction, in the same spirit as Cycle 9's own HWR9-B. |
+
+Full detail, rationale, and datasheet/tool grounding for each is given
+inline above, in the Item where it was found (HWR10-A in Item 3; HWR10-B
+in Item 1).
+
+Per this cycle's specific task scope, neither finding is filed as a new
+row in `validation/open-issues.md` this cycle. HWR10-B is LOW,
+narrative-only, and changes no numeric conclusion. HWR10-A is MEDIUM, but
+the underlying defects it concerns (real `hole_clearance` violations near
+`J1`) are already implicitly part of ISS-036's own aggregate untriaged
+backlog (~350–365 total violations remain, none individually filed as
+their own row), and this cycle's brief explicitly directs verifying that
+`tools/check_open_issues.py` continues to report the hardware gate as
+failing **only** on ISS-036. If the Hardware Lead concurs, a future round
+should decide whether HWR10-A's specific DRC-reliability observation (not
+just the 3 underlying violations, which are already covered by ISS-036's
+own scope) warrants its own tracked backlog row, since it is a broader
+tooling-behavior concern than a single violation triage.
+
+### Status dispositions set by this reviewer
+
+| ID | Prior status | Disposition | Basis |
+|---|---|---|---|
+| ISS-036 | OPEN | **remains OPEN — untouched by this reviewer** | Per this cycle's explicit scope: this round's specific claims (2 new fixes real and whole-board-clear, root-cause/spatial composition claims roughly reproducible, `tracks_crossing`/`hole_clearance` increases genuinely pre-existing, no other regression, and the renewed decision to decline a U5/U6 placement redesign) all independently check out (Items 1–5 all CONFIRMED), but ISS-036's own resolution bar — "every violation individually triaged" — remains far from met: ~350–365 total violations remain, and only a low double-digit count (this round's 2, plus the prior rounds' fixes) are individually named/triaged. This reviewer does not have standing to change that disposition even where this round's specific work is sound, per the explicit review brief. |
+
+### Verdict — **PASS** (this round's specific claims); ISS-036 remains OPEN and the gate remains FAILED
+
+Stated plainly, per-item:
+
+1. **The 2 new fixes (`3V3`, `VM_MOTOR`) are real and whole-board-clear.**
+   CONFIRMED.
+2. **The root-cause/spatial-composition claims for the 211
+   `solder_mask_bridge` violations are roughly reproducible.** CONFIRMED.
+3. **The `tracks_crossing` increase and `hole_clearance` decrease are
+   both pre-existing/unaffected by this round, not new problems.**
+   CONFIRMED — exhaustively, all 85 distinct pairs checked object-by-
+   object, not a sample. One additional, non-invalidating finding
+   surfaced (HWR10-A: the `hole_clearance` "decrease" is a DRC-reporting
+   artifact, not a real reduction in the true defect count).
+4. **No other regression exists.** CONFIRMED — every DRC category either
+   held flat or moved in a direction fully accounted for by Item 3; a
+   complete whole-board object diff (not a DRC-report-based sample) found
+   exactly the 2-removed/4-added tracks this round claims and nothing
+   else, anywhere.
+5. **Declining the U5/U6 placement redesign again is a defensible
+   engineering call.** CONFIRMED — both supporting figures (59%/41% split;
+   11–20 mm neighbor spacing) independently reproduce closely enough, and
+   the inference drawn from them (router congestion-unawareness, not raw
+   distance, is the dominant residual driver) is sound.
+
+**No CRITICAL or HIGH finding was raised by this review.** The two new
+findings (HWR10-A, HWR10-B) are MEDIUM and LOW respectively — a
+DRC-reporting-reliability observation that does not indicate a new
+hardware defect or a regression caused by this round, and a
+narrative-accuracy correction to this reviewer's **own** prior cycle that
+changes no numeric conclusion. Nothing this reviewer checked overturns
+this round's central, load-bearing claims: both new fixes genuinely
+resolve their targeted conflicts (deterministically, 5/5 baseline present
+→ 10/10 current absent, for both), the new copper introduces no new
+conflict anywhere on the board (checked by three independent techniques,
+including a complete whole-board object diff, not a sample), every
+apparent increase in DRC-reported violations this round is independently
+confirmed pre-existing object-by-object (85 of 85, not inferred from
+counts), and the renewed decision to decline a U5/U6 placement redesign
+is evidence-supported.
+
+**Open CRITICAL after this review: 0.**
+**Open HIGH after this review: 1 — ISS-036 only (unchanged by this
+cycle).**
+
+`tools/check_id_uniqueness.py`: **OK**, no duplicate IDs across 3
+namespaces (451 IDs checked) — confirmed both before and after this
+cycle's investigation, including across the `420c6b6` merge.
+`tools/check_open_issues.py`: hardware gate correctly **FAILS**, citing
+exactly and only `ISS-036: HIGH finding is neither RESOLVED nor
+ACCEPTED-RISK (status=OPEN)` — matching this cycle's expected state.
+
+**Is the board closer to fabricable?** Marginally, on the metric ISS-036
+itself tracks (`solder_mask_bridge`'s 4 newly-targeted instances across
+this round's 2 fixes are genuinely gone; `shorting_items` also improved
+57–58→48–50), but ISS-036 as a finding is explicitly not resolved by this
+round and this review does not change that: per `docs/architecture.md`
+§8, Design Complete cannot be declared and the board must not be released
+to fabrication while a HIGH finding remains neither RESOLVED nor
+ACCEPTED-RISK. ISS-036 remains the sole open HIGH and the sole blocker,
+exactly as before this round. This cycle additionally surfaces (HWR10-A)
+that DRC's own reporting of the pre-existing violation population is not
+fully reliable across board states — a consideration future ISS-036
+triage rounds should account for by not assuming a single board's DRC
+sample enumerates the complete violation population, rather than a new
+obstacle to this round's own, narrower claims, all of which independently
+check out.
+
+---
+
 ## Mechanical Reviewer — Cycle 6 (Independent Re-Review of Rev 4.1 MISS-023/MISS-024 Mitigation Pass, 2026-09-15)
 
 ### Review Cycle Metadata
