@@ -551,31 +551,45 @@ triaged" resolution bar:
 | Category | Count | Disposition |
 |---|---|---|
 | Benign (`<no net>` mechanical/unused pad on one side) | 3 (5%) | Confirmed harmless |
-| `via_vs_inner_layer_copper` (GND via vs. `VBUS_5V` on In2.Cu, near J1) | 4 (7%) | Same mechanism class as this fix, different net/layer — see below |
+| `via_vs_inner_layer_copper` — 2 distinct instances, not one pocket (correction below) | 4 (7%) | Same mechanism class as this fix, different net/layer — see below |
 | `via_vs_track_outer_layer` (F.Cu/B.Cu) | 28 (46%) | Disclosed autorouter-class gap (14 of these match the already-documented U5/U6 0.65mm fine-pitch package-proximity pattern, geometrically confirmed within 8mm of each IC's placed center) |
 | `track_vs_pad` | 22 (36%) | Same disclosed gap |
 | `track_vs_track` | 4 (7%) | Same disclosed gap |
 
-The 4-item `via_vs_inner_layer_copper` pocket is a real, specific,
-further-tractable-looking lead: a GND through-via (spanning every copper
-layer, including In2.Cu) sits directly on or immediately beside a
-`VBUS_5V` track routed on In2.Cu near J1's own VBUS pad and a via
-cluster at (29.9,25)/(45.9,25)mm. **Not attempted this cycle**: In2.Cu
-carries several different nets (unlike In1.Cu's single dedicated GND
-net), so the "declare one zone, fill it" technique that fixed the
-In1.Cu case doesn't directly generalize here — a real fix would need a
-per-via, per-net clearance/reroute pass, exactly the class of change the
-earlier reverted detour attempt already demonstrated produces an
-unreliable mixed result on this board's actual geometry (see above).
-Flagged as a specific, well-scoped candidate for the same future
-dedicated session Kyosuke already authorized for option (b)
-(whole-board-aware routing), not attempted ad-hoc here.
+**Correction (2026-09-02, per the Chief Engineer's own independent
+re-verification — confirmed identically across 3 fresh DRC runs on
+re-check)**: the 4-item `via_vs_inner_layer_copper` bucket was originally
+described here as one uniform pocket "near J1" — that's only true for 3
+of the 4. A GND through-via (spanning every copper layer, including
+In2.Cu) sits directly on or immediately beside a `VBUS_5V` track routed
+on In2.Cu near J1's own VBUS pad and a via cluster at
+(29.9,25)/(45.9,25)mm — **3 instances**, all in that same location. **The
+4th is a separate instance**: `I2C1_SDA` (via) vs `I2C1_SCL` (track) on
+In2.Cu at (107.1,80.9)mm — 4.1mm from U5's placed center (110,78),
+nowhere near J1 at all. Same underlying mechanism (a through-via of one
+net conflicting with a different net's track on a shared inner layer),
+but plausibly also related to the same 0.65mm fine-pitch
+package-proximity characteristic already documented for U5/U6 in the
+`via_vs_track_outer_layer` row above (U5's own I2C pins are physically
+adjacent) — it just happens to manifest here as a via-vs-inner-layer-
+track shape rather than the outer-layer via-vs-track/track-vs-pad shape
+that pattern otherwise covers. **Not attempted this cycle, either
+instance**: In2.Cu carries several different nets (unlike In1.Cu's single
+dedicated GND net), so the "declare one zone, fill it" technique that
+fixed the In1.Cu case doesn't directly generalize here — a real fix would
+need a per-via, per-net clearance/reroute pass, exactly the class of
+change the earlier reverted detour attempt already demonstrated produces
+an unreliable mixed result on this board's actual geometry (see above).
+Flagged as 2 specific, well-scoped candidates (J1-area ×3, U5-area ×1)
+for the same future dedicated session Kyosuke already authorized for
+option (b) (whole-board-aware routing), not attempted ad-hoc here.
 
 Net effect: confirms, with actual mechanism-level evidence rather than
 net-pair percentages alone, that the bulk of what remains (54 of 61,
 89%) is the already-disclosed autorouter-class routing-density gap this
 design has carried since its first DRC pass — not a fresh class of
-defect — while narrowing the "still needs a real answer" subset to a
-specific, named, 4-item pocket with an identified mechanism. Does not
-claim to have individually resolved any of these 58 non-benign items;
-ISS-036 remains correctly OPEN and the gate correctly still fails.
+defect — while narrowing the "still needs a real answer" subset to 2
+specific, named, geometrically-distinct instances (not one pocket) with
+an identified mechanism. Does not claim to have individually resolved
+any of these 58 non-benign items; ISS-036 remains correctly OPEN and the
+gate correctly still fails.
