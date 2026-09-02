@@ -830,7 +830,7 @@ entries total now) in `generate_pcb.py`, board regenerated, verified via
 | `shorting_items` | 56–57 | 49–50 |
 | `tracks_crossing` | 72–73 | 81 |
 | `clearance` | 16–17 | 16 |
-| `hole_clearance` | 5–6 | 3 |
+| `hole_clearance` | 5–6 | 3 (reported) — **true population unchanged at 6, see correction below** |
 | `solder_mask_bridge` | 209–226 | 199–217 |
 | `silk_overlap` | 1 | 1 |
 | `unconnected_items` | 0 | 0 |
@@ -852,8 +852,45 @@ genuinely new, including re-confirming the same 3 J1/U2-area
 `hole_clearance` items already independently verified pre-existing by
 Hardware Reviewer Cycle 9.
 
+**Correction (2026-09-02, Hardware Reviewer Cycle 10 independent
+verification — Finding HWR10-A, MEDIUM)**: the "`hole_clearance`: 5–6 →
+3" table row above is accurate only as a description of *this round's
+DRC-reported output* — it should **not** be read as "3 `hole_clearance`
+defects were resolved." Cycle 10 discovered the baseline actually
+carries **6** distinct `hole_clearance` pairs (not the 3 this section
+originally emphasized): the 3 already covered above (J1/U2-area, already
+verified pre-existing by Cycle 9) plus **3 more** — both of J1's own NPTH
+mounting holes vs. a `GND` track, present in all 5 baseline runs — that
+are silently **absent from all 10 of Cycle 10's own current-board runs**,
+despite Cycle 10's own whole-board object diff proving **zero** track/
+via/pad change exists anywhere near J1 (the only geometry this round
+touched is 90mm+ away, in the `3V3`/`VM_MOTOR` regions). Cycle 10
+independently re-measured these 3 pairs' true clearance directly via
+`pcbnew` (bypassing DRC's own report entirely): **0.0000mm** (the GND
+track literally overlaps the NPTH hole — the same pair Cycle 9 already
+confirmed pre-existing on 2026-09-02, so genuinely present across at
+least 3 board generations), **0.0500mm**, and **0.2232mm** — all
+genuinely below the 0.25mm required hole clearance, confirming these are
+**real, physically-present defects on the current board right now**, not
+resolved and not a measurement artifact. What changed is that DRC's own
+reporting of these 3 specific pairs stopped, for reasons Cycle 10
+characterizes as a previously-undocumented DRC reporting-reliability
+mode (stable-but-different reported sets between two board states
+proven geometrically identical in the relevant area) rather than
+anything this round's actual changes caused. **The true `hole_clearance`
+population is unchanged at 6, not reduced to 3** — this does not affect
+ISS-036's OPEN status (if anything it reinforces that more genuine,
+unresolved defects remain than the raw current-run count alone would
+suggest) but is recorded here so a future session doesn't mistake DRC's
+raw category count for this board's true defect count without
+cross-checking, exactly the kind of gap this correction exists to
+prevent. Full detail: `validation/design-review.md` Hardware Reviewer —
+Cycle 10, Finding HWR10-A.
+
 **Net effect**: 2 more real, individually-verified fixes (7 total across
-both rounds); ~350–365 total violations remain. ISS-036 remains
+both rounds); ~350–365 total violations remain (likely a slight
+undercount given HWR10-A above — DRC's own reporting is not fully
+reliable across all categories). ISS-036 remains
 correctly OPEN — its own "every violation individually triaged"
 resolution bar is still not met, and the evidenced conclusion is now
 stronger: further local-detour-based fixing has a real, reproducible,
