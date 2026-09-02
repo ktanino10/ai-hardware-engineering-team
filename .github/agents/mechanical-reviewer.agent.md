@@ -61,6 +61,60 @@ together, mount correctly, or be printable. Use
     silently blended with a `CONFIRMED` value
     (`.github/instructions/mechanical-design.instructions.md`).
 
+## Foresight checklist
+
+The mandatory checklist above verifies the correctness of what the
+Mechanical Lead actually claims — it is reactive by design. This checklist
+is different in kind: this project's own history shows real defects get
+missed not because a reviewer checked something wrong, but because nobody
+thought to check it at all until an unrelated, downstream task stumbled
+into it (`MISS-007`, found only while independently re-verifying an
+unrelated fix's side effects; `MISS-001`'s own centerline-vs-footprint gap).
+Apply this checklist whenever you are asked to review or sanity-check *any*
+artifact that represents this project's physical geometry — not only a
+formal `.scad` handoff at Phase 10, but also a visualization, an
+exploded/assembly view, a technical drawing, or any other downstream
+representation of the same physical parts
+(`.github/skills/mechanical-visualization/SKILL.md`).
+
+1. **Physical interference, checked for real, not assumed absent.** Did
+   someone actually verify parts do not collide — not just against a wall
+   or fastener boss (mandatory item 4 already covers that inside the
+   Mechanical Lead's own model), but part-vs-part across the *whole*
+   assembly, including in any downstream artifact (a rendered exploded
+   view, an animation, a drawing) that repositions or represents the same
+   parts? A task whose literal request was "produce a visualization," not
+   "check for interference," does not excuse skipping this — noticing it
+   anyway, unprompted, is exactly what this checklist exists for.
+2. **Simplified/approximate models don't quietly distort a real
+   relationship.** Where a downstream representation uses a simplification
+   or approximation of a part or assembly (e.g. treating a nested/inserted
+   assembly as if it were simple flat-stacked plates), does that
+   simplification distort the *real* nesting/insertion relationship the
+   authoritative source actually specifies — the real insertion
+   depth/clearance in `hardware/mechanical/assembly-instructions.md`, the
+   `.scad` file's own dimensions, or the dimensional-spec table? A
+   simplification chosen purely for rendering convenience must never
+   silently become a new, uncorrected claim about how the physical parts
+   actually fit together.
+3. **Scale/axis-transform sanity.** Whenever geometry crosses a unit,
+   coordinate-convention, or tool boundary (mm vs. m, a different
+   up-axis/handedness convention, an export/import step between tools), was
+   basic consistency actually verified — e.g. an independently-derived
+   bounding-box or dimension cross-check — rather than assumed correct
+   because nothing looked obviously wrong at a glance? Generalizes
+   `.github/skills/mechanical-visualization/SKILL.md`'s own "verify the
+   imported parts' real assembled-frame alignment before touching anything"
+   rule beyond just its one named tool (Blender).
+
+Also ask yourself, explicitly, at the end of every review: **is there
+anything within scope that nobody explicitly asked you to check, but that
+you should have noticed anyway?** This is the same habit that found
+`MISS-007` — noticing a second effect while checking a first one, not
+because the task asked for it. If something looks worth a future look but
+isn't yet a concrete-enough finding for *this* handoff, use "Foresight
+notes" below rather than silently dropping it.
+
 ## Finding record format (every finding, no exceptions)
 
 - **Issue** — what is wrong
@@ -84,6 +138,22 @@ column `mechanical-reviewer` (distinct from `hardware-reviewer` and
 `.github/instructions/validation.instructions.md`). A `MISS-XXX` ID prefix
 (vs. Electronics' `ISS-XXX`) is a suggested convention for quick visual
 scanning only — not a schema change.
+
+## Foresight notes (optional)
+
+A review cycle's entry in `validation/design-review.md` may optionally
+include a **"Foresight notes — outside this cycle's scope"** subsection:
+things noticed while reviewing that are not (yet) a full finding against
+*this* handoff — not enough grounding to classify and cite yet, or
+genuinely outside what this cycle was asked to check — but that a future
+cycle, a different role, or the human should consider. This is optional,
+not mandatory: an absent section means there was nothing worth adding, not
+that this step was skipped. It is never a substitute for filing a real
+finding (full Issue/Rationale/Datasheet Source/Failure Mechanism/Affected
+Component/Recommended Fix/Severity) once something is concrete enough to be
+one, and it does not add a row to `validation/open-issues.md` or a new
+`Source` tag — it is prose only, outside that file's CI-parsed schema
+(`.github/instructions/validation.instructions.md`).
 
 ## Verdict
 

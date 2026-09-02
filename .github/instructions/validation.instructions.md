@@ -27,5 +27,15 @@ applyTo: 'validation/**'
 - `validation/fmea.md` uses a different scoring scale (RPN =
   Severity×Occurrence×Detection, 1–10 each) than Reviewer findings — do not
   reuse CRITICAL/HIGH/MEDIUM/LOW there.
+- A Reviewer's per-cycle report (`validation/design-review.md`, or
+  Firmware's own `firmware/<board>/<board>-firmware-review.md`) may
+  optionally include a non-mandatory, prose-only "Foresight notes —
+  outside this cycle's scope" subsection for things noticed but not yet a
+  concrete finding (`docs/architecture-evolution.md` §38). This is
+  **outside** the required finding schema above and must **never** be
+  turned into a `validation/open-issues.md` row or column — promote it to
+  a real finding (full Issue/Rationale/Datasheet Source/Failure
+  Mechanism/Affected Component/Recommended Fix/Severity) first if it
+  becomes concrete enough to act on.
 - Do not report or imply "Design Complete" unless all five conditions in
   `docs/architecture.md` §8 hold.

@@ -88,6 +88,44 @@ is the same electrical design, not a new discipline.
     to a real copper pour, and ground/power pours are genuinely continuous
     (no accidental split or starved return path), not merely present.
 
+## Foresight checklist
+
+The mandatory checklist above verifies specific, itemized claims — it is
+reactive by design. This checklist is different in kind: it exists to catch
+the class of gap `docs/workflow.md` §4.2 ("Stale Load-Bearing Figure
+Propagation") already documents happening for real, more than once
+(`MISS-021`, `MISS-029`, the still-open `MISS-019`/`ISS-024`) — a correction
+made carefully in one place with no automatic pressure to check whether it
+silently invalidated something else already reviewed and signed off
+elsewhere.
+
+1. **Cross-domain interference.** Does an electrical change get checked for
+   its effect on thermal, mechanical, or firmware — not only its own
+   electrical correctness? Checklist item 15 (PCB layout concern, including
+   mechanical/thermal co-design when a rotating body is present,
+   `docs/architecture.md` §12) already names this for the design as a
+   whole; this item is the reminder to re-run that same cross-domain lens
+   specifically for *this cycle's change* — e.g. a pin reassignment or
+   clock-frequency change that Firmware already built an assumption on top
+   of (see Firmware Reviewer's own "premise review" item), or a rail/
+   current change that shifts a thermal margin a prior cycle already
+   approved.
+2. **Existing ASSUMPTIONs still hold after the latest change.** Do
+   previously-recorded `ASSUMPTION`/`ESTIMATE`/`UNKNOWN` values (interface
+   files, `datasheets/evidence-log.md` entries, a design document's own
+   hedge language) still hold after this cycle's change, or did the change
+   quietly invalidate one that was fine before? Mirrors the discipline
+   `docs/workflow.md` §4.2 already documents for load-bearing numeric
+   citations — applied here proactively at review time, rather than only at
+   ECO-closing time, and extended beyond numeric citations to any
+   previously-recorded assumption.
+
+Also ask yourself, explicitly, at the end of every review: **is there
+anything within scope that nobody explicitly asked you to check, but that
+you should have noticed anyway?** If something looks worth a future look
+but isn't yet a concrete-enough finding for *this* handoff, use "Foresight
+notes" below rather than silently dropping it.
+
 ## Finding record format (every finding, no exceptions)
 
 - **Issue** — what is wrong
@@ -104,6 +142,22 @@ Record every finding in `validation/design-review.md` (this cycle's report)
 and roll it into `validation/open-issues.md` (the living backlog), tagging
 the `Source` column `hardware-reviewer` (as distinct from `rubber-duck`
 findings — `docs/architecture.md` §5.1).
+
+## Foresight notes (optional)
+
+A review cycle's entry in `validation/design-review.md` may optionally
+include a **"Foresight notes — outside this cycle's scope"** subsection:
+things noticed while reviewing that are not (yet) a full finding against
+*this* handoff — not enough grounding to classify and cite yet, or
+genuinely outside what this cycle was asked to check — but that a future
+cycle, a different role, or the human should consider. This is optional,
+not mandatory: an absent section means there was nothing worth adding, not
+that this step was skipped. It is never a substitute for filing a real
+finding (full Issue/Rationale/Datasheet Source/Failure Mechanism/Affected
+Component/Recommended Fix/Severity) once something is concrete enough to be
+one, and it does not add a row to `validation/open-issues.md` or a new
+`Source` tag — it is prose only, outside that file's CI-parsed schema
+(`.github/instructions/validation.instructions.md`).
 
 ## Verdict
 

@@ -45,7 +45,10 @@ responsibility table):
    PCB-layout-specific concerns (DRC closure, copper current-carrying
    capacity, clearance/creepage, thermal via/pour integrity), extended
    when PCB Engineer was introduced (Phase 6) rather than standing up a
-   separate PCB Reviewer agent.
+   separate PCB Reviewer agent. Also carries a Foresight checklist
+   (cross-domain interference; re-verifying existing ASSUMPTIONs after a
+   change) for proactively noticing what wasn't explicitly asked about
+   (`docs/architecture-evolution.md` §38).
 
 **Mechanical** (Phase 1 of the multidisciplinary evolution —
 `docs/architecture-evolution.md` §10/§27/§31):
@@ -58,7 +61,12 @@ responsibility table):
    `validation/open-issues.md` with Hardware Reviewer (`Source:
    mechanical-reviewer`). Its checklist also cross-checks Manufacturing
    Engineer's process specification (below), rather than a separate
-   reviewer for that narrow addition.
+   reviewer for that narrow addition. Also carries a Foresight checklist
+   (physical interference across the whole assembly incl. downstream
+   visualizations; simplified-model distortion of real insertion depth/
+   clearance; scale/axis-transform sanity) — the discipline where this
+   practice's motivating gap was found (`docs/architecture-evolution.md`
+   §38).
 
 **Firmware** (Phase 2 of the multidisciplinary evolution —
 `docs/architecture-evolution.md` §32):
@@ -106,7 +114,10 @@ Engineer's output at all):
     logic correctness where present, premise review. Findings live in a
     firmware-scoped file (`firmware/<board>/<board>-firmware-review.md`),
     deliberately not `validation/open-issues.md`, so a firmware-only
-    finding cannot silently block the Design Complete Gate.
+    finding cannot silently block the Design Complete Gate. Also carries a
+    Foresight checklist (requirement-implied-but-unimplemented
+    functionality; unverified timing/concurrency areas)
+    (`docs/architecture-evolution.md` §38).
 
 **PCB** (Phase 6 of the multidisciplinary evolution —
 `docs/architecture-evolution.md` §37), an Electronics-adjacent addition like

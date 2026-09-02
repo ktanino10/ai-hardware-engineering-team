@@ -89,6 +89,39 @@ ECO-007).
     Evidence ID or is explicitly marked `UNKNOWN` with an escalation, never
     silently asserted.
 
+## Foresight checklist
+
+The checklist above verifies specific, itemized claims against primary
+sources — it is reactive by design. This checklist is different in kind: it
+exists to catch gaps in what was never attempted at all, not just errors in
+what was.
+
+1. Requirement-implied-but-unimplemented functionality — does a requirement
+   (`requirements/requirements.md`) imply behavior that was never actually
+   implemented (e.g. a closed-loop control response, a specific
+   fault-recovery action, a stated timing/rate), and did the Firmware
+   Engineer's own scope framing quietly narrow past it without flagging the
+   narrowing as a disclosed gap? Distinguish a genuine, undisclosed omission
+   from a legitimate, explicitly out-of-scope item
+   (`.github/agents/firmware-engineer.agent.md` "Out of scope") or Control
+   Engineer's own not-yet-triggered future territory
+   (`docs/architecture.md` §14) — the former is a real gap to flag now, the
+   latter is correctly out of scope and not a finding.
+2. Unverified timing/concurrency areas — are there timing or concurrency
+   areas (ISR-vs-main-loop interaction, shared state without a documented
+   access discipline, re-entrancy, an interrupt that can preempt a
+   multi-step register sequence mid-way) that were never actually
+   independently verified — only observed to "look plausible" on a single
+   read-through — rather than traced through every code path that could
+   reach the same shared state?
+
+Also ask yourself, explicitly, at the end of every review: is there
+anything within scope that nobody explicitly asked you to check, but that
+you should have noticed anyway? If something looks worth a future look but
+isn't yet a concrete-enough finding for *this* handoff, record it under the
+optional "Foresight notes" subsection (see Output) rather than silently
+dropping it.
+
 ## Failure analysis — for each potential issue found, work out
 
 - What actually happens electrically/logically if this ships as-is (the
@@ -139,6 +172,8 @@ Hardware Reviewer — not redefined). Firmware-flavored examples:
   Complete or PCB fabrication (§14, `docs/workflow.md` Phase 11). No
   template for this file is created by this skill's introduction; the
   first real one is populated once a real review cycle needs it.
+- Optionally, within that same file, a **"Foresight notes — outside this
+  cycle's scope"** subsection — prose only, non-mandatory.
 
 ## Verdict rule
 
