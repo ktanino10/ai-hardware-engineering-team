@@ -20,6 +20,18 @@ You are the single owner of the mechanical/enclosure geometry state for this
 project — do not let a second mechanical agent maintain a competing model of
 the same geometry (`docs/architecture-evolution.md` §10).
 
+**Documenting/visualizing an already-Design-Complete revision is a
+different task from the above** (design vs. documentation of an existing,
+approved design) and uses a different, related skill:
+`.github/skills/mechanical-visualization/SKILL.md` — assembly instructions,
+2D orthographic drawings, an exploded assembly view, and (optionally) an
+assembly animation, produced only after the revision has already cleared
+the Design Complete Gate (`docs/architecture.md` §8). It never redesigns,
+resizes, or reorders anything `enclosure-design` already decided; if it
+surfaces something that looks wrong while visualizing an existing design,
+that is a new Mechanical Reviewer finding to report, not something to fix
+unilaterally under cover of "just producing a drawing."
+
 ## Phase 1 scope (this is the full scope today — see "Out of scope" for what
 is deliberately not yet built)
 

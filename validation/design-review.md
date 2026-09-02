@@ -8308,3 +8308,240 @@ this Reviewer's own loop-back rule), not a partial spot-check:
   remain `OPEN`, unaffected by this cycle, rows not edited. MISS-029 (LOW)
   is newly logged `OPEN`, `Source: mechanical-reviewer`, non-gating, for
   whoever maintains `bom/component-selection.md` to pick up at convenience.
+
+## Mechanical Reviewer — Cycle 7 (Independent Review of Bench-IMU-01 Assembly Documentation/Visualization Pass, 2026-09-16)
+
+### Review Cycle Metadata
+
+- **Design revision reviewed**: No new mechanical revision.
+  `hardware/mechanical/bench-imu-01-enclosure.scad` is independently
+  confirmed **byte-for-byte unchanged** this cycle (`git diff
+  52fce6b..HEAD -- hardware/mechanical/bench-imu-01-enclosure.scad` returns
+  empty) — the Rev 3 + Rev 4/4.1 design reviewed across Cycles 1–6 (Design
+  Complete at `ECO-031`; Cycle 6's own `CONDITIONAL` verdict and `MISS-023`
+  disposition untouched by anything in this pass) is not re-litigated here.
+  The reviewed artifact this cycle is `ECO-033`: a documentation/
+  visualization-only pass producing `hardware/mechanical/assembly-
+  instructions.md` (new), `hardware/mechanical/drawings/` (new directory:
+  `scad/` 6 wrapper files, `2d/` 19 PNGs, `exploded/` 2 files, `animation/`
+  3 files, `README.md`), `.github/skills/mechanical-visualization/SKILL.md`
+  (new), and small addenda to `hardware/mechanical/README.md`,
+  `docs/architecture.md` §16, and `.github/agents/mechanical-lead.agent.md`.
+  Independently confirmed via `git diff --stat 52fce6b..HEAD`: 37 files
+  changed, +1431/−0 lines, zero deletions, zero lines touched in any
+  `.scad`, dimensional-spec, or interface file, and (independently checked)
+  zero lines touched in `validation/open-issues.md` — the only
+  `validation/` file changed by this PR is `validation/change-log.md`
+  (its new `ECO-033` row, +1 line).
+- **Reviewer**: Mechanical Reviewer — see
+  `.github/agents/mechanical-reviewer.agent.md`. Independent of the
+  Mechanical Lead session that authored this pass.
+- **Scope departure from the standard procedure (explicit, Chief-Engineer-
+  directed this cycle)**: The standard 10-item enclosure-design checklist
+  (`.github/skills/mechanical-review/SKILL.md`) is **not** re-run this
+  cycle — it was already satisfied at Design Complete (`ECO-031`) against
+  geometry that is confirmed unchanged. Re-running it here would produce no
+  new information and would risk re-litigating Cycle 6's own still-open
+  `MISS-023` disposition via a side door, which this cycle's own task
+  framing explicitly places out of scope. Instead, this cycle independently
+  re-derives the 5 criteria specified for this review: **(a)** build-order
+  accuracy, **(b)** visual accuracy via independent re-rendering, **(c)**
+  ASSUMPTION-flag justification, **(d)** the new skill's quality/
+  reusability, **(e)** whether the documentation/visualization process
+  itself surfaced any real, previously-latent defect.
+- **Independence statement**: No claim in any of the 5 new/changed
+  documents was accepted on the strength of its own stated confidence, its
+  own self-check marks, or its own "verified"/"fixed" language. Every
+  load-bearing claim was independently re-derived from the raw `.scad`
+  source, `bench-imu-01-dimensional-spec.md`, `hardware/mechanical-
+  interface.md`, `datasheets/evidence-log.md`, a read-only cross-branch BOM
+  read, the live `validation/open-issues.md` table's own current Status
+  fields, or a fresh independent render/measurement/`ffprobe` — not re-read
+  from the new documents' own prose and nodded along. One claim
+  (`drawings/README.md`'s "hit and fixed" bug-disclosure) is independently
+  found to be only partially true — see Finding 1.
+- **Tooling disclosure**: `openscad` 2026.08.30 (`/opt/homebrew/bin/openscad`,
+  `--backend=manifold`), `trimesh` 4.11.5 (Python), and `ffprobe`/`ffmpeg`
+  8.1 were used directly this cycle to independently re-render/measure
+  geometry and to independently probe the committed animation files — not
+  merely to re-run or trust the new documents' own cited commands/figures.
+
+### Criterion-by-Criterion Independent Results
+
+Per this cycle's own explicit re-scoping (above), this table replaces the
+standard 10-item checklist table for this cycle only:
+
+| # | Criterion | Result | Independent evidence (this cycle) |
+|---|---|---|---|
+| a | Build-order accuracy vs. the `.scad` module structure, `show_mode=="assembled"` branch, and Z-stack variables; vs. dimensional-spec §14/§18.9 | **PASS** | Independently re-read the parent file's own `if (show_mode == "assembled")` block (line 1789) and Z-stack variables (`brg_top_z`, `brg_bottom_z`, `stand_plate_top_z`, `stand_plate_bottom_z`), and independently re-read §14 (Rev 3's own 6-step sequence: PCB seat → PCB lid → motor mount → motor wiring → hub-collar+flywheel → containment cap installed **last**) and §18.9 (Rev 4's own 4-step addendum, steps 7–10: bearing-bottom-plate-to-stand-plate → bearing-top-plate-to-flipped-Rev-3-unit → mate via captive ball race → route tether through the coaxial bore) in full, then compared both directly against `assembly-instructions.md`'s own §4.1–§4.7 — confirmed an exact 1:1 correspondence for all 10 source steps, with the Rev 4.1 pinch-guard-placement and cable-anchoring/turn-limit additions correctly layered onto (not reordering) that sequence. The "Rev 3 sub-assembly finishes first as one already-completed unit before §18.9's stationary/rotating fork begins" framing (`assembly-instructions.md` lines 116–119, 190–194) is independently confirmed to track dimensional-spec §18.9's own words verbatim ("The Rev 3 sub-assembly (steps 1–6)... is treated as a single completed unit here"). No reordering, omission, or invented step found. |
+| b | Visual accuracy of the 2D drawings/exploded view/animation vs. real assembled geometry | **PASS** | Independently re-rendered **all 6** `drawings/scad/assembled-*.scad` wrapper scripts to STL this cycle (double the 2–3 requested) using the correct `-D 'show_mode="export"'` flag; every resulting bounding box exactly matches either `hardware/mechanical/stl/README.md`'s own independently-derived table or raw `.scad` source variables — see Verdict section for the full number-by-number breakdown. Viewed the committed `bench-imu-01-exploded-view.png`, `pinch-guard-top.png`, and `assembled-unit-iso.png` directly — all physically reasonable and dimensionally consistent (e.g. `pinch-guard-top.png`'s annular inner/outer radius ratio ≈0.52 matches `pinch_guard_ir/pinch_guard_or`=60/115≈0.522 exactly). `ffprobe`'d both committed animation files directly — both exactly match `drawings/README.md`'s own stated frame count/resolution/framerate/duration (180 frames/24fps/7.5s MP4; 90 frames/12fps/7.5s GIF). |
+| c | ASSUMPTION-flagged items (fastener sizes/types) reasonably justified vs. real cross-references; the 4-vs-6-tab claim specifically | **PASS** | Independently confirmed `datasheets/evidence-log.md` `DS-BRG-007`/`DS-FAST-001` are real, correctly-cited entries; independently confirmed `.scad` variables `bmount_pilot_dia`=2.8mm, `screw_len`=6.0mm, `n_cap_bolts`=6, `heatset_od`=4.6mm/`heatset_len`=5.7mm all match `assembly-instructions.md`'s §5 fastener table exactly. Independently read `origin/ktanino10-bench-imu-01-rev3-pcb-layout:bom/bench-imu-01-fab-bom.csv` (read-only, cross-branch) and confirmed its `MH1` line item states quantity 4 (`MH1`–`MH4`) — corroborating the "4 corner tabs, not 6" claim against dimensional-spec §14's own pre-existing "6× M2.5" prose, which the new document discloses transparently (§4.1) rather than silently "fixing" the source spec. Additionally, independently cross-checked all 4 restated finding dispositions (`MISS-016`, `MISS-023`, `MISS-024`, `MISS-025`) against `validation/open-issues.md`'s own live `Status` column (confirmed HIGH/ACCEPTED-RISK, HIGH/ACCEPTED-RISK, HIGH/RESOLVED, MEDIUM/OPEN respectively) — all 4 restatements in `assembly-instructions.md` §1 and §4.5/§4.7 match exactly, including MISS-023's own human-Chief-Engineer-sign-off framing, with no upgrading/softening found in either direction. |
+| d | `mechanical-visualization/SKILL.md` well-formed, convention-conformant, genuinely reusable | **PASS** | Direct structural side-by-side against `.github/skills/enclosure-design/SKILL.md`: valid frontmatter, `name` matches directory name, same core section skeleton, two well-justified additional sections. Confirmed the skill's own generic Step 4 procedure (not just its narration of this one task) correctly specifies `-D 'show_mode="export"'`, and its own "Common failure modes to avoid" section explicitly names the exact failure mode found in Finding 1 below — i.e. the reusable generic guidance is itself correct; the defect found is confined to 6 concrete file instantiations, not the procedure a future session would actually follow. |
+| e | Does the process reveal a real, previously-latent design/process defect? | **1 finding — MISS-030 (MEDIUM)** | See Finding 1. No finding of CRITICAL/HIGH severity, and no finding affecting the physical product design itself, was found despite exhaustive independent cross-checking across (a)–(d) above, including a full re-check of `hardware/mechanical/README.md`'s and `docs/architecture.md` §16's own small addenda diffs and a `git merge-base`/commit-message trace of an initially-suspicious-looking but ultimately honestly-disclosed incidental fix bundled into the same commit as the new skill. |
+
+### Findings
+
+#### Finding 1 — MISS-030: all 6 new `drawings/scad/assembled-*.scad` wrapper scripts' own embedded regeneration commands omit the `-D 'show_mode="export"'` flag their own project documentation says is required and declares already fixed
+
+- **Issue**: Each of the 6 new wrapper scripts in
+  `hardware/mechanical/drawings/scad/` (`assembled-base-assembly.scad`,
+  `assembled-pcb-lid.scad`, `assembled-containment-cap.scad`, `assembled-
+  stand-plate.scad`, `assembled-pinch-guard.scad`, `assembled-reference-
+  bearing.scad`) carries, in its own header comment, two self-documented
+  regeneration commands — one to regenerate its 2D drawing, one to
+  regenerate its assembled-position STL export — and in **all 6 files,
+  both commands** omit the `-D 'show_mode="export"'` flag. Independently
+  confirmed via direct `cat` of all 6 files this cycle.
+- **Rationale**: These wrapper scripts use `include
+  <../../bench-imu-01-enclosure.scad>` (confirmed via direct read of all 6
+  files), which — unlike `use` — inlines the entire parent file, including
+  the parent's own top-level `if (show_mode == "assembled") { ... }`
+  executable render block (parent line 1789). The parent's own default is
+  `show_mode = "assembled"` (parent line 105, independently confirmed).
+  Without the `-D 'show_mode="export"'` override, running a wrapper file's
+  own embedded command literally leaves that default in effect, so the
+  parent's entire assembled-scene block renders **in addition to** the
+  wrapper's own explicit isolated-piece call — silently, into the same
+  output, with no error or warning. This is independently confirmed to be
+  **exactly** the failure mode `.github/skills/mechanical-visualization/
+  SKILL.md`'s own "Common failure modes to avoid" section names, and that
+  `hardware/mechanical/drawings/README.md` (lines 88–92) explicitly states
+  was "hit and fixed" while producing this same pass's own deliverables.
+  That claim is only partially true: the fix was applied to
+  `drawings/README.md`'s own documented commands, to
+  `build_exploded_view.py`'s own embedded commands, and — necessarily — to
+  whatever commands actually produced the 19 committed, independently-
+  verified-correct PNGs and the STL geometry `build_exploded_view.py`
+  consumed. It was **not** propagated to the 6 wrapper files' own
+  header-comment self-documentation, which is the artifact a future
+  engineer is most likely to copy-paste from when regenerating a single
+  piece's drawing or STL later.
+- **Datasheet Source**: `hardware/mechanical/drawings/scad/*.scad` (all 6
+  files, header comments, both the "Regenerate 2D drawing" and "Regenerate
+  assembled-position STL" command blocks — independently `cat`'d in full
+  this cycle); contrast against the correct commands in
+  `hardware/mechanical/drawings/README.md` lines 113–143 and its own
+  bug-disclosure at lines 88–92; contrast against the correct generic
+  guidance in `.github/skills/mechanical-visualization/SKILL.md`
+  (Procedure step 4, ~line 133, and "Common failure modes to avoid," ~lines
+  240–245); contrast against `hardware/mechanical/drawings/exploded/
+  build_exploded_view.py` (lines 21–26, correct); parent file
+  `bench-imu-01-enclosure.scad` line 105 (`show_mode` default) and line
+  1789 (`if (show_mode == "assembled")` block) establish the mechanism.
+- **Failure Mechanism**: Empirically reproduced this cycle on
+  `assembled-containment-cap.scad`. Running the literal embedded command
+  (no `-D` flag) yields `Genus=10 / Vertices=6179 / Facets=12394` — the
+  full 6-part assembly superimposed. Adding the missing flag and
+  re-rendering the identical file yields `Genus=6 / Vertices=864 /
+  Facets=1748` — the correct, isolated cap alone, whose bounding box
+  (109.4 × 109.4 × 12.0mm) exactly matches `cap_skirt_od`=109.4mm and
+  `hardware/mechanical/stl/README.md`'s own independently-derived table. A
+  future engineer who copy-pastes a wrapper file's own documented command
+  verbatim — the normal, expected use of a "regenerate" comment — gets a
+  silently wrong 2D drawing or STL (the whole assembly, not the isolated
+  piece), with `Status: NoError` and no diagnostic of any kind, and no
+  indication anything is wrong short of noticing the image/geometry itself
+  looks different from before.
+- **Affected Component**: `hardware/mechanical/drawings/scad/assembled-
+  base-assembly.scad`, `assembled-pcb-lid.scad`, `assembled-containment-
+  cap.scad`, `assembled-stand-plate.scad`, `assembled-pinch-guard.scad`,
+  `assembled-reference-bearing.scad` — all 6 files' own header-comment
+  self-documentation only. **No currently-committed deliverable is
+  affected**: all 19 committed 2D PNGs, the exploded-view PNG, and both
+  animation files were independently re-verified this cycle (produced via
+  the corrected procedure / the separate STL pipeline that already carries
+  the flag) — this is a latent reproducibility defect in the wrapper
+  files' own documentation of themselves, not a currently-manifest visual/
+  geometric defect in any shipped artifact.
+- **Recommended Fix**: Add `-D 'show_mode="export"'` to both embedded
+  commands (2D-render and STL-export) in all 6 `assembled-*.scad` files'
+  header comments, matching the already-correct wording in
+  `drawings/README.md` exactly (12 one-line edits total). Consider a
+  lightweight automated guard (e.g. a `grep -L` check across
+  `drawings/scad/*.scad` for the literal flag string, in the spirit of
+  `tools/check_open_issues.py`'s existing automated-guard pattern) so a
+  future 7th wrapper file added under this same convention cannot silently
+  omit it again without being caught. Owner: Mechanical Lead.
+- **Severity**: **MEDIUM** — per `docs/architecture.md` §7.1: "Deviates
+  from recommended practice, raises risk, doesn't clearly break function."
+  Not LOW/cosmetic: the failure mode is real, empirically reproduced,
+  silent (no error/warning), and would corrupt a future regeneration if the
+  documented command is followed as written — a genuine process risk
+  against this project's own stated "regenerate on demand, don't hand-edit
+  a stale PNG" convention (`drawings/README.md`). Not HIGH/CRITICAL: it
+  requires a specific future action to manifest (copy-pasting the flawed
+  embedded command rather than the correct procedure documented one
+  directory up in the same PR), has zero effect on the physical product or
+  any currently-committed artifact, and a correct procedure is readily
+  available in three other places in the very same PR (`drawings/
+  README.md`, `build_exploded_view.py`, `mechanical-visualization/
+  SKILL.md`).
+
+### Verdict
+
+- **Verdict**: **PASS**.
+- **Open CRITICAL count**: 0.
+- **Open HIGH count introduced by this cycle**: 0. (`MISS-023`, HIGH, is
+  independently confirmed to already carry a legitimate, pre-existing,
+  named-human `ACCEPTED-RISK` disposition — sign-off from Kyosuke,
+  2026-09-15, per `MISS-023`'s own Notes column and `validation/change-
+  log.md` `ECO-031` — recorded entirely before this branch's merge-base and
+  untouched by this PR's zero-diff on `validation/open-issues.md`. This
+  cycle does not re-open, re-litigate, or speak to that disposition either
+  way; it is out of this cycle's own explicitly re-scoped review boundary.)
+- **Open MEDIUM count introduced this cycle (non-gating)**: 1 —
+  **MISS-030** (Finding 1), newly logged.
+- **Why PASS, not CONDITIONAL, despite one open new finding**: Per this
+  Reviewer's own agent-file rule and this cycle's own task framing, only an
+  open CRITICAL or HIGH forces FAIL/CONDITIONAL; a MEDIUM does not. This is
+  not a reflexive default — it is the same standard this project applied at
+  Cycle 4 (`validation/design-review.md`, "Mechanical Reviewer — Cycle 4,"
+  2026-09-12), which returned a clean **PASS** with one open MEDIUM
+  (`MISS-011`) explicitly carried forward and disclosed, on the express
+  reasoning that "MEDIUM findings are non-gating" per `docs/architecture.md`
+  §7.1. The same reasoning applies here with equal force: `MISS-030` is
+  real, is not hidden, and should be fixed — but it does not misrepresent
+  the design, does not affect any currently-shipped artifact, and does not
+  rise to a bar this project's own established practice treats as
+  PASS-blocking.
+- **What independently checks out with no error found**: Build order
+  (criterion a) matches the `.scad` source and both dimensional-spec
+  sections exactly, with no reordering/omission. All 6 wrapper scripts'
+  correctly-rendered geometry (criterion b) matches `stl/README.md`'s table
+  and/or raw `.scad` variables exactly on every dimension checked: 109.4 ×
+  109.4 × 12.0mm containment cap (= `cap_skirt_od`); 123 × 168 × 51mm
+  base-assembly including its own `watertight=False` STL quirk; 120 × 120 ×
+  6mm stand plate (Z-bounds exactly matching `stand_plate_top_z`=−13.9mm/
+  `stand_plate_bottom_z`=−19.9mm); 111.4 × 69.8 × 5.0mm PCB lid (Z-min
+  exactly matching `base_total_h`−`lid_lip_h`=18.1mm); 230 × 230 × 14.9mm
+  full pinch-guard ring (exactly `2×pinch_guard_or`; correctly documented in
+  the wrapper's own header as the full assembled ring, not the single
+  print-ready quadrant used by the separate `stl/export/` pipeline); 101.6 ×
+  101.6 × 7.9mm reference bearing, exactly matching `brg_od`/`brg_t`'s own
+  `CONFIRMED (DS-BRG-001)` source variables. Both committed animation
+  files' frame count/resolution/framerate/duration (criterion b) exactly
+  match `drawings/README.md`'s own claims per direct `ffprobe`. Every
+  ASSUMPTION-flagged fastener claim (criterion c) traces to a real,
+  correctly-cited evidence-log entry or `.scad` variable, including the
+  4-vs-6-tab cross-branch BOM corroboration, and all 4 restated finding
+  dispositions (`MISS-016`/`023`/`024`/`025`) exactly match their live
+  `Status` field in `validation/open-issues.md` with no upgrading. The new
+  skill (criterion d) is structurally conformant and its generic procedure
+  is itself correct — the defect found is confined to 6 concrete files, not
+  the reusable guidance. The "small addenda" diffs (`hardware/mechanical/
+  README.md`, `docs/architecture.md` §16, `.github/agents/mechanical-
+  lead.agent.md`) were independently diffed against the merge-base this
+  cycle and found accurate and honestly caveated: the Blender-tooling-
+  status note explicitly does not overwrite the prior session's own
+  historical "not connected" record, and `docs/architecture.md` §16's own
+  inclusion of two seemingly-unrelated pre-existing directory-map entries
+  was independently traced via `git show`/`git merge-base --is-ancestor` to
+  an honestly-disclosed, correctly-attributed incidental fix recorded in
+  that same commit's own message — not an undisclosed scope violation.
+- **What's newly open, non-gating**: `MISS-030` (MEDIUM), logged `OPEN`,
+  `Source: mechanical-reviewer`, in `validation/open-issues.md`, for the
+  Mechanical Lead to pick up at convenience — a 12-line, low-effort fix.
+- **Next action**: Report **PASS** (with one new, non-gating MEDIUM
+  finding, `MISS-030`) to the Hardware Lead. `MISS-023` (HIGH →
+  `ACCEPTED-RISK`, pre-existing) is untouched by this cycle either way,
+  since it is out of this cycle's own explicitly re-scoped review boundary.
