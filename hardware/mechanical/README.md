@@ -14,6 +14,12 @@ enclosure/mechanical structure (`docs/architecture-evolution.md` §10/§27).
 - A design rationale log (can be a section of the dimensional-spec file)
   recording the "why" for every dimension, per
   `.github/skills/enclosure-design/SKILL.md`.
+- Once a revision reaches Design Complete, downstream documentation
+  artifacts may also live here: `assembly-instructions.md` (a build
+  procedure), `stl/` (print-ready exports), and `drawings/` (2D
+  orthographic views + an exploded assembly view — see `drawings/README.md`
+  for the tooling/regeneration convention). None of these edit the source
+  `.scad` geometry; they are read-only-derived documentation.
 
 ## Conventions
 
@@ -25,6 +31,17 @@ enclosure/mechanical structure (`docs/architecture-evolution.md` §10/§27).
   rendered preview, an STL export, or a fit-check exists unless a
   verified-connected tool actually produced it — see
   `.github/agents/mechanical-lead.agent.md`.
+  - **Addendum, later session (documentation-generation pass, `drawings/`
+    directory)**: a fresh `blender-get_addon_status`/`blender-get_scene_info`
+    check found Blender (v5.1.1) genuinely connected via the `blender-*` MCP
+    tools that session, and it was used (read-only against this directory's
+    `.scad` file) to build the exploded assembly view in `drawings/exploded/`.
+    This does **not** retroactively change the historical record above (that
+    was an accurate account of a prior session's own tooling state) or
+    establish a standing guarantee — the same "no CAD/3D tool connected until
+    verified this session" default still applies to any future session; check
+    again rather than assuming Blender (or OpenSCAD, or any other tool named
+    in this file) is still connected.
 - Every dimension must trace to `hardware/mechanical-interface.md`, an
   Evidence ID (`datasheets/evidence-log.md`), or an explicit
   `ASSUMPTION`/`ESTIMATE` — never a silent guess
