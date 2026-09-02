@@ -433,6 +433,97 @@ check, not an engineering-judgment task, and a new discipline for it would
 be exactly the role/file proliferation architecture.md §14's closing
 paragraph warns against introducing ahead of actual need.
 
+### 4.2 Stale Load-Bearing Figure Propagation (Cross-Document Citations)
+
+A different, equally recurring failure lives in the same file-based
+Source-of-Truth layer described above. When a load-bearing computed
+physical quantity — an RPM figure, an energy-in-Joules figure, a
+friction-margin multiplier, a thermal-rise ΔTJ figure — is corrected in
+the one or two documents that actually derive it, every *other* document
+that merely cites (rather than derives) that number can silently go
+stale. The correction itself is usually careful and independently
+re-verified; the gap is that fixing a number in its home document creates
+no automatic pressure to look beyond the file(s) already open to every
+other file that happens to quote the same figure.
+
+**This isn't even a merge problem.** Unlike §4.1, a single-branch,
+single-session edit to the authoritative document is a clean,
+unremarkable diff — there is no conflicting merge to flag it. The failure
+is purely that "I corrected the number where I derived it" and "I found
+and corrected every place it's cited" are two different, unlinked tasks,
+and only the first is naturally forced by the edit itself.
+
+This is not hypothetical — it has happened for real, more than once, in
+this repository's own `validation/open-issues.md` and
+`validation/change-log.md` (dated record, cross-checked against both
+files):
+
+- **MISS-021** (MEDIUM, RESOLVED): after the Rev 3.3 motor-voltage/RPM
+  correction, `bench-imu-01-manufacturing-spec.md` still cited the
+  superseded 121.60J/69.74 m/s/22,200 RPM figures at 6 locations — "not
+  flagged by either ECO-022 or ECO-023," the two ECOs that made and then
+  swept that same correction. Only caught in a separate, later Mechanical
+  Reviewer pass.
+- **MISS-029** (LOW, RESOLVED): `bom/component-selection.md`'s own
+  friction-torque margin ("~29x") used a stale "~300g representative"
+  rotating-assembly mass that pre-dated Rev 4's real bearing/flange/
+  stand-plate hardware (actual mass ~405.55g) — discovered during Cycle
+  6's unrelated re-review of a Rev 4.1 mechanical fix pass, "not
+  mentioned anywhere in the Mechanical Lead's own Rev 4.1 report,
+  self-check, or UNKNOWNs table."
+- **MISS-019** (LOW, **OPEN** — only partially fixed): the same Rev 3.3
+  correction left a cluster of other documents citing the superseded
+  "~20,000-22,200 RPM"/"~3.3-3.7x" figures, "missed by ECO-022/ECO-023's
+  own completeness sweep." Hardware Lead has since fixed
+  `requirements/traceability-matrix.md` and `requirements/requirements.md`
+  directly and annotated `bom/component-selection.md`'s table — but the
+  finding's own notes say the `firmware/bench-imu-01/*` source-code
+  citations "**Remains OPEN**," deferred to a future Firmware Engineer
+  dispatch. Still live, not fully closed.
+- **ISS-024** (LOW, **OPEN**, unresolved as of this writing): the Rev 5
+  schematic's own top-of-file changelog summary states U6's thermal rise
+  as "ΔTJ ≈ 10–16°C", inconsistent with three other internally-consistent
+  locations in the *same document* and with `hardware/power-budget.md`
+  (all state "≈7.5–13.0°C") — a live instance of exactly this failure
+  mode sitting in the repo right now, not a closed historical example.
+
+**Resolution convention, empirically grounded (judgment still applies —
+this is not a rigid rule):**
+
+1. **Search before closing, not just the file you edited.** When a
+   load-bearing computed quantity changes, before closing the triggering
+   ECO/finding, run a repo-wide text search (`grep -rn`) for the old
+   value's distinctive numeric string(s) — including its unit variants
+   (J, m/s, RPM) and any range/rounding forms — across every directory,
+   not only the document(s) already being corrected.
+2. **Triage every remaining hit.** Each one is either updated to the
+   corrected figure, or explicitly re-labeled as a historical "(was X)"
+   comparison so a future reader cannot mistake it for a live,
+   uncorrected citation.
+3. **Record the sweep in the closing `validation/change-log.md` entry.**
+   State what was searched for and what was found/fixed — this is what
+   makes the convention auditable rather than an unrecorded habit. ECO-024
+   already did exactly this for one document, recording: *"Every
+   remaining '121.60J'/'69.74 m/s' text in the document was confirmed
+   (repo-wide grep) to be an explicitly-labeled historical '(was ...)'
+   comparison, not a live uncorrected citation"* — real, working
+   precedent that this convention already works when actually applied.
+4. Only then treat the propagation as complete — don't close an
+   ECO/finding on the strength of the one document you were asked to fix;
+   MISS-019 and ISS-024 above are both still open precisely because that
+   wider sweep hasn't (yet) happened for them.
+
+Unlike §4.1's ID collisions — a discrete string that either matches or
+doesn't — this failure matches free-text numeric values with many valid
+spellings (ranges, unit conversions, rounding, thousands separators), so
+a generic script would likely both over-flag (legitimate unrelated
+numbers) and under-flag (reformatted variants of the same value). This is
+deliberately left as a process convention applied at ECO/finding-closure
+time, not a new mandatory CI script or a new agent/reviewer role —
+mirroring how §4.1 itself invokes this same architecture.md §14 caution
+against role/file proliferation ahead of actual demonstrated need for
+something more rigid.
+
 ## 5. How to Start a New Design Cycle
 
 Use `docs/commands/make-circuit.md` for the copy-pasteable kickoff prompt.

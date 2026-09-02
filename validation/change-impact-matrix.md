@@ -83,3 +83,42 @@ of discovering them after the fact. Cross-reference by ID with
 | BOM / lifecycle (does this affect other line items, e.g. shared connector) | None | N | No component added, removed, or re-specified; no BOM line item affected. |
 | Requirements coverage (`requirements/traceability-matrix.md`) | High | Y | **Closes the gap ECO-023's own entry above flagged and left open**: REQ-403's traceability-matrix row's stale "121.60J" quote is now corrected to the current figures (this ECO); REQ-405's row and `requirements/requirements.md` line 142 (MISS-019, partial) also corrected. MISS-016 (HIGH, `validation/open-issues.md`) status is unchanged by this ECO (still OPEN at the time this ECO was logged) — its own Issue/Rationale/Notes text is updated to the final, corrected Rev 3.4 figures, ready for the human's REQ-403 review with accurate numbers (see ECO-025 for the disposition that followed the same day). |
 
+
+### For `ECO-029` — Rev 4 free-rotation bearing mount (first Mechanical Design pass)
+
+| Impact Domain | Impact Level (None/Low/Medium/High) | Cross-check Required? | Verification Result |
+|---|---|---|---|
+| Power (rail loading, `hardware/power-budget.md`) | None | N | No electrical component/rail touched — the bearing is a passive mechanical part. |
+| Thermal | None | N | No thermal source added; existing motor/driver thermal picture unchanged. |
+| EMI/EMC | None | N | No electrical/RF content touched. |
+| Timing (interface/bus timing) | None | N | No interface/bus/peripheral timing touched. |
+| Mechanical (fit, connectors, mounting; vibration if a rotating body is present — `docs/architecture.md` §12) | High | Y | **Verified in this pass**: real CG/tip-over analysis performed (rotating-assembly CG offset ≈14.3mm from bearing axis, 6.2× static tip-over margin at the chosen 120mm stand-plate diameter); a genuine manufacturability finding (internal overhang) disclosed with 3 alternatives considered; Independent Mechanical Review (Cycle 5) found the analysis itself sound but identified 2 new HIGH gaps this pass's own scope didn't originally cover (pinch-point/overhang hazard, cable-entanglement hazard) — see ECO-030 for the loop-back addressing these. |
+| Grounding | None | N | No electrical grounding/return-current path touched. |
+| BOM / lifecycle (does this affect other line items, e.g. shared connector) | Low | Y | Adds the bearing (already Component-Selection-approved, DS-BRG-001) as a new physical BOM line item; no existing electronic line item affected. |
+| Requirements coverage (`requirements/traceability-matrix.md`) | High | Y | REQ-011/012/113/310/311 now have real design content to trace to (`bench-imu-01-enclosure.scad`/dimensional-spec §18/mechanical-interface Part C) — traceability-matrix.md rows themselves updated in the Hardware Lead's own follow-up pass (see ECO-030's own entry / same-session traceability update), not by this ECO's own Mechanical Lead author (out of that role's scope). REQ-407/408 remain open pending MISS-023/024's resolution. |
+
+### For `ECO-030` — Rev 4.1 loop-back fix (pinch-guard + cable turn-limit) + friction-margin correction
+
+| Impact Domain | Impact Level (None/Low/Medium/High) | Cross-check Required? | Verification Result |
+|---|---|---|---|
+| Power (rail loading, `hardware/power-budget.md`) | None | N | No electrical component/rail touched. |
+| Thermal | None | N | No thermal source added. |
+| EMI/EMC | None | N | No electrical/RF content touched. |
+| Timing (interface/bus timing) | None | N | No interface/bus/peripheral timing touched. |
+| Mechanical (fit, connectors, mounting; vibration if a rotating body is present — `docs/architecture.md` §12) | High | Y | **Verified in this pass, independently, twice**: the Mechanical Lead's own `pinch_guard()`/cable-turn-limit fix was re-verified by a fresh Independent Mechanical Review (Cycle 6), which re-derived the swept-radius correction (126.424mm), the guard's coverage/mass/collision-clearance, and J1/J4's cable-wrap arithmetic from raw geometry rather than trusting either prior report. Net result: MISS-024 closed (RESOLVED); MISS-023 remains OPEN/HIGH — a real, quantified residual safety gap (an 11.4mm unguarded band at the highest-velocity edge of the hazard zone, plus an unfastened/driftable guard) now reported to the human Chief Engineer as an explicit accept-or-iterate decision point, mirroring the REQ-403/MISS-016 precedent. Total system mass grew again (≈601.8g → ≈1173.4g, driven by `pinch_guard()`'s own ≈570.6g) — confirmed by both sub-agents to sit entirely on the stationary (non-bearing-loaded) side of the assembly, so the bearing's own friction-torque margin is unaffected by this specific growth (it remains keyed to the ≈405.55g rotating-assembly mass, not the ≈1173.4g total) — this was independently confirmed, not assumed. |
+| Grounding | None | N | No electrical grounding/return-current path touched. |
+| BOM / lifecycle (does this affect other line items, e.g. shared connector) | Low | Y | Adds cable ties (`cable_anchor_tab()`, generic commodity, no Evidence ID) as a new minor BOM item; no existing electronic line item affected. |
+| Requirements coverage (`requirements/traceability-matrix.md`) | High | Y | MISS-029 (stale `bom/component-selection.md` friction-margin citation, discovered by Cycle 6) fixed same-pass by the Hardware Lead — 3 citations corrected to ≈21.5×/≈242× against the current ≈405.55g mass, independently re-verified by hand. REQ-407/408's traceability-matrix rows remain `Pending`, gated on MISS-023's own resolution — see the Hardware Lead's own traceability-matrix update this same session for the full row-by-row disposition. |
+
+### For `ECO-031` — MISS-023 ACCEPTED-RISK disposition + Design Complete Gate (Rev 4 mechanical scope) GRANTED
+
+| Impact Domain | Impact Level (None/Low/Medium/High) | Cross-check Required? | Verification Result |
+|---|---|---|---|
+| Power (rail loading, `hardware/power-budget.md`) | None | N | No electrical component/rail touched — this is a safety disposition + gate determination, not a design change. |
+| Thermal | None | N | No thermal analysis, component, or rating touched. |
+| EMI/EMC | None | N | No EMI/EMC analysis, layout, or component touched. |
+| Timing (interface/bus timing) | None | N | No interface/bus/peripheral timing touched. |
+| Mechanical (fit, connectors, mounting; vibration if a rotating body is present — `docs/architecture.md` §12) | High | Y | **Verified in this pass**: `pinch_guard()`'s design is unchanged by this ECO (this is a disposition of an already-built design, not a new geometry change); `validation/fmea.md` received a proper Rev 4 systemic-risk pass (FMEA-013 through 016) covering the guard's own ongoing drift risk, the cable-procedure human-factors risk, an honestly-disclosed dynamic-tip-over analysis gap, and the bearing-mount fastener-load gap — none of these were newly discovered by this ECO, all trace to already-open/already-dispositioned findings. |
+| Grounding | None | N | No electrical grounding/return-current path touched. |
+| BOM / lifecycle (does this affect other line items, e.g. shared connector) | None | N | No component added, removed, or re-specified by this ECO itself. |
+| Requirements coverage (`requirements/traceability-matrix.md`) | High | Y | **Verified in this pass**: REQ-011, REQ-205, REQ-407 all moved `Pending` → `Verified — human-accepted disposition` (mirrors REQ-403's own exact wording precedent). REQ-013 remains `Pending`, explicitly disclosed as blocked on a not-yet-triggered future Firmware phase (not a mechanical-scope gap) — Design Complete is granted for Rev 4's **mechanical scope** specifically, not silently claimed as a full Electronics/Mechanical/Firmware completion the way Rev 3's ECO-025 was. |

@@ -599,6 +599,7 @@ methodology and metrics.
 .github/agents/*.agent.md                  Custom agent profiles (name+description frontmatter):
                                               4 Electronics MVP agents + 2 Mechanical agents (Phase 1)
                                               + 1 Firmware agent (Phase 2) + 1 Power agent (Phase 3)
+                                              + 1 Manufacturing agent (Phase 4) + 1 Firmware Reviewer (Phase 5)
 .github/skills/*/SKILL.md                  Agent skill profiles (name+description frontmatter):
   requirements-engineering/SKILL.md
   component-selection/SKILL.md
@@ -609,6 +610,11 @@ methodology and metrics.
   mechanical-review/SKILL.md                Mechanical Reviewer's procedure (Phase 1)
   firmware-bringup/SKILL.md                 Firmware Engineer's procedure (Phase 2)
   power-architecture/SKILL.md                Power Engineer's procedure (Phase 3)
+  manufacturing-process-specification/SKILL.md  Manufacturing Engineer's procedure (Phase 4)
+  firmware-review/SKILL.md                  Firmware Reviewer's procedure (Phase 5)
+  mechanical-visualization/SKILL.md         Mechanical Lead's assembly-instructions/2D-drawing/
+                                              exploded-view/animation procedure for an already-
+                                              Design-Complete revision (documentation, not design)
 .github/instructions/*.instructions.md     Path-scoped rules (datasheets/, hardware+bom/, validation/,
                                               hardware/mechanical/+mechanical-interface.md — Phase 1,
                                               firmware/ — Phase 2)
