@@ -139,26 +139,71 @@ accepted it — not as a "fully clean" design:**
   Electronics/PCB scope (Rev 4 firmware, REQ-013) per ECO-035's own notes.
   This README makes no claim about that broader gate.
 
-### BOM open items (`bom/bench-imu-01-fab-bom.csv`) — disclosed plainly, not resolved
+### BOM sourcing (`bom/bench-imu-01-fab-bom.csv`) — resolved 2026-09-02, updated from the original 24 OPEN ITEM rows
 
-The flat BOM has **24 "OPEN ITEM" rows out of 51 total line items**. These
-are **not treated as resolved here** (per this project's own
-"disclose, don't silently invent" convention) — but they are not uniform in
-severity either; breaking them down honestly:
+**Update, same day, following Kyosuke's direct request to resolve BOM
+sourcing**: all 24 of the rows this section originally described as
+"OPEN ITEM" are now **CONFIRMED** with real, currently-orderable
+manufacturer part numbers, each backed by a new Evidence ID in
+`datasheets/evidence-log.md` (`DS-CONN-007/008`, `DS-SW-001`,
+`DS-OPTO-001`, `DS-PASS-001` through `-005`, `DS-FAST-004/005`) and its
+own metadata record under `datasheets/`. See `validation/change-log.md`
+ECO-037 for the full change record. **Not resolved by this pass**: the
+one pre-existing, unrelated `OPEN ITEM` note on U4 (real MPN already
+selected; only its unit price wasn't independently re-quoted) — untouched,
+out of scope for this update, exactly as it was before.
 
-| Category | Count | Refs | What it actually means |
-|---|---|---|---|
-| Generic, multi-source passives/connectors/hardware | 21 | C1-C17 (ceramic caps, various values/packages), J2/J3 (2.54mm pin headers), SW1 (6mm THT switch), D1 (0603 LED), MH1-4 (M2.5 mounting hardware, 1 BOM line) | Standard, low-cost parts stocked by essentially every distributor under many interchangeable manufacturer SKUs. Package/value is already pinned down; only the *specific* manufacturer/exact orderable code wasn't picked, because doing so wouldn't be a meaningful engineering decision — any compliant SKU works. Sourceable at order time with no design input needed. |
-| Already-selected part, pricing only not re-confirmed | 1 | U4 (USBLC6-2SC6 ESD protection) | Has a real manufacturer (STMicroelectronics) **and** a real MPN already — flagged `OPEN ITEM` only because this session didn't independently re-quote its unit price, not because the part itself is undecided. |
-| Genuine open sourcing decision | 1 | J1 (USB-C receptacle) | The schematic's own design document explicitly states J1's exact MPN was never formally selected (footprint is illustrative, matched for pin count/height only against the GCT USB4105 family). This is the one BOM row that needs an actual sourcing decision — picking a specific 16-pin USB2.0-only USB-C receptacle MPN — before or at order time. |
+Real parts were consolidated where a single, appropriately-rated SKU
+safely covers several BOM rows at once (a higher voltage rating always
+covers a lower stated minimum — standard, not corner-cutting, practice):
 
-**None of these 24 rows are being resolved to a specific manufacturer SKU by
-this export** (out of scope per the task that produced this package) — they
-are disclosed here in full, with their real distribution across
-"trivially generic" vs. "one real gap" so a human placing an order knows
-exactly what does and doesn't still need a sourcing call, rather than
-either silently implying full BOM readiness or treating all 24 as equally
-blocking.
+| Real part | Covers | Why this rating |
+|---|---|---|
+| GCT USB4105-GF-A (J1) | J1 | Matches this exact footprint's own embedded KiCad tags; base part (no `-060`/`-120` thin-board suffix) fits this board's standard 1.6mm thickness; confirmed in stock (DigiKey/Mouser) vs. the sibling `USB4105-15-A` variant, which is not normally stocked |
+| Sullins PREC004SAAN-RC | J2, J3 | Bare/unshrouded 2.54mm header — matches the plain KiCad footprint; deliberately not a shrouded/locking family (wrong physical footprint) |
+| Omron/Aratas B3F-1000 | SW1 | Standard 6mm THT tactile switch |
+| Lite-On LTST-C191KRKT | D1 | Red, Vf=2.0V typ — matches the design doc's own "Vf≈2.0V assumed" basis for R5's value; a blue/white/high-brightness-green LED would have silently invalidated that assumption |
+| Samsung CL10B104KB8NNNC (100nF/0603/X7R/**50V**) | C3,C4,C5,C6,C7,C11,C12 | 50V clears C11's stated 10V minimum and C12's real ≥26V requirement (design's actual VM_MOTOR/VCC ceiling is 13.0V, not the datasheet's abstract 28V, so "≥VCC×2" = ≥26V here) |
+| Samsung CL10B105KB8NNNC (1µF/0603/X7R/**50V**) | C1,C8,C9,C14,C15,C16 | 50V clears C14/C15's stated 5V minimum and C16's existing "≥16-25V rated" note |
+| Samsung CL10B474KB8NNNC (0.47µF/0603/X7R/50V) | C2 | Same 3.3V-logic-domain family, no special requirement |
+| Samsung CL21A106KAYNNNE (10µF/0805/X5R/**25V**) | C10, C13 | Matches `hardware/pcb/README.md`'s own stated "≥16-25V-class" target for these positions |
+| Murata GRM1885C1H223JA01D (22nF/0603/**C0G**) | C17 | C0G (not X7R) chosen deliberately: C17 sets a timing/ramp-rate characteristic (U6 dVdT), where C0G's low tempco/tight tolerance is the more appropriate dielectric |
+| Essentra 50M025045P005 (screw) / Würth 971050154 (optional standoff) | MH1 | Generic M2.5 hardware; screw is nylon (disclosed) — a metal/steel equivalent is an equally valid substitute, no material requirement stated by the design |
+
+**Honestly disclosed, not silently smoothed over, in the process**:
+- An initial search pass mis-stated Samsung CL10B105KB8NNNC's voltage
+  rating as 25V; independently re-checked via 2 follow-up targeted
+  searches and corrected to the actual 50V before citing it anywhere.
+- A DigiKey search for CL10B474KB8NNNC surfaced a similar but distinct
+  sibling part (`CL10B474KA8NNNC`, "A8" not "B8") — the correct "B8" part
+  number was independently re-confirmed via Octopart/GlobalSpec rather
+  than conflating the two.
+- **DC-bias derating checked at this design's real ~9-13V operating
+  point for C10/C13, not just their 25V nameplate rating** (per this
+  task's own explicit instruction): Samsung's own published derating
+  curve for this series shows only ~50-60% of nominal capacitance
+  remaining at ~12V DC bias (≈5-6µF effective, not the full 10µF
+  nameplate). This is a real, disclosed characteristic — consistent
+  with, not contradicting, the existing design record's own reason for
+  choosing 0805 over 0603 in the first place — not a new problem
+  introduced by this sourcing pass, and not independently re-designed
+  here (that would be a schematic-level decoupling-network change,
+  outside a BOM-sourcing task's scope).
+- A targeted search for a metal (steel/brass) M2.5 screw did not
+  converge on one specific, confidently-verified distributor listing
+  this session — rather than cite an uncertain metal-screw MPN, the one
+  genuinely confirmed real part (nylon) is cited instead, with the
+  material trade-off disclosed plainly rather than implied away.
+- Several capacitor prices could not be confirmed to a single exact
+  figure this session (disclosed as a range, or left blank with "not
+  independently re-sourced," per each row's own Notes column) — real
+  MPN/spec confirmation was prioritized over price precision.
+
+**Still true, unchanged by this update**: this package reflects the board
+exactly as ISS-036 ACCEPTED-RISK left it (see the section above) — BOM
+sourcing and DRC/layout status are independent facts; resolving the BOM
+does not change, and is not being represented as changing, the board's
+DRC/ISS-036 status in any way.
 
 ## Regenerating this package
 
