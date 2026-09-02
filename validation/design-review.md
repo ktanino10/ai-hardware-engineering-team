@@ -11945,3 +11945,74 @@ corrected.
   and `MISS-032` are independently confirmed RESOLVED this cycle. This
   documentation/visualization pass may now be considered done from the
   Mechanical Reviewer's perspective.
+
+---
+
+## Hardware Reviewer — Cycle 11 (Independent adversarial review of the ISS-042 J1 non-existent-MPN correction, `6073d72`) (2026-09-03)
+
+### Review Cycle Metadata
+
+- **Scope**: commit `6073d72` (PR #26) only — the correction of J1's schematic
+  `Value` from `USB4105-GH-A` (a part number that does not exist) to the
+  CONFIRMED, orderable `USB4105-GF-A` (DS-CONN-007), plus de-propagation of
+  that stale value from the generator, the published GitHub Pages viewer, the
+  re-exported schematic PDF, and the schematic README provenance row. Parent
+  commit for all diffs: `4aa95f5` (`origin/main`).
+- **Reviewer**: `hardware-reviewer` agent, independent — did **not** author the
+  change under review. Commissioned by the scheduled autonomous check-in loop
+  specifically because PR #25 (which republished the defect to a public site)
+  had been merged with **zero** reviews and never received an independent audit.
+- **Stage**: schematic-stage fidelity/consistency review. No layout artifact was
+  touched by this change, so layout checklist items were verified as *unaffected*
+  rather than re-reviewed.
+- **Tooling actually used** (not assumed): `kicad-cli` 10.0.1 (`sch export
+  netlist`, `sch export erc`, `sch export pdf`), `pdftotext`, a 150-dpi PDF
+  raster diff, `git show` against pinned SHAs, live web verification against
+  GCT/DigiKey/Mouser/TME, and a real re-run of `generate_schematic.py` in a
+  scratch venv with `kiutils` installed.
+
+### Independent verification performed
+
+| Question | Result |
+|---|---|
+| Is `USB4105-GH-A` genuinely non-existent, and `-GF-A` genuinely correct? | **PASS** — independently re-verified against GCT's catalogue and DigiKey/Mouser/TME. No `GH-A` suffix variant exists. The repo's own DS-CONN-007 record was deliberately *not* treated as evidence, since it was itself under audit. |
+| Electrically/mechanically safe and correctly scoped? | **PASS** — land pattern verified **pad-for-pad against the GCT manufacturer drawing's mating view** (22 pads = 16 SMD contacts + 4 shell stakes + 2 NPTH pegs; pad order an exact match). Board `(thickness 1.6)` vs. blank-suffix 0.95 mm stake → correct variant. PCB, Gerbers, position files and BOM genuinely needed no change. |
+| Any missed copies of the stale value, including binaries? | **PASS** — none. `grep` over the extracted Gerber set returns zero hits (`Value` lives on `F.Fab`, not in the exported layer set); `firmware/`, `docs/`, `requirements/` contain zero `USB4105` references. Remaining `GH-A` strings are intentional historical prose describing the defect. |
+| Schematic still valid and electrically identical? | **PASS** — exported netlist diff is **3 lines**: source path, timestamp, and the J1 `value` string. Zero net, pin, connectivity, placement or UUID drift. `sch erc` identical on both sides (0 errors, 1 pre-existing unrelated `lib_symbol_mismatch` warning on U3, present before and after). |
+| Is the generator fix real? | **PASS** — `generate_schematic.py` was actually re-run and its output diffed with UUIDs normalized: **identical** to the committed `.kicad_sch`. Confirms regeneration will not reintroduce `GH-A`, and that the hand-edit introduced zero drift from generator output. |
+| ISS-042 severity | **MEDIUM confirmed** — reviewer independently argued both directions and declined to move it. Not HIGH (no malfunction mechanism; shared land pattern, netlist unchanged). Not LOW (the schematic is a designated Source-of-Truth artifact, the bad value was published externally, and it violates the repo's core part-number rule). |
+
+### Findings raised this cycle
+
+| ID | Severity | Status | Summary |
+|---|---|---|---|
+| ISS-043 | LOW | RESOLVED | This very cycle entry was missing: commit `6073d72` filed a `Source=hardware-reviewer` finding (ISS-042) into `validation/open-issues.md` without the mandated corresponding per-cycle entry in this file, breaking the audit trail. Fixed by this entry. |
+| ISS-044 | LOW | RESOLVED | The rewritten schematic README J1 row upgraded the **footprint** provenance label from ASSUMPTION to CONFIRMED resting on the KiCad footprint's own `tags` metadata (a community-maintained secondary source, and circular — the footprint used as evidence for the part number that justifies the footprint), while ECO-043 simultaneously asserted "no ASSUMPTION was upgraded to CONFIRMED by this entry". Fixed by re-grounding the README row on the GCT manufacturer drawing and correcting ECO-043's claim. |
+
+Both findings are documentation/traceability only. The reviewer explicitly
+recorded five further candidate findings it **considered and rejected as
+manufactured** (including the U3/U5 base-part-vs-reel-suffix "double standard"
+and the pre-existing, already-disclosed M1 `Value` mismatch) rather than
+inflating the count.
+
+### Verdict — **PASS-WITH-FINDINGS**
+
+**No CRITICAL finding. No HIGH finding.** Merge is **not blocked** under
+`docs/architecture.md` §8 or `.github/workflows/hardware-gate.yml`. The two LOW
+findings above were fixed in the same PR before merge rather than deferred.
+
+**Next free ID is `ISS-045`** (this branch allocated ISS-042 in `6073d72` and
+ISS-043/ISS-044 in this entry). This supersedes the Cycle 8 line stating "the
+next free ID remains **ISS-042**" — that statement was accurate when written and
+is left unedited, as a chronological review log self-corrects forward rather
+than being retroactively rewritten.
+
+### Note on a state hazard during this review
+
+Partway through the review the requesting session briefly checked out a
+different branch in the same worktree the reviewer was reading, transiently
+exposing `origin/main` content. The hazard was disclosed to the reviewer
+mid-review, and the reviewer re-verified all affected conclusions against pinned
+git objects (`git show 6073d72:<path>`) rather than the working tree, explicitly
+confirming that one finding it had drafted was **not** an artifact of the stale
+read. Recorded here rather than quietly omitted.
