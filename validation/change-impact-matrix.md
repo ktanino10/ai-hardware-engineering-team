@@ -161,3 +161,16 @@ of discovering them after the fact. Cross-reference by ID with
 | Grounding | None | N | Not applicable. |
 | BOM / lifecycle (does this affect other line items, e.g. shared connector) | None | N | No component added, removed, or re-specified. |
 | Requirements coverage (`requirements/traceability-matrix.md`) | None | N | Does not implement or claim any closed-loop control capability — REQ-009/REQ-014's existing anti-scope status is unaffected; REQ-011's single-axis figure is only read (cited), not changed. |
+
+### For `ECO-042` — Merge `origin/main` + cross-branch ECO-ID renumbering (bookkeeping only)
+
+| Impact Domain | Impact Level (None/Low/Medium/High) | Cross-check Required? | Verification Result |
+|---|---|---|---|
+| Power (rail loading, `hardware/power-budget.md`) | None | N | Not applicable — pure ID rename plus a git merge of unrelated `main` content (firmware-flashing tooling datasheets/guide); no electrical change. |
+| Thermal | None | N | Not applicable. |
+| EMI/EMC | None | N | Not applicable. |
+| Timing (interface/bus timing) | None | N | Not applicable. |
+| Mechanical (fit, connectors, mounting; vibration if a rotating body is present — `docs/architecture.md` §12) | None | N | No `.scad` geometry, dimension, or module body touched by this entry — confined to renumbering this branch's own not-yet-merged `ECO-038/039/040` (+ `ECO-040a/040b`) to `ECO-039/040/041` (+ `ECO-041a/041b`) across every citing file, resolving a genuine collision with `main`'s own real `ECO-038`. `tools/check_id_uniqueness.py` re-run after the merge: 486 IDs, 0 duplicates. |
+| Grounding | None | N | Not applicable. |
+| BOM / lifecycle (does this affect other line items, e.g. shared connector) | None | N | No component added, removed, or re-specified. |
+| Requirements coverage (`requirements/traceability-matrix.md`) | None | N | Not applicable — no requirement touched. |
