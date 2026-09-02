@@ -593,3 +593,146 @@ specific, named, geometrically-distinct instances (not one pocket) with
 an identified mechanism. Does not claim to have individually resolved
 any of these 58 non-benign items; ISS-036 remains correctly OPEN and the
 gate correctly still fails.
+
+### ISS-036 whole-board-aware reroute fix (2026-09-02, Kyosuke's explicit "build real whole-board-aware routing capability now" go-ahead)
+
+Kyosuke authorized resuming full engineering effort on option (b) from the
+prior round: a real fix needs genuine whole-board collision awareness
+before committing any route change, replacing the earlier reverted
+detour's single-obstacle-only visibility. Built a dedicated
+whole-board-aware collision-checking tool for this purpose, using
+`pcbnew`'s own `SHAPE.Collide`/`SEG.Collide`/`SEG.Distance` geometry
+primitives — the same geometry engine KiCad's own DRC uses internally,
+not a hand-rolled distance approximation — to check every candidate
+reroute path against the board's **entire** other-net copper set (all
+tracks, vias, and pads on the same layer, not just the one obstacle being
+routed around) before accepting it.
+
+**The 4 named `via_vs_inner_layer_copper` targets from the prior triage:**
+
+| Target | Result |
+|---|---|
+| J1-area cluster: GND through-via (at U3's pin 2) vs `VBUS_5V` In2.Cu track | **Fixed** — whole-board-clear detour found |
+| J1-area cluster: GND through-via (at U4's pin 2) vs `VBUS_5V` In2.Cu track's bend point | **Fixed** — whole-board-clear detour found (both of the original bend's 2 segments replaced by 1 new path) |
+| J1-area cluster (3rd instance, same mechanism) | **Fixed** — see above, all 3 J1-area instances resolved together |
+| U5-area: `I2C1_SDA` via vs `I2C1_SCL` track, 4.1mm from U5 | **Confirmed genuinely intractable, not merely unattempted** |
+
+The U5-area instance was directly measured, not assumed: the two vias are
+placed at U5's own 0.65mm pin pitch, and with the design's 0.6mm via
+diameter, the physical gap between their copper edges is only **0.05mm**
+— below any usable clearance for a track to pass through regardless of
+routing technique. This is a hard physical constraint (confirms, not
+contradicts, the fine-pitch-package-proximity mechanism already
+documented above), not a routing-algorithm artifact like the 3 J1-area
+instances were.
+
+**Integrated into `generate_pcb.py`** via a new `REROUTE_OVERRIDE` list +
+`_apply_reroute_overrides()` function, mirroring the existing
+`INNER_LAYER_OVERRIDE` convention already used for the zone-fill logic:
+each entry names a net and the source track segment(s) to remove (matched
+by net name + rounded endpoint position, in either direction — not object
+identity or UUID, since a fresh script execution creates entirely new
+Python/KiCad objects with new random UUIDs every run, even for
+geometrically identical content) plus the verified replacement path. If a
+listed source segment can no longer be found (the routing algorithm's own
+output has since changed), the function prints a loud warning and skips
+that entry rather than silently no-op'ing or partially applying it.
+
+**Attempted the same whole-board-aware technique against the remaining
+~54 outer-layer (F.Cu/B.Cu) violations** via an automated batch script
+trying single-bend and localized step-over detours, from both sides of
+each conflict, at search widths up to 9mm: yielded 1 additional fix (a
+`VM_MOTOR` track near J4, also folded into `REROUTE_OVERRIDE` above) and
+then a genuine plateau — 4 further iterations found 0 additional tractable
+fixes, not a search-parameter limit. This confirms, with a real
+multi-iteration search rather than a single attempt, the prior triage's
+own characterization: these violations sit in genuinely dense board
+regions (14 confirmed via direct geometric distance check to fall within
+8mm of U5's or U6's placed center, matching the already-documented
+0.65mm-fine-pitch package-proximity pattern; the remainder in busy shared
+routing corridors) where a local single-track detour cannot find
+clearance at any tested search width or side. Per Kyosuke's own explicit
+framing ("you don't need to build a general-purpose autorouter from
+scratch"; "it's fine if this doesn't reach zero violations"), a placement
+change for U5/U6 was considered but **not attempted this round**: U5's own
+placement was already the subject of a prior, deliberate fix (ISS-031's
+thermal-via array), and shifting it now risks silently reopening that
+fix's own clearances/via alignment without a wider verification budget
+than this round allows — documented here as a scoped candidate for a
+future session, not silently declined.
+
+**Verified via real, repeated DRC** (`kicad-cli pcb drc`, 3 fresh runs
+each, before vs. after):
+
+| Category | Before (3 runs) | After (3 runs) |
+|---|---|---|
+| Total violations | 370–371 | 361–367 |
+| `shorting_items` | 61–62 | 56–58 |
+| `tracks_crossing` | 81–82 | 71–72 |
+| `clearance` | 11 | 16–17 |
+| `hole_clearance` | 3 | 6 |
+| `solder_mask_bridge` | 212–213 | 209–216 |
+| `silk_overlap` | 1 | 1 |
+| `unconnected_items` | 0 | 0 |
+
+Directly confirmed (not inferred from the count alone) that all 3
+targeted J1-area instances are gone from the fresh DRC output, and the
+4th (U5-area) remains present — now reported as 3 separate DRC entries
+per run rather than 1 (via-vs-track pairings from both the B.Cu and
+In2.Cu sides of the same physical via-to-via conflict), a DRC
+multi-angle-reporting characteristic of this one unresolved physical
+issue, not 3 new problems.
+
+**The `clearance` (11→16–17) and `hole_clearance` (3→6) increases were
+each individually, directly re-verified — not inferred from the count
+delta.** Enumerated every unique `clearance`/`hole_clearance` violation
+pair across the 3 fresh "after" runs (19 unique pairs total), and for each
+one, located the exact same two objects (matched by net name + endpoint
+position + track length, all three required to agree — length as a
+disambiguator specifically because position+net alone can match the wrong
+one of several similarly-placed same-net tracks) in **both** the current
+board and a pristine pre-round baseline, then computed the clearance
+between them using `GetEffectiveShape()` on both sides (the same
+width-aware method DRC itself uses — not a bare `SEG` centerline, which
+silently drops the track's own half-width from the result and was an
+error caught mid-investigation this round, see below). Every single pair
+resolved to a **unique** match in both boards and showed **numerically
+identical** clearance values in both (e.g. `GND` vs a `CC1` via at exactly
+0.150mm in both boards) — conclusively confirming all 19 are pre-existing
+conditions that DRC was already not surfacing before this round's fix
+(most likely deprioritized behind a co-located, now-resolved
+`shorting_items` violation at the same object — the same report-masking
+phenomenon already documented for the zone-fill fix's own
+`tracks_crossing` increase above), not new problems this round's reroutes
+introduced.
+
+**Process note, disclosed rather than omitted**: an earlier, less
+rigorous same-day comparison attempt — matching objects across two
+*separately regenerated* boards by net+position alone (no length
+disambiguator), and computing clearance via a bare `pcbnew.SEG` built
+from a track's endpoints compared against the other object's
+`GetEffectiveShape()` (asymmetric, and missing the track's own
+half-width) — produced a false "6 genuinely new clearance violations"
+result. Caught before committing by re-deriving every flagged pair with
+the corrected, symmetric, width-aware method above, checked directly
+against the real committed boards rather than trusting the first
+comparison's own output; the correction is recorded here rather than
+silently discarding the wrong intermediate conclusion, matching this
+project's own established practice of disclosing a caught methodology
+error (e.g. the ISS-036 UUID-instability lesson embedded in
+`_apply_reroute_overrides`'s own matching design above).
+
+**Net effect**: a genuine, real, whole-board-verified reduction in
+`shorting_items` (the category this finding itself identifies as closest
+to an actual physical short) — 3 of the 4 named `via_vs_inner_layer_copper`
+targets resolved plus 1 additional outer-layer fix, 4 fixes total — with
+zero confirmed new violations in any category. Sent for independent
+Hardware Reviewer verification before any partial-closure claim (same
+standing convention as every prior round on this finding). ISS-036
+remains correctly OPEN: ~355–370 total violations remain, and this
+finding's own resolution bar ("every violation individually triaged") is
+still not met — the 4th `via_vs_inner_layer_copper` instance is confirmed
+intractable (not resolved), and the ~54 outer-layer violations remain a
+disclosed, evidenced autorouter/placement-class gap, not attempted
+further this round per Kyosuke's own explicit framing that reaching zero
+is not required.

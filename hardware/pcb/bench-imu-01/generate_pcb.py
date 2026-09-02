@@ -281,6 +281,117 @@ POWER_NETS = {"VBUS_5V", "3V3", "U5_V3P3"}
 # iteration log), not pre-guessed.
 INNER_LAYER_OVERRIDE: dict[str, str] = {}
 
+# ISS-036 whole-board-aware reroute overrides: specific track segment(s)
+# (identified by net name and endpoints, in mm) whose default MST/
+# L-shape-bend path was found by real DRC to short against another net's
+# copper -- and for which a genuine, whole-board-checked detour was
+# found and verified (see `_apply_reroute_overrides` and the ISS-036
+# section near the end of `build_board` for the full rationale/method).
+# Each entry is (net, [source segment endpoint pairs to remove],
+# replacement path) -- most fixes remove exactly one source segment, but
+# the U3-area fix removes TWO (the default algorithm draws an L-shaped
+# hop as 2 separate track objects meeting at a bend point, and that bend
+# point itself is what needs to move, so both of that hop's segments are
+# replaced together by one new path). Matched by (net, rounded endpoint
+# position) in either direction, not exact float equality or object
+# identity, so this survives a full script re-run; if the routing
+# algorithm's output ever changes enough that a listed segment no longer
+# exists, `_apply_reroute_overrides` prints a loud warning and skips that
+# entry rather than silently doing nothing.
+REROUTE_OVERRIDE: list[
+    tuple[str, list[tuple[tuple[float, float], tuple[float, float]]], list[tuple[float, float]]]
+] = [
+    # GND through-via at U4's pin 2 sits directly on VBUS_5V's own
+    # default straight In2.Cu run from J1 toward U4. Detour around it
+    # while keeping both real endpoints (J1's VBUS pad; U4's VBUS pad)
+    # exactly fixed.
+    (
+        "VBUS_5V",
+        [((9.32, 25.0), (32.138, 25.0))],
+        [(9.32, 25.0), (32.138, 26.0), (32.138, 25.0)],
+    ),
+    # GND through-via at U3's own pin 2 sits exactly at the bend point of
+    # VBUS_5V's default L-shaped hop toward U3's pin 1 -- both of that
+    # hop's 2 segments (sharing the bend at (45.862,25.0)) are replaced
+    # by one new path with the bend moved to (32.138,24.05) instead,
+    # keeping both real endpoints (U4's VBUS pad; U3's VBUS pad) fixed.
+    (
+        "VBUS_5V",
+        [((45.862, 24.05), (45.862, 25.0)), ((45.862, 25.0), (32.138, 25.0))],
+        [(32.138, 25.0), (32.138, 24.05), (45.862, 24.05)],
+    ),
+    # VM_MOTOR's default straight run toward J4/F1's area passes too
+    # close to unrelated copper; a 4-bend step-over detour (found by the
+    # same whole-board-aware search) clears it while keeping both real
+    # endpoints fixed.
+    (
+        "VM_MOTOR",
+        [((113.85, 18.0), (99.225, 18.0))],
+        [
+            (113.85, 18.0), (102.275, 18.0), (102.275, 16.8),
+            (99.275, 16.8), (99.275, 18.0), (99.225, 18.0),
+        ],
+    ),
+]
+
+
+def _apply_reroute_overrides(board: "pcbnew.BOARD") -> int:
+    """Replace each REROUTE_OVERRIDE entry's source track segment(s) with
+    its verified detour path. Matches by (net name, rounded endpoints)
+    in either direction, not object identity, since this runs on a
+    freshly (re)built board every script execution. Returns the number
+    of overrides actually applied; any entry whose source segment(s)
+    can no longer all be found prints a loud warning and is skipped (not
+    silently ignored, and not partially applied) -- that means the
+    routing algorithm's output has drifted since this override was
+    derived, and it needs re-deriving against the current routing, not
+    blind trust that a stale detour is still correct or even still
+    needed.
+    """
+
+    def close(a: float, b: float) -> bool:
+        return abs(a - b) < 0.01
+
+    def find_track(net_name: str, p1: tuple[float, float], p2: tuple[float, float]):
+        for t in board.GetTracks():
+            if t.Type() == pcbnew.PCB_VIA_T or t.GetNetname() != net_name:
+                continue
+            sx, sy = pcbnew.ToMM(t.GetStart().x), pcbnew.ToMM(t.GetStart().y)
+            ex, ey = pcbnew.ToMM(t.GetEnd().x), pcbnew.ToMM(t.GetEnd().y)
+            forward = close(sx, p1[0]) and close(sy, p1[1]) and close(ex, p2[0]) and close(ey, p2[1])
+            backward = close(sx, p2[0]) and close(sy, p2[1]) and close(ex, p1[0]) and close(ey, p1[1])
+            if forward or backward:
+                return t
+        return None
+
+    applied = 0
+    for net_name, source_segments, path in REROUTE_OVERRIDE:
+        targets = [find_track(net_name, p1, p2) for p1, p2 in source_segments]
+        if any(t is None for t in targets):
+            print(
+                f"WARNING: REROUTE_OVERRIDE for {net_name} {source_segments} "
+                "found no matching track for at least one source segment -- "
+                "this fix is stale (routing algorithm output changed) and was "
+                "NOT applied; re-derive it against the current routing before "
+                "trusting this override again."
+            )
+            continue
+        layer = targets[0].GetLayer()
+        width = targets[0].GetWidth()
+        net_item = targets[0].GetNet()
+        for t in targets:
+            board.Remove(t)
+        for (x1, y1), (x2, y2) in zip(path, path[1:]):
+            seg = pcbnew.PCB_TRACK(board)
+            seg.SetStart(pcbnew.VECTOR2I(MM(x1), MM(y1)))
+            seg.SetEnd(pcbnew.VECTOR2I(MM(x2), MM(y2)))
+            seg.SetLayer(layer)
+            seg.SetWidth(width)
+            seg.SetNet(net_item)
+            board.Add(seg)
+        applied += 1
+    return applied
+
 
 def fp_lib_path(lib: str) -> str:
     if lib == PROJECT_NAME:
@@ -722,6 +833,30 @@ def build_board(footprints: dict[str, str], nets: dict[str, list[tuple[str, str]
             if nx != bend_x or ny != ay:
                 add_track(nx, ny, bend_x, bend_y, layer, width, ni)
             add_track(bend_x, bend_y, ax, ay, layer, width, ni)
+
+    # --- ISS-036 continued: whole-board-aware local reroutes for
+    # specific, individually-verified shorting_items violations --------
+    # Found using a dedicated whole-board-aware collision-checking tool
+    # built for this exact purpose (using pcbnew's own SHAPE.Collide/
+    # SEG.Collide geometry primitives, so clearance checks match KiCad's
+    # own DRC engine rather than a hand-rolled approximation). Unlike the
+    # earlier reverted ISS-036 detour attempt, every candidate path here
+    # was checked against the WHOLE board's other-net copper on the same
+    # layer before being accepted -- not just the one obstacle being
+    # routed around, which is exactly what made that earlier attempt
+    # produce a mixed/regressive result. Verified via real, repeated DRC:
+    # a genuine reduction in shorting_items with 0 unconnected items
+    # preserved throughout; every apparent new clearance-category finding
+    # was independently confirmed, by direct geometric measurement
+    # against the pristine pre-fix board, to be a PRE-EXISTING condition
+    # that DRC had simply not been reporting (most likely deprioritized
+    # behind a co-located, higher-severity shorting_items report at the
+    # same object) -- not a new problem this reroute introduced. See
+    # hardware/pcb/README.md and validation/open-issues.md ISS-036 for
+    # the full account, including the categories that do NOT have a
+    # tractable local-reroute fix (still open).
+    n_rerouted = _apply_reroute_overrides(board)
+    print(f"Applied {n_rerouted}/{len(REROUTE_OVERRIDE)} ISS-036 reroute override(s)")
 
     out_path = HERE / f"{PROJECT_NAME}.kicad_pcb"
     board.Save(str(out_path))
