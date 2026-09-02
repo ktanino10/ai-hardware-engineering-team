@@ -53,11 +53,19 @@ def _split_row(line: str) -> list[str]:
     pipe does NOT separate cells, unlike a bare one. A naive
     ``.split("|")`` (the previous implementation) wrongly inflates the
     apparent column count of a row containing legitimately-escaped prose.
-    Kept in sync with the identical fix in
-    `tools/check_id_uniqueness.py`'s own `_split_row` -- see that one's
-    docstring for the real, concrete example this fixes.
+    The escape-aware scan runs over the WHOLE line, including its
+    boundary delimiters, rather than pre-stripping them with a naive
+    ``.strip("|")`` first -- that would remove ANY ``|`` characters from
+    the string's edges with no escape-awareness, corrupting a cell whose
+    content legitimately ends in an escaped pipe with nothing between it
+    and the row's real closing delimiter. Splitting first and then
+    dropping exactly the one leading and one trailing EMPTY artifact cell
+    the boundary delimiters produce (by position) avoids this. Kept in
+    sync with the identical fix in `tools/check_id_uniqueness.py`'s own
+    `_split_row` -- see that one's docstring for the real, concrete
+    example this fixes.
     """
-    stripped = line.strip().strip("|")
+    stripped = line.strip()
     cells: list[str] = []
     current: list[str] = []
     i = 0
@@ -75,6 +83,10 @@ def _split_row(line: str) -> list[str]:
         current.append(ch)
         i += 1
     cells.append("".join(current).strip())
+    if cells and cells[0] == "":
+        cells = cells[1:]
+    if cells and cells[-1] == "":
+        cells = cells[:-1]
     return cells
 
 

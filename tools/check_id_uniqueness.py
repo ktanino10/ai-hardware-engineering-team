@@ -94,8 +94,24 @@ def _split_row(line: str) -> list[str]:
     (DS-IMU-086, DS-MCU-068): both are correctly, deliberately escaped
     per GFM convention and parse as a clean 8 cells with this fix, not the
     9 a naive split reports.
+
+    The escape-aware scan runs over the WHOLE line, including its
+    boundary delimiters, rather than pre-stripping them with a naive
+    ``.strip("|")`` first -- found necessary by independent code review:
+    ``.strip("|")`` removes ANY ``|`` characters from the string's edges
+    with no escape-awareness, so a cell whose content legitimately ends
+    in an escaped pipe with nothing between it and the row's real closing
+    delimiter (e.g. `` |a\\|foo\\|| `` -- the cell "a|foo|" followed by
+    the real closing delimiter) would have BOTH the escaped pipe's own
+    character and the real delimiter stripped together, corrupting the
+    cell and silently dropping a trailing backslash into it. Splitting
+    first and then dropping exactly the one leading and one trailing
+    EMPTY artifact cell the boundary delimiters produce (by position, not
+    by blindly stripping characters) avoids this: not live in any row in
+    this repo's 3 real files today, but a real latent parsing bug fixed
+    while it's cheap to fix.
     """
-    stripped = line.strip().strip("|")
+    stripped = line.strip()
     cells: list[str] = []
     current: list[str] = []
     i = 0
@@ -113,6 +129,17 @@ def _split_row(line: str) -> list[str]:
         current.append(ch)
         i += 1
     cells.append("".join(current).strip())
+    # A well-formed row is "| cell | cell |": the leading and trailing
+    # real (unescaped) delimiter pipes each produce an empty artifact
+    # cell in the split above (nothing precedes the first one, nothing
+    # follows the last one). Drop exactly those two, by position -- NOT
+    # by re-stripping "|" characters from the string, which is what
+    # re-introduces the escape-unaware boundary bug this function's own
+    # docstring describes.
+    if cells and cells[0] == "":
+        cells = cells[1:]
+    if cells and cells[-1] == "":
+        cells = cells[:-1]
     return cells
 
 
