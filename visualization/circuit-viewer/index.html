@@ -50,7 +50,11 @@
   .box text.role{fill:var(--dim);font-size:9.5px;}
   .box.selected rect{stroke:#fff;stroke-width:2.4;filter:drop-shadow(0 0 6px rgba(255,255,255,.5));}
 
-  path.wire{fill:none;stroke-width:2;transition:opacity .3s;}
+  path.wire{fill:none;stroke-width:2;transition:opacity .3s, stroke-width .15s;pointer-events:none;}
+  path.wire-hit{fill:none;stroke:transparent;stroke-width:14px;cursor:pointer;}
+  path.wire-hit:hover + path.wire, path.wire.wire-hover{stroke-width:4.5px;}
+  path.cat-motorphase.wire-hover, path.wire-hit:hover + path.cat-motorphase{stroke-width:6.5px;}
+  path.wire.wire-selected{stroke-width:5px;filter:drop-shadow(0 0 5px currentColor);}
   path.cat-power5v{stroke:var(--pow5);}
   path.cat-powervm{stroke:var(--powvm);}
   path.cat-motorphase{stroke:var(--motor);stroke-width:3;}
@@ -61,7 +65,7 @@
   path.cat-debug{stroke:var(--debug);stroke-dasharray:3,3;}
   path.cat-future{stroke:var(--future);stroke-width:2;stroke-dasharray:6,5;opacity:0;}
 
-  .pulse{filter:drop-shadow(0 0 4px currentColor);}
+  .pulse{filter:drop-shadow(0 0 4px currentColor);pointer-events:none;}
   .badge-future{fill:#3a2f10;stroke:#c99a2e;stroke-width:1;opacity:0;}
   .badge-future text{fill:#f0c96a;font-size:10.5px;font-weight:700;}
   .mode-future .badge-future{opacity:1;}
@@ -91,18 +95,15 @@
 <div id="app">
   <header>
     <div>
-      <h1 data-en="Bench-IMU-01 — Circuit &amp; Current-Flow Viewer" data-ja="Bench-IMU-01 — 回路・電流フロービューア"></h1>
-      <div class="sub" data-en="Generated from the real KiCad schematic, netlist, and firmware source in this repository — not illustrative." data-ja="このリポジトリの実際のKiCad回路図・ネットリスト・ファームウェアソースから生成（架空の図ではありません）"></div>
-    </div>
-    <div class="lang-toggle">
-      <button id="btn-ja" class="active">日本語</button><button id="btn-en">EN</button>
+      <h1>Bench-IMU-01 — Circuit &amp; Current-Flow Viewer</h1>
+      <div class="sub">Generated from the real KiCad schematic, netlist, and firmware source in this repository — not illustrative.</div>
     </div>
   </header>
 
   <nav class="tabs">
-    <button data-mode="power" class="active"><span class="dot" style="background:var(--powvm)"></span><span data-en="Power Distribution" data-ja="① 電源系統"></span></button>
-    <button data-mode="bench"><span class="dot" style="background:var(--i2c)"></span><span data-en="Current Behavior (implemented)" data-ja="② 現在の動作（実装済み）"></span></button>
-    <button data-mode="future"><span class="dot" style="background:var(--future)"></span><span data-en="Future: Closed-Loop Attitude Control" data-ja="③ 将来：閉ループ姿勢制御（未実装）"></span></button>
+    <button data-mode="power" class="active"><span class="dot" style="background:var(--powvm)"></span><span>Power Distribution</span></button>
+    <button data-mode="bench"><span class="dot" style="background:var(--i2c)"></span><span>Current Behavior (implemented)</span></button>
+    <button data-mode="future"><span class="dot" style="background:var(--future)"></span><span>Future: Closed-Loop Attitude Control</span></button>
   </nav>
 
   <div class="banner" id="banner"></div>
@@ -112,7 +113,7 @@
       <svg id="circuit" viewBox="0 0 1220 850" xmlns="http://www.w3.org/2000/svg"></svg>
     </div>
     <div id="info">
-      <div class="placeholder" data-en="Click any component in the diagram to see its real role, part number, and datasheet." data-ja="図中の部品をクリックすると、実際の役割・型番・データシートが表示されます。"></div>
+      <div class="placeholder">Click any component for its real role, part number, and datasheet. Click any wire for what that specific signal actually carries and why it exists — not just an animated line.</div>
     </div>
   </main>
 
