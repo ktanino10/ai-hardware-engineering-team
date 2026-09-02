@@ -11432,7 +11432,7 @@ replace the standard 11-item checklist table for this cycle only.
 | # | Criterion | Result | Independent evidence (this cycle) |
 |---|---|---|---|
 | 1 | Rev 4 mechanical Design Complete grant (`validation/change-log.md`, "Design Complete is now GRANTED") silently reopened, contradicted, or undermined | **PASS — not reopened** | No `.scad`/interface/dimensional-spec file touched (confirmed above); `validation/open-issues.md` untouched by the pass under review (confirmed via empty `git diff HEAD --stat`, prior to this Reviewer's own edits); all three ECO entries and the change-impact-matrix sections explicitly self-scope as documentation/visualization/simulation-only and explicitly state they do not reopen or re-litigate the grant. |
-| 2 | `validation/change-impact-matrix.md`'s new "None" impact claims for `ECO-039`/`039`/`040` are accurate | **PASS** | Freshly read all three new sections in full: each claims "None" (no functional/safety/schedule impact), consistent with the fact that this is a pure documentation/visualization pass and no geometry changed. Not contradicted by anything found this cycle — both findings are documentation-precision issues, not functional-impact issues, so "None" remains accurate as an *impact* claim even though 2 findings exist as *accuracy* issues. |
+| 2 | `validation/change-impact-matrix.md`'s new "None" impact claims for `ECO-039`/`040`/`041` are accurate | **PASS** | Freshly read all three new sections in full: each claims "None" (no functional/safety/schedule impact), consistent with the fact that this is a pure documentation/visualization pass and no geometry changed. Not contradicted by anything found this cycle — both findings are documentation-precision issues, not functional-impact issues, so "None" remains accurate as an *impact* claim even though 2 findings exist as *accuracy* issues. |
 | 3 | Anywhere the "SIMULATION" or "CONCEPT" framing is weakened, contradicted, or could plausibly be read as real measured data or an implemented capability | **PASS — no weakening found** | Both watermarks are persistent, unambiguous, and present on every viewed frame (not just a title card that could be skipped past). No filename, title card, or caption anywhere claims or implies real measured data or an implemented closed-loop control law. |
 | 4 | `hardware/mechanical/drawings/README.md`'s new Method 2/4/5/6 sections accurately describe what the actual committed files do | **1 FAIL, same root cause as Finding 1** | README Method 2 (lines 240–255) states "every fact in a callout label (size/qty/confidence) is copied **verbatim** from `../assembly-instructions.md` §5's own fastener summary table." This is true for 2 of 3 callouts but demonstrably false for the containment-cap callout, whose `"safety joint, REQ-403"` phrase does not appear anywhere in the table. Methods 4/5/6 (drafting sheets, physics-demo, concept-demo) were independently checked against their own committed artifacts and found accurate — no further discrepancy found. See Finding 1, which folds this README overclaim in as compounding evidence rather than a separate finding, since fixing the callout resolves both. |
 | 5 | Final broad "CONFIRMED" scan across all new/changed artifacts, to confirm the 2 findings are isolated, not systemic | **PASS — isolated** | Freshly re-swept all new files this cycle (in addition to the two findings): every other `CONFIRMED` label found (drafting-sheet bullets, README prose, callout text) was independently checked against its cited `.scad` variable or table row and found correctly scoped. `validation/change-log.md`'s own `ECO-039` entry additionally repeats the same "copied verbatim" claim as the README (further compounding evidence for Finding 1, not a third independent finding) but was otherwise clean. |
@@ -11446,7 +11446,7 @@ replace the standard 11-item checklist table for this cycle only.
   116) reads: `"6× M3 → Ruthex RX-M3×5.7\nheat-set insert (containment
   cap)\nCONFIRMED — safety joint, REQ-403"`. The governing source of
   truth, `hardware/mechanical/assembly-instructions.md` §5's fastener
-  table (line 264), states for this exact joint: `"CONFIRMED (insert
+  table (line 263), states for this exact joint: `"CONFIRMED (insert
   match)"` — with no mention of "safety joint" anywhere in that row or
   anywhere else in the table. The callout's confidence field is not a
   copy, a legitimate shortening, or a faithful combination of anything the
@@ -11489,7 +11489,7 @@ replace the standard 11-item checklist table for this cycle only.
   "verbatim" claims.
 - **Datasheet Source**: `hardware/mechanical/drawings/exploded/
   build_exploded_view_annotations.py` line 116 (`CALLOUTS` list, containment-
-  cap entry); `hardware/mechanical/assembly-instructions.md` line 264 (§5
+  cap entry); `hardware/mechanical/assembly-instructions.md` line 263 (§5
   fastener table, "Containment cap → base flange" row, ground truth);
   `validation/open-issues.md` line 89 (`MISS-016`, HIGH, ACCEPTED-RISK,
   ground truth for the joint's actual safety disposition);
@@ -11692,3 +11692,256 @@ replace the standard 11-item checklist table for this cycle only.
   Mechanical Lead per the standard escalation path
   (`.github/agents/mechanical-reviewer.agent.md`, "Out of scope" /
   "Handoff contract").
+
+## Mechanical Reviewer — Cycle 9 (Focused Independent Re-Review of Cycle 8 Loop-Back Fixes, 2026-09-18)
+
+### Review Cycle Metadata
+
+- **Design revision reviewed**: No new mechanical revision. Independently
+  re-confirmed via `git diff HEAD -- hardware/mechanical/bench-imu-01-
+  enclosure.scad` (empty) that the `.scad` source remains byte-for-byte
+  untouched; this remains a documentation-only pass.
+- **What changed since Cycle 8**: Two targeted fixes to the two Cycle 8
+  gating findings (`MISS-031` HIGH, `MISS-032` MEDIUM), plus an unrelated,
+  disclosed **cross-branch ECO-ID renumbering**: `origin/main` merged two
+  PRs while this branch was in progress and took the real `ECO-038` for
+  unrelated content (a firmware-flashing tooling guide), so this pass's own
+  three ECOs were renumbered site-wide (038→039, 039→040, 040→041) per
+  `docs/workflow.md` §4.1's collision convention, recorded as a new,
+  separate `ECO-042` bookkeeping entry. Both the fixes and the renumbering
+  are independently re-verified in this cycle, not accepted at face value.
+- **Scope**: a **focused** re-review, per this cycle's own task — re-verify
+  exactly the 2 Cycle 8 gating findings against the real files/pixels (not
+  the fix description), and separately audit this Reviewer's *own* Cycle 8
+  review text for citation accuracy after the repo-wide renumbering sweep
+  touched it. Not a from-scratch re-scan of the whole documentation pass;
+  everything else Cycle 8 already found clean (byte-for-byte geometry
+  match, keep-out exclusion, stator/rotor split, legend, physics constants,
+  REQ citations, reference-mark position, etc.) is not re-litigated here.
+- **Reviewer**: Mechanical Reviewer — see
+  `.github/agents/mechanical-reviewer.agent.md`. Same reviewer role as
+  Cycle 8, independent of the Mechanical Lead session that authored both
+  the original pass and this fix.
+- **Independence statement**: Neither fix was accepted on the strength of
+  the requester's own description of what changed. Fix 1 (`MISS-031`) was
+  re-verified at three independent levels: (a) direct re-read of the live
+  `CALLOUTS` source list, (b) algebraic re-derivation of the new
+  `draw_callouts()` edge-clamping logic (not just a read-through), and (c)
+  direct pixel inspection of the regenerated PNG plus a fresh,
+  from-scratch programmatic pixel scan — not a reuse of any measurement
+  from Cycle 8 or from the fix description. Fix 2 (`MISS-032`) was
+  re-verified by re-opening `change-log.md`'s live `ECO-040` entry and the
+  cited `.scad` line 763 fresh this cycle, plus an independent `git diff
+  HEAD` re-confirmation that the `.scad` source itself remains untouched.
+  The ECO-renumbering claim was independently corroborated by re-running
+  `tools/check_id_uniqueness.py` this cycle (486 IDs, 0 duplicates,
+  matching the `ECO-042` entry's own claim) rather than accepting the
+  claimed count.
+
+### Tooling & methodology disclosure
+
+- **Git**: `git log --oneline`, `git status --short`, `git diff HEAD
+  --stat`, and targeted `git diff HEAD -- <file>` / `git log --oneline
+  --all -- <file>` against the live worktree, to independently establish
+  which files actually changed (and which provably did not) since Cycle 8.
+- **Direct source re-read**: `grep`/`sed`/`view` against the live
+  `build_exploded_view_annotations.py`, `change-log.md`,
+  `bench-imu-01-enclosure.scad`, and `assembly-instructions.md` — never
+  the fix description alone.
+- **Direct pixel inspection**: the `view` tool, cropped to the
+  containment-cap callout region of the regenerated
+  `bench-imu-01-exploded-view.png`, to visually confirm the corrected
+  4-line text renders completely and legibly.
+- **Independent programmatic pixel scan**: a fresh, from-scratch Python/
+  PIL script (not reused from Cycle 8) that scans the callout's known
+  text-color range and reports the rightmost non-background pixel's X
+  coordinate, compared directly against the 2000px canvas width — used to
+  quantify the clipping margin numerically rather than eyeball it.
+- **`tools/check_id_uniqueness.py`** and **`tools/check_open_issues.py`**:
+  both independently re-run this cycle (not just cited) to corroborate the
+  ECO-renumbering claim and to confirm `open-issues.md`'s structural gate
+  passes cleanly after this cycle's own edits.
+
+### Findings — independent re-verification of the 2 Cycle 8 gating findings
+
+#### Re-verification of Finding 1 / MISS-031 (HIGH) — containment-cap callout overclaim
+
+- **Fix claimed**: `build_exploded_view_annotations.py`'s `CALLOUTS` list
+  (`cap_heatset` entry) changed from `"CONFIRMED — safety joint, REQ-403"`
+  to a 4-line corrected form: `"6× M3 → Ruthex RX-M3×5.7\nheat-set insert
+  (containment cap)\nCONFIRMED (insert match)\nSafety: ACCEPTED-RISK — see
+  MISS-016"`; the PNG was regenerated from this script; a prior
+  regeneration attempt had this longer text run past the 2000px canvas
+  width (truncating "...see MISS-016" to "...see MISS-0"), since fixed by
+  (a) moving that callout's `label_pos` left and (b) adding real
+  edge-clamping logic to `draw_callouts()` (previously a comment claimed
+  boxes were "kept on-canvas" with no code actually doing it).
+- **Independent re-derivation performed**: Re-opened the live
+  `build_exploded_view_annotations.py` this cycle and confirmed the
+  `CALLOUTS` list's `cap_heatset` entry now contains exactly the claimed
+  4-line text, verbatim, not a paraphrase. Independently re-derived (not
+  just read) the new `draw_callouts()` clamp logic algebraically: for each
+  callout box, the code computes the box's right edge from `label_pos[0]`
+  plus the rendered text width and, if that exceeds the canvas width minus
+  a margin, shifts `label_pos[0]` left by exactly the overshoot amount —
+  confirmed this is a real, general bound (holds for any text length, not
+  hand-tuned to this one callout's current string), not a cosmetic no-op.
+- **Independent pixel-level re-verification, method 1 (direct visual
+  inspection)**: Viewed the regenerated `bench-imu-01-exploded-view.png`
+  directly via the `view` tool this cycle, cropped to the containment-cap
+  callout's region. The full corrected text, including the final line
+  "Safety: ACCEPTED-RISK — see MISS-016", is completely rendered and
+  legible with visible clear space to its right — no truncation, no
+  overrun past the box border, no overlap with another callout or the
+  canvas edge.
+- **Independent pixel-level re-verification, method 2 (programmatic pixel
+  scan, independent of method 1)**: Wrote and ran a fresh, from-scratch
+  Python/PIL script this cycle (not reused from Cycle 8) that opens the
+  committed PNG, isolates the callout's known text-color range within its
+  bounding region, and reports the rightmost pixel matching that range.
+  Result: rightmost non-background pixel at **x=1921** against the
+  **2000px** canvas width — a **79px margin**, independently confirming no
+  clipping at the actual rendered-pixel level (not merely inferred from
+  source review or a single eyeballed screenshot). Two independently
+  different methods (direct visual crop, programmatic scan) agree.
+- **Compounding-overclaim fix cross-check**: Independently re-read
+  `hardware/mechanical/drawings/README.md`'s Method 2 section and
+  `validation/change-log.md`'s `ECO-039` entry (renumbered from `ECO-038`,
+  independently confirmed at `change-log.md` line 65). Both now state that
+  2 of 3 callouts reflect the fastener table while the containment-cap one
+  adds a deliberate, correctly-attributed safety cross-reference — the
+  blanket "copied verbatim" claim Cycle 8 flagged as independently false
+  for this one callout is gone from both documents, replaced with an
+  accurate "reflects" framing, and both carry an explicit post-review-fix
+  note citing this Reviewer's own `MISS-031` finding by name (not a silent
+  correction).
+- **Disposition**: **RESOLVED, independently confirmed.** All three
+  independent checks (source text, clamp-logic algebra, and two
+  independent pixel-level measurements) agree the callout now correctly
+  states the joint's confidence and cross-references its real, governing
+  safety disposition, and the earlier clipping regression is genuinely
+  fixed with margin to spare.
+
+#### Re-verification of Finding 2 / MISS-032 (MEDIUM) — `bmount_flange_ir` mislabeled CONFIRMED
+
+- **Fix claimed**: `validation/change-log.md`'s `ECO-040` entry (renumbered
+  from `ECO-039`) changed "...independently matching `bmount_flange_ir`'s
+  existing 28.0mm-radius CONFIRMED value exactly..." to state that value is
+  ASSUMPTION, not CONFIRMED, with an explicit citation to
+  `bench-imu-01-enclosure.scad` line 763.
+- **Independent re-derivation performed**: Re-opened the live
+  `change-log.md` this cycle (the file itself, not a diff) and confirmed
+  the `ECO-040` entry (line 66) now reads "...independently matching
+  `bmount_flange_ir`'s existing 28.0mm-radius value exactly — that source
+  value is itself labeled ASSUMPTION, not CONFIRMED, in `bench-imu-01-
+  enclosure.scad` line 763" — correctly softened, with an explicit,
+  checkable citation rather than a bare assertion.
+- **Independent ground-truth re-verification**: Re-opened
+  `bench-imu-01-enclosure.scad` at line 763 fresh this cycle:
+  `bmount_flange_ir = 28.0; // mm. ASSUMPTION -- ...` — an exact,
+  byte-for-byte match to what the fix now cites. Independently
+  re-confirmed via `git diff HEAD -- hardware/mechanical/bench-imu-01-
+  enclosure.scad` (empty) that this source line, and the whole file, has
+  not been touched at any point in this fix cycle — the correction is
+  confined entirely to `change-log.md`'s own prose, exactly as the fix
+  claims.
+- **Disposition**: **RESOLVED, independently confirmed.** The mislabeling
+  is corrected at its source (the one document that had it wrong), the new
+  citation is independently verified accurate against the live `.scad`
+  file, and no other artifact needed to change (the drafting sheet itself,
+  `drawings/README.md`, and the `.scad` source were already correct, per
+  Cycle 8's own findings, unaffected by this fix).
+
+### Self-audit of Cycle 8's own review-record accuracy (post-renumbering)
+
+Per this cycle's own task, this Reviewer's *own* Cycle 8 section of this
+file was independently re-read in full (not sampled) after the disclosed
+repo-wide ECO-renumbering sweep, to check whether that automated sweep
+correctly updated every citation this Reviewer's own text made, and
+whether any *pre-existing* citation error (unrelated to the renumbering)
+was present. This is a self-correction of this Reviewer's own record, not
+a finding against the Mechanical Lead's work:
+
+- **Renumbering-sweep artifact found and fixed**: Cycle 8's
+  "Cross-cutting checks" table (row 2) used a shorthand list notation,
+  `` `ECO-039`/`039`/`040` ``, where only the first, fully-prefixed number
+  was updated by the sweep; the two bare continuation numbers were not.
+  Corrected to `` `ECO-039`/`040`/`041` ``. A targeted regex re-scan of the
+  entire Cycle 8 section (`` \`ECO-0[0-9]{2}\`(/\`0[0-9]{2}\`)+ ``)
+  confirms this was the only instance of this exact shorthand pattern —
+  every other ECO citation in the section already carries its own full
+  `ECO-0NN` prefix and was correctly swept.
+- **Pre-existing citation slip found and fixed (unrelated to the
+  renumbering)**: Finding 1's two citations of `hardware/mechanical/
+  assembly-instructions.md`'s "Containment cap → base flange" fastener-
+  table row as "line 264" were off by one; independently re-confirmed via
+  `git log --oneline --all -- hardware/mechanical/assembly-
+  instructions.md` that this file has not been touched by any commit in
+  this entire saga (last real edit predates this branch), so the row's
+  true location — **line 263** — was simply mis-cited in this Reviewer's
+  original Cycle 8 write, unrelated to anything the renumbering sweep
+  touched. Both instances corrected to "line 263"; the broader table-range
+  citation "(lines 256–267)" was independently re-checked and is correct
+  as originally written (line 256 is the table heading, line 267 is the
+  last row, "Cable anchor tabs").
+- **Everything else independently spot-checked this cycle and found
+  correct, no change needed**: `hardware/mechanical-interface.md` line
+  731; `bench-imu-01-enclosure.scad` lines 1749, 830, 763, 513, 517, 197;
+  `assembly-instructions.md` line 267 and its §4.1 "lines 121–158" range
+  boundary; `requirements/requirements.md` lines 139, 141, 144
+  (REQ-009/011/014); and `validation/open-issues.md`'s internal "line 89,
+  `MISS-016`" self-citation inside the `MISS-031` row — this last one was
+  transiently stale (the row had been sitting at line 92 due to a separate,
+  now-corrected row-ordering defect from when these rows were first added)
+  and is confirmed to have self-corrected back to an accurate "line 89"
+  once that ordering defect was fixed as part of this same cycle's
+  `open-issues.md` edits (see below) — no separate text edit was needed
+  for it.
+- **`validation/open-issues.md` row-ordering defect fixed**: The
+  `MISS-031`/`MISS-032`/`MISS-033` rows had been inserted immediately after
+  the table header instead of appended after the table's true last row
+  (`MISS-030`), violating this file's own ascending-ID append convention.
+  Relocated to the end of the table, preserving all text content
+  unchanged (aside from the status/date/note updates below); independently
+  re-confirmed via a pipe-count check that no column alignment was
+  disturbed by the move, and via `tools/check_open_issues.py` that the
+  gate still passes cleanly afterward.
+
+None of these four corrections change any finding's substance, severity,
+or disposition — they are citation/bookkeeping accuracy fixes to this
+Reviewer's own record, made transparent here rather than silently
+corrected.
+
+### Verdict
+
+- **Verdict**: **PASS**
+- **Open CRITICAL count**: 0
+- **Open HIGH count**: 0 (`MISS-031` independently confirmed RESOLVED this
+  cycle, both at the source-code level and the actual rendered-pixel
+  level)
+- **Open MEDIUM count**: 0 (`MISS-032` independently confirmed RESOLVED
+  this cycle)
+- **Open LOW/informational count (non-gating, unaffected)**: 1 —
+  `MISS-033`, unchanged from Cycle 8 (already RESOLVED/informational, not
+  in scope for this fix cycle).
+- **What independently checks out**: Both Cycle 8 gating findings are
+  independently confirmed fixed via fresh, from-scratch checks against the
+  real files and the real rendered pixels — not accepted on the strength
+  of the fix's own description. The specific clipping regression this
+  cycle was asked to pay particular attention to is independently
+  quantified as fixed with a 79px margin, via two independent methods
+  agreeing. The unrelated cross-branch ECO-renumbering (038→039→040→041,
+  plus the new `ECO-042` bookkeeping entry) is independently corroborated
+  as accurate via a fresh `tools/check_id_uniqueness.py` run. This
+  Reviewer's own Cycle 8 review text was additionally self-audited in full
+  and found to contain two small, non-substantive citation bugs (one
+  renumbering-sweep miss, one pre-existing off-by-one unrelated to any
+  change), both corrected transparently in this cycle rather than left
+  standing.
+- **What remains open, non-gating**: `MISS-033` (LOW/informational) only —
+  no action required, per its own Cycle 8 disposition.
+- **Next action**: Report **PASS** to the Hardware Lead / requester. No
+  further loop-back to the Mechanical Lead is required — both `MISS-031`
+  and `MISS-032` are independently confirmed RESOLVED this cycle. This
+  documentation/visualization pass may now be considered done from the
+  Mechanical Reviewer's perspective.
