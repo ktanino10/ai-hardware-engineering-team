@@ -527,3 +527,55 @@ category, not a claim of closure. Sent for independent Hardware Reviewer
 verification before any RESOLVED/partial-closure disposition; PCB
 Engineer does not self-declare this finding's status, same standing
 convention as every other finding this session.
+
+**Fresh Hardware Reviewer pass — verdict CONFIRMED (2026-09-02).** A
+dedicated reviewer independently re-derived every key claim via their own
+tooling: loaded the board directly in `pcbnew` (zone filled, 0 residual
+In1.Cu GND tracks, all 29 GND vias inside the zone, 53 footprints
+unchanged), independently re-ran DRC 15 times (0 unconnected every run,
+`shorting_items`/`tracks_crossing`/every other category matching this
+fix's own figures with no undisclosed regression), and read the
+crash-safety code directly (confirmed the save-before-reload ordering
+really does mean a hypothetical future segfault would leave a valid file
+already on disk). No blocking finding.
+
+### ISS-036 mechanism-level triage of the remaining violations (2026-09-02)
+
+With the zone fix in place, re-triaged all 61 current `shorting_items`
+violations by actual geometric mechanism (DRC's own JSON `pos`/
+`description` fields cross-referenced against this design's own known
+component placements), not just by net-pair percentages as the earlier
+analysis did — a genuine further step into ISS-036's own "individually
+triaged" resolution bar:
+
+| Category | Count | Disposition |
+|---|---|---|
+| Benign (`<no net>` mechanical/unused pad on one side) | 3 (5%) | Confirmed harmless |
+| `via_vs_inner_layer_copper` (GND via vs. `VBUS_5V` on In2.Cu, near J1) | 4 (7%) | Same mechanism class as this fix, different net/layer — see below |
+| `via_vs_track_outer_layer` (F.Cu/B.Cu) | 28 (46%) | Disclosed autorouter-class gap (14 of these match the already-documented U5/U6 0.65mm fine-pitch package-proximity pattern, geometrically confirmed within 8mm of each IC's placed center) |
+| `track_vs_pad` | 22 (36%) | Same disclosed gap |
+| `track_vs_track` | 4 (7%) | Same disclosed gap |
+
+The 4-item `via_vs_inner_layer_copper` pocket is a real, specific,
+further-tractable-looking lead: a GND through-via (spanning every copper
+layer, including In2.Cu) sits directly on or immediately beside a
+`VBUS_5V` track routed on In2.Cu near J1's own VBUS pad and a via
+cluster at (29.9,25)/(45.9,25)mm. **Not attempted this cycle**: In2.Cu
+carries several different nets (unlike In1.Cu's single dedicated GND
+net), so the "declare one zone, fill it" technique that fixed the
+In1.Cu case doesn't directly generalize here — a real fix would need a
+per-via, per-net clearance/reroute pass, exactly the class of change the
+earlier reverted detour attempt already demonstrated produces an
+unreliable mixed result on this board's actual geometry (see above).
+Flagged as a specific, well-scoped candidate for the same future
+dedicated session Kyosuke already authorized for option (b)
+(whole-board-aware routing), not attempted ad-hoc here.
+
+Net effect: confirms, with actual mechanism-level evidence rather than
+net-pair percentages alone, that the bulk of what remains (54 of 61,
+89%) is the already-disclosed autorouter-class routing-density gap this
+design has carried since its first DRC pass — not a fresh class of
+defect — while narrowing the "still needs a real answer" subset to a
+specific, named, 4-item pocket with an identified mechanism. Does not
+claim to have individually resolved any of these 58 non-benign items;
+ISS-036 remains correctly OPEN and the gate correctly still fails.
