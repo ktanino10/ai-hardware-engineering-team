@@ -332,6 +332,31 @@ REROUTE_OVERRIDE: list[
             (99.275, 16.8), (99.275, 18.0), (99.225, 18.0),
         ],
     ),
+    # --- ISS-036 continued (solder_mask_bridge sweep): a dedicated
+    # whole-board-aware search against all 206 uniquely-identified
+    # solder_mask_bridge (track, pad) conflicts found only these 2
+    # additional tractable fixes (~1% yield, reconfirming the same
+    # technique ceiling already established for the outer-layer
+    # shorting_items sweep) -- see hardware/pcb/README.md for the full
+    # search methodology and yield analysis.
+    #
+    # 3V3's default straight run toward U1 passes directly under U1's own
+    # unrelated pin 1 pad, bridging their solder-mask apertures (3
+    # separate DRC entries against 3 different nearby pads, all on this
+    # one track). A localized step-over clears all of them while keeping
+    # both real endpoints fixed.
+    (
+        "3V3",
+        [((31.825, 47.6), (31.825, 42.0))],
+        [(31.825, 47.6), (28.825, 47.6), (31.825, 42.0)],
+    ),
+    # VM_MOTOR's default straight run near J4/M1's area (a separate
+    # segment from the fix above) passes too close to unrelated copper.
+    (
+        "VM_MOTOR",
+        [((107.1375, 30.0), (113.85, 30.0))],
+        [(107.1375, 30.0), (110.85, 27.0), (113.85, 30.0)],
+    ),
 ]
 
 
