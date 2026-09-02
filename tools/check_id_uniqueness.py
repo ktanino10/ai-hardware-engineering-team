@@ -110,20 +110,31 @@ def parse_table_rows(
     unchanged from the original design.
 
     Deciding where that table's data ROWS actually END is the part this
-    function hardens. A genuine end-of-table boundary is a real section
-    break: a non-blank line that is not itself a table row (typically a
-    Markdown heading, e.g. "## Notes"), or EOF. A lone blank line between
-    two otherwise-adjacent data rows is NOT, by itself, treated as a
-    boundary: scanning looks past the whole run of blank lines, and if a
-    well-formed row follows -- same column count as the header, AND (when
-    id_pattern is given) an ID cell that actually matches this namespace's
-    own ID pattern or is a recognized placeholder -- the gap is treated as
-    a stray/accidental blank line: it is skipped (with a warning recorded,
-    never silently) and scanning continues past it. The id_pattern check
-    matters on its own: column count alone isn't a safe enough signal, since
-    a genuinely different, unrelated table (e.g. a differently-scoped
-    two-column table elsewhere) could coincidentally share the same column
-    count as the real data table and get wrongly merged in without it.
+    function hardens. The ONLY thing treated as a genuine, unconditional
+    end-of-table boundary is a real section break: a Markdown heading line
+    (starts with "#", e.g. "## Notes") or EOF. Anything else that isn't
+    itself a well-formed data row of this exact table -- a blank line, a
+    run of several, a malformed/corrupted row, stray prose, or any mix of
+    these -- is NOT by itself treated as ending the table: scanning skips
+    forward over the whole contiguous run of such lines and keeps looking,
+    all the way up to the next real heading or EOF, for a row that IS a
+    well-formed continuation (same column count as the header, not a
+    separator row, and an ID cell that matches this namespace's own
+    id_pattern or is a recognized placeholder). If one is found, the
+    skipped span is treated as an accidental gap: it's skipped, a warning
+    is recorded (never silently), and scanning resumes from there. If a
+    heading or EOF is reached first, that's the table's genuine end --
+    scanning stops, but a warning is still recorded if the span leading up
+    to it contained anything non-blank (unlike a bare blank line before a
+    heading/EOF, which is the normal, expected shape and warrants no
+    warning).
+
+    The id_pattern (and column-count) check on a candidate continuation
+    row matters on its own, independent of the blank-line-vs-EOF question:
+    column count alone isn't a safe enough signal, since a genuinely
+    different, unrelated table (e.g. a differently-scoped two-column table
+    elsewhere) could coincidentally share the real table's column count
+    and get wrongly merged in without it.
 
     This distinction matters because the previous version of this function
     stopped scanning, unconditionally and silently, at the FIRST line that
@@ -133,8 +144,21 @@ def parse_table_rows(
     ECO scanning to only 12 of 26 real rows for an entire session (7 stray
     blank lines had accumulated between ECO-012 and later rows, the first
     one right after ECO-012) -- with zero warning that anything was wrong,
-    on this branch *and* on `main` itself. See ECO-033 / the commit that
-    introduced this hardening for the full incident writeup.
+    on this branch *and* on `main` itself. A first hardening pass fixed
+    that exact shape (an isolated run of blank lines with well-formed rows
+    on both sides) but an independent code review of that pass found it
+    still silently truncated scanning -- with zero warning, exactly the
+    same bug class -- if a single MALFORMED (not blank) row sat between the
+    gap and the next real row: the lookahead checked only the one line
+    immediately following a blank run, and gave up (silently, on
+    `check_open_issues.py`, incorrectly reporting a passing Design
+    Complete Gate) if that one line didn't itself qualify, even when
+    further genuine rows existed just past it. This version closes that
+    gap by continuing to look past ANY non-qualifying, non-heading content
+    -- not just blank lines, and not just one line's worth of it -- before
+    concluding the table has genuinely ended. See ECO-033 / the commits
+    that introduced and then completed this hardening for the full
+    incident writeup.
     """
     lines = text.splitlines()
 
@@ -163,6 +187,25 @@ def parse_table_rows(
 
     rows: list[tuple[int, list[str]]] = []
     warnings: list[str] = []
+
+    def is_real_row(line_stripped: str) -> bool:
+        """True for a line that looks like a genuine, plausible data row
+        of THIS table: right column count, not a separator row, and (when
+        id_pattern is given) an ID cell that matches this namespace's own
+        ID pattern or is a recognized placeholder.
+        """
+        if not line_stripped.startswith("|"):
+            return False
+        cells = _split_row(line_stripped)
+        if len(cells) != expected_ncols or _is_separator_row(cells):
+            return False
+        id_cell = cells[0] if cells else ""
+        if id_pattern is not None and not (
+            _is_placeholder(id_cell) or id_pattern.match(id_cell)
+        ):
+            return False
+        return True
+
     while j < len(lines):
         stripped = lines[j].strip()
 
@@ -173,47 +216,65 @@ def parse_table_rows(
             j += 1
             continue
 
-        if stripped == "":
-            # Could be a legitimate end-of-table blank line (e.g. right
-            # before a "## Notes" heading or EOF) or a stray gap
-            # accidentally inserted between two data rows. Look past the
-            # *whole* run of blank lines to see which.
-            gap_start = j
-            k = j
-            while k < len(lines) and lines[k].strip() == "":
-                k += 1
-            if k < len(lines):
-                next_stripped = lines[k].strip()
-                if next_stripped.startswith("|"):
-                    next_cells = _split_row(next_stripped)
-                    id_cell = next_cells[0] if next_cells else ""
-                    id_plausible = (
-                        id_pattern is None
-                        or _is_placeholder(id_cell)
-                        or bool(id_pattern.match(id_cell))
-                    )
-                    if (
-                        len(next_cells) == expected_ncols
-                        and not _is_separator_row(next_cells)
-                        and id_plausible
-                    ):
-                        n_blank = k - gap_start
-                        warnings.append(
-                            f"{label}line {gap_start + 1}: skipped "
-                            f"{n_blank} stray blank line(s) between table "
-                            f"rows (table resumes at line {k + 1}) -- "
-                            "remove the blank line(s); a stray blank line "
-                            "here previously truncated scanning silently."
-                        )
-                        j = k
-                        continue
-            # Not followed by more of the same table -- a genuine
-            # end-of-table blank line (heading or EOF next). Stop, no
-            # warning: this is the normal, expected shape.
-            break
+        if stripped.startswith("#"):
+            break  # an actual Markdown heading is an unambiguous section end
 
-        # A non-blank line that isn't a table row at all (typically a
-        # heading) always ends the table -- unambiguous, no warning needed.
+        # A blank line OR some other non-table content (a malformed/
+        # corrupted row, illustrative prose, etc.) that is NOT a heading.
+        # Neither, by itself, is treated as ending the table: an earlier
+        # version of this hardening only looked one line past a blank-line
+        # run before giving up, which meant a single malformed row sitting
+        # right after (or instead of) a blank gap was silently treated as
+        # a hard, unwarned end-of-table -- exactly the bug class this
+        # function exists to close, just with a narrower trigger (found by
+        # this hardening's own independent code review: a malformed row
+        # immediately after a blank line caused `check_open_issues.py` to
+        # silently stop counting Backlog rows entirely, producing a clean
+        # exit-0 "OK" that hid a real, unresolved HIGH finding). So: skip
+        # forward over a whole contiguous run of non-row, non-heading
+        # lines (blank or not) and see whether a real row of this exact
+        # table reappears on the other side, all the way up to the next
+        # genuine heading or EOF -- only THOSE are treated as an
+        # unambiguous, real section boundary.
+        gap_start = j
+        k = j
+        saw_nonblank = False
+        while k < len(lines):
+            k_stripped = lines[k].strip()
+            if k_stripped.startswith("|") and is_real_row(k_stripped):
+                break
+            if k_stripped.startswith("#"):
+                break
+            if k_stripped != "":
+                saw_nonblank = True
+            k += 1
+
+        if k < len(lines) and lines[k].strip().startswith("|") and is_real_row(lines[k].strip()):
+            n_skipped = k - gap_start
+            kind = "non-blank/malformed" if saw_nonblank else "blank"
+            warnings.append(
+                f"{label}line {gap_start + 1}: skipped {n_skipped} {kind} "
+                f"line(s) between table rows (table resumes at line {k + 1}) "
+                "-- clean this up; a gap like this here previously could "
+                "silently truncate scanning."
+            )
+            j = k
+            continue
+
+        # Either a genuine heading, or EOF, without a real continuation in
+        # between -- a genuine end of table. If anything non-blank was
+        # skipped to reach it, warn even though we correctly stop: unlike
+        # a bare blank line before a heading/EOF (the normal, expected
+        # shape), non-blank content there is still worth a human's look --
+        # it may be a malformed row that was never counted.
+        if saw_nonblank:
+            warnings.append(
+                f"{label}line {gap_start + 1}: found non-blank content that "
+                "isn't a valid row of this table, right before what looks "
+                "like the table's real end (a heading or end of file) -- if "
+                "this was meant to be a data row, it's malformed and was "
+                "NOT counted; please check nothing real was missed here."
+            )
         break
 
     return rows, warnings

@@ -62,15 +62,21 @@ def _is_placeholder(id_cell: str) -> bool:
 def parse_backlog_rows(text: str) -> tuple[list[list[str]], list[str]]:
     """Return (data rows of the Backlog table, parser warning messages).
 
-    A genuine end-of-table boundary is a real section break: a non-blank
-    line that is not itself a table row (typically a Markdown heading), or
-    EOF. A lone blank line between two otherwise-adjacent data rows is NOT,
-    by itself, treated as a boundary: scanning looks past the whole run of
-    blank lines, and if a well-formed row follows -- same column count as
-    the header, AND an ID cell that looks like a real ISS-/MISS- ID or a
-    recognized placeholder -- the gap is treated as a stray/accidental
-    blank line: it is skipped (with a warning recorded, never silently)
-    and scanning continues past it.
+    The ONLY thing treated as a genuine, unconditional end-of-table
+    boundary is a real section break: a Markdown heading line (starts with
+    "#") or EOF. Anything else that isn't itself a well-formed data row of
+    this exact table -- a blank line, a run of several, a malformed row,
+    stray prose, or any mix -- is NOT by itself treated as ending the
+    table: scanning skips forward over the whole contiguous run of such
+    lines and keeps looking, all the way up to the next real heading or
+    EOF, for a row that IS a well-formed continuation (same column count
+    as the header, not a separator row, and an ID cell matching
+    ISS-/MISS- or a recognized placeholder). If one is found, the skipped
+    span is treated as an accidental gap: it's skipped, a warning is
+    recorded (never silently), and scanning resumes. If a heading or EOF
+    is reached first, that's the genuine end -- scanning stops, but a
+    warning is still recorded if the span leading up to it contained
+    anything non-blank.
 
     The previous version of this function stopped scanning, unconditionally
     and silently, at the first line that didn't start with "|" after the
@@ -78,7 +84,16 @@ def parse_backlog_rows(text: str) -> tuple[list[list[str]], list[str]]:
     blank line accidentally inserted between two data rows. See this
     file's module docstring for the real incident (in the near-identical
     tools/check_id_uniqueness.py parser) that motivated hardening this
-    mirrored parser the same way before it could bite here too.
+    mirrored parser the same way before it could bite here too. A first
+    hardening pass fixed that exact shape but an independent code review
+    found it still silently truncated scanning -- with zero warning -- if
+    a single MALFORMED (not blank) row sat between the gap and the next
+    real row: concretely demonstrated, against this exact file/function,
+    to make `main()` print a clean `OK` and exit 0 while hiding a real,
+    unresolved HIGH finding. This version closes that gap by continuing to
+    look past ANY non-qualifying, non-heading content -- not just blank
+    lines, and not just one line's worth of it -- before concluding the
+    table has genuinely ended.
     """
     lines = text.splitlines()
 
@@ -104,6 +119,15 @@ def parse_backlog_rows(text: str) -> tuple[list[list[str]], list[str]]:
         if _is_separator_row(_split_row(lines[j])):
             j += 1
 
+    def is_real_row(line_stripped: str) -> bool:
+        if not line_stripped.startswith("|"):
+            return False
+        cells = _split_row(line_stripped)
+        if len(cells) != expected_ncols or _is_separator_row(cells):
+            return False
+        id_cell = cells[0] if cells else ""
+        return _is_placeholder(id_cell) or bool(ID_PATTERN.match(id_cell))
+
     rows: list[list[str]] = []
     warnings: list[str] = []
     while j < len(lines):
@@ -116,46 +140,49 @@ def parse_backlog_rows(text: str) -> tuple[list[list[str]], list[str]]:
             j += 1
             continue
 
-        if stripped == "":
-            # Could be a legitimate end-of-table blank line (e.g. right
-            # before a heading or EOF) or a stray gap accidentally
-            # inserted between two data rows. Look past the *whole* run
-            # of blank lines to see which.
-            gap_start = j
-            k = j
-            while k < len(lines) and lines[k].strip() == "":
-                k += 1
-            if k < len(lines):
-                next_stripped = lines[k].strip()
-                if next_stripped.startswith("|"):
-                    next_cells = _split_row(next_stripped)
-                    id_cell = next_cells[0] if next_cells else ""
-                    id_plausible = _is_placeholder(id_cell) or bool(
-                        ID_PATTERN.match(id_cell)
-                    )
-                    if (
-                        len(next_cells) == expected_ncols
-                        and not _is_separator_row(next_cells)
-                        and id_plausible
-                    ):
-                        n_blank = k - gap_start
-                        warnings.append(
-                            f"line {gap_start + 1}: skipped {n_blank} "
-                            "stray blank line(s) between Backlog table "
-                            f"rows (table resumes at line {k + 1}) -- "
-                            "remove the blank line(s); a stray blank "
-                            "line here previously truncated scanning "
-                            "silently in a near-identical parser."
-                        )
-                        j = k
-                        continue
-            # Not followed by more of the same table -- a genuine
-            # end-of-table blank line (heading or EOF next). Stop, no
-            # warning: this is the normal, expected shape.
-            break
+        if stripped.startswith("#"):
+            break  # an actual Markdown heading is an unambiguous section end
 
-        # A non-blank line that isn't a table row at all (typically a
-        # heading) always ends the table -- unambiguous, no warning needed.
+        # A blank line OR some other non-table content (a malformed row,
+        # stray prose, etc.) that is NOT a heading. Skip forward over a
+        # whole contiguous run of such lines and see whether a real row
+        # reappears on the other side, up to the next genuine heading or
+        # EOF.
+        gap_start = j
+        k = j
+        saw_nonblank = False
+        while k < len(lines):
+            k_stripped = lines[k].strip()
+            if k_stripped.startswith("|") and is_real_row(k_stripped):
+                break
+            if k_stripped.startswith("#"):
+                break
+            if k_stripped != "":
+                saw_nonblank = True
+            k += 1
+
+        if k < len(lines) and lines[k].strip().startswith("|") and is_real_row(lines[k].strip()):
+            n_skipped = k - gap_start
+            kind = "non-blank/malformed" if saw_nonblank else "blank"
+            warnings.append(
+                f"line {gap_start + 1}: skipped {n_skipped} {kind} line(s) "
+                f"between Backlog table rows (table resumes at line "
+                f"{k + 1}) -- clean this up; a gap like this here "
+                "previously could silently truncate scanning."
+            )
+            j = k
+            continue
+
+        # Genuine end (heading or EOF), no real continuation found. Warn
+        # anyway if anything non-blank was skipped to reach it.
+        if saw_nonblank:
+            warnings.append(
+                f"line {gap_start + 1}: found non-blank content that isn't "
+                "a valid Backlog row, right before what looks like the "
+                "table's real end (a heading or end of file) -- if this "
+                "was meant to be a data row, it's malformed and was NOT "
+                "counted; please check nothing real was missed here."
+            )
         break
 
     return rows, warnings
