@@ -60,3 +60,4 @@ firmware/**/build/
 # an independent review pass -- e.g. re-exported netlists/ERC reports for
 # the reviewer's own re-derivation, not project deliverables)
 .review-scratch*/
+review-artifacts*/
