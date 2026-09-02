@@ -86,8 +86,22 @@ def _is_placeholder(id_cell: str) -> bool:
     return not id_cell or id_cell.startswith("<") or id_cell.startswith("ISS-XXX")
 
 
-def parse_backlog_rows(text: str) -> tuple[list[list[str]], list[str]]:
-    """Return (data rows of the Backlog table, parser warning messages).
+def parse_backlog_rows(text: str) -> tuple[list[list[str]], list[str], int]:
+    """Return (data rows of the Backlog table, parser warning messages,
+    the table's expected column count).
+
+    The expected column count is returned so callers (see `main()`) can
+    validate a row's actual length before trusting fixed-position
+    indexing into it (`row[1]` for Severity, `row[2]` for Status) --
+    found necessary by independent code review: a row whose own internal
+    pipe-boundary shifts for any reason (e.g. a human accidentally
+    deletes one `|` while hand-editing -- the exact class of manual-
+    editing mistake this whole hardening effort exists to catch) can
+    silently merge Severity and Status into one cell. Since neither
+    "CRITICAL"/"HIGH" would then exactly match that merged string,
+    `main()`'s severity checks would silently fall through to nothing --
+    a live, concretely-demonstrated false PASS of this exact gate, one
+    function downstream of the parser's own hardening.
 
     The ONLY thing treated as a genuine, unconditional end-of-table
     boundary is a real section break: a Markdown heading line (starts with
@@ -137,7 +151,7 @@ def parse_backlog_rows(text: str) -> tuple[list[list[str]], list[str]]:
             break
 
     if header_idx is None:
-        return [], []
+        return [], [], 0
 
     expected_ncols = len(header_cells)
 
@@ -250,7 +264,7 @@ def parse_backlog_rows(text: str) -> tuple[list[list[str]], list[str]]:
             )
         break
 
-    return rows, warnings
+    return rows, warnings, expected_ncols
 
 
 def main() -> int:
@@ -259,7 +273,7 @@ def main() -> int:
         return 0
 
     text = OPEN_ISSUES_PATH.read_text(encoding="utf-8")
-    rows, parse_warnings = parse_backlog_rows(text)
+    rows, parse_warnings, expected_ncols = parse_backlog_rows(text)
 
     if parse_warnings:
         print(
@@ -272,13 +286,31 @@ def main() -> int:
         print()
 
     violations: list[str] = []
+    length_issues: list[str] = []
     for row in rows:
-        if len(row) < 3:
-            continue
-        issue_id, severity, status = row[0], row[1].upper(), row[2].upper()
+        issue_id = row[0] if row else ""
         if not issue_id or issue_id.startswith("<") or issue_id.startswith("ISS-XXX"):
             continue  # placeholder row, not a real finding
 
+        if len(row) != expected_ncols:
+            # Do NOT trust fixed-position indexing (row[1]=Severity,
+            # row[2]=Status) into a row whose own column count doesn't
+            # match the table's header -- found by independent code
+            # review: an accidentally-deleted "|" merging Severity and
+            # Status into one cell would otherwise silently defeat BOTH
+            # severity checks below (neither "CRITICAL" nor "HIGH" would
+            # exactly match the merged string, so neither branch fires),
+            # a live, concretely-demonstrated false PASS of this exact
+            # gate. Fail loudly and specifically instead of guessing.
+            length_issues.append(
+                f"{issue_id}: row has {len(row)} cell(s), expected "
+                f"{expected_ncols} -- cannot reliably determine this "
+                "finding's Severity/Status; fix the row's own "
+                "formatting (likely a missing or extra '|')"
+            )
+            continue
+
+        severity, status = row[1].upper(), row[2].upper()
         if severity == "CRITICAL" and status != RESOLVED:
             violations.append(
                 f"{issue_id}: CRITICAL finding is not RESOLVED "
@@ -290,6 +322,15 @@ def main() -> int:
                 f"ACCEPTED-RISK (status={status or 'EMPTY'})"
             )
 
+    if length_issues:
+        print(
+            "Hardware gate FAILED - cannot verify these Backlog row(s) "
+            "(malformed, wrong column count):"
+        )
+        for li in length_issues:
+            print(f"  - {li}")
+        print()
+
     if violations:
         print("Hardware gate FAILED - Design Complete cannot proceed:")
         for v in violations:
@@ -298,6 +339,9 @@ def main() -> int:
             "\nSee docs/architecture.md section 8 (Design Complete Gate) and "
             "validation/open-issues.md for the resolution rules."
         )
+        return 1
+
+    if length_issues:
         return 1
 
     print(
