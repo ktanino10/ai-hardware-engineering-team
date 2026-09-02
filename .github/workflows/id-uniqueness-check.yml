@@ -13,13 +13,15 @@ name: ID Uniqueness Check
 # deterministic bookkeeping check across three specific shared-namespace
 # files, not part of the Design Complete gate's severity/status logic.
 
+# NOTE (pull_request trigger is deliberately NOT path-filtered): this job's
+# name, "Check ECO/Issue/Evidence IDs for cross-branch duplicates", is a
+# REQUIRED status check on `main`, and GitHub never reports a required check
+# that a path filter skipped -- see the equivalent note in hardware-gate.yml.
+# This script scans the three shared-namespace files in full regardless of what
+# a PR touched, and runs in ~10s. The `push` trigger keeps its path filter.
+
 on:
   pull_request:
-    paths:
-      - "validation/change-log.md"
-      - "validation/open-issues.md"
-      - "datasheets/evidence-log.md"
-      - "tools/check_id_uniqueness.py"
   push:
     branches: [main]
     paths:
