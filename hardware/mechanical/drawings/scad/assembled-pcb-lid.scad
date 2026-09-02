@@ -6,11 +6,11 @@
 // — not an invented coordinate. Roof-up, as installed, sitting on top of
 // the base's PCB bay.
 // Regenerate 2D drawing, e.g. top view:
-//   openscad --projection=ortho --render --autocenter --viewall \
+//   openscad -D 'show_mode="export"' --projection=ortho --render --autocenter --viewall \
 //     --imgsize=1600,1200 --camera=0,0,0,0,0,0,300 \
 //     -o ../2d/pcb-lid-top.png assembled-pcb-lid.scad
 // Regenerate assembled-position STL (for Blender import):
-//   openscad --backend=manifold --export-format binstl \
+//   openscad -D 'show_mode="export"' --backend=manifold --export-format binstl \
 //     -o /tmp/assembled-pcb-lid.stl assembled-pcb-lid.scad
 include <../../bench-imu-01-enclosure.scad>
 

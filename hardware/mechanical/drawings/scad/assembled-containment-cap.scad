@@ -7,11 +7,11 @@
 // MISS-016, human ACCEPTED-RISK (Rev 3, ECO-024/025) — installed LAST in
 // the real assembly sequence (dimensional-spec.md §14, step 6).
 // Regenerate 2D drawing, e.g. top view:
-//   openscad --projection=ortho --render --autocenter --viewall \
+//   openscad -D 'show_mode="export"' --projection=ortho --render --autocenter --viewall \
 //     --imgsize=1600,1200 --camera=0,0,0,0,0,0,300 \
 //     -o ../2d/containment-cap-top.png assembled-containment-cap.scad
 // Regenerate assembled-position STL (for Blender import):
-//   openscad --backend=manifold --export-format binstl \
+//   openscad -D 'show_mode="export"' --backend=manifold --export-format binstl \
 //     -o /tmp/assembled-containment-cap.stl assembled-containment-cap.scad
 include <../../bench-imu-01-enclosure.scad>
 

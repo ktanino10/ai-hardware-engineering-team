@@ -9,11 +9,11 @@
 // mitigation — human ACCEPTED-RISK, a partial (~77.7%-by-area) hazard-band
 // mitigation, not a complete guard (validation/open-issues.md MISS-023).
 // Regenerate 2D drawing, e.g. top view:
-//   openscad --projection=ortho --render --autocenter --viewall \
+//   openscad -D 'show_mode="export"' --projection=ortho --render --autocenter --viewall \
 //     --imgsize=1600,1200 --camera=0,0,0,0,0,0,300 \
 //     -o ../2d/pinch-guard-top.png assembled-pinch-guard.scad
 // Regenerate assembled-position STL (for Blender import):
-//   openscad --backend=manifold --export-format binstl \
+//   openscad -D 'show_mode="export"' --backend=manifold --export-format binstl \
 //     -o /tmp/assembled-pinch-guard.stl assembled-pinch-guard.scad
 include <../../bench-imu-01-enclosure.scad>
 

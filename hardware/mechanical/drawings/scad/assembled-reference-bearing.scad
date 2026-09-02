@@ -10,7 +10,7 @@
 // reference_bearing()'s own internal color("silver") so it visually reads
 // as a distinct bought/metal part, not a printed PETG piece.
 // Regenerate assembled-position STL (for Blender import):
-//   openscad --backend=manifold --export-format binstl \
+//   openscad -D 'show_mode="export"' --backend=manifold --export-format binstl \
 //     -o /tmp/assembled-reference-bearing.stl assembled-reference-bearing.scad
 include <../../bench-imu-01-enclosure.scad>
 
