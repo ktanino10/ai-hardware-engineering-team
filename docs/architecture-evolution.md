@@ -1533,3 +1533,169 @@ preserve the audit trail of what was true before this phase vs. after.
   awaiting independent audit before merge — same process every prior
   change in this repository's history went through.
 
+## 38. Foresight Checklist Addendum (cross-Reviewer checklist extension)
+
+Added when all three Reviewer agents' checklists were extended with a
+**Foresight checklist** — deliberately **not** labeled a "Phase" the way
+§27/§32/§33/§35/§36/§37 are, since nothing here introduces a new
+discipline or agent; it is a cross-cutting checklist extension to three
+already-existing agents, kept as its own numbered addendum purely to
+preserve this document's own audit-trail convention (what was true before
+this change vs. after), the same reason every prior addendum is its own
+section.
+
+- **Trigger — a real, dated gap, not a hypothetical.** While producing a
+  PCB+mechanical-parts exploded-view visualization in Unity (an ad hoc
+  session, using `unityMCP-*` tools — **not** this repository's own
+  established Blender-based `.github/skills/mechanical-visualization/SKILL.md`
+  workflow, and **not** a Bench-IMU-01 deliverable: no `.scad` file,
+  schematic, firmware source, or BOM line was touched), a physical
+  interference check between parts was not performed proactively — it took
+  the human (Kyosuke) explicitly pointing it out. This revealed a real,
+  general gap: this framework's three existing Reviewer agents are built to
+  **verify the correctness of a specific, stated claim** (an adversarial
+  checklist run against a design the Lead/Engineer already claims is
+  correct) — none of them are built to **proactively notice an adjacent
+  concern nobody explicitly asked about**. That is a gap in reviewer
+  *disposition*, not in any one discipline's checklist coverage, which is
+  why it applies across all three Reviewers at once rather than to
+  Mechanical Reviewer alone (even though Mechanical Reviewer is where the
+  motivating example lives).
+- **Human approval**: given, scoped explicitly to extending the three
+  existing Reviewer agents' own checklists — an **explicit, stated
+  constraint that no new agent/role be created** for this gap (unlike
+  Mechanical Reviewer's/Firmware Reviewer's own original stand-up, §27/§36),
+  delivered via the creator/"General Chat" session, 2026-09-03. This is
+  its own standalone PR, off a fresh branch from `main` (not bundled with
+  any real Bench-IMU-01 design work), mirroring how Firmware Reviewer
+  (§36) and Manufacturing Engineer (§35) were each introduced.
+- **Explicit decision — extend three existing reviewers' checklists,
+  mirroring Manufacturing Engineer's/PCB Engineer's "extend, don't add a
+  new agent" precedent (§35/§37), not Mechanical/Firmware Reviewer's "stand
+  up a new agent" precedent (§27/§36)** — a human-directed choice, not a
+  default: the human explicitly selected "add a checklist to the existing
+  Reviewer roles" over introducing a new "Foresight Reviewer" agent. Unlike
+  §35/§37, which each extended exactly *one* existing reviewer for a
+  *narrow*, single-discipline gap, this addition extends all *three*
+  simultaneously, because the underlying gap (reactive-verification-only
+  disposition) is itself general across disciplines, not specific to
+  Mechanical review.
+- **Per-role content, each grounded in this repository's own real
+  history, not invented hypotheticals**:
+  - **Mechanical Reviewer** (`.github/agents/mechanical-reviewer.agent.md`,
+    `.github/skills/mechanical-review/SKILL.md`) — highest priority, the
+    discipline of the motivating example: (1) physical interference
+    actually checked across the *whole* assembly, including in any
+    downstream artifact (a visualization, exploded view, drawing), not only
+    the Mechanical Lead's own `.scad` model (mandatory item 4's narrower
+    scope); (2) a simplified/approximate representation (e.g. treating a
+    nested/inserted assembly as flat-stacked plates) must not silently
+    distort the real insertion depth/clearance
+    `hardware/mechanical/assembly-instructions.md` (or the `.scad`
+    file/dimensional-spec) actually specifies; (3) basic scale/axis-
+    transform consistency actually verified, not assumed, at any unit/tool/
+    axis-convention boundary. Cites this project's own real precedent:
+    `MISS-007` (found only while independently re-verifying an unrelated
+    fix's side effects) and `MISS-001` (a centerline-vs-footprint gap) —
+    concrete, not hypothetical, grounding.
+  - **Hardware Reviewer** (`.github/agents/hardware-reviewer.agent.md`,
+    `.github/skills/hardware-review/SKILL.md`): (1) cross-domain
+    interference — an electrical change checked for effects on thermal/
+    mechanical/firmware, not only its own electrical correctness, extending
+    checklist item 15/`docs/architecture.md` §12's existing "PCB layout
+    concern" lens specifically to *this cycle's change*; (2) existing
+    `ASSUMPTION`/`ESTIMATE`/`UNKNOWN` values re-verified after the latest
+    change. Item 2 directly operationalizes, at review time rather than
+    only at ECO-closing time, the failure mode `docs/workflow.md` §4.2
+    ("Stale Load-Bearing Figure Propagation") already documents happening
+    for real more than once in this repository (`MISS-021`, `MISS-029`, the
+    still-open `MISS-019`/`ISS-024`) — this addendum does not change §4.2's
+    own convention, it gives the Hardware Reviewer's own checklist a
+    proactive hook into the same already-identified failure class.
+  - **Firmware Reviewer** (`.github/agents/firmware-reviewer.agent.md`,
+    `.github/skills/firmware-review/SKILL.md`): (1) requirement-implied-but-
+    unimplemented functionality (e.g. a closed-loop control response) not
+    silently narrowed past without disclosure, distinguished from
+    genuinely out-of-scope Control Engineer territory (§14) or Firmware
+    Engineer's own disclosed "Out of scope" items; (2) unverified timing/
+    concurrency areas (ISR-vs-main-loop, shared state, re-entrancy) traced
+    through every code path, not just the one that "looks plausible."
+- **Common mechanism added to all three** (near-identical wording across
+  all 6 files): an explicit self-question at the end of every review cycle
+  — "is there anything within scope nobody explicitly asked about, but that
+  you should have noticed anyway?" — plus a new, **optional**, non-
+  mandatory **"Foresight notes — outside this cycle's scope"** report
+  subsection (`validation/design-review.md` for Hardware/Mechanical;
+  `firmware/<board>/<board>-firmware-review.md` for Firmware) for things
+  noticed but not yet concrete enough to be a real finding. Deliberately
+  **not** a new mandatory finding field and **not** a new
+  `validation/open-issues.md` column: that file's table header/column
+  order is CI-parsed (`tools/check_open_issues.py`,
+  `.github/instructions/validation.instructions.md`) and is left completely
+  untouched by this addendum — the new subsection is prose only, inside the
+  existing per-cycle report documents, never promoted to a backlog row
+  unless/until it becomes a real, fully-schema'd finding.
+- **Explicitly not a Bench-IMU-01 design change — no ECO.** The motivating
+  Unity example is ad hoc work outside this repository's own established
+  tooling/workflow for mechanical visualization, not a Bench-IMU-01
+  deliverable, and this addendum itself touches zero files under
+  `hardware/**`, `bom/**`, `firmware/**`, or `requirements/**` — per
+  `.github/instructions/hardware-design.instructions.md`'s/
+  `.github/instructions/firmware.instructions.md`'s own ECO trigger ("any
+  non-cosmetic change under `hardware/**`/`bom/**`/`firmware/**`"), no
+  `validation/change-log.md` entry is created or needed. This is a
+  framework/process change, recorded here (this document is exactly where
+  framework/process changes belong — see every prior addendum), not a
+  design revision.
+- **Deliberately narrower scope than a full "Phase," disclosed rather than
+  silently inconsistent** (the same discipline §35/§36's own "deliberately
+  narrower scope" bullets used): `docs/workflow.md` is **not** updated —
+  Phase 5/10/11's own text already references the Reviewer agent/skill
+  files generically ("run the full adversarial checklist
+  (`.github/agents/mechanical-reviewer.agent.md`)") rather than enumerating
+  specific checklist items, so nothing there actually goes stale; adding a
+  Foresight-checklist mention would be new content, not a correction, and is
+  left for a future pass if a human judges it valuable. `README.md`'s own
+  agent roster (already a disclosed, pre-existing gap since §36/§37) is
+  likewise left untouched — it lists agent names/count only, unaffected by
+  a checklist-content change to existing agents.
+- **Files added**: none — this addendum extends three existing agent/skill
+  pairs; no new `.agent.md` or `SKILL.md` file is created.
+- **Files edited, additively only** (nothing existing removed/reworded, no
+  section renumbered): `.github/agents/mechanical-reviewer.agent.md`,
+  `.github/skills/mechanical-review/SKILL.md`,
+  `.github/agents/hardware-reviewer.agent.md`,
+  `.github/skills/hardware-review/SKILL.md`,
+  `.github/agents/firmware-reviewer.agent.md`,
+  `.github/skills/firmware-review/SKILL.md` (each: new "Foresight
+  checklist" section + new "Foresight notes"/Output-bullet addition);
+  `docs/architecture.md` (§3 new explanatory paragraph, cross-referencing
+  this addendum); `docs/architecture-evolution.md` (this addendum);
+  `.github/copilot-instructions.md` (one short added clause to each of the
+  three existing Reviewer bullets, mirroring how the PCB-layout and
+  manufacturing-spec checklist extensions were already disclosed inline
+  there); `.github/instructions/validation.instructions.md` (one
+  clarifying bullet sanctioning the new "Foresight notes" subsection as
+  optional/prose-only, outside the required finding schema and outside the
+  CI-parsed table).
+- **Confirmed untouched** (verified via `git diff` before opening the PR):
+  `.github/agents/{circuit-engineer,mechanical-lead,firmware-engineer,
+  hardware-lead,component-engineer,power-engineer,manufacturing-engineer,
+  pcb-engineer}.agent.md` (all non-Reviewer agents — explicitly out of
+  scope per the human's own instruction), every other `SKILL.md`,
+  `docs/workflow.md`, `README.md`, `validation/open-issues.md` (no
+  header/schema change), `validation/design-review.md` (no retroactive
+  edit to any past cycle entry — the optional subsection is a
+  future-cycle practice, not backfilled), `validation/change-log.md` (no
+  ECO — see above), `validation/fmea.md`, `validation/bring-up-procedure.md`,
+  all of `firmware/**`, `hardware/**`, `bom/**`, `requirements/**`,
+  `datasheets/**`, `.github/CODEOWNERS` (no change needed — it does not
+  cover `.github/agents/`, `.github/skills/`, or `docs/`), and both
+  `tools/*.py` CI scripts (run, not edited, to confirm frontmatter/schema
+  integrity after the edits above).
+- **Status**: implemented, its own standalone PR (mirrors Firmware
+  Reviewer's/Manufacturing Engineer's precedent of standing up a
+  framework/process change on its own, not bundled with real design work),
+  awaiting independent audit before merge — same process every prior
+  change in this repository's history went through.
+

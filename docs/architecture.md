@@ -154,6 +154,28 @@ today (§10, §5.3, §5.4) — a separate "System Lead" role remains premature
 until the framework's own discipline count grows further
 (`docs/architecture-evolution.md` §7).
 
+Separately, all three Reviewer agents (Hardware, Mechanical, Firmware) had
+their checklists extended with a **Foresight checklist** — a deliberately
+*proactive* checklist, distinct in kind from each Reviewer's existing
+*reactive* adversarial-verification checklist above. Motivated by a real
+gap observed in ad hoc mechanical-visualization work outside this
+project's own formal Bench-IMU-01 deliverables (not itself an ECO-tracked
+design change): the existing checklists verify the correctness of a
+specific, stated claim well, but nothing in a Reviewer's mandate prompts it
+to notice an adjacent concern nobody explicitly asked about. Per-role
+content: physical interference and simplified-model distortion for
+Mechanical Reviewer (`.github/agents/mechanical-reviewer.agent.md`);
+cross-domain interference and stale-`ASSUMPTION` re-verification for
+Hardware Reviewer (`.github/agents/hardware-reviewer.agent.md`);
+requirement-implied-but-unimplemented functionality and unverified timing/
+concurrency for Firmware Reviewer
+(`.github/agents/firmware-reviewer.agent.md`) — plus a shared,
+non-mandatory "Foresight notes" report subsection for things worth a future
+look that aren't yet a concrete finding. No new agent was introduced for
+this — a deliberate, human-directed choice, extending three existing
+reviewers rather than standing up a "Foresight Reviewer." Full record:
+`docs/architecture-evolution.md` §38.
+
 Full role specs: `.github/agents/hardware-lead.agent.md`,
 `.github/agents/component-engineer.agent.md`,
 `.github/agents/circuit-engineer.agent.md`,
