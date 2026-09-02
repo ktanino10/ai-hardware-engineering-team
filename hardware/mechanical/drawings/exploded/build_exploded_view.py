@@ -2,7 +2,7 @@
 """
 Bench-IMU-01 -- Exploded Assembly View generator (Blender Python API).
 
-Regenerates `bench-imu-01-exploded-view.png` from the 6 assembled-position
+Regenerates `bench-imu-01-exploded-view.png` from the 8 assembled-position
 STLs produced by the wrapper scripts in `../scad/assembled-*.scad`. Written
 against Blender 5.1 (bpy.ops.wm.stl_import); run inside Blender via its
 Scripting tab, `blender --background --python build_exploded_view.py`, or
@@ -12,15 +12,27 @@ Does NOT touch bench-imu-01-enclosure.scad or any other source geometry --
 purely a downstream visualization step, per this project's own read-only
 convention for generated artifacts.
 
+**Revision note**: the motor (M1) + flywheel reference ghosts
+(`assembled-reference-motor-body`/`assembled-reference-flywheel-rotor`, 2 of
+the 8 parts below) are NEW as of this pass. An earlier revision of this
+script/README deliberately left them out ("judged to add clutter"); that
+call is reversed here now that the omission was flagged as inconsistent with
+the bearing (also a bought/non-printed part) already being shown as a
+reference ghost, and with `assembly-instructions.md` §4.2/§4.4 documenting
+mounting them as real build steps. See `../README.md`'s exploded-view
+section for the full disclosure.
+
 ## Regeneration steps (full pipeline, from a clean checkout)
 
-1. Export the 6 assembled-position STLs (one per real printed piece, plus the
-   bearing reference ghost) -- NOT the print-ready STLs in `hardware/mechanical/
-   stl/`, which use a different, print-bed-convenience orientation:
+1. Export the 8 assembled-position STLs (one per real printed piece, plus the
+   bearing/motor-body/flywheel-rotor reference ghosts) -- NOT the print-ready
+   STLs in `hardware/mechanical/stl/`, which use a different, print-bed-
+   convenience orientation:
 
    cd hardware/mechanical/drawings/scad
    for f in assembled-base-assembly assembled-pcb-lid assembled-containment-cap \
-            assembled-stand-plate assembled-pinch-guard assembled-reference-bearing; do
+            assembled-stand-plate assembled-pinch-guard assembled-reference-bearing \
+            assembled-reference-motor-body assembled-reference-flywheel-rotor; do
      openscad -D 'show_mode="export"' --backend=manifold --export-format binstl \
        -o /tmp/$f.stl $f.scad
    done
@@ -74,6 +86,16 @@ PARTS = [
     "assembled-stand-plate",
     "assembled-pinch-guard",
     "assembled-reference-bearing",
+    # NEW this pass: motor (M1) + flywheel, previously omitted entirely (see
+    # this pass's own commit message / drawings/README.md for the honest
+    # "why re-added now" disclosure). Split into the stationary motor-body
+    # (bolted to the platform, moves WITH assembled-base-assembly/pcb-lid/
+    # containment-cap in the physics-demo animation) and the rotating
+    # shaft+hub+flywheel-disk group, mirroring
+    # `assembled-reference-motor-body.scad`/`assembled-reference-flywheel-
+    # rotor.scad`'s own header comments for the stator/rotor split rationale.
+    "assembled-reference-motor-body",
+    "assembled-reference-flywheel-rotor",
 ]
 
 # Distinct per-part colors -- doubles as an implicit legend (also drawn as a
@@ -88,16 +110,41 @@ COLOR_MAP = {
 }
 BEARING_COLOR = (0.75, 0.76, 0.78)  # silver, translucent (reference only)
 
+# Reference-only ("bought part, not printed") ghost colors -- same
+# translucent/metallic treatment convention as BEARING_COLOR above, so these
+# read visually as "reference," not as one of the 5 printed pieces.
+REFERENCE_GHOST_COLORS = {
+    "assembled-reference-motor-body":     (0.22, 0.23, 0.27),  # charcoal (motor can)
+    "assembled-reference-flywheel-rotor": (0.62, 0.18, 0.68),  # purple/magenta (flywheel
+    # mass) -- deliberately NOT gold/orange, which visually collided with
+    # assembled-containment-cap's own orange in an intermediate render this
+    # pass (confirmed, not assumed) and could be mistaken for it.
+}
+
 # Explode offsets -- ARTIFICIAL visualization distances chosen purely to
 # separate pieces clearly; NOT real assembly clearances. Primarily along Z
 # (matching the .scad file's own real Z-stack order), with a lateral (X,Y)
 # stagger perpendicular to CAM_DIRECTION's own azimuth so pieces read as
 # clearly separated from an isometric angle, not just occluding each other.
+#
+# The 2 new motor/flywheel ghosts needed a LARGER offset than a naive
+# Z-stack interpolation would suggest: they start out physically INSIDE
+# `fw_bay_wall()`, a cylindrical wall of `base()` (unmoved, radius up to
+# ~43.5mm around fw_cx/fw_cy) reaching up to `fw_wall_h`=43.0mm -- a small
+# offset leaves them still visually trapped inside that wall's silhouette
+# from every camera angle tried (confirmed by an intermediate render pass
+# during this task, not assumed). Fixed with a large, mostly-+X offset:
+# +X decomposes into a mix of both perpendicular-to-camera screen shift
+# AND a toward-camera depth component (CAM_DIRECTION's own (X,-Y) azimuth),
+# clearing the wall radius in both screen position and depth ordering, plus
+# enough +Z to clear the wall's own 43mm rim height.
 OFFSETS = {
     "assembled-pinch-guard":       (-45, -45, -35),
     "assembled-stand-plate":       (-25, -25, -22),
     "assembled-reference-bearing": (-16, -16, -18),
     "assembled-base-assembly":     (0, 0, 0),      # anchor, unmoved
+    "assembled-reference-motor-body":     (65, 15, 24),
+    "assembled-reference-flywheel-rotor": (95, 25, 38),
     "assembled-pcb-lid":           (12, 12, 22),
     "assembled-containment-cap":   (25, 25, 38),
 }
@@ -159,6 +206,14 @@ def main():
     mat_bearing = make_mat("mat_bearing", BEARING_COLOR, metallic=0.9, roughness=0.2, alpha=0.75)
     bearing.data.materials.clear()
     bearing.data.materials.append(mat_bearing)
+    # Reference-only ghosts (motor body + flywheel rotor) -- same
+    # translucent/metallic "bought part, not printed" treatment as the
+    # bearing above, so all 3 read visually as reference geometry.
+    for name, color in REFERENCE_GHOST_COLORS.items():
+        obj = imported[name]
+        mat = make_mat(f"mat_{name}", color, metallic=0.7, roughness=0.35, alpha=0.85)
+        obj.data.materials.clear()
+        obj.data.materials.append(mat)
 
     # Apply explode offsets (absolute location -- these objects have no other
     # transform applied, since STL import keeps world coords in mesh data).

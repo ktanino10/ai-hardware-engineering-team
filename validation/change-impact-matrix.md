@@ -122,3 +122,42 @@ of discovering them after the fact. Cross-reference by ID with
 | Grounding | None | N | No electrical grounding/return-current path touched. |
 | BOM / lifecycle (does this affect other line items, e.g. shared connector) | None | N | No component added, removed, or re-specified by this ECO itself. |
 | Requirements coverage (`requirements/traceability-matrix.md`) | High | Y | **Verified in this pass**: REQ-011, REQ-205, REQ-407 all moved `Pending` → `Verified — human-accepted disposition` (mirrors REQ-403's own exact wording precedent). REQ-013 remains `Pending`, explicitly disclosed as blocked on a not-yet-triggered future Firmware phase (not a mechanical-scope gap) — Design Complete is granted for Rev 4's **mechanical scope** specifically, not silently claimed as a full Electronics/Mechanical/Firmware completion the way Rev 3's ECO-025 was. |
+
+### For `ECO-039` — Exploded-view parity fix (motor+flywheel ghosts, fastener callouts)
+
+| Impact Domain | Impact Level (None/Low/Medium/High) | Cross-check Required? | Verification Result |
+|---|---|---|---|
+| Power (rail loading, `hardware/power-budget.md`) | None | N | No electrical rail touched — visualization-only. |
+| Thermal | None | N | No thermal path touched. |
+| EMI/EMC | None | N | Not applicable — no electrical change. |
+| Timing (interface/bus timing) | None | N | Not applicable. |
+| Mechanical (fit, connectors, mounting; vibration if a rotating body is present — `docs/architecture.md` §12) | None | N | No `.scad` geometry, dimension, or module body changed — the 2 new wrapper scripts duplicate existing, unchanged `reference_motor_flywheel()` primitives verbatim for a downstream Blender render only. Ghost-part world positions independently re-verified against the source `.scad` named variables (not eyeballed) before use. |
+| Grounding | None | N | Not applicable. |
+| BOM / lifecycle (does this affect other line items, e.g. shared connector) | None | N | No component added, removed, or re-specified. |
+| Requirements coverage (`requirements/traceability-matrix.md`) | None | N | Does not reopen or affect any requirement row — the underlying Rev 4 mechanical Design Complete grant is unchanged. |
+
+### For `ECO-040` — New Fusion-style OpenSCAD-sourced drafting sheets
+
+| Impact Domain | Impact Level (None/Low/Medium/High) | Cross-check Required? | Verification Result |
+|---|---|---|---|
+| Power (rail loading, `hardware/power-budget.md`) | None | N | Not applicable — documentation-only. |
+| Thermal | None | N | Not applicable. |
+| EMI/EMC | None | N | Not applicable. |
+| Timing (interface/bus timing) | None | N | Not applicable. |
+| Mechanical (fit, connectors, mounting; vibration if a rotating body is present — `docs/architecture.md` §12) | None | N | No `.scad` geometry, dimension, or module body changed — new wrapper scripts feed the SAME existing assembled-frame module calls through `projection(cut=false)` (a rendering technique) instead of a camera. Auto-measured dimensions cross-checked against known CONFIRMED source values where available (e.g. `stand_plate`'s auto-measured ⌀56.0mm inner bore vs. `bmount_flange_ir`'s existing 28.0mm-radius value — exact match). |
+| Grounding | None | N | Not applicable. |
+| BOM / lifecycle (does this affect other line items, e.g. shared connector) | None | N | No component added, removed, or re-specified. |
+| Requirements coverage (`requirements/traceability-matrix.md`) | None | N | Not applicable — new documentation artifact type, no requirement affected. |
+
+### For `ECO-041` — New physics-demo SIMULATION animation + CONCEPT attitude-hold animation
+
+| Impact Domain | Impact Level (None/Low/Medium/High) | Cross-check Required? | Verification Result |
+|---|---|---|---|
+| Power (rail loading, `hardware/power-budget.md`) | None | N | Not applicable — no electrical change. |
+| Thermal | None | N | Not applicable. |
+| EMI/EMC | None | N | Not applicable. |
+| Timing (interface/bus timing) | None | N | Not applicable. |
+| Mechanical (fit, connectors, mounting; vibration if a rotating body is present — `docs/architecture.md` §12) | None | N | No `.scad` geometry, dimension, or module body changed — both animations reuse the existing assembled-position STL pipeline unmodified. All physics numbers rendered are copied verbatim from `bom/component-selection.md`'s own already-approved ESTIMATE (not re-derived); the concept-demo's reference-mark position was measured directly from the existing `assembled-base-assembly.stl` binary, not guessed. |
+| Grounding | None | N | Not applicable. |
+| BOM / lifecycle (does this affect other line items, e.g. shared connector) | None | N | No component added, removed, or re-specified. |
+| Requirements coverage (`requirements/traceability-matrix.md`) | None | N | Does not implement or claim any closed-loop control capability — REQ-009/REQ-014's existing anti-scope status is unaffected; REQ-011's single-axis figure is only read (cited), not changed. |
