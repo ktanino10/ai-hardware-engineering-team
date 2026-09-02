@@ -122,12 +122,15 @@ closed PCB bay, motor, flywheel, and containment cap.
 
 > **This step cannot be physically performed yet.** Bench-IMU-01's PCB
 > layout is still in progress on a separate, still-open branch
-> (`ktanino10-bench-imu-01-rev3-pcb-layout`; `validation/open-issues.md`
-> `ISS-036` unresolved) — no fabricated, populated board exists in this
-> repository as of this writing. The steps below describe the *mechanical*
-> interface as designed; do not attempt a real build of this step until a
-> real board exists, and do not treat any PCB-side mounting-hole detail
-> below as fabrication-confirmed.
+> (`ktanino10-bench-imu-01-rev3-pcb-layout`), which carries its own
+> `validation/open-issues.md` `ISS-036` (HIGH, OPEN, on that branch — not
+> yet merged here): 366 independently-reproduced open DRC violations on
+> the whole-board copper layout, none individually triaged/resolved, so
+> that layout is not yet fabrication-ready even before considering that no
+> physical board has been ordered/populated at all. The steps below
+> describe the *mechanical* interface as designed; do not attempt a real
+> build of this step until a real board exists, and do not treat any
+> PCB-side mounting-hole detail below as fabrication-confirmed.
 
 1. Seat the PCB on piece 1's 6 internal standoffs (`mount_holes` MH-1..6:
    4 corners + 2 mid-edge motor-zone supports, all sized for M2.5
