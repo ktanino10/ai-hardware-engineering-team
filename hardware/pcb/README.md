@@ -437,3 +437,93 @@ CONDITIONAL. This round:
 Design Complete gate status after this round: still fails, now on only 2
 open HIGH items (ISS-032 pending review, ISS-036 root-caused but not yet
 fixed), down from 3. Board still not declared ready to fabricate.
+
+### ISS-036 real fix: GND is now an actual filled zone on In1.Cu (2026-09-02, Kyosuke's explicit go-ahead to resume real engineering work)
+
+Kyosuke woke, was given the honest choice (accept the current risk, or
+wait for a future dedicated session), and chose to make that "later" now
+— explicitly authorizing a real attempt at option (a) from ISS-036's own
+Notes: get `pcbnew.ZONE_FILLER.Fill()` working against the actual
+GND-on-In1.Cu zone (not the unrelated F.Cu zone the Chief Engineer's own
+earlier re-test happened to use).
+
+**The segfault is real, but it isn't what it looked like.** Re-isolated
+exactly when `Fill()` crashes vs. works, since the prior record looked
+like unexplained flakiness (worked for the Chief Engineer, didn't for the
+original session). It is not flaky: `Fill()` against this exact
+zone/board segfaults **100% of the time** (3/3 attempts, including two
+different placements within `generate_pcb.py`'s own construction — right
+after the zone is declared, and again after every net's tracks/vias are
+already placed; ordering isn't the variable) when called in the **same
+process** that incrementally built the board via the `pcbnew` Python API.
+It succeeds **100% of the time** (15+ direct calls across this session's
+testing) against a board freshly reloaded via `pcbnew.LoadBoard()` from
+an already-saved `.kicad_pcb` file — and a minimal from-scratch
+reproduction (a single zone, no other complexity) doesn't crash
+in-process either, so this is specific to *this* real, complex board's
+in-memory construction state, not zone-filling in general. This
+reconciles every prior conflicting report without needing to invoke
+"non-deterministic": the Chief Engineer's own successful re-test loaded a
+saved file; the original segfault reports were always from in-process
+construction.
+
+**Fix implemented in `generate_pcb.py` itself** (not a one-off hand
+patch — regeneratable, per this project's own convention): build the
+board exactly as before (GND still routed as explicit discrete tracks on
+In1.Cu, the known-safe baseline — unconditionally, so a valid, fully
+connected board is guaranteed regardless of what happens next), save it,
+then reload that just-written file fresh into a brand new `BOARD` object
+and attempt the fill there. If it succeeds (confirmed via
+`zone.IsFilled()`, not just the return value), remove the now-redundant
+discrete GND tracks on In1.Cu (vias stay — still needed to bring an F.Cu
+pad down to the zone) and re-save. If the fill doesn't succeed for any
+reason (a non-crashing failure, or if a future environment's segfault
+turns out not to be fully eliminated), the script falls back to the
+original, known-safe discrete-track behavior automatically — a real
+segfault would still crash the whole script (Python cannot catch that),
+but only *after* a valid, fully-connected board is already safely on
+disk from the first save, never leaving a broken half-fixed board
+committed.
+
+**Verified, not just claimed — real DRC data, apples-to-apples:**
+
+| Board | shorting_items (5 runs) | tracks_crossing (5 runs) | clearance (5 runs) | Unconnected |
+|---|---|---|---|---|
+| Pre-fix (actual last-committed board, backed up before this work) | 76-77 | 69-70 | 18 (constant) | 0 (all 5) |
+| Control (unmodified script, freshly re-run — isolates regen noise from the fix itself) | 74-75 | 69-70 | 16-17 | 0 (all 5) |
+| **Fixed (modified script, freshly re-run — the real committed state)** | **61-62** | 81-82 | 11 | 0 (all 5) |
+
+Comparing **fixed against control** (both freshly regenerated, the only
+apples-to-apples pairing — isolates the fix's own effect from ordinary
+regeneration noise, which the pre-fix-vs-control gap shows is real but
+small): **`shorting_items` drops ~17%, zero overlap across 5/5 runs each
+side** — this is the category ISS-036 itself calls "closest to
+representing an already-existing physical short," and it's the one this
+fix's root-cause (via-through-GND-track punctures on In1.Cu) directly
+targets. GND's own involvement in `tracks_crossing` is flat-to-slightly-
+better (15/69 control vs. 12/82 fixed) — the increase in that category is
+entirely among *other* net pairs, not GND-related, and the leading (not
+fully confirmed) explanation is that KiCad's DRC engine appears to
+suppress reporting more than one violation type at the same physical
+location: removing a GND track that was co-located with an unrelated
+tracks_crossing defect may simply have stopped masking a pre-existing
+defect between two *other* nets, rather than created a new one. Whatever
+the exact mechanism, **0 unconnected items in every single run, both
+before and after** — GND connectivity is fully preserved (independently
+confirmed: every GND pad and every GND via in this design's actual
+footprint set falls inside the zone's poured area, so removing the
+redundant tracks never orphans anything).
+
+This is a genuine, reproducible, right-priority trade-off — unlike the
+earlier reverted detour-based attempt (which improved `tracks_crossing`
+at the cost of *worsening* `shorting_items`, the wrong category to trade
+away), this fix improves the more safety-relevant category and completes
+this design's own originally-intended stack-up decision (a real GND pour,
+not a workaround) rather than adding a new one. It does **not** fully
+close ISS-036: ~365-380 total violations remain, and the resolution bar
+("every violation individually triaged") is not yet met — this is real,
+verified, honest partial progress on the single most safety-relevant
+category, not a claim of closure. Sent for independent Hardware Reviewer
+verification before any RESOLVED/partial-closure disposition; PCB
+Engineer does not self-declare this finding's status, same standing
+convention as every other finding this session.

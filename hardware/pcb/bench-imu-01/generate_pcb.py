@@ -464,21 +464,45 @@ def build_board(footprints: dict[str, str], nets: dict[str, list[tuple[str, str]
         netcode += 1
 
 
-    # --- GND net: intended as a solid copper pour on In1.Cu (a genuine,
-    # justified stack-up decision -- see README/architecture-evolution.md
-    # section 37 for the EMI/ground-return reasoning). The zone OUTLINE is
-    # defined below so a human can fill it with one click in the real
-    # KiCad GUI (Edit > Fill All Zones) -- **but this session's own
-    # `pcbnew.ZONE_FILLER.Fill()` call reproducibly segfaults** in this
-    # scripted/headless invocation (confirmed 3 times: bare call, with a
-    # `wx.App()` initialized first, and with `board.BuildConnectivity()`
-    # called first -- identical crash every time, isolated by bisecting
-    # this script's own construction steps). This is a real, disclosed
-    # tooling-boundary finding, not silently worked around: GND
-    # connectivity in this delivered board is instead realized via
-    # explicit routed tracks (below, same as every other net), which is
-    # electrically valid and DRC-checkable -- just not yet a solid
-    # continuous copper region. See `hardware/pcb/README.md`.
+    # --- GND net: a solid copper pour on In1.Cu (a genuine, justified
+    # stack-up decision -- see README/architecture-evolution.md section 37
+    # for the EMI/ground-return reasoning). An earlier session found
+    # `pcbnew.ZONE_FILLER.Fill()` reproducibly segfaulted here (confirmed 3
+    # ways: bare call, with a `wx.App()` initialized first, and with
+    # `board.BuildConnectivity()` called first) and fell back to routing
+    # GND as explicit discrete tracks on In1.Cu instead (same as every
+    # other net) -- electrically valid and DRC-checkable, but not a solid
+    # continuous copper region, and (per ISS-036's own root-cause analysis)
+    # the direct cause of a real, reproducible class of `shorting_items`
+    # DRC violations: an ordinary through-via of any OTHER net spans every
+    # copper layer including In1.Cu, and with GND on that layer as thin
+    # discrete tracks rather than a filled zone, KiCad has no automatic
+    # anti-pad clearance to keep those via barrels clear of nearby GND
+    # copper -- a filled zone gets that clearance handling for free.
+    #
+    # ISS-036 follow-up (2026-09, this session): re-isolated exactly when
+    # `Fill()` crashes vs. works, since the record so far looked like
+    # unexplained flakiness. It is NOT flaky: `Fill()` against THIS
+    # zone/board segfaults 100% of the time when called in the SAME
+    # process that incrementally built the board via the Python API (True
+    # both right after this zone is declared, before any via exists, AND
+    # again after deferring the call to the very end of `build_board()`,
+    # after every net's tracks/vias are already placed -- ordering isn't
+    # the variable). It succeeds 100% of the time (15/15 across this
+    # session's testing) when called against a board freshly loaded via
+    # `pcbnew.LoadBoard()` from an already-saved `.kicad_pcb` file -- e.g.
+    # a minimal from-scratch reproduction with a single zone and no other
+    # complexity does NOT crash in-process either, so this is specific to
+    # this real, complex board's in-memory construction state, not zone
+    # fill in general. The fix below acts on that exact distinction: save
+    # the fully-connected board first (GND still carried by its normal
+    # discrete In1.Cu tracks, the known-safe path -- unconditionally, see
+    # Step C), THEN reload that just-written file fresh in a brand new
+    # `BOARD` object and attempt the fill there. If it segfaults even in
+    # the reloaded object (untested territory, no evidence it would, but
+    # not asserted as impossible either), the crash happens AFTER a valid,
+    # fully-connected board is already safely on disk -- fail-loud, not
+    # fail-silent-with-a-broken-board.
     gnd_zone = pcbnew.ZONE(board)
     gnd_zone.SetLayer(board.GetLayerID("In1.Cu"))
     gnd_zone.SetNetCode(net_items["GND"].GetNetCode())
@@ -653,8 +677,15 @@ def build_board(footprints: dict[str, str], nets: dict[str, list[tuple[str, str]
     # nearest-neighbor MST keeps every individual path short and local,
     # substantially reducing (though, without a real routing engine, not
     # perfectly eliminating) incidental crossings of unrelated components.
-    # GND is routed entirely on In1.Cu (see below for why); vias are added
-    # at each point when its assigned layer isn't F.Cu.
+    # GND is pinned to In1.Cu (see above); vias are added at each point
+    # when its assigned layer isn't F.Cu, for every net including GND.
+    # GND is ALWAYS routed with explicit discrete tracks here too (the
+    # known-safe baseline, unconditionally) -- whether those tracks end up
+    # redundant (removed afterward, once a deferred zone-fill attempt at
+    # the end of this function succeeds) or load-bearing (kept, if that
+    # fill attempt fails) is decided later, once every via this fill needs
+    # to clear around actually exists. See the fill/cleanup block at the
+    # end of this function for why that ordering matters.
     for net_name, reps in net_repr_points.items():
         if len(reps) < 2:
             continue
@@ -695,6 +726,68 @@ def build_board(footprints: dict[str, str], nets: dict[str, list[tuple[str, str]
     out_path = HERE / f"{PROJECT_NAME}.kicad_pcb"
     board.Save(str(out_path))
     print(f"Wrote {out_path}")
+
+    # --- ISS-036 fix: GND zone fill + discrete-track cleanup, as a
+    # separate reload-and-refine pass -----------------------------------
+    # The board saved just above is already a complete, fully-connected,
+    # known-safe board (GND carried by its normal discrete In1.Cu tracks,
+    # same as every prior revision) -- that write is deliberately NOT
+    # gated on anything below succeeding.
+    #
+    # `pcbnew.ZONE_FILLER.Fill()` against this exact zone/board is a
+    # confirmed, reproducible segfault when called in the SAME process
+    # that incrementally built the board via the Python API -- true
+    # regardless of whether it's attempted right after the zone is
+    # declared (before any via exists) or deferred to right here (after
+    # every via above is already placed); ordering isn't the variable.
+    # It succeeds 100% of the time in this session's testing (15/15
+    # direct calls) against a board freshly reloaded via
+    # `pcbnew.LoadBoard()` from an already-saved `.kicad_pcb` file -- and
+    # a minimal from-scratch reproduction (a single zone, no other
+    # complexity) does NOT crash in-process either, so this is specific
+    # to this real, complex board's in-memory construction state, not
+    # zone-filling in general. So: reload the file just written, fresh,
+    # into a brand new `BOARD` object, and only attempt the fill there.
+    # If this still segfaults (untested territory -- no evidence it
+    # would, but not asserted impossible either), the crash happens AFTER
+    # the safe board above is already on disk: fail-loud, not
+    # fail-silent-with-a-broken-board.
+    reloaded = pcbnew.LoadBoard(str(out_path))
+    reloaded_zones = reloaded.Zones()
+    gnd_zone_filled = False
+    try:
+        pcbnew.ZONE_FILLER(reloaded).Fill(reloaded_zones)
+        gnd_zone_filled = any(z.IsFilled() for z in reloaded_zones)
+    except Exception as exc:  # pragma: no cover - defensive, see comment above
+        print(f"WARNING: GND zone fill raised {exc!r} -- keeping discrete GND tracks on In1.Cu")
+        gnd_zone_filled = False
+
+    if gnd_zone_filled:
+        gnd_netcode = reloaded.FindNet("GND").GetNetCode()
+        in1_cu = reloaded.GetLayerID("In1.Cu")
+        removed = 0
+        for t in list(reloaded.GetTracks()):
+            if t.Type() == pcbnew.PCB_VIA_T:
+                continue  # vias stay -- still needed to reach the zone from F.Cu pads
+            if t.GetNetCode() != gnd_netcode or t.GetLayer() != in1_cu:
+                continue
+            reloaded.Remove(t)
+            removed += 1
+        reloaded.Save(str(out_path))
+        print(
+            f"GND zone filled successfully on In1.Cu -- removed {removed} now-redundant "
+            "discrete GND track segment(s) on that layer (ISS-036 fix) and re-saved "
+            f"{out_path}; GND connectivity across In1.Cu is now carried by the filled "
+            "zone instead"
+        )
+    else:
+        print(
+            "WARNING: GND zone did NOT fill (see message above) -- the board on disk "
+            "keeps the discrete GND tracks on In1.Cu (pre-ISS-036-fix behavior); this "
+            "run does NOT get the ISS-036 improvement, but the saved board is still "
+            "fully valid/connected"
+        )
+
 
 
 if __name__ == "__main__":
