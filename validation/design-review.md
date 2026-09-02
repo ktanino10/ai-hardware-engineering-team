@@ -11294,3 +11294,654 @@ standard 10-item checklist table for this cycle only:
   finding, `MISS-030`) to the Hardware Lead. `MISS-023` (HIGH →
   `ACCEPTED-RISK`, pre-existing) is untouched by this cycle either way,
   since it is out of this cycle's own explicitly re-scoped review boundary.
+
+## Mechanical Reviewer — Cycle 8 (Independent Review of Bench-IMU-01 Drafting-Sheets + Physics/Concept-Demo Documentation Pass, 2026-09-17)
+
+### Review Cycle Metadata
+
+- **Design revision reviewed**: No new mechanical revision.
+  `hardware/mechanical/bench-imu-01-enclosure.scad` is independently
+  confirmed **byte-for-byte unchanged** this cycle (`git diff HEAD --
+  hardware/mechanical/bench-imu-01-enclosure.scad` returns empty), and so
+  are `hardware/mechanical-interface.md`, `hardware/mechanical/bench-imu-
+  01-dimensional-spec.md`, and `hardware/mechanical/assembly-
+  instructions.md` (all three also return an empty `git diff HEAD --stat`).
+  No `.scad` dimension, module body, or geometry was touched anywhere in
+  this pass. The reviewed artifact is **not a merged PR** — it is an
+  in-progress, uncommitted working-tree pass on top of commit `a848241`,
+  independently confirmed via `git status --short` / `git diff HEAD
+  --stat`: 5 tracked files modified (`hardware/mechanical/drawings/
+  README.md`, `.../exploded/bench-imu-01-exploded-view.png`, `.../exploded/
+  build_exploded_view.py`, `validation/change-impact-matrix.md`,
+  `validation/change-log.md`; **387 insertions / 36 deletions** total,
+  exact `git diff --stat` summary line) plus 6 new untracked paths
+  (`drawings/concept-demo/`, `drawings/drafting-sheets/`, `drawings/
+  physics-demo/`, `drawings/exploded/build_exploded_view_annotations.py`,
+  `drawings/scad/assembled-reference-flywheel-rotor.scad`, `drawings/scad/
+  assembled-reference-motor-body.scad`). This corresponds to the author's
+  own `ECO-039`/`ECO-040`/`ECO-041` entries in `validation/change-log.md`
+  and the matching new sections in `validation/change-impact-matrix.md`,
+  both dated 2026-09-03 in-file (a pre-existing, harmless date/cycle-order
+  inconsistency in the project's own record-keeping, not something this
+  cycle corrects). `validation/open-issues.md` and this file
+  (`validation/design-review.md`) are both independently confirmed
+  untouched by the pass under review (`git diff HEAD --stat`, empty on
+  both) prior to this Reviewer's own edits below.
+- **Reviewer**: Mechanical Reviewer — see
+  `.github/agents/mechanical-reviewer.agent.md`. Independent of the
+  Mechanical Lead session that authored this pass.
+- **Scope departure from the standard procedure (explicit, per this
+  cycle's own task framing)**: The standard 11-item enclosure-design
+  checklist (`.github/skills/mechanical-review/SKILL.md` — PCB mounting,
+  connector accessibility, component height clearance, internal
+  interference, fastener placement, wall thickness, assembly order,
+  print-fit tolerance, printability) has no artifact to check against this
+  cycle, since no geometry changed anywhere in this pass (independently
+  confirmed above), and is explicitly not scored. Checklist item 10
+  (interface-value traceability) and the general "never invent a
+  dimension" discipline are retained and extended to this documentation/
+  visualization deliverable type, per this cycle's own explicit brief:
+  never invent a position, fastener fact, or physics number in a
+  visualization, and never silently blend an `ASSUMPTION`/`ESTIMATE`
+  source value with a `CONFIRMED` label. This cycle instead independently
+  re-derives every load-bearing numeric/textual claim across all three
+  ECOs directly against `hardware/mechanical-interface.md`,
+  `bom/component-selection.md`'s own physics finding, `requirements/
+  requirements.md`, `hardware/mechanical/assembly-instructions.md`, and the
+  unchanged `.scad` source — never accepted on the strength of the ECO's,
+  the README's, or the artifact's own stated confidence/self-check
+  language.
+- **Independence statement**: No claim in `validation/change-log.md`'s
+  `ECO-039`/`ECO-040`/`ECO-041` entries, `validation/change-impact-
+  matrix.md`'s matching sections, or `hardware/mechanical/drawings/
+  README.md`'s new Method 2/4/5/6 sections was accepted at face value. Every
+  load-bearing claim was independently re-derived: geometry parameters via
+  direct side-by-side `.scad` file comparison; fastener facts via direct
+  read of `assembly-instructions.md` §5's live table; drafting-sheet
+  dimensions via first-principles hand-computation from raw `.scad`
+  variables (including tracing `lid_tab()`'s own geometry to resolve an
+  initially-apparent discrepancy on the `pcb_lid` sheet, not simply
+  matching a variable name); physics constants via direct read of
+  `bom/component-selection.md`'s own "Platform angular-rate physics
+  finding" section; REQ-009/011/014 text via direct grep of `requirements/
+  requirements.md`; and the concept-demo reference-mark world-position
+  claim via independent hand-derivation from the same `.scad` variables the
+  script itself cites. Two substantive findings were produced this way
+  (below) that the ECO/README/change-impact-matrix narratives do not
+  themselves disclose.
+- **Tooling disclosure**: Direct `git diff`/`git status`/`grep`/`sed`/`cat`
+  against the live worktree; the `view` tool for direct visual inspection
+  of all 3 drafting-sheet PNGs, the regenerated exploded-view PNG, the
+  physics-demo GIF, and the concept-demo GIF; and independent, from-scratch
+  arithmetic (radius doublings, tab-projection geometry, moment-of-inertia
+  ratio/angular-rate figures) rather than re-running or trusting any
+  script's own printed output. No new render/build tooling was invoked this
+  cycle beyond direct inspection of already-committed artifacts, since no
+  geometry changed and the physics/concept-demo MP4s are not directly
+  viewable by this Reviewer's tooling (their still-present intermediate PNG
+  frames in `/tmp/physics-demo-frames/final/` were viewed directly instead,
+  and both GIFs were viewed directly via the `view` tool).
+
+### Criterion-by-Criterion Independent Results
+
+Per this cycle's own explicit re-scoping (above), per-deliverable tables
+replace the standard 11-item checklist table for this cycle only.
+
+#### ECO-039 — Exploded-view parity fix (motor + flywheel reference ghosts, fastener callouts)
+
+| # | Criterion | Result | Independent evidence (this cycle) |
+|---|---|---|---|
+| 1 | New wrapper `.scad` geometry byte-for-byte match vs. parent `reference_motor_flywheel()` (line 1749) on all 4 physical-object primitives, using the same named variables (`fw_cx`, `fw_cy`, `fw_motor_platform_top`, `m1_body_dia`, `m1_body_h`, `fw_motor_bell_top`, `m1_shaft_dia`, `fw_shaft_exposed_len_needed`, `fw_hub_collar_od`, `fw_hub_collar_h`, `fw_disk_bottom`, `fw_dia`, `fw_t`) | **PASS** | Directly viewed the full text of `assembled-reference-motor-body.scad`, `assembled-reference-flywheel-rotor.scad`, and the parent module side-by-side this cycle. Motor-body file's single `cylinder()` call matches the parent's motor-body primitive on every named variable, verbatim. Flywheel-rotor file's 3 `cylinder()` calls (shaft, hub collar, disk) match the parent's corresponding 3 primitives on every named variable, verbatim. No parameter renamed, reordered, or silently altered. |
+| 2 | Rotation-clearance keep-out cylinder (`fw_env_dia`/`fw_env_axial`, `color("red",0.15)`) correctly excluded from both new wrapper scripts | **PASS** | Confirmed by the same direct full-text read: neither new file contains any reference to `fw_env_dia`, `fw_env_axial`, or the annotation-only keep-out cylinder — only the 4 physical-object primitives are present across the two files. |
+| 3 | Stator/rotor split (motor body stays with the stationary platform group; shaft+hub+disk is the rotating group) is a defensible characterization of the actual described mounting mechanism | **PASS** | Freshly read `assembly-instructions.md` §4.2 (motor bolted to `motor_platform()` via 4× M3, direction-agnostic — i.e. does not rotate) and §4.4 step 5 (hub collar slides onto the motor's exposed shaft, then the flywheel disk onto the hub collar — i.e. shaft+hub+disk rotate together, keyed to the motor's own rotor). The split exactly matches this described mechanism; no other split (e.g. including the motor body in the "rotating" group) would be defensible. |
+| 4 | 3 new fastener leader-line callouts (`build_exploded_view_annotations.py` `CALLOUTS`, lines 106–124) exactly match `assembly-instructions.md` §5's own fastener summary table (lines 256–267), fact for fact | **1 FAIL — Finding 1 (`MISS-031`, HIGH)** | Directly compared all 3 callout text blocks against the live table this cycle, one final time, side by side. Callout 1 (PCB-lid) and callout 3 (motor-screw) are faithful — one an exact-substring match on the confidence field with a legitimate space-saving omission of a "see §4.1" pointer, the other a faithful combination of the table's separate confidence and torque columns into one line. Callout 2 (containment-cap) is **not** faithful: its confidence field reads `"CONFIRMED — safety joint, REQ-403"`, which does not appear anywhere in the table row (`"CONFIRMED (insert match)"`) or anywhere else in the fastener table — it is invented text, not a copy, paraphrase, or field-combination of anything the table actually says. See Finding 1 for the full analysis, including the compounding discovery that this same "verbatim" claim is independently asserted (and independently false for this one callout) in two further documents, `drawings/README.md` lines 249–250 and `validation/change-log.md`'s own `ECO-039` entry. |
+| 5 | "4× not 6×" PCB-lid-screw reconciliation, as restated in the ECO/README/callout, matches what `assembly-instructions.md` §4.1 and §5 actually say | **PASS** | Freshly read §4.1 (lines 121–158) in full: the `.scad`'s actual 4 `tab_positions`, the dimensional-spec's older, superseded "6×" prose, and an independent cross-branch fab-BOM corroboration of 4 (`MH1`–`MH4`) are all disclosed transparently, exactly as the callout, README, and change-log restate them. A genuine, disclosed documentation-precision reconciliation, not a silent correction. |
+| 6 | Regenerated `bench-imu-01-exploded-view.png`: all 8 legend rows legible; all 3 callout leader-lines land on the correct/plausible part; new motor/flywheel ghost colors visually distinguishable from all other parts | **PASS** | Directly viewed the PNG this cycle. All 8 legend rows are present and legible (rows 7–8, motor near-black and flywheel purple, both newly added and both visually distinct from the other 6 existing colors — no color collision). All 3 leader-lines terminate on the correct part: callout 1 → the green PCB lid; callout 2 → the orange containment cap; callout 3 → the dark motor-body cylinder (partially occluded by the blue base ring at this camera angle, but its own leader-line and legend swatch color unambiguously identify it). The Finding-1 overclaim text is directly visible, verbatim, on the rendered image itself — not a subtle or buried defect. |
+
+#### ECO-040 — Fusion-style drafting sheets (stand-plate, containment-cap, pcb-lid)
+
+| # | Criterion | Result | Independent evidence (this cycle) |
+|---|---|---|---|
+| 1 | Title block on all 3 sheets says something equivalent to "NOT a Fusion 360 drawing" and never claims/implies Fusion 360 was used | **PASS** | Directly viewed all 3 PNGs this cycle. All 3 title blocks carry the identical note: "OpenSCAD-source-driven drafting sheet. NOT a Fusion 360 drawing." No sheet anywhere implies Fusion 360 involvement. |
+| 2 | `stand_plate` sheet's auto-measured overall envelope (~120mm) and inner bore (~56mm) match `stand_plate_or`/`bmount_flange_ir` | **PASS** | Freshly grepped `.scad`: `stand_plate_or = 60.0` (line 830, confidence "DECIDED") → 120.0mm envelope exactly; `bmount_flange_ir = 28.0` (line 763, **ASSUMPTION**) → 56.0mm bore exactly. Both exactly match the sheet's own "120.0" / "⌀56.0 (measured)" labels, directly viewed. |
+| 3 | `containment_cap` sheet's bolt-circle-adjacent hole diameters (~3.4mm, ×6) match the real through-hole variable | **PASS** | Freshly traced the actual `containment_cap()` module code (not just a variable-name guess): the real through-hole diameter is `m1_bolt_dia_clear = 3.4mm` (line 197, **ASSUMPTION**) — a different variable from the base-side heat-set-insert pilot diameter (`heatset_od = 4.6mm`, line 517), which is a distinct feature (press-fit pilot vs. clearance hole). `n_cap_bolts = 6` (line 513) matches the ×6 count. Both exactly match the sheet's own "⌀3.4 (measured)" ×6 labels, directly viewed. The sheet's own bullet text separately and correctly frames this joint as "ACCEPTED-RISK defense-in-depth containment, NOT proven-adequate (`validation/open-issues.md` `MISS-016`)" — the *correct* framing, found on this same sheet, in the same pass that produced Finding 1's overclaim elsewhere (see Finding 1). |
+| 4 | `pcb_lid` sheet's overall envelope (~111.4 × ~69.8mm) matches `pcb_length`/`pcb_width` or the equivalent modeled geometry | **PASS, after first-principles re-derivation** | X=111.4mm is directly skirt-limited (`lid_skirt_outer_x`) and matched trivially. Y=69.8mm did **not** trivially match the skirt's own Y-span (`lid_skirt_outer_y = 61.4mm`) — this was investigated to a real resolution, not dismissed or reported as a false mismatch: tracing `lid_tab()`'s own geometry shows the front/rear corner tabs (`lid_tab_project = 6.8mm`) project 4.2mm beyond the skirt's Y-range on each end, bringing the true bounding box to exactly 61.4 + 4.2 + 4.2 = 69.8mm. Confirmed exact after real module-tracing, not a variable-name lookup. |
+| 5 | Disclosed "blind hole" limitation (`stand_plate`'s own bearing pilot holes don't appear as DXF contours) is actually true and actually disclosed on that specific sheet | **PASS** | Directly viewed the `stand_plate` sheet's own note text this cycle: the blind-hole disclosure bullet is present, accurate, and correctly scoped to that sheet only (not a generic disclaimer misapplied elsewhere). |
+| 6 | `validation/change-log.md`'s own `ECO-040` narrative restatement of the `stand_plate` bore-match ("independently matching `bmount_flange_ir`'s existing 28.0mm-radius **CONFIRMED** value exactly") accurately reflects that variable's real confidence label | **1 FAIL — Finding 2 (`MISS-032`, MEDIUM)** | Freshly re-read the live `.scad` line 763 one final time: `bmount_flange_ir = 28.0; // mm. ASSUMPTION -- ...`. The change-log's own restatement labels this **CONFIRMED**, which is factually wrong — a `CONFIRMED`/`ASSUMPTION` mislabel confined to this one clause of `change-log.md` prose (not the drafting-sheet artifact itself, not the README, and not the `.scad` source, all three of which correctly carry or imply `ASSUMPTION`/no-label for this value). See Finding 2. |
+
+#### ECO-041a — Physics-demo animation (SIMULATION)
+
+| # | Criterion | Result | Independent evidence (this cycle) |
+|---|---|---|---|
+| 1 | `I_wheel` = 4.5e-5 kg·m², `I_platform` ≈ 6.9e-4 kg·m², 30 RPM→≈12°/s, 300 RPM→≈117°/s match `bom/component-selection.md`'s own physics finding | **PASS** | Directly read `bom/component-selection.md`'s "Platform angular-rate physics finding" section and directly viewed 3 actual rendered frames still present in `/tmp/physics-demo-frames/final/` (frame 1 title card, frame 100 Stage 1, frame 218 Stage 2) — every constant and both stage figures (0.205 rad/s ≈ 12°/s at 30 RPM; 2.049 rad/s ≈ 117°/s at 300 RPM; ratio ≈ 1:15 / 0.0652 both stages) match exactly, copied correctly, not altered. |
+| 2 | SIMULATION watermark and stage captions are unambiguous ("SIMULATION" / "PREDICTION, NOT MEASURED DATA" explicit, not hedged) | **PASS** | The exact title-card text is `"SIMULATION — PREDICTION, NOT MEASURED DATA"`, present as a persistent on-screen watermark box, independently confirmed on all 3 viewed frames (not just the title card) — no ambiguity, no softened language. Frame 218 additionally carries a proactive, honest disclosure not required by the brief: `"(wheel visual spin STYLIZED — true 1800°/s would alias at 24fps; platform rate IS real-time)"` — an exemplary documentation-honesty practice, noted positively. |
+| 3 | Frames/GIF viewable and confirm the above directly | **PASS** | The MP4 itself is not directly viewable by this Reviewer's tooling, but 433 intermediate rendered PNG frames remain in `/tmp/physics-demo-frames/final/` and were viewed directly (not a blocker, per the brief's own guidance, since the source scripts are fully readable and the final MP4/GIF exist on disk). |
+
+#### ECO-041b — Concept-demo animation (CONCEPT)
+
+| # | Criterion | Result | Independent evidence (this cycle) |
+|---|---|---|---|
+| 1 | REQ-011 actually says what the concept-demo claims (single vertical/yaw axis only, no pitch/roll) | **PASS** | Freshly grepped `requirements/requirements.md` line 141: REQ-011 specifies "at least one (vertical/yaw) axis." The demo's own "exactly one axis, no pitch/roll" framing is a reasonable, non-misleading paraphrase of the actually-built single-axis mechanism (only one axis was actually realized), not a misquote of the requirement's own (more permissive) minimum bound. |
+| 2 | REQ-009 and REQ-014 are explicit anti-scope statements against closed-loop control, supporting the "idealized, not a specific control law" claim | **PASS** | Freshly grepped lines 139 and 144: both are "Won't (this cycle)" entries, explicitly anti-scope against closed-loop control. Directly supports the demo's own disclaimer. |
+| 3 | Concept-demo GIF: CONCEPT watermark present/legible; visible green reference mark; rotating assembly's own witness feature visible | **PASS** | Directly viewed the GIF's title-card frame this cycle: exact text `"CONCEPT — NOT A LITERAL CAPABILITY OF THIS RIG"`, explicit REQ-011/REQ-009/REQ-014 citations matching `requirements.md`, and an explicit definition of both witness features (fixed green reference mark; `rotation_index_pointer()` witness tab on the rotating base). |
+| 4 | Reference-mark world-position claim, `rotation_index_pointer()`'s tip at (fw_cx, fw_cy+115.5) = (53.5, 168.0), "measured directly from assembled-base-assembly.stl's binary vertex data" | **PASS, exact** | Independently hand-derived from the live `.scad` variables the script itself cites (`fw_cx=53.5`, `pcb_bay_y0=105.0`, `base_outer_y=57.0`, `rot_pointer_project=6.0`): X=53.5, Y=168.0 — an exact match to the script's own `POINTER_REST_XY = (53.5, 168.0)`. Dimensionally consistent with landing on the north (+Y) wall at the claimed radius. STL vertex-data re-parsing was not re-run (not required per the brief), but the claim is independently corroborated, not merely accepted. |
+| 5 | Reference-mark continuous visibility throughout the "OFF REFERENCE" caption window (no silent gap that could mislead a viewer into reading a blank frame as "no reference exists") | **Investigated; resolved, not a documentation-honesty defect — logged `MISS-033` (LOW, informational)** | An initial loosely-tuned pixel-color detector raised a false alarm suggesting the mark disappears; a subsequent rigorous re-investigation (a corrected color-signature detector plus tightly-cropped, zoomed visual inspection of the actual frames) fully overturned this: the mark is continuously visible (bright or shadow-dimmed, never absent) throughout the entire "OFF REFERENCE" window and the whole animation; two brief shallow dips occur only during unrelated motion-easing captions, not the "OFF REFERENCE" window itself. Logged as a LOW/informational finding purely to record that this specific visibility question was investigated and resolved clean, not because a real defect was found. |
+
+#### Cross-cutting checks
+
+| # | Criterion | Result | Independent evidence (this cycle) |
+|---|---|---|---|
+| 1 | Rev 4 mechanical Design Complete grant (`validation/change-log.md`, "Design Complete is now GRANTED") silently reopened, contradicted, or undermined | **PASS — not reopened** | No `.scad`/interface/dimensional-spec file touched (confirmed above); `validation/open-issues.md` untouched by the pass under review (confirmed via empty `git diff HEAD --stat`, prior to this Reviewer's own edits); all three ECO entries and the change-impact-matrix sections explicitly self-scope as documentation/visualization/simulation-only and explicitly state they do not reopen or re-litigate the grant. |
+| 2 | `validation/change-impact-matrix.md`'s new "None" impact claims for `ECO-039`/`040`/`041` are accurate | **PASS** | Freshly read all three new sections in full: each claims "None" (no functional/safety/schedule impact), consistent with the fact that this is a pure documentation/visualization pass and no geometry changed. Not contradicted by anything found this cycle — both findings are documentation-precision issues, not functional-impact issues, so "None" remains accurate as an *impact* claim even though 2 findings exist as *accuracy* issues. |
+| 3 | Anywhere the "SIMULATION" or "CONCEPT" framing is weakened, contradicted, or could plausibly be read as real measured data or an implemented capability | **PASS — no weakening found** | Both watermarks are persistent, unambiguous, and present on every viewed frame (not just a title card that could be skipped past). No filename, title card, or caption anywhere claims or implies real measured data or an implemented closed-loop control law. |
+| 4 | `hardware/mechanical/drawings/README.md`'s new Method 2/4/5/6 sections accurately describe what the actual committed files do | **1 FAIL, same root cause as Finding 1** | README Method 2 (lines 240–255) states "every fact in a callout label (size/qty/confidence) is copied **verbatim** from `../assembly-instructions.md` §5's own fastener summary table." This is true for 2 of 3 callouts but demonstrably false for the containment-cap callout, whose `"safety joint, REQ-403"` phrase does not appear anywhere in the table. Methods 4/5/6 (drafting sheets, physics-demo, concept-demo) were independently checked against their own committed artifacts and found accurate — no further discrepancy found. See Finding 1, which folds this README overclaim in as compounding evidence rather than a separate finding, since fixing the callout resolves both. |
+| 5 | Final broad "CONFIRMED" scan across all new/changed artifacts, to confirm the 2 findings are isolated, not systemic | **PASS — isolated** | Freshly re-swept all new files this cycle (in addition to the two findings): every other `CONFIRMED` label found (drafting-sheet bullets, README prose, callout text) was independently checked against its cited `.scad` variable or table row and found correctly scoped. `validation/change-log.md`'s own `ECO-039` entry additionally repeats the same "copied verbatim" claim as the README (further compounding evidence for Finding 1, not a third independent finding) but was otherwise clean. |
+
+### Findings
+
+#### Finding 1 — `MISS-031`: the containment-cap fastener callout on the exploded-view PNG overclaims a HIGH-severity, ACCEPTED-RISK (not-proven-adequate) safety joint as `CONFIRMED`, and this same overclaim is independently repeated as a false "copied verbatim" methodology claim in two further documents
+
+- **Issue**: The containment-cap callout in `hardware/mechanical/drawings/
+  exploded/build_exploded_view_annotations.py`'s `CALLOUTS` list (line
+  116) reads: `"6× M3 → Ruthex RX-M3×5.7\nheat-set insert (containment
+  cap)\nCONFIRMED — safety joint, REQ-403"`. The governing source of
+  truth, `hardware/mechanical/assembly-instructions.md` §5's fastener
+  table (line 263), states for this exact joint: `"CONFIRMED (insert
+  match)"` — with no mention of "safety joint" anywhere in that row or
+  anywhere else in the table. The callout's confidence field is not a
+  copy, a legitimate shortening, or a faithful combination of anything the
+  table actually says; it substitutes invented text that manufactures an
+  unearned safety-adequacy connotation. This is compounded by two further
+  documents in the same pass independently asserting a specific,
+  checkable "copied verbatim" claim about this exact callout set that is
+  false for this one instance: `hardware/mechanical/drawings/README.md`
+  lines 249–250 ("Every fact in a callout label (size/qty/confidence) is
+  copied verbatim from `../assembly-instructions.md` §5's own fastener
+  summary table") and `validation/change-log.md`'s own `ECO-039` entry
+  ("every fastener fact (size/qty/confidence) copied verbatim from
+  `assembly-instructions.md` §5's own already-reconciled fastener table").
+  Both claims are true for callouts 1 and 3 but false for callout 2, whose
+  `"safety joint, REQ-403"` phrase appears nowhere in the table.
+- **Rationale**: `REQ-403` and the containment cap's actual safety
+  adequacy are governed by `validation/open-issues.md`'s `MISS-016`
+  (**HIGH**, **ACCEPTED-RISK** — not `RESOLVED`), whose own disposition is
+  that the containment wall fails to absorb the disclosed 156.44J hazard
+  energy by 1.7–3.6 orders of magnitude (typical case) to 3.26–4.30×
+  (best case), with the human Chief Engineer's own sign-off explicitly
+  framed as "defense-in-depth... NOT proof of adequacy." The table's own
+  `"CONFIRMED (insert match)"` is narrowly scoped: it confirms only that
+  the fastener/insert *part* matches its spec (a geometry/BOM fact), not
+  that the joint is safety-adequate. The callout's `"CONFIRMED — safety
+  joint, REQ-403"` reads, to any downstream viewer of the exploded-view
+  PNG, as if the safety-relevant aspect of this joint (not just the part
+  match) were confirmed — directly contradicting the project's own
+  governing HIGH/ACCEPTED-RISK disposition on the very same fact, in the
+  most visible and least-caveated artifact in the entire pass (a
+  large-format annotated engineering drawing, not buried prose). This is
+  not a hypothetical risk: the SAME pass's own containment-cap drafting
+  sheet (`hardware/mechanical/drawings/drafting-sheets/bench-imu-01-
+  containment-cap-drafting-sheet.png`) independently and correctly frames
+  the identical underlying fact elsewhere as "Safety-relevant joint
+  (REQ-403) -- ACCEPTED-RISK defense-in-depth containment, NOT
+  proven-adequate (`validation/open-issues.md` `MISS-016`)" — proving the
+  author had the correct framing available and used it correctly in one
+  artifact, but not in the exploded-view callout or its two supporting
+  "verbatim" claims.
+- **Datasheet Source**: `hardware/mechanical/drawings/exploded/
+  build_exploded_view_annotations.py` line 116 (`CALLOUTS` list, containment-
+  cap entry); `hardware/mechanical/assembly-instructions.md` line 263 (§5
+  fastener table, "Containment cap → base flange" row, ground truth);
+  `validation/open-issues.md` line 89 (`MISS-016`, HIGH, ACCEPTED-RISK,
+  ground truth for the joint's actual safety disposition);
+  `hardware/mechanical/drawings/README.md` lines 249–250 (the false
+  "copied verbatim" methodology claim); `validation/change-log.md`'s
+  `ECO-039` entry (the same false "copied verbatim" claim, repeated);
+  `hardware/mechanical/drawings/drafting-sheets/bench-imu-01-containment-
+  cap-drafting-sheet.png` (the SAME pass's own correct framing of the same
+  fact, corroborating this is an isolated slip, not a project-wide
+  misunderstanding).
+- **Failure Mechanism**: A downstream reader of the exploded-view PNG —
+  the single most-referenced, most-visible artifact in this pass — sees a
+  bold, large-format callout stating this safety-relevant joint is
+  `CONFIRMED`, tagged explicitly to a requirement (`REQ-403`), with no
+  caveat, no cross-reference to `MISS-016`, and no indication that the
+  project's own governing disposition on this exact fact is HIGH-severity,
+  open, and explicitly "not proof of adequacy." A reader relying on the
+  exploded-view drawing alone (a very plausible use pattern for an
+  at-a-glance engineering reference) would reasonably conclude the
+  containment joint's safety adequacy is settled, when the opposite is
+  true. This is precisely the kind of "invented/overclaimed fact in a
+  visualization" this cycle's own adapted checklist item 10 exists to
+  catch.
+- **Affected Component**: `hardware/mechanical/drawings/exploded/
+  build_exploded_view_annotations.py` (line 116, `CALLOUTS` list);
+  `hardware/mechanical/drawings/exploded/bench-imu-01-exploded-view.png`
+  (the committed, regenerated image the callout text renders onto,
+  directly viewed and confirmed to display the overclaim verbatim);
+  `hardware/mechanical/drawings/README.md` (lines 249–250, the "copied
+  verbatim" methodology claim); `validation/change-log.md` (`ECO-039`
+  entry, the same claim repeated). Not affected: the underlying `.scad`
+  geometry, the `MISS-016` disposition itself (unchanged, still HIGH/
+  ACCEPTED-RISK), and the containment-cap drafting sheet (already correct).
+- **Recommended Fix**: Change the containment-cap callout's confidence
+  field from `"CONFIRMED — safety joint, REQ-403"` to a wording that
+  matches the table's actual scope and cross-references the real
+  disposition, e.g. `"CONFIRMED (insert match); safety adequacy
+  ACCEPTED-RISK, see MISS-016"` — mirroring the correct framing already
+  used on the containment-cap drafting sheet in this same pass. Once
+  corrected, the README's and change-log's "copied verbatim" claims become
+  true for all 3 callouts without further edits; if the fix is instead
+  worded so it is no longer a literal table copy, soften "copied verbatim"
+  in both documents to "reflects" or similar. Owner: Mechanical Lead.
+- **Severity**: **HIGH** — per `docs/architecture.md` §7.1, this
+  misrepresents a HIGH-severity, safety-relevant, unresolved
+  (ACCEPTED-RISK, not RESOLVED) disposition as settled/confirmed, in the
+  single most-visible artifact of the pass, with no caveat anywhere on
+  that artifact. Not CRITICAL: it does not itself create or worsen any
+  physical hazard, does not touch any geometry, and the correct underlying
+  disposition (`MISS-016`) remains intact, unedited, and still
+  independently discoverable in `validation/open-issues.md` — this is a
+  documentation-honesty/traceability defect, not a new physical failure
+  mode. Consistent with this project's own severity precedent for
+  traceability overclaims on safety-relevant facts.
+
+#### Finding 2 — `MISS-032`: `validation/change-log.md`'s `ECO-040` entry mislabels an ASSUMPTION-sourced dimension as CONFIRMED
+
+- **Issue**: `validation/change-log.md`'s `ECO-040` entry (line 66) states
+  the `stand_plate` drafting sheet's auto-measured inner bore
+  "independently matching `bmount_flange_ir`'s existing 28.0mm-radius
+  **CONFIRMED** value exactly." The live `.scad` source (line 763) actually
+  reads: `bmount_flange_ir = 28.0; // mm. ASSUMPTION -- ...`. The
+  change-log's own restatement upgrades this value's confidence label from
+  `ASSUMPTION` to `CONFIRMED` — a mislabel.
+- **Rationale**: This project's own explicit discipline
+  (`.github/instructions/mechanical-design.instructions.md`) requires every
+  dimension to trace to a `CONFIRMED` interface value or be explicitly
+  marked `ASSUMPTION`/`ESTIMATE`, never silently blended. This one clause
+  blends them in the wrong direction (understating uncertainty, not
+  overstating it, which is the more dangerous direction for a downstream
+  reader to be misled in). The error is confined to this one clause of
+  `change-log.md` prose — it does not appear on the `stand_plate` drafting
+  sheet itself (which correctly shows the value unlabeled/without a
+  CONFIRMED claim, per the direct PNG view this cycle), in `drawings/
+  README.md`, or in the `.scad` source, all of which are correct.
+- **Datasheet Source**: `hardware/mechanical/bench-imu-01-enclosure.scad`
+  line 763 (`bmount_flange_ir = 28.0; // mm. ASSUMPTION`), ground truth;
+  `hardware/mechanical-interface.md` line 731 (corroborating `ASSUMPTION`
+  classification); `validation/change-log.md` line 66 (`ECO-040` entry,
+  the mislabel).
+- **Failure Mechanism**: A future reader auditing `change-log.md` in
+  isolation (a plausible use pattern, since it is the project's own
+  chronological engineering-change record) would come away believing
+  `bmount_flange_ir` is a `CONFIRMED` interface value, when it is actually
+  an `ASSUMPTION` awaiting a real datasheet/measurement citation — a
+  traceability-discipline violation confined to this one document, with no
+  effect on the drafting sheet, the interface file, or the `.scad` source
+  itself, all of which remain correct.
+- **Affected Component**: `validation/change-log.md` (`ECO-040` entry,
+  line 66, prose only). Not affected: `hardware/mechanical/drawings/
+  drafting-sheets/bench-imu-01-stand-plate-drafting-sheet.png` (correct,
+  independently confirmed via direct view), `hardware/mechanical/drawings/
+  README.md` (correct), `hardware/mechanical/bench-imu-01-enclosure.scad`
+  (correct, unchanged), `hardware/mechanical-interface.md` (correct,
+  unchanged).
+- **Recommended Fix**: Edit `change-log.md` line 66 to read "...
+  independently matching `bmount_flange_ir`'s existing 28.0mm-radius
+  **ASSUMPTION** value exactly..." (one-word fix). Owner: Mechanical Lead
+  or whoever maintains `validation/change-log.md`.
+- **Severity**: **MEDIUM** — per `docs/architecture.md` §7.1: confined to
+  one document's prose, does not affect any committed artifact a builder
+  would actually consult for the physical dimension (the drafting sheet
+  itself is correct), and does not touch geometry or safety — but it is a
+  real, checkable traceability-discipline violation in the project's own
+  chronological record, not a cosmetic nit, and understates rather than
+  overstates uncertainty, which is the more consequential mislabeling
+  direction.
+
+#### Finding 3 (informational, non-gating) — `MISS-033`: concept-demo reference-mark visibility investigated and resolved clean
+
+- **Issue**: None — recorded for traceability only. An initial,
+  loosely-tuned pixel-color detector applied to the concept-demo GIF's
+  rendered frames raised a false alarm suggesting the fixed green
+  reference mark disappears during the "OFF REFERENCE" caption window,
+  which could (if true) have constituted a documentation-honesty defect
+  (a viewer unable to see the reference mark during the exact window
+  captioned to explain its significance).
+- **Rationale**: A rigorous re-investigation — a corrected color-signature
+  detector plus tightly-cropped, zoomed visual inspection of the actual
+  frames, not just trusting the first detector's raw pixel counts — fully
+  overturned the initial alarm: the mark is continuously visible (bright
+  or shadow-dimmed, never fully absent) throughout the entire "OFF
+  REFERENCE" window and the whole animation. Two brief, shallow
+  brightness dips do occur, but only during unrelated motion-easing
+  captions, not the "OFF REFERENCE" window itself.
+- **Datasheet Source**: `hardware/mechanical/drawings/concept-demo/
+  bench-imu-01-attitude-hold-CONCEPT.gif`, directly inspected frame-by-
+  frame (color-signature detection + zoomed crops) in a prior part of this
+  same review session.
+- **Failure Mechanism**: N/A — no misleading claim found. Logged solely so
+  a future reviewer does not have to re-run the same investigation from
+  scratch, and so this specific, non-trivial visibility question is
+  recorded as asked-and-answered rather than silently unasked.
+- **Affected Component**: `hardware/mechanical/drawings/concept-demo/
+  bench-imu-01-attitude-hold-CONCEPT.gif` — no defect found.
+- **Recommended Fix**: None required. Optional future hardening: increase
+  the reference mark's minimum brightness floor slightly during the two
+  identified dip windows for extra visual margin, purely as a robustness
+  nicety, not a correctness fix.
+- **Severity**: **LOW** (informational/non-gating) — recorded per this
+  cycle's "explicitly note no issues found" instruction rather than
+  omitted, since the investigation was substantive enough to warrant a
+  record even though it resolved clean.
+
+### Verdict
+
+- **Verdict**: **CONDITIONAL**.
+- **Open CRITICAL count**: 0.
+- **Open HIGH count introduced by this cycle**: 1 — **`MISS-031`**
+  (Finding 1). This is a new finding, not a re-opening of any pre-existing
+  disposition; `MISS-016` itself (the underlying HIGH/ACCEPTED-RISK safety
+  fact this finding is about) is unchanged and untouched by this pass.
+- **Open MEDIUM count introduced this cycle**: 1 — **`MISS-032`**
+  (Finding 2).
+- **Open LOW/informational count introduced this cycle (non-gating)**: 1 —
+  **`MISS-033`** (Finding 3), recorded as resolved-clean, not an open
+  action item.
+- **Why CONDITIONAL, not FAIL**: Per this Reviewer's own agent-file rule,
+  any open CRITICAL or HIGH forces FAIL or CONDITIONAL, not PASS.
+  CONDITIONAL (not FAIL) is appropriate because the defect is narrowly
+  scoped, precisely diagnosed, cheap to fix (one callout string, one
+  change-log word), does not touch any geometry or the underlying safety
+  disposition itself, and the same pass demonstrates elsewhere (the
+  containment-cap drafting sheet) that the author both knows and can
+  correctly state the true framing — this is an isolated slip in one
+  artifact (compounded by two documents restating the same slip's
+  "verbatim" claim), not a systemic misunderstanding of the project's own
+  safety-disposition discipline.
+- **Why not PASS**: A HIGH-severity mischaracterization of an
+  ACCEPTED-RISK safety joint as `CONFIRMED`, visible directly on the
+  project's single most-referenced visualization artifact with zero
+  caveat, cannot be waved through regardless of how narrowly it is scoped
+  — per this Reviewer's own explicit mandate not to soften a CRITICAL/HIGH
+  finding's severity to keep the process moving.
+- **What independently checks out with no error found**: ECO-039's
+  geometry match (byte-for-byte, both new wrapper files), keep-out-cylinder
+  exclusion, stator/rotor split, "4×-not-6×" reconciliation, 8-row legend,
+  and 2 of 3 fastener callouts; ECO-040's Fusion-360 disclaimer (all 3
+  sheets), blind-hole disclosure, and all drafting-sheet numeric claims
+  (including a first-principles re-derivation of the `pcb_lid` sheet's
+  tab-limited Y-dimension); ECO-041 physics-demo's constants, watermark,
+  and captions in full (with one exemplary proactive honesty practice
+  noted — the STYLIZED-vs-real-time wheel-spin disclosure); ECO-041
+  concept-demo's REQ-009/011/014 citations, watermark, witness-feature
+  definitions, and reference-mark world-position claim (independently
+  hand-derived, exact match); the Rev 4 Design Complete grant (untouched);
+  and `change-impact-matrix.md`'s "None"-impact claims (accurate, since
+  both findings are documentation-precision issues, not functional-impact
+  issues).
+- **What's newly open, gating**: `MISS-031` (HIGH) and `MISS-032` (MEDIUM),
+  both logged `OPEN`, `Source: mechanical-reviewer`, in `validation/
+  open-issues.md`. `MISS-031` must be fixed (or its severity formally
+  contested with new evidence, per this Reviewer's own escalation-trigger
+  process) before this documentation pass can be considered done.
+- **What's newly open, non-gating**: `MISS-033` (LOW/informational),
+  logged for traceability, resolved-clean, requiring no action.
+- **Next action**: Report **CONDITIONAL** to the Hardware Lead, with
+  `MISS-031` (HIGH) as the required fix before this pass closes, and
+  `MISS-032` (MEDIUM) as a should-fix alongside it. Loop back to the
+  Mechanical Lead per the standard escalation path
+  (`.github/agents/mechanical-reviewer.agent.md`, "Out of scope" /
+  "Handoff contract").
+
+## Mechanical Reviewer — Cycle 9 (Focused Independent Re-Review of Cycle 8 Loop-Back Fixes, 2026-09-18)
+
+### Review Cycle Metadata
+
+- **Design revision reviewed**: No new mechanical revision. Independently
+  re-confirmed via `git diff HEAD -- hardware/mechanical/bench-imu-01-
+  enclosure.scad` (empty) that the `.scad` source remains byte-for-byte
+  untouched; this remains a documentation-only pass.
+- **What changed since Cycle 8**: Two targeted fixes to the two Cycle 8
+  gating findings (`MISS-031` HIGH, `MISS-032` MEDIUM), plus an unrelated,
+  disclosed **cross-branch ECO-ID renumbering**: `origin/main` merged two
+  PRs while this branch was in progress and took the real `ECO-038` for
+  unrelated content (a firmware-flashing tooling guide), so this pass's own
+  three ECOs were renumbered site-wide (038→039, 039→040, 040→041) per
+  `docs/workflow.md` §4.1's collision convention, recorded as a new,
+  separate `ECO-042` bookkeeping entry. Both the fixes and the renumbering
+  are independently re-verified in this cycle, not accepted at face value.
+- **Scope**: a **focused** re-review, per this cycle's own task — re-verify
+  exactly the 2 Cycle 8 gating findings against the real files/pixels (not
+  the fix description), and separately audit this Reviewer's *own* Cycle 8
+  review text for citation accuracy after the repo-wide renumbering sweep
+  touched it. Not a from-scratch re-scan of the whole documentation pass;
+  everything else Cycle 8 already found clean (byte-for-byte geometry
+  match, keep-out exclusion, stator/rotor split, legend, physics constants,
+  REQ citations, reference-mark position, etc.) is not re-litigated here.
+- **Reviewer**: Mechanical Reviewer — see
+  `.github/agents/mechanical-reviewer.agent.md`. Same reviewer role as
+  Cycle 8, independent of the Mechanical Lead session that authored both
+  the original pass and this fix.
+- **Independence statement**: Neither fix was accepted on the strength of
+  the requester's own description of what changed. Fix 1 (`MISS-031`) was
+  re-verified at three independent levels: (a) direct re-read of the live
+  `CALLOUTS` source list, (b) algebraic re-derivation of the new
+  `draw_callouts()` edge-clamping logic (not just a read-through), and (c)
+  direct pixel inspection of the regenerated PNG plus a fresh,
+  from-scratch programmatic pixel scan — not a reuse of any measurement
+  from Cycle 8 or from the fix description. Fix 2 (`MISS-032`) was
+  re-verified by re-opening `change-log.md`'s live `ECO-040` entry and the
+  cited `.scad` line 763 fresh this cycle, plus an independent `git diff
+  HEAD` re-confirmation that the `.scad` source itself remains untouched.
+  The ECO-renumbering claim was independently corroborated by re-running
+  `tools/check_id_uniqueness.py` this cycle (486 IDs, 0 duplicates,
+  matching the `ECO-042` entry's own claim) rather than accepting the
+  claimed count.
+
+### Tooling & methodology disclosure
+
+- **Git**: `git log --oneline`, `git status --short`, `git diff HEAD
+  --stat`, and targeted `git diff HEAD -- <file>` / `git log --oneline
+  --all -- <file>` against the live worktree, to independently establish
+  which files actually changed (and which provably did not) since Cycle 8.
+- **Direct source re-read**: `grep`/`sed`/`view` against the live
+  `build_exploded_view_annotations.py`, `change-log.md`,
+  `bench-imu-01-enclosure.scad`, and `assembly-instructions.md` — never
+  the fix description alone.
+- **Direct pixel inspection**: the `view` tool, cropped to the
+  containment-cap callout region of the regenerated
+  `bench-imu-01-exploded-view.png`, to visually confirm the corrected
+  4-line text renders completely and legibly.
+- **Independent programmatic pixel scan**: a fresh, from-scratch Python/
+  PIL script (not reused from Cycle 8) that scans the callout's known
+  text-color range and reports the rightmost non-background pixel's X
+  coordinate, compared directly against the 2000px canvas width — used to
+  quantify the clipping margin numerically rather than eyeball it.
+- **`tools/check_id_uniqueness.py`** and **`tools/check_open_issues.py`**:
+  both independently re-run this cycle (not just cited) to corroborate the
+  ECO-renumbering claim and to confirm `open-issues.md`'s structural gate
+  passes cleanly after this cycle's own edits.
+
+### Findings — independent re-verification of the 2 Cycle 8 gating findings
+
+#### Re-verification of Finding 1 / MISS-031 (HIGH) — containment-cap callout overclaim
+
+- **Fix claimed**: `build_exploded_view_annotations.py`'s `CALLOUTS` list
+  (`cap_heatset` entry) changed from `"CONFIRMED — safety joint, REQ-403"`
+  to a 4-line corrected form: `"6× M3 → Ruthex RX-M3×5.7\nheat-set insert
+  (containment cap)\nCONFIRMED (insert match)\nSafety: ACCEPTED-RISK — see
+  MISS-016"`; the PNG was regenerated from this script; a prior
+  regeneration attempt had this longer text run past the 2000px canvas
+  width (truncating "...see MISS-016" to "...see MISS-0"), since fixed by
+  (a) moving that callout's `label_pos` left and (b) adding real
+  edge-clamping logic to `draw_callouts()` (previously a comment claimed
+  boxes were "kept on-canvas" with no code actually doing it).
+- **Independent re-derivation performed**: Re-opened the live
+  `build_exploded_view_annotations.py` this cycle and confirmed the
+  `CALLOUTS` list's `cap_heatset` entry now contains exactly the claimed
+  4-line text, verbatim, not a paraphrase. Independently re-derived (not
+  just read) the new `draw_callouts()` clamp logic algebraically: for each
+  callout box, the code computes the box's right edge from `label_pos[0]`
+  plus the rendered text width and, if that exceeds the canvas width minus
+  a margin, shifts `label_pos[0]` left by exactly the overshoot amount —
+  confirmed this is a real, general bound (holds for any text length, not
+  hand-tuned to this one callout's current string), not a cosmetic no-op.
+- **Independent pixel-level re-verification, method 1 (direct visual
+  inspection)**: Viewed the regenerated `bench-imu-01-exploded-view.png`
+  directly via the `view` tool this cycle, cropped to the containment-cap
+  callout's region. The full corrected text, including the final line
+  "Safety: ACCEPTED-RISK — see MISS-016", is completely rendered and
+  legible with visible clear space to its right — no truncation, no
+  overrun past the box border, no overlap with another callout or the
+  canvas edge.
+- **Independent pixel-level re-verification, method 2 (programmatic pixel
+  scan, independent of method 1)**: Wrote and ran a fresh, from-scratch
+  Python/PIL script this cycle (not reused from Cycle 8) that opens the
+  committed PNG, isolates the callout's known text-color range within its
+  bounding region, and reports the rightmost pixel matching that range.
+  Result: rightmost non-background pixel at **x=1921** against the
+  **2000px** canvas width — a **79px margin**, independently confirming no
+  clipping at the actual rendered-pixel level (not merely inferred from
+  source review or a single eyeballed screenshot). Two independently
+  different methods (direct visual crop, programmatic scan) agree.
+- **Compounding-overclaim fix cross-check**: Independently re-read
+  `hardware/mechanical/drawings/README.md`'s Method 2 section and
+  `validation/change-log.md`'s `ECO-039` entry (renumbered from `ECO-038`,
+  independently confirmed at `change-log.md` line 65). Both now state that
+  2 of 3 callouts reflect the fastener table while the containment-cap one
+  adds a deliberate, correctly-attributed safety cross-reference — the
+  blanket "copied verbatim" claim Cycle 8 flagged as independently false
+  for this one callout is gone from both documents, replaced with an
+  accurate "reflects" framing, and both carry an explicit post-review-fix
+  note citing this Reviewer's own `MISS-031` finding by name (not a silent
+  correction).
+- **Disposition**: **RESOLVED, independently confirmed.** All three
+  independent checks (source text, clamp-logic algebra, and two
+  independent pixel-level measurements) agree the callout now correctly
+  states the joint's confidence and cross-references its real, governing
+  safety disposition, and the earlier clipping regression is genuinely
+  fixed with margin to spare.
+
+#### Re-verification of Finding 2 / MISS-032 (MEDIUM) — `bmount_flange_ir` mislabeled CONFIRMED
+
+- **Fix claimed**: `validation/change-log.md`'s `ECO-040` entry (renumbered
+  from `ECO-039`) changed "...independently matching `bmount_flange_ir`'s
+  existing 28.0mm-radius CONFIRMED value exactly..." to state that value is
+  ASSUMPTION, not CONFIRMED, with an explicit citation to
+  `bench-imu-01-enclosure.scad` line 763.
+- **Independent re-derivation performed**: Re-opened the live
+  `change-log.md` this cycle (the file itself, not a diff) and confirmed
+  the `ECO-040` entry (line 66) now reads "...independently matching
+  `bmount_flange_ir`'s existing 28.0mm-radius value exactly — that source
+  value is itself labeled ASSUMPTION, not CONFIRMED, in `bench-imu-01-
+  enclosure.scad` line 763" — correctly softened, with an explicit,
+  checkable citation rather than a bare assertion.
+- **Independent ground-truth re-verification**: Re-opened
+  `bench-imu-01-enclosure.scad` at line 763 fresh this cycle:
+  `bmount_flange_ir = 28.0; // mm. ASSUMPTION -- ...` — an exact,
+  byte-for-byte match to what the fix now cites. Independently
+  re-confirmed via `git diff HEAD -- hardware/mechanical/bench-imu-01-
+  enclosure.scad` (empty) that this source line, and the whole file, has
+  not been touched at any point in this fix cycle — the correction is
+  confined entirely to `change-log.md`'s own prose, exactly as the fix
+  claims.
+- **Disposition**: **RESOLVED, independently confirmed.** The mislabeling
+  is corrected at its source (the one document that had it wrong), the new
+  citation is independently verified accurate against the live `.scad`
+  file, and no other artifact needed to change (the drafting sheet itself,
+  `drawings/README.md`, and the `.scad` source were already correct, per
+  Cycle 8's own findings, unaffected by this fix).
+
+### Self-audit of Cycle 8's own review-record accuracy (post-renumbering)
+
+Per this cycle's own task, this Reviewer's *own* Cycle 8 section of this
+file was independently re-read in full (not sampled) after the disclosed
+repo-wide ECO-renumbering sweep, to check whether that automated sweep
+correctly updated every citation this Reviewer's own text made, and
+whether any *pre-existing* citation error (unrelated to the renumbering)
+was present. This is a self-correction of this Reviewer's own record, not
+a finding against the Mechanical Lead's work:
+
+- **Renumbering-sweep artifact found and fixed**: Cycle 8's
+  "Cross-cutting checks" table (row 2) used a shorthand list notation,
+  `` `ECO-039`/`039`/`040` ``, where only the first, fully-prefixed number
+  was updated by the sweep; the two bare continuation numbers were not.
+  Corrected to `` `ECO-039`/`040`/`041` ``. A targeted regex re-scan of the
+  entire Cycle 8 section (`` \`ECO-0[0-9]{2}\`(/\`0[0-9]{2}\`)+ ``)
+  confirms this was the only instance of this exact shorthand pattern —
+  every other ECO citation in the section already carries its own full
+  `ECO-0NN` prefix and was correctly swept.
+- **Pre-existing citation slip found and fixed (unrelated to the
+  renumbering)**: Finding 1's two citations of `hardware/mechanical/
+  assembly-instructions.md`'s "Containment cap → base flange" fastener-
+  table row as "line 264" were off by one; independently re-confirmed via
+  `git log --oneline --all -- hardware/mechanical/assembly-
+  instructions.md` that this file has not been touched by any commit in
+  this entire saga (last real edit predates this branch), so the row's
+  true location — **line 263** — was simply mis-cited in this Reviewer's
+  original Cycle 8 write, unrelated to anything the renumbering sweep
+  touched. Both instances corrected to "line 263"; the broader table-range
+  citation "(lines 256–267)" was independently re-checked and is correct
+  as originally written (line 256 is the table heading, line 267 is the
+  last row, "Cable anchor tabs").
+- **Everything else independently spot-checked this cycle and found
+  correct, no change needed**: `hardware/mechanical-interface.md` line
+  731; `bench-imu-01-enclosure.scad` lines 1749, 830, 763, 513, 517, 197;
+  `assembly-instructions.md` line 267 and its §4.1 "lines 121–158" range
+  boundary; `requirements/requirements.md` lines 139, 141, 144
+  (REQ-009/011/014); and `validation/open-issues.md`'s internal "line 89,
+  `MISS-016`" self-citation inside the `MISS-031` row — this last one was
+  transiently stale (the row had been sitting at line 92 due to a separate,
+  now-corrected row-ordering defect from when these rows were first added)
+  and is confirmed to have self-corrected back to an accurate "line 89"
+  once that ordering defect was fixed as part of this same cycle's
+  `open-issues.md` edits (see below) — no separate text edit was needed
+  for it.
+- **`validation/open-issues.md` row-ordering defect fixed**: The
+  `MISS-031`/`MISS-032`/`MISS-033` rows had been inserted immediately after
+  the table header instead of appended after the table's true last row
+  (`MISS-030`), violating this file's own ascending-ID append convention.
+  Relocated to the end of the table, preserving all text content
+  unchanged (aside from the status/date/note updates below); independently
+  re-confirmed via a pipe-count check that no column alignment was
+  disturbed by the move, and via `tools/check_open_issues.py` that the
+  gate still passes cleanly afterward.
+
+None of these four corrections change any finding's substance, severity,
+or disposition — they are citation/bookkeeping accuracy fixes to this
+Reviewer's own record, made transparent here rather than silently
+corrected.
+
+### Verdict
+
+- **Verdict**: **PASS**
+- **Open CRITICAL count**: 0
+- **Open HIGH count**: 0 (`MISS-031` independently confirmed RESOLVED this
+  cycle, both at the source-code level and the actual rendered-pixel
+  level)
+- **Open MEDIUM count**: 0 (`MISS-032` independently confirmed RESOLVED
+  this cycle)
+- **Open LOW/informational count (non-gating, unaffected)**: 1 —
+  `MISS-033`, unchanged from Cycle 8 (already RESOLVED/informational, not
+  in scope for this fix cycle).
+- **What independently checks out**: Both Cycle 8 gating findings are
+  independently confirmed fixed via fresh, from-scratch checks against the
+  real files and the real rendered pixels — not accepted on the strength
+  of the fix's own description. The specific clipping regression this
+  cycle was asked to pay particular attention to is independently
+  quantified as fixed with a 79px margin, via two independent methods
+  agreeing. The unrelated cross-branch ECO-renumbering (038→039→040→041,
+  plus the new `ECO-042` bookkeeping entry) is independently corroborated
+  as accurate via a fresh `tools/check_id_uniqueness.py` run. This
+  Reviewer's own Cycle 8 review text was additionally self-audited in full
+  and found to contain two small, non-substantive citation bugs (one
+  renumbering-sweep miss, one pre-existing off-by-one unrelated to any
+  change), both corrected transparently in this cycle rather than left
+  standing.
+- **What remains open, non-gating**: `MISS-033` (LOW/informational) only —
+  no action required, per its own Cycle 8 disposition.
+- **Next action**: Report **PASS** to the Hardware Lead / requester. No
+  further loop-back to the Mechanical Lead is required — both `MISS-031`
+  and `MISS-032` are independently confirmed RESOLVED this cycle. This
+  documentation/visualization pass may now be considered done from the
+  Mechanical Reviewer's perspective.

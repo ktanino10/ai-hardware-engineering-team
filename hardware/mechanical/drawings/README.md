@@ -1,10 +1,13 @@
-# Bench-IMU-01 — 2D Drawings + Exploded Assembly View + Assembly Animation (Rev 4/4.1, Mechanical scope)
+# Bench-IMU-01 — 2D Drawings + Exploded Assembly View + Assembly Animation + Drafting Sheets + Physics/Concept Demos (Rev 4/4.1, Mechanical scope)
 
 Visual documentation of the already-Design-Complete mechanical assembly
 (`validation/change-log.md` ECO-031/032/033) — 2D orthographic drawings of
 each of the 5 printed pieces plus the full assembled unit, a Blender-built
-exploded assembly view, and an assembly animation. **This is the first
-time this project has generated 2D drawings, an exploded view, or an
+exploded assembly view, an assembly animation, Fusion-style engineering
+drafting sheets (Method 4), a physics-based conservation-of-angular-
+momentum **SIMULATION** animation (Method 5), and a **CONCEPT**
+reference-attitude-hold demonstration animation (Method 6). **This is the
+first time this project has generated 2D drawings, an exploded view, or an
 animation** — this document establishes the convention so it is
 reproducible, not a one-off.
 
@@ -18,7 +21,8 @@ or video.
 
 - **OpenSCAD CLI** (v2026.08.30, `--backend=manifold`) — already this
   project's established CAD tool throughout its history. Used here for
-  both the STL isolation and the 2D orthographic renders.
+  the STL isolation, the 2D orthographic renders, and the new drafting-
+  sheet DXF projections (Method 4).
 - **Blender, via the `blender-*` MCP tools** — confirmed connected and
   working this session (`blender-get_addon_status`, Blender 5.1.1,
   `bpy.ops.wm.stl_import` available). This was **not** true in earlier
@@ -28,8 +32,13 @@ or video.
   connected" as of when they were written) — treat Blender's availability
   as **verified per-session, not a standing guarantee**
   (`docs/architecture.md` §5.3/§13's own convention). If Blender is not
-  connected in a future session, the exploded view cannot be regenerated
-  until it is.
+  connected in a future session, the exploded view/animations cannot be
+  regenerated until it is.
+- **matplotlib + a hand-written DXF parser** (Method 4) — `ezdxf` is
+  **not** installed this session; a small, purpose-built parser is used
+  instead (see `drafting-sheets/build_drafting_sheet.py`'s own docstring
+  for exactly which DXF entity types this project's OpenSCAD version
+  actually emits).
 
 ## Directory layout
 
@@ -37,13 +46,14 @@ or video.
 hardware/mechanical/drawings/
   README.md                          this file
   scad/                               new OpenSCAD wrapper scripts, one per
-                                      printed piece (+ one for the bearing
-                                      reference), each isolating that
-                                      piece's exact module call(s) in its
-                                      real ASSEMBLED-frame position (NOT the
-                                      print_layout/print-bed position the
-                                      existing hardware/mechanical/stl/
-                                      export/*.scad scripts use)
+                                      printed piece (+ bearing/motor-body/
+                                      flywheel-rotor references), each
+                                      isolating that piece's exact module
+                                      call(s) in its real ASSEMBLED-frame
+                                      position (NOT the print_layout/
+                                      print-bed position the existing
+                                      hardware/mechanical/stl/export/*.scad
+                                      scripts use)
   2d/                                 rendered PNGs: top/front/side for
                                       each of the 5 printed pieces, plus
                                       top/front/side/iso for the full
@@ -51,7 +61,13 @@ hardware/mechanical/drawings/
   exploded/
     build_exploded_view.py           Blender Python script that reproduces
                                       the exploded-view scene from scratch
-    bench-imu-01-exploded-view.png   final rendered output (with legend)
+                                      (8 parts as of this pass -- see
+                                      Method 2's own revision note)
+    build_exploded_view_annotations.py  Pillow post-process: legend strip
+                                      (8 rows) + 3 fastener leader-line
+                                      callouts
+    bench-imu-01-exploded-view.png   final rendered output (with legend +
+                                      fastener callouts)
   animation/
     build_assembly_animation.py      Blender Python script that keyframes
                                       and renders the assembly animation
@@ -60,6 +76,19 @@ hardware/mechanical/drawings/
     bench-imu-01-assembly-animation.mp4   final video (H.264/MPEG4, 24fps)
     bench-imu-01-assembly-animation.gif   derived GIF (12fps, palette-
                                            optimized) for inline preview
+  drafting-sheets/                   NEW this pass (Method 4)
+    scad/projection-*.scad           projection(cut=false) wrapper scripts
+    build_drafting_sheet.py          DXF parser + matplotlib renderer
+    bench-imu-01-<part>-drafting-sheet.png/.pdf   3 parts (stand-plate,
+                                      containment-cap, pcb-lid)
+  physics-demo/                      NEW this pass (Method 5) -- SIMULATION
+    build_physics_demo_animation.py
+    annotate_physics_demo_frames.py
+    bench-imu-01-momentum-conservation-SIMULATION.mp4/.gif
+  concept-demo/                      NEW this pass (Method 6) -- CONCEPT
+    build_concept_attitude_hold_animation.py
+    annotate_concept_demo_frames.py
+    bench-imu-01-attitude-hold-CONCEPT.mp4/.gif
 ```
 
 ## Method 1: 2D orthographic drawings (`2d/`)
@@ -174,18 +203,70 @@ pushed below its fixed height).
 
 **Colors are a legend, not decoration**: each of the 5 printed pieces gets
 its own solid color (matching a caption baked into the final PNG); the
-bearing is left translucent silver to read as "reference, not printed."
+bearing, motor body, and flywheel rotor (see below) are left translucent
+to read as "reference, not printed."
 
-**What is deliberately left out**: the PCBA and motor/flywheel reference
-geometry that also exist in the source `.scad` file (`reference_pcba()`,
-`reference_motor_flywheel()`) are not included in the exploded render —
-those are already documented in `bom/component-selection.md` and the
-Rev 3 BOM; adding them was judged to add clutter without adding new
-information for a *mechanical* exploded view.
+**Revision (this pass): motor (M1) + flywheel are now shown, reversing an
+earlier decision.** A prior revision of this document read here: *"the
+PCBA and motor/flywheel reference geometry... are not included in the
+exploded render... judged to add clutter without adding new information."*
+That call is reversed as of this pass. The reason: `assembly-
+instructions.md` §4.2/§4.4 documents mounting the motor and installing the
+flywheel as real, load-bearing build steps, and the bearing — also a
+bought, non-printed part — was already being shown as a reference ghost in
+the very same render; omitting the motor/flywheel while showing the
+bearing was an inconsistency, not a principled distinction, once directly
+questioned. New wrapper scripts `scad/assembled-reference-motor-body.scad`
+and `scad/assembled-reference-flywheel-rotor.scad` split the parent file's
+existing `reference_motor_flywheel()` module (Section 4) into its
+stationary (motor body/housing, bolted to the platform) and rotating
+(shaft + hub collar + flywheel disk, per `assembly-instructions.md` §4.4
+step 5's own "motor's exposed shaft" language) halves — deliberately
+excluding that module's own rotation-clearance keep-out cylinder (a
+translucent annotation volume, not a physical object; including it in an
+STL export would wrongly merge it into opaque solid geometry). The
+`reference_pcba()` module remains excluded (out of scope for this
+revision, which was specifically about the motor/flywheel gap; the PCBA
+itself is still fully documented in `bom/component-selection.md` and the
+fab BOM). The 2 new ghosts needed a much larger explode offset than a
+naive Z-stack interpolation would suggest, since they start out physically
+inside `fw_bay_wall()`'s cylindrical wall — confirmed empirically by an
+intermediate render during this pass that still looked hidden, not
+assumed; see `build_exploded_view.py`'s own `OFFSETS` comment for the
+fix. The flywheel-rotor ghost's color was also changed from an initial
+gold (too close to `containment_cap()`'s own orange from this camera
+angle, confirmed by a pixel-level comparison) to purple.
+
+**Fastener leader-line callouts (new this pass)**: the committed PNG also
+carries 3 leader-line callouts (containment-cap heat-set inserts, PCB-lid
+screws, motor screws), added via `exploded/build_exploded_view_annotations.py`
+(Pillow). Anchor points are **not eyeballed** — computed via
+`bpy_extras.object_utils.world_to_camera_view()` against the real camera
+this scene builds, from real assembled-frame STL bounding-box data; 2 of
+the 3 anchors were cross-checked a second way (an independent per-pixel
+hue-cluster scan of the actual rendered PNG) since the camera-projected
+points for those 2 landed close enough to a part boundary from this
+specific angle to risk ambiguity. Every size/qty/confidence fact in a
+callout label **reflects** `../assembly-instructions.md` §5's own fastener
+summary table — including that table's own already-reconciled PCB-lid
+screw count (**4**, not the older, superseded "6" figure that appears in
+`bench-imu-01-dimensional-spec.md`'s prose but doesn't match the actual
+modeled geometry — see that table's own cross-reference note for the full
+reconciliation) — with one deliberate exception, **not** a verbatim copy:
+the containment-cap callout adds an explicit
+`Safety: ACCEPTED-RISK — see MISS-016` line beyond the table's own
+`CONFIRMED (insert match)` text, because a fastener-dimension match is a
+separate fact from whether that joint's safety margin is proven adequate
+(it isn't yet — `validation/open-issues.md` MISS-016 is still OPEN). An
+earlier version of this callout blurred the two into one unearned
+"CONFIRMED — safety joint" phrase; Mechanical Reviewer Cycle 8 (MISS-031,
+HIGH) caught this and it was corrected before this PR — see
+`validation/change-log.md` ECO-039 and `validation/open-issues.md` for the
+full record.
 
 ### Regenerating the exploded view
 
-1. Export the 6 assembled-position STLs (see `build_exploded_view.py`'s own
+1. Export the 8 assembled-position STLs (see `build_exploded_view.py`'s own
    header for the exact commands) — these are **not committed**
    (regenerable build intermediates, avoiding near-duplicate binaries next
    to the real print-ready STLs in `hardware/mechanical/stl/`).
@@ -193,11 +274,10 @@ information for a *mechanical* exploded view.
    `blender --background --python build_exploded_view.py`, or paste into a
    Blender MCP `execute_blender_code` call), after setting `STL_DIR` and
    `OUTPUT_PATH` at the top of the script.
-3. The committed `bench-imu-01-exploded-view.png` additionally has a
-   caption/legend strip added via a short Pillow (PIL) post-process (listing
-   each part's color, name, and a one-line cross-reference) — not part of
-   `build_exploded_view.py` itself; regenerate it the same way if needed
-   (see the script's own render output for the un-captioned base image).
+3. Run `exploded/build_exploded_view_annotations.py` (plain `python3`, no
+   Blender needed) to add the legend strip (8 rows) and the 3 fastener
+   leader-line callouts on top of the raw render — this is the file
+   actually committed as `bench-imu-01-exploded-view.png`.
 
 ## Method 3: Assembly animation (`animation/`)
 
@@ -266,10 +346,188 @@ referenced by relative path — practical value, not a redundant duplicate.
    regenerable-intermediate convention as the exploded view's own
    assembled-position STLs) — only the two encoded output files are.
 
+## Method 4: Fusion-style engineering drafting sheets (`drafting-sheets/`)
+
+New this pass, added per an explicit request for a Fusion-360-style
+drafting sheet — **this project does not have Fusion 360 access, and
+these sheets do not claim to be Fusion output.** Every sheet's own title
+block says so explicitly ("OpenSCAD-source-driven drafting sheet. NOT a
+Fusion 360 drawing."), per this project's own no-overclaiming discipline.
+
+**Pipeline**: `bench-imu-01-enclosure.scad` (unmodified) → a new,
+`include`-only wrapper script per part (`drafting-sheets/scad/projection-
+<part>.scad`) that feeds the SAME assembled-frame module call Method 1
+already uses through OpenSCAD's `projection(cut=false)` (a top-down
+**silhouette** projection — the whole solid's outer boundary collapsed
+onto the XY plane, not a cross-section) → `openscad --export-format dxf`
+(a regenerable intermediate, **not committed**, same convention as the
+exploded view's own STLs) → `build_drafting_sheet.py`: a small,
+**hand-written DXF entity parser** (per this task's own explicit "simple
+parser" instruction — no `ezdxf` dependency was added) + a matplotlib
+renderer.
+
+**What the parser actually has to handle — verified, not assumed**: 3 real
+test exports on this project's OpenSCAD version produced **only
+`LWPOLYLINE` entities** (vertex-list circles/rectangles, no bulge/arc data
+at all) — `LINE`/`CIRCLE`/`ARC` are supported defensively in case a future
+OpenSCAD version's DXF exporter changes, but are unexercised by this
+project's own real files.
+
+**A real, disclosed limitation**: a BLIND hole (e.g. `stand_plate()`'s own
+bearing-mount pilot holes) does not appear as a separate DXF contour — the
+silhouette from directly above is unbroken wherever solid material still
+exists anywhere in the part's Z extent, the exact same "a top-down view
+can't show a hidden Z-step" caveat Method 1 already discloses for camera-
+based top views. Fastener facts that don't survive into the DXF as real
+geometry are annotated from the known, cited source values instead (with
+an explicit "(blind hole, not visible in this outline-only projection)"
+note), never inferred from geometry that isn't actually there.
+
+**What is auto-measured vs. what is cited text**: overall envelope
+dimensions and any cleanly-circular hole/boundary diameter are **measured
+directly from the parsed DXF vertex data** (a real geometric fit-and-
+check, printed to the console for cross-verification — e.g. `stand_plate`'s
+inner bore auto-measured at ⌀56.0mm, matching `bmount_flange_ir`'s own
+28.0mm radius exactly) — these are genuine measurements, not guesses.
+Fastener callouts (size/qty/confidence) are fixed text cross-referenced to
+`../assembly-instructions.md` §5's own fastener table, same convention as
+Method 2's own leader-line callouts.
+
+**3 parts covered** (not all 5 — chosen to cover the 3 fastener classes
+named in the request without "drawing everything"): `stand_plate`
+(bearing mounting holes — blind, see above), `containment_cap` (the
+safety-relevant M3-into-heat-set-insert joint — 6 holes auto-measured at
+⌀3.4mm each, matching the design's own M3-clearance convention), `pcb_lid`
+(the 4 corner screw tabs).
+
+**Output**: PNG (matches this project's existing convention) + PDF (a
+near-free bonus from matplotlib — useful if a sheet is ever printed at a
+stated scale, since PDF preserves vector data a raster PNG does not).
+
+### Regenerating a drafting sheet
+
+```sh
+cd drafting-sheets/scad
+openscad -D 'show_mode="export"' --export-format dxf \
+  -o /tmp/<part>.dxf projection-<part>.scad
+cd ..
+python3 build_drafting_sheet.py --part <part> --dxf /tmp/<part>.dxf \
+  --out bench-imu-01-<part>-drafting-sheet.png \
+  --out-pdf bench-imu-01-<part>-drafting-sheet.pdf
+```
+
+## Method 5: Physics-based conservation-of-angular-momentum SIMULATION animation (`physics-demo/`)
+
+**This is a SIMULATION / PREDICTION, not a measurement.** No PCB has been
+fabricated/populated yet (`../assembly-instructions.md` §4.1 placeholder;
+366 unresolved DRC items on the still-open PCB-layout branch) and no
+firmware has ever been flashed to real hardware — this animation cannot
+be, and does not claim to be, real test data. Every physics number it
+renders (`I_wheel = 4.5e-5 kg·m²`, `I_platform ≈ 6.9e-4 kg·m²`, ratio
+≈1:15, and both stages' ω values) is copied verbatim from the already-
+approved ESTIMATE in `bom/component-selection.md`'s own "Platform
+angular-rate physics finding" — nothing here is re-derived.
+
+**What it shows**: the same assembled-position STL pipeline as Method 2
+(now including the motor-body/flywheel-rotor ghosts added this pass), but
+at TRUE assembled positions (no explode offsets), grouped into 2 rigid-
+body Empty pivots at the real rotation axis (`fw_cx`,`fw_cy`) via "keep
+transform" parenting: **PLATFORM** (base-assembly + pcb-lid +
+containment-cap + motor-body ghost — the part that actually rotates in
+reaction, the real quantity of physical interest) and **WHEEL**
+(flywheel-rotor ghost only). Two stages, each a LINEAR-interpolated
+(exactly constant angular rate, not eased) hold: 30 RPM → platform ≈12°/s,
+then 300 RPM → platform ≈117°/s — **the platform's own rate is rendered
+in real time every stage** (1 animated second = 1 predicted real second),
+since that is the actual quantity a conservation-of-angular-momentum demo
+is about. The wheel's Stage-1 visual spin (180°/s) is ALSO true real-time
+(no aliasing concern at this project's 24fps convention); Stage 2's true
+rate (1800°/s = 75°/frame) would alias badly, confirmed by an intermediate
+render, so the wheel's Stage-2 visual spin is a disclosed, stylized 720°/s
+indicator instead — stated on-screen and here, never silently substituted.
+
+**Labeling**: a title card, a **persistent** on-screen watermark
+("SIMULATION — PREDICTION, NOT MEASURED DATA," every frame, not just the
+start), a per-stage numeric caption box, and an outro card stating the
+future real-hardware test's own success criteria (platform rotates
+opposite the wheel; the rate ratio holds within a reasonable tolerance
+across ≥2 speeds; the onboard IMU's measured rate matches the predicted
+rate; repeatable across multiple trials) — framed explicitly as a bar this
+animation has NOT yet been checked against.
+
+### Regenerating the physics-demo animation
+
+Same 3-step shape as Methods 2/3: build the scene + keyframe in Blender
+(`build_physics_demo_animation.py`, chunked render — see that script's own
+docstring), annotate with Pillow (`annotate_physics_demo_frames.py`,
+plain `python3`, no Blender needed), then `ffmpeg` (2-pass MP4 + palette-
+GIF, same technique as Method 3's own header).
+
+## Method 6: CONCEPT reference-attitude-hold demonstration animation (`concept-demo/`)
+
+**This is a CONCEPT, not a literal capability of this rig.**
+Bench-IMU-01 rotates about exactly ONE (vertical/yaw) axis
+(`requirements/requirements.md` REQ-011, `hardware/mechanical-interface.md`)
+— there is no pitch/roll degree of freedom, so literal "inversion"/tumble
+recovery is physically impossible on this hardware. Per an explicit
+reinterpretation: this animation instead shows a deviation from a
+**reference attitude**, corrected by the reaction wheel returning the
+platform to that reference — the single-axis analog of the eventual
+attitude-control concept, not a demonstration of a capability this rig
+actually has today.
+
+**Also idealized, not a specific control law's simulated response**: no
+closed-loop attitude controller (PID or otherwise) is implemented
+anywhere in this project (REQ-009/REQ-014, explicit anti-scope
+statements) — this animation cannot and does not claim to show a
+particular controller's actual computed response, only an illustrative,
+generic ease-in-out curve for a "disturbance → correction → hold" beat.
+
+**Reference-attitude witness mark**: reuses the existing
+`rotation_index_pointer()` feature already modeled in
+`bench-imu-01-enclosure.scad` (Rev 4.1, `MISS-024` mitigation) — a
+witness tab on the rotating base, already intended by its own source-file
+comment to be sighted "against any convenient FIXED external landmark."
+This animation adds exactly that: a fixed, bright-green reference-mark
+object placed at the pointer's own real rest-position world coordinates
+(measured directly from `assembled-base-assembly.stl`'s binary vertex
+data — (`fw_cx`, `fw_cy`+115.5) — not guessed), so "pointer aligned with
+the mark" corresponds exactly to "platform at its reference rotation."
+
+**5-beat sequence** (EASE_IN_OUT bezier throughout — deliberately not the
+physics-demo's constant-rate LINEAR keying, since nothing here is a
+precise rate): (1) hold at reference; (2) an EXTERNAL disturbance (the
+flywheel visibly stays at rest through this phase — the disturbance is
+explicitly not wheel-caused) eases the platform to +35° off reference;
+(3) hold at the disturbed attitude, pointer visibly misaligned from the
+mark; (4) the flywheel eases up to a stylized spin and back down to rest
+(a single ease-in-out bezier segment's own natural "zero velocity at both
+endpoints, peak in the middle" shape, needing no hand-authored ramp/hold/
+ramp trapezoid) while the platform eases back to exactly 0°; (5) final
+hold at reference, pointer re-aligned.
+
+**Camera note**: an early attempt reused Method 5's own camera tilt, which
+left the reference mark nearly invisible/occluded from that angle —
+confirmed by an intermediate render, not assumed — fixed with a much more
+top-down camera specifically so the mark/pointer alignment reads clearly.
+
+**Labeling**: a CONCEPT title card (stating the yaw-only/no-closed-loop
+caveats above in full), a **persistent** on-screen watermark ("CONCEPT —
+NOT A LITERAL CAPABILITY OF THIS RIG," every frame), a per-phase caption,
+and an outro card restating what this demo does **not** claim.
+
+### Regenerating the concept-demo animation
+
+Same pipeline shape as Method 5:
+`build_concept_attitude_hold_animation.py` (Blender, chunked render) →
+`annotate_concept_demo_frames.py` (Pillow) → `ffmpeg` (2-pass MP4 +
+palette-GIF).
+
 ## Related documents
 
 - `hardware/mechanical/assembly-instructions.md` — the step-by-step build
-  procedure these visuals support.
+  procedure these visuals support; §5's fastener summary table is the
+  cited source for every fastener callout in Methods 2 and 4.
 - `hardware/mechanical/stl/README.md` — the print-ready STL exports (a
   different reference frame/orientation than this directory's own
   assembled-position renders — see Method 1 above).
@@ -277,5 +535,11 @@ referenced by relative path — practical value, not a redundant duplicate.
   read-only reference for every wrapper script here.
 - `hardware/mechanical/bench-imu-01-dimensional-spec.md` — full rationale
   for every dimension visualized.
-- `validation/change-log.md` — will carry the ECO entry for this
-  documentation-generation pass (no geometry changed).
+- `bom/component-selection.md` — the "Platform angular-rate physics
+  finding" section, the sole source for every number Method 5 renders.
+- `requirements/requirements.md` — REQ-011 (single-axis confirmation,
+  Method 6's own premise), REQ-009/REQ-014 (no-closed-loop-controller
+  anti-scope, Method 6's own "idealized, not a specific control law"
+  caveat).
+- `validation/change-log.md` — carries the ECO entries for this pass (see
+  that file's own log for the exact ECO numbers used).
