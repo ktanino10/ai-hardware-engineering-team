@@ -760,3 +760,109 @@ intractable (not resolved), and the ~54 outer-layer violations remain a
 disclosed, evidenced autorouter/placement-class gap, not attempted
 further this round per Kyosuke's own explicit framing that reaching zero
 is not required.
+
+### ISS-036 solder_mask_bridge sweep — 2 more whole-board-aware fixes (2026-09-02, continued per explicit request to keep pushing)
+
+`solder_mask_bridge` is by far the largest untriaged DRC category
+(209–226 instances across runs — more than the `shorting_items` (49–58),
+`clearance` (14–17), and `hole_clearance` (3–6) categories combined) and
+had never been deep-dived before this round; the earlier mechanism-level
+triage covered `shorting_items` only. Root-caused first, then attacked
+with the same whole-board-aware technique already validated on
+`via_vs_inner_layer_copper`.
+
+**What this violation actually means**: 209 of 211 instances are
+track-vs-pad conflicts where a different-net track passes close enough
+to an unrelated pad that their solder-mask apertures merge into one
+shared opening — a real solder-bridging risk on the physical board if
+fabricated as-is, not a cosmetic DRC nag (KiCad's own solder-mask-web
+computation: aperture expansion 0.05mm each side + minimum web width
+0.1mm means any two different-net copper features closer than roughly
+the same ~0.2mm design clearance already targeted elsewhere in this
+finding will typically also trigger this check).
+
+**Spatial distribution, checked before assuming a fix strategy**: 125 of
+211 (59%) fall within 15mm of U5's or U6's placed center, matching the
+already-documented 0.65mm-fine-pitch-package-proximity pattern. The
+remaining 86 (41%) are spread across the rest of the board. This
+directly answers the standing "is a U5/U6 placement change worth
+attempting" question with real data rather than assumption: even a
+perfect placement fix eliminating every single U5/U6-proximate instance
+could only address 59% of this one category, while 41% would remain
+untouched elsewhere — and the router's own lack of routing-channel/
+congestion awareness (not simple component-to-component distance; U5/U6's
+nearest *neighboring components* sit 11–20mm away center-to-center,
+not tightly packed) is the more fundamental limitation. A placement
+optimizer aware of routing congestion is itself autorouter-adjacent
+work, beyond what "you don't need to build a general-purpose autorouter
+from scratch" contemplates — **a U5/U6 placement redesign was
+considered and explicitly declined again this round**, now with
+quantified evidence rather than the prior round's qualitative risk
+argument alone.
+
+**Detour search, same validated method**: uniquely identified the
+specific track object for 206 of 211 violations (net + position + track
+length matching, requiring an unambiguous single match; 3 skipped as
+genuinely ambiguous). Ran the same whole-board-aware collision search
+(`pcbnew`'s own `SHAPE.Collide`/`SEG.Collide`, checking every candidate
+detour against the board's entire other-net copper on the same layer,
+not just the one pad being routed around) against all 206: found
+genuinely tractable fixes for only **2 unique track objects** (~1%
+yield) — one on `3V3` (its default path happened to pass under U1's own
+unrelated pin 1 pad, generating 3 separate DRC entries against 3
+different nearby pads simultaneously, all resolved by the one detour)
+and one on `VM_MOTOR` (a different segment from the one already fixed in
+the prior round). This closely matches the ~2% yield already found for
+the 54-item outer-layer `shorting_items` sweep in the prior round —
+**now confirmed via a second, independent, much larger-scale (206-item)
+test**, strong and reproducible evidence that local single-track detour
+search has genuinely hit a real ceiling for this board's routing
+density, not a fluke or a search-parameter artifact specific to one
+category.
+
+**Integrated and verified**: both fixes added to `REROUTE_OVERRIDE` (5
+entries total now) in `generate_pcb.py`, board regenerated, verified via
+5 fresh `kicad-cli pcb drc` runs on the real committed board:
+
+| Category | Before this round (3 runs) | After this round (5 runs) |
+|---|---|---|
+| Total violations | 361–378 | 350–368 |
+| `shorting_items` | 56–57 | 49–50 |
+| `tracks_crossing` | 72–73 | 81 |
+| `clearance` | 16–17 | 16 |
+| `hole_clearance` | 5–6 | 3 |
+| `solder_mask_bridge` | 209–226 | 199–217 |
+| `silk_overlap` | 1 | 1 |
+| `unconnected_items` | 0 | 0 |
+
+Directly confirmed (not inferred from aggregate counts, which are
+dominated by run-to-run noise larger than a 2-fix effect size) that both
+specific targeted conflicts are absent from every fresh run, checked
+against their exact pre-fix path signature. `shorting_items` improved
+further beyond the prior round's own result (56–58 → 49–50) as a side
+effect of the same detour work. The `tracks_crossing` increase (72–73 →
+81) and `hole_clearance` decrease (5–6 → 3) were each individually
+verified, not assumed benign: enumerated all 84 unique
+`tracks_crossing`/`hole_clearance` pairs across the 5 "after" runs and
+matched every one (net + position + length, and for the 3 pad-based
+`hole_clearance` items, a direct pad reference/number/position lookup
+since tracks-only matching can't find footprint pads) against the
+pre-round board — **all 84 confirmed pre-existing/unchanged**, 0
+genuinely new, including re-confirming the same 3 J1/U2-area
+`hole_clearance` items already independently verified pre-existing by
+Hardware Reviewer Cycle 9.
+
+**Net effect**: 2 more real, individually-verified fixes (7 total across
+both rounds); ~350–365 total violations remain. ISS-036 remains
+correctly OPEN — its own "every violation individually triaged"
+resolution bar is still not met, and the evidenced conclusion is now
+stronger: further local-detour-based fixing has a real, reproducible,
+sub-2% yield ceiling across two independent large-scale tests spanning
+both major violation categories, and the U5/U6 placement question has
+moved from "declined on risk grounds" to "declined with quantified
+59%/41% evidence that it would not close this finding even if fully
+successful." Closing the remainder would need either a
+routing-congestion-aware placement/routing pass (autorouter-adjacent
+scope) or a substantially more invasive full re-layout — both beyond
+this round's scope. Sent for independent Hardware Reviewer verification
+before any disposition claim.
