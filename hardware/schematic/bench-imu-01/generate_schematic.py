@@ -70,6 +70,72 @@ def snap(v: float) -> float:
     return round(v, 4)
 
 
+def patch_alternate_pin_function(sch_path: Path, ref: str, pin_number: str, alternate: str) -> None:
+    """Activate a real per-instance KiCad "alternate pin function"
+    (`(pin "<num>" (alternate "<name>") (uuid ...))`) on one specific
+    placed symbol instance, as a raw text post-process of an already-
+    written `.kicad_sch` file.
+
+    Why this exists (Hardware Reviewer Cycle 6, ISS-030): `kiutils`
+    1.4.8's `SchematicSymbol.pins` model is a bare `{pin_number: uuid}`
+    mapping (confirmed by reading its own source) with no way to express
+    this real, needed-here KiCad 7+ per-instance mechanism. Some MCU
+    library symbols shared across a whole silicon family (e.g.
+    `MCU_ST_STM32G0:STM32G031K8Tx`) declare a physical pin's *base*
+    electrical type as `no_connect` with the real, in-use function
+    (e.g. "PA9") only selectable as an alternate -- without activating
+    it, KiCad's netlist compiler places that pin on a synthetic
+    `unconnected-` net regardless of any wire/label visually drawn to
+    it, silently dropping it from every net it was actually meant to
+    join. Scoped narrowly to the named component's own symbol-instance
+    block (found by its `(property "Reference" "<ref>"` line) so the
+    same pin number on a *different* component is never touched.
+
+    The `(alternate ...)` token must be a CHILD of the `(pin ...)`
+    s-expression, not a sibling appended after its closing paren (an
+    earlier version of this function inserted it as a new line after the
+    pin block instead of inside it, which produces a structurally invalid
+    file KiCad refuses to load at all -- caught immediately by re-running
+    `kicad-cli sch erc` on the result, exactly the kind of tool-based
+    self-verification this project's own conventions require before
+    trusting any generated-file edit). `kiutils` writes each pin as a
+    single physical line, `(pin "<num>" (uuid <uuid>))` -- this patch
+    does an in-place string replacement on that exact line rather than
+    inserting a new one.
+    """
+    text = sch_path.read_text()
+    lines = text.splitlines(keepends=True)
+
+    ref_marker = f'(property "Reference" "{ref}"'
+    start = next((i for i, ln in enumerate(lines) if ref_marker in ln), None)
+    if start is None:
+        raise ValueError(f"patch_alternate_pin_function: no symbol instance found for ref={ref!r}")
+    # This component's own instance block runs until the next symbol
+    # instance's "Reference" property (or end of file).
+    end = next(
+        (i for i in range(start + 1, len(lines)) if '(property "Reference" "' in lines[i]),
+        len(lines),
+    )
+
+    pin_open = f'(pin "{pin_number}" '
+    pin_idx = next(
+        (i for i in range(start, end) if pin_open in lines[i]),
+        None,
+    )
+    if pin_idx is None:
+        raise ValueError(
+            f"patch_alternate_pin_function: no pin {pin_number!r} found on ref={ref!r}"
+        )
+    if lines[pin_idx].count(pin_open) != 1:
+        raise ValueError(
+            f"patch_alternate_pin_function: ambiguous match for pin {pin_number!r} on ref={ref!r}"
+        )
+
+    lines[pin_idx] = lines[pin_idx].replace(pin_open, f'{pin_open}(alternate "{alternate}") ', 1)
+    sch_path.write_text("".join(lines))
+    print(f"Patched {ref} pin {pin_number}: activated alternate function {alternate!r}")
+
+
 # ---------------------------------------------------------------------------
 # Library symbol loading helpers
 # ---------------------------------------------------------------------------
@@ -364,6 +430,150 @@ def build_bmi270_symbol() -> Symbol:
     return sym
 
 
+def build_drv10983_symbol() -> Symbol:
+    """DRV10983 (U5, new Rev 3) -- like BMI270, no standard-library symbol
+    exists for this MPN. Real 24-pin HTSSOP pinout independently re-verified
+    this session directly against TI's own primary datasheet text
+    (SLVSCP6H, https://www.ti.com/lit/ds/symlink/drv10983.pdf, pin diagram
+    on the device's own top-level application schematic page) -- confirmed
+    to match hardware/schematic/bench-imu-01-design.md section 7.5.4/13's
+    own pin table exactly (independently re-derived from the primary source,
+    not copied from the design doc without cross-check). Standard HTSSOP
+    pin numbering: 1-12 down the left edge, 13-24 up the right edge (24
+    bottom-right, wrapping to 13 at the bottom, per the datasheet's own
+    diagram) -- so `right_pins` below is listed 24-down-to-13 (top to
+    bottom) to match `add_side()`'s top-to-bottom placement convention,
+    the same as `build_bmi270_symbol()` above.
+    """
+    left_pins = [
+        ("1", "VCP", "passive"),
+        ("2", "CPP", "passive"),
+        ("3", "CPN", "passive"),
+        ("4", "SW", "passive"),
+        ("5", "SWGND", "power_in"),
+        ("6", "VREG", "power_out"),
+        ("7", "V1P8", "power_out"),
+        ("8", "GND", "power_in"),
+        ("9", "V3P3", "power_out"),
+        ("10", "SCL", "bidirectional"),
+        ("11", "SDA", "bidirectional"),
+        ("12", "FG", "output"),
+    ]
+    right_pins = [
+        ("24", "VCC", "power_in"),
+        ("23", "VCC", "power_in"),
+        ("22", "W", "passive"),
+        ("21", "W", "passive"),
+        ("20", "V", "passive"),
+        ("19", "V", "passive"),
+        ("18", "U", "passive"),
+        ("17", "U", "passive"),
+        ("16", "PGND", "power_in"),
+        ("15", "PGND", "power_in"),
+        ("14", "DIR", "input"),
+        ("13", "SPEED", "input"),
+    ]
+    n = len(left_pins)
+    first_y = (n - 1) * 2.54 / 2  # 12 pins -> 13.97
+    top_y = first_y + 2.54
+    bottom_y = -top_y
+    body_w = 15.24
+
+    sym = Symbol(
+        libraryNickname=PROJECT_NAME,
+        entryName="DRV10983",
+        pinNames=None,
+        inBom=True, onBoard=True,
+        properties=[
+            Property(key="Reference", value="U", id=0,
+                      position=Position(X=-body_w / 2, Y=top_y + 2.54, angle=0), effects=Effects()),
+            Property(key="Value", value="DRV10983", id=1,
+                      position=Position(X=-body_w / 2, Y=top_y + 5.08, angle=0), effects=Effects()),
+            # Footprint corrected (Hardware Reviewer finding ISS-031, HIGH,
+            # continued-iteration round): the original ASSUMPTION-labeled
+            # "EP3.2x5mm" custom-sized footprint had NO thermal via array
+            # under the pad at all -- a bare top-side copper island cannot
+            # achieve TI's own datasheet-stated thermal performance, which
+            # explicitly requires "connected to bottom side of PCB through
+            # vias for better thermal spreading" (DRV10983 datasheet
+            # SLVSCP6H, pin-table section, re-fetched and re-read this
+            # cycle -- not merely a generic SLMA002/SLMA004 app-note
+            # citation this time, the part's OWN datasheet says this).
+            # Switched to a REAL, standard KiCad library footprint that
+            # already has a proper thermal-via array (18 vias at 0.3mm
+            # drill / 0.6mm pad, matching the "0.3-0.33mm" guidance TI's
+            # PowerPAD app notes give) rather than hand-building a custom
+            # one -- safer than a from-scratch via array, and the F.Cu
+            # land (3.4x7.8mm) matches the datasheet's own "as large as
+            # possible" directive better than the previous custom pad's
+            # smaller, ASSUMPTION-derived estimate. Still an ASSUMPTION on
+            # the exact EP size (the primary datasheet's own mechanical
+            # package-outline drawing remains an image, not extractable by
+            # this session's tooling -- disclosed, not silently resolved),
+            # but now backed by a real, via-stitched footprint rather than
+            # a bare pad.
+            Property(key="Footprint",
+                      value="Package_SO:HTSSOP-24-1EP_4.4x7.8mm_P0.65mm_EP3.4x7.8mm_Mask2.4x4.68mm_ThermalVias",
+                      id=2,
+                      position=Position(X=0, Y=0, angle=0), effects=Effects(hide=True)),
+            Property(key="Datasheet", value="https://www.ti.com/lit/ds/symlink/drv10983.pdf", id=3,
+                      position=Position(X=0, Y=0, angle=0), effects=Effects(hide=True)),
+            Property(key="Description",
+                      value="Texas Instruments DRV10983 sensorless 3-phase BLDC motor driver, "
+                            "HTSSOP-24 (PWP), exposed pad -- custom symbol, no standard-library "
+                            "part exists for this MPN; pins independently re-verified against the "
+                            "primary datasheet (SLVSCP6H) this session, cross-checked against "
+                            "hardware/schematic/bench-imu-01-design.md section 7.5.4/13", id=4,
+                      position=Position(X=0, Y=0, angle=0), effects=Effects(hide=True)),
+        ],
+        units=[],
+    )
+    body_unit = Symbol(entryName="DRV10983", unitId=0, styleId=1)
+    from kiutils.items.syitems import SyRect
+    body_unit.graphicItems.append(SyRect(
+        start=Position(X=-body_w / 2, Y=top_y), end=Position(X=body_w / 2, Y=bottom_y),
+        stroke=Stroke(width=0.254, type="default"),
+    ))
+    pin_unit = Symbol(entryName="DRV10983", unitId=1, styleId=1)
+
+    def add_side(pins, x_edge, angle, y_start):
+        y = y_start
+        for number, name, etype in pins:
+            pin_unit.pins.append(SymbolPin(
+                electricalType=etype, graphicalStyle="line",
+                position=Position(X=x_edge, Y=y, angle=angle),
+                length=2.54, name=name, number=number,
+                nameEffects=Effects(font=Font(height=1.27, width=1.27)),
+                numberEffects=Effects(font=Font(height=1.27, width=1.27)),
+            ))
+            y -= 2.54
+
+    left_x = -body_w / 2 - 2.54
+    right_x = body_w / 2 + 2.54
+    add_side(left_pins, left_x, 0, first_y)
+    add_side(right_pins, right_x, 180, first_y)
+
+    # Pin 25 = EP (exposed thermal pad) -- ADDED (Hardware Reviewer Cycle 6,
+    # ISS-031, HIGH): the real 24-pin HTSSOP/PWP package has a 25th
+    # electrical contact, the exposed pad, per TI's own datasheet Pin
+    # Configuration table (DS-MTR-052) -- this custom symbol previously
+    # defined only pins 1-24, omitting it entirely (unlike U6's real
+    # library symbol, which does model its own exposed pad as pin 21).
+    # Drawn as a bottom-edge pin (matching how KiCad's own library symbols
+    # conventionally represent an EP distinct from the 4-sided lead pins),
+    # wired to GND alongside U5's other GND-family pins (5/8/15/16).
+    pin_unit.pins.append(SymbolPin(
+        electricalType="power_in", graphicalStyle="line",
+        position=Position(X=0, Y=bottom_y - 2.54, angle=90),
+        length=2.54, name="EP", number="25",
+        nameEffects=Effects(font=Font(height=1.27, width=1.27)),
+        numberEffects=Effects(font=Font(height=1.27, width=1.27)),
+    ))
+
+    sym.units = [body_unit, pin_unit]
+    return sym
+
+
 # ---------------------------------------------------------------------------
 # Main: build the real Bench-IMU-01 Rev 2 (corrected) schematic
 # ---------------------------------------------------------------------------
@@ -384,6 +594,42 @@ def main() -> None:
     cap = load_symbol("Device.kicad_sym", "C", "Device:C")
     pwr_flag = load_symbol("power.kicad_sym", "PWR_FLAG", "power:PWR_FLAG")
     bmi270 = build_bmi270_symbol()
+
+    # --- Rev 3-5 motor-subsystem symbols (new this revision) ---------
+    # U6: real library symbol -- TI's own KiCad footprint association
+    # (Package_SO:HTSSOP-20-1EP_..._ThermalVias) is reused as-is below, a
+    # CONFIRMED library-maintained symbol<->footprint pairing, not a guess.
+    tps26631 = load_symbol("Power_Management.kicad_sym", "TPS26631PWP",
+                            "Power_Management:TPS26631PWP")
+    # J4: real CUI/Same Sky part has 3 physical terminals (center pin +
+    # sleeve + an unpopulated N.O./N.C. switch contact) -- Barrel_Jack_Switch
+    # is the matching 3-pin symbol (vs. the 2-pin plain Barrel_Jack), pairing
+    # with the part-specific BarrelJack_CUI_PJ-102AH_Horizontal footprint
+    # (also 3 pads) below.
+    barrel_jack = load_symbol("Connector.kicad_sym", "Barrel_Jack_Switch",
+                               "Connector:Barrel_Jack_Switch")
+    # D2 (STPS3L60, real Schottky) -- Device:D_Schottky, pin1=K/pin2=A.
+    d_schottky = load_symbol("Device.kicad_sym", "D_Schottky", "Device:D_Schottky")
+    # D3 (SMBJ16A, real UNIDIRECTIONAL TVS) -- deliberately Device:D_Zener,
+    # not Device:D_TVS: D_TVS's own graphic is a symmetric bowtie (two
+    # triangles apex-to-apex), KiCad's standard symbol for a BIDIRECTIONAL
+    # TVS, and its pins are named generically "A1"/"A2" with no K/A
+    # polarity. SMBJ16A is explicitly unidirectional (design doc section
+    # 7.5.2/13); D_Zener's single-diode graphic + real K(pin1)/A(pin2)
+    # naming correctly conveys a one-directional clamping device, matching
+    # how this design's own net list already states polarity ("cathode-to-
+    # VM_MOTOR/anode-to-GND"). A disclosed symbol-choice substitution, not
+    # an electrical-function change -- footprint (D_SMB) is unaffected.
+    d_zener = load_symbol("Device.kicad_sym", "D_Zener", "Device:D_Zener")
+    # F1 (Littelfuse 30R500UF, PTC fuse) -- generic 2-pin Device:Fuse;
+    # footprint is custom-built below (no matching library footprint exists
+    # for this specific radial PTC's real 10.2mm lead spacing/14mm body).
+    fuse = load_symbol("Device.kicad_sym", "Fuse", "Device:Fuse")
+    # M1's phase-wire interconnect: a plain 3-pin generic connector (the
+    # motor itself is off-board, wired via 3 leads -- see the placement
+    # comment below for the ASSUMPTION this represents).
+    conn3 = load_symbol("Connector_Generic.kicad_sym", "Conn_01x03", "Connector_Generic:Conn_01x03")
+    drv10983 = build_drv10983_symbol()
 
     # --- Place symbols (rough logical-block layout on an A3 sheet) ---
     # Block 1: USB-C power input + ESD + LDO (left)
@@ -429,6 +675,94 @@ def main() -> None:
                   footprint="Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical", datasheet="~")
     r5 = b.place("R5", "330", res, 213.36, 111.76, footprint="Resistor_SMD:R_0603_1608Metric")
     d1 = b.place("D1", "LED", led, 213.36, 127.0, footprint="LED_SMD:LED_0603_1608Metric", datasheet="~")
+
+    # Block 5.5: Motor Driver + Reaction Wheel subsystem (new Rev 3-5,
+    # design doc section 7.5). Placed in its own region of the sheet,
+    # physically distinct from Blocks 1-5 above -- mirrors this design's own
+    # explicit instruction (section 9/section 10) to keep the motor-driver
+    # group physically separated from the IMU (U2) for vibration/thermal
+    # isolation; the real physical separation is enforced at PCB placement
+    # time (PCB Engineer), but the schematic sheet layout previews the same
+    # intent.
+    #
+    # Sub-block A: input protection chain (J4 -> F1 -> D2 -> D3)
+    j4 = b.place("J4", "PJ-102AH", barrel_jack, 25.4, 200.66,
+                  footprint="Connector_BarrelJack:BarrelJack_CUI_PJ-102AH_Horizontal",
+                  datasheet="https://www.sameskydevices.com/product/resource/pj-102ah.pdf")
+    f1 = b.place("F1", "30R500UF", fuse, 53.34, 200.66,
+                  footprint="bench-imu-01:Fuse_Littelfuse_30R500UF_Radial_D14.0mm_P10.2mm",
+                  datasheet="https://www.littelfuse.com/assetdocs/littelfuse_ptc_30r_datasheet?assetguid=46bd151a-f029-4cec-aeef-2614869244f4")
+    d2 = b.place("D2", "STPS3L60", d_schottky, 78.74, 200.66,
+                  footprint="Diode_SMD:D_SMB",
+                  datasheet="https://www.st.com/resource/en/datasheet/stps3l60.pdf")
+    d3 = b.place("D3", "SMBJ16A", d_zener, 104.14, 213.36,
+                  footprint="Diode_SMD:D_SMB",
+                  datasheet="https://www.littelfuse.com/products/tvs-diodes/automotive-and-commercial-vehicle/smbj/smbj16a")
+    # F2 -- NEW (Hardware Reviewer finding ISS-032, HIGH; Chief Engineer
+    # disposition, 2026-09-02: "take a real crack at a design-level fix
+    # before treating this as an escalation"). Second PTC resettable
+    # fuse, in series in J4's *sleeve/GND* leg -- mirrors F1's own
+    # already-approved role in the tip/VM_MOTOR leg exactly (same MPN,
+    # same footprint, same current-class justification, DS-PROT-006/032/
+    # 033), placed here so an INTERNAL J4 pin-mapping error (this
+    # design's own schematic/footprint choice, independent of what a user
+    # plugs in) cannot hijack the shared GND reference to the barrel
+    # jack's full +9-13V supply rail with zero protection -- which is
+    # exactly what the bare `J4 pin1 -> GND` wire before this fix would
+    # have allowed. See the full reasoning at the GND-leg connect() call
+    # below.
+    f2 = b.place("F2", "30R500UF", fuse, 25.4, 213.36,
+                  footprint="bench-imu-01:Fuse_Littelfuse_30R500UF_Radial_D14.0mm_P10.2mm",
+                  datasheet="https://www.littelfuse.com/assetdocs/littelfuse_ptc_30r_datasheet?assetguid=46bd151a-f029-4cec-aeef-2614869244f4")
+    c16 = b.place("C16", "1uF", cap, 104.14, 187.96, footprint="Capacitor_SMD:C_0603_1608Metric")
+    # PWR_FLAG for the VM_MOTOR net (fed by an off-board DC source through
+    # J4, same convention as PF1/PF2 above for VBUS_5V/GND) -- required so
+    # ERC's power_pin_not_driven check doesn't flag U6 IN(1-3)/IN_SYS(6),
+    # which are power_in-type pins with no power_out driver on this sheet.
+    pf3 = b.place("#FLG03", "PWR_FLAG", pwr_flag, 129.54, 200.66, footprint="")
+
+    # Sub-block B: U6 supervisory eFuse/load-switch controller (new Rev 5)
+    u6 = b.place("U6", "TPS26631PWPR", tps26631, 144.78, 220.98,
+                  footprint="Package_SO:HTSSOP-20-1EP_4.4x6.5mm_P0.65mm_EP3.4x6.5mm_Mask2.96x2.96mm_ThermalVias",
+                  datasheet="https://www.ti.com/lit/ds/symlink/tps2663.pdf")
+    r11 = b.place("R11", "10k", res, 144.78, 187.96, footprint="Resistor_SMD:R_0603_1608Metric")
+    r12 = b.place("R12", "887k", res, 172.72, 187.96, footprint="Resistor_SMD:R_0603_1608Metric")
+    r13 = b.place("R13", "60.4k", res, 180.34, 187.96, footprint="Resistor_SMD:R_0603_1608Metric")
+    r14 = b.place("R14", "88.7k", res, 187.96, 187.96, footprint="Resistor_SMD:R_0603_1608Metric")
+    r15 = b.place("R15", "3.57k", res, 172.72, 254.0, footprint="Resistor_SMD:R_0603_1608Metric")
+    c17 = b.place("C17", "22nF", cap, 180.34, 254.0, footprint="Capacitor_SMD:C_0603_1608Metric")
+
+    # Sub-block C: U5 DRV10983 motor driver + its own reference-circuit
+    # passives (new Rev 3)
+    u5 = b.place("U5", "DRV10983", drv10983, 228.6, 220.98,
+                  footprint="Package_SO:HTSSOP-24-1EP_4.4x7.8mm_P0.65mm_EP3.4x7.8mm_Mask2.4x4.68mm_ThermalVias",
+                  datasheet="https://www.ti.com/lit/ds/symlink/drv10983.pdf")
+    c10 = b.place("C10", "10uF", cap, 203.2, 187.96, footprint="Capacitor_SMD:C_0805_2012Metric")
+    c11 = b.place("C11", "0.1uF", cap, 210.82, 187.96, footprint="Capacitor_SMD:C_0603_1608Metric")
+    c12 = b.place("C12", "0.1uF", cap, 218.44, 187.96, footprint="Capacitor_SMD:C_0603_1608Metric")
+    r9 = b.place("R9", "39", res, 203.2, 254.0, footprint="Resistor_SMD:R_1206_3216Metric")
+    c13 = b.place("C13", "10uF", cap, 210.82, 254.0, footprint="Capacitor_SMD:C_0805_2012Metric")
+    c14 = b.place("C14", "1uF", cap, 218.44, 254.0, footprint="Capacitor_SMD:C_0603_1608Metric")
+    r10 = b.place("R10", "1k", res, 256.54, 187.96, footprint="Resistor_SMD:R_0603_1608Metric")
+    r6 = b.place("R6", "4.75k", res, 264.16, 254.0, footprint="Resistor_SMD:R_0603_1608Metric")
+    r7 = b.place("R7", "4.75k", res, 271.78, 254.0, footprint="Resistor_SMD:R_0603_1608Metric")
+    r8 = b.place("R8", "4.75k", res, 279.4, 254.0, footprint="Resistor_SMD:R_0603_1608Metric")
+    c15 = b.place("C15", "1uF", cap, 264.16, 187.96, footprint="Capacitor_SMD:C_0603_1608Metric")
+
+    # M1: T-Motor MN2206-13 KV2000 is off-board (a 27mm-diameter rotating
+    # BLDC motor mounted to the separate mechanical bearing/flywheel
+    # structure, not this logic/driver PCB -- design doc section 10 itself
+    # leaves "on-board or off-board" and "connector choice at the
+    # wire-to-board interface" explicitly UNRESOLVED, flagging it as a
+    # layout-time decision). ASSUMPTION (PCB Engineer decision, disclosed):
+    # represented here as a plain 3-pin interconnect (phase U/V/W); real
+    # footprint chosen at PCB-layout time is a 5.0mm-pitch terminal block
+    # (TerminalBlock_MaiXu_MX126-5.0-03P) for real-wire termination at this
+    # design's up-to-3A worst-case motor-phase current -- a wider pitch than
+    # J2/J3's 2.54mm signal headers specifically for that current margin.
+    m1 = b.place("M1", "T-Motor_MN2206-13_conn", conn3, 302.26, 220.98,
+                  footprint="TerminalBlock:TerminalBlock_MaiXu_MX126-5.0-03P_1x03_P5.00mm",
+                  datasheet="~")
 
     # --- Wire every net from bench-imu-01-design.md section 12 (corrected) ---
     # VBUS_5V: J1 VBUS -> U4 VBUS(5) -> C1 -> U3 IN(1). Real TLV75533PDBV
@@ -495,6 +829,173 @@ def main() -> None:
     b.connect("LED_CTRL", [("U1", "12"), ("R5", "1")])
     b.connect("LED_A", [("R5", "2"), ("D1", "2")])
 
+    # --- Rev 3-5 motor-subsystem nets (design doc section 12) ---------
+    # Each design-doc net-list row is a PHYSICAL SIGNAL PATH description
+    # (arrows crossing a series element), not a flat net-membership list --
+    # re-derived into distinct electrical nets below, split at every
+    # resistor/diode/fuse boundary (a series element's two terminals are
+    # never the same net).
+    #
+    # Input protection chain: J4(tip) -> F1 -> D2 -> D3's cathode/U6 IN.
+    # J4 pin mapping (Barrel_Jack_Switch symbol, matching the real 3-pad
+    # BarrelJack_CUI_PJ-102AH_Horizontal footprint) is an ASSUMPTION, not
+    # CONFIRMED: the real Same Sky PJ-102AH datasheet's own mechanical
+    # drawing/schematic diagram could not be rendered by this session's
+    # tooling (PDF diagram lost in text extraction). Best available
+    # evidence (a web search citing the primary datasheet + a DigiKey
+    # mirror) gives pin1=sleeve, pin2=switch(N.C., unpopulated),
+    # pin3=tip/center(+) -- used here, flagged prominently for human
+    # verification against the real mechanical drawing before fabrication.
+    #
+    # **Safety-argument corrected and narrowed (Hardware Reviewer finding
+    # ISS-032, HIGH, fixed this cycle -- do not restate the old, too-broad
+    # claim)**: D2's series reverse-polarity protection only ever covers
+    # an *external* failure mode (a user plugging in a reverse-polarity
+    # adapter) -- it sits in the tip/VM_MOTOR leg and does nothing to
+    # protect the *sleeve/GND* leg. An *internal* pin-mapping error (this
+    # design's own schematic/footprint pin1<->pin3 assignment being wrong,
+    # independent of anything a user does) would previously have applied
+    # the barrel jack's full +9-13V supply directly to the shared GND net
+    # via a bare wire with NO protection at all -- D2 is on the wrong leg
+    # to help with that specific failure mode, and the design documentation
+    # previously overstated what D2 covers. Fixed with a second,
+    # independent protective element (F2, a second Littelfuse 30R500UF PTC
+    # resettable fuse, identical in kind to F1) now in series in the
+    # sleeve/GND leg: this makes the worst case safe *regardless* of which
+    # physical pin turns out to be tip vs. sleeve, without needing to ever
+    # resolve the pin-mapping ASSUMPTION itself. If the mapping is
+    # correct, F2 just passes the normal GND-return current (well within
+    # its 5A hold rating for this design's <=3A worst case, same margin
+    # F1 already relies on, DS-PROT-006).
+    #
+    # **Correction (Hardware Reviewer Cycle 8, ISS-040, MEDIUM)**: an
+    # earlier version of this comment claimed F2's Rmin=0.010Ω added "not
+    # a new voltage-drop term in any existing calculation, since the GND
+    # reference is not part of the VM_MOTOR series-drop budget" -- this
+    # was WRONG, and conflated the *reference node* with the *loop*. U5's
+    # UVLO comparator measures its own VCC relative to its own GND pins;
+    # current flows around the WHOLE loop (J4 -> F1 -> D2 -> U5 VCC ->
+    # [internal] -> U5 GND -> board copper -> F2 -> J4 sleeve), so F2's
+    # own IR drop is exactly as much a series-loop term as F1's already-
+    # counted one, using this design's own existing methodology (0.02Ω
+    # assumed in-circuit PTC resistance, DS-PROT-006). At the design's own
+    # binding 3A UVLO-margin corner this is a real, non-negligible further
+    # ~0.06V erosion (from ~0.32V to ~0.26V margin against DRV10983's
+    # VUVLO_R max=8.0V) -- still positive, not unsafe, but the design
+    # doc's own tracked margin figure (currently ~0.32V in 6 locations,
+    # `bench-imu-01-design.md` lines 163/1496/1909/3122/3870-3871/4166) is
+    # now stale and should be updated to ~0.26V by whoever next revises
+    # that section -- not done in this same commit given the number of
+    # cross-referenced locations and the judgment call the reviewer's own
+    # finding correctly identifies (whether ~0.26V remains an acceptable
+    # margin is a Circuit-Engineer/Chief-Engineer design decision, not a
+    # pure documentation mechanics fix). At DS-MTR-080's own actual
+    # operating point (no-load, ≈0.3A, not the 3A UVLO corner) the effect
+    # genuinely is negligible (≈3mV, ≈6 RPM) -- that specific conclusion
+    # was and remains correct; only the general "not a new term" framing
+    # was wrong.
+    #
+    # **Corrected 2026-09-02 (Hardware Reviewer Cycle 8, ISS-041, LOW)**:
+    # if the mapping is reversed, F2 sees the full supply rail attempting
+    # to drive current into the low-impedance GND plane. Matching F1's
+    # own already-honest adjacent text (not overclaiming beyond it): F2's
+    # Itrip (10.00A) exceeds J4's own 5.0A connector rating (DS-CONN-005)
+    # -- a fault between 5A and 10A stresses J4 beyond its own rating
+    # before F2 trips at all, the same disclosed window F1 already has
+    # for the supply leg. F2's real protective value is against genuine
+    # short-circuit-level fault currents well above 10A, tripping in
+    # seconds per its own time-to-trip curve -- this repository holds no
+    # actual time-to-trip numeric data for this part (no such citation
+    # exists under DS-PROT-006 in datasheets/evidence-log.md), so no
+    # faster/more specific response time is asserted here (the previous
+    # "trips within its rated response" wording implied more precision
+    # than the evidence supports). It then strongly current-limits in its
+    # tripped high-resistance state -- converting an indefinite, fully
+    # unprotected GND-hijack into a bounded, self-limiting,
+    # automatically-resettable fault event, still a real improvement over
+    # the prior zero-protection state even with this more precise
+    # scoping. J4's tip/sleeve
+    # ASSUMPTION itself remains open and still flagged for human
+    # verification before fabrication -- this fix does not resolve it, it
+    # removes the need to resolve it before the board can be considered
+    # safe either way.
+    b.connect("VM_MOTOR_RAW", [("J4", "3"), ("F1", "1")])
+    b.connect("J4_GND_RAW", [("J4", "1"), ("F2", "1")])
+    b.connect("GND", [("F2", "2")])
+    b.no_connect("J4", "2")
+    b.connect("VM_MOTOR_F1", [("F1", "2"), ("D2", "2")])
+    # D2 = D_Schottky, pin1=K(cathode)/pin2=A(anode); D3 = D_Zener (chosen
+    # for correct K/A unidirectional polarity, see symbol-load comment
+    # above), pin1=K(cathode)/pin2=A(anode). Design doc: "D2 anode <- F1;
+    # D2 cathode -> D3 (cathode-to-VM_MOTOR/anode-to-GND)".
+    b.connect("VM_MOTOR", [("D2", "1"), ("D3", "1"), ("U6", "1"), ("U6", "2"), ("U6", "3"),
+                             ("U6", "6"), ("R12", "1"), ("C16", "1"), ("#FLG03", "1")],
+              direction_map={("#FLG03", "1"): "up"})
+    b.connect("GND", [("D3", "2"), ("C16", "2")])
+    # U6 UVLO/OVP divider: IN_SYS -[R12]- UVLO -[R13]- OVP -[R14]- GND.
+    b.connect("U6_UVLO_TAP", [("R12", "2"), ("U6", "7"), ("R13", "1")])
+    b.connect("U6_OVP_TAP", [("R13", "2"), ("U6", "8"), ("R14", "1")])
+    b.connect("GND", [("R14", "2")])
+    # U6 ILIM / dVdT
+    b.connect("U6_ILIM", [("U6", "11"), ("R15", "1")])
+    b.connect("GND", [("R15", "2")])
+    b.connect("U6_dVdT", [("U6", "10"), ("C17", "1")])
+    b.connect("GND", [("C17", "2")])
+    # U6 GND (pin 9) + PowerPAD (pin 21 -- KiCad's own convention for this
+    # 1EP/HTSSOP-20 symbol's exposed-pad virtual pin, confirmed against the
+    # real library symbol this session) + PGTH tied to GND.
+    b.connect("GND", [("U6", "9"), ("U6", "21"), ("U6", "16")])
+    # U6 EN/SHDN: U1 PA9 (pin 19, direct tie, no series resistor) -> U6
+    # SHDN(13); R11 (10k) shunt pulldown on the same node (fail-safe-OFF).
+    b.connect("U6_EN", [("U1", "19"), ("U6", "13"), ("R11", "1")])
+    b.connect("GND", [("R11", "2")])
+    # U6 floating pins (all explicitly sanctioned floating configurations
+    # per TI's own guidance, design doc section 7.5.10): B_GATE(4), DRV(5)
+    # -- no external reverse-polarity FET used; MODE(12) -- selects
+    # Latch-off overload response; IMON(14), FLT(15), PGOOD(17) -- unused
+    # this revision.
+    for num in ("4", "5", "12", "14", "15", "17"):
+        b.no_connect("U6", num)
+    # U6 OUT -> U5 VCC (a distinct net from "VM_MOTOR" above -- U6's
+    # internal load-switch separates them when disabled).
+    b.connect("U5_VCC", [("U6", "18"), ("U6", "19"), ("U6", "20"),
+                           ("U5", "23"), ("U5", "24"), ("C10", "1"), ("C11", "2")])
+    b.connect("GND", [("C10", "2")])
+    # U5 charge-pump network (VCP/CPP/CPN) -- internal gate-drive only, no
+    # MCU/external connection beyond the reference-circuit caps.
+    b.connect("U5_VCP", [("U5", "1"), ("C11", "1")])
+    b.connect("U5_CPP", [("U5", "2"), ("C12", "1")])
+    b.connect("U5_CPN", [("C12", "2"), ("U5", "3")])
+    # U5 internal regulator (linear mode): SW -[R9]- VREG -[C13]- GND;
+    # V1P8 -[C14]- GND. Explicitly NOT connected to the board's 3V3 rail
+    # (Option A, design doc section 7.5.3).
+    b.connect("U5_SW", [("U5", "4"), ("R9", "1")])
+    b.connect("U5_VREG", [("R9", "2"), ("U5", "6"), ("C13", "1")])
+    b.connect("GND", [("C13", "2")])
+    b.connect("U5_V1P8", [("U5", "7"), ("C14", "1")])
+    b.connect("GND", [("C14", "2")])
+    # U5's own V3P3 output biases the FG/I2C1 pull-ups (a different domain
+    # from the board's main 3V3 rail, per Option A).
+    b.connect("U5_V3P3", [("U5", "9"), ("R6", "2"), ("R7", "2"), ("R8", "2"), ("C15", "1")])
+    b.connect("GND", [("C15", "2"), ("U5", "8"), ("U5", "5"), ("U5", "16"), ("U5", "15"), ("U5", "25")])
+    # MCU <-> U5 signal pins: SPEED (PA8/TIM1_CH1, PWM), DIR (PB1), FG
+    # (PA6/TIM3_CH1), I2C1 SCL/SDA (PB6/PB7) -- pin numbers per the
+    # corrected design doc section 11 pin table.
+    b.connect("SPEED_PWM", [("U1", "18"), ("U5", "13"), ("R10", "1")])
+    b.connect("GND", [("R10", "2")])
+    b.connect("DIR", [("U1", "16"), ("U5", "14")])
+    b.connect("FG_TACH", [("U5", "12"), ("R6", "1"), ("U1", "13")])
+    b.connect("I2C1_SCL", [("U1", "30"), ("R7", "1"), ("U5", "10")])
+    b.connect("I2C1_SDA", [("U1", "31"), ("R8", "1"), ("U5", "11")])
+    # Motor phase outputs -> M1 (off-board, via the new 3-pin interconnect;
+    # M1 pin assignment U=1/V=2/W=3 is this design's own arbitrary but
+    # internally-consistent choice, since M1 is a 3-phase BLDC with no
+    # fixed "correct" phase-to-pin convention -- swapping any two phases
+    # only reverses rotation direction, not a wiring defect).
+    b.connect("MOTOR_PHASE_U", [("U5", "17"), ("U5", "18"), ("M1", "1")])
+    b.connect("MOTOR_PHASE_V", [("U5", "19"), ("U5", "20"), ("M1", "2")])
+    b.connect("MOTOR_PHASE_W", [("U5", "21"), ("U5", "22"), ("M1", "3")])
+
     # --- No-connects: deliberately unpopulated pins -------------------
     for num in ("A6", "A7", "A8", "B6", "B7", "B8"):
         b.no_connect("J1", num)  # D+/D-/SBU pins -- power-only port, REQ-105 (this
@@ -505,17 +1006,43 @@ def main() -> None:
         b.no_connect("U2", num)  # ASDx, ASCx, INT1, INT2, OCSB, OSDO -- polling, no aux i/f
     # U1's full free-GPIO inventory per the corrected design doc section 11
     # (DS-MCU-064): every real, bonded-out pin not otherwise committed above.
-    for num in ("1", "2", "3", "7", "8", "11", "13", "14", "15", "16", "17",
-                "18", "20", "26", "27", "28", "29", "30", "31", "32"):
+    # Pins 13/16/18/30/31 (PA6/PB1/PA8/PB6/PB7) removed from this list this
+    # revision -- now wired to the motor subsystem above, not free. Pin 19
+    # (PA9) was never in this list (a pre-existing Rev 2 gap -- neither
+    # wired nor no-connected in that script; now resolved by this
+    # revision's U6_EN wiring).
+    for num in ("1", "2", "3", "7", "8", "11", "14", "15", "17", "20",
+                "26", "27", "28", "29", "32"):
         b.no_connect("U1", num)
 
-    b.sch.to_file(str(HERE / f"{PROJECT_NAME}.kicad_sch"))
+    sch_path = HERE / f"{PROJECT_NAME}.kicad_sch"
+    b.sch.to_file(str(sch_path))
 
-    # --- Write the project-local symbol library (BMI270 only) --------
-    bmi_lib = SymbolLib(symbols=[build_bmi270_symbol()])
+    # --- Post-process: activate U1 pin 19's "PA9" alternate pin function
+    # (Hardware Reviewer Cycle 6, ISS-030, CRITICAL). Root cause: the real
+    # MCU_ST_STM32G0 library symbol (shared across the whole STM32G031x4/
+    # 6/8 family) declares physical pin 19's *base* electrical type as
+    # `no_connect`, name "NC/PA9" -- PA9 is only a selectable *alternate*
+    # pin function, a real per-instance KiCad 7+ mechanism
+    # (`(pin "19" (alternate "PA9"))`) that `kiutils` 1.4.8's
+    # `SchematicSymbol.pins` object model does not expose (confirmed by
+    # reading its own source -- only a bare {pin_number: uuid} mapping).
+    # Previously mis-classified in this project's own README as a benign,
+    # cosmetic ERC warning; Cycle 6 independently proved the wire is not
+    # actually recognized by KiCad's netlist compiler at all without this
+    # activation (U1 pin 19 lands on a synthetic `unconnected-` net, and
+    # `/U6_EN` silently lacks its MCU-driven member), permanently disabling
+    # the entire motor/reaction-wheel subsystem. Patched here as a raw
+    # text post-process (not the object model, which cannot express this)
+    # so the fix is reproducible by re-running this script, not a one-off
+    # hand-edit of the generated file that would silently drift from it.
+    patch_alternate_pin_function(sch_path, ref="U1", pin_number="19", alternate="PA9")
+
+    # --- Write the project-local symbol library (BMI270 + DRV10983) --
+    bmi_lib = SymbolLib(symbols=[build_bmi270_symbol(), build_drv10983_symbol()])
     bmi_lib.to_file(str(HERE / f"{PROJECT_NAME}.kicad_sym"))
 
-    print(f"Wrote {HERE / (PROJECT_NAME + '.kicad_sch')}")
+    print(f"Wrote {sch_path}")
     print(f"Wrote {HERE / (PROJECT_NAME + '.kicad_sym')}")
     print(f"Placed {len(b.placed)} symbols, {b._nc_count} no-connects")
 

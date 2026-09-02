@@ -24,7 +24,8 @@ follow regardless of which specific role it's playing.
 
 ## Roles
 
-Eight agents across three disciplines, each with a narrow, non-overlapping
+Eleven agents across three top-level disciplines (plus two
+discipline-adjacent extensions), each with a narrow, non-overlapping
 responsibility — defined as real GitHub Copilot custom agent profiles in
 `.github/agents/*.agent.md` (see `docs/architecture.md` §3 for the
 responsibility table):
@@ -40,7 +41,11 @@ responsibility table):
 3. **Circuit Engineer** — designs from approved parts + datasheets, with a
    recorded "why" for every decision.
 4. **Hardware Reviewer** — independent, adversarial review; classifies
-   findings CRITICAL/HIGH/MEDIUM/LOW.
+   findings CRITICAL/HIGH/MEDIUM/LOW. Its checklist now also covers
+   PCB-layout-specific concerns (DRC closure, copper current-carrying
+   capacity, clearance/creepage, thermal via/pour integrity), extended
+   when PCB Engineer was introduced (Phase 6) rather than standing up a
+   separate PCB Reviewer agent.
 
 **Mechanical** (Phase 1 of the multidisciplinary evolution —
 `docs/architecture-evolution.md` §10/§27/§31):
@@ -51,7 +56,9 @@ responsibility table):
 6. **Mechanical Reviewer** — independent, adversarial mechanical review,
    mirroring the Hardware Reviewer pattern; shares
    `validation/open-issues.md` with Hardware Reviewer (`Source:
-   mechanical-reviewer`).
+   mechanical-reviewer`). Its checklist also cross-checks Manufacturing
+   Engineer's process specification (below), rather than a separate
+   reviewer for that narrow addition.
 
 **Firmware** (Phase 2 of the multidisciplinary evolution —
 `docs/architecture-evolution.md` §32):
@@ -60,9 +67,7 @@ responsibility table):
    (`firmware/<board>/`) from a Design-Complete schematic: peripheral
    initialization and register-level configuration matching the schematic's
    actual pin/interface decisions, every register-level claim grounded in
-   manufacturer documentation. No independent Firmware Reviewer exists yet
-   — self-check against `.github/skills/firmware-bringup/SKILL.md` stands
-   in until a documented future trigger is met (`docs/architecture.md` §14).
+   manufacturer documentation.
 
 **Power** (Phase 3 of the multidisciplinary evolution —
 `docs/architecture-evolution.md` §33), an Electronics-adjacent addition
@@ -77,6 +82,44 @@ discipline the way Mechanical/Firmware are):
    automatically for every design. Proposes rail topology/source options
    with real numbers; Circuit Engineer implements the human-approved
    architecture.
+
+**Manufacturing** (Phase 4 of the multidisciplinary evolution —
+`docs/architecture-evolution.md` §35), a Mechanical-adjacent addition:
+
+9. **Manufacturing Engineer** — specifies the additive-manufacturing PROCESS
+   parameters (infill %/pattern, wall/perimeter count, print orientation vs.
+   load direction, material) a safety-critical/structural mechanical part
+   needs to actually achieve the physical properties its CAD design
+   assumes, engaged only when Mechanical Lead/Hardware Lead judges a
+   specific part's function warrants it. Never self-certifies — cross-checked
+   by the Mechanical Reviewer.
+
+**Firmware Reviewer addition to Firmware** (Phase 5 of the multidisciplinary
+evolution — `docs/architecture-evolution.md` §36), a genuinely new
+independent-reviewer agent (unlike Manufacturing Engineer's "extend an
+existing reviewer" pattern, because nothing previously reviewed Firmware
+Engineer's output at all):
+
+10. **Firmware Reviewer** — independent, adversarial review of Firmware
+    Engineer's driver-level bring-up code: register/peripheral correctness,
+    pin/interface fidelity against the actual schematic, safety-critical
+    logic correctness where present, premise review. Findings live in a
+    firmware-scoped file (`firmware/<board>/<board>-firmware-review.md`),
+    deliberately not `validation/open-issues.md`, so a firmware-only
+    finding cannot silently block the Design Complete Gate.
+
+**PCB** (Phase 6 of the multidisciplinary evolution —
+`docs/architecture-evolution.md` §37), an Electronics-adjacent addition like
+Power Engineer:
+
+11. **PCB Engineer** — takes a Design-Complete schematic to a real,
+    DRC-clean PCB layout: footprint assignment (CONFIRMED/ASSUMPTION
+    labeled), board outline/layer-stackup justification, placement,
+    current-aware routing, DRC closure, and the flat BOM + visual snapshot a
+    fabrication decision needs. Does not self-declare "ready to fabricate" —
+    hands off to Hardware Reviewer's now-extended checklist (above) for
+    independent review, per the "before PCB fabrication" Human-in-the-loop
+    gate.
 
 If you are asked to act as one of these roles — or invoked directly as
 that custom agent — load/follow the corresponding

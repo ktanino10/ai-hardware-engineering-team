@@ -1408,3 +1408,128 @@ after.
   instruction), awaiting independent audit before merge — same process
   every prior PR in this repository's history went through.
 
+## 37. Phase 6 Implementation Status (Addendum — PCB Engineer)
+
+Added when Phase 6 (PCB Engineer) was actually implemented, in a separate
+branch from this document's original merge and the Phase 1–5 (§31/§32/§33/
+§35/§36) addenda — kept as its own addendum for the same reason those are:
+preserve the audit trail of what was true before this phase vs. after.
+
+- **Trigger met, dated, and concrete — not a hypothetical.**
+  `docs/architecture.md` §14 already documented a PCB Engineer future role
+  with a named trigger: "when schematic-to-layout handoff becomes a
+  distinct phase." That trigger was met by an **explicit human request**
+  (the human Chief Engineer, via the creator/"General Chat" session,
+  2026-09-01) to bring Bench-IMU-01 Rev 3 to an orderable-PCB stage — the
+  same mechanism (a human judging a documented §14 trigger met) that
+  introduced Power Engineer (§33) and Firmware Engineer (§32). No other
+  §14 row's trigger was judged met by this same request — Control Engineer,
+  Test Engineer, Datasheet Specialist, and Safety/Compliance Reviewer all
+  remain exactly as §14 documents them (deferred, untouched triggers), per
+  the explicit scope fence for this change.
+- **Human approval**: given, scoped explicitly to standing up the PCB
+  Engineer discipline **and** applying it to Bench-IMU-01 Rev 3's real
+  schematic-to-PCB work in the same request — **a deliberate, disclosed
+  exception to the Phase 3/4/5 precedent** (Power Engineer, Manufacturing
+  Engineer, and Firmware Reviewer were each introduced as their own
+  standalone PR, explicitly *not* bundled with real Rev 3 design work, per
+  the human's own sequencing instruction each time). This time the human's
+  own kickoff explicitly asked for both the framework role and the real
+  Rev 3 PCB layout together, so this addendum documents the framework
+  introduction; the real Rev 3 layout work itself is documented where every
+  other discipline's real Bench-IMU-01 work already lives —
+  `hardware/schematic/bench-imu-01/`, `hardware/pcb/`, `bom/`,
+  `validation/` — not duplicated here.
+- **Explicit decision — no new independent-reviewer agent, unlike Power
+  Engineer/Manufacturing Engineer/Firmware Reviewer's own precedents (each
+  handled this question differently, and this phase makes its own
+  reasoned choice rather than mechanically copying one)**: rather than
+  standing up a "PCB Reviewer" agent, the **existing** Hardware Reviewer's
+  own checklist (`.github/skills/hardware-review/SKILL.md`) was extended
+  with PCB-layout-specific items (DRC closure, copper current-carrying
+  capacity vs. real trace width/weight, clearance/creepage at physical
+  distances, thermal via-stitching/copper-pour integrity under exposed
+  pads — the last of these already flagged as needed in
+  `bom/component-selection.md`'s Motor Driver IC section, Escalation flag
+  4, before this change). Reasoning: PCB Engineer is Electronics-adjacent
+  (§3/§14 already place it in the same bucket as Power Engineer, not a new
+  top-level discipline the way Mechanical/Firmware are), and — critically,
+  the actual deciding fact, not merely a category label — **PCB Engineer's
+  output is the same physical board/schematic Hardware Reviewer already
+  independently reviews**, unlike Firmware (where nothing but self-check
+  reviewed Firmware Engineer's output at all before Phase 5). Hardware
+  Reviewer's own pre-existing checklist item 15 ("PCB layout concern,"
+  `docs/architecture.md` §12) already contemplated this in principle —
+  it simply had no real PCB to review against yet. This mirrors
+  Manufacturing Engineer's "extend an existing reviewer's checklist"
+  precedent (§35), not Mechanical Reviewer/Firmware Reviewer's "stand up a
+  new agent" precedent (§27/§36) — a considered choice between the two
+  precedents this framework's own history already established, not a
+  default.
+- **Independent review is still mandatory, just routed through the
+  extended checklist**: PCB Engineer's own agent file explicitly forbids
+  self-declaring a layout "reviewed" or "ready to fabricate" — the "before
+  PCB fabrication" Human-in-the-loop gate (`docs/architecture.md` §10)
+  still requires an independent Hardware Reviewer pass (now checklist-
+  extended for layout) before any fabrication-readiness claim, and any
+  CRITICAL/HIGH finding still loop-backs to PCB Engineer and feeds the same
+  `validation/open-issues.md` backlog and Design Complete Gate (§8) that
+  Circuit Engineer's and Mechanical Lead's findings already share — unlike
+  Firmware Reviewer's deliberately-separate, non-gating record (§36),
+  because PCB layout findings concern the same physical board the Design
+  Complete Gate already governs.
+- **A real, non-obvious tooling discovery made while implementing this
+  phase, not previously documented**: beyond the already-documented
+  `kicad-cli` workaround for the broken `kicad-*` MCP tools (§5.2/§34),
+  this session found that **KiCad 10.0.1's own bundled Python 3.9
+  interpreter genuinely imports a working `pcbnew` module**
+  (`.../KiCad.app/Contents/Frameworks/Python.framework/Versions/3.9/bin/python3.9`
+  on this machine) — real `BOARD`/`FOOTPRINT`/`PCB_TRACK`/`PCB_VIA`/`ZONE`
+  construction classes, confirmed by direct introspection and by
+  constructing a real `BOARD()` object this session (one benign
+  `wxApp`-related assertion printed to stderr, not a failure — pcbnew
+  scripting outside the full GUI process is a known, non-fatal
+  characteristic, not a defect). This is a materially more capable,
+  natively-KiCad path for programmatic PCB construction than hand-authoring
+  `.kicad_pcb` S-expressions from scratch would have been (the schematic
+  side's own `kiutils` approach has no equivalent board-construction
+  convenience). `pcbnew.ExportSpecctraDSN`/`ImportSpecctraSES` also exist —
+  confirming a Freerouting-style external-autorouter round-trip is
+  *technically* possible — but no such external tool is installed, and this
+  phase deliberately does not fetch/trust one, per the same tooling-honesty
+  discipline §5.3/§5.4 already established for CAD/firmware tooling; see
+  `hardware/pcb/README.md` for the full, precise disclosure and
+  `.github/agents/pcb-engineer.agent.md`'s own "Tooling honesty" section.
+- **Verified, not assumed, during implementation** (mirroring §31/§32/§33/
+  §35/§36's own "verified, not assumed" bullets, for the same reasons): the
+  GitHub custom agent (`.github/agents/*.agent.md`, required `description`)
+  and agent skill (`.github/skills/<name>/SKILL.md`, required `name`+
+  `description`, matching its directory) specs were re-checked this
+  session — unchanged since prior phases, no additional "fix the spec"
+  round was needed. The documented 5-working/11-broken `kicad-*` MCP tool
+  split (§5.2/§34) was independently re-verified this session (not assumed
+  carried over) by directly re-calling `kicad-run_drc_check` and
+  `kicad-generate_pcb_thumbnail` against the real project — both still fail
+  identically (`'ctx' is a required property`) — and `kicad-validate_project`/
+  `kicad-get_drc_history_tool` still work; no drift since 2026-08-31, so
+  `docs/architecture.md` §5.2/`hardware/pcb/README.md`'s ERC/tooling notes
+  needed no correction, only extension for the new `pcbnew`-scripting
+  finding above.
+- **Files added**: `.github/agents/pcb-engineer.agent.md`,
+  `.github/skills/pcb-layout/SKILL.md`.
+- **Files edited, additively only** (nothing existing removed/reworded
+  beyond what each bullet above discloses, no section renumbered):
+  `docs/architecture.md` (§3 new agents-table row + new explanatory
+  paragraph text + role-spec file list; §14 PCB Engineer row struck through
+  and annotated `[IMPLEMENTED]`), `docs/architecture-evolution.md` (this
+  addendum), `.github/copilot-instructions.md` (Roles section rewritten to
+  list all eleven agents in phase order — this also closes a pre-existing,
+  previously-disclosed gap from §35/§36, since that section had not been
+  updated for Manufacturing Engineer or Firmware Reviewer either), `README.md`
+  (agent roster table — same pre-existing gap closed for the same reason).
+- **Status**: implemented, on the same branch as Bench-IMU-01 Rev 3's real
+  PCB layout work (see the "Human approval" bullet above for why this
+  deliberately departs from the Phase 3/4/5 standalone-PR precedent),
+  awaiting independent audit before merge — same process every prior
+  change in this repository's history went through.
+

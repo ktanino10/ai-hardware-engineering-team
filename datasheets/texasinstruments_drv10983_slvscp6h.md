@@ -32,7 +32,9 @@
   2026-09-10 — see the second Update note near the end of this file), plus
   DS-MTR-077/DS-MTR-078 (added by the Firmware Engineer closing Firmware
   Reviewer Finding 1, HIGH, PR #14, 2026-09-12 — see the third Update note
-  at the end of this file)
+  at the end of this file), plus DS-MTR-081 (added by the PCB Engineer
+  closing Hardware Reviewer finding ISS-031, HIGH, 2026-09-02 — see the
+  fourth Update note at the end of this file)
 
 ## Update (Circuit Engineer, 2026-09-04, Bench-IMU-01 Rev 3)
 
@@ -126,3 +128,25 @@ reject threshold — see `firmware/bench-imu-01/src/motor.h` and
 derivation, its confidence marking, and its disclosed load-dependence
 limitation. Both new rows cite this same datasheet record; no new metadata
 file was needed.
+
+## Update (PCB Engineer, 2026-09-02, ISS-031 follow-up fix)
+
+Re-read the already-cached primary-PDF text (same `r.jina.ai` extraction,
+same URL already cited above) to source U5's own datasheet-stated thermal
+pad layout requirement, needed to close Hardware Reviewer finding ISS-031
+(HIGH): the "Pin Configuration and Functions" section's thermal-pad note
+("must be electrically connected to the ground plane... connected to
+bottom side of PCB through vias for better thermal spreading") and the
+"Layout Guidelines" section ("Keep the thermal pad connection as large as
+possible, both on the bottom side and top side. It should be one piece of
+copper without any gaps.") (DS-MTR-081, new). This is the part's own
+primary-source layout directive, not a generic SLMA002/SLMA004 PowerPAD
+app-note citation — used to justify switching U5's KiCad footprint from a
+bare-pad custom footprint to a real, standard KiCad library footprint with
+a proper thermal-via array. As with the 2026-09-04/09-10/09-12 Updates
+above, the mechanical package-outline drawing itself (a vector graphic,
+not body text) remains not independently text-extractable this session —
+the exact D2xE2 exposed-pad numeric dimension is still UNKNOWN, unchanged
+from the "Known gaps" section above; this Update only adds the layout
+*guideline* text, not a new pad dimension. One new row cites this same
+datasheet record; no new metadata file was needed.

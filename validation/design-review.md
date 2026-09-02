@@ -7751,6 +7751,2755 @@ this annotation.
   whoever owns `validation/fmea.md` for MISS-020; Manufacturing Engineer
   for MISS-021) to pick up at convenience.
 
+## Hardware Reviewer — Cycle 6 (Rev 3-5 motor-subsystem schematic transcription, first PCB layout, and flat fab BOM — first review of this scope, 2026-09-14)
+
+### Review Cycle Metadata
+
+- **Artifacts reviewed** (3 commits, all directly preceding HEAD on
+  `ktanino10-bench-imu-01-rev3-pcb-layout`):
+  1. `f58cd2f` ("PCB Engineer: extend KiCad schematic to Rev 3-5 motor
+     subsystem") — extends `hardware/schematic/bench-imu-01/generate_schematic.py`
+     (+319/-formatting, 12370 lines of generated `.kicad_sch` diff) to add
+     the 25 new symbols (U5/U6/M1/J4/D2/D3/F1/R6–R15/C10–C17) implementing
+     the already-approved §7.5 Motor Driver + Reaction Wheel subsystem,
+     which had never before existed in the real KiCad project (only in the
+     Markdown design document). 6 files changed, 9780 insertions / 3252
+     deletions (`git show --stat f58cd2f`, independently re-run this cycle).
+  2. `a454b0c` ("PCB Engineer: Bench-IMU-01 PCB layout (Rev 3-5) --
+     CONDITIONAL, not DRC-clean") — first-ever `.kicad_pcb` for this board,
+     150×95mm 4-layer (F.Cu/In1.Cu-GND/In2.Cu/B.Cu), built programmatically
+     via `hardware/pcb/bench-imu-01/generate_pcb.py` using KiCad 10.0.1's
+     bundled `pcbnew` Python module. 5 files changed, 13999 insertions / 11
+     deletions, including the `bench-imu-01-3d.png` visual snapshot
+     (embedded below).
+  3. `2c62cf5` ("PCB Engineer: flat, order-ready BOM for Bench-IMU-01") —
+     `bom/bench-imu-01-fab-bom.csv`, 51 lines, pulling forward already-approved
+     MPNs from `bom/component-selection.md` for major actives and flagging
+     23 of 50 part lines `OPEN ITEM`.
+  These 3 commits are preceded by `88116cf` (this checklist's own extension
+  to 21 items) and `a0def1d` (introduction of the PCB Engineer discipline,
+  `docs/architecture-evolution.md` §37) — process/framework commits that
+  establish this cycle's mandate but are not themselves under review.
+  HEAD = `2c62cf5`; `git status` independently confirmed a clean working
+  tree at the start of this cycle.
+- **Reviewer**: Hardware Reviewer — see
+  `.github/agents/hardware-reviewer.agent.md`. I did not author the
+  schematic transcription, the PCB layout, or the BOM — all three were
+  produced by a PCB Engineer session this same session/day. Independent of
+  that authorship.
+- **Independence statement**: Read `hardware/schematic/bench-imu-01/README.md`'s
+  "Rev 3-5 extension" section and `hardware/pcb/README.md` in full per the
+  task's own instruction, but treated both as claims to independently
+  verify, not as findings to inherit. Concretely: (1) did not accept the
+  PCB README's own disclosed "~370" DRC violation count at face value —
+  independently re-ran `kicad-cli pcb drc` myself (3 times — see Findings,
+  DRC-count stability note); (2) did not accept either README's "0
+  unconnected items" claim at face value — independently re-derived it via
+  DRC AND went beyond DRC with a whole-board `pcbnew` pad/net audit that
+  found real missing-net defects DRC itself cannot see (see Findings,
+  ISS-031/033/034/035); (3) did not accept the schematic README's own
+  footprint-fidelity claims at face value — independently re-checked F1,
+  R9, and U5/U6's footprints against primary/distributor sources; (4) did
+  not accept the J4/D2 "fails safe even if pin-mapping is swapped" safety
+  claim at face value — independently re-traced the schematic's own wiring
+  and found the claim unsound for internal pin-mapping errors (ISS-032);
+  (5) independently exported the schematic's netlist via `kicad-cli sch
+  export netlist` and cross-checked it against `bench-imu-01-design.md`
+  §12's own net-by-net table rather than assuming the transcription
+  matched it, which is what surfaced this cycle's headline CRITICAL
+  finding (ISS-030).
+- **Scope**: The 3 artifacts listed above, in their dependency order
+  (schematic → PCB → BOM). All 21 checklist items per
+  `.github/skills/hardware-review/SKILL.md`: items 1–16 applied to the
+  schematic extension's new content specifically (Rev 2's already-Design-Complete
+  content is not re-litigated, consistent with Cycles 3–5's own scope
+  discipline); items 17–21 applied to the PCB layout. Explicitly out of
+  scope, per the task's own instruction: `hardware/mechanical/**`,
+  `firmware/**`, and the underlying design intent of §7.5 itself (already
+  human-approved before this session — only its transcription fidelity
+  into KiCad is this cycle's concern).
+- **Parallel sub-scans run**: None dispatched as separate sub-agent scans.
+  Per the agent's own instruction that the verdict is a single serial
+  integration step, this cycle ran as one integrated pass, organized in
+  the order: (1) tooling-status triage, (2) schematic netlist/net-by-net
+  cross-check, (3) whole-board PCB pad/net audit, (4) DRC re-run and
+  category attribution, (5) footprint-fidelity/copper/clearance checks,
+  (6) BOM cross-check.
+- **Rubber-duck premise review run in parallel?**: Not run this cycle. All
+  new rows below are tagged `Source: hardware-reviewer`, not `rubber-duck`
+  (`docs/architecture.md` §5.1).
+- **Tool status disclosure** (independently re-confirmed at the start of
+  this cycle, not assumed from the task framing): `run_drc_check`,
+  `extract_schematic_netlist`, `analyze_schematic_connections`,
+  `generate_pcb_thumbnail`/`generate_project_thumbnail`,
+  `identify_circuit_patterns`/`analyze_project_circuit_patterns`, and
+  `find_component_connections` all confirmed **broken** this session —
+  each call fails with `'ctx' is a required property'` before reaching any
+  project-specific logic. `get_drc_history_tool`, `validate_project`,
+  `get_project_structure`, `list_projects`, and `open_project` confirmed
+  **working**. Workaround used throughout: `kicad-cli` 10.0.1 invoked
+  directly (`pcb drc --format json`, `sch export netlist`, `sch erc
+  --format json`), plus KiCad's own bundled Python 3.9 interpreter and its
+  `pcbnew` module, invoked directly for whole-board pad/net/footprint
+  programmatic audits that go beyond what `kicad-cli` alone exposes (no
+  MCP tool of any kind provides pad-level net-assignment introspection,
+  broken or not).
+- **Process-integrity check**: Independently re-ran `git show --stat` on
+  all 3 commits under review (figures above) rather than relying on their
+  own commit-message summaries. Confirmed each commit's file scope is
+  consistent with its stated purpose and touches no file under
+  `hardware/mechanical/`, `firmware/`, or `requirements/`. `git log
+  --oneline` independently confirms the commit ordering
+  (`a0def1d`→`88116cf`→`f58cd2f`→`a454b0c`→`2c62cf5`=HEAD) with no
+  out-of-order or since-amended history.
+
+### Checklist Results
+
+Full 21-item checklist per `.github/skills/hardware-review/SKILL.md` —
+items 1–16 against the new schematic content, items 17–21 against the PCB
+layout.
+
+| # | Checklist item | Result | Notes |
+|---|---|---|---|
+| 1 | Voltage violation | Pass — independently reconfirmed | VM_MOTOR (2S–3S LiPo), U5/U6 internal rails, and all MCU-domain GPIOs unchanged in voltage from the already-reviewed Cycle 3/4 design content; the transcription introduces no new voltage-domain decision. |
+| 2 | Absolute Maximum Rating violation | Pass — independently reconfirmed | No new AMR-relevant net topology introduced by the transcription beyond what Cycles 3/4 already checked against TI's primary AMR tables. |
+| 3 | Current limit | Pass | U5's OCP/current-limit behavior unchanged from Cycle 3's finding; not re-litigated. |
+| 4 | Thermal risk | **Finding — ISS-031 (HIGH)** | U5's exposed pad (pin 25, primary thermal path per DS-MTR-039/052/055) is not defined in the custom KiCad symbol at all and has no thermal-via array in its footprint — independently confirmed via direct symbol-file/footprint inspection, not merely re-read from the schematic README's own ASSUMPTION disclosure. |
+| 5 | Missing decoupling capacitor | Pass — independently reconfirmed | C10–C17 all present and correctly valued, matching TI's own reference-circuit tables for U5 and U6; no omission found. |
+| 6 | Floating pin | **Finding — ISS-030 (CRITICAL)** | U1 pin 19 (intended: PA9→U6_EN per `generate_schematic.py` line 755 and design-doc §12) is objectively absent from the `/U6_EN` net in the exported netlist — independently confirmed via `kicad-cli sch export netlist`, ERC's own `no_connect_connected` rule, and direct inspection of KiCad's real `MCU_ST_STM32G0.kicad_sym` library file (pin 19's base electrical type is `no_connect`; PA9 exists only as an unassigned alternate function that `kiutils`, this script's dependency, cannot express). |
+| 7 | Incorrect pull-up/pull-down | Pass, with a cross-referenced caveat | R6–R8 (motor-driver FG/I2C pull-ups) and R11/R14/R15 (U6 supervisory biasing) are all independently confirmed correctly valued against TI's own reference tables. The pull-down R11 does establish U6's intended default-OFF fail-safe state correctly on its own terms — but see ISS-030: the MCU-side override this pull-down is meant to be overridden BY does not exist, so the fail-safe direction is right while the intended active-control path is entirely absent. |
+| 8 | Logic voltage mismatch | Pass | No new logic-voltage-domain interface introduced by the transcription beyond Cycle 3/4's already-reviewed 3.3V-referenced GPIOs. |
+| 9 | Interface timing | Pass | No new timing-relevant interface introduced by the transcription itself (peripheral/AF assignments unchanged from the design document). |
+| 10 | Power sequencing | **Finding — cross-refs ISS-030** | The intended MCU-gated power-sequencing control for the motor domain (U1 PA9→U6 SHDN) is the same net broken by ISS-030 — sequencing enforcement is not a new defect distinct from ISS-030, but ISS-030's consequence includes total loss of this sequencing control, not merely the SPEED/DIR floating-pin risk Cycle 3 already flagged (ISS-015, separately tracked, unaffected by this cycle). |
+| 11 | Grounding | **Findings — ISS-031 (HIGH), ISS-033 (HIGH)** | U5's exposed pad (ISS-031) and U6's PowerPAD (ISS-033) are each, independently, not actually netted to GND in the real board despite both being schematically/documentarily intended to be — see Findings for full root-cause detail. The GND net's topology as documented (§12/§8) is otherwise sound and independently reconfirmed single/unsplit. |
+| 12 | EMI/EMC risk | Pass, no new finding | No new EMI-relevant schematic-level decision introduced by the transcription beyond Cycle 3's already-reviewed treatment; PCB-side EMI/EMC considerations are folded into the layout-specific items 17–21 below. |
+| 13 | Motor noise | Pass, no new finding | Unchanged from Cycle 3's already-reviewed treatment (§7.5.7/§8); this cycle found no new motor-noise-specific defect in the transcription or layout beyond the copper-width/stub-segment finding logged under item 19 (ISS-037). |
+| 14 | Sensor noise | Pass | Unchanged from Cycle 3's already-reviewed treatment; VM_MOTOR remains independently sourced from the IMU's own 3V3 rail, confirmed still true in the real KiCad net structure (modulo ISS-030's unrelated defect). |
+| 15 | PCB layout concern (incl. mechanical/thermal co-design) | **Findings — see items 17–21 below** | This is the first cycle a real PCB layout exists to check against this item; folded into the layout-specific items 17–21 rather than duplicated here, per this checklist's own numbering note that items 17–21 extend (not replace) item 15 for the layout stage. |
+| 16 | Datasheet recommendation violation | **Finding — ISS-032 (HIGH)** | J4's disclosed pin-mapping ASSUMPTION (sleeve=GND/tip=+ for a barrel jack whose own datasheet does not resolve this) combines with D2's series-diode topology in a way that does not actually fail safe for an internal pin-mapping error, contrary to the schematic README's own safety claim — independently re-traced from the schematic's own wiring, not accepted from the README's narrative. |
+| 17 | Footprint/package fidelity | **Finding — ISS-031 (HIGH), folds in here too** | F1 (Littelfuse 30R500UF custom footprint) independently reconfirmed correct via live distributor/datasheet cross-check. R9's 1206 (not 0603) footprint choice independently reconfirmed justified by its real ¼W dissipation requirement at U5's SW-VREG operating point — not a cosmetic choice. U6's footprint independently confirmed correct. U5's ASSUMPTION-labeled footprint is the one genuine failure: independently re-derived, its reasoning is incomplete — it addresses pin pitch/count but not the exposed-pad thermal-via requirement, tracked as ISS-031. |
+| 18 | DRC closure | **Finding — ISS-036 (HIGH)** | Independently re-ran `kicad-cli pcb drc` three times this cycle: 366/367/366 violations (see Findings for the run-to-run stability note), reproducing the PCB README's own disclosed "~370" figure. 0 unconnected items independently reconfirmed all three runs — but see ISS-031/033/034/035, which are real missing-net defects invisible to this specific DRC check (explained in Findings). None of the 366 violations are individually triaged/resolved/justified beyond the 9 this review traces to ISS-032/033/034; logged as its own closure-gate finding distinct from the individually-named connectivity defects. |
+| 19 | Copper current-carrying capacity | **Finding — ISS-037 (MEDIUM)** | PCB README's own IPC-2221 citation is internally inconsistent (cites a 10°C-rise trace width that actually corresponds to ~20°C rise on the same chart, and uses DRV10983's fault/OCP current rather than its continuous rating as the sizing basis) — independently re-derived from the IPC-2221 chart directly. The board's actual 1.0mm motor-domain trace width is, despite the flawed citation, independently confirmed adequate (~28% margin on the corrected continuous-current basis). Separately, ~0.25mm narrow stub segments found near pads on 5 motor-domain nets — a routing-script artifact. |
+| 20 | Clearance/creepage (VM_MOTOR vs. 3V3 domain) | Pass — independently reconfirmed | Minimum measured spacing between the two voltage domains ≈22.08mm, independently measured directly from `.kicad_pcb` geometry — passes comfortably against any realistic creepage/clearance requirement for a ≤13V difference at this board's altitude/pollution-degree assumptions. No finding. |
+| 21 | Thermal via-stitching / copper-pour integrity | **Findings — ISS-031 (HIGH), ISS-033 (HIGH)** | U5's footprint has no thermal-via array at all (ISS-031, compounding its undefined EP pin). U6's footprint DOES have a full 17-via thermal array as intended — but a PCB-generation script defect leaves 16 of those 17 physical sub-pads un-netted to GND, so the via array exists physically but is not doing its job electrically (ISS-033). Ground-pour continuity itself, independently checked, is not split/starved elsewhere on the board. |
+
+### Findings
+
+#### ISS-030 — U1 PA9 → U6_EN net is silently absent from the schematic (CRITICAL)
+
+- **Claim under review**: `generate_schematic.py` line 755 and the design
+  document's own §12 net-by-net table both intend U1 (STM32G031K8T6) pin 19
+  to drive U6's SHDN pin (net `U6_EN`), giving MCU-gated control over the
+  entire motor/reaction-wheel subsystem's power enable.
+- **Independent verification method**: Exported the schematic's netlist
+  directly via `kicad-cli sch export netlist` rather than reading the
+  script's source and assuming it worked. Pin 19 is absent from `/U6_EN`
+  in the export — instead present on a synthetic `unconnected-(...)` net.
+  Reproduced this from a completely fresh, isolated `kiutils` virtual
+  environment by re-running the current committed `generate_schematic.py`
+  from scratch, confirming the defect is deterministic and not an artifact
+  of the committed `.kicad_sch` file specifically. Independently ran `sch
+  erc` and confirmed its own `no_connect_connected` rule flags this exact
+  pin and wire. Root-caused by direct inspection of KiCad's real,
+  installed standard library file
+  (`MCU_ST_STM32G0.kicad_sym`): U1 uses the standard `STM32G031K8Tx`
+  symbol, whose pin 19 has base electrical type `no_connect` — PA9 exists
+  on that physical pin only as an unassigned **alternate** function, and
+  `kiutils` (this script's own dependency for schematic authoring) has no
+  mechanism to express KiCad's per-instance alternate-pin-function
+  assignment. Confirmed this is a general tooling limitation, not a
+  one-off oversight, by grepping all 187 occurrences of "alternate" in the
+  committed `.kicad_sch`: every one is a library-definition-level
+  occurrence (ending well before the first placed symbol instance), i.e.
+  no per-instance alternate-pin assignment is used anywhere in this
+  schematic. Independently confirmed pin 19 = PA9 is the objectively
+  correct physical-pin identity (DS-MCU-064), ruling out a
+  wrong-pin-number defect of the ISS-026/ISS-027 kind.
+- **Functional consequence, independently derived from TPS26631's primary
+  datasheet**: SHDN has an internal pull-up (native state = ON); R11's
+  external pull-down forces the correct default-OFF fail-safe state absent
+  any MCU override (REQ-403 satisfied) — but since the intended override
+  path does not exist at all, U6 (and therefore the entire motor/reaction-wheel
+  subsystem downstream of it) is **permanently, unconditionally disabled**,
+  fully defeating REQ-007. The system fails SAFE, not fails FUNCTIONAL —
+  an important distinction, but it does not reduce this finding's severity,
+  since the design's actual required function (motor control availability)
+  is completely absent, not merely degraded.
+- **Important context independently found this cycle**: ISS-021's own
+  Cycle-4 (2026-09-08) notes in `validation/open-issues.md` already
+  independently verified that "PA9 driving U6's SHDN low removes power
+  from U5 entirely" is a sound enforcement mechanism **at the
+  design-document level**, before any KiCad transcription of it existed.
+  This proves the underlying architectural intent was always correct — this
+  is specifically a transcription-tooling defect introduced this session,
+  not a flaw in the original, already-approved design.
+- **Datasheet Source**: DS-MCU-064 (pin identity), DS-PROT-024 (TPS26631
+  SHDN native bias), plus direct citation of KiCad's own installed
+  `MCU_ST_STM32G0.kicad_sym` library file as a primary tool artifact (not a
+  manufacturer datasheet — disclosed as such, consistent with how DRC/ERC
+  tool output is cited directly elsewhere in this repository without a
+  `DS-` evidence-log entry).
+- **Affected Component**: U1 (STM32G031K8T6, pin 19/PA9), U6 (TPS26631PWPR,
+  SHDN pin 13).
+- **Severity**: **CRITICAL** — a required, safety-relevant control path
+  (REQ-403's own fail-safe mechanism depends on the MCU being ABLE to
+  override the default-OFF state, not merely on the default-OFF state
+  existing) is completely non-functional, with no workaround available in
+  the current schematic.
+- Logged as **ISS-030**.
+
+#### ISS-031 — U5's exposed pad (pin 25) is undefined in the schematic symbol and has no thermal vias in its footprint (HIGH)
+
+- **Claim under review**: The schematic README discloses U5's footprint as
+  an ASSUMPTION; DRV10983 is a 24-pin HTSSOP (PWP) package whose exposed
+  pad is its primary thermal path and, per its own datasheet, must be
+  soldered to GND.
+- **Independent verification method**: Direct inspection of
+  `generate_schematic.py`'s custom U5 symbol definition (lines 368–409)
+  confirms it defines pins 1–24 only — **no pin 25/EP is defined at all**,
+  so the exposed pad cannot appear in any exported netlist regardless of
+  intent, and cannot be flagged by any DRC "unconnected" check, since there
+  is no netlist entry for it to be unconnected FROM. Cross-checked
+  `bench-imu-01-design.md` §12's own net-by-net GND row for U5: it lists
+  "GND(pin8)/PGND(pins15,16)/SWGND(pin5)" and — notably, unlike U6's own
+  GND row in the same table, which explicitly states "U6 GND(pin9) *and*
+  PowerPAD (both, per TI's own instruction — the pad is not a substitute
+  for pin 9)" — **never mentions U5's exposed pad at all**. This means the
+  omission traces back further than this session's KiCad transcription
+  alone: the design document's own net-list table never explicitly
+  required this connection in the first place, even though §13's
+  descriptive prose ("exposed pad tied to GND") and DRV10983's own
+  datasheet (DS-MTR-039, DS-MTR-052) do require it. Independently confirmed
+  via DS-MTR-055 (Thermal Information / RθJA) that the exposed pad is
+  DRV10983's dominant thermal path, making this a real, not merely
+  cosmetic, omission. Independently confirmed the assigned footprint has
+  no thermal-via array of any kind (checked directly in the `.kicad_pcb`
+  footprint geometry).
+- **Datasheet Source**: DS-MTR-039 (package/exposed-pad description),
+  DS-MTR-052 (Pin Configuration table), DS-MTR-055 (Thermal
+  Information/RθJA).
+- **Affected Component**: U5 (DRV10983, HTSSOP-24/PWP package, pin 25/EP).
+- **Recommended Fix**: Add pin 25 (EP) to the custom KiCad symbol, wire it
+  to the GND net in the schematic (and update §12's own net-by-net table to
+  explicitly document this, matching the precedent already set by U6's own
+  row), assign/confirm a footprint with an adequate thermal-via array
+  beneath the pad, and re-verify continuity from the pad through to the
+  ground pour once corrected.
+- **Severity**: **HIGH** — DRV10983 drives a real motor at a non-trivial
+  duty cycle; a floating/unstitched thermal pad risks a real thermal
+  derating or shutdown/lock-detection fault under sustained operation, but
+  does not itself create an unsafe condition the way ISS-030's total loss
+  of enable control does.
+- Logged as **ISS-031**.
+
+#### ISS-032 — J4/D2's disclosed "fails safe on pin-mapping error" claim does not hold for internal wiring errors (HIGH)
+
+- **Claim under review**: The schematic README argues that even if J4's
+  ASSUMPTION-labeled sleeve/tip pin-mapping turns out to be wrong, D2's
+  series reverse-polarity Schottky diode protects the board regardless.
+- **Independent verification method**: Re-traced the schematic's own GND
+  net row (§12): "**(new Rev 3, §8) J4 sleeve/GND contact → D2/D3 return
+  sides → U5 GND(pin8)/PGND(pins15,16)/SWGND(pin5)**". This wiring is
+  correct and safe for the specific failure mode the README's argument
+  addresses — an *external* polarity reversal at the barrel-jack plug
+  itself (D2 blocks reverse current on the + leg). It is not sound for an
+  *internal* pin-mapping error — i.e., if J4's own sleeve/tip physical
+  identity is actually the reverse of what this design assumed, then what
+  this schematic calls "GND" is actually wired to the supply's positive
+  terminal, with **no fusing or blocking element of any kind in that
+  return leg** (D2 sits only in the leg the schematic calls the `+` path).
+  In that failure mode, +9–13V would appear directly on the board's GND
+  net with no protection element in its path at all — a materially worse
+  outcome than the "fails safe" framing suggests, and D2's real placement
+  in the circuit does nothing to prevent it.
+- **Datasheet Source**: `datasheets/samesky_pj-102ah_rev1-05.md` (J4's own
+  primary source — its mechanical pin-mapping diagram does not resolve
+  which physical contact is sleeve vs. tip for this design's specific
+  panel-mount orientation, which is why this is an ASSUMPTION in the first
+  place); DS-PROT-005 (D2/STPS3L60 ratings, confirming its unidirectional,
+  single-leg placement).
+- **Affected Component**: J4 (Same Sky PJ-102AH barrel jack), D2 (ST
+  STPS3L60).
+- **Recommended Fix**: Independently confirm J4's actual sleeve/tip
+  physical identity against a verified mechanical drawing or a physical
+  sample/continuity check before fabrication (do not carry the ASSUMPTION
+  forward as-is); alternatively, adopt a polarity-agnostic protection
+  topology (e.g. a full-bridge/ideal-diode input stage, or duplicate
+  series protection in both legs) that does not depend on correctly
+  guessing which physical contact is which.
+- **Severity**: **HIGH** — a wrong internal assumption here creates a real
+  reverse-supply-on-GND hazard with no protective element in the affected
+  path, materially undercutting the specific safety property the schematic
+  README claims to have, even though the failure requires the ASSUMPTION
+  to actually be wrong (not yet independently confirmed either way).
+- Logged as **ISS-032**.
+
+#### ISS-033, ISS-034, ISS-035 — one shared PCB-generation script defect leaves multiple footprints' duplicate physical pads un-netted (HIGH / HIGH / MEDIUM)
+
+- **How this was found**: Sampling individual `shorting_items` DRC
+  violations for root cause (rather than accepting the DRC report's own
+  category labels as self-explanatory) turned up one that did not fit any
+  previously-understood geometry-only category. This led to a systematic,
+  independent whole-board pad/net audit via direct `pcbnew` Python
+  scripting: enumerating every footprint's every physical pad and its
+  assigned net, rather than trusting DRC's own summary. This found **80
+  total no-net pads across 52 footprints** on the board.
+- **Root cause, independently traced to one shared script defect**:
+  `generate_pcb.py`'s net-assignment logic keys purely on (footprint
+  reference, pad NUMBER) and nets only the FIRST physical pad it encounters
+  for a given key — when a footprint legitimately has multiple physical
+  pads sharing one electrical pad number (a normal, common convention for
+  connector shields, thermal-via arrays under an exposed-pad part, and
+  dual-pad through-hole switch terminals), every pad after the first is
+  left with no net assigned at all.
+- **ISS-033 — U6 (TPS26631PWPR) PowerPAD, HIGH**: 17 physical thermal-via
+  sub-pads share one pad number under U6's exposed pad; only 1 of the 17 is
+  actually netted to GND. Per DS-PROT-023 (TI's own exact instruction: the
+  PowerPAD "must be soldered directly to the board GND plane... in
+  addition to the GND pin, not as a substitute"), this directly contradicts
+  `hardware/power-budget.md`'s own grounding claim for this component. The
+  via array exists physically but is not doing its intended thermal/return
+  job electrically. Produces 7 of the 366 DRC `shorting_items` violations.
+- **ISS-034 — J1 (USB-C) mechanical shield, HIGH**: 4 physical shield pads
+  share one pad number; only 1 of 4 is netted to GND. Produces 2 of the 366
+  DRC `shorting_items` violations. Does not fully float the shield (the
+  connector's own metal shell provides some physical continuity through the
+  1 netted pad), but is a genuine, unintended partial connectivity defect
+  degrading the shield's designed low-impedance ESD/EMI return path.
+- **ISS-035 — SW1 (tactile switch), MEDIUM**: each electrical terminal has
+  2 physical pads; one pad per terminal is left unconnected while the other
+  remains correctly netted, so the switch's basic function is not broken —
+  only mechanical solder-joint redundancy/retention is reduced. Produces
+  **zero** DRC violations of any category — found only via the independent
+  whole-board pad/net audit, fully invisible to DRC (no adjacent copper for
+  the no-net pad to short against). This is itself a generalizable
+  methodological point: DRC violation count/category is not a reliable
+  proxy for a board's pad-level connectivity completeness.
+- **Datasheet Source**: DS-PROT-023 (TPS26631 PowerPAD grounding
+  requirement, for ISS-033); the J1/SW1 defects (ISS-034/035) are generic
+  connector/switch mechanical conventions independently confirmed via
+  direct footprint-pad inspection, not part-specific electrical datasheet
+  facts requiring a citation.
+- **Affected Components**: U6 (TPS26631PWPR), J1 (USB-C receptacle), SW1
+  (tactile switch).
+- **Recommended Fix (all three)**: Fix `generate_pcb.py`'s net-assignment
+  logic to enumerate and net ALL physical pads sharing a given
+  (footprint, pad-number) key, not just the first; re-run PCB generation
+  and re-verify via a whole-board pad/net audit (not DRC alone, per
+  ISS-035's own DRC-invisibility) that all physical pads are genuinely
+  netted as intended.
+- **Severities**: ISS-033 and ISS-034 **HIGH** (real loss of an intended
+  thermal or shielding/EMI return path under a component that actively
+  needs it); ISS-035 **MEDIUM** (reliability/robustness degradation, not a
+  functional break, since the switch's basic electrical operation is
+  unaffected).
+- Logged as **ISS-033**, **ISS-034**, **ISS-035**.
+
+#### ISS-036 — 366 open DRC violations, none individually triaged or justified (HIGH)
+
+- **Independent DRC re-run**: `kicad-cli pcb drc` run three independent
+  times this cycle against the unmodified `.kicad_pcb` (confirmed via `git
+  status`/`git diff --stat` to be byte-identical across all three runs).
+  Results: **366 / 367 / 366** total violations — a small (~0.3%),
+  observed run-to-run non-determinism isolated entirely to the
+  `tracks_crossing`/`shorting_items`/`clearance` categories (consistent
+  with floating-point/geometry-epsilon edge cases in KiCad's polygon
+  engine near a threshold boundary); `solder_mask_bridge` (200),
+  `hole_clearance` (3), `silk_overlap` (1), and **`unconnected_items` (0)**
+  were exactly stable across all three runs. Reporting the most
+  recent/typical breakdown: **solder_mask_bridge=200, tracks_crossing=76,
+  shorting_items=72–73, clearance=13–14, hole_clearance=3, silk_overlap=1**;
+  severity 365–366 error / 1 warning. This independently reproduces —
+  rather than contradicts — the PCB README's own disclosed "~370" figure
+  and its own honest CONDITIONAL/not-DRC-clean characterization.
+- **Attribution**: Of the 72–73 `shorting_items` specifically, only 9 (2
+  from ISS-034/J1, 7 from ISS-033/U6) are traced to a known, understood
+  root cause by this review. The remaining ~357 violations (all of
+  solder_mask_bridge/tracks_crossing/clearance/hole_clearance/silk_overlap,
+  plus ~63–64 unattributed `shorting_items`) were **not individually
+  root-caused this cycle** — an explicitly disclosed scope boundary, not an
+  assumption that they are benign. `shorting_items` specifically represents
+  DRC's assessment that two DIFFERENT nets' copper is already geometrically
+  touching as drawn; if fabricated exactly as-is, each unresolved instance
+  of this category would produce an actual physical short on the real
+  board. Whether the ~63–64 unattributed instances are between
+  functionally-equivalent nets (e.g. two GND-referenced items, effectively
+  harmless) or a genuinely harmful cross-functional short was **not
+  verified either way this cycle**.
+- **0 unconnected items claim — independently reconfirmed, but with an
+  important caveat**: DRC's own `unconnected_items=0` was independently
+  reproduced in all three re-runs. However, ISS-031/033/034/035 above are
+  all real missing-net defects that this specific DRC check cannot see —
+  either because the schematic pin was never defined at all (ISS-031, so
+  there is no netlist expectation to be "unconnected" from), or because the
+  no-net pad simply does not happen to physically touch different-net
+  copper (ISS-035). **"0 unconnected items" is therefore independently
+  confirmed accurate as literally reported by DRC, but must not be read as
+  "the board has no missing connections"** — it is a narrower claim than
+  that, and the schematic/PCB READMEs' own framing does not make this
+  distinction clear.
+- **Refutes**: The PCB README's characterization that all outstanding
+  issues are pure routing-density geometry with connectivity itself
+  complete is independently found to be factually incomplete —
+  ISS-030/031/033/034/035 above are genuine connectivity defects, several
+  of which manifest partially within this same 366-violation DRC count.
+- **Datasheet Source**: N/A — evidenced directly by this cycle's own
+  independently-run `kicad-cli pcb drc` tool output.
+- **Affected Component**: Whole-board copper layout.
+- **Recommended Fix**: Individually triage every one of the 366 violations
+  to at least a category-level root cause before this layout is considered
+  for fabrication — in particular, every one of the ~72–73 `shorting_items`
+  should be resolved or individually, explicitly confirmed harmless
+  net-pair-by-net-pair; the large solder_mask_bridge/tracks_crossing counts
+  suggest a design-rule/router-tuning adjustment is likely more efficient
+  than one-by-one manual fixes given their apparent systematic/bulk
+  character.
+- **Severity reasoning**: Classified **HIGH**, not CRITICAL — this
+  reviewer's own affirmative, verified evidence of functional impact from
+  this 366-violation count is limited to the 9 `shorting_items` already
+  separately captured at HIGH under ISS-033/034. The remaining ~357 are
+  unverified either way this cycle; asserting CRITICAL on the basis of
+  unexamined suspicion alone would itself be an unsupported severity
+  inflation, not the "report the real, verified state" standard this
+  review is held to.
+- Logged as **ISS-036**.
+
+#### ISS-037 — IPC-2221 citation error in the PCB README, and narrow stub segments on 5 motor-domain nets (MEDIUM)
+
+- **IPC-2221 citation independently re-derived, found inconsistent**: The
+  PCB README's own justification for its 1.0mm motor-domain trace width
+  cites a 30–35mil figure for a 3A/10°C-rise target — independently
+  re-derived directly from the IPC-2221 external-layer trace-width chart,
+  that 30–35mil figure actually corresponds to roughly a 20°C rise at 3A on
+  the same chart, not 10°C. Separately, the "3A" figure itself is
+  DRV10983's OCP/fault threshold (DS-MTR-058), not its continuous operating
+  current (~2A per DS-MTR-054/056 and this design's own power-budget
+  nominal figure) — using the correct continuous-current basis, the
+  board's actual 1.0mm (~39mil) trace width independently computes to
+  roughly 28% current-carrying margin over a properly-derived 10°C-rise
+  IPC-2221 target, which is adequate despite the citation error. This
+  finding is about the flawed derivation/citation, not a live undersized-trace
+  defect on the corrected basis.
+- **Narrow stub segments, independently measured**: Direct `.kicad_pcb`
+  track-segment geometry inspection found ~0.25mm-wide short segments
+  immediately adjacent to component pads on 5 distinct motor-domain nets —
+  consistent with a routing-script artifact (likely a pad-escape or
+  via-transition segment inheriting a default trace width rather than the
+  intended power-net width), not an intentional design choice.
+- **Datasheet Source**: DS-MTR-054 (continuous-current basis), DS-MTR-058
+  (confirms the 3–4A figure is the OCP/fault threshold, not continuous
+  current).
+- **Affected Component**: Motor-domain copper (VM_MOTOR and related power
+  nets).
+- **Recommended Fix**: Correct the PCB README's IPC-2221 citation to
+  accurately reflect the 10°C-rise target's actual corresponding trace
+  width and explicitly state the continuous-vs-fault-current distinction
+  used for sizing; re-run PCB generation with the routing script's
+  stub-segment behavior fixed so all segments of the 5 affected nets carry
+  the intended full-width copper.
+- **Severity**: **MEDIUM** — a documentation/derivation-quality defect plus
+  minor geometry artifacts, not a live undersized-copper defect on the
+  corrected engineering basis.
+- Logged as **ISS-037**.
+
+#### Additional independently-checked items with no finding (explicitly confirmed, not merely assumed)
+
+- **BOM cross-check** (`bom/bench-imu-01-fab-bom.csv` vs.
+  `bom/component-selection.md`): Spot-checked MPN/price pairs for all major
+  actives (U1 MCU, U2 IMU, U3 LDO, U5 motor-driver IC, U6 supervisory
+  controller, M1 motor) — all match exactly. Of the 23 lines flagged `OPEN
+  ITEM`, each independently confirmed to be an honest, explicit flag (J1
+  MPN genuinely not yet selected per the design document itself; D1/SW1/J2/J3
+  generic parts genuinely not yet sourced; all 17 capacitor lines missing
+  only orderable voltage/tolerance sub-codes, not the core part identity;
+  M2.5 mounting hardware) — no silent placeholder found anywhere in the 50
+  lines.
+- **R9 footprint (1206 vs. 0603)**: Independently reconfirmed R9's real
+  power dissipation at U5's SW–VREG linear-mode operating point genuinely
+  requires ¼W handling, which 0603 packages are not rated for at typical
+  derating curves — the 1206 footprint choice is substantively, not merely
+  cosmetically, justified.
+- **F1 (Littelfuse 30R500UF) custom footprint**: Independently confirmed
+  correct via a live distributor listing and datasheet cross-check this
+  cycle (no library match exists for this part, consistent with the
+  schematic README's own disclosure of why a custom footprint was needed).
+- **Clearance/creepage (VM_MOTOR domain vs. 3.3V logic domain, checklist
+  item 20)**: Minimum spacing independently measured directly from
+  `.kicad_pcb` geometry at ≈22.08mm — passes comfortably for a ≤13V
+  difference; no finding.
+- **Schematic net-by-net fidelity vs. design-doc §12**: Exported the full
+  netlist via `kicad-cli sch export netlist` and cross-referenced it
+  against §12's own table for the new §7.5 motor-subsystem nets
+  specifically. All nets match §12's documented intent with exactly the
+  two exceptions already covered above as findings: `U6_EN` (ISS-030 — the
+  net is not merely mismatched but entirely absent, a tooling limitation)
+  and U5's exposed pad (ISS-031 — where, as detailed above, §12's own table
+  never explicitly required this connection either, a pre-existing gap in
+  the design document itself that predates this session, compounding rather
+  than excusing the schematic symbol's own omission).
+
+### Visual snapshot
+
+![Bench-IMU-01 PCB 3D render](../hardware/pcb/bench-imu-01/bench-imu-01-3d.png)
+
+*First real PCB visual-snapshot artifact produced for this project
+(`hardware/pcb/bench-imu-01/bench-imu-01-3d.png`, committed in `a454b0c`).
+Referenced here per this cycle's task instructions; no prior convention
+exists in this file for visual-artifact attachment beyond "attach it".*
+
+### Verdict
+
+- **Verdict**: **CONDITIONAL** — not a clean PASS (one open CRITICAL
+  finding makes a PASS impossible per this checklist's own verdict rule),
+  and not a FAIL in the sense of "the overall approach must be
+  abandoned" — every defect found this cycle has a narrow, well-understood
+  root cause and a describable fix path; the underlying architecture and
+  topology (already reviewed and approved across Cycles 3–5) remain sound;
+  the PCB's floor-plan and clearance choices are good; and this is
+  explicitly the project's first-ever PCB layout attempt, whose author
+  already honestly disclosed a CONDITIONAL/not-DRC-clean status before this
+  review began. This review's findings exceed that disclosure in severity
+  (the CRITICAL U6_EN defect and the 4 real missing-net PCB defects were
+  not previously known to anyone), but do not change the conclusion that
+  the path forward is continued, targeted rework, not a restart.
+- **Open CRITICAL count**: **1** (ISS-030 — U1 PA9 → U6_EN net silently
+  absent, a `kiutils`/alternate-pin-function tooling limitation).
+- **Open HIGH count**: **5** (ISS-031 — U5 exposed pad undefined/unstitched;
+  ISS-032 — J4/D2 safety-argument gap for internal pin-mapping errors;
+  ISS-033 — U6 PowerPAD un-netted; ISS-034 — J1 shield partially un-netted;
+  ISS-036 — 366 open DRC violations, none individually triaged).
+- **Open MEDIUM count**: **2** (ISS-035 — SW1 duplicate-pad partial
+  connectivity loss; ISS-037 — IPC-2221 citation error + narrow stub
+  segments).
+- **What independently checks out with no further action needed**:
+  clearance/creepage between the VM_MOTOR and 3.3V domains (item 20); the
+  BOM's cross-referencing against already-approved MPNs/pricing, with every
+  `OPEN ITEM` flag independently confirmed honest rather than a silent
+  placeholder; F1's and R9's footprint choices; U6's own footprint;
+  decoupling-capacitor completeness for both U5 and U6; the corrected
+  motor-domain trace width itself (1.0mm, once sized on DRV10983's
+  continuous rather than fault current); and the underlying `U6_EN`/SHDN
+  fail-safe *architecture* (as opposed to its broken KiCad transcription),
+  which independent Cycle-4 review already confirmed sound at the
+  design-document level.
+- **What's blocking a clean PASS, precisely**: ISS-030 (CRITICAL) alone is
+  sufficient to block. ISS-031/032/033/034/036 (HIGH) each independently
+  also block a PASS and must be dispositioned regardless of ISS-030's own
+  resolution. Per `docs/architecture.md` §7.1/§8, a CRITICAL finding cannot
+  be dispositioned as `ACCEPTED-RISK` — it must be genuinely fixed and
+  independently re-verified before this board is fabricated.
+- **Next action**: Route back through the Hardware Lead to (1) **Circuit
+  Engineer** for the schematic-stage findings — ISS-030 (add a
+  per-instance alternate-pin-function assignment for U1 pin 19, or select
+  an MCU variant/pin where PA9-equivalent function is a base rather than
+  alternate assignment, and re-verify via netlist export that `/U6_EN`
+  actually contains the MCU-side pin afterward), ISS-031 (add pin 25/EP to
+  U5's custom symbol and wire it to GND, updating §12's own net table to
+  match U6's own precedent), and ISS-032 (independently confirm J4's real
+  pin-mapping or adopt a polarity-agnostic protection topology); and (2)
+  **PCB Engineer** for the layout-stage findings — ISS-033/034/035 (fix the
+  shared duplicate-physical-pad net-assignment bug in `generate_pcb.py` and
+  re-verify via a whole-board pad/net audit, not DRC alone), ISS-036
+  (individually triage all 366 DRC violations, especially the ~63–64
+  unattributed `shorting_items`, before any fabrication consideration), and
+  ISS-037 (correct the IPC-2221 citation and fix the stub-segment routing
+  artifact). Given the CRITICAL and several HIGH findings both originate in
+  the schematic-transcription stage and propagate into the PCB layout built
+  on top of it, recommend the schematic fixes (ISS-030/031/032) land and
+  are independently re-verified *before* the PCB is re-regenerated from
+  it, to avoid the PCB Engineer re-routing against a netlist that will
+  change again shortly after.
+---
+
+## Hardware Reviewer — Cycle 7 (Focused re-verification of ISS-030/033/034/035 fix round, e63e62c) (2026-09-02)
+
+### Review Cycle Metadata
+
+- **Artifact reviewed**: commit `e63e62c` ("PCB Engineer: fix ISS-030
+  (CRITICAL), ISS-033/034/035 (HIGH/HIGH/MEDIUM), partial ISS-031 (HIGH)")
+  applied on top of `84db343` (the Cycle 6 review commit), branch
+  `ktanino10-bench-imu-01-rev3-pcb-layout`. Concretely:
+  `hardware/schematic/bench-imu-01/{generate_schematic.py,
+  bench-imu-01.kicad_sch, bench-imu-01.kicad_sym, README.md}`,
+  `hardware/pcb/bench-imu-01/{generate_pcb.py, bench-imu-01.kicad_pcb,
+  bench-imu-01-3d.png}`, `hardware/pcb/README.md`,
+  `validation/open-issues.md`.
+- **Reviewer**: Hardware Reviewer — see
+  `.github/agents/hardware-reviewer.agent.md` and
+  `.github/skills/hardware-review/SKILL.md`. Independent of the PCB
+  Engineer session that authored `e63e62c`, and — per this project's
+  independent-review discipline — the fix round's own commit message,
+  READMEs and `open-issues.md` status edits were treated as **claims to be
+  tested**, not as evidence.
+- **This is a focused re-verification, NOT a full re-review.** It
+  deliberately mirrors the scope discipline of "Cycle 5 — ISS-026 CRITICAL
+  fix (Rev 6) re-verification" above: the 21-item Hardware Reviewer
+  checklist was **not** re-run from scratch, and nothing already settled at
+  Cycle 6 that this fix round did not touch was re-litigated — specifically
+  **out of scope**: J4's pin-mapping ASSUMPTION, the flat fab BOM, the board
+  outline/stackup/trace-width derivation, and every Cycle 6 checklist item
+  that passed. `firmware/` and `hardware/mechanical/` were not touched or
+  reviewed.
+- **Independence statement**: Every tool result below was produced by this
+  reviewer's own invocations against the committed artifacts — ERC, netlist
+  export, DRC (4 independent runs on the post-fix board, 2 on the pre-fix
+  board), gerber export, a from-scratch schematic regeneration in a clean
+  throwaway `venv` with `kiutils==1.4.8`, and **an independently written**
+  `pcbnew` pad/net/geometry audit (deliberately written from scratch rather
+  than reusing any audit code the PCB Engineer may have, so as not to
+  inherit its blind spots). All `pcbnew` work used KiCad's bundled
+  interpreter
+  (`/Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/3.9/bin/python3.9`).
+  `kicad-cli` is 10.0.1.
+- **Tooling-honesty note / deviation from the task's literal paths**: the
+  task text specified `/tmp/reverify-*.rpt`; this reviewer's runtime forbids
+  writes to `/tmp`, so all report/scratch artifacts were written to an
+  untracked in-repo scratch directory instead and deleted before commit. The
+  commands and their outputs are otherwise exactly as specified. No tool was
+  used that is not actually available in this session.
+
+### Scope — the six things this cycle checked
+
+1. ISS-030 (CRITICAL) fix: real and correct?
+2. ISS-033/034/035 (multi-pad net assignment) fixes: real and correct?
+3. ISS-031 partial-fix honesty claim: accurate?
+4. Scope creep / silent regressions elsewhere?
+5. Are ISS-031/032/036/037 honestly left OPEN?
+6. Do `tools/check_id_uniqueness.py` and `tools/check_open_issues.py` output
+   what the commit message claims?
+
+---
+
+### Item 1 — ISS-030 (CRITICAL): **CONFIRMED RESOLVED**
+
+**What the fix actually does (read directly, not from the commit message).**
+`generate_schematic.py` gained `patch_alternate_pin_function()`, called after
+`b.sch.to_file(...)`. It is a raw-text post-process on the emitted
+`.kicad_sch`: it locates the symbol instance block whose
+`(property "Reference" "U1"` line starts it, bounds the search at the next
+`Reference` property, and rewrites that block's `(pin "19" (uuid ...))` line
+into `(pin "19" (alternate "PA9") (uuid ...))`. This is a legitimate
+workaround, not a hack around a checkable fact: `kiutils` 1.4.8 models
+`SchematicSymbol.pins` as a bare `{pin_number: uuid}` map and structurally
+cannot express KiCad's per-instance alternate-pin-function. The insertion is
+a **child token** of the `(pin ...)` form (KiCad refuses to parse a sibling
+line), and the script prints its own action (`Patched U1 pin 19: activated
+alternate function 'PA9'`).
+
+**Independent verification.**
+
+- **Scoping of the edit**: the committed `.kicad_sch` contains **exactly one**
+  instance-level `(alternate ...)` token, at line 3155, inside U1's own
+  instance block (bounded by `Reference "U1"` at line 3125 and the next
+  `Reference` — `C3` — at line 3180). Total occurrences of the string
+  `alternate` went 187 → 188 versus Cycle 6, i.e. a delta of exactly one. No
+  other pin on any other symbol received an `(alternate ...)`.
+- **ERC, run by this reviewer**: `kicad-cli sch erc --severity-all` →
+  **0 errors, 1 warning**. The warning is the pre-existing, benign U3
+  `TLV75533PDBV` `lib_symbol_mismatch` already characterised at Cycle 6. The
+  `no_connect_connected` error that was ISS-030's proximate ERC symptom is
+  gone.
+- **Netlist membership, run by this reviewer**: `kicad-cli sch export
+  netlist` → `/U6_EN` (net code 28) has exactly three members: `R11` pin 1,
+  **`U1` pin 19** (pinfunction `PA9_19`, pintype `bidirectional`), and `U6`
+  pin 13 (`~{SHDN}_13`). U1 pin 19 is genuinely a *member of that net*, not
+  merely a string present somewhere in the file.
+- **Regression check — full net-by-net diff**: the pre-fix schematic was
+  checked out from `84db343`, its netlist exported with the same command, and
+  the two netlists compared net-by-net. Net count 79 → 78. **Exactly three
+  changes, all intended and all attributable**: the synthetic
+  `unconnected-(U1-NC{slash}PA9-Pad19)` net disappeared; `/U6_EN` gained
+  `U1` pin 19; `/GND` gained `U5` pin 25 (the ISS-031 partial fix, item 3).
+  **No other net changed in any way.**
+- **Reproducibility**: `generate_schematic.py` was re-run from scratch in a
+  clean `venv` with `kiutils==1.4.8`. The regenerated netlist is **identical
+  to the committed one** (78 nets, zero differing nets), with `/U6_EN` =
+  {R11.1, U1.19, U6.13} and `U5` pin 25 in `/GND`. The fix therefore lives in
+  the generator, not in a hand-edit of the artifact.
+
+**Conclusion**: the CRITICAL is genuinely closed at the schematic level, by
+the generator, with a clean and fully-attributed delta. `open-issues.md`
+marking ISS-030 `RESOLVED` is correct.
+
+---
+
+### Item 2 — ISS-033 / ISS-034 / ISS-035: **CONFIRMED RESOLVED**, with one new finding about the copper the fix added
+
+**What the fix actually does.** The root cause was `fp.FindPadByNumber(pin)`
+returning only the *first* physical pad for a given pad number. The fix
+enumerates `[p for p in fp.Pads() if p.GetNumber() == pin]`, nets all of
+them, and then adds a local F.Cu "bridge" track (`WIDTH_SIGNAL`, 0.25 mm)
+from `matching_pads[0]` to each additional pad. The enumeration half is
+correct and is the actual substance of ISS-033/034/035's own Recommended
+Fix. The bridging half is where the new finding is (below).
+
+**Independent audit (own script, KiCad's bundled Python).** Against the
+committed `bench-imu-01.kicad_pcb`:
+
+| Target | Physical pads | Result |
+| --- | --- | --- |
+| U6 pad `"21"` (PowerPAD + thermal-via array) | 17 | all 17 on one net, `GND` — **PASS** |
+| J1 pad `"SH"` (USB-C shield) | 4 | all 4 on one net, `GND` — **PASS** |
+| SW1 pad `"1"` | 2 | both on one net, `NRST` — **PASS** |
+| SW1 pad `"2"` | 2 | both on one net, `GND` — **PASS** |
+
+All four targeted claims hold. Board-wide, no-net pads went **80 → 57**, and
+the delta of 23 is fully attributable: 16 (U6 `"21"`) + 3 (J1 `"SH"`) + 2
+(SW1) + 1 (U5 `"25"`, item 3) + 1 (U1 `"19"`, item 1). **No new no-net pad was
+introduced.** The 57 that remain are the previously-characterised benign
+set (NC pins on U1–U4, J4 pad `"2"`, MH1–MH4 mounting holes, J1's unused
+USB2/SBU contacts and two pre-existing unnetted THT anchor pads, U5/U6
+F.Paste-only stencil apertures, and U6 pins 4/5/12/14/15/17) — none of them
+part of this fix round's claims.
+
+**DRC, run 4 times by this reviewer** (the PCB Engineer's documentation
+claims non-determinism; **confirmed**): totals 381 / 391 / 385 / 381 — within
+the disclosed ~380–400 band. **`unconnected_items` = 0 on all four runs**, and
+`schematic_parity` = 0 on all four. The connectivity claim is real and stable.
+
+*(Minor correction to Cycle 6's own record: Cycle 6 noted `solder_mask_bridge`
+appeared "exactly stable" at 200 across repeats. In this cycle's runs it
+varies, 203–213. Non-blocking; recorded for accuracy.)*
+
+**New finding — ISS-038 (HIGH), logged in `validation/open-issues.md`.**
+While verifying the bridging half of the fix, this reviewer found that the
+bridge tracks under U6 are simultaneously **unnecessary** and **harmful**:
+
+- *Unnecessary*: an independent geometry check shows all 15 of U6's PTH
+  thermal-via pads have their centres inside **both** the 3.40 × 6.50 mm F.Cu
+  land **and** the 3.20 × 5.80 mm B.Cu land. The 17-member group was already
+  copper-connected by overlap before any bridge existed, so the 16 F.Cu
+  bridges add nothing electrically.
+- *Harmful*: 12 of them cross the 21.6875 mm `U6_ILIM` F.Cu track. All four
+  DRC runs report **exactly 12 `tracks_crossing` errors** in the U6
+  exposed-pad region (x 107.5–112.5, y 48.0–56.0), and every one of them is
+  `GND` vs `U6_ILIM` **on the same layer (F.Cu)** — i.e. a genuine different-net
+  copper conflict, not a margin issue. The offending GND segment lengths
+  (2.9069 / 3.677 / 3.9 / 4.111 / 4.6872 mm) match the bridge tracks exactly.
+  The same region pre-fix (`84db343`) had 1 `tracks_crossing` and 7
+  `shorting_items`. Board-wide, `tracks_crossing` rose 76 → 87–88 while
+  `shorting_items` fell 73 → 67–68. **The fix traded 7 `shorting_items` for
+  ~12 GND-to-ILIM crossings.**
+- *Latent generic defect in the same step*: the bridge layer is hard-coded to
+  F.Cu regardless of the target pad's layer set. One U6 bridge targets the
+  **B.Cu-only** land and therefore bridges nothing. It is harmless here only
+  because the overlap already connects that land — but it is a silent-failure
+  mode for any future pad group that does not overlap.
+- *Honesty assessment of the disclosure*: the fix round's ISS-036 update
+  describes the DRC increase as "additional clearance/hole_clearance
+  violations in that immediate vicinity". That is honest in intent but
+  **factually incomplete** — `clearance` rose only +2 and `hole_clearance` +4,
+  while the dominant new class is +11–12 different-net same-layer crossings, a
+  short-risk class rather than a manufacturing-margin class. Logged separately
+  from ISS-036 precisely so it cannot disappear into an aggregate count: unlike
+  ISS-036's remaining 357, these 12 are individually root-caused and have a
+  targeted fix (skip bridges for already-overlapping pad groups) that does not
+  require solving ISS-036 as a whole.
+
+**Conclusion**: ISS-033, ISS-034 and ISS-035 are correctly `RESOLVED` —
+each is satisfied against its own Recommended Fix text. The new copper the
+fix introduced is a separate, newly-created defect and is now ISS-038.
+
+---
+
+### Item 3 — ISS-031 partial fix: **claims CONFIRMED ACCURATE AND HONEST**
+
+- **Schematic half — done, as claimed.** `build_drv10983_symbol()` now
+  defines pin `25` ("EP", electrical type `power_in`), and
+  `b.connect("GND", [...])` includes `("U5", "25")`. Independently confirmed
+  in the generated `bench-imu-01.kicad_sym`, in the exported netlist (`U5`
+  pin 25 ∈ `/GND`), and in the from-scratch regeneration.
+- **Footprint pad numbering — claim TRUE.** The real installed footprint
+  `/Applications/KiCad/KiCad.app/Contents/SharedSupport/footprints/Package_SO.pretty/HTSSOP-24-1EP_4.4x7.8mm_P0.65mm_EP3.2x5mm.kicad_mod`
+  contains **exactly one** `(pad "25" smd rect ...)`. The exposed pad really is
+  numbered 25, so the schematic-side pin 25 does land on it.
+- **"Thermal-via-array gap UNCHANGED" — claim TRUE.** That same footprint
+  contains **zero** `thru_hole` pads. On the board, U5 pad 25 exists at
+  (110.00, 78.00), 3.2 × 5.0 mm, **F.Cu only**, net `GND`, reached by two
+  0.25 mm F.Cu tracks. There is no via array, exactly as the commit message
+  says. For the record, KiCad ships a sibling variant
+  (`...EP3.2x5mm_ThermalVias`) with 23 pads numbered `"25"` (1 land + 22
+  vias) — a ready fix path in the same library whenever a human decides to
+  take it.
+- **Framing**: ISS-031 is correctly left `OPEN`. Half of a two-part defect
+  was fixed and the unfixed half was named. That is the honest disposition.
+- *Context that the eventual ISS-031 fix must account for*: `hardware/pcb/README.md`
+  already discloses (independently corroborated by this reviewer) that
+  `pcbnew.ZONE_FILLER.Fill()` segfaults in this headless environment, so the
+  board's single `GND` zone on `In1.Cu` exists as an **outline only** —
+  `IsFilled()` is `False`, the `.kicad_pcb` contains zero `filled_polygon`
+  entries (identically pre- and post-fix), and `kicad-cli pcb export gerbers
+  -l In1.Cu` yields **zero G36 regions**, i.e. no plane copper in fab output;
+  GND is instead realised by routed tracks. This is **pre-existing, honestly
+  pre-disclosed, and not a regression from `e63e62c`**, so no finding is
+  logged for it — but it does mean U5's EP has no plane to sink into, and it
+  qualifies the wording of Cycle 6's item-21 pour-continuity note: the
+  accurate statement is that GND is routed on a dedicated layer, not that a
+  continuous pour exists.
+
+---
+
+### Item 4 — Scope creep / silent regressions: **NONE FOUND**
+
+`git diff 84db343 e63e62c --name-status` shows exactly 9 modified files, all
+of them ones the commit message claims: the two `generate_*.py` scripts, the
+three generated artifacts (`.kicad_sch`, `.kicad_sym`, `.kicad_pcb`), the
+regenerated 3D render, the two READMEs, and `validation/open-issues.md`. **No
+file was added or deleted.** Nothing under `firmware/`, `hardware/mechanical/`,
+`bom/`, `requirements/`, `datasheets/` or `.github/` was touched. The BOM is
+byte-identical — correct, since adding U5's EP pin is a symbol/footprint-pad
+matter, not a purchased-part change. The net-by-net netlist diff (item 1) and
+the pad-inventory diff (item 2) are the substantive regression evidence, and
+both are fully attributed with no unexplained residue.
+
+*(Observation, not a finding: no `validation/change-log.md` ECO entry
+accompanies this fix round. Not required here — the board is not being put
+forward as Design Complete — but it will be required before it is.)*
+
+---
+
+### Item 5 — Honesty of `open-issues.md` statuses: **ACCURATE**
+
+| ID | Status after `e63e62c` | This cycle's independent assessment |
+| --- | --- | --- |
+| ISS-030 | RESOLVED | **Correct** (item 1) |
+| ISS-031 | OPEN, with partial progress documented | **Correct** (item 3) |
+| ISS-032 | OPEN, untouched by the diff | **Correct** — not addressed, not hidden |
+| ISS-033 | RESOLVED | **Correct** (item 2) |
+| ISS-034 | RESOLVED | **Correct** (item 2) |
+| ISS-035 | RESOLVED | **Correct** (item 2) |
+| ISS-036 | OPEN, Notes updated with the new ~380–400 counts | **Correct status**; disclosure incomplete on *which* class grew — see ISS-038 |
+| ISS-037 | OPEN, untouched by the diff | **Correct** — not addressed, not hidden |
+
+Nothing was silently dropped, renumbered, downgraded, or marked `RESOLVED`
+without a real fix behind it. The PCB Engineer also volunteered the DRC-count
+*increase* rather than burying it, which is the behaviour this process wants.
+
+Two record-keeping observations, neither a finding:
+
+1. ISS-030/033/034/035 carry `Resolved: 2026-09-02` against `Opened:
+   2026-09-14` — a resolution date chronologically *before* the opening date.
+   This is an environment-clock artifact (the same artifact this Cycle 7
+   heading carries), not a falsification.
+2. ISS-036's **Title** still reads "366 ... DRC violations ... tracks_crossing=76,
+   shorting_items=73" while its Notes correctly state the current ~380–400 and
+   the new categories. The row is honest because the Notes correct it, but the
+   title is now stale; recommend the Hardware Lead have it refreshed so the
+   human-facing summary line matches the artifact.
+
+---
+
+### Item 6 — Gate scripts: **OUTPUT MATCHES THE COMMIT MESSAGE'S CLAIM**
+
+Run by this reviewer, at `e63e62c` (i.e. *before* adding ISS-038):
+
+- `python3 tools/check_id_uniqueness.py` → `OK: no duplicate IDs found across
+  3 namespace(s) (408 ID(s) checked)` — exit 0. Matches the claim.
+- `python3 tools/check_open_issues.py` → `Hardware gate FAILED`, listing
+  exactly **ISS-031, ISS-032, ISS-036** — 3 open HIGH items. Matches the claim.
+
+After this cycle logged ISS-038, re-run: `check_id_uniqueness.py` → OK, 409
+IDs, no duplicates; `check_open_issues.py` → gate still correctly FAILS, now
+on **four** open HIGH items (ISS-031, ISS-032, ISS-036, **ISS-038**). ID
+allocation followed `docs/workflow.md` §4.1: `ISS-037` is the local maximum
+and `git show origin/main:validation/open-issues.md` tops out at `ISS-027`, so
+`ISS-038` is free on both sides with no cross-branch collision risk.
+
+---
+
+### Findings raised this cycle
+
+| ID | Severity | Summary |
+| --- | --- | --- |
+| ISS-038 | HIGH | The ISS-033 fix's new bridging copper under U6's PowerPAD is electrically redundant (all 17 pad-`"21"` members already overlap) yet introduces 12 new different-net same-layer `GND`↔`U6_ILIM` F.Cu crossings; the bridge layer is also hard-coded to F.Cu regardless of the target pad's layer set. |
+
+No other finding is raised. Everything else this cycle examined held up under
+independent re-derivation, and this review declines to manufacture additional
+findings to appear thorough.
+
+### Verdict
+
+**The fix round's claims are CONFIRMED.** ISS-030 (CRITICAL) is genuinely
+fixed at the generator level, verified from primary tool output rather than
+from the commit message; ISS-033/034/035 are genuinely fixed and independently
+audited pad-by-pad; the ISS-031 partial-fix claim — including its explicit
+admission of what it did *not* fix — is accurate in every particular this
+reviewer could check against the real footprint file and the real board. No
+scope creep, no silent regression, no dishonest status edit.
+
+**Is the board closer to fabricable? Yes, materially — but it is NOT ready.**
+
+- **Genuine progress**: open CRITICAL count is now **0** (ISS-030 closed on
+  real evidence), the whole-board connectivity model is now trustworthy
+  (`unconnected_items` = 0 across 4 independent runs, corroborated by an
+  independent pad/net audit rather than by the DRC proxy alone), and 3 of the
+  5 Cycle 6 HIGH/MEDIUM layout findings are closed.
+- **Status is unchanged: CONDITIONAL — NOT ready to fabricate.** Stating it
+  explicitly rather than leaving it implicit: **ISS-031** (U5 EP thermal via
+  array), **ISS-032**, and **ISS-036** (aggregate DRC closure) remain OPEN at
+  HIGH independently of anything found this cycle, **ISS-037** remains OPEN at
+  LOW/MEDIUM, and this cycle adds **ISS-038** at HIGH. `tools/check_open_issues.py`
+  correctly fails the Design Complete Gate on four open HIGH items. Per
+  `docs/architecture.md` §8, Design Complete additionally still requires the
+  traceability matrix, FMEA review, and a `validation/change-log.md` ECO entry
+  for this revision — none of which this fix round claimed or delivered.
+
+**Recommended next actions** (for the Hardware Lead to route): to the **PCB
+Engineer** — ISS-038 first (it is cheap: suppress bridge generation for
+already-overlapping pad groups, which should also recover ~12 of ISS-036's
+crossings for free), then ISS-036's triage and ISS-037; to whoever owns the
+schematic/footprint choice — ISS-031's remaining half, for which the
+`...EP3.2x5mm_ThermalVias` footprint variant is a ready path, and ISS-032. The
+unfilled `In1.Cu` GND zone is pre-existing and pre-disclosed, but a human
+should fill zones in the KiCad GUI and confirm plane copper actually appears
+in gerber output before any fabrication release.
+
+---
+
+### Cycle 7 follow-up addendum — ISS-038 fix re-verification (commit `6353fa6`, 2026-09-02, same day)
+
+**Not a new numbered cycle.** A narrow, five-item confirmation check of the
+PCB Engineer's same-day ISS-038 fix, appended to the Cycle 7 section above.
+Nothing else was re-run or re-litigated; the 21-item checklist was not
+re-executed. Same independence discipline: every number below is from this
+reviewer's own tool invocations against the committed artifact.
+
+**1. Is the fix's reasoning actually correct?** **Yes**, and it is broader
+than the commit subject implies — three distinct changes, matching all of
+ISS-038's own Recommended Fix: (a) the hub/reference pad is now
+`max(matching_pads, key=lambda p: p.GetBoundingBox().GetArea())` instead of
+`matching_pads[0]`; (b) a bridge is skipped entirely when the hub pad's
+bounding box intersects the extra pad's; (c) when a bridge *is* drawn, its
+layer comes from the intersection of both pads' layer sets instead of a
+hard-coded `F.Cu`. The stated root cause is independently correct: U6's
+thermal vias are 0.6 × 0.6 mm on a 1.3 mm pitch, so via-to-via bounding boxes
+genuinely never intersect, whereas the 3.40 × 6.50 mm F.Cu land (area
+22.1 mm², the largest member) contains every via centre — so picking the
+largest-area member as hub is the right discriminator, not merely a
+plausible-looking one.
+*Latent limitation, recorded but not logged as a finding*: the skip test is
+bounding-box-only and does **not** check that the two pads share a copper
+layer. On this board that is benign — the skipped B.Cu land shares no layer
+with the F.Cu hub and is joined only through the 15 PTH vias, so the skip is
+correct in outcome though not by the logic used — and `bridge_layer` also
+silently falls back to `F.Cu` when no common layer exists. Both are caught in
+practice by `unconnected_items`, which is 0 (below). Flagged for the next time
+this generator meets a non-overlapping, non-coplanar pad group.
+
+**2. ISS-033/034/035 not regressed — confirmed.** Own `pcbnew` audit of the
+current `.kicad_pcb`: U6 pad `"21"` = 17 pads, all net `GND`; J1 pad `"SH"` =
+4 pads, all `GND`; SW1 pad `"1"` = 2 pads, both `NRST`; SW1 pad `"2"` = 2
+pads, both `GND` — **all PASS**. Widened board-wide: all 7 multi-pad groups
+on the board are net-consistent, **0 mismatches**. No-net pads remain **57**,
+identical to Cycle 7 — nothing was disconnected by this change. Bridge tracks
+now: **U6 `"21"` = 0** (was 16), J1 `"SH"` = 3, SW1 `"1"` = 1, SW1 `"2"` = 1 —
+exactly the claimed outcome.
+
+**3. DRC — claim CONFIRMED in substance, one specific REFUTED (in the fix's
+favour), one over-claimed.** Four independent `kicad-cli pcb drc --format
+json` runs: `unconnected_items` = 0 and `schematic_parity` = 0 on all four.
+- **GND-vs-`U6_ILIM` `tracks_crossing` = 0 board-wide on all four runs**, not
+  1. Better than claimed; the 12 crossings ISS-038 was raised for are gone.
+  Board-wide `tracks_crossing` is 78, versus 87–88 at `e63e62c` and 77 at the
+  `84db343` baseline.
+- **The "remaining 1 matches Cycle 6's documented pre-existing crossing"
+  claim is inaccurate as stated, though right in substance.** The single
+  remaining violation in the U6 exposed-pad region (x 107.5–112.5,
+  y 48.0–56.0) is a `shorting_items` between `GND` (2.8809 mm F.Cu) and
+  **`DIR`** (the 74.0750 mm F.Cu trace) — not `U6_ILIM`, and not a
+  `tracks_crossing`. The baseline `84db343` region violation was likewise
+  `GND` vs **`DIR`** (as a `tracks_crossing`, GND segment 5.1193 mm). So the
+  underlying conflict — a long `DIR` trace routed straight through U6's
+  exposed-pad region — is genuinely pre-existing and genuinely unrelated to
+  the bridging step, but it was never a `U6_ILIM` crossing. It belongs to
+  ISS-036's aggregate triage; no new finding is raised for it.
+- **Totals: my four runs give 379 / 379 / 370 / 368**, and re-running DRC on
+  the `84db343` baseline board this cycle gives **377** (Cycle 7's two
+  baseline runs gave 370 and 374). The claimed "365–373, at or below the
+  ~370 baseline" is therefore narrower than what this reviewer reproduces,
+  and "a net improvement over baseline" over-reads the noise: the honest
+  statement is that the count is **back within the baseline's own
+  non-determinism band** — the ISS-038 regression is undone, which is what
+  was asked, but it is a wash versus baseline rather than a measured
+  improvement. Recommend softening that sentence in the ISS-038 Notes.
+
+**4. Scope — clean.** `git diff 89a158c 6353fa6 --stat` shows exactly the five
+claimed files: `hardware/pcb/README.md`,
+`hardware/pcb/bench-imu-01/{bench-imu-01-3d.png, bench-imu-01.kicad_pcb,
+generate_pcb.py}`, `validation/open-issues.md`. No additions or deletions;
+nothing under `firmware/`, `hardware/mechanical/`, `bom/`, `requirements/`,
+`datasheets/` or `.github/`.
+
+**5. ISS-038 → RESOLVED is honest.** Not a bare status flip: the row carries a
+correct root-cause explanation, the real code change, and its own verification
+evidence, all of which this reviewer independently reproduced. Two wording
+corrections are owed (the "remaining 1 GND-vs-U6_ILIM crossing", and the
+"365–373 / at or below baseline / net improvement" framing), but neither
+changes the disposition — **this reviewer confirms ISS-038 as RESOLVED**. The
+commit's own disclosure that this fix had not yet been independently
+re-verified was accurate at the time of writing, and is what this addendum
+now closes. `check_id_uniqueness.py` → OK, 409 IDs; `check_open_issues.py` →
+gate still correctly FAILS on ISS-031, ISS-032, ISS-036 (ISS-038 correctly no
+longer listed).
+
+**Verdict: the ISS-038 fix holds up — YES.** Correct reasoning, correct
+implementation, no regression to ISS-030/033/034/035, and the defect it
+targeted is fully (not partially) eliminated by my own measurement.
+**Overall board status is unchanged: CONDITIONAL — NOT ready to fabricate**,
+and this reviewer agrees with that framing: ISS-031, ISS-032 and ISS-036
+remain OPEN at HIGH, ISS-037 remains open, and `docs/architecture.md` §8 still
+additionally requires the traceability matrix, FMEA review and a
+`validation/change-log.md` ECO entry for this revision.
+
+---
+
+## Hardware Reviewer — Cycle 8 (Focused re-verification of ISS-031/032/037 fixes, e9a173f/c436ca9/6fd4226) (2026-09-02)
+
+### Review Cycle Metadata
+
+- **Artifact reviewed**: the three PCB Engineer commits applied on top of
+  `f55d8f7` (the Cycle 7 addendum commit) on branch
+  `ktanino10-bench-imu-01-rev3-pcb-layout`, in commit order:
+  `6fd4226` (ISS-037, MEDIUM — IPC-2221 citation math + trace-width stubs),
+  `c436ca9` (ISS-031, HIGH — U5 footprint/thermal-via array), and
+  `e9a173f` (ISS-032, HIGH, safety-critical — new F2 PTC fuse in J4's
+  ground-return leg). Concretely:
+  `hardware/schematic/bench-imu-01/{generate_schematic.py,
+  bench-imu-01.kicad_sch}`, `hardware/schematic/bench-imu-01-design.md`,
+  `hardware/pcb/bench-imu-01/{generate_pcb.py, bench-imu-01.kicad_pcb}`,
+  `hardware/pcb/bench-imu-01/bench-imu-01.pretty/*`,
+  `bom/bench-imu-01-fab-bom.csv`, `validation/open-issues.md`.
+- **Reviewer**: Hardware Reviewer — see
+  `.github/agents/hardware-reviewer.agent.md` and
+  `.github/skills/hardware-review/SKILL.md`. Independent of the PCB Engineer
+  session that authored all three commits. Per this project's
+  independent-review discipline, each commit message, the design doc's own
+  new §7.5.9 reasoning, and the author's own `open-issues.md` status edits
+  were treated as **claims to be tested**, not as evidence.
+- **This is a focused re-verification, NOT a full re-review.** It
+  deliberately mirrors the scope discipline of "Cycle 5 — ISS-026 CRITICAL
+  fix (Rev 6) re-verification" and "Hardware Reviewer — Cycle 7" above: the
+  21-item Hardware Reviewer checklist was **not** re-run from scratch, and
+  nothing already settled that this fix round did not touch was
+  re-litigated. Specifically **out of scope**: **ISS-036** (still OPEN, not
+  touched this round, explicitly excluded by the review request), J4's
+  underlying pin-mapping ASSUMPTION itself, the board outline/stackup, the
+  pre-existing unfilled `In1.Cu` GND zone (already disclosed at Cycle 7),
+  and every Cycle 6/7 checklist item that passed. `firmware/` and
+  `hardware/mechanical/` were not touched or reviewed.
+- **Independence statement**: Every tool result below was produced by this
+  reviewer's own invocations against the committed artifacts — `kicad-cli
+  sch erc`, `kicad-cli sch export netlist` parsed with a **from-scratch
+  s-expression parser written for this review**, `kicad-cli pcb drc` (4
+  independent runs on the post-fix board, plus a comparison load of the
+  pre-fix `c436ca9` board), and **independently written** `pcbnew`
+  pad/net/geometry/trace-width audits. Audit code was deliberately written
+  fresh rather than reusing anything the PCB Engineer may have, so as not to
+  inherit its blind spots. All `pcbnew` work used KiCad's bundled
+  interpreter
+  (`/Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/3.9/bin/python3.9`).
+  `kicad-cli` is 10.0.1, verified present this session at
+  `/opt/homebrew/bin/kicad-cli` — not assumed carried over from a prior
+  session.
+- **Tooling-honesty note**: this reviewer's runtime forbids writes to
+  `/tmp`, so all report/scratch artifacts were written to an untracked
+  in-repo scratch directory and deleted before commit (same deviation
+  recorded at Cycle 7). No tool was used that is not actually available in
+  this session. No SPICE, no ERC-beyond-`kicad-cli`, no thermal solver, no
+  parts-availability database was used or is claimed — the thermal figures
+  below are this reviewer's own IPC-2221 hand-derivations, explicitly
+  labelled as such.
+
+### Scope — the five things this cycle checked
+
+1. ISS-032 (HIGH, safety-critical): is the F2 fix wired as claimed, **and
+   does it actually hold up adversarially** — electrically, in layout, and
+   as a protective element?
+2. ISS-031 (HIGH): spot-check the author's self-declared RESOLVED.
+3. ISS-037 (MEDIUM): spot-check the author's self-declared RESOLVED.
+4. Did the ISS-032 fix introduce any regression?
+5. Process/governance: was the PCB Engineer's role-boundary exception
+   handled appropriately?
+
+Items 2 and 3 close a real process gap: unlike ISS-030/033/034/035/038,
+which Cycle 7 independently confirmed, ISS-031 and ISS-037 were marked
+RESOLVED by their own author with no independent confirmation.
+
+---
+
+### Item 1 — ISS-032 (HIGH, safety-critical): **NOT RESOLVED — remains OPEN**
+
+The schematic half of this fix is correct and is confirmed below. The fix as
+**implemented on this board** is not, and it introduces a new HIGH-severity
+layout defect (**ISS-039**) that specifically defeats the protective
+behaviour the fix claims. Detail follows.
+
+#### 1a. Is the circuit change what the commit message claims? — **YES, confirmed**
+
+Read directly from `git show e9a173f -- hardware/schematic/bench-imu-01/generate_schematic.py`.
+The single line
+
+```
+b.connect("GND", [("J4", "1")])
+```
+
+is replaced by
+
+```
+b.connect("J4_GND_RAW", [("J4", "1"), ("F2", "1")])
+b.connect("GND",        [("F2", "2")])
+```
+
+with `F2` added as a `Device:Fuse` instance at (25.4, 213.36) carrying
+footprint `bench-imu-01:Fuse_Littelfuse_30R500UF_Radial_D14.0mm_P10.2mm`
+(the same footprint already used by F1). That is exactly what the commit
+message describes.
+
+#### 1b. ERC — **0 errors, independently confirmed**
+
+Own run of `kicad-cli sch erc` against the committed
+`hardware/schematic/bench-imu-01/bench-imu-01.kicad_sch`:
+
+- **0 errors.**
+- 1 warning: `lib_symbol_mismatch` on `TLV75533PDBV` — pre-existing, present
+  before this fix round, unrelated to F2, benign.
+
+#### 1c. Netlist net-membership — **confirmed; F2 is topologically the sole path**
+
+Own `kicad-cli sch export netlist` run, parsed with this reviewer's own
+parser. 79 nets. The relevant three:
+
+| Net | Nodes |
+|---|---|
+| `/J4_GND_RAW` | **exactly 2**: `J4` pin 1, `F2` pin 1 |
+| `/GND` | 46 nodes, **including `F2` pin 2**; `J4` is **not** a member |
+| `/VM_MOTOR_RAW` | `J4` pin 3, `F1` pin 1 |
+
+`J4` pin 2 is `unconnected-(J4-Pad2)` (intentional NC). So the claim "J4 pin
+1 no longer reaches `/GND` directly, only via F2" is **exactly true**, and
+because `/J4_GND_RAW` has precisely two nodes, **100 % of any current
+into or out of J4's sleeve pin traverses F2**. There is no schematic-level
+bypass. Topologically airtight.
+
+#### 1d. Alternate-path analysis — **no bypass at J4, but the fault narrative in the commit is over-simplified**
+
+Re-derived from the netlist, not from the commit message.
+
+Within the J4 loop itself there is no bypass: the only other J4 pin in
+circuit is pin 3 → `/VM_MOTOR_RAW` → F1 → `/VM_MOTOR_F1` → D2 anode-side.
+So a fault current entering J4 must leave through either F1 or F2.
+
+However, the commit's implied fault picture ("the supply's full output
+drives the ground plane, F2 bounds it") is only conditionally right:
+
+- **With an isolated (floating) bench supply and J4 as the only external
+  connection**, the reversed-mapping fault does **not** produce a
+  significant current at all. Design-pin-1 (actually tip, +13 V) → F2 →
+  board GND; design-pin-3 (actually sleeve, 0 V) → F1 → D2 **anode**. The
+  return leg through D2 is **reverse-biased and blocked** (STPS3L60, 60 V
+  reverse rating ≫ 13 V, DS-PROT-034). Essentially no current flows and F2
+  never trips. In that specific topology the *original* D2 "fails safe"
+  claim was substantially correct.
+- **The hazard is real only when a second, externally-referenced ground
+  path exists** — and this board has three: J1 (USB-C), J2 (UART header,
+  3V3/GND/TX/RX) and J3 (SWD header, 3V3/GND/SWCLK/SWDIO) all bring board
+  GND out to typically host- or earth-referenced equipment. With an
+  earth-referenced supply the loop closes: supply(+) → F2 → board GND →
+  J1/J2/J3 GND → host → earth → supply(−). **There, F2 does carry the
+  fault current and is the right element in the right place.**
+
+So F2's protective merit is **real but narrower and more conditional than
+the commit and §7.5.9 assert**. This is not itself logged as a finding —
+the fix is still a genuine improvement over "zero protection" for the case
+that actually matters — but the reasoning gap is recorded here, and it
+matters for 1e.
+
+Note also the residual exposure F2 cannot address: in the earth-referenced
+case, the pre-trip fault current flows through a USB/UART/SWD cable ground
+and the attached host's port. F2 protects the board's own return leg; it
+does not protect the host. Post-trip, F2 holds off the supply and board GND
+returns toward host potential, which is the desired end state.
+
+#### 1e. **Is a PTC actually an appropriate protective element here? — Partially, with a real reasoning gap**
+
+Independently confirmed against `datasheets/evidence-log.md` **DS-PROT-006**
+(and DS-PROT-032/033 establishing 30R500U ≡ 30R500UF): Ihold = 5.00 A,
+Itrip = 10.00 A, Vmax = 30 Vdc, Imax(fault) = 40 A, Rmin(initial) =
+0.010 Ω, R1max(post-trip) = 0.050 Ω, Ihold derating 5.00 A@20 °C →
+2.60 A@85 °C (crossing 3 A at ≈71.7 °C). **The commit cites these values
+correctly** — no misquotation of the Evidence ID.
+
+For the intended fault (a 9–13 V supply, well under Vmax = 30 Vdc, driving
+a low-impedance return), a PTC is a defensible choice: it is resettable, it
+is in the right leg, and Imax = 40 A comfortably covers what a bench supply
+can deliver. So the element class is appropriate.
+
+But three gaps are real:
+
+1. **Trip time is uncited and is not "brief."** §7.5.9's new F2 text says
+   the fault current "trips [F2] within its rated response," with **no
+   Evidence ID**. `grep -ci "time.to.trip\|trip time" datasheets/evidence-log.md`
+   returns **0** — this repository holds no time-to-trip data for this part
+   at all. Under this project's own Source-of-Truth rule that is a gap that
+   should read `UNKNOWN`, not an assertion. Worse, F1's **own existing**
+   §7.5.9 text already states the honest version — that a PTC of this class
+   trips "**in seconds** per its own time-to-trip curve." The new F2 text
+   contradicts the adjacent F1 text about the identical part number.
+2. **The 5–10 A window is unprotected**, and F2's text omits this where
+   F1's text states it. J4 itself is rated 5.0 A (DS-CONN-005). A fault
+   current between J4's 5 A rating and F2's 10 A Itrip stresses the
+   connector without ever tripping F2.
+3. **The Ihold derating is omitted** from F2's text. F1's text carries it;
+   F2's says only "well within its 5A hold rating," which is a 20 °C
+   figure.
+
+These three are logged together as **ISS-041 (LOW)** — documentation
+accuracy, not function. The irony is worth naming: ISS-032's own remedy was
+to *narrow* an over-broad safety claim, and the fix's new prose reintroduces
+the same over-claim one element to the left.
+
+#### 1f. **F2's series resistance IS in the UVLO loop — the design doc's dismissal is electrically wrong**
+
+`generate_schematic.py`'s new comment and §7.5.9 both assert F2 is "not a
+new term in any existing voltage-drop calculation, since the GND reference
+is not part of the VM_MOTOR series-drop budget at DS-MTR-080."
+
+That is incorrect. U5's VCC is measured **relative to board GND**, and board
+GND is now displaced from J4's sleeve by F2's I·R drop. F2 is therefore in
+the series loop, exactly as F1 is.
+
+Using the design's **own** method and **own** constants (0.02 Ω assumed
+in-circuit PTC resistance × 3 A = 0.06 V — precisely as already applied to
+F1 at design-doc lines 1491–1498):
+
+| | Documented (F1 only) | Actual (F1 + F2) |
+|---|---|---|
+| 9.0 V − D2 VF(max) 0.62 V − F1 0.06 V [− F2 0.06 V] | 8.32 V | **8.26 V** |
+| vs `VUVLO_R` max 8.0 V | **≈0.32 V margin** | **≈0.26 V margin** |
+
+That is a further ~19 % erosion of a tracked margin on the design's own
+*binding* 3S-only constraint. The stale ≈0.32 V figure still appears at
+`hardware/schematic/bench-imu-01-design.md` lines **163, 1496, 1909, 3122,
+3870–3871, 4166**.
+
+At DS-MTR-080's operating point (no-load, 0.3 A) the impact genuinely is
+negligible — 3 mV, ≈6 RPM against a stated 25,060–25,280 band. So the
+*conclusion* "negligible" is right **there**; the *stated reason* is wrong,
+and it is **not** negligible at the 3 A UVLO corner. Logged as **ISS-040
+(MEDIUM)**: the margin remains positive at the design's own worst corner,
+and the 0.02 Ω figure is itself an ESTIMATE, so this is a
+derivation-accuracy and stale-figure finding rather than a HIGH.
+
+#### 1g. PCB layout — F2 **is** placed and **is** routed, but with grossly undersized copper
+
+`generate_pcb.py`'s `PLACEMENT` dict does contain F2, and the board is not
+merely "declared placed": own `pcbnew` audit of the committed
+`.kicad_pcb` finds F2 at (83.0, 8.0), pad 1 on `J4_GND_RAW`, pad 2 on
+`GND`, and real copper connecting it. The F1/F2 bounding box is 14.35 ×
+17.52 mm — the ~41 mm inflated-bbox artefact seen earlier is genuinely
+gone.
+
+**DRC, 4 independent runs by this reviewer:**
+
+| Run | total violations | `unconnected_items` | `schematic_parity` |
+|---|---|---|---|
+| 1 | 369 | **0** | 0 |
+| 2 | 375 | **0** | 0 |
+| 3 | 369 | **0** | 0 |
+| 4 | 372 | **0** | 0 |
+
+Totals fall inside the commit's claimed 369–380 band; `unconnected_items` is
+0 on every run. Categories: `solder_mask_bridge` 199–205,
+`tracks_crossing` 78 (constant), `shorting_items` 71 (constant),
+`clearance` 15–16, `hole_clearance` 4, `silk_overlap` 1. No
+`courtyards_overlap`, `pth_inside_courtyard` or `silk_over_copper` — the
+Value-field-hiding claim also checks out. Run-to-run variance is confined to
+`solder_mask_bridge`, consistent with this project's documented DRC
+non-determinism.
+
+**But the copper implementing the fix is wrong.** Own per-net trace-width
+audit of the committed board:
+
+```
+J4_GND_RAW    widths=[0.25]      <-- the new net
+VM_MOTOR_RAW  widths=[1.0]
+VM_MOTOR_F1   widths=[1.0]
+VM_MOTOR      widths=[1.0]
+U5_VCC        widths=[1.0]
+MOTOR_PHASE_U/V/W widths=[1.0]
+```
+
+All copper on `J4_GND_RAW`: a **single 0.250 mm-wide, 22.000 mm-long F.Cu
+track** from (83.00, 30.00) to (83.00, 8.00), plus one **degenerate
+zero-length segment** (83.00, 8.00) → (83.00, 8.00). No vias, no zone on
+that net (the only zone on the board is the `In1.Cu` GND zone, and it is
+**unfilled** — pre-existing and previously disclosed). So the entire motor
+ground-return current is carried by one 10-mil trace.
+
+**This is a regression the fix itself introduced.** Loading the *pre-fix*
+board (`c436ca9`) with the same audit, J4 pad 1 was reached by **three
+1.0 mm GND tracks** (17.77 mm + 2.92 mm + 2.83 mm). Post-fix it is reached
+by **one 0.25 mm track**. The ground return went from three parallel 1.0 mm
+conductors to a single 0.25 mm conductor.
+
+**Root cause**, read directly from `generate_pcb.py`: width is selected as
+`WIDTH_HIGH_CURRENT if net_name in HIGH_CURRENT_NETS or net_name == "GND"
+else WIDTH_POWER if net_name in POWER_NETS else WIDTH_SIGNAL` (lines
+560–563 and 643–646). `HIGH_CURRENT_NETS` (line 250) is
+`{"VM_MOTOR_RAW", "VM_MOTOR_F1", "VM_MOTOR", "U5_VCC", "MOTOR_PHASE_U",
+"MOTOR_PHASE_V", "MOTOR_PHASE_W"}`. The new net `J4_GND_RAW` was **never
+added**, and it no longer matches the literal `"GND"` special case, so it
+fell through to `WIDTH_SIGNAL = 0.25`. Previously it *was* literally `GND`
+and got 1.0 mm for free; the rename silently dropped it out of the
+high-current class.
+
+**Own IPC-2221 derivation** (external layer, 1 oz = 1.378 mil,
+I = 0.048·ΔT^0.44·A^0.725 — the design's own formula; this reviewer
+reproduced ISS-037's own published numbers with it exactly, 54 mil @3 A/10 °C,
+35.3 mil @3 A/20 °C, 30.8 mil @2 A/10 °C, as a method check):
+
+- 0.25 mm (9.84 mil, A = 13.56 mil²) carries **0.88 A at a 10 °C rise**.
+- At **2 A** (DRV10983's continuous rating, DS-MTR-034 — the basis ISS-037's
+  own resolution established as correct) → implied rise **≈65 °C**.
+- At the design's stated **≤3 A** worst case (DS-MTR-056 start-up/locked
+  rotor) → implied rise **≈164 °C**, far outside chart validity and
+  indicative of gross undersizing.
+- Required width at 2 A/10 °C is **0.79 mm**; the net is **0.25 mm**, i.e.
+  **~3.1× undersized** by the design's own accepted sizing basis, and 4×
+  narrower than every sibling net in the same current loop.
+
+**And this specifically defeats the ISS-032 remedy.** F2 is a *resettable*
+device chosen so a fault is self-limiting and recoverable. It is now in
+series with a 22 mm, 10-mil trace. For any fault current large enough to
+matter, that trace is the weakest element in the leg: in the 5–10 A window
+F2 does not trip at all while the trace sits at a computed steady-state rise
+far past fusing; at ≥10 A the trace's fusing time and the PTC's
+multi-second trip time are the same order of magnitude. The likely real
+outcome of the fault F2 was added to survive is **the PCB trace burns
+open**, not "F2 trips and resets." (Stated explicitly as an
+order-of-magnitude engineering argument, **not** a sourced number — this
+repo holds no time-to-trip curve for the part and no fusing data, so this
+reviewer will not present a precise crossover.)
+
+Logged as **ISS-039 (HIGH)**. Severity reasoning, stated openly: CRITICAL
+was considered — at the design's own ≤3 A worst case the computed rise is
+damage-level — but nominal running current is ≈1.05 A (≈15 °C rise,
+survivable) and the 3 A figure is a start-up transient rather than a
+continuous condition, so "will fail under normal operating conditions" is
+not met with certainty. **HIGH** per `docs/architecture.md` §7.1 ("likely
+malfunction or reliability failure under realistic conditions/corners"). If
+the Hardware Lead judges the 2 A *continuous* rating to be the binding
+normal condition, escalation to CRITICAL would be defensible and this
+reviewer would not argue against it.
+
+Note for completeness, and deliberately **not** logged as a finding: the
+board also carries 4 other 0.25 mm `GND` segments (near J1 and at
+(60.00, 62.50)). All four are byte-identical in the pre-fix `c436ca9`
+board — **pre-existing, not introduced this round**, and outside this
+focused cycle's scope. Recorded here so the observation is not lost, not
+inflated into a finding.
+
+#### 1h. Disposition of ISS-032
+
+**Remains OPEN.** The schematic topology is confirmed correct and the
+electrical intent is sound and worth keeping. But ISS-032 is a **safety**
+finding, and the board as committed does not deliver the protective
+behaviour the fix claims, because the fix's own new conductor is undersized
+by ~3× and will very likely fail open before the resettable device it feeds
+can act. Closing a safety finding on a topology that the physical
+implementation defeats is precisely the "fake Design Complete" this project
+forbids. It should close on the next cycle once ISS-039 is fixed — the
+remedy is small (add `"J4_GND_RAW"` to `HIGH_CURRENT_NETS`, re-run, and drop
+the degenerate segment).
+
+---
+
+### Item 2 — ISS-031 (HIGH): **CONFIRMED RESOLVED** (author's claim independently verified)
+
+Two independent checks, both pass:
+
+1. **Footprint reference.** `generate_schematic.py`'s U5 footprint property
+   is now
+   `Package_SO:HTSSOP-24-1EP_4.4x7.8mm_P0.65mm_EP3.4x7.8mm_Mask2.4x4.68mm_ThermalVias`
+   — a **real, stock KiCad library footprint** whose name carries
+   `_ThermalVias`, replacing the prior `EP3.2x5mm` variant that had no via
+   array. This is the specific gap Cycle 6 recorded as unfixed and Cycle 7
+   recorded as still-partial.
+2. **Pad/net audit of the committed `.kicad_pcb`.** U5's pad `"25"` group
+   has **20 members**, and **all 20 are on net `GND`** — 0 mismatches. A
+   board-wide multi-pad net-consistency sweep (every reference, every
+   duplicated pad number) also returns **0 mismatches**, so the fix did not
+   disturb the ISS-033/034/035 work Cycle 7 confirmed.
+
+`unconnected_items` = 0 across all 4 DRC runs, and no
+`courtyards_overlap`/`pth_inside_courtyard` appeared, so swapping to the
+larger EP footprint did not create a placement conflict.
+
+The author's self-declared RESOLVED is **accurate**. Status confirmed.
+
+---
+
+### Item 3 — ISS-037 (MEDIUM): **CONFIRMED RESOLVED** for its stated scope, with a caveat
+
+Own per-net trace-width sweep of the committed board (written fresh, not
+taken from the commit message) over the five named motor-domain nets:
+
+| Net | tracks | widths |
+|---|---|---|
+| `MOTOR_PHASE_U` | 3 | **1.0 mm** |
+| `MOTOR_PHASE_V` | 3 | **1.0 mm** |
+| `MOTOR_PHASE_W` | 3 | **1.0 mm** |
+| `U5_VCC` | 8 | **1.0 mm** |
+| `VM_MOTOR` | 10 | **1.0 mm** |
+
+All uniformly 1.0 mm — **no narrow stubs remain on any of the five**.
+`VM_MOTOR_RAW` is also 1.0 mm; `VM_MOTOR_F1` is 1.0 mm track plus a 0.6 mm
+via (that 0.6 mm is a via *diameter*, not a trace stub — consistent with the
+PCB Engineer's own note, and confirmed here by item type).
+
+The citation half also checks out: this reviewer independently re-derived
+54 mil @ 3 A/10 °C, 35.3 mil @ 3 A/20 °C and 30.8 mil (0.78 mm) @ 2 A/10 °C
+from the IPC-2221 formula, reproducing the corrected README figures.
+
+**Status confirmed RESOLVED**, with this caveat recorded in the backlog: the
+fix corrected the five *named* nets but not the **underlying
+net-classification gap**, which recurred immediately on the very next net
+the project added (`J4_GND_RAW`, ISS-039). ISS-037 stays RESOLVED — it is
+honest to close a finding on its own stated scope — but ISS-039's recommended
+fix should address the classification mechanism, not just add one more
+string to a set.
+
+---
+
+### Item 4 — Regression check
+
+- `unconnected_items` **0**, `schematic_parity` **0** on all 4 DRC runs.
+- Board-wide multi-pad net-consistency audit: **0 mismatches**.
+- ERC: 0 errors, only the pre-existing `lib_symbol_mismatch` warning.
+- No new DRC *category* appeared versus Cycle 7; totals are in the same band.
+- BOM: `bom/bench-imu-01-fab-bom.csv` row 13 adds F2 with the correct MPN
+  (30R500UF), correct footprint, correct DS-PROT-009/032/033 citations, and
+  — creditably — the self-flag "added 2026-09-02, not yet independently
+  reviewed." That flag is now discharged by this cycle: the BOM row is
+  accurate.
+- `tools/check_id_uniqueness.py`: OK, no duplicates across 3 namespaces
+  (410 IDs).
+- `tools/check_open_issues.py`: correctly FAILS the hardware gate.
+
+The one regression found is ISS-039, covered above.
+
+---
+
+### Item 5 — Process/governance: **handled appropriately**
+
+The commit's claim that it "stepped outside normal PCB Engineer scope at
+explicit Chief Engineer direction" is **not** a silent role violation. The
+exception is disclosed in **four** independent places: the commit message,
+an inline comment in `generate_schematic.py`, `bench-imu-01-design.md` (its
+header, §7.5.9, and the parts-list row), and `open-issues.md`'s Notes cell.
+
+More importantly, the author **did not self-close the finding**. ISS-032 was
+deliberately left `Status=OPEN` for independent review, matching the ISS-026
+/ Cycle-5 precedent exactly. That is the correct behaviour under this
+project's author/reviewer separation convention and is worth affirming
+positively — it is the reason this cycle was able to catch ISS-039 before
+the finding was closed.
+
+The contrast is instructive: ISS-031 and ISS-037 *were* self-closed by the
+author, and while both happened to hold up under scrutiny here, the
+ISS-032 handling is the pattern that should be the norm.
+
+---
+
+### Findings raised this cycle
+
+| ID | Severity | Title (short) |
+|---|---|---|
+| ISS-039 | **HIGH** | `J4_GND_RAW`, the ISS-032 fix's own new motor-ground-return net, is routed as a single 0.25 mm / 22 mm F.Cu trace (was three 1.0 mm GND tracks pre-fix) — ~3.1× undersized, and defeats F2's resettable-protection intent |
+| ISS-040 | MEDIUM | F2's series resistance IS in the U5 UVLO loop; the design doc's dismissal is wrong and its ≈0.32 V margin figure is stale (true ≈0.26 V) in 6 locations |
+| ISS-041 | LOW | F2's §7.5.9 safety text omits the three honesty caveats F1's own adjacent text carries (uncited "brief" trip time, unprotected 5–10 A window vs J4's 5 A rating, Ihold thermal derating) |
+
+### Status dispositions set by this reviewer
+
+| ID | Prior status | Disposition | Basis |
+|---|---|---|---|
+| ISS-031 | RESOLVED (author-declared) | **RESOLVED — confirmed** | Real library `_ThermalVias` footprint; U5 pad-25 = 20 members, all `GND`, 0 mismatches |
+| ISS-032 | OPEN | **remains OPEN** | Schematic topology confirmed correct; layout implementation defective (ISS-039) and defeats the fix's protective intent |
+| ISS-037 | RESOLVED (author-declared) | **RESOLVED — confirmed** | All 5 named nets uniformly 1.0 mm; citation math independently reproduced. Caveat noted re: recurring classification gap |
+| ISS-036 | OPEN | **untouched** | Explicitly out of scope for this focused cycle |
+
+---
+
+### Verdict — **CONDITIONAL / FAIL: not ready to fabricate**
+
+Stated plainly, without inflation:
+
+**Is the board closer to fabricable? Partially — but not on the axis that
+mattered most this round.**
+
+- **ISS-031 and ISS-037 are genuine, verified progress.** Both author-
+  declared RESOLVED claims hold up under independent scrutiny. U5's exposed
+  pad now has a real thermal-via array and a clean pad/net audit; the five
+  motor-domain nets are uniformly 1.0 mm. Two real defects are really gone.
+- **ISS-032 is not.** The safety fix's *thinking* is sound, its schematic
+  topology is confirmed exactly as claimed, F2 is genuinely the sole path,
+  ERC is clean, DRC has 0 unconnected items, and the datasheet specs are
+  cited correctly. This was a serious, well-disclosed attempt at a real
+  design fix. But the fix shipped with its own new current-carrying net at
+  4× narrower than every sibling net in the same loop — a ~12× reduction in
+  ground-return copper cross-section relative to the pre-fix board — which
+  both fails the design's own continuous-current sizing basis and
+  specifically undermines F2's purpose as a resettable protective element.
+  A safety finding cannot be closed on that.
+
+**Open CRITICAL after this review: 0.**
+**Open HIGH after this review: 3** — ISS-032 (still open, awaiting the
+layout fix), ISS-036 (untouched, out of scope), ISS-039 (new, raised this
+cycle).
+
+`tools/check_open_issues.py` correctly reports the hardware gate as FAILED.
+Per `docs/architecture.md` §8, Design Complete cannot be declared and the
+board must not be released to fabrication.
+
+**The good news is that ISS-039's remedy is small and well-understood** —
+add `"J4_GND_RAW"` to `HIGH_CURRENT_NETS` (ideally by deriving the class
+from the net's role rather than by string membership, so the next added net
+does not repeat this), drop the degenerate zero-length segment, regenerate,
+and re-run DRC. Once that is done and independently re-verified, ISS-032 and
+ISS-039 should close together and the open-HIGH count drops to 1 (ISS-036).
+
+---
+
+### Cycle 8 follow-up addendum — ISS-039 fix re-verification and ISS-032 final disposition (commits `fad3ea5`, `984097b`, 2026-09-02, same day)
+
+**Not a new numbered cycle.** A narrowly scoped confirmation check of the PCB
+Engineer's same-day ISS-039/041 fix and its consequence for ISS-032, appended
+to the Cycle 8 section above. Mirrors the Cycle 5 / Cycle 7-follow-up scoping
+precedent. The 21-item checklist was **not** re-executed. Nothing already
+settled was re-litigated.
+
+| Field | Value |
+| --- | --- |
+| Reviewer | Hardware Reviewer (AI agent), independent of the PCB Engineer who authored the fixes |
+| Date | 2026-09-02 |
+| Branch | `ktanino10-bench-imu-01-rev3-pcb-layout` |
+| Artifacts under review | `fad3ea5` (ISS-039 + ISS-041), `984097b` (ISS-040 doc propagation), and the committed `bench-imu-01.kicad_pcb` / `.kicad_sch` at `984097b` |
+| In scope | **ISS-039** and **ISS-032** only |
+| Explicitly out of scope | **ISS-040** — dispositioned directly by the human Chief Engineer as a routine margin judgment; not re-verified here, and its status was left exactly as the author set it. **ISS-036** — untouched, still open. `firmware/*`, `hardware/mechanical/*` — not read, not modified. |
+| Verdict | **PASS** — ISS-039 and ISS-032 both closed |
+
+**Independence statement.** Every number below is from this reviewer's own
+tool invocations against the committed artifacts. No figure was taken from
+either commit message, from `bench-imu-01-design.md`'s prose, or from the
+author's self-attestation. Where my measurements disagree with the author's,
+mine are reported as measured (see §3).
+
+**Tooling honesty.** `kicad-cli` 10.0.1 (`/opt/homebrew/bin/kicad-cli`) for
+ERC, netlist export and DRC; KiCad's bundled Python 3.9 with `pcbnew` for the
+pad/net/width/geometry audits, all scripts written from scratch this session.
+No ERC-for-PCB, SPICE, parts-availability or test-equipment tool was used
+because none is connected (`docs/architecture.md` §13). Scratch files were
+written to an in-repo gitignored directory rather than `/tmp`, which this
+environment forbids.
+
+---
+
+**1. Scope cleanliness — CLEAN.** `git diff b54d5f7 984097b --stat` shows
+**9 files**, every one of them disclosed by the two commit messages:
+`generate_pcb.py`, `generate_schematic.py`, `bench-imu-01-design.md`,
+`bench-imu-01.kicad_sch`, `bench-imu-01.kicad_pcb`, `bench-imu-01-3d.png`,
+`power-budget.md`, `bom/component-selection.md`, `validation/open-issues.md`.
+Nothing unexpected, no drive-by edits, no firmware or mechanical files
+touched. `984097b` alone touches only the four documentation files — so the
+entire board delta comes from `fad3ea5`, which simplifies the analysis below.
+
+**2. ISS-039 — fix CONFIRMED, and unusually clean. Status set to RESOLVED.**
+
+- **The width is really fixed.** My own `pcbnew` per-net query of the
+  committed `.kicad_pcb` returns a width set for `J4_GND_RAW` of exactly
+  `{1.0}`. **Both** items are 1.000 mm: the 22.000 mm F.Cu run
+  (83.00, 30.00) → (83.00, 8.00), and the zero-length segment at
+  (83.00, 8.00). Not "claimed 1.0 mm" — measured.
+- **The requested regression hunt found nothing.** `HIGH_CURRENT_NETS` is
+  referenced at exactly **two** sites in `generate_pcb.py` — line 580
+  (bridge step) and line 663 (main MST routing) — and both are the *same*
+  width-selection ternary (`WIDTH_HIGH_CURRENT if net_name in
+  HIGH_CURRENT_NETS or net_name == "GND" else …`). Step B's layer assignment
+  keys off representative-point bounding boxes, not widths; via sizing is
+  independent of the set. **Set membership can affect trace width and
+  nothing else.** There is no second, differently-behaving consumer waiting
+  to misfire on this net.
+- **A geometry diff proves the change was surgical.** I wrote a from-scratch
+  comparison of the pre-fix board (`b54d5f7`) against the current one:
+  **227 vs 227 tracks, 42 vs 42 vias**, and the geometry-only signature
+  (net, layer, start, end) is **identical** — zero items only-in-old, zero
+  only-in-new, vias identical. On shared geometry there are **exactly two
+  width changes, both `J4_GND_RAW`, 0.250 mm → 1.000 mm**. No track moved,
+  no via moved, no other net's width changed. The ~11.6 k-line `.kicad_pcb`
+  churn is UUID/serialisation noise from regeneration, not routing change.
+  This is the cleanest fix delta reviewed on this branch.
+- **Thermal adequacy re-derived independently**, not quoted. IPC-2221
+  `I = 0.048·ΔT^0.44·A^0.725`, 1 oz external = 1.378 mil: 1.0 mm = 39.37 mil,
+  A = 54.25 mil² → **≈2.39 A at a 10 °C rise**, i.e. **≈6.7 °C rise at the
+  2 A continuous basis** (DS-MTR-034) and **≈16.7 °C at the 3 A start-up
+  transient** (DS-MTR-056). Against the old 0.250 mm trace's 0.88 A / 10 °C
+  and ≈65 °C at 2 A, this is a decisive correction and it now matches every
+  sibling net in the same current loop.
+- **The Cycle 8 sub-recommendation to delete the degenerate zero-length
+  segment is WITHDRAWN.** It was not actioned, and a board-wide audit shows
+  **16** such segments across many nets at several widths — a benign,
+  pre-existing systemic artifact of the MST/bridge routing algorithm that
+  DRC does not flag and that does not affect connectivity
+  (`unconnected_items` = 0). It was not a J4-specific defect and I should not
+  have coupled it to a HIGH finding. Closing ISS-039 on its primary defect,
+  the ~12× ground-return copper reduction, which is fully corrected.
+
+**3. DRC — statistically unchanged, and an honest correction to my own Cycle 8
+framing.** `kicad-cli pcb drc --format json` run **8× on the current board and
+8× on the pre-fix board in the same session** (the disclosed run-to-run
+non-determinism makes a same-session baseline the only fair comparison):
+
+| Metric | OLD `b54d5f7` (n=8) | NEW `984097b` (n=8) |
+| --- | --- | --- |
+| `unconnected_items` | **0** on all 8 | **0** on all 8 |
+| `schematic_parity` | **0** on all 8 | **0** on all 8 |
+| Total violations | 370–380, median **373.5** | 368–388, median **373.5** |
+| `tracks_crossing` | 78–79 | 68–70 |
+| `shorting_items` | 69–71 | 76–77 |
+| `clearance` | 15–16 | 17–19 |
+| `hole_clearance` | 4 | 3 |
+| `solder_mask_bridge` | 201–210 | 200–221 |
+
+The **totals are indistinguishable** (identical medians), so `fad3ea5`'s
+claimed 369/370/372 band understates the true spread but the conclusion it
+supports — no DRC regression — is correct.
+
+The category-level shifts, however, are real and non-overlapping across
+runs, and my first instinct was that widening the trace had reclassified
+centreline crossings into copper shorts. **I tested that and it is wrong.**
+Across all 16 runs, **zero** violations on either board name `J4_GND_RAW`,
+and **zero** violations have any item anywhere in the x 81–85 / y 6–32
+corridor the trace occupies. A diff of the violations stable across all 8
+runs shows **84 disappeared and 89 appeared**, all of them in the
+U5/U6/R11/R12/`DIR`/`I2C2` region — nowhere near the change. The most
+plausible mechanism is that regeneration assigns fresh UUIDs to every item
+and the DRC engine's pair-selection/de-duplication in densely-overlapping
+regions is order-dependent, so ~25 % of the reported set churns identity
+across a regeneration that altered only two numbers.
+
+*Recorded as an observation, deliberately not logged as a new finding.* It
+is a property of the verification method, not a defect in the design, and
+the underlying bulk-DRC problem is already tracked as ISS-036 — splitting a
+second ID off it would fragment the backlog. But it is a real caveat for
+whoever works ISS-036: **on this board, comparing DRC violation *counts*
+across a regeneration is weaker evidence than it appears**, and category
+totals should not be read as attributable to the design change without a
+positional or net-name check of the kind done here.
+
+**4. ISS-032 — the blocking objection is gone. Status set to RESOLVED.**
+
+Cycle 8 refused to close ISS-032 for exactly one reason: F2's own series leg
+was 0.250 mm, which made the trace — not the PTC — the weakest element in the
+protected path and defeated the point of choosing a *resettable* device.
+That specific objection is now removed by measurement (§2). What I re-checked
+this cycle, to be sure nothing else drifted:
+
+- **ERC**: 0 errors, 1 warning — a pre-existing, unrelated
+  `lib_symbol_mismatch` on U3 (TLV75533PDBV). Unchanged from Cycle 8.
+- **Topology re-derived from a fresh netlist export**, parsed with my own
+  reader: `/J4_GND_RAW` has **exactly 2 nodes — J4 pin 1 and F2 pin 1**;
+  `/GND` has 46 nodes and **includes F2 pin 2**; **J4 pin 1 is not a direct
+  member of `/GND`**. F2 remains topologically the sole path from J4's sleeve
+  to the shared ground — no schematic-level bypass. J4 pin 2 remains
+  unconnected; F1 remains J4 pin 3 → `/VM_MOTOR_RAW` → `/VM_MOTOR_F1` → D2
+  pin 2.
+- **The layout path is 1.0 mm end to end, not just up to F2.** J4 pad 1
+  (83.00, 30.00) → 22.000 mm 1.0 mm F.Cu → F2 pad 1 (83.00, 8.00); F2 pad 2
+  (93.20, 8.00) → 10.000 mm **1.0 mm In1.Cu** → onward. F2's pads are THT
+  (1.20 mm drill, all copper layers), so the transition is not layer-limited.
+  There is no downstream width bottleneck hiding behind the fixed one.
+- **No new proximity problem from the wider copper** — see §3: nothing at all
+  is flagged in the trace's corridor. The four remaining 0.250 mm `GND`
+  segments sit 60–84 mm away in the J1/USB region; they are pre-existing,
+  previously disclosed, and out of scope.
+- **Nothing else drifted**: U5 pad-25 is still 20 members all on `GND`, and
+  the board-wide multi-pad net-consistency audit still returns **0
+  mismatches** across all 8 groups.
+
+**Honest statement of what the fix does and does not buy.** The reasoning
+nuance recorded at Cycle 8 stands, and it is a nuance, not a defect: with a
+genuinely isolated supply and J4 as the only external ground reference, a
+reversed J4 mapping is blocked by D2's reverse bias and F2 never trips. F2's
+protection is actually *engaged* when a second externally-referenced ground
+path exists — J1 USB-C, J2 UART or J3 SWD — which is the realistic bench
+configuration this board is built for. Within that envelope the fix converts
+an indefinite, completely unprotected ground-hijack into a current-limited,
+self-resetting fault event, and §7.5.9 now states the envelope accurately
+rather than over-claiming it (the 5–10 A window between Ihold = 5.00 A and
+Itrip = 10.00 A is disclosed against J4's own 5.0 A rating, DS-CONN-005; the
+Ihold derating crossing 3 A at ≈71.7 °C is stated; DS-PROT-006). The
+repository still holds **no time-to-trip data** for the 30R500UF, so no
+precise fusing/trip crossover is claimed by the design or by this review —
+correctly. What can be said with confidence is the ordering: at 1.0 mm the
+trace comfortably outlasts F2's own 40 A Imax rating, so **F2 is now the
+weakest element in its own leg, which is what a protective device must be.**
+That was the property the 0.250 mm trace destroyed and it is restored.
+
+That is sufficient to close. ISS-032 → **RESOLVED**.
+
+**5. ISS-041 — confirmed fixed (beyond the literal ask). Status set to
+RESOLVED.** Checked because leaving a demonstrably-fixed finding of my own
+open would misstate the backlog. §7.5.9 (≈ lines 1444–1463) now carries all
+three caveats F1's adjacent text already carried: the uncited
+"trips within its rated response" claim is replaced by an explicit
+do-not-overclaim statement, the 5–10 A unprotected window is disclosed, and
+the Ihold derating table with its ≈71.7 °C crossing of 3 A is stated. Text
+only; no electrical or layout impact.
+
+**6. ISS-040 — not re-verified, by direction.** The human Chief Engineer
+dispositioned it directly as a routine margin judgment (margin remains
+positive, negligible at the actual no-load operating point). Its status was
+left exactly as the author set it. I note only, for the record, that
+`984097b` propagated the corrected ≈0.26 V figure to **eight** locations —
+the six I identified plus `hardware/power-budget.md` and
+`bom/component-selection.md`, which I missed. That is a better fix than my
+own finding asked for.
+
+---
+
+### Cycle 8 follow-up verdict
+
+**PASS.** Both items in scope close.
+
+| Finding | Severity | Disposition |
+| --- | --- | --- |
+| ISS-039 | HIGH | **RESOLVED** — width measured at 1.0 mm on both segments; no hidden `HIGH_CURRENT_NETS` side effect; geometry diff proves an exactly-two-value change; thermally adequate by independent IPC-2221 derivation |
+| ISS-032 | HIGH | **RESOLVED** — topology re-derived and unchanged, F2 still the sole path, path 1.0 mm end to end, no new DRC exposure, protective-element ordering restored |
+| ISS-041 | LOW | **RESOLVED** — all three honesty caveats now present in §7.5.9 |
+| ISS-040 | MEDIUM | Not re-verified — Chief Engineer disposition, status left as the author set it |
+
+**No new findings were raised this cycle.** The next free ID remains
+**ISS-042** (branch max ISS-041; `origin/main` max ISS-029; all other remote
+branches ≤ ISS-029; `tools/check_id_uniqueness.py` reports 413 IDs, no
+duplicates).
+
+**Open CRITICAL after this review: 0.**
+**Open HIGH after this review: 1 — ISS-036 only.**
+
+**Is the board closer to ready to fabricate? Yes, materially.** The
+open-HIGH count on this branch has gone 3 → 1, and the one that mattered
+most is the one that closed properly: the safety-critical ground-return
+finding was fixed at the circuit level, then its own fix's layout defect was
+caught and fixed, and both have now been independently verified from primary
+tools rather than accepted on attestation. The two-step loop-back
+(Cycle 8 → fix → Cycle 8 follow-up) worked exactly as this project's process
+intends.
+
+**It is still not fabricable.** `tools/check_open_issues.py` continues to
+report the hardware gate as **FAILED** on ISS-036, and per
+`docs/architecture.md` §8 Design Complete cannot be declared and the board
+must not be released to fabrication while a HIGH finding is neither RESOLVED
+nor human-accepted-risk. ISS-036 is now the sole remaining blocker.
+
+---
+
+## Hardware Reviewer — Cycle 9 (Independent verification of ISS-036 whole-board-aware reroute fixes, `7847974`) (2026-09-02)
+
+### Review Cycle Metadata
+
+- **Artifact reviewed**: commit `7847974fceed46f9833cbdcefcdc55e66ede1a2a`
+  ("ISS-036: whole-board-aware reroute fixes (4 of 4 targeted, 3 of 4
+  closed)") on branch `ktanino10-bench-imu-01-rev3-pcb-layout`, made by the
+  PCB Engineer role. Concretely:
+  `hardware/pcb/bench-imu-01/{generate_pcb.py, bench-imu-01.kicad_pcb}` and
+  `hardware/pcb/README.md`/`validation/open-issues.md` narrative updates.
+  Pre-round baseline for all before/after comparisons is `19ffb164b3868`
+  (the last commit before this round's PCB changes — confirmed via `git show
+  --stat` on every intermediate commit between the prior triage round and
+  this one; none touched `generate_pcb.py` or the `.kicad_pcb`).
+- **Reviewer**: Hardware Reviewer — see
+  `.github/agents/hardware-reviewer.agent.md` and
+  `.github/skills/hardware-review/SKILL.md`. Independent of the PCB Engineer
+  session that authored the commit. Per this project's independent-review
+  discipline, the commit message, `hardware/pcb/README.md`'s own narrative,
+  and `validation/open-issues.md`'s own Notes-column claims were treated as
+  **claims to be tested from primary tools**, not as evidence — including
+  the PCB Engineer's own disclosed self-correction (a bare-`SEG`
+  measurement bug caught mid-round), which was re-derived from scratch
+  rather than trusted on the strength of the disclosure alone.
+- **Scope discipline**: this cycle is a **focused re-verification of one
+  commit's specific claims**, not a full 21-item re-review. `firmware/**`
+  and `hardware/mechanical/**` were not touched or read. ISS-036's own
+  `Status` field in `validation/open-issues.md` was **not** changed by this
+  reviewer — per the review brief, this cycle's job is to verify and report
+  a verdict on this round's specific claims, not to adjudicate ISS-036's own
+  overall disposition, which the brief itself (and this review's own
+  findings, see Verdict) confirms remains far from its "every violation
+  individually triaged" resolution bar regardless of how this round's
+  claims hold up.
+- **Independence statement**: every number in this section was produced by
+  this reviewer's own tool invocations against the two committed board
+  states — `kicad-cli pcb drc --format json` (10.0.1, confirmed present at
+  `/opt/homebrew/bin/kicad-cli`; 3 independent runs on the current board
+  **and** 3 independent runs on a `git show 19ffb16:...`-extracted baseline
+  copy, 6 runs total) and **independently written** `pcbnew` geometry
+  scripts run under KiCad's own bundled interpreter
+  (`/Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/3.9/bin/python3.9`).
+  Two separate geometry techniques were built and **cross-validated against
+  each other** before being trusted: (1) an independent from-scratch
+  whole-board collision checker built without reference to the PCB
+  Engineer's own code, and (2) a binary-search over the `clearance`
+  parameter of `pcbnew`'s own `SHAPE.Collide()` (using
+  `GetEffectiveShape()`, the same width-aware shape KiCad's own DRC engine
+  uses internally) — chosen because this KiCad Python build exposes no
+  SWIG-level `intp` helper to read `Collide()`'s `aActual` out-parameter
+  directly. Both techniques agreed to four decimal places (0.2250 mm) on
+  the same real board pair before either was used for a reported finding.
+- **Tooling-honesty note**: `/tmp` is writable in this session (unlike some
+  historical cycles, which had to fall back to an untracked in-repo scratch
+  directory) — all scratch scripts and DRC JSON output for this cycle live
+  under `/tmp/hwreview9/` and were not part of the commit.
+
+### Scope — the five things this cycle checked
+
+1. Are the 3 "J1-area" `via_vs_inner_layer_copper` fixes real, and does the
+   new reroute avoid introducing a conflict with any *other* net anywhere
+   on the board (not just the 3 targeted ones)?
+2. Is the 4th target (I2C1_SDA vs I2C1_SCL near U5) genuinely physically
+   intractable, independently re-derived, not just re-asserted?
+3. Are the claimed "19 pre-existing, not new" `clearance`/`hole_clearance`
+   violations actually pre-existing — checked object-by-object against a
+   pristine pre-round baseline, not inferred from the aggregate count?
+4. Any other undisclosed regression, in any DRC category?
+5. Is the engineering judgment sound: leaving ~54 outer-layer violations
+   unfixed after a real multi-iteration search, and declining a U5/U6
+   placement change this round?
+
+---
+
+### Item 1 — The 3 J1-area `via_vs_inner_layer_copper` fixes: **CONFIRMED**
+
+**(a) Geometric sense of the `REROUTE_OVERRIDE` definitions.** Read
+`generate_pcb.py`'s new `REROUTE_OVERRIDE` list and `_apply_reroute_overrides()`
+in full (`git show 7847974`). Independently cross-checked the two named GND
+through-vias against the schematic/netlist: both sit at U3/U4 pin 2 exactly
+where the prior mechanism-level triage located them, and the new
+`VBUS_5V` detour geometry matches the override list's own coordinates
+exactly (no transcription drift between the stated fix and the applied
+one). The override design (match by net + position, not UUID/object
+identity, with a loud warning-and-skip rather than a silent no-op if a
+source segment goes stale) is sound given this project's own documented
+UUID-instability-across-regeneration lesson.
+
+**(b) DRC-confirmed absence of the 3 targeted conflicts.** Ran
+`kicad-cli pcb drc --format json` three independent times on the current
+board. All 3 runs: **zero** remaining conflicts pairing a GND object at
+either of the 2 known via positions, `(29.8625, 25.0)` / `(45.8625, 25.0)`,
+against a `VBUS_5V` object. Broadened the search to every violation
+mentioning an `In2.Cu` item at all (the shared inner layer these conflicts
+lived on): the current board has exactly **2** remaining `In2.Cu`
+`shorting_items` instances (`VM_MOTOR_RAW` at `(86.0, 30.0)` — see Finding
+HWR9-A below — and `I2C1_SCL`/`I2C1_SDA` at `(107.14, 80.275)` — the 4th
+target, Item 2 below), consistent across all 3 runs. The original 3
+J1-area conflicts are conclusively gone, not merely undercounted by DRC
+noise.
+
+**(c) Whole-board collision re-check, independently authored.** Wrote a
+from-scratch collision checker (not derived from or reusing the PCB
+Engineer's own code, and deliberately **not** calling KiCad's own
+`GetEffectiveShape()`/`Collide()` machinery, to get a structurally
+independent second opinion) that loads the current board via `pcbnew`,
+identifies every new/modified track segment introduced by the reroute (9
+segments), and checks each one by hand-written point-to-segment /
+segment-to-segment trigonometry against **all 485** other-net copper
+objects on the board (every track, via, and pad not on the same net,
+each pad conservatively approximated as a bounding circle) — not just the
+objects DRC itself already flagged. All 9 segments clear every one of the
+485 objects with positive margin. The tightest margin found is **0.2250
+mm** (the `VM_MOTOR` reroute segment from `(102.275, 16.8)` to `(99.275,
+16.8)` vs. C16's GND pad 2 at `(100.775, 18.0)`) — independently
+cross-validated by locating that same real, committed track and pad in
+`pcbnew` and computing their gap via the official
+`GetEffectiveShape()`/`Collide()`-binary-search method instead: **0.225001
+mm**, i.e. the two structurally-independent methods agree to within
+0.000001 mm despite one approximating the pad as a circle and the other
+using its exact shape. This exceeds the
+board's sole applicable clearance rule (`board.GetDesignSettings().m_MinClearance`
+= 150 000 nm = 0.15 mm — confirmed the only rule in force: no `(net_class
+...)` override exists anywhere in `bench-imu-01.kicad_pcb`, and the only
+`(clearance 0.3)` token in the file is a GND zone's own unrelated
+`connect_pads` thermal-relief setting). `VM_MOTOR` is a 9.0–13.0 V rail
+(`requirements/traceability-matrix.md` REQ-109) — at this voltage a 0.225 mm
+copper-to-copper gap is not a creepage/clearance (checklist item 20)
+concern.
+
+`unconnected_items` = **0** on all 3 fresh runs.
+
+**Item 1 verdict: CONFIRMED.** All 3 targeted conflicts are genuinely
+resolved, the new copper does not introduce any new conflict anywhere else
+on the board (checked against all 485 other-net objects, not a sample),
+and the claimed clearance margins are independently reproduced by two
+different methods.
+
+---
+
+### Item 2 — The 4th target (I2C1_SDA vs I2C1_SCL near U5): **CONFIRMED intractable**, with one narrative-accuracy finding
+
+Queried `pcbnew` directly for U5's placed position and the two vias.
+Results: U5 at `(110.0, 78.0)` (footprint
+`HTSSOP-24-1EP_4.4x7.8mm_P0.65mm_..._ThermalVias`, confirming this is a
+0.65 mm-pitch fine-pitch package); `I2C1_SDA` via at `(107.1375, 80.925)`;
+`I2C1_SCL` via at `(107.1375, 80.275)`. Both vias: 0.6 mm copper diameter /
+0.3 mm drill. Pitch between the two vias: **exactly 0.65 mm** (matching
+U5's own pin pitch, as claimed). Copper-edge gap: **exactly 0.05 mm**,
+independently confirmed two ways — hand arithmetic (`0.65 − 0.6 = 0.05`)
+and the validated `Collide()`-binary-search method (`0.050001 mm`).
+Distance from the SDA via to U5's placed center: **4.09 mm** (claimed
+"4.1 mm" — matches). Mathematically confirmed no track width can thread
+this gap while holding the board's 0.15 mm clearance rule to both vias
+simultaneously (`0.05 mm ≥ w + 2×0.15 mm` requires `w ≤ −0.25 mm`,
+impossible for any positive width) — this is a **hard geometric
+impossibility**, not a routing-algorithm limitation, and independently
+confirms the claim.
+
+**Additional check beyond the task's specific framing**: the README
+states this conflict is "now reported as 3 separate DRC entries per run
+rather than 1." Searching the current board's DRC output for every
+violation mentioning both `I2C1_SCL` and `I2C1_SDA` found **4** entries
+total, consistently across all 3 runs: 1 `clearance` (the via-vs-via pair
+just verified above) + 3 `shorting_items` (via-vs-track pairings —
+`I2C1_SCL` via vs. a 95.175 mm `I2C1_SDA` track on B.Cu; `I2C1_SDA` via vs.
+a 36.925 mm `I2C1_SCL`-conflicting track, also B.Cu; and `I2C1_SCL`'s own
+3.725 mm `In2.Cu` track vs. the `I2C1_SDA` via). Checking the **baseline**
+(`19ffb16`) for the same search: **the identical 4 entries are already
+present**, same net names, same positions, same track lengths, across all
+3 baseline runs too. This directly contradicts the "rather than 1"
+half of the claim — the 3-shorting-items-entries reporting granularity for
+this conflict is pre-existing, not something this round's changes caused.
+The underlying substance is unaffected (the via-to-via gap really is
+0.05 mm and really is unfixable, confirmed above independent of this
+detail), so this does not change the Item 2 verdict, but it is a real,
+independently-checkable inaccuracy in the round's own narrative — see
+Finding HWR9-B.
+
+**Item 2 verdict: CONFIRMED** (the physical-intractability claim holds up
+completely under independent re-derivation), **with Finding HWR9-B** (LOW)
+against one adjacent, non-substantive narrative detail.
+
+---
+
+### Item 3 — The claimed "19 pre-existing" `clearance`/`hole_clearance` violations: **CONFIRMED, exhaustively**
+
+The task asked for at least 4–5 spot-checked pairs. This review checked
+**all of them**: enumerated every unique `clearance`/`hole_clearance`
+violation (by UUID-pair, confirmed stable across repeated DRC runs on one
+static file) across 3 fresh current-board DRC runs — **22** unique pairs
+found (vs. the PCB Engineer's own reported 19; a difference consistent
+with the same run-to-run DRC non-determinism already independently
+reconfirmed this cycle — see Item 4 — not a contradiction).
+
+For **all 22**, this reviewer independently: (1) located the exact two
+objects in the current board by UUID, (2) computed their real, width-aware
+clearance via `GetEffectiveShape()` + the validated `Collide()`-binary-search
+method, (3) located the matching two objects in the pristine `19ffb16`
+baseline by net name + position + (for tracks) length — the same
+disambiguating signature the PCB Engineer's own corrected methodology
+uses, chosen specifically because UUIDs are **not** stable across a board
+*regeneration* (only across repeated DRC runs on one static file) — (4)
+required a **unique** match in the baseline (flagging, not guessing, if 0
+or 2+ candidates existed — this fired once, for a same-reference-designator
+NPTH mounting-hole pad with an empty pad name shared by two mounting
+holes on J1, resolved unambiguously by nearest-position since mounting
+holes are a fixed mechanical constraint), and (5) computed the identical
+clearance calculation on the baseline pair.
+
+**Result: all 22 of 22 pairs are numerically identical between baseline
+and current** (agreement to <0.0005 mm, the binary search's own
+convergence tolerance), including:
+
+| Sample pair | Current | Baseline | Match |
+|---|---|---|---|
+| `I2C1_SCL` via vs. `I2C1_SDA` via (the 4th target, cross-checked against Item 2) | 0.0500 mm | 0.0500 mm | ✅ |
+| `GND` track (8.64 mm) vs. `CC1` via — **the PCB Engineer's own cited worked example** | 0.1500 mm | 0.1500 mm | ✅ |
+| `VBUS_5V` via vs. `GND` track (8.64 mm), near J1 | 0.1500 mm | 0.1500 mm | ✅ |
+| `GND` track (9.598 mm) vs. J1's NPTH pad (`hole_clearance`) | 0.0000 mm | 0.0000 mm | ✅ |
+| `U5_V3P3` track vs. `I2C1_SCL` via | 0.1500 mm | 0.1500 mm | ✅ |
+| `GND` track (2.168 mm) vs. `U2` pad 4 (`<no net>`) | 0.0263 mm | 0.0263 mm | ✅ |
+| ...16 further pairs (full sweep, not a sample) | — | — | ✅ all 16 |
+
+Zero ambiguous matches, zero missing matches, zero pairs showing any
+numerical difference. This is a stronger result than the task strictly
+required (4–5 pairs) and independently, exhaustively confirms: every
+`clearance`/`hole_clearance` violation visible in the current board's DRC
+output was **already present, at the identical numeric margin, before this
+round's changes** — the round's reroutes introduced no new instance of
+either category.
+
+**Item 3 verdict: CONFIRMED**, with a stronger evidentiary base (22/22
+checked) than the minimum the task requested.
+
+---
+
+### Item 4 — No other regression: **CONFIRMED**, with one pre-existing triage-completeness finding
+
+- `unconnected_items` = **0** on all 6 DRC runs (3 current + 3 baseline).
+  `schematic_parity` = **0** on all 6 runs.
+- Exactly the same **6** distinct violation `type` values appear in both
+  boards (`clearance`, `hole_clearance`, `shorting_items`, `silk_overlap`,
+  `solder_mask_bridge`, `tracks_crossing`) — no new/hidden category
+  appeared, none disappeared.
+- Footprint count unchanged: 53 in both boards.
+- Per-category totals, this reviewer's own 3-run bands (baseline →
+  current), closely matching the PCB Engineer's own claimed table:
+
+  | Category | Baseline (3 runs) | Current (3 runs) | Direction |
+  |---|---|---|---|
+  | Total | 370–376 | 363–369 | ↓ (improved) |
+  | `shorting_items` | 60–62 | 56–59 | ↓ (improved, matches claimed fix) |
+  | `tracks_crossing` | 81–82 | 71–73 | ↓ (improved) |
+  | `clearance` | 11 (all 3 runs) | 16–17 | ↑ — fully explained, see Item 3 |
+  | `hole_clearance` | 3 (all 3 runs) | 5–6 | ↑ — fully explained, see Item 3 |
+  | `solder_mask_bridge` | 211–217 | 211–215 | flat |
+  | `silk_overlap` | 1 | 1 | unchanged |
+
+  The only two categories that increased in raw count (`clearance`,
+  `hole_clearance`) were independently, exhaustively confirmed in Item 3 to
+  be a pre-existing DRC-reporting artifact, not new copper problems. Every
+  other category held flat or improved.
+
+- **Finding HWR9-A (new, surfaced incidentally during this review, LOW
+  severity)**: while confirming the In2.Cu conflict count in Item 1(b),
+  this reviewer found a `shorting_items` instance — `VM_MOTOR_RAW` (In2.Cu,
+  14.0 mm track) vs. J4 pin 2 (a PTH pad with **no net assigned**) at
+  `(86.0, 30.0)` — that is **not** one of the round's named targets.
+  Checked the baseline: **identical** position, identical 14.0 mm length,
+  already present before this round — confirmed pre-existing and
+  untouched by commit `7847974`, **not a regression**. However, it does
+  not cleanly fit any of the prior round's mechanism-level triage buckets
+  ("3 benign + 4 `via_vs_inner_layer_copper` + 54 outer-layer = 61
+  `shorting_items`", from the 2026-09-02 mechanism-level-triage entry in
+  `hardware/pcb/README.md`): it sits on `In2.Cu`, not `F.Cu`/`B.Cu`, so it
+  is not "outer-layer"; and its mechanism is track-vs-unconnected-pad, not
+  via-vs-track, so it is not `via_vs_inner_layer_copper` either. Traced why
+  J4 pin 2 has no net: the schematic confirms J4's symbol is
+  `Connector:Barrel_Jack_Switch` (`lib_id`), value `PJ-102AH`, a 3-pin
+  symbol — and `validation/open-issues.md` already carries **ISS-017**
+  (LOW, currently OPEN) for exactly this terminal: "J4 (Same Sky PJ-102AH)
+  barrel jack's third terminal function (switch contact vs. sleeve/GND
+  identity) is unconfirmed from the datasheet page fetched to date,"
+  disposed as "left unpopulated, a safe default." So J4 pin 2's netless
+  state is not an undocumented floating-pin defect at all — it is a
+  **known, already-tracked, correctly-disposed design choice** (ISS-017),
+  confirmed still open and unchanged by this round. The only genuine gap
+  this reviewer is newly flagging is narrower than "why is this pin
+  unconnected": it is that the *DRC-consequence* of ISS-017's deliberate
+  unpopulated pin (a `shorting_items` violation against the adjacent
+  `VM_MOTOR_RAW` track) was not cross-referenced in the prior round's own
+  `shorting_items` bucket accounting, so "3+4+54=61" reads as an implicit
+  exhaustive partition when at least this one additional, already-explained
+  instance sits outside all three named buckets. See Finding record below.
+
+**Item 4 verdict: CONFIRMED** — no regression from commit `7847974` in any
+DRC category, in `unconnected_items`, or in `schematic_parity`. One
+pre-existing (not new) triage-completeness gap surfaced (Finding HWR9-A).
+
+---
+
+### Item 5 — Engineering judgment on the ~54 outer-layer violations and the declined U5/U6 placement change: **PARTIALLY CONFIRMED**
+
+**Geometric sanity check.** Queried `pcbnew` directly: U5 at `(110.0,
+78.0)` (`HTSSOP-24-1EP`, 0.65 mm pitch), U6 at `(110.0, 52.0)`
+(`HTSSOP-20-1EP`, 0.65 mm pitch) — both fine-pitch exposed-pad packages, as
+claimed. Re-derived the `via_vs_track_outer_layer` sub-bucket specifically
+(one item a via, the other a track, neither on `In2.Cu`) from a fresh DRC
+run: **26** instances (vs. the claimed 28 — close, consistent with
+documented DRC noise, and stable at exactly 26 across all 3 of this
+reviewer's own runs, i.e. not itself a noisy figure on this reviewer's
+side). Checking each instance's distance to the nearest of U5's or U6's
+placed center:
+
+| Interpretation | Count | vs. claimed "14" |
+|---|---|---|
+| Either participant's position ≤ 8 mm from U5 or U6 | **11** | lower |
+| Both participants' positions ≤ 8 mm | 6 | lower |
+| Either participant ≤ 8 mm, counting the 5 instances that measured exactly 8.497 mm as a boundary match | 16 | higher |
+
+None of these three reasonable interpretations reproduces "14" exactly,
+though all are the same order of magnitude and all corroborate the
+qualitative claim: a genuinely substantial fraction (roughly 40–60% by any
+of these countings) of the residual outer-layer `via_vs_track` violations
+really do cluster tightly around U5/U6's 0.65 mm-pitch pins, not spread
+uniformly across the board. This reviewer could not pin down the exact
+counting rule that produces "14" specifically (candidates considered:
+mismatched reference point — bounding-box centroid vs. footprint anchor —
+or genuine run-to-run instance churn in *which* 26–28 violations appear,
+even though the *bucket size* itself was stable across this reviewer's own
+3 runs). Recorded as **Finding HWR9-C** (LOW): a specific supporting
+figure in the round's engineering-judgment narrative does not exactly
+reproduce independently, though the qualitative conclusion it supports
+does.
+
+**Is declining the U5/U6 placement change defensible?** Verified the
+cited justification is real, not fabricated: `validation/open-issues.md`
+confirms **ISS-031** (HIGH, RESOLVED) is a genuine, independently-verified
+prior fix that added U5's thermal-via array under its exposed pad — so
+"U5's placement was already the subject of a prior, deliberate fix" is an
+accurate citation, and the stated risk (moving U5 now would require
+re-verifying that fix's own via-array clearances and alignment, not just a
+trivial re-placement) is a real, non-trivial cost, not a pretext. Combined
+with the disclosed multi-iteration automated batch-fix search (1 further
+fix found, then a genuine 4-iteration plateau at search widths up to
+9 mm) and Kyosuke's own cited explicit authorization that reaching zero
+violations is not required this round, this reviewer's independent
+judgment is that **declining the placement change this round is a
+defensible call**, not an unjustified shortcut — the interaction risk with
+a real, previously-verified HIGH-severity thermal fix is a legitimate
+reason to scope a placement change to its own dedicated, properly-budgeted
+session rather than an ad hoc addition to this round.
+
+**Item 5 verdict: PARTIALLY CONFIRMED** — the underlying engineering
+judgment (leaving the ~54 outer-layer violations for a future dedicated
+session, and declining a U5/U6 placement change this round) is sound and
+well-evidenced; one specific supporting figure ("14 of ~54... within
+8 mm") could not be exactly reproduced independently (this reviewer
+obtains 11–16 depending on interpretation) though the pattern it
+illustrates does hold up qualitatively.
+
+---
+
+### Findings raised this cycle
+
+| ID (informal) | Severity | Summary |
+| --- | --- | --- |
+| HWR9-A | LOW | `VM_MOTOR_RAW` (In2.Cu) vs. J4 pin 2 (`<no net>`) `shorting_items` instance at (86.0, 30.0) is pre-existing (confirmed identical in baseline `19ffb16`) and is fully explained by already-open ISS-017 (J4's unconfirmed/unpopulated 3rd terminal), but does not fit any of the "3 benign / 4 `via_vs_inner_layer_copper` / 54 outer-layer" buckets in the 2026-09-02 mechanism-level triage — a triage-completeness gap, not a defect. |
+| HWR9-B | LOW | `hardware/pcb/README.md`'s claim that the I2C1 4th-target conflict is "now reported as 3 separate DRC entries per run rather than 1" is factually inaccurate — the identical 4-entry set (1 `clearance` + 3 `shorting_items`) already exists in the pristine pre-round baseline. Narrative-accuracy issue only; the physical-intractability conclusion itself is independently confirmed regardless (Item 2). |
+| HWR9-C | LOW | The cited figure "14 of ~54 outer-layer violations... within 8mm of U5's or U6's placed center" does not exactly reproduce independently (this reviewer obtains 11, 6, or 16 depending on reasonable interpretation, never exactly 14). Documentation-precision issue only; the qualitative clustering conclusion it supports is independently corroborated (Item 5). |
+
+Full detail, rationale, datasheet grounding, and recommended fix for each is
+given inline above, in the Item discussion where it was found (HWR9-A in
+Item 4; HWR9-B in Item 2; HWR9-C in Item 5).
+
+Per this cycle's specific task scope, none of these three are filed as new
+rows in `validation/open-issues.md` this cycle — the review brief for
+Cycle 9 explicitly directs verifying that `tools/check_open_issues.py`
+continues to report the hardware gate as failing **only** on ISS-036, and
+all three findings are LOW severity, pre-existing-or-narrative-only, and do
+not themselves block Design Complete. If the Hardware Lead concurs, a
+future round should decide whether to promote any of these into formally
+tracked backlog rows.
+
+### Status dispositions set by this reviewer
+
+| ID | Prior status | Disposition | Basis |
+|---|---|---|---|
+| ISS-036 | OPEN | **remains OPEN — untouched by this reviewer** | Per this cycle's explicit scope: this round's specific claims (3 J1-area fixes, 4th-target intractability, 19–22 pre-existing clearance/hole_clearance violations, no other regression) all independently check out (Items 1–4 CONFIRMED, Item 5 PARTIALLY CONFIRMED), but ISS-036's own resolution bar — "every violation individually triaged" — remains far from met: ~355–370 total violations remain, and only a low double-digit count are individually named/triaged. This reviewer does not have standing to change that disposition even where this round's specific work is sound, per the explicit review brief. |
+
+### Verdict — **PASS** (this round's specific claims); ISS-036 remains OPEN and the gate remains FAILED
+
+Stated plainly, per-item:
+
+1. **The 3 J1-area fixes are real and whole-board-clear.** CONFIRMED.
+2. **The 4th target (I2C1 near U5) is genuinely intractable.** CONFIRMED.
+3. **The 19 (this reviewer independently found 22) claimed pre-existing
+   `clearance`/`hole_clearance` violations are genuinely pre-existing, not
+   new.** CONFIRMED — exhaustively, all 22 checked, not a sample.
+4. **No other regression exists.** CONFIRMED — every DRC category either
+   held flat or improved except `clearance`/`hole_clearance`, both fully
+   accounted for by Item 3. One pre-existing (not new) triage-completeness
+   gap surfaced (HWR9-A).
+5. **The engineering judgment (leave ~54 outer-layer violations, decline a
+   U5/U6 placement change this round) is sound.** PARTIALLY CONFIRMED — the
+   judgment itself holds up on independent reasoning and evidence (ISS-031
+   interaction risk verified real), but one specific supporting figure ("14
+   of ~54... within 8mm") does not exactly reproduce (this reviewer
+   independently obtains 11–16 depending on interpretation) — Finding
+   HWR9-C.
+
+**No CRITICAL or HIGH finding was raised by this review.** All three new
+findings (HWR9-A, HWR9-B, HWR9-C) are LOW severity, non-substantive
+(documentation/narrative precision, not a hardware defect or a
+regression), and none of them contradicts this round's core engineering
+claims. Nothing this reviewer checked overturns the commit's central,
+load-bearing claims: the reroute genuinely closes 3 of the 4 targeted
+conflicts without introducing any new one anywhere on the board (checked
+against all 485 other-net objects, not a sample); the 4th is a real
+physical impossibility, not an unattempted case; and every apparent
+increase in DRC-reported violations this round is a pre-existing reporting
+artifact, independently confirmed object-by-object (22 of 22), not a fresh
+defect.
+
+**Open CRITICAL after this review: 0.**
+**Open HIGH after this review: 1 — ISS-036 only (unchanged by this
+cycle).**
+
+`tools/check_id_uniqueness.py`: **OK**, no duplicate IDs across 3
+namespaces (427 IDs checked).
+`tools/check_open_issues.py`: hardware gate correctly **FAILS**, citing
+exactly and only `ISS-036: HIGH finding is neither RESOLVED nor
+ACCEPTED-RISK (status=OPEN)` — matching this cycle's expected state.
+
+**Is the board closer to fabricable?** Marginally, on the metric ISS-036
+itself tracks (`shorting_items` 60–62→56–59, `tracks_crossing` 81–82→71–73,
+both genuine reductions), but ISS-036 as a finding is explicitly not
+resolved by this round and this review does not change that: per
+`docs/architecture.md` §8, Design Complete cannot be declared and the
+board must not be released to fabrication while a HIGH finding remains
+neither RESOLVED nor ACCEPTED-RISK. ISS-036 remains the sole open HIGH and
+the sole blocker, exactly as before this round — this round reduced its
+underlying violation count without closing the finding, which is the
+correct and honestly-disclosed characterization already in
+`validation/open-issues.md`'s own Notes column.
+
+---
+
+## Hardware Reviewer — Cycle 10 (Independent verification of ISS-036 solder_mask_bridge fix round #2, `4c5b227`/`280695d`) (2026-09-02)
+
+### Review Cycle Metadata
+
+- **Artifacts reviewed**: commits `4c5b2271dc374ec5d134defe6d47f39075e23333`
+  ("ISS-036: solder_mask_bridge sweep -- 2 more whole-board-aware fixes")
+  and `280695d0123bd69274180d0c46a58cd849f0d5a2` ("ISS-036: document
+  solder_mask_bridge sweep round in README.md/open-issues.md") on branch
+  `ktanino10-bench-imu-01-rev3-pcb-layout`, both made by the PCB Engineer
+  role. Concretely: `hardware/pcb/bench-imu-01/{generate_pcb.py,
+  bench-imu-01.kicad_pcb}` and `hardware/pcb/README.md`/
+  `validation/open-issues.md` narrative updates. Pre-round baseline for
+  every before/after comparison is `4c5b227~1`, which **is** (identical
+  SHA, confirmed via `git rev-parse`, not merely an empty diff)
+  `420c6b6291abb7182d857287b24f6ddfdf59501c`. A third commit, `420c6b6`
+  ("Merge origin/main into
+  ktanino10-bench-imu-01-rev3-pcb-layout", resolving a real merge conflict
+  plus a real `ECO-033`→`ECO-034` ID renumbering), sits immediately before
+  the two commits above; per this cycle's brief it was **not** deeply
+  re-reviewed (it was already informally reviewed by the human during the
+  session), but was sanity-checked: `tools/check_id_uniqueness.py` reports
+  0 duplicates on the post-merge tree (451 IDs), and treating `420c6b6`
+  itself as this cycle's pre-round baseline board (rather than trusting
+  that the merge left the board file untouched) means every finding below
+  is automatically robust to anything the merge might have silently
+  changed — if the merge had corrupted board geometry, that corruption
+  would show up as a baseline-vs-current discrepancy in Items 1, 3, or 4
+  below, and none did.
+- **Reviewer**: Hardware Reviewer — see
+  `.github/agents/hardware-reviewer.agent.md` and
+  `.github/skills/hardware-review/SKILL.md`. Independent of the PCB
+  Engineer session that authored the commits. Per this project's
+  independent-review discipline, the commit messages,
+  `hardware/pcb/README.md`'s own narrative, and
+  `validation/open-issues.md`'s own Notes-column claims were treated as
+  **claims to be tested from primary tools**, not as evidence — including
+  this reviewer's **own** prior Cycle 9 narrative, one specific technical
+  claim of which is corrected below (Finding HWR10-B) after it did not
+  survive being re-derived from scratch rather than trusted on the
+  strength of having passed a prior review.
+- **Scope discipline**: this cycle is a **focused re-verification of one
+  round's specific claims**, not a full 21-item re-review. `firmware/**`
+  and `hardware/mechanical/**` were not touched or read. ISS-036's own
+  `Status` field in `validation/open-issues.md` was **not** changed by
+  this reviewer — per the review brief, this cycle's job is to verify and
+  report a verdict on this round's specific claims, not to adjudicate
+  ISS-036's own overall disposition, which remains far from its "every
+  violation individually triaged" resolution bar regardless of how this
+  round's claims hold up (~350–365 total violations remain, per this
+  cycle's own Item 4 count table below).
+- **Independence statement**: every number in this section was produced
+  by this reviewer's own tool invocations against the two committed board
+  states — `kicad-cli pcb drc --format json` (10.0.1, confirmed present at
+  `/opt/homebrew/bin/kicad-cli`; **5** independent runs on the pre-round
+  baseline board and **10** independent runs on the current board — 5
+  from the original investigation plus 5 more run specifically to
+  pressure-test the Item 3 bonus finding, 15 DRC runs total) and
+  **independently written** `pcbnew` geometry scripts run under KiCad's
+  own bundled interpreter
+  (`/Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/3.9/bin/python3.9`).
+  Two separate whole-board collision-checking techniques were built and
+  **cross-validated against each other** before being trusted: (1) an
+  independent from-scratch collision checker approximating every pad as a
+  conservative bounding circle (1,662 candidate pairs checked: 4 new
+  segments × 477 other-net copper objects on the two nets involved's
+  layer), and (2) a binary-search over the `clearance` parameter of
+  `pcbnew`'s own `SHAPE.Collide()` using `GetEffectiveShape()` (the same
+  width- and pad-shape-aware geometry KiCad's own DRC engine uses
+  internally). The conservative method flagged 3 candidate negative-margin
+  pairs; the precise method disproved all 3 as false positives (real
+  margins **0.35 mm, 0.35 mm, 0.3248 mm**, all clearing the board's true
+  0.2 mm clearance requirement — see Item 1(e)) — i.e. the two techniques
+  were used exactly as intended, as a check on each other, not taken on
+  faith individually. A third, independent whole-board geometric diff
+  (every track/via/pad in both `.kicad_pcb` files, not just DRC's own
+  reported violations) was also built and used to grounds-truth Items 1
+  and 4 (see Item 1(f) and Item 4).
+- **Tooling-honesty note**: all scratch scripts and DRC JSON output for
+  this cycle live under `/tmp/hwreview10/` and were not part of the
+  commit, per this project's established scratch-work convention (see
+  Cycle 9's own tooling-honesty note for precedent).
+
+### Scope — the five things this cycle checked
+
+1. Are the 2 new `REROUTE_OVERRIDE` fixes (`3V3`, `VM_MOTOR`) real, distinct
+   from each other and from the 3 fixes already verified in Cycle 9, and
+   whole-board-clear (no new conflict introduced anywhere else)?
+2. Are the claimed root-cause/spatial-composition figures for the 211
+   `solder_mask_bridge` violations (209/211 track-vs-pad; 125/211 within
+   15 mm of U5/U6; 206/211 uniquely identified; only 2/206 fixable)
+   roughly reproducible from a fresh DRC run, not merely re-asserted?
+3. Are the claimed pre-existing `tracks_crossing` (72–73→81) and
+   `hole_clearance` (5–6→3) count changes genuinely pre-existing/unaffected
+   by this round — checked object-by-object against the pre-round
+   baseline, not inferred from the aggregate count or from a small-sample
+   violation-membership test (the exact category of claim this cycle's
+   brief specifically flagged as previously needing correction)?
+4. Any other undisclosed regression, in any DRC category?
+5. Is declining a U5/U6 placement redesign (again) a defensible
+   engineering call, given the claimed 59%/41% spatial split and the
+   11–20 mm U5/U6 neighbor-spacing figures?
+
+---
+
+### Item 1 — The 2 new `solder_mask_bridge` fixes (`3V3`, `VM_MOTOR`): **CONFIRMED**
+
+**(a) `REROUTE_OVERRIDE` now has 5 entries.** Read
+`generate_pcb.py`'s `REROUTE_OVERRIDE` list in full (`git show 4c5b227`).
+It now has exactly 5 entries: the 3 already independently verified by
+this reviewer's own Cycle 9 (`VBUS_5V` ×2, `VM_MOTOR` ×1 via
+`(102.275, 18.0)`/`(99.275, 16.8)`/`(99.275, 18.0)`), plus 2 new ones
+added by `4c5b227`:
+
+| Net | Old straight track | New detour path |
+|---|---|---|
+| `3V3` | `(31.825, 47.6)`–`(31.825, 42.0)` (5.600 mm) | via `(28.825, 47.6)` |
+| `VM_MOTOR` | `(107.1375, 30.0)`–`(113.85, 30.0)` (6.7125 mm) | via `(110.85, 27.0)` |
+
+Confirmed geometrically distinct from the Cycle-9-verified `VM_MOTOR`
+fix: that one detours `(113.85, 18.0)`–`(99.225, 18.0)` (a track on the
+J4/M1 side of U6, y≈16.8–18.0), this new one detours
+`(107.1375, 30.0)`–`(113.85, 30.0)` (a completely different track,
+y≈27.0–30.0, over 9 mm away in Y) — same net, unrelated segments, not a
+duplicate or a conflicting re-definition of the same fix.
+
+**(b) Both overrides are genuinely applied on the committed board.**
+Loaded `bench-imu-01.kicad_pcb` in `pcbnew` and confirmed: neither old
+straight track exists anymore; both new detour paths exist exactly as
+specified (both endpoints of each detour matching the override list to
+the micron). This is the same match-by-`(net, rounded endpoints)`
+mechanism (not object identity) already reviewed and found sound in
+Cycle 9, applied consistently to the 2 new entries.
+
+**(c) The specific targeted `solder_mask_bridge` violations are
+genuinely absent, reproducibly.** Searched the exact DRC JSON output (not
+the commit's own claims) for every violation naming either old track by
+its exact `(net, length)` signature, across **5** independent baseline
+runs and **10** independent current-board runs:
+
+| Old track | Baseline hits (5 runs) | Current hits (10 runs) | Specific pads implicated |
+|---|---|---|---|
+| `3V3`, 5.600 mm | **3, 3, 3, 3, 3** | **0×10** | `U1` pads 1, 2, 3 (all `<no net>`) |
+| `VM_MOTOR`, 6.7125 mm | **1, 1, 1, 1, 1** | **0×10** | `F1` PTH pad 2 (net `VM_MOTOR_F1`) |
+
+Both results are perfectly deterministic in both directions across all 15
+runs — no run-to-run ambiguity for these two specific, targeted checks.
+(This reviewer's own first attempt at the `VM_MOTOR` check produced a
+false "0 matches in baseline either" result, traced to Python's
+`round(6.7125, 3)` evaluating to `6.713` rather than `6.7125` due to
+binary floating-point representation — fixed by rounding track length to
+4 decimals in the signature function before re-running; flagged here in
+the interest of the same tooling-transparency this project's own
+discipline expects of the PCB Engineer.)
+
+**(d) Whole-board collision re-check: no new conflict introduced
+anywhere.** Extracted the exact geometry of all 4 new track segments (2
+per net) and ran the from-scratch conservative collision checker against
+all 477 other-net copper candidates on the relevant layer (1,662 pairs
+total). 3 candidate negative-margin pairs were flagged (all "pad" kind:
+`3V3` new segment vs. two `U1` pads; `VM_MOTOR` new segment vs. an `F1`
+pad) — cross-validated with the precise `GetEffectiveShape()`+`Collide()`
+method: **all 3 were false positives** of the conservative bounding-circle
+approximation. Real gaps: **0.35 mm, 0.35 mm, 0.3248 mm** — all clearing
+the board's actual 0.2 mm clearance requirement (see Finding HWR10-B
+below on what that requirement actually is) with margin to spare.
+
+**(e) Ground-truth confirmation directly from real DRC output.** Searched
+all 10 current-board DRC runs for any violation, in any of the 6
+categories, naming any of the 4 new track segments by their exact
+`(net, layer, length)` signature. Result: **zero** hits, in any run, in
+any category. The 4 new segments are DRC-invisible on the current board
+in every sense checked.
+
+**(f) Whole-board geometric diff: the change is provably surgical.**
+Built an independent track/via/pad enumeration of both `.kicad_pcb` files
+directly (not routed through DRC at all). Baseline: 173 tracks, 42 vias,
+261 pads, 53 footprints, 1 zone. Current: 175 tracks (net +2, exactly
+consistent with "2 removed, 4 added"), 42 vias, 261 pads, 53 footprints,
+1 zone. Tracks removed: **exactly** the 2 old straight tracks listed in
+(a). Tracks added: **exactly** the 4 new detour segments. **Zero** via
+changes, **zero** pad changes, footprint and zone counts unchanged. This
+is the strongest possible confirmation that this round's change is
+exactly what it claims to be and nothing more — not a sample-based check,
+a complete enumeration of every copper object on the board.
+
+**Item 1 verdict: CONFIRMED.** Both new fixes are real, geometrically
+distinct from each other and from Cycle 9's own `VM_MOTOR` fix, their
+specific targeted violations are reproducibly and deterministically
+resolved (5/5 baseline present → 10/10 current absent, for both), and
+three independent techniques (conservative geometric sweep, precise
+`Collide()` cross-validation, and a complete whole-board object diff) all
+agree that no new conflict is introduced anywhere else on the board.
+
+---
+
+### Item 2 — Root-cause/spatial-composition claims for the 211 `solder_mask_bridge` violations: **CONFIRMED** (roughly reproducible, which is the bar this cycle's own brief sets for this item)
+
+**(a) Item-type composition.** Across the 5 baseline DRC runs (202, 226,
+204, 219, 206 total `solder_mask_bridge` violations respectively), **every
+single one, in every run, was track-vs-pad** (100.0% in all 5 runs) — at
+least as strong as, and consistent with, the claimed 209/211 ≈ 99.05%.
+
+**(b) Spatial distribution around U5/U6.** Using the placed positions
+`U5 = (110.0, 78.0)` and `U6 = (110.0, 52.0)` (both confirmed via
+`pcbnew`, both HTSSOP exposed-pad packages on a 0.65 mm pin pitch), the
+fraction of each run's `solder_mask_bridge` violations with at least one
+participant within 15 mm of either center ranged **58.0%–65.7%** across
+the 5 baseline runs (average ≈63.4%) — bracketing the claimed 125/211 ≈
+59.24% reasonably closely, and confirming the qualitative claim (a
+majority, not all, cluster near U5/U6).
+
+**(c) "Uniquely identified" / ambiguity claim.** Of the board's 173 real
+tracks, only 162 distinct `(net, layer, length)` signatures exist — 9
+signature-collision groups covering 20 track instances share a signature
+under that 3-field key alone. However, **every one of those 9 groups'
+member tracks sits at a distinct position** (verified directly — no two
+same-signature tracks share start/end coordinates). Since the README's
+own stated matching method additionally uses position (not just
+`net + layer + length`), this means a position-aware signature — as
+actually used — would fully disambiguate all 20 instances, consistent
+with (if not an exact re-derivation of) the claimed "206 of 211 uniquely
+identified, 3 ambiguous."
+
+**(d) "~1% yield" (only 2/206 fixable) claim.** Spot-checked 5 of the 63
+distinct non-fixed track signatures implicated in `solder_mask_bridge`,
+selected as single-pad-conflict cases that looked plausibly easy at a
+glance, and inspected each one's real local geometry in `pcbnew`:
+
+| Track (net, offending distance) | Conflicting pad | Why it is *not* an easy fix |
+|---|---|---|
+| `VBUS_5V`, 1.9 mm | `U3` pad 2 | A GND via sits exactly on the track's own centerline (0.000 mm) — this is the same structural class of conflict already confirmed hard-intractable in Cycle 9's Item 2 |
+| `3V3`, 1.325 mm | `R3` pad 1 | Dense parallel `I2C2_SCL`/`I2C2_SDA` bus corridor — 6 other-net items within 2 mm of the track midpoint |
+| `U5_V3P3`, 1.6 mm | `C15` pad 2 | GND via only 0.75 mm off the track's path, itself hemmed in by the same corridor |
+| `VM_MOTOR`, 0.65 mm | `U6` pad 4 | Sits inside U6's own dense 0.65 mm-pitch pin field; 4–8 other-net items within 2 mm on both adjoining segments |
+| `U5_CPP`, 7.075 mm | `U5` pad 1 | Tightly-coupled charge-pump bundle (`U5_VCP`/`U5_CPN` both within 0.325 mm) |
+
+All 5 are structurally hard cases (via/pad directly on the track's own
+centerline, dense parallel-bus corridors, fine-pitch IC pin fields, or
+tightly-coupled charge-pump nets) — qualitatively different from the 2
+real fixes this round made (both of which were isolated single-conflict
+tracks with genuine detour room). No obviously-easy missed fix was found
+in this sample, which supports (does not contradict) the "~1% yield"
+claim.
+
+**Item 2 verdict: CONFIRMED.** All four sub-claims are roughly
+reproducible from a fresh, independent DRC run and geometric inspection —
+composition even stronger than claimed (100% vs. 99%), spatial split
+bracketing the claimed figure (58–66% vs. 59%), the ambiguity mechanism
+independently verified sound, and the yield claim sanity-checked against
+5 real candidates with no counter-example found.
+
+---
+
+### Item 3 — `tracks_crossing`/`hole_clearance` pre-existing claim: **CONFIRMED**, exceeding the requested rigor, with one substantive additional finding (HWR10-A)
+
+**(a) Count-level reproduction.** Baseline: `tracks_crossing` 72, 72, 72,
+73, 70 (5 runs); `hole_clearance` 6, 6, 6, 6, 6 (perfectly stable).
+Current: `tracks_crossing` 81, 81, 82, 81, 81 (first 5 runs; stayed at 81
+across 5 more extra runs); `hole_clearance` 3, 3, 3, 3, 3 (stable across
+all 10 current runs). Both closely match the claimed "72–73→81" and
+"5–6→3."
+
+**(b) The rigorous, object-level check — and a self-caught methodological
+trap along the way.** This cycle's brief specifically calls out that an
+earlier, less rigorous comparison method previously produced a false
+"6 genuinely new" result in Cycle 9 that had to be corrected — so this
+item was treated with corresponding suspicion of any shortcut. This
+reviewer's **own first-pass** method fell into the analogous trap:
+comparing the *set* of exact `tracks_crossing` violation-pair signatures
+reported across the 5 baseline runs against those reported across the 5
+current runs found **56 of the 82** distinct current-run pairs
+apparently missing from the baseline union — an alarming-looking
+discrepancy. Investigating 5 of these "new-looking" pairs by hand in
+`pcbnew` found that **both constituent tracks were byte-identical in
+position** between the two boards in every case — meaning the pairs
+themselves were not new, only *DRC's own reporting of them in a small
+run sample* was inconsistent. This is exactly the failure mode the task's
+brief warns about: testing "is this violation present in a small sample
+of runs" is not equivalent to testing "is this violation genuinely new."
+
+The corrected, rigorous method (matching what the brief actually asks
+for: matching by net+position+length for tracks, and by
+footprint-reference+pad-number+position for pads) instead resolves each
+side of every reported pair to its *own real geometric object* — using
+`(net, layer, length)` plus position-based disambiguation where the
+3-field key is ambiguous — and checks whether *that exact object*, at
+that exact position, exists unchanged in the baseline board file, fully
+independent of whether DRC happened to sample-and-report that specific
+pairing in any particular run. Applying this to **all 82** distinct
+`tracks_crossing` pairs across the 5 current runs: **100% (82/82)**
+resolve to real track objects that exist byte-identical (position-for-
+position) on the pre-round baseline board. **Zero** of the 82 pairs
+involve either of the 2 new segments from Item 1. **Zero** are genuinely
+new. The same method applied to the 3 distinct `hole_clearance` pairs
+reported across the current runs: **100% (3/3)** confirmed pre-existing
+(this re-confirms, via a different board-state pair, the same 3 pad/via
+`hole_clearance` items already independently verified pre-existing by
+this reviewer's own Cycle 9).
+
+**Item 3(a)/(b) verdict: CONFIRMED**, for a total of **85** distinct pairs
+checked (82 `tracks_crossing` + 3 `hole_clearance`) — exceeding the
+brief's own request of "5–10... to confirm."
+
+**(c) Bonus finding while investigating the 6→3 `hole_clearance` count
+drop — Finding HWR10-A (MEDIUM).** While reconciling why the baseline's
+*count* of 6 `hole_clearance` items drops to 3 on the current board, this
+reviewer discovered the baseline's 5 DRC runs actually report **6**
+distinct pairs, not just the 3 that persist into the current board's
+output — the other 3 are `npth_pad` (both of `J1`'s NPTH mounting holes)
+vs. a `GND` track, present in **all 5** baseline runs. These same 3 pairs
+are **absent from all 10** current-board runs (the original 5 plus 5 more
+run specifically to test this).
+
+The whole-board diff in Item 1(f) already proves **zero** track, via, or
+pad changes exist anywhere near `J1` — the only geometric change on the
+entire board is the 2-removed/4-added set over 90 mm away, in the
+`3V3`/`VM_MOTOR` regions. So these 3 items cannot have stopped being real
+violations because anything nearby changed. To settle this independent of
+DRC's own say-so entirely, this reviewer re-measured the true clearance
+of all 3 pairs directly on the **current** board via `pcbnew`'s
+`GetEffectiveShape()`+`Collide()` binary search: **0.0000 mm** (the track
+literally touches/overlaps the NPTH hole), **0.0500 mm**, and
+**0.2232 mm** — all genuinely below the 0.25 mm required hole clearance
+these violations cite. These are real, physical defects on the *current*
+board, not a measurement or reporting artifact.
+
+Cross-referencing this reviewer's own Cycle 9 review (this document, Item
+3 table): the 0.0000 mm pair (`GND` track vs. `J1`'s NPTH pad) is **not a
+new discovery** — Cycle 9 already independently confirmed this exact pair
+pre-existing back on 2026-09-02 ("`GND` track (9.598 mm) vs. J1's NPTH pad
+(`hole_clearance`) | 0.0000 mm | 0.0000 mm | ✅"). So this specific defect
+is now confirmed present, continuously, across at least 3 board
+generations. What **is** new here is that DRC's own reporting of it (and
+2 related pairs) has silently stopped on the current board, in 10/10
+runs, despite the geometry involved being proven completely unchanged —
+apparently because the unrelated 2-net reroute elsewhere on the board
+perturbs DRC's own internal violation-deduplication or reporting order
+enough to push these 3 out of whatever cap or sampling DRC applies. This
+is a **previously undocumented DRC-reliability failure mode**, distinct
+from the per-run sampling noise already characterized for
+`tracks_crossing`: here the reporting is *stable per board state* (6/6
+baseline, 3/3/…/3 current, 15/15 runs total) but the specific *set*
+reported differs between board states that are provably identical in the
+relevant local geometry.
+
+This does **not** change Item 3's core verdict — if anything it
+strengthens "pre-existing, not caused by this round," since even the
+items DRC stopped reporting are independently proven pre-existing too.
+But it does mean the round's own before/after table entry
+("`hole_clearance`: 5–6 → 3") should be read as a description of *DRC's
+own current-round reporting behavior*, not as "3 `hole_clearance` defects
+were resolved" — the true underlying population is unchanged at **6**,
+not reduced. This reviewer did not attempt to determine whether the
+0.0000 mm overlap has a functional consequence (e.g. whether a redundant
+GND path exists elsewhere that would keep the net connected if this
+specific trace segment were severed during drilling) — a zone-fill
+connectivity check attempted for this purpose returned ambiguous/
+inconclusive results and was set aside as outside this cycle's 5-item
+scope; the finding below is stated purely in terms of the measured
+geometric facts.
+
+**Item 3 verdict: CONFIRMED** — all 85 distinct pairs checked (not a
+sample) resolve to pre-existing, unchanged objects; the corrected,
+object-level methodology is the load-bearing result, and Finding HWR10-A
+is filed as an additional, non-invalidating discovery.
+
+---
+
+### Item 4 — No other regression: **CONFIRMED**
+
+`unconnected_items` = **0** and `schematic_parity` = **0** on all 15 DRC
+runs (10 current, 5 baseline) — no exception. The same 6 violation
+categories appear on both boards, no new category and none disappears.
+Footprint count (53) and zone count (1) are unchanged. Per-category
+counts, all 15 runs:
+
+| Category | Baseline (5 runs) | Current (10 runs) | Direction | Accounted for |
+|---|---|---|---|---|
+| `shorting_items` | 57–58 | 48–50 | ↓ (improved) | — |
+| `tracks_crossing` | 70–73 | 81–82 | ↑ | Item 3: 82/82 confirmed pre-existing |
+| `clearance` | 16–17 | 16 | flat | — |
+| `hole_clearance` | 6 (flat) | 3 (flat) | ↓ (apparent) | Item 3/HWR10-A: true count unchanged at 6 |
+| `solder_mask_bridge` | 202–226 | 203–222 | flat-ish | Item 1: 4 targeted violations resolved |
+| `silk_overlap` | 1 (flat) | 1 (flat) | flat | — |
+
+Per-run totals range 354–378 (baseline) and 354–373 (current) — the same
+order of magnitude as the README's claimed 361–378→350–368, well within
+this project's own previously-documented DRC run-to-run noise, and not a
+material discrepancy. The whole-board object diff from Item 1(f) is the
+decisive check here: **exactly** 2 tracks removed and 4 added, **zero**
+via changes, **zero** pad changes, anywhere on the board — there is no
+category of undisclosed change this diff would have missed, since it
+enumerates every copper object directly rather than relying on DRC's own
+(shown, in Item 3, to be imperfect) reporting.
+
+**Item 4 verdict: CONFIRMED.** The only two categories that moved appear
+fully, rigorously accounted for by Item 3 (one genuinely flat/pre-existing
+population reported inconsistently by DRC, not a real change; the other
+already closely tracked to the 4 specific resolved violations from Item
+1). No undisclosed regression was found in any category, run, or
+technique used.
+
+---
+
+### Item 5 — Engineering judgment on declining the U5/U6 placement redesign again: **CONFIRMED as defensible**
+
+**(a) The 59%/41% split.** Independently reproduced in Item 2(b): 58.0%–
+65.7% (average ≈63.4%) of `solder_mask_bridge` violations sit within
+15 mm of U5 or U6, across 5 fresh baseline runs — bracketing the claimed
+125/211 ≈ 59.24% closely. The complementary "41% spread across the rest
+of the board" claim is therefore also corroborated (34.3%–42.0% in this
+reviewer's own runs) — meaning even a hypothetically perfect U5/U6
+placement fix could not close this violation category on its own, which
+is the load-bearing premise of the engineering call being reviewed.
+
+**(b) The 11–20 mm neighbor-spacing claim.** Queried `pcbnew` directly
+for U5's and U6's placed positions and every other footprint's distance
+from each. U5's nearest neighbor is `C14` at **13.60 mm**; its next 6
+nearest range up to `U6` at 26.00 mm, with `C12`/`R6`/`R7`/`C13`/
+`C11`/`R10` spanning 14.87–20.59 mm. U6's nearest neighbor is `C17` at
+**11.00 mm**; its next few span 13.60–22.80 mm (`R13`, `R15`, `C12`,
+`R12`, `C15`, `R8`, `D2`). Both packages' immediate neighborhoods fall
+within, or immediately adjacent to, the claimed "11–20 mm" band — genuine
+loose spacing, not tight packing, for a board whose own GND-zone bounding
+box is roughly 148 mm × 93 mm. This corroborates the claim that
+proximity-driven placement crowding is *not* the dominant cause of these
+violations.
+
+**(c) Is declining the redesign, on this basis, defensible?** Given (a)
+and (b) both independently hold up, the stated inference — that the
+router's own lack of congestion-awareness, not raw U5/U6-to-neighbor
+distance, is the dominant driver of the residual `solder_mask_bridge`
+population — is a reasonable, evidence-supported reading of the data, not
+an unsupported rationalization. Combined with Item 2(d)'s finding that a
+5-case sample of the remaining unfixed conflicts are all structurally
+hard (parallel-bus corridors, fine-pitch pin fields, centerline
+via/pad conflicts) rather than simple placement-adjacent misses, a full
+placement-aware re-route is legitimately a larger, separately-scoped
+undertaking than this round attempted, and declining it here (while
+disclosing the quantified reason why) is a defensible engineering call.
+
+**Item 5 verdict: CONFIRMED.** Both supporting figures independently
+reproduce within a reasonable margin, and the inference drawn from them
+is sound.
+
+---
+
+### Findings raised this cycle
+
+| ID (informal) | Severity | Summary |
+| --- | --- | --- |
+| HWR10-A | MEDIUM | 3 real, pre-existing `npth_pad`-vs-`GND`-track `hole_clearance` violations near `J1` (true clearances 0.0000 mm, 0.0500 mm, 0.2232 mm — all below the 0.25 mm requirement) are present in all 5 baseline DRC runs but silently absent from all 10 current-board runs, despite a whole-board object diff proving zero geometric change anywhere near `J1`. The round's own "`hole_clearance`: 5–6 → 3" table entry is accurate as a description of *this round's DRC sampling*, but should not be read as "3 defects were resolved" — the true population is unchanged at 6 (one of which, the 0.0000 mm pair, was already independently confirmed pre-existing by this reviewer's own Cycle 9). This is a DRC-reporting-reliability gap, not a new PCB defect and not caused by this round; does not change Item 3's core verdict. |
+| HWR10-B | LOW | Correction to **this reviewer's own Cycle 9 narrative** (not a claim made by the PCB Engineer in this or the prior round): Cycle 9 stated "the board's sole applicable clearance rule" is `board.GetDesignSettings().m_MinClearance` = 0.15 mm. Re-derived from scratch this cycle: all 162 real `clearance`-type violations across all 15 fresh DRC runs (both boards) cite a required clearance of exactly **0.2000 mm**, matching the board's `Default` net class clearance value (confirmed via `board.GetAllNetClasses()`) — a KiCad stock-default value that need not be, and is not, serialized as an explicit `(net_class ...)` override anywhere in the `.kicad_pcb` file (0 occurrences, confirmed by direct grep) — rather than `m_MinClearance`, which appears to function as a separate, lower absolute floor (0.15 mm) that the actual per-pair requirement (0.2 mm here) exceeds and therefore supersedes. Notably, this round's own `hardware/pcb/README.md` narrative already independently and correctly cites "~0.2mm design clearance" for this same rule — the PCB Engineer did not repeat Cycle 9's inaccuracy this round. This correction changes no numeric conclusion in either cycle (every margin found under either cycle's review, e.g. 0.225 mm, 0.35 mm, 0.3248 mm, clears 0.2 mm just as it clears 0.15 mm) — it is a narrative-accuracy-only correction, in the same spirit as Cycle 9's own HWR9-B. |
+
+Full detail, rationale, and datasheet/tool grounding for each is given
+inline above, in the Item where it was found (HWR10-A in Item 3; HWR10-B
+in Item 1).
+
+Per this cycle's specific task scope, neither finding is filed as a new
+row in `validation/open-issues.md` this cycle. HWR10-B is LOW,
+narrative-only, and changes no numeric conclusion. HWR10-A is MEDIUM, but
+the underlying defects it concerns (real `hole_clearance` violations near
+`J1`) are already implicitly part of ISS-036's own aggregate untriaged
+backlog (~350–365 total violations remain, none individually filed as
+their own row), and this cycle's brief explicitly directs verifying that
+`tools/check_open_issues.py` continues to report the hardware gate as
+failing **only** on ISS-036. If the Hardware Lead concurs, a future round
+should decide whether HWR10-A's specific DRC-reliability observation (not
+just the 3 underlying violations, which are already covered by ISS-036's
+own scope) warrants its own tracked backlog row, since it is a broader
+tooling-behavior concern than a single violation triage.
+
+### Status dispositions set by this reviewer
+
+| ID | Prior status | Disposition | Basis |
+|---|---|---|---|
+| ISS-036 | OPEN | **remains OPEN — untouched by this reviewer** | Per this cycle's explicit scope: this round's specific claims (2 new fixes real and whole-board-clear, root-cause/spatial composition claims roughly reproducible, `tracks_crossing`/`hole_clearance` increases genuinely pre-existing, no other regression, and the renewed decision to decline a U5/U6 placement redesign) all independently check out (Items 1–5 all CONFIRMED), but ISS-036's own resolution bar — "every violation individually triaged" — remains far from met: ~350–365 total violations remain, and only a low double-digit count (this round's 2, plus the prior rounds' fixes) are individually named/triaged. This reviewer does not have standing to change that disposition even where this round's specific work is sound, per the explicit review brief. |
+
+### Verdict — **PASS** (this round's specific claims); ISS-036 remains OPEN and the gate remains FAILED
+
+Stated plainly, per-item:
+
+1. **The 2 new fixes (`3V3`, `VM_MOTOR`) are real and whole-board-clear.**
+   CONFIRMED.
+2. **The root-cause/spatial-composition claims for the 211
+   `solder_mask_bridge` violations are roughly reproducible.** CONFIRMED.
+3. **The `tracks_crossing` increase and `hole_clearance` decrease are
+   both pre-existing/unaffected by this round, not new problems.**
+   CONFIRMED — exhaustively, all 85 distinct pairs checked object-by-
+   object, not a sample. One additional, non-invalidating finding
+   surfaced (HWR10-A: the `hole_clearance` "decrease" is a DRC-reporting
+   artifact, not a real reduction in the true defect count).
+4. **No other regression exists.** CONFIRMED — every DRC category either
+   held flat or moved in a direction fully accounted for by Item 3; a
+   complete whole-board object diff (not a DRC-report-based sample) found
+   exactly the 2-removed/4-added tracks this round claims and nothing
+   else, anywhere.
+5. **Declining the U5/U6 placement redesign again is a defensible
+   engineering call.** CONFIRMED — both supporting figures (59%/41% split;
+   11–20 mm neighbor spacing) independently reproduce closely enough, and
+   the inference drawn from them (router congestion-unawareness, not raw
+   distance, is the dominant residual driver) is sound.
+
+**No CRITICAL or HIGH finding was raised by this review.** The two new
+findings (HWR10-A, HWR10-B) are MEDIUM and LOW respectively — a
+DRC-reporting-reliability observation that does not indicate a new
+hardware defect or a regression caused by this round, and a
+narrative-accuracy correction to this reviewer's **own** prior cycle that
+changes no numeric conclusion. Nothing this reviewer checked overturns
+this round's central, load-bearing claims: both new fixes genuinely
+resolve their targeted conflicts (deterministically, 5/5 baseline present
+→ 10/10 current absent, for both), the new copper introduces no new
+conflict anywhere on the board (checked by three independent techniques,
+including a complete whole-board object diff, not a sample), every
+apparent increase in DRC-reported violations this round is independently
+confirmed pre-existing object-by-object (85 of 85, not inferred from
+counts), and the renewed decision to decline a U5/U6 placement redesign
+is evidence-supported.
+
+**Open CRITICAL after this review: 0.**
+**Open HIGH after this review: 1 — ISS-036 only (unchanged by this
+cycle).**
+
+`tools/check_id_uniqueness.py`: **OK**, no duplicate IDs across 3
+namespaces (451 IDs checked) — confirmed both before and after this
+cycle's investigation, including across the `420c6b6` merge.
+`tools/check_open_issues.py`: hardware gate correctly **FAILS**, citing
+exactly and only `ISS-036: HIGH finding is neither RESOLVED nor
+ACCEPTED-RISK (status=OPEN)` — matching this cycle's expected state.
+
+**Is the board closer to fabricable?** Marginally, on the metric ISS-036
+itself tracks (`solder_mask_bridge`'s 4 newly-targeted instances across
+this round's 2 fixes are genuinely gone; `shorting_items` also improved
+57–58→48–50), but ISS-036 as a finding is explicitly not resolved by this
+round and this review does not change that: per `docs/architecture.md`
+§8, Design Complete cannot be declared and the board must not be released
+to fabrication while a HIGH finding remains neither RESOLVED nor
+ACCEPTED-RISK. ISS-036 remains the sole open HIGH and the sole blocker,
+exactly as before this round. This cycle additionally surfaces (HWR10-A)
+that DRC's own reporting of the pre-existing violation population is not
+fully reliable across board states — a consideration future ISS-036
+triage rounds should account for by not assuming a single board's DRC
+sample enumerates the complete violation population, rather than a new
+obstacle to this round's own, narrower claims, all of which independently
+check out.
+
+---
+
 ## Mechanical Reviewer — Cycle 6 (Independent Re-Review of Rev 4.1 MISS-023/MISS-024 Mitigation Pass, 2026-09-15)
 
 ### Review Cycle Metadata

@@ -1,14 +1,21 @@
-# Bench-IMU-01 — Real KiCad Project (Rev 2, corrected)
+# Bench-IMU-01 — Real KiCad Project (Rev 2 corrected, extended to Rev 3-5)
 
 This is this repository's **first real KiCad project** — a genuine
-`.kicad_pro`/`.kicad_sch` pair (plus a project-local `.kicad_sym` for the one
-part not in any standard library), not the structured Markdown
-schematic-equivalent document this repository used for every prior design
-cycle. It captures **Bench-IMU-01 Rev 2** (already Design Complete, PR #6),
-as corrected for **ISS-014** (see below) — the authoritative net-by-net
-rationale remains `hardware/schematic/bench-imu-01-design.md`; this project
-is the physically-verifiable artifact built from it, not a replacement for
-its rationale.
+`.kicad_pro`/`.kicad_sch` pair (plus project-local `.kicad_sym`/`.pretty`
+libraries for parts not in any standard library), not the structured
+Markdown schematic-equivalent document this repository used for every
+prior design cycle. It originally captured **Bench-IMU-01 Rev 2** (already
+Design Complete, PR #6), as corrected for **ISS-014** (see below) — and was
+extended this session (PCB Engineer, Phase 6,
+`docs/architecture-evolution.md` §37) to add the **Rev 3-5 Motor Driver +
+Reaction Wheel subsystem** (U5/U6/M1/J4/D2/D3/F1/R6-R15/C10-C17), which had
+been fully designed and human-approved in
+`hardware/schematic/bench-imu-01-design.md` §7.5 and
+`bom/component-selection.md` but never transcribed into this real KiCad
+project until now — the authoritative net-by-net rationale remains
+`hardware/schematic/bench-imu-01-design.md`; this project is the
+physically-verifiable artifact built from it, not a replacement for its
+rationale.
 
 ## Tooling honesty (verify-before-use, per this repo's own discipline)
 
@@ -70,9 +77,11 @@ its rationale.
 | File | What it is |
 |---|---|
 | `bench-imu-01.kicad_pro` | Project file (hand-authored JSON; not GUI-generated) |
-| `bench-imu-01.kicad_sch` | The real schematic — 23 components, every net from the corrected design doc |
-| `bench-imu-01.kicad_sym` | Project-local symbol library — BMI270 only (not in any standard KiCad library) |
+| `bench-imu-01.kicad_sch` | The real schematic — 49 components (23 Rev 2 + 25 Rev 3-5 motor subsystem + F2, ISS-032 fix, 2026-09-02), every net from the corrected design doc |
+| `bench-imu-01.kicad_sym` | Project-local symbol library — BMI270 and DRV10983 (neither in any standard KiCad library) |
+| `bench-imu-01.pretty/` | Project-local footprint library — F1's custom radial-PTC footprint (no matching library footprint exists for the real Littelfuse 30R500UF) |
 | `sym-lib-table` | Registers the project-local `bench-imu-01` symbol library |
+| `fp-lib-table` | Registers the project-local `bench-imu-01` footprint library |
 | `generate_schematic.py` | The actual generation script — re-run to regenerate/modify |
 
 ## Symbol/footprint decisions (every one disclosed, per this repo's evidence conventions)
@@ -88,7 +97,26 @@ its rationale.
 | SW1 | Momentary N.O. pushbutton | `Switch:SW_Push` | `Button_Switch_THT:SW_PUSH_6mm` | ASSUMPTION (disclosed) — design doc doesn't select an exact MPN either |
 | D1 | Generic indicator LED | `Device:LED` | `LED_SMD:LED_0603_1608Metric` | ASSUMPTION (disclosed) — design doc explicitly states "MPN not selected" |
 | R1–R5, C1–C9 | Passives | `Device:R` / `Device:C` | 0603 SMD | ASSUMPTION on package size (design doc never specifies; 0603 chosen for consistency, easily changed) |
-| MH1–MH4 | Mounting holes | *excluded from schematic* | — | No electrical net — standard KiCad convention places these in the PCB editor only; out of scope per this task's explicit no-PCB-layout instruction |
+| MH1–MH4 | Mounting holes | *excluded from schematic* | — | No electrical net — standard KiCad convention places these in the PCB editor only |
+
+### New Rev 3-5 motor subsystem (PCB Engineer, this session — design doc §7.5/§11/§12/§13)
+
+| Ref | Part | Symbol | Footprint | Confidence |
+|---|---|---|---|---|
+| U5 | TI DRV10983 | **custom**, `bench-imu-01:DRV10983` | `Package_SO:HTSSOP-24-1EP_4.4x7.8mm_P0.65mm_EP3.4x7.8mm_Mask2.4x4.68mm_ThermalVias` | Pin count/names/body **CONFIRMED** — independently re-verified this session directly against TI's own primary datasheet (SLVSCP6H, fetched live), not merely copied from the design doc. Footprint body size (4.4×7.8mm, 24-pin thermally-enhanced HTSSOP) CONFIRMED against the same primary source; exact exposed-pad sub-variant is **ASSUMPTION** — a web-search-derived pad estimate (~4.4×2.45mm) didn't exactly match any installed KiCad EP-mask variant, so the smallest/most conservative discrete-pad option was chosen (mirrors this project's own "CONFIRMED-via-standard, not part-specific" precedent already used for the MCU/LDO Rev 2 footprints, design doc §10). **Corrected 2026-09-02 (Hardware Reviewer Cycle 6, ISS-031, HIGH, partially fixed):** the custom symbol originally omitted pin 25 (EP/exposed pad) entirely — the schematic never modeled the pad as an electrical node at all, unlike U6's real library symbol which does. Fixed by adding pin 25 to `build_drv10983_symbol()` and wiring it to GND; the chosen footprint's own pad numbering (`(pad "25" smd rect ...)`, independently confirmed by inspecting the `.kicad_mod` file directly) already matches. **RESOLVED 2026-09-02 (continued-iteration round per Chief Engineer disposition)**: switched to a real, standard KiCad library footprint (`...ThermalVias`) with an 18-via thermal array (0.3mm drill/0.6mm pad, matching SLMA002/SLMA004's own "0.3-0.33mm" guidance) plus a larger 3.4x7.8mm F.Cu land — independently justified this cycle by re-reading DRV10983's OWN primary datasheet text (DS-MTR-081, not just the generic PowerPAD app notes): "...connected to bottom side of PCB through vias for better thermal spreading" and "Keep the thermal pad connection as large as possible... one piece of copper without any gaps." Independently re-verified: ERC clean; a standalone pad/net audit confirms all 20 physical pad-25 members (2 lands + 18 vias) share one correct GND net; DRC re-run x3 stays within the established baseline band (384/367/374 violations, 0 unconnected), no regression. The exact EP numeric dimension remains an ASSUMPTION (the primary datasheet's own mechanical package-outline drawing is a vector image, still not text-extractable by this session's tooling) — disclosed, not silently resolved — but this no longer blocks a genuine, via-stitched thermal connection. See `validation/open-issues.md` ISS-031 |
+| U6 | TI TPS26631PWPR | `Power_Management:TPS26631PWP` (real library symbol) | `Package_SO:HTSSOP-20-1EP_4.4x6.5mm_P0.65mm_EP3.4x6.5mm_Mask2.96x2.96mm_ThermalVias` | **CONFIRMED** — real library symbol with the footprint pre-associated by KiCad's own library maintainers (not independently chosen); pin numbers cross-checked against the design doc's own §7.5.10 pinout table, exact match including the symbol's pin 21 = PowerPAD (exposed-pad virtual pin) |
+| J4 | Same Sky PJ-102AH | `Connector:Barrel_Jack_Switch` (3-pin, matching the real 3-terminal part) | `Connector_BarrelJack:BarrelJack_CUI_PJ-102AH_Horizontal` | Footprint **CONFIRMED** (part-specific, name match, 3 pads). Pin-to-function mapping (sleeve/switch/tip) is **ASSUMPTION** — the primary datasheet's own mechanical drawing/schematic diagram could not be rendered by this session's tooling (PDF diagram lost in text extraction); used pin1=sleeve/GND, pin2=switch(N.C., unpopulated), pin3=tip/VM_MOTOR per a web search citing the primary datasheet + a DigiKey mirror. **Flagged for human verification against the real mechanical drawing before fabrication** — low blast-radius if wrong, since D2's series reverse-polarity protection fails safe (blocks conduction) rather than damaging anything if J4's tip/sleeve assignment is actually reversed |
+| D2 | ST STPS3L60 | `Device:D_Schottky` | `Diode_SMD:D_SMB` | CONFIRMED — SMB package explicitly stated in design doc §13; standard K/A Schottky symbol |
+| D3 | Littelfuse SMBJ16A | `Device:D_Zener` (substituted for `Device:D_TVS`) | `Diode_SMD:D_SMB` | Footprint CONFIRMED. Symbol choice is a disclosed substitution: SMBJ16A is explicitly **unidirectional**, but KiCad's generic `D_TVS` symbol is drawn as a symmetric bowtie (the standard *bidirectional*-TVS glyph) with generic "A1"/"A2" pin names, no K/A polarity. `D_Zener`'s single-diode graphic + real K(1)/A(2) naming correctly conveys a one-directional clamping device, matching this design's own net-list language ("cathode-to-VM_MOTOR/anode-to-GND") unambiguously — an electrically-equivalent, more precise symbol choice, not a functional change |
+| F1 | Littelfuse 30R500UF | `Device:Fuse` (generic 2-pin) | **custom**, `bench-imu-01:Fuse_Littelfuse_30R500UF_Radial_D14.0mm_P10.2mm` | ASSUMPTION/custom — no KiCad library footprint matches this specific radial PTC fuse. Built to web-search-derived real dimensions (14mm body diameter, 10.2mm lead spacing); exact lead diameter (pad/drill sizing) is an ESTIMATE (datasheet's own lead-diameter spec not independently re-pulled this session), sized generously for a 5A-class radial lead. **Bug fixed 2026-09-02 (ISS-032 follow-up)**: this custom footprint's own `Value` silkscreen/F.Fab text field previously contained the full descriptive footprint filename as a literal 40mm-wide text string, inflating `pcbnew`'s reported footprint bounding box to ~40x20mm (vs. the real ~14x14mm courtyard) — harmless while F1 had no near neighbour, but a real, load-bearing bug once F2 (below) was placed nearby and appeared to collide. Fixed by hiding the Value text field (`hide yes`), matching standard KiCad footprint convention; independently re-verified via `pcbnew`'s own bounding-box query before/after |
+| F2 | Littelfuse 30R500UF (2nd instance) | `Device:Fuse` (generic 2-pin) | **custom**, `bench-imu-01:Fuse_Littelfuse_30R500UF_Radial_D14.0mm_P10.2mm` (same footprint as F1) | **NEW (Hardware Reviewer finding ISS-032, HIGH; PCB Engineer at explicit Chief Engineer direction, 2026-09-02)** — second PTC resettable fuse, in series between J4's sleeve/GND pin and the shared ground net, protecting against an *internal* J4 pin-mapping error that D2's series diode (opposite leg) cannot cover. A genuine circuit-topology addition, normally Circuit-Engineer-scoped, made here only because explicitly directed by the human Chief Engineer coordinating this cross-branch task — see `hardware/schematic/bench-imu-01-design.md` §7.5.9 for the full safety-argument correction and reasoning, and `validation/open-issues.md` ISS-032 for review status (not yet independently re-verified as of this commit — status intentionally left OPEN, not self-declared RESOLVED, per this project's own author/reviewer separation convention) |
+| M1 (interconnect) | T-Motor MN2206-13 (off-board motor, wired via 3 leads) | `Connector_Generic:Conn_01x03` | `TerminalBlock:TerminalBlock_MaiXu_MX126-5.0-03P_1x03_P5.00mm` | **ASSUMPTION, disclosed** — design doc §10 explicitly leaves "M1 on-board or off-board" and "connector choice at the wire-to-board interface" unresolved, flagging it as a layout-time decision. M1 is a 27mm-diameter rotating BLDC motor that mounts to the separate mechanical bearing/flywheel structure (a parallel session's own scope), not this logic/driver PCB — so a real phase-wire interconnect is required here. A 5.0mm-pitch terminal block was chosen over a 2.54mm-pitch signal header (as J2/J3 use) specifically for higher current margin at this design's ≤3A worst-case motor-phase current. Phase-to-pin assignment (U=1/V=2/W=3) is this design's own arbitrary-but-consistent choice — swapping any two phases only reverses rotation direction, not a wiring defect |
+| R6, R7, R8 | 4.75kΩ (FG/I2C1 pull-ups, referenced to U5's own V3P3) | `Device:R` | `Resistor_SMD:R_0603_1608Metric` | ASSUMPTION on package (no wattage stated; low-current bias/pull-up, 0603 consistent with the rest of the board) |
+| R9 | 39Ω **¼W** (SW–VREG linear-mode select) | `Device:R` | `Resistor_SMD:R_1206_3216Metric` | **CONFIRMED-by-rating, not an arbitrary package choice** — the design doc explicitly states a ¼W power rating (DS-MTR-065 Table 11); a 0603 package (~1/10W typical) cannot safely dissipate ¼W, so 1206 (conventionally rated for ¼W) was chosen instead of following the rest-of-board 0603 convention |
+| R10 | 1kΩ (SPEED pulldown) | `Device:R` | `Resistor_SMD:R_0603_1608Metric` | **CONFIRMED** — 0603 is explicitly stated in the design doc's own parts list (§13), not this session's own choice |
+| R11–R15 | 10kΩ / 887kΩ / 60.4kΩ / 88.7kΩ / 3.57kΩ (U6 SHDN pulldown + OVP/UVLO divider + ILIM) | `Device:R` | `Resistor_SMD:R_0603_1608Metric` | ASSUMPTION on package (no wattage stated; µA-to-low-mA-level bias currents throughout, 0603 adequate) |
+| C10, C13 | 10µF (U5 VCC/VREG decoupling, ≥16-25V-class rail) | `Device:C` | `Capacitor_SMD:C_0805_2012Metric` | **ASSUMPTION, deliberately not 0603** — 10µF ceramic at this voltage class faces real DC-bias capacitance derating in an 0603 case size (a genuine practical/electrical concern, not merely stylistic); 0805 is the more reliable, still-small choice for this specific value+voltage combination |
+| C11, C12, C14–C17 | 0.1µF / 1µF / 22nF (charge pump, V1P8, V3P3, U6 IN bypass, dVdT) | `Device:C` | `Capacitor_SMD:C_0603_1608Metric` | ASSUMPTION on package — these values/voltage classes don't face the same 0603 derating concern as C10/C13 above, so 0603 is kept consistent with the rest of the board |
 
 **Real pin-numbering corrections found and fixed during construction** (beyond
 the headline ISS-014 finding below): the design doc's own citation of
@@ -225,11 +253,90 @@ translating the (corrected) design into KiCad, caught and fixed by the same
 tool-based self-verification this task required, before any independent
 review.
 
+## Rev 3-5 extension (PCB Engineer, this session — `docs/architecture-evolution.md` §37)
+
+Re-ran the same self-verification loop after extending `generate_schematic.py`
+with the Motor Driver + Reaction Wheel subsystem (25 new symbols: U5, U6, M1's
+new interconnect, J4, D2, D3, F1, R6–R15, C10–C17 — see the footprint table
+above). Result: **48 real components total** (23 Rev 2 + 25 new), **zero ERC
+errors**, 2 warnings — both disclosed, non-blocking (updated 2026-09-02: **49
+components** after F2's addition, ISS-032 fix — still zero ERC errors,
+warning count unaffected by the new component; see the corrected count
+below once ISS-030 is also accounted for):
+
+1. `lib_symbol_mismatch` on U3 (`TLV75533PDBV`) — pre-existing, already
+   explained above (a benign `lib_symbols`-caching artifact, not an
+   electrical defect).
+2. ~~`no_connect_connected` on U1 pin 19 (shown as `NC/PA9`) — new this
+   revision, disclosed, not fixed.~~ **CORRECTED 2026-09-02 (Hardware
+   Reviewer Cycle 6, ISS-030, CRITICAL — then fixed same session):** this
+   was originally (incorrectly) assessed below as a purely cosmetic
+   metadata gap. The independent Hardware Reviewer found that assessment
+   wrong: because `kiutils` 1.4.8 cannot express KiCad's real per-instance
+   `(pin "19" (alternate "PA9"))` mechanism, the wire drawn to U1 pin 19 in
+   the schematic **never actually joined the `/U6_EN` net at all** — pin
+   19's un-patched *default* pin-type (`no_connect`) meant KiCad's own
+   netlister silently excluded it, so U6 (and the entire downstream motor
+   + reaction wheel subsystem) could never be enabled by firmware under
+   any condition. This was a real CRITICAL connectivity defect, not a
+   cosmetic one — the original framing below under-stated its severity.
+   **Fixed** via a `patch_alternate_pin_function()` post-processing step
+   in `generate_schematic.py` that edits the raw `.kicad_sch` text to
+   inject `(alternate "PA9")` *inside* U1 pin 19's own `(pin "19" ...)`
+   s-expression (the critical gotcha: inserting it as a sibling line
+   after the closing paren instead breaks the file's S-expression
+   structure and KiCad refuses to load it — caught via `kicad-cli sch
+   erc` failing to parse the file during the fix). **Verified** two ways:
+   `kicad-cli sch erc` now reports only the one pre-existing U3 warning
+   above (0 errors, this warning gone); `kicad-cli sch export netlist`
+   independently re-confirms U1 pin 19 is now a genuine member of the
+   `/U6_EN` net. See `validation/open-issues.md` ISS-030 (RESOLVED).
+   The paragraph immediately below is preserved as originally written,
+   for an honest record of the (incorrect) reasoning at the time — do not
+   trust its "not a connectivity defect" conclusion:
+   > The real `MCU_ST_STM32G0` library symbol is shared across the whole
+   > STM32G031x4/6/8 family; pin 19's *default* pin-type designation is
+   > `no_connect` (`NC/PA9`), with `PA9` available only as a selectable
+   > *alternate* pin function — a real KiCad 7+ per-instance feature
+   > (`(pin "19" (alternate "PA9"))`) that `kiutils` 1.4.8 does not expose
+   > in its `SchematicSymbol.pins` model (confirmed by reading its own
+   > source this session, not assumed). The wiring itself is electrically
+   > **correct** — PA9 is a real, bonded-out GPIO on the actual
+   > STM32G031K8T6 part, independently re-confirmed via ST's own official
+   > pin database (DS-MCU-064, already used to correct several other pins
+   > in this same project). ~~This is a metadata-completeness gap (KiCad's
+   > own GUI would close it in seconds via right-click → assign the
+   > alternate pin function), not a connectivity defect~~ — flagged for
+   > Hardware Reviewer awareness and as a trivial future GUI-side fix, not
+   > chased further here given the disproportionate `kiutils`-patching
+   > effort a fully scripted fix would require for a purely cosmetic ERC
+   > finding.
+
+Every new footprint decision (CONFIRMED vs. ASSUMPTION, with reasoning) is
+in the table above. One genuinely open, human-verification-recommended item:
+**J4's exact pin-to-function (sleeve/switch/tip) mapping** — see that row's
+own entry for the full reasoning and the fail-safe backstop (D2) that keeps
+this a low-blast-radius open item, not a blocking one.
+
+**Correction (Hardware Reviewer Cycle 6, ISS-032, HIGH, still OPEN):** the
+"D2 keeps this low-blast-radius" framing above is only partially correct.
+The independent Hardware Reviewer found D2 (a series reverse-polarity diode
+on J4's supply-side path) only protects against a *supply*-side pin-mapping
+reversal — it does not cover a scenario where J4's mapping error instead
+swaps a *GND*-side pin with a switch/signal pin, which D2's own topology
+cannot backstop. This is a real gap in the original safety argument, not
+yet fixed or otherwise dispositioned this session — see
+`validation/open-issues.md` ISS-032 for the full finding and recommended
+fix options. Treat the claim above as superseded until that item is
+resolved.
+
 ## Explicit scope boundaries
 
-- **No PCB layout** (footprint placement, routing, copper pours) — out of
-  scope per this task's kickoff; `kicad-validate_project`'s "Missing PCB
-  layout file" finding is expected, not a gap to close here.
+- **PCB layout now exists** — see `hardware/pcb/README.md` for the real
+  `.kicad_pcb` this same PCB Engineer discipline produced from this
+  schematic, stackup/outline justification, DRC results, and the flat BOM.
+  This project's own schematic-authoring scope boundary (below) is
+  unchanged; layout is a separate artifact, not folded into this file.
 - **ERC is a real, working `kicad-cli` capability**, verified this session
   — but there is still no ERC *MCP tool* (the MCP wrapper surface has no
   `run_erc_check`-equivalent). Both facts are true simultaneously; neither
@@ -237,5 +344,6 @@ review.
 - **No SPICE simulation claimed.** `libngspice.dylib` is bundled with this
   KiCad install, but `kicad-cli` has no `sim` subcommand — no scriptable
   path found. Remains Future Integration for *automated* use.
-- **This project does not touch** the parallel, in-progress Rev 3
-  (motor-driver) session's branch or files.
+- **This project does not touch** `hardware/mechanical/**` or `firmware/**`
+  — a parallel session owns the mechanical/3D-print deliverable on a
+  different branch; firmware is a separate discipline entirely.

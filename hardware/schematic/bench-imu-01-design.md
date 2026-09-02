@@ -1,6 +1,6 @@
 # Bench-IMU-01 — Schematic-Equivalent Design Document
 
-**Author**: Circuit Engineer (AI agent) · **Date**: 2026-08-31, revised 2026-09-01, **Rev 2 Design Complete 2026-09-03** (`validation/change-log.md` ECO-005), **pin-bonding correction adopted** (ECO-006, see the "Rev 2, corrected" changelog entry below), revised 2026-09-04, revised 2026-09-06, revised 2026-09-08 · **Status**: **Revised (Rev 5)** — Motor Driver + Reaction Wheel subsystem (§7.5) added in Rev 3 and iterated through two loop-back rework cycles (Rev 4: F1 PTC fuse + binding 9.0–13.0V VM_MOTOR envelope + SPEED pulldown, addressing Independent Review Cycle 3's 5 HIGH findings; Rev 5: U6 TPS26631PWPR supervisory controller, closing the residual continuous-OVP/power-up-sequencing gap), **plus a corrected MCU pin-identity fix (ISS-027)**: no separate VDDA pin (combined with VDD at physical pin 4), no VBAT pin at all on this package, one combined VSS/VSSA pin (physical pin 5), NRST sharing physical pin 6 with GPIO PF2, and the IMU's I2C2 bus on **PA11(SCL)/PA12(SDA)** rather than the non-existent PB10/PB11. This more complete fix was independently surfaced by this repository's first real KiCad project (`hardware/schematic/bench-imu-01/`, tool-verified via `kicad-cli` ERC/netlist export) and is adopted here **in place of** this branch's own earlier, narrower attempt at the same defect class (previously tracked on this branch as "Rev 6"/ISS-026, I2C2 pins only — see the "Rev 2, corrected" entry below for why that narrower fix is superseded, not kept alongside this one). See §19 for the dedicated pin-correction handoff. **Ready for a fresh Hardware Reviewer pass**: a first review of the Rev 3–5 motor subsystem, and a fidelity-scoped re-review of the corrected pin areas (not a full Design-Complete re-litigation — see ISS-027).
+**Author**: Circuit Engineer (AI agent) · **Date**: 2026-08-31, revised 2026-09-01, **Rev 2 Design Complete 2026-09-03** (`validation/change-log.md` ECO-005), **pin-bonding correction adopted** (ECO-006, see the "Rev 2, corrected" changelog entry below), revised 2026-09-04, revised 2026-09-06, revised 2026-09-08, **revised 2026-09-02 — F2 added (ISS-032 loop-back fix, PCB Engineer at explicit Chief Engineer direction, see §7.5.9 and the parts-list table)** · **Status**: **Revised (Rev 5)** — Motor Driver + Reaction Wheel subsystem (§7.5) added in Rev 3 and iterated through two loop-back rework cycles (Rev 4: F1 PTC fuse + binding 9.0–13.0V VM_MOTOR envelope + SPEED pulldown, addressing Independent Review Cycle 3's 5 HIGH findings; Rev 5: U6 TPS26631PWPR supervisory controller, closing the residual continuous-OVP/power-up-sequencing gap), **plus a corrected MCU pin-identity fix (ISS-027)**: no separate VDDA pin (combined with VDD at physical pin 4), no VBAT pin at all on this package, one combined VSS/VSSA pin (physical pin 5), NRST sharing physical pin 6 with GPIO PF2, and the IMU's I2C2 bus on **PA11(SCL)/PA12(SDA)** rather than the non-existent PB10/PB11. This more complete fix was independently surfaced by this repository's first real KiCad project (`hardware/schematic/bench-imu-01/`, tool-verified via `kicad-cli` ERC/netlist export) and is adopted here **in place of** this branch's own earlier, narrower attempt at the same defect class (previously tracked on this branch as "Rev 6"/ISS-026, I2C2 pins only — see the "Rev 2, corrected" entry below for why that narrower fix is superseded, not kept alongside this one). See §19 for the dedicated pin-correction handoff. **Plus one further loop-back fix, 2026-09-02**: F2, a second PTC resettable fuse in J4's ground return leg, closing Hardware Reviewer finding ISS-032 (HIGH) — narrowed the D2 safety-argument claim to what it actually covers (external reverse-polarity only, not an internal J4 pin-mapping error) and added independent protection for the case D2 cannot cover; see the corrected §7.5.9 text and parts-list row below. Authored by the PCB Engineer, not the Circuit Engineer, at the explicit direction of the human Chief Engineer coordinating this cross-branch task — a deliberate, disclosed exception to this project's normal role boundary (PCB Engineer does not normally redesign circuit topology), not a silent scope violation. **Ready for a fresh Hardware Reviewer pass**: a first review of the Rev 3–5 motor subsystem, a fidelity-scoped re-review of the corrected pin areas (not a full Design-Complete re-litigation — see ISS-027), and independent verification of the F2 fix specifically (not yet independently reviewed as of this edit).
 
 ## Revision changelog
 
@@ -162,7 +162,11 @@ DS-MTR-068/069/071, cited directly below, not re-derived from scratch);
   corner alone). New §7.5.9's F1 (PTC fuse, below) adds further series
   resistance, narrowing the 3S margin from ≈0.38V to ≈0.32V at the
   near-cutoff corner — still adequate, quantified explicitly rather than
-  left unstated. **Flagged, not self-resolved** (per this agent's own
+  left unstated. **Corrected 2026-09-02 (ISS-040)**: F2 (§7.5.9, added
+  this revision in the ISS-032 loop-back fix) sits in the same series
+  loop and adds a further, identical ≈0.06V estimated drop, narrowing the
+  margin again to **≈0.26V** — still positive/adequate, not unsafe.
+  **Flagged, not self-resolved** (per this agent's own
   "Out of scope" instructions): (a) propagating the 3S-only constraint
   into `bom/component-selection.md`/`requirements/requirements.md` — both
   outside this agent's edit scope, routed to Hardware Lead; (b) the
@@ -1390,8 +1394,9 @@ diode), this input gets its own protection stage that Rev 2's USB-C input
 does not need:
 
 **J4 (+) → D2 (STPS3L60, series) → D3 (SMBJ16A, shunt TVS) → U5 (VCC,
-pins 23/24)**, with J4 sleeve/GND, D2/D3 return sides, and U5's
-GND/PGND/SWGND all tied to the single common ground net (§8).
+pins 23/24)**, with J4 sleeve/GND now through **F2** (new, see below), and
+D2/D3 return sides and U5's GND/PGND/SWGND all tied to the single common
+ground net (§8).
 
 - **D2 = STMicroelectronics STPS3L60** (60V/3A power Schottky rectifier,
   SMB package, DS-PROT-005), in series, blocks reverse-polarity input.
@@ -1412,6 +1417,83 @@ GND/PGND/SWGND all tied to the single common ground net (§8).
   choice for the same package/cost class. Unidirectional (not
   bidirectional) is correct here since D3 sits downstream of D2's
   reverse-blocking action, never itself exposed to reverse polarity.
+- **F2 = Littelfuse 30R500UF (new this revision, PCB Engineer at explicit
+  Chief Engineer direction, ISS-032 loop-back fix, 2026-09-02)** — a
+  second instance of F1's own PTC resettable fuse, now in series between
+  J4's sleeve/GND pin and the shared ground net. **Corrected safety
+  argument, narrowed to what each element actually covers** (Hardware
+  Reviewer finding ISS-032, HIGH): D2's series reverse-polarity
+  protection sits in the tip/VM_MOTOR leg and only ever protects against
+  an *external* failure mode (a user physically plugging in a
+  reverse-polarity supply) — it does nothing for an *internal* failure
+  mode, where this design's own J4 pin-mapping ASSUMPTION (§7.5.9 below)
+  turns out to be wrong regardless of what the user does. Before this
+  fix, J4's sleeve/GND pin tied directly to the shared ground net with no
+  protection in that leg at all — if the internal mapping were reversed,
+  the barrel jack's full +9-13V supply would be applied directly to the
+  board's shared ground reference (used by U1/U2/U3/J1's USB-C GND as
+  well) with nothing to stop it. F2 makes this safe *regardless* of which
+  physical pin the connector's tip/sleeve actually turns out to be,
+  without needing to resolve that ASSUMPTION first: in normal (correctly-
+  mapped) operation it simply passes the board's ordinary ground-return
+  current (well within its 5A hold rating for this design's ≤3A worst
+  case, the same margin F1 already relies on, DS-PROT-006).
+
+  **Corrected 2026-09-02 (Hardware Reviewer Cycle 8, ISS-041, LOW)**: the
+  fault-case description below was originally overclaimed relative to
+  F1's own, more honestly-scoped text in the same section — brought in
+  line with it, not a circuit change:
+  in the fault case (mapping reversed), F2 sees the full supply rail
+  driving into the low-impedance ground plane. **Honestly scoped, not
+  overclaimed (matching F1's own adjacent caveat)**: F2's Itrip (10.00A)
+  likewise exceeds J4's own 5.0A connector rating (DS-CONN-005) — a fault
+  current between 5A and 10A would stress J4 beyond its own rating
+  before F2 trips at all, the same unprotected window F1's text already
+  discloses for the supply leg. F2's real protective value, like F1's, is
+  against genuine short-circuit-level fault currents well above 10A,
+  tripping **in seconds per its own time-to-trip curve** — this
+  repository holds no actual time-to-trip numeric data for this part
+  (`datasheets/evidence-log.md` has no time-to-trip citation for
+  DS-PROT-006), so no faster or more specific response time is claimed;
+  the original text's "trips within its rated response" framing implied
+  more precision than this evidence supports and is corrected here.
+  **Thermal derating (ambient)**, same table as F1 (DS-PROT-006/033):
+  F2's derated hold current stays at or above this design's ≤3A worst
+  case through 70°C (3.05A), dropping below 3A somewhere between 70°C
+  and 85°C (≈71.7°C by linear interpolation) — comfortably above REQ-201's
+  40°C ambient design target either way. None of this changes the core
+  conclusion — F2 still converts an indefinite, completely unprotected
+  GND-hijack into a bounded, self-limiting, automatically-resettable
+  fault response, a real improvement over the prior zero-protection
+  state — it only corrects how precisely/broadly that improvement was
+  first described.
+
+  J4's tip/sleeve pin-mapping itself
+  remains an open ASSUMPTION, unchanged by this fix, still flagged for
+  human verification against the real mechanical drawing before
+  fabrication (§7.5.9) — this fix removes the need to resolve it before
+  the board can be considered safe either way, it does not resolve it.
+  **Correction (Hardware Reviewer Cycle 8, ISS-040, MEDIUM)**: F2's own
+  0.02Ω assumed in-circuit resistance (same DS-PROT-006-derived figure
+  already used for F1 below) IS a term in U5's UVLO series loop, not
+  outside it — U5's UVLO comparator measures VCC relative to its own GND
+  pins, and current flows around the *whole* loop including the return
+  path through F2, not just the supply-side path through F1/D2. Using
+  this section's own existing methodology, F2 adds the same ~0.06V drop
+  F1 already contributes at the design's binding 3A UVLO corner, eroding
+  the previously-tracked ~0.32V margin (§7.5.2) to ~0.26V. **Propagated
+  2026-09-02 (Chief Engineer disposition: a routine margin judgment, not
+  an escalation-class question — margin stays positive, and the design's
+  actual no-load operating point sees only a negligible ~3mV effect)**:
+  the ~0.32V figure previously quoted elsewhere in this document (§7.5.2,
+  §7.5.9's own F1 paragraph, and the §14/§16 self-check sections) is now
+  updated to ~0.26V at each location. At
+  DS-MTR-080's own actual operating point (no-load, ≈0.3A, not the 3A
+  UVLO corner) the effect genuinely is negligible (≈3mV, ≈6 RPM) — that
+  specific conclusion is unaffected; only the general framing needed
+  correcting.
+
+
 
 **Corrected this revision (ISS-014, HIGH) — 2S is not a viable practical
 option through the added diode; 3S-only is a binding constraint**:
@@ -1462,7 +1544,14 @@ R1max post-trip resistance, not a max-initial figure; 0.02Ω assumed
 in-circuit resistance × 3A is a reasonable estimate, not a sourced
 figure), narrowing the 3S margin to **≈0.32V (8.32V vs. 8.0V VUVLO_R
 max)** — still adequate, and now stated quantitatively rather than left
-unstated.
+unstated. **Corrected 2026-09-02 (Hardware Reviewer ISS-040)**: F2, a
+second PTC fuse added later (§7.5.9, ISS-032 loop-back fix) in J4's
+ground-return leg, is in the same series loop as F1 (U5's UVLO
+comparator measures VCC relative to its own GND pins, and current flows
+around the whole loop, not just the supply-side path) — it contributes
+an identical further ≈0.06V estimated drop, narrowing the true current
+margin to **≈0.26V (8.26V vs. 8.0V VUVLO_R max)** — still positive/
+adequate, not unsafe.
 
 **Cross-document consistency, corrected this revision**: `hardware/
 power-budget.md`'s Rail Margin Summary previously stated the opposite
@@ -1873,7 +1962,9 @@ concern**: F1 adds an estimated ~0.06V further worst-case series drop
 (ESTIMATE, no Evidence ID — the datasheet publishes only Rmin initial and
 R1max post-trip resistance, not a max-initial figure; 0.02Ω assumed
 in-circuit resistance × 3A) — already folded into §7.5.2's corrected
-3S-margin figure (≈0.32V), not double-counted here.
+3S-margin figure. **Corrected 2026-09-02 (ISS-040)**: that figure is now
+≈0.26V (was ≈0.32V before F2's own identical further drop, §7.5.9
+below, was also folded in) — not double-counted here.
 
 **Flagged in Rev 4, resolved this revision (a) / still flagged (b)**:
 (a) a true hardware-enforced continuous input overvoltage lockout — F1
@@ -2816,6 +2907,7 @@ now-retired step being the superseded Rev 6 fix itself).
 | **C15** *(new Rev 3)* | 1µF/5V ceramic | U5 V3P3–GND, per DS-MTR-065 Table 11 |
 | **R10** *(new Rev 4, ISS-015)* | 1kΩ, 0603 | SPEED external pulldown to GND — added this revision, reversing Rev 3's "deliberate non-addition" stance; see §7.5.5 |
 | **F1** *(new Rev 4, ISS-019; MPN swapped Rev 5)* | Littelfuse 30R500UF | Radial-leaded PTC resettable fuse, Ihold=5.00A/Itrip=10.00A/Vmax=30Vdc/Imax=40A, in-line on VM_MOTOR upstream of D2/D3 (DS-PROT-006/033) — **swapped from 30R500U this revision (Rev 5)**: same datasheet/electrical/mechanical spec, RoHS3-compliant construction, Active/orderable status (30R500U's own manufacturer-recommended direct replacement); see §7.5.9 |
+| **F2** *(new, PCB Engineer at explicit Chief Engineer direction, ISS-032 loop-back fix, 2026-09-02)* | Littelfuse 30R500UF (identical MPN to F1) | Second radial-leaded PTC resettable fuse, in-line between J4's sleeve/GND pin and the shared ground net — protects against an *internal* J4 pin-mapping error (this design's own schematic/footprint assumption being wrong) that D2's series diode, sitting in the opposite leg, cannot cover; makes the worst case safe regardless of which physical pin is actually tip vs. sleeve, without needing to resolve that ASSUMPTION; see the corrected safety-argument text above |
 | **U6** *(new Rev 5, ISS-015/019/021)* | Texas Instruments TPS26631PWPR | eFuse/load-switch supervisory controller, HTSSOP-20 (PWP), exposed pad (PowerPAD) tied to GND in addition to pin 9; Component-Engineer-proposed, human-approved (`bom/component-selection.md`); see §7.5.10 |
 | **R11** *(new Rev 5)* | 10kΩ | U6 SHDN external pull-down (fail-safe-OFF direction), sized against TI's guaranteed 10µA leakage spec; see §7.5.10 |
 | **R12** *(new Rev 5)* | 887kΩ, E96 1% | U6 IN_SYS–UVLO divider leg (top), OVP/UVLO trip-point network; see §7.5.10 |
@@ -3085,7 +3177,11 @@ conclusion actually changed:
    typ VF = 6.87V, below U5's 7.4V typ VUVLO_R, DS-MTR-057) — not merely
    a rare worst case. 3S clears UVLO at every corner, margin ≈0.38V
    (near-cutoff 9.0V − 0.62V max VF = 8.38V vs. 8V max VUVLO_R), narrowing
-   to ≈0.32V once new F1's own estimated ≈0.06V added drop is included.
+   to ≈0.32V once new F1's own estimated ≈0.06V added drop is included,
+   and further to **≈0.26V** once F2's own identical estimated ≈0.06V
+   added drop is also included (corrected 2026-09-02, ISS-040 — F2 was
+   added later, in the ISS-032 loop-back fix, and sits in the same
+   series loop as F1).
    **New binding envelope: 9.0–13.0V (§7.5.9, ISS-019)**, replacing the
    previously-unbounded source assumption; enforced by new F1 in-line
    ahead of D2/D3.
@@ -3834,7 +3930,10 @@ In priority order:
     practical constraint**, not a soft recommendation; `hardware/
     power-budget.md`'s Rail Margin Summary is reconciled to state the
     identical conclusion. New F1 (§7.5.9, ISS-019) narrows the 3S margin
-    further, from ≈0.38V to ≈0.32V — quantified, not left unstated. Still
+    further, from ≈0.38V to ≈0.32V — quantified, not left unstated.
+    **Corrected 2026-09-02 (ISS-040)**: F2 (§7.5.9, added later in the
+    ISS-032 loop-back fix, same series loop as F1) narrows it further
+    still, to **≈0.26V**. Still
     flagged for Hardware Reviewer/Hardware Lead to confirm the operational
     recommendation, and **flagged, not self-resolved**, for propagation
     into `bom/component-selection.md`/`requirements/requirements.md`
@@ -4130,7 +4229,11 @@ tracked entirely separately from the 3V3 budget above, never folded in):**
   previously stated here — this revision corrects that understatement.
   3S clears UVLO at every corner (near-cutoff 9.0V − 0.62V max VF =
   8.38V > 8V max VUVLO_R), with margin narrowing from ≈0.38V to ≈0.32V
-  once F1's own estimated ≈0.06V added drop is included. This remains a
+  once F1's own estimated ≈0.06V added drop is included, and further to
+  **≈0.26V** once F2's own identical estimated ≈0.06V added drop is also
+  included (corrected 2026-09-02, ISS-040 — F2 was added later, in the
+  ISS-032 loop-back fix, and sits in the same series loop as F1). This
+  remains a
   consequence of this design's own added series protection diode, not a
   flaw in the Component-Engineer-approved motor selection (M1 is validly
   rated 2S–3S) — flagged for propagation into `bom/component-
