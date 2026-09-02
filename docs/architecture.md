@@ -324,6 +324,36 @@ working CAD/3D tool is verified connected in a future session:
   when one exists — this is reuse of an already-verified tool surface, not a
   new capability claim.
 
+**Addendum, 2026-09-02 (this session, re-checked at the user's own
+prompting after sharing screenshots of a locally-running Blender MCP
+add-on)**: a prior session had found Blender (v5.1.1) genuinely connected
+and usable (see `hardware/mechanical/README.md`'s own dated addendum, used
+read-only to build an exploded assembly view) — but that is explicitly
+**not** a standing guarantee, and this session's own fresh check found it
+disconnected again, precisely the outcome that addendum itself already
+anticipated ("check again rather than assuming... is still connected").
+Two separate `blender-get_addon_status` calls this session both failed,
+each with a **different** specific error, despite the user's screenshots
+showing the Blender-side add-on (Blender 5.1, "Blender MCP" add-on v1.2.0)
+itself reporting "Running on port 9876" / offering "Disconnect from MCP
+server" (i.e., the add-on believes it is listening/connected):
+
+1. First call: `Addon handshake failed: Connection to Blender lost:
+   [Errno 32] Broken pipe`.
+2. Second call (after the user's second screenshot, Preferences → Add-ons →
+   Blender MCP v1.2.0 enabled): `Addon handshake failed: Communication
+   error with Blender: name 'bl_info' is not defined`.
+
+Both calls returned `protocol_version: null`, `blender_version: null`,
+`capabilities: []` — no working capability was ever actually obtained this
+session. **This does not change this section's practical conclusion**: the
+Mechanical Lead still produces text/parametric output only until a working
+CAD/3D tool is actually verified connected in whatever session needs it —
+this addendum is only a precise, dated record of what was tried and what
+specifically failed, not a claim that Blender is now usable. No
+troubleshooting of the user's local Blender/add-on setup was attempted this
+session (out of scope for this documentation-only update).
+
 ### 5.4 Firmware toolchain (Phase 2)
 
 No ARM embedded toolchain, PlatformIO, or vendor IDE (STM32CubeIDE/
@@ -552,7 +582,7 @@ tools/servers exist)
 | Component database / parts availability MCP | Not available | Evaluate when such a tool is actually connected |
 | Test equipment MCP (bench instruments) | Not available | Relevant once `validation/bring-up-procedure.md` moves to instrumented bench testing |
 | CAD/3D modeling tool (e.g. Blender or a parametric CAD/OpenSCAD engine) | Not available — **verified**, not assumed | A live connection check (`blender-get_addon_status`) failed ("Could not connect to Blender"); no local `openscad`/`freecad` binary or `cadquery`/`solid`/`build123d` Python library is installed either. Mechanical Lead produces text/parametric output only until a working tool is verified connected (§5.3) |
-| Firmware flashing / hardware-in-the-loop test tool (e.g. `st-flash`, OpenOCD, a debugger's own CLI) | Not available today | Relevant once a physical board exists to flash — see §5.4/§10. An ARM embedded *compiler* toolchain is a separate, already-available concern (§5.4), not blocked on this row |
+| Firmware flashing / hardware-in-the-loop test tool (e.g. `st-flash`, OpenOCD, a debugger's own CLI) | Not available today (to this AI session's own tooling) | Relevant once a physical board exists to flash — see §5.4/§10. An ARM embedded *compiler* toolchain is a separate, already-available concern (§5.4), not blocked on this row. **2026-09-02**: the human's own tool-procurement research (which SWD programmer/flashing software/USB-UART adapter to actually buy for Bench-IMU-01) is now written up in `validation/bring-up-procedure.md` §0a.1–§0a.4 — that is a paper guide for a future physical build, not a change to this row's own status; no flashing tool is connected to this AI session itself |
 
 Never implement code/process that assumes any of the above exists. When one
 becomes available, move its row out of this table and into §5.

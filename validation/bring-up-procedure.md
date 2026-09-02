@@ -37,22 +37,127 @@ this copy, if a number ever needs re-confirming.
 | Known accepted residual risk | ISS-002 (LDO ROC margin, ACCEPTED-RISK) — if bench-measuring at a deliberately worst-case ~5.5V input, expect this is a known, human-accepted edge case, not a new finding | `validation/change-log.md` ECO-003 |
 | Enclosure fit check (once PCB exists) | Enclosure geometry is fit to `hardware/mechanical-interface.md`'s estimates, not a confirmed real PCB layout (FMEA-007) — verify physical board dimensions/connector positions against the enclosure BEFORE final assembly, not after | `hardware/mechanical-interface.md`, `hardware/mechanical/bench-imu-01-dimensional-spec.md` |
 
-## 0a. Firmware Flashing — Bench-IMU-01 (Phase 2, added — not executed this session)
+## 0a. Firmware Flashing — Bench-IMU-01 (Phase 2; tooling guide added 2026-09-02 — still NOT executed this session)
 
 Driver-level bring-up firmware exists
 (`firmware/bench-imu-01/`, design rationale in
 `firmware/bench-imu-01/bench-imu-01-firmware-design.md`) and **compiles
 cleanly** with `arm-none-eabi-gcc` (verified this session — see that
 document's §0/§7). **Nothing in this section has been executed**: there is
-no physical Bench-IMU-01 board in this environment to flash, matching this
-whole procedure's own "not executed this session" framing (REQ-502). This
-section is prepared, like the rest of this file, for the human's future
-physical build.
+no physical Bench-IMU-01 board in this environment, no SWD programmer or
+USB-UART adapter has actually been purchased/connected, and no firmware has
+actually been flashed — matching this whole procedure's own "not executed
+this session" framing (REQ-502). §0a.1–§0a.5 below replace this section's
+prior placeholder ("flashing tool not part of this repository's tooling")
+with a concrete, evidence-cited **tooling-procurement guide** for the
+human's own future physical build — it remains paper research, not a
+tool-capability claim about this AI session (`docs/architecture.md` §5.4/
+§13 still correctly state no flashing tool is connected to this session
+itself). Flashing real hardware for the first time remains gated behind
+the "before flashing firmware to real hardware" Human-in-the-loop gate
+(`docs/architecture.md` §10).
+
+### 0a.1 SWD programmer options
+
+Bench-IMU-01's J3 header is a bare, unshrouded 4-position 2.54mm-pitch pin
+header (Sullins PREC004SAAN-RC, DS-CONN-008), wired **VDD/SWCLK/GND/SWDIO
+only — no NRST, no SWO** (`bench-imu-01-design.md` §4.4, DS-CONN-002). Any
+programmer connected here needs female-socket ("Dupont") jumper wires (or
+an equivalent adapter) matched **by signal name, not by wire color or
+physical position** — clone-programmer pinout silkscreens vary by seller.
+
+| Option | Type | Approx. price (qty1) | STM32G0/Cortex-M0+ evidence | Notes |
+|---|---|---|---|---|
+| STMicroelectronics **ST-LINK/V2** (genuine) | Official ST tool | ~$25 (DigiKey/Mouser/ST eStore) | DS-TOOL-001, DS-TOOL-002 | Classic 20-pin IDC header ships with flying-lead/Dupont adapter cables — mates directly with J3's 2.54mm pitch, no adapter needed |
+| STMicroelectronics **STLINK-V3MINI** (genuine) | Official ST tool | ~$9–11 (DigiKey/Mouser) — **cheaper than ST-LINK/V2** | DS-TOOL-003, DS-TOOL-004 | Also provides a Virtual COM Port (VCP) UART bridge (STDC14 pins 13/14) that could stand in for a separate USB-UART adapter (§0a.3) — **but** its STDC14 connector (14-pin, 0.05" pitch) does not directly mate with J3's 2.54mm pitch; needs ST's own adapter board or hand-wiring |
+| Generic **"ST-LINK V2" compatible clone** (e.g. widely-sold "ST-LINK V2 Mini") | Third-party clone | Amazon ~$7–15; AliExpress ~$3–4 | DS-TOOL-005 | Explicitly named as supported by the open-source `stlink-org/stlink` toolset ("STLINK programmer boards and clones thereof... no difference in handling or operation") — not an ST-authorized/warrantied product |
+| *(Bonus)* **NUCLEO-G031K8** official eval board's onboard ST-LINK, used standalone | Official ST board, repurposed | ~$13 (DS-MCU-020) | DS-TOOL-013, DS-CONN-002 | Same MCU family already used as this design's own SWD-header reference (DS-CONN-002); requires removing the board's own ST-LINK-to-target jumpers per its user manual, then wiring its CN4 (same VDD/SWCLK/GND/SWDIO convention) out to J3 — more setup effort, but a genuine ST-LINK/V3 debugger plus a spare eval board for the same low price |
+
+**Recommendation**: a classic ST-LINK V2-form-factor unit is the simplest
+match for J3's plain 2.54mm header. Buy the **genuine STMicroelectronics
+ST-LINK/V2** (~$25) for official ST vendor support, or a **~$5–10
+compatible clone** if minimizing cost for this one-off bench build is the
+priority (accepting no ST warranty/support channel) — both are expected to
+work identically with all three flashing-software options in §0a.2, per
+DS-TOOL-005.
+
+### 0a.2 Flashing software options (macOS)
+
+| Tool | macOS install | STM32G0 support evidence | Interface | Trade-offs |
+|---|---|---|---|---|
+| **`st-flash`** (`stlink-org/stlink`, open source) | `brew install stlink` (stable **1.8.0**, bottled for macOS Sequoia/Sonoma, ARM64+Intel — confirmed via Homebrew's own formula API) | DS-TOOL-005, DS-TOOL-006, DS-TOOL-007 | CLI only | Simplest single command; matches this repo's own `firmware/bench-imu-01/Makefile` header-comment example; community-maintained, not ST-official |
+| **STM32CubeProgrammer** | Official ST installer (`st.com`), requires a free myST account; GUI + CLI (`STM32_Programmer_CLI`) | DS-TOOL-008 | GUI + CLI | ST's own official tool, most complete feature set (option bytes, etc.); heavier install, some macOS Java/security-permission friction reported in ST's own community forum |
+| **OpenOCD** | `brew install openocd` (stable **0.12.0**, bottled for macOS Sequoia/Sonoma/Ventura/Monterey/Big Sur, ARM64+Intel — confirmed via Homebrew's own formula API) | DS-TOOL-009, DS-TOOL-010 | CLI + live GDB server | Adds interactive GDB debugging beyond one-shot flashing; more setup (interface + target `.cfg` pair) |
+
+**Important — J3 has no NRST pin** (§4.4): whichever tool is used, expect
+it to fall back to a **software reset** rather than a hardware NRST pulse.
+This is not a guess — both `st-flash` (AIRCR software reset, supported
+since v1.5.1, DS-TOOL-006) and OpenOCD's own mainline `stm32g0x.cfg`
+(`reset_config srst_nogate` + `cortex_m reset_config sysresetreq` when no
+hardware-adapter probe is used, DS-TOOL-010) explicitly document this exact
+fallback path for this MCU family.
+
+**Recommendation**: `st-flash` for the simplest one-shot flash (matches
+this repository's own existing Makefile-comment example); STM32CubeProgrammer
+if the human prefers ST's own official/most full-featured tool; OpenOCD if
+interactive GDB debugging (not just flashing) will also be wanted.
+
+### 0a.3 USB-UART adapter for J2 (3.3V logic)
+
+J2 is a 4-pin, 2.54mm-pitch header (same MPN as J3, DS-CONN-008): **TX
+(PA2)/RX(PA3)/GND/3V3**, fixed at 3.3V logic (`bench-imu-01-design.md` §6)
+— the adapter's own logic-level setting must be 3.3V, not 5V.
+
+| Option | Approx. price (qty1) | Logic level | macOS driver | Evidence |
+|---|---|---|---|---|
+| **CP2102-based module** (Silicon Labs) | ~$3–6 | 3.3V/5V jumper-selectable on most modules | Official Silicon Labs VCP driver | DS-TOOL-011 |
+| **FTDI FT232R/FT232RL-based module** | ~$15–20 (genuine) | Depends on the specific module (fixed-3.3V, fixed-5V, or jumper-selectable SKUs all exist) | Official FTDI VCP driver, long macOS track record | DS-TOOL-012 |
+
+**Recommendation**: a **CP2102-based module**, set to 3.3V — cheapest,
+widely available, and directly matches J2's fixed-3.3V logic. An FTDI
+FT232R-based module is an equally valid, historically very reliable
+alternative at higher cost; watch for counterfeit-chip risk on
+ultra-cheap FTDI-branded listings (DS-TOOL-012).
+
+### 0a.4 End-to-end procedure: build → flash → verify (for the future physical build — not run this session)
+
+```sh
+# 1) Build (already verified working this session — arm-none-eabi-gcc required)
+cd firmware/bench-imu-01
+make                                    # -> build/bench-imu-01.{elf,bin,hex}
+
+# 2) Wire the SWD programmer to J3, matching signal names (VDD/SWCLK/GND/SWDIO)
+#    — no NRST/SWO on this header; confirm 3.3V VDD reference before connecting.
+
+# 3a) Flash with st-flash (brew install stlink):
+st-flash --format ihex write build/bench-imu-01.hex
+# or, using the raw binary + explicit STM32 flash base address:
+st-flash write build/bench-imu-01.bin 0x08000000
+
+# 3b) ...or with STM32CubeProgrammer:
+STM32_Programmer_CLI -c port=SWD -w build/bench-imu-01.hex
+
+# 3c) ...or with OpenOCD:
+openocd -f interface/stlink.cfg -f target/stm32g0x.cfg \
+        -c "program build/bench-imu-01.hex verify reset exit"
+
+# 4) Wire the USB-UART adapter (set to 3.3V) to J2: adapter TX -> J2 RX(PA3),
+#    adapter RX -> J2 TX(PA2), adapter GND -> J2 GND. Find its device path:
+ls /dev/cu.usbserial-*                  # (prefer cu.* over tty.* for `screen`)
+
+# 5) Open the serial console at 115200 8N1:
+screen /dev/cu.usbserial-XXXX 115200    # Ctrl-A then K, then Y, to exit
+```
+
+Compare the resulting output against §0a.5's expected first-boot sequence
+below (boot banner → `RESET_REASON:` → `BMI270_INIT_OK` → CSV telemetry).
+
+### 0a.5 Debug access, expected output, and known residual items
 
 | Item | Value | Source |
 |---|---|---|
 | Debug/programming access | SWD via J3 (VDD/SWCLK/GND/SWDIO) — same header row already listed above | `bench-imu-01-design.md` §4.4 |
-| Flashing tool | Not part of this repository's tooling today (`docs/architecture.md` §13) — use a generic SWD programmer/debugger appropriate for an Arm Cortex-M0+ part (e.g. an ST-LINK or equivalent) with the built `firmware/bench-imu-01/build/bench-imu-01.hex` or `.elf` | `docs/architecture.md` §5.4/§13 |
+| Flashing tool | See §0a.1–§0a.2 above for the evidence-cited programmer/software recommendation (previously: "not part of this repository's tooling today" — that placeholder is now replaced by this concrete guide; still not exercised by this AI session itself, `docs/architecture.md` §5.4/§13) | This file §0a.1–§0a.4 |
 | Expected first-boot UART output (at 115200 8N1, on the J2 header) | A boot banner, one `RESET_REASON:` line (decoding `RCC_CSR` — expect `POWER_ON` on a first-ever flash, or `NRST_PIN(SW1_or_debugger)` if reset via SWD/reset line), then either `BMI270_INIT_OK` followed by continuous `millis,ax,ay,az,gx,gy,gz` CSV lines at ~100 Hz, or a `BMI270_INIT_FAILED: ...` line if the IMU didn't come up (check I2C2/PA11-PA12 wiring — corrected 2026-09-11, ISS-027; was PB10/PB11 through Rev 5/6 — and the BMI270's solder joints first) | `firmware/bench-imu-01/src/main.c`, `reset_reason.c` |
 | Pre-flash checklist addition | Confirm the SWD debugger is configured for a Cortex-M0+ target at the expected VDD (3.3V, from J3's own VDD reference pin) before connecting — same polarity/orientation care as the rest of §1's checklist | `bench-imu-01-design.md` §4.4 |
 | Known residual, non-blocking item | The I2C_TIMINGR value used by the firmware (DS-MCU-063) was cross-checked via two independent web-search-derived sources but not directly re-verified against the primary ST AN4235 PDF this session — low-risk for a bench link, worth a direct check before this firmware is considered final | `datasheets/stmicroelectronics_an4235_i2c-timing-configuration-tool.md` |
