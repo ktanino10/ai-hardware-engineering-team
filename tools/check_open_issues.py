@@ -48,7 +48,34 @@ ACCEPTED_RISK = "ACCEPTED-RISK"
 
 
 def _split_row(line: str) -> list[str]:
-    return [cell.strip() for cell in line.strip().strip("|").split("|")]
+    """Split a Markdown table row into cells, respecting GFM's own escape
+    convention for a literal pipe inside a cell (``\\|``) -- an escaped
+    pipe does NOT separate cells, unlike a bare one. A naive
+    ``.split("|")`` (the previous implementation) wrongly inflates the
+    apparent column count of a row containing legitimately-escaped prose.
+    Kept in sync with the identical fix in
+    `tools/check_id_uniqueness.py`'s own `_split_row` -- see that one's
+    docstring for the real, concrete example this fixes.
+    """
+    stripped = line.strip().strip("|")
+    cells: list[str] = []
+    current: list[str] = []
+    i = 0
+    while i < len(stripped):
+        ch = stripped[i]
+        if ch == "\\" and i + 1 < len(stripped) and stripped[i + 1] == "|":
+            current.append("|")  # literal pipe, not a cell separator
+            i += 2
+            continue
+        if ch == "|":
+            cells.append("".join(current).strip())
+            current = []
+            i += 1
+            continue
+        current.append(ch)
+        i += 1
+    cells.append("".join(current).strip())
+    return cells
 
 
 def _is_separator_row(cells: list[str]) -> bool:
@@ -128,6 +155,23 @@ def parse_backlog_rows(text: str) -> tuple[list[list[str]], list[str]]:
         id_cell = cells[0] if cells else ""
         return _is_placeholder(id_cell) or bool(ID_PATTERN.match(id_cell))
 
+    def id_plausible_row(line_stripped: str) -> bool:
+        """Weaker than is_real_row: doesn't require the right column
+        count, only that the line's own first cell (unaffected by a
+        formatting defect elsewhere in the row, e.g. a stray unescaped
+        '|' in a later free-text cell) matches ISS-/MISS- or is a
+        recognized placeholder. Prevents a row that IS genuinely meant as
+        real data, but fails the strict check for some other reason, from
+        being silently swallowed as anonymous gap filler.
+        """
+        if not line_stripped.startswith("|"):
+            return False
+        cells = _split_row(line_stripped)
+        if not cells or _is_separator_row(cells):
+            return False
+        id_cell = cells[0]
+        return _is_placeholder(id_cell) or bool(ID_PATTERN.match(id_cell))
+
     rows: list[list[str]] = []
     warnings: list[str] = []
     while j < len(lines):
@@ -153,7 +197,9 @@ def parse_backlog_rows(text: str) -> tuple[list[list[str]], list[str]]:
         saw_nonblank = False
         while k < len(lines):
             k_stripped = lines[k].strip()
-            if k_stripped.startswith("|") and is_real_row(k_stripped):
+            if k_stripped.startswith("|") and (
+                is_real_row(k_stripped) or id_plausible_row(k_stripped)
+            ):
                 break
             if k_stripped.startswith("#"):
                 break
@@ -161,15 +207,34 @@ def parse_backlog_rows(text: str) -> tuple[list[list[str]], list[str]]:
                 saw_nonblank = True
             k += 1
 
-        if k < len(lines) and lines[k].strip().startswith("|") and is_real_row(lines[k].strip()):
+        resumed = lines[k].strip() if k < len(lines) else ""
+        if resumed.startswith("|") and (is_real_row(resumed) or id_plausible_row(resumed)):
             n_skipped = k - gap_start
             kind = "non-blank/malformed" if saw_nonblank else "blank"
-            warnings.append(
-                f"line {gap_start + 1}: skipped {n_skipped} {kind} line(s) "
-                f"between Backlog table rows (table resumes at line "
-                f"{k + 1}) -- clean this up; a gap like this here "
-                "previously could silently truncate scanning."
-            )
+            if is_real_row(resumed):
+                warnings.append(
+                    f"line {gap_start + 1}: skipped {n_skipped} {kind} line(s) "
+                    f"between Backlog table rows (table resumes at line "
+                    f"{k + 1}) -- clean this up; a gap like this here "
+                    "previously could silently truncate scanning."
+                )
+            else:
+                # id_plausible_row but NOT is_real_row: the resumed row
+                # itself is malformed (e.g. wrong column count). It WILL
+                # still be added as a normal row by the main loop next
+                # iteration (any "|"-prefixed line is, unconditionally) --
+                # but name the malformation explicitly so it's never
+                # missed.
+                resumed_cells = _split_row(resumed)
+                warnings.append(
+                    f"line {gap_start + 1}: skipped {n_skipped} {kind} "
+                    f"line(s), then found a row with ID '{resumed_cells[0]}' "
+                    f"at line {k + 1} that has {len(resumed_cells)} cell(s) "
+                    f"(expected {expected_ncols}) -- possible internal "
+                    "formatting corruption (e.g. an unescaped '|' in a "
+                    "free-text cell); counted anyway since its ID looks "
+                    "genuine, but PLEASE FIX this row's own formatting."
+                )
             j = k
             continue
 

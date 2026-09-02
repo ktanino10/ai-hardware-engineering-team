@@ -83,7 +83,37 @@ NAMESPACES: list[NamespaceSpec] = [
 
 
 def _split_row(line: str) -> list[str]:
-    return [cell.strip() for cell in line.strip().strip("|").split("|")]
+    """Split a Markdown table row into cells, respecting GFM's own escape
+    convention for a literal pipe inside a cell (``\\|``) -- an escaped
+    pipe does NOT separate cells, unlike a bare one. A naive
+    ``.split("|")`` (the previous implementation) wrongly inflates the
+    apparent column count of a row containing legitimately-escaped prose
+    (e.g. a cell reading ``gyr_en\\|acc_en``, which any real Markdown
+    renderer displays as the single literal string "gyr_en|acc_en") --
+    found for real in this repo's own `datasheets/evidence-log.md`
+    (DS-IMU-086, DS-MCU-068): both are correctly, deliberately escaped
+    per GFM convention and parse as a clean 8 cells with this fix, not the
+    9 a naive split reports.
+    """
+    stripped = line.strip().strip("|")
+    cells: list[str] = []
+    current: list[str] = []
+    i = 0
+    while i < len(stripped):
+        ch = stripped[i]
+        if ch == "\\" and i + 1 < len(stripped) and stripped[i + 1] == "|":
+            current.append("|")  # literal pipe, not a cell separator
+            i += 2
+            continue
+        if ch == "|":
+            cells.append("".join(current).strip())
+            current = []
+            i += 1
+            continue
+        current.append(ch)
+        i += 1
+    cells.append("".join(current).strip())
+    return cells
 
 
 def _is_separator_row(cells: list[str]) -> bool:
@@ -206,6 +236,32 @@ def parse_table_rows(
             return False
         return True
 
+    def id_plausible_row(line_stripped: str) -> bool:
+        """Weaker than is_real_row: doesn't require the right column
+        count, only that the line looks like it's INTENDED as a data row
+        of this table -- its very first cell (which a formatting defect
+        elsewhere in the row, e.g. a stray unescaped '|' in a later
+        free-text cell, does not disturb) matches this namespace's own ID
+        pattern or is a recognized placeholder. Used so a row that IS
+        genuinely meant to be real data, but fails the strict check for
+        some other reason, is never silently swallowed as anonymous gap
+        filler just because its own formatting is off -- found for real
+        (independent code review, not hypothetical): a stray unescaped
+        '|' inflating a row's cell count is exactly this shape, and 3 such
+        rows existed for real in `datasheets/evidence-log.md` at the time
+        (since fixed at the data level too, see `_split_row`'s own
+        escape-handling and DS-MCU-076's corrected citation -- but a
+        future row could still hit this some other way, e.g. an
+        accidentally dropped cell).
+        """
+        if id_pattern is None or not line_stripped.startswith("|"):
+            return False
+        cells = _split_row(line_stripped)
+        if not cells or _is_separator_row(cells):
+            return False
+        id_cell = cells[0]
+        return _is_placeholder(id_cell) or bool(id_pattern.match(id_cell))
+
     while j < len(lines):
         stripped = lines[j].strip()
 
@@ -241,7 +297,9 @@ def parse_table_rows(
         saw_nonblank = False
         while k < len(lines):
             k_stripped = lines[k].strip()
-            if k_stripped.startswith("|") and is_real_row(k_stripped):
+            if k_stripped.startswith("|") and (
+                is_real_row(k_stripped) or id_plausible_row(k_stripped)
+            ):
                 break
             if k_stripped.startswith("#"):
                 break
@@ -249,15 +307,35 @@ def parse_table_rows(
                 saw_nonblank = True
             k += 1
 
-        if k < len(lines) and lines[k].strip().startswith("|") and is_real_row(lines[k].strip()):
+        resumed = lines[k].strip() if k < len(lines) else ""
+        if resumed.startswith("|") and (is_real_row(resumed) or id_plausible_row(resumed)):
             n_skipped = k - gap_start
             kind = "non-blank/malformed" if saw_nonblank else "blank"
-            warnings.append(
-                f"{label}line {gap_start + 1}: skipped {n_skipped} {kind} "
-                f"line(s) between table rows (table resumes at line {k + 1}) "
-                "-- clean this up; a gap like this here previously could "
-                "silently truncate scanning."
-            )
+            if is_real_row(resumed):
+                warnings.append(
+                    f"{label}line {gap_start + 1}: skipped {n_skipped} {kind} "
+                    f"line(s) between table rows (table resumes at line {k + 1}) "
+                    "-- clean this up; a gap like this here previously could "
+                    "silently truncate scanning."
+                )
+            else:
+                # id_plausible_row but NOT is_real_row: the row this gap
+                # resumes at is itself malformed (e.g. wrong column count),
+                # not just preceded by a gap of junk. Its own ID cell still
+                # looks genuine, so it WILL be added as a normal row by the
+                # main loop on the next iteration (any "|"-prefixed line is
+                # -- unconditionally, unaffected by this check) -- but name
+                # it explicitly so the malformation itself is never missed.
+                resumed_cells = _split_row(resumed)
+                warnings.append(
+                    f"{label}line {gap_start + 1}: skipped {n_skipped} {kind} "
+                    f"line(s), then found a row with ID '{resumed_cells[0]}' "
+                    f"at line {k + 1} that has {len(resumed_cells)} cell(s) "
+                    f"(expected {expected_ncols}) -- possible internal "
+                    "formatting corruption (e.g. an unescaped '|' in a "
+                    "free-text cell); counted anyway since its ID looks "
+                    "genuine, but PLEASE FIX this row's own formatting."
+                )
             j = k
             continue
 
