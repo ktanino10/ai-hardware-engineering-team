@@ -17,9 +17,11 @@ document adds a judgment call not explicit in the source, it is marked
 (`.github/instructions/mechanical-design.instructions.md`).
 
 **Companion visuals**: `hardware/mechanical/drawings/` — 2D orthographic
-views of each part (`drawings/2d/`) and an exploded assembly view
-(`drawings/exploded/bench-imu-01-exploded-view.png`). See
-`drawings/README.md` for how those were generated.
+views of each part (`drawings/2d/`), an exploded assembly view
+(`drawings/exploded/bench-imu-01-exploded-view.png`), and an assembly
+animation (`drawings/animation/bench-imu-01-assembly-animation.mp4`/`.gif`)
+showing the same 5 pieces + bearing moving into place in the real build
+order below. See `drawings/README.md` for how those were generated.
 
 **This document does not re-open, re-verify, or dispute any prior
 Mechanical Reviewer finding.** It restates existing dispositions (§1

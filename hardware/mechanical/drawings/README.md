@@ -1,16 +1,18 @@
-# Bench-IMU-01 — 2D Drawings + Exploded Assembly View (Rev 4/4.1, Mechanical scope)
+# Bench-IMU-01 — 2D Drawings + Exploded Assembly View + Assembly Animation (Rev 4/4.1, Mechanical scope)
 
 Visual documentation of the already-Design-Complete mechanical assembly
-(`validation/change-log.md` ECO-031/032) — 2D orthographic drawings of each
-of the 5 printed pieces plus the full assembled unit, and a Blender-built
-exploded assembly view. **This is the first time this project has
-generated 2D drawings or an exploded view** — this document establishes
-the convention so it is reproducible, not a one-off.
+(`validation/change-log.md` ECO-031/032/033) — 2D orthographic drawings of
+each of the 5 printed pieces plus the full assembled unit, a Blender-built
+exploded assembly view, and an assembly animation. **This is the first
+time this project has generated 2D drawings, an exploded view, or an
+animation** — this document establishes the convention so it is
+reproducible, not a one-off.
 
 No dimension, tolerance, or module body in `bench-imu-01-enclosure.scad`
 was touched to produce any of this — every file here is either a small,
 new, `include`-only wrapper script (same convention already established by
-`hardware/mechanical/stl/export/*.scad`) or a downstream rendered image.
+`hardware/mechanical/stl/export/*.scad`) or a downstream rendered image
+or video.
 
 ## Tooling honesty (verified this session)
 
@@ -50,6 +52,14 @@ hardware/mechanical/drawings/
     build_exploded_view.py           Blender Python script that reproduces
                                       the exploded-view scene from scratch
     bench-imu-01-exploded-view.png   final rendered output (with legend)
+  animation/
+    build_assembly_animation.py      Blender Python script that keyframes
+                                      and renders the assembly animation
+                                      (depends on build_exploded_view.py's
+                                      own scene already existing)
+    bench-imu-01-assembly-animation.mp4   final video (H.264/MPEG4, 24fps)
+    bench-imu-01-assembly-animation.gif   derived GIF (12fps, palette-
+                                           optimized) for inline preview
 ```
 
 ## Method 1: 2D orthographic drawings (`2d/`)
@@ -188,6 +198,73 @@ information for a *mechanical* exploded view.
    each part's color, name, and a one-line cross-reference) — not part of
    `build_exploded_view.py` itself; regenerate it the same way if needed
    (see the script's own render output for the un-captioned base image).
+
+## Method 3: Assembly animation (`animation/`)
+
+An animated companion to the static exploded view, added per a follow-up
+request: each part moves from its exploded position back to its true
+assembled position, **staggered across 4 stages that follow the real
+build order** already documented in `../assembly-instructions.md` — not an
+arbitrary sequence. Direction is **exploded → assembled** ("watching it
+get built"), the more intuitive framing for an assembly animation.
+
+**Stage order** (piece — source build step):
+
+1. PCB lid — `assembly-instructions.md` §4.1 (early core-enclosure step)
+2. Containment cap — §4.4 (last of the core-enclosure steps)
+3. Stand plate + pinch guard together — §4.5 (the source document places
+   these "at the same assembly step," a parallel subassembly)
+4. Bearing — §4.6/§4.7 (the final connecting piece; mirrors "mate the two
+   halves via the bearing's captive ball race" being the last real step)
+
+The base assembly never moves — it is the substrate/anchor everything else
+attaches to, exactly as in the static exploded view. Camera and lighting
+are unchanged from the static exploded-view shot (kept fixed deliberately,
+to keep the viewer's focus on the part motion rather than a moving camera).
+180 frames at 24fps (7.5s), with brief holds at fully-exploded, between
+each stage, and fully-assembled, via `CONSTANT` F-curve extrapolation
+(each part holds its position before/after its own stage, rather than
+drifting).
+
+**Format — verified, not assumed**: both `ffmpeg` (v8.1, `libx264`) and
+Blender's own built-in FFMPEG render output
+(`bpy.app.build_options.codec_ffmpeg == True`) were confirmed present this
+session before committing to a format. The MP4 is the primary deliverable
+(H.264/MPEG4, rendered from a PNG frame sequence + a single `ffmpeg`
+encode pass — see `build_assembly_animation.py`'s own "Key lessons
+learned" for why a PNG-sequence-then-encode pipeline was used instead of
+Blender's own FFMPEG muxer directly). The GIF is derived from that same
+PNG sequence via `ffmpeg`'s standard two-pass palette technique
+(`palettegen`/`paletteuse`, 12fps/640px wide) specifically because GitHub
+renders a committed GIF inline in markdown, unlike a committed MP4
+referenced by relative path — practical value, not a redundant duplicate.
+
+### Regenerating the assembly animation
+
+1. Run `exploded/build_exploded_view.py` first (the animation script reuses
+   that same scene — same 6 imported parts, materials, camera, lighting,
+   ground plane — rather than rebuilding it from scratch).
+2. Run `animation/build_assembly_animation.py` inside Blender to keyframe
+   the animation and render the PNG frame sequence (chunk the render across
+   multiple calls if driving Blender via a tool with a practical per-call
+   time budget — see the script's own "Key lessons learned" for exactly how
+   this project did that: 6 chunks of 30 frames each).
+3. Encode with `ffmpeg` (exact commands in the script's own header):
+   ```sh
+   ffmpeg -y -framerate 24 -i "frames/f_%04d.png" \
+     -c:v libx264 -pix_fmt yuv420p -crf 20 -movflags +faststart \
+     bench-imu-01-assembly-animation.mp4
+
+   ffmpeg -y -framerate 24 -i "frames/f_%04d.png" \
+     -vf "fps=12,scale=640:-1:flags=lanczos,palettegen=stats_mode=diff" \
+     /tmp/anim-palette.png
+   ffmpeg -y -framerate 24 -i "frames/f_%04d.png" -i /tmp/anim-palette.png \
+     -filter_complex "fps=12,scale=640:-1:flags=lanczos[x];[x][1:v]paletteuse=dither=bayer:bayer_scale=3" \
+     -loop 0 bench-imu-01-assembly-animation.gif
+   ```
+4. The rendered PNG frame sequence itself is **not committed** (same
+   regenerable-intermediate convention as the exploded view's own
+   assembled-position STLs) — only the two encoded output files are.
 
 ## Related documents
 
