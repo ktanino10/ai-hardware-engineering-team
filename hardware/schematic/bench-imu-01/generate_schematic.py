@@ -633,7 +633,7 @@ def main() -> None:
 
     # --- Place symbols (rough logical-block layout on an A3 sheet) ---
     # Block 1: USB-C power input + ESD + LDO (left)
-    j1 = b.place("J1", "USB4105-GH-A", usbc, 25.4, 50.8,
+    j1 = b.place("J1", "USB4105-GF-A", usbc, 25.4, 50.8,
                   footprint="Connector_USB:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal",
                   datasheet="~")
     u4 = b.place("U4", "USBLC6-2SC6", esd, 76.2, 45.72,

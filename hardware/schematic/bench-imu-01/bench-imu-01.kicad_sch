@@ -2933,7 +2933,7 @@
     (property "Reference" "J1" (id 0) (at 27.939999999999998 45.72 0)
       (effects (font (size 1.0 1.0)))
     )
-    (property "Value" "USB4105-GH-A" (id 1) (at 27.939999999999998 48.26 0)
+    (property "Value" "USB4105-GF-A" (id 1) (at 27.939999999999998 48.26 0)
       (effects (font (size 1.0 1.0)))
     )
     (property "Footprint" "Connector_USB:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal" (id 2) (at 25.4 50.8 0)

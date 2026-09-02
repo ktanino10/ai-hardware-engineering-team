@@ -12,7 +12,7 @@
 // x,y,w,h are SVG coordinates. category drives box accent styling (hub = MCU).
 const COMPONENTS = [
   { id:'J1', x:30,  y:55,  w:100, h:85, ref:'J1', hub:false,
-    nameEn:'USB-C Receptacle', nameJa:'USB-C レセプタクル', part:'USB4105-GH-A (GCT)',
+    nameEn:'USB-C Receptacle', nameJa:'USB-C レセプタクル', part:'USB4105-GF-A (GCT)',
     roleEn:'Power-only 5V input from a USB-C cable. D+/D- are deliberately left unconnected — this board has no USB data stack (REQ-105).',
     roleJa:'USB-Cケーブルからの電源専用5V入力。D+/D-はあえて未接続（このボードにUSBデータ機能はない, REQ-105）。',
     datasheet:null },
