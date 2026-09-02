@@ -9,12 +9,17 @@ name: Agent Frontmatter Lint
 # repo-hygiene guard covering every discipline's agents/skills equally, not
 # part of the Design Complete gate logic.
 
+# NOTE (pull_request trigger is deliberately NOT path-filtered): this job's
+# name, "Check agent/skill frontmatter", is a REQUIRED status check on `main`,
+# and GitHub never reports a required check that a path filter skipped -- see
+# the equivalent note in hardware-gate.yml. This was the binding constraint in
+# practice: most PRs touch neither `.github/agents/**` nor `.github/skills/**`,
+# so this check was the one that silently held them at "Expected" forever. The
+# script validates every agent profile and skill in the repo regardless of what
+# a PR touched, and runs in ~15s. The `push` trigger keeps its path filter.
+
 on:
   pull_request:
-    paths:
-      - ".github/agents/**"
-      - ".github/skills/**"
-      - "tools/check_agent_frontmatter.py"
   push:
     branches: [main]
     paths:
