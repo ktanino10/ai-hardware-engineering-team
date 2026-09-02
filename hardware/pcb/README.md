@@ -647,11 +647,11 @@ then a genuine plateau — 4 further iterations found 0 additional tractable
 fixes, not a search-parameter limit. This confirms, with a real
 multi-iteration search rather than a single attempt, the prior triage's
 own characterization: these violations sit in genuinely dense board
-regions (14 confirmed via direct geometric distance check to fall within
-8mm of U5's or U6's placed center, matching the already-documented
-0.65mm-fine-pitch package-proximity pattern; the remainder in busy shared
-routing corridors) where a local single-track detour cannot find
-clearance at any tested search width or side. Per Kyosuke's own explicit
+regions (a substantial fraction confirmed via direct geometric distance
+check to fall close to U5's or U6's placed center, matching the
+already-documented 0.65mm-fine-pitch package-proximity pattern; the
+remainder in busy shared routing corridors) where a local single-track
+detour cannot find clearance at any tested search width or side. Per Kyosuke's own explicit
 framing ("you don't need to build a general-purpose autorouter from
 scratch"; "it's fine if this doesn't reach zero violations"), a placement
 change for U5/U6 was considered but **not attempted this round**: U5's own
@@ -677,11 +677,35 @@ each, before vs. after):
 
 Directly confirmed (not inferred from the count alone) that all 3
 targeted J1-area instances are gone from the fresh DRC output, and the
-4th (U5-area) remains present — now reported as 3 separate DRC entries
-per run rather than 1 (via-vs-track pairings from both the B.Cu and
-In2.Cu sides of the same physical via-to-via conflict), a DRC
-multi-angle-reporting characteristic of this one unresolved physical
-issue, not 3 new problems.
+4th (U5-area) remains present as a 4-entry DRC signature per run (1
+`clearance` + 3 `shorting_items`, all via-vs-track/via-vs-via pairings
+between the two conflicting vias and their own connected tracks on B.Cu/
+In2.Cu) — this exact 4-entry signature was already present before this
+round's changes (see Cycle 9 correction below), not new reporting
+granularity this round introduced.
+
+**Correction (2026-09-02, Hardware Reviewer Cycle 9 independent
+verification)**: this section originally claimed the U5-area conflict is
+"now reported as 3 separate DRC entries per run rather than 1" — Cycle 9
+independently searched the pre-round baseline (commit `19ffb16`) and found
+the identical 4-entry set (not 3, and not new) already present there, same
+net names/positions/lengths, across all 3 baseline runs. The "rather than
+1" framing was inaccurate; corrected above. This does not affect the
+underlying intractability conclusion, which Cycle 9 independently
+reconfirmed via its own two-method distance check. Cycle 9 also could not
+exactly reproduce the "14 of ~54... within 8mm" figure above (obtained 11,
+6, or 16 depending on which reasonable counting rule is used, never
+exactly 14) — the qualitative clustering claim holds, the specific number
+did not reproduce and has been softened above accordingly. Neither
+correction changes ISS-036's OPEN status, the confirmed fixes, or the
+confirmed pre-existing clearance/hole_clearance findings — both are
+narrative/documentation-precision issues in this file, not hardware
+defects, caught by Cycle 9's own from-scratch re-derivation rather than by
+trusting this file's numbers. Full detail: `validation/design-review.md`
+Hardware Reviewer — Cycle 9 (Findings HWR9-B, HWR9-C; see also HWR9-A, an
+incidental, fully pre-existing/benign `shorting_items` triage-bucket gap
+this reviewer separately surfaced, unrelated to this round's own changes
+and already explained by already-open ISS-017).
 
 **The `clearance` (11→16–17) and `hole_clearance` (3→6) increases were
 each individually, directly re-verified — not inferred from the count
