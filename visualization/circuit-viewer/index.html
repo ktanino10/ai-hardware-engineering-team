@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bench-IMU-01 — Circuit &amp; Current Flow / 回路・電流フロー図</title>
+<style>
+  :root{
+    --bg:#0a1628; --bg2:#0e1e38; --panel:#0d1f3c; --line:#1c3a63;
+    --ink:#dce8f7; --dim:#5c7699; --accent:#4fd3ff;
+    --pow5:#ffb03a; --powvm:#ff5a5a; --motor:#ff8a3d;
+    --i2c:#4fd3ff; --uart:#b385ff; --ctrl:#3ee08a; --fb:#ff5ac8;
+    --future:#9aa7bb; --debug:#546a8a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:"Segoe UI","Hiragino Sans","Noto Sans JP",sans-serif;height:100%;}
+  #app{display:flex;flex-direction:column;height:100vh;}
+  header{display:flex;align-items:center;justify-content:space-between;
+    padding:14px 22px;background:linear-gradient(180deg,#0d1e38,#0a1628);
+    border-bottom:1px solid var(--line);}
+  header h1{font-size:17px;margin:0;font-weight:600;letter-spacing:.02em;}
+  header .sub{font-size:11.5px;color:var(--dim);margin-top:3px;}
+  .lang-toggle button{background:transparent;border:1px solid var(--line);color:var(--dim);
+    padding:5px 12px;font-size:12px;cursor:pointer;border-radius:4px 0 0 4px;}
+  .lang-toggle button:last-child{border-radius:0 4px 4px 0;border-left:none;}
+  .lang-toggle button.active{background:var(--accent);color:#04121f;border-color:var(--accent);font-weight:600;}
+
+  nav.tabs{display:flex;gap:8px;padding:10px 22px;background:#0b1a30;border-bottom:1px solid var(--line);}
+  nav.tabs button{background:var(--panel);border:1px solid var(--line);color:var(--ink);
+    padding:9px 16px;border-radius:20px;font-size:12.5px;cursor:pointer;transition:.15s;}
+  nav.tabs button .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;}
+  nav.tabs button.active{background:var(--accent);color:#04121f;border-color:var(--accent);font-weight:700;}
+  nav.tabs button:not(.active):hover{border-color:var(--accent);}
+
+  .banner{margin:10px 22px 0;padding:9px 14px;background:#152a4a;border:1px solid #23456f;
+    border-radius:6px;font-size:12px;color:#a9c3e6;line-height:1.6;}
+  .banner b{color:#fff;}
+
+  main{flex:1;display:flex;overflow:hidden;padding:10px 22px;gap:14px;}
+  #stage{flex:1;background:radial-gradient(ellipse at 30% 20%,#0e2244 0%,#081226 70%);
+    border:1px solid var(--line);border-radius:8px;overflow:auto;position:relative;}
+  svg#circuit{display:block;width:100%;height:auto;min-width:1180px;}
+
+  .box rect{fill:#0f2543;stroke:var(--line);stroke-width:1.4;rx:7;}
+  .box.hub rect{fill:#122a4d;stroke:var(--accent);stroke-width:2;}
+  .box:hover rect{stroke:#fff;cursor:pointer;}
+  .box text{fill:var(--ink);font-size:12.5px;pointer-events:none;}
+  .box text.ref{fill:var(--accent);font-weight:700;font-size:12px;}
+  .box text.role{fill:var(--dim);font-size:9.5px;}
+  .box.selected rect{stroke:#fff;stroke-width:2.4;filter:drop-shadow(0 0 6px rgba(255,255,255,.5));}
+
+  path.wire{fill:none;stroke-width:2;transition:opacity .3s;}
+  path.cat-power5v{stroke:var(--pow5);}
+  path.cat-powervm{stroke:var(--powvm);}
+  path.cat-motorphase{stroke:var(--motor);stroke-width:3;}
+  path.cat-i2c{stroke:var(--i2c);}
+  path.cat-uart{stroke:var(--uart);}
+  path.cat-ctrl{stroke:var(--ctrl);}
+  path.cat-feedback{stroke:var(--fb);}
+  path.cat-debug{stroke:var(--debug);stroke-dasharray:3,3;}
+  path.cat-future{stroke:var(--future);stroke-width:2;stroke-dasharray:6,5;opacity:0;}
+
+  .pulse{filter:drop-shadow(0 0 4px currentColor);}
+  .badge-future{fill:#3a2f10;stroke:#c99a2e;stroke-width:1;opacity:0;}
+  .badge-future text{fill:#f0c96a;font-size:10.5px;font-weight:700;}
+  .mode-future .badge-future{opacity:1;}
+  .mode-future .cat-future{opacity:1;}
+
+  .mode-power .cat-i2c,.mode-power .cat-uart,.mode-power .cat-ctrl,.mode-power .cat-feedback{opacity:.08;}
+  .mode-bench .cat-power5v,.mode-bench .cat-powervm,.mode-bench .cat-motorphase{opacity:.14;}
+  .mode-future .cat-power5v,.mode-future .cat-powervm,.mode-future .cat-motorphase{opacity:.08;}
+  .mode-future .cat-i2c,.mode-future .cat-uart,.mode-future .cat-ctrl,.mode-future .cat-feedback{opacity:.4;}
+
+  #info{width:300px;flex:0 0 300px;background:var(--panel);border:1px solid var(--line);
+    border-radius:8px;padding:16px;overflow-y:auto;font-size:12.8px;line-height:1.65;}
+  #info h2{font-size:14.5px;margin:0 0 2px;color:#fff;}
+  #info .ref{color:var(--accent);font-size:12px;font-weight:700;margin-bottom:10px;}
+  #info .field{margin-top:11px;}
+  #info .field .k{color:var(--dim);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;}
+  #info .field .v{margin-top:2px;}
+  #info a{color:var(--i2c);}
+  #info .placeholder{color:var(--dim);font-size:12.5px;}
+
+  footer.legend{display:flex;flex-wrap:wrap;gap:16px;padding:10px 22px 16px;font-size:11px;color:var(--dim);}
+  footer.legend .item{display:flex;align-items:center;gap:6px;}
+  footer.legend .sw{width:20px;height:3px;border-radius:2px;}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div>
+      <h1 data-en="Bench-IMU-01 — Circuit &amp; Current-Flow Viewer" data-ja="Bench-IMU-01 — 回路・電流フロービューア"></h1>
+      <div class="sub" data-en="Generated from the real KiCad schematic, netlist, and firmware source in this repository — not illustrative." data-ja="このリポジトリの実際のKiCad回路図・ネットリスト・ファームウェアソースから生成（架空の図ではありません）"></div>
+    </div>
+    <div class="lang-toggle">
+      <button id="btn-ja" class="active">日本語</button><button id="btn-en">EN</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button data-mode="power" class="active"><span class="dot" style="background:var(--powvm)"></span><span data-en="Power Distribution" data-ja="① 電源系統"></span></button>
+    <button data-mode="bench"><span class="dot" style="background:var(--i2c)"></span><span data-en="Current Behavior (implemented)" data-ja="② 現在の動作（実装済み）"></span></button>
+    <button data-mode="future"><span class="dot" style="background:var(--future)"></span><span data-en="Future: Closed-Loop Attitude Control" data-ja="③ 将来：閉ループ姿勢制御（未実装）"></span></button>
+  </nav>
+
+  <div class="banner" id="banner"></div>
+
+  <main>
+    <div id="stage">
+      <svg id="circuit" viewBox="0 0 1220 850" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+    <div id="info">
+      <div class="placeholder" data-en="Click any component in the diagram to see its real role, part number, and datasheet." data-ja="図中の部品をクリックすると、実際の役割・型番・データシートが表示されます。"></div>
+    </div>
+  </main>
+
+  <footer class="legend" id="legend"></footer>
+</div>
+
+<script src="circuit-data.js"></script>
+<script src="circuit-render.js"></script>
+</body>
+</html>
