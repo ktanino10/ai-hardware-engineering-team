@@ -963,3 +963,39 @@ committed zip" is **also** correct and does not conflict with any of the
 above: that export was taken from the committed board *file*, whose
 footprint order is fixed by construction. Re-exporting a committed file and
 re-generating a board are different operations.
+
+### `bench-imu-01-3d.png` render command (ISS-045/047 superseded by ISS-055)
+
+**Reproducible command** (this is the actual, verified answer to Cycle 13's
+own recorded-but-unactioned Foresight note #3 — "camera parameters should be
+documented... so the artifact becomes regenerable"):
+
+```
+kicad-cli pcb render hardware/pcb/bench-imu-01/bench-imu-01.kicad_pcb \
+  --side top --width 1568 --height 984 --quality high --floor \
+  --background opaque -o hardware/pcb/bench-imu-01/bench-imu-01-3d.png
+```
+
+ISS-045/047 (both RESOLVED, left unedited — see `validation/open-issues.md`)
+concluded this render's camera parameters were "undocumented and empirically
+not recoverable," evidenced by a **bare, unflagged** `kicad-cli pcb render`
+call producing 1568×872 against the committed 1568×984. That measurement is
+accurate for what it tested — independently reproduced here, exactly
+(1568×872) — but a bare call was the only invocation tried. ISS-055
+re-tested the fully-flagged command above (never previously tried) and found
+it reproduces the **same camera angle, zoom and board-fill fraction** as the
+historical image, confirmed both visually and via pixel-diff (~2% of pixels
+differ, max channel delta 31/255, confined to component/silkscreen edge
+antialiasing — not a shifted or re-zoomed scene).
+
+**Known caveat, disclosed rather than hidden**: the flagged command's actual
+output canvas (1544×952) does not exactly match its own requested
+`--width 1568 --height 984` (nor the historical 1568×984). This is **not**
+camera drift — the same proportional shortfall appears for the bare call too
+(`--width`/`--height` default to 1600×900 per `kicad-cli pcb render --help`;
+actual bare output is 1568×872, a 2.0%/3.1% reduction) as for the flagged
+call (1568×984 requested → 1544×952 actual, a 1.5%/3.3% reduction) — nearly
+identical proportional crops in both cases, consistent with a fixed internal
+`kicad-cli` 10.0.1 auto-fit/margin behavior on this environment, not a
+per-invocation camera difference. Re-running this exact command against an
+unchanged board reproduces the same 1544×952 output deterministically.
