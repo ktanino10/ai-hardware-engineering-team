@@ -36,6 +36,28 @@ decision was made or changed to produce this package — see
 | `bench-imu-01-PTH.drl` / `-NPTH.drl` | Excellon drill files, plated / non-plated holes, separated |
 | `bench-imu-01-PTH-drl_map.pdf` / `-NPTH-drl_map.pdf` | Human-readable drill maps |
 
+## ⚠️ This package is a derived artifact — it goes stale silently
+
+**Every file in `bench-imu-01-gerbers.zip` and `bench-imu-01-positions.csv` is
+derived from `../bench-imu-01.kicad_pcb`. The moment that source is revised,
+this package is wrong, and nothing in the repository will tell you so** — it is
+the "stale load-bearing figure propagation" hazard `docs/workflow.md` §4.2
+describes, and it is worse here than for a documentation figure, because this
+is the artifact a fab house actually consumes to build physical boards.
+
+This is not hypothetical. It has already happened once: PRs #30/#31 added and
+repositioned a silkscreen mark on `F.SilkS`, and this package was left at its
+pre-silkscreen export for two merges — boards ordered from it would have
+shipped without the mark the merged design specifies (`ISS-045`, fixed by
+`ECO-044`).
+
+**Rule: re-run the exact commands below in the same change that revises
+`../bench-imu-01.kicad_pcb`, and never hand-edit an exported file.** Note that
+this package is *one of several* derived-artifact families — the public viewer
+PDFs under `visualization/circuit-viewer/reference/` carry the same warning in
+their own README, and a PCB revision must sweep **both**. Fixing only the
+publicly-visible one is exactly the partial sweep that left `ISS-045` open.
+
 ## Exact commands used (reproducible)
 
 Run from the repo root, against the current
@@ -111,6 +133,16 @@ typically want it as a directly-readable file).
   change-log.md` row) — `bench-imu-01.kicad_pcb`, `.kicad_pro`,
   `generate_pcb.py`, the schematic, and `validation/open-issues.md` are all
   byte-for-byte unchanged.
+
+### Regeneration history
+
+The verification list above is the **original ECO-036 export record** and is
+left unedited, as this repo's logs self-correct forward rather than being
+retroactively rewritten. Subsequent regenerations are appended here.
+
+| Date | ECO | Trigger | What actually changed | Verification |
+|---|---|---|---|---|
+| 2026-09-03 | ECO-044 | `ISS-045` — PRs #30/#31 added/repositioned the GitHub logo + `@ktanino10` `F.SilkS` mark; this package had not been re-exported | **Exactly 1 of 16 files**: `bench-imu-01-F_Silkscreen.gto` (**2844 → 3539 coordinate records**, definition `^X-?[0-9]+Y-?[0-9]+D0[123]\*$`; 1702 → 2113 distinct coordinates, **zero removed**). `bench-imu-01-positions.csv` re-exported **byte-identical** and is unchanged | Timestamp-normalized diff of every file in the old vs. new zip: all 10 other Gerber layers, both Excellon drill files and the `.gbrjob` **byte-identical**; both drill-map PDFs **150-dpi pixel-identical**. Added silkscreen geometry independently localized to a 12.43 × 12.80 mm cluster at X 124.79–137.21 mm / Y 15.50–28.30 mm from the top edge (board Edge.Cuts extents X 0–150, Y −95–0) — i.e. upper-right, confirming PR #31's claim without relying on it. Whole original claim-set re-confirmed: 16/16 files, `unzip -t` clean, `LayerNumber` 4, 150.15 × 95.15 mm, 101 PTH / 6 NPTH holes, 49 position rows. Exported with `kicad-cli` 10.0.1 — the same version string recorded in the committed Gerber headers, so version drift is excluded as a confounder |
 
 ## What this package does — and does NOT — claim
 
