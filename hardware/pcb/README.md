@@ -909,3 +909,57 @@ routing-congestion-aware placement/routing pass (autorouter-adjacent
 scope) or a substantially more invasive full re-layout — both beyond
 this round's scope. Sent for independent Hardware Reviewer verification
 before any disposition claim.
+
+### Comparing a regenerated board against the committed board (ISS-050, ISS-054)
+
+`generate_pcb.py` rebuilds `bench-imu-01.kicad_pcb` from scratch, and two
+runs over byte-identical inputs do **not** produce a byte-identical file.
+Two separate, independently measured mechanisms cause this, and neither is
+a design change:
+
+- **Fresh UUIDs** every run (1372 lines) — ISS-050.
+- **Unstable footprint emission order** — ISS-054. Two consecutive
+  regenerations differ in **41 of 54** footprint positions (**47 of 54**
+  against the committed board), while the footprint *multiset* is identical
+  in all three. Because emission order sets the order aperture shapes are
+  first used, KiCad renumbers gerber D-codes, so a naive content hash flags
+  **9 of 27** exported files — **6 of the 11 fabrication layers** (`B_Cu`,
+  `F_Cu`, `In1_Cu`, `In2_Cu`, `F_Silkscreen`, `F_Paste`) — as differing on a
+  provably unchanged design.
+
+**Do not use** for this comparison:
+
+- `kicad-cli pcb drc` — UUID-dependent; a regenerated-vs-committed pair
+  gives a median ~208-item symmetric difference on identical geometry
+  (ISS-050). Its bare totals are additionally noisy run-to-run (ISS-049).
+- Naive `diff` / `shasum` on the `.kicad_pcb` or on exported gerbers —
+  ISS-054, above.
+
+**Do use** — all of these were re-measured on a freshly regenerated board
+and agreed:
+
+| Instrument | Committed vs. regenerated |
+|---|---|
+| Track (`segment`) multiset — start/end/width/layer/net | 175 / 175, identical |
+| Via multiset — at/size/drill/layers/net | 42 / 42, identical |
+| Footprint set | 54 / 54, identical |
+| Pad count | 264 / 264 |
+| GND zone `filled_polygon` vertices | 3769 on the committed board and on 3 further runs — deterministic |
+| Aperture-aware gerber fingerprint, all 27 exported files | identical, incl. `In1_Cu` (3871 coordinate lines, one `G36`/`G37` region both sides) |
+
+"Aperture-aware" means resolving each `%ADDnn` D-code to its shape and
+parameters *before* comparing primitives, so pure renumbering does not
+register as a difference. Comparing raw D-code numbers will produce false
+positives here.
+
+Two cautions when reading the numbers above. First, anchor any
+zone measurement to the **top-level** zone: the substring `\t(zone` also
+matches `\t\t(zone_connect` inside footprint bodies, and a count taken from
+there through end-of-file tracks footprint *order*, not the zone — this
+produced (and this repo then withdrew) an apparent "zone fill varies
+3785–3812 vertices" result, ISS-054. Second, ECO-045's separate claim that
+"all 11 fabrication gerber layers re-exported byte-identical to the
+committed zip" is **also** correct and does not conflict with any of the
+above: that export was taken from the committed board *file*, whose
+footprint order is fixed by construction. Re-exporting a committed file and
+re-generating a board are different operations.
