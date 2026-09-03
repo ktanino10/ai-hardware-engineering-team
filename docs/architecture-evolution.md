@@ -1911,3 +1911,96 @@ obviously moot.
   merge — same process every prior change in this repository's history
   went through.
 
+## 41. 3D Assembly & Part Inspector (Three.js) + Landing Page Activation (Addendum — documentation/tooling only)
+
+Added when the landing page's grayed-out "3D Assembly & Part Inspector
+(coming soon)" card — described there as Unity-based and WebGL-build-blocked
+— was replaced with a live, working viewer under a new
+`visualization/assembly-viewer/` tree, and the landing page itself
+(`visualization/index.html`) was updated to activate it. Like §39, this is
+deliberately **not** a "Phase" and **not** a new discipline — no
+`.agent.md`/`SKILL.md` file is touched — kept as its own numbered addendum
+for this document's own audit-trail convention.
+
+- **Trigger**: the human (Kyosuke) had asked, via the creator/"General Chat"
+  session, to see the assembly interactively; a prior session's attempt
+  built this in the Unity Editor (click-to-inspect + auto-orbiting camera,
+  working in-Editor) but never shipped it, because that session's Unity
+  Editor connection was persistently unavailable for many hours, blocking
+  the WebGL export step specifically — not a decision to abandon the goal.
+  A parent session reimplemented the same feature set directly as a
+  framework-light Three.js page (no Unity, no plugin, no build step) and
+  reported it fully tested locally; this session's job was integration into
+  the repo plus independent re-verification, not re-authoring the viewer.
+- **Why Three.js instead of continuing to wait on Unity**: identical
+  end-user capability (orbit freely, click any part, see its real
+  dimensions/role/source) with zero export/build step and zero Editor
+  dependency — it is plain HTML + one ES-module script loaded against
+  Three.js from a CDN, served exactly like the existing Circuit Viewer.
+- **What was added**: `visualization/assembly-viewer/{index.html,
+  assembly-data.js,assembly-render.js,README.md}` plus
+  `visualization/assembly-viewer/models/*.obj` (6 files, ~3.7MB) — 5
+  converted from this repo's own real `hardware/mechanical/stl/*.stl`
+  files (the same STLs used for the already-reviewed exploded-view/2D
+  drawings) and 1 (`PCB_BenchIMU01.obj`) a direct `kicad-cli pcb export
+  glb`→OBJ conversion of the real `hardware/pcb/bench-imu-01/
+  bench-imu-01.kicad_pcb`. `visualization/index.html` was edited (not
+  rewritten from scratch) to turn the grayed-out `.soon`/`href="#"` 3D card
+  into a live link to `assembly-viewer/index.html`, and both cards' copy
+  was switched to English-only, matching the English-only convention this
+  document's own §39/PR #28 history already established for the Circuit
+  Viewer.
+- **Verified, not assumed** (independently re-derived by this session, not
+  taken on the word of the session that produced the package):
+  - All 6 `.obj` files are byte-identical to the source package (SHA-256
+    compared file-by-file) and non-empty; both `.js` files pass `node
+    --check`.
+  - `git diff` of `visualization/index.html` was read in full before
+    committing (not overwritten blind) — confirms the only changes are
+    `lang="ja"`→`"en"`, the `.soon`/Japanese copy removed, and the 3D card's
+    `href="#"` replaced with a real link, with the Circuit Viewer card
+    otherwise unchanged in structure.
+  - The pages were served locally (`python3 -m http.server`) and driven
+    with a real, independently-authored Playwright script (not reused from
+    the parent session): landing page confirmed to render the 3D card as a
+    live, non-"soon" link; navigation to `assembly-viewer/index.html`
+    confirmed; all 6 `.obj` requests confirmed HTTP 200; the true initial
+    camera transform was reconstructed with Three.js's own
+    `Vector3.project()` (not hand-rolled math) to compute exact on-screen
+    coordinates for three different real parts — **Motor**, **Pinch
+    Guard**, and **Containment Cap** — each clicked and confirmed to show
+    its correct real name/dimensions/role/source in the info panel;
+    orbit-drag was performed and confirmed (via screenshot pixel diff) to
+    actually rotate the rendered view; zero console errors, zero page
+    errors, and zero failed network requests were observed throughout.
+  - Commit-size sanity check: the new tree is ~3.8MB (PCB model alone
+    ~3.3MB) added to a repo that already carries multi-MB binary artifacts
+    (e.g. the existing `bench-imu-01-momentum-conservation-SIMULATION.gif`
+    at 2.4MB) — confirmed no `.gitattributes`/Git LFS rule, pre-commit
+    hook, or CI size-check step exists in this repository that this would
+    trip; none of the three required PR checks (frontmatter lint, open-
+    issues gate, ID-uniqueness check) inspect file size.
+- **Explicitly not an ECO, not a new discipline**: this addendum touches
+  zero files under `hardware/**`, `bom/**`, `firmware/**`,
+  `requirements/**`, or `validation/**` (confirmed via `git status` before
+  commit) and does not modify the Circuit & Current-Flow Viewer or
+  `.github/workflows/deploy-pages.yml` (which already publishes all of
+  `visualization/**` with no change needed) — per
+  `.github/instructions/hardware-design.instructions.md`'s own ECO
+  trigger, no design change occurred, so no `validation/change-log.md`
+  entry is created or needed.
+- **Files added**: `visualization/assembly-viewer/{index.html,
+  assembly-data.js,assembly-render.js,README.md,models/*.obj}` (6 models).
+- **Files edited**: `visualization/index.html`; `docs/architecture-
+  evolution.md` (this addendum) only.
+- **Confirmed untouched**: `visualization/circuit-viewer/**`,
+  `.github/workflows/deploy-pages.yml`, all of `hardware/**`, `bom/**`,
+  `firmware/**`, `requirements/**`, `validation/**`, `datasheets/**`, every
+  `.agent.md`/`SKILL.md` file, `docs/architecture.md`, `docs/workflow.md`,
+  `README.md`; `tools/check_agent_frontmatter.py`,
+  `tools/check_open_issues.py`, and `tools/check_id_uniqueness.py` were run
+  (not edited) and all pass, confirming no regression.
+- **Status**: implemented, PR opened, awaiting independent audit before
+  merge — same process every prior change in this repository's history
+  went through.
+
