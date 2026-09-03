@@ -12362,3 +12362,132 @@ Outside this PR's scope; surfaced for the Hardware Lead / human Chief Engineer:
    Future cycles should use aperture-aware geometry fingerprinting.
 3. **The single pre-existing `silk_overlap`** (J2 silkscreen vs J3 reference
    field, x≈60–62) appears to be untracked in `validation/open-issues.md`.
+
+---
+
+## Mechanical Reviewer — Cycle 10 (Independent post-merge audit of PR #37; Electronics-to-Mechanical board-geometry seam, 2026-09-03)
+
+### Review Cycle Metadata
+
+- **Design revision reviewed**: No new mechanical revision. `hardware/mechanical/bench-imu-01-enclosure.scad` is byte-for-byte
+  untouched by this cycle. This pass reviewed the *seam* between the merged
+  Rev 3-5 PCB layout and the Rev 4/4.1 mechanical package, which no prior
+  cycle had owned.
+- **What triggered it**: the scheduled autonomous check-in loop performing
+  an independent post-merge audit of PR #37 ("Add 3D Assembly & Part
+  Inspector"), merged `2026-09-03T12:07Z` with **no recorded review** on the
+  PR. The audit was of PR #37's factual claims, not of the mechanical design
+  — the finding below was reached by measuring real geometry and fell out of
+  that measurement.
+- **Reviewer**: Mechanical Reviewer — see
+  `.github/agents/mechanical-reviewer.agent.md`. Independent of the
+  Mechanical Lead session that authored the enclosure and of the PCB
+  Engineer session that authored the board.
+- **Independence statement**: nothing here was accepted from any agent's
+  self-report, commit message, or PR description. Every load-bearing number
+  below was re-derived this cycle from the committed files themselves.
+
+### PR #37's own claims — independently verified, all PASS
+
+Verified before, and separately from, the finding below:
+
+1. **"5 OBJs converted from this repo's own real `hardware/mechanical/stl/*.stl`"** —
+   PASS. Parsed both formats directly and compared triangle counts and
+   bounding boxes. All five match **exactly**: base-assembly 8316 tri /
+   123.0 x 168.0 x 51.0mm, containment-cap 1748 tri / 109.4 x 109.4 x 12.0mm,
+   pcb-lid 1028 tri / 111.4 x 69.8 x 5.0mm, pinch-guard-quadrant 64 tri /
+   115.0 x 115.0 x 14.9mm, stand-plate 1152 tri / 120.0 x 120.0 x 6.0mm.
+2. **"`PCB_BenchIMU01.obj` is a `kicad-cli` export of the real board"** —
+   PASS. Its bbox measures 150.000 x 95.000mm, matching the `Edge.Cuts`
+   `(gr_rect (start 0 0) (end 150 95))` in `bench-imu-01.kicad_pcb` exactly.
+3. **All 6 `mesh:` references in `assembly-data.js` resolve** to files that
+   exist on disk — PASS.
+4. **Three.js import map** — PASS, and stronger than a read-through: the
+   bare specifiers `three` and `three/addons/` are both mapped, version-pinned
+   to `0.160.0`, and all three CDN URLs were fetched live and return HTTP 200.
+   Without that map the page would have failed outright, so this was worth
+   confirming rather than assuming.
+
+**PR #37 is sound and is not the defect.** It is, however, what made the
+defect visible.
+
+### Finding: MISS-034 (CRITICAL) — enclosure is dimensioned for a board that no longer exists
+
+The measurement in claim 1 vs. claim 2 above is self-contradicting the moment
+the two are put side by side, and PR #37's own `assembly-data.js` does put them
+side by side: it renders a PCB it correctly labels **"150 x 95mm, real KiCad
+board outline"** into an exploded stack whose **PCB Lid is 111.4 x 69.8mm**.
+
+Re-derived from the committed sources, three independent ways:
+
+| Fact | Value | Source re-read this cycle |
+|---|---|---|
+| Real board outline | **150 x 95mm** | `bench-imu-01.kicad_pcb`, `Edge.Cuts` `gr_rect (start 0 0) (end 150 95)` |
+| Real board M2.5 hole pattern | **134 x 79mm** (holes at (8,8), (142,8), (8,87), (142,87)) | 4x `MountingHole_2.7mm_M2.5` footprint positions in the same file |
+| Enclosure's assumed board | **100 x 50mm** | `bench-imu-01-enclosure.scad` lines 116-117 (`pcb_length`, `pcb_width`) |
+| Enclosure PCB bay interior | **103 x 53mm** | same file lines 286-287 (`interior_x`/`interior_y`) |
+| Enclosure standoff pattern | **93 x 43mm** | `dimensional-spec.md` MH-1..4 row, enclosure-local (3.5,3.5)..(96.5,46.5) |
+| Whole base assembly, X extent | **123.0mm** | measured bbox of `bench-imu-01-base-assembly.stl` |
+
+The simplest statement of the defect: **the board (150mm in X) is longer than
+the entire base assembly (123mm in X) that is supposed to house it.** It does
+not fit the bay, and its mounting holes would not line up even if the bay were
+enlarged on its own.
+
+This is not a corner case or a tolerance argument — there is no operating
+condition under which it assembles. Per `docs/architecture.md` §7.1 ("Design
+will fail ... under normal/expected operating conditions as designed") that is
+**CRITICAL**, and per `.github/instructions/validation.instructions.md` a
+CRITICAL may never be recorded as ACCEPTED-RISK.
+
+### Why no earlier cycle caught it
+
+Not an individual agent's error — a seam nobody owned:
+
+- `350ac36` (08-31) recorded 100 x 50mm in `mechanical-interface.md` A1 as an
+  explicitly **proposed** board size (labeled ASSUMPTION, with a documented
+  component-count-growth rationale).
+- `1d18d22` (09-01) designed the enclosure against that proposal. Correct at
+  the time.
+- `a454b0c` (09-02) laid out the real board at 150 x 95mm, sized from real
+  summed footprint/courtyard area under REQ-308's relaxed ceiling. Also
+  correct, and documented in `hardware/pcb/README.md`.
+- **No re-handoff back to Mechanical followed.** `mechanical-interface.md`
+  still presents the superseded proposal as current, and
+  `dimensional-spec.md` has hardened it further by marking `pcb_length` = 100
+  as **CONFIRMED** — a false-confidence label on a value the Source of Truth
+  contradicts.
+
+Mechanical Reviewer cycles 5-9 checked mechanical artifacts for internal
+self-consistency, which they genuinely have. Hardware Reviewer cycles 8-15
+checked the PCB, which is genuinely correct. Both disciplines were clean
+in isolation; the contradiction lived only in the space between them. This is
+exactly the class of cross-domain interference the Foresight checklist added in
+PR #24 exists to catch, and the `docs/workflow.md` §4.2 stale-load-bearing-
+figure hazard reaching across a discipline boundary rather than within one.
+
+### Disposition — deliberately NOT decided here
+
+Which side moves (grow the enclosure to the real board, or re-lay-out the
+board to the mechanical envelope) is an architecture/scope decision reserved
+for the human Chief Engineer under `docs/architecture.md` §10. This cycle
+records the contradiction and its consequences; it does not choose the fix,
+and no design artifact was modified. `hardware-gate` will now correctly fail
+until the finding is dispositioned — that is the Design Complete Gate working,
+not a regression.
+
+### Foresight notes — outside this cycle's scope
+
+1. **The REQ-308 envelope reading in `dimensional-spec.md` §3 is downstream of
+   this.** Its 8.0-13.7%-over-soft-ceiling figures are computed from the
+   100 x 50-based shell; they will move once the board basis is corrected, and
+   should not be quoted as current in the meantime.
+2. **A5's bare-board mass (14.8g) is computed from "100mm x 50mm x 1.6mm".**
+   The real board is ~2.85x that area, so the populated-assembly subtotal
+   (~19-20g) and anything downstream of it (including rotational-inertia and
+   motor-sizing narratives that consume assembly mass) are affected.
+3. **Recurring pattern worth a process note:** of the last eight PRs, **six
+   (#30, #31, #34, #35, #36, #37) carry zero recorded reviews**; only #32 and
+   #33 have one each (counted via `gh pr view <n> --json reviews`, not
+   assumed). The audit loop is currently the only independent check on most of
+   that stream, and it is post-merge by construction.
