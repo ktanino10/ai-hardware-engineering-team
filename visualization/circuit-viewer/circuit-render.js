@@ -1,11 +1,12 @@
 /*
  * circuit-render.js — renders COMPONENTS/WIRES (circuit-data.js) into the SVG,
- * handles language toggle, mode tabs, and the click-to-inspect info panel.
+ * handles mode tabs and the click-to-inspect info panel (components AND wires).
+ * English-only by design (per explicit user preference) — no language toggle.
  */
 const SVGNS = "http://www.w3.org/2000/svg";
-let currentLang = 'ja';
 let currentMode = 'power';
 let selectedId = null;
+let selectedWire = null;
 
 function byId(id){
   return COMPONENTS.find(c => c.id === id) || (FUTURE_BOX.id === id ? FUTURE_BOX : null);
@@ -71,6 +72,11 @@ function renderSVG(){
     const p = pathFor(w);
     if (!p) return;
     const pid = `wire-${i}`;
+    // Invisible fat hit-path first, so its CSS adjacent-sibling hover rule
+    // (see path.wire-hit:hover + path.wire) reaches the thin visible path
+    // rendered right after it — makes thin 2px wires easy to click/hover.
+    const hit = el('path', { class:'wire-hit', d: p.d, 'data-wire': i }, wireLayer);
+    hit.addEventListener('click', () => selectWire(i));
     el('path', { id: pid, class: `wire cat-${w.category}`, d: p.d }, wireLayer);
     if (w.dir){
       const speed = w.category === 'motorphase' ? 0.9 : (w.category === 'uart' ? 2.6 : 1.6);
@@ -94,14 +100,14 @@ function renderSVG(){
     const nameCharW = box.w > 140 ? 8.6 : 8.2;
     const nameMaxChars = Math.max(6, Math.floor((box.w-16)/nameCharW));
     const nameMaxLines = box.h >= 90 ? 2 : 1;
-    const nameLines = wrapText(currentLang==='ja'?box.nameJa:box.nameEn, nameMaxChars, nameMaxLines);
+    const nameLines = wrapText(box.nameEn, nameMaxChars, nameMaxLines);
     multilineText(g, box.x+8, box.y+31, nameLines, 14, 'name');
     const roleTop = box.y + 31 + (nameLines.length>1 ? 14 : 0) + 16;
     const roleAvail = box.y + box.h - 6 - roleTop;
     const roleMaxLines = Math.max(0, Math.floor(roleAvail / 11));
     if (roleMaxLines > 0 && box.w > 90){
       const roleMaxChars = Math.max(8, Math.floor((box.w-16)/6.6));
-      const roleLines = wrapText((currentLang==='ja'?box.roleJa:box.roleEn), roleMaxChars, roleMaxLines);
+      const roleLines = wrapText(box.roleEn, roleMaxChars, roleMaxLines);
       multilineText(g, box.x+8, roleTop, roleLines, 11, 'role');
     }
     g.style.cursor = 'pointer';
@@ -164,27 +170,51 @@ function multilineText(parent, x, y, lines, lineHeight, cls){
 
 function selectComponent(id){
   selectedId = id;
+  selectedWire = null;
   highlightSelected();
   renderInfo(byId(id));
+}
+
+function selectWire(idx){
+  selectedWire = idx;
+  selectedId = null;
+  highlightSelected();
+  renderWireInfo(WIRES[idx], idx);
 }
 
 function highlightSelected(){
   document.querySelectorAll('#boxes .box').forEach(g => {
     g.classList.toggle('selected', g.dataset.id === selectedId);
   });
+  document.querySelectorAll('#wires path.wire').forEach((p, i) => {
+    p.classList.toggle('wire-selected', i === selectedWire);
+  });
 }
 
 function renderInfo(box){
   const panel = document.getElementById('info');
   if (!box){ panel.innerHTML = ''; return; }
-  const L = currentLang;
-  const name = L==='ja' ? box.nameJa : box.nameEn;
-  const role = L==='ja' ? box.roleJa : box.roleEn;
   panel.innerHTML = `
-    <h2>${name}</h2>
+    <h2>${box.nameEn}</h2>
     <div class="ref">${box.ref}${box.ref!=='—' ? ' &middot; ' : ''}${box.part||''}</div>
-    <div class="field"><div class="k">${L==='ja'?'役割':'Role in this circuit'}</div><div class="v">${role}</div></div>
-    ${box.datasheet ? `<div class="field"><div class="k">Datasheet</div><div class="v"><a href="${box.datasheet}" target="_blank" rel="noopener">${L==='ja'?'一次資料を開く':'Open primary datasheet'} ↗</a></div></div>` : ''}
+    <div class="field"><div class="k">Role in this circuit</div><div class="v">${box.roleEn}</div></div>
+    ${box.datasheet ? `<div class="field"><div class="k">Datasheet</div><div class="v"><a href="${box.datasheet}" target="_blank" rel="noopener">Open primary datasheet ↗</a></div></div>` : ''}
+  `;
+}
+
+const CAT_LABEL = { power5v:'USB 5V / 3.3V logic power', powervm:'External motor-rail power (DC in)',
+  motorphase:'3-phase motor current (U/V/W)', i2c:'I²C data bus', uart:'UART telemetry & commands',
+  ctrl:'Control signal', feedback:'Safety feedback', debug:'Debug / static (no data flow shown)',
+  future:'Not implemented yet (future work)' };
+
+function renderWireInfo(w, idx){
+  const panel = document.getElementById('info');
+  const a = byId(w.from), b = byId(w.to);
+  panel.innerHTML = `
+    <h2>${w.net}</h2>
+    <div class="ref">${a ? a.ref : w.from} → ${b ? b.ref : w.to} &middot; ${CAT_LABEL[w.category] || w.category}</div>
+    <div class="field"><div class="k">What this signal actually does</div><div class="v">${w.why || 'No description recorded for this net yet.'}</div></div>
+    <div class="field"><div class="k">Connects</div><div class="v">${a ? a.nameEn : w.from} \u2194 ${b ? b.nameEn : w.to}</div></div>
   `;
 }
 
@@ -193,21 +223,15 @@ function applyModeVisibility(){
   svg.classList.remove('mode-power','mode-bench','mode-future');
   svg.classList.add(`mode-${currentMode}`);
   document.querySelectorAll('.future-box').forEach(g => g.style.opacity = currentMode==='future' ? 1 : 0);
-  // banner
-  const b = BANNER[currentMode];
-  document.getElementById('banner').innerHTML = currentLang==='ja' ? b.ja : b.en;
-}
-
-function applyLanguage(){
-  document.querySelectorAll('[data-en]').forEach(elx => {
-    elx.textContent = currentLang==='ja' ? elx.dataset.ja : elx.dataset.en;
-  });
-  document.getElementById('btn-ja').classList.toggle('active', currentLang==='ja');
-  document.getElementById('btn-en').classList.toggle('active', currentLang==='en');
-  renderSVG();
-  renderLegend();
-  if (selectedId) renderInfo(byId(selectedId));
-  applyModeVisibility();
+  document.getElementById('banner').innerHTML = BANNER[currentMode].en;
+  // A wire/component selected in a different mode may now be dimmed or
+  // hidden — clear the panel back to the default hint rather than show
+  // stale detail for something no longer visually relevant.
+  selectedId = null;
+  selectedWire = null;
+  highlightSelected();
+  document.getElementById('info').innerHTML =
+    '<div class="placeholder">Click any component for its real role, part number, and datasheet. Click any wire for what that specific signal actually carries and why it exists — not just an animated line.</div>';
 }
 
 function renderLegend(){
@@ -216,13 +240,11 @@ function renderLegend(){
   LEGEND.forEach(item => {
     const div = document.createElement('div');
     div.className = 'item';
-    div.innerHTML = `<span class="sw" style="background:var(--${ {power5v:'pow5',powervm:'powvm',motorphase:'motor',i2c:'i2c',uart:'uart',ctrl:'ctrl',feedback:'fb',future:'future'}[item.cat] })"></span>${currentLang==='ja'?item.ja:item.en}`;
+    div.innerHTML = `<span class="sw" style="background:var(--${ {power5v:'pow5',powervm:'powvm',motorphase:'motor',i2c:'i2c',uart:'uart',ctrl:'ctrl',feedback:'fb',future:'future'}[item.cat] })"></span>${item.en}`;
     foot.appendChild(div);
   });
 }
 
-document.getElementById('btn-ja').addEventListener('click', () => { currentLang='ja'; applyLanguage(); });
-document.getElementById('btn-en').addEventListener('click', () => { currentLang='en'; applyLanguage(); });
 document.querySelectorAll('nav.tabs button').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
@@ -234,3 +256,4 @@ document.querySelectorAll('nav.tabs button').forEach(btn => {
 
 renderSVG();
 renderLegend();
+applyModeVisibility();
