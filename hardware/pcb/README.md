@@ -143,7 +143,13 @@ never a stale hand-copied snapshot of the schematic.
 See `bench-imu-01/generate_pcb.py` for the full, commented implementation.
 Summary:
 - Footprints loaded from their real KiCad libraries (or this project's own
-  `bench-imu-01.pretty` for F1's custom footprint) via `pcbnew.FootprintLoad`.
+  `bench-imu-01.pretty` — F1's custom footprint, and the decorative
+  `Logo_GitHub_ktanino10` silkscreen mark) via `pcbnew.FootprintLoad`.
+  The mark is the one footprint with no schematic symbol and no net, so it
+  cannot be recovered from the netlist and is placed from an explicit
+  constant instead; it is vendored in the library precisely so a
+  regeneration run reproduces it rather than silently dropping it
+  (ISS-048 / ECO-045).
 - Net connectivity parsed directly from `kicad-cli sch export netlist`'s
   own output (never hand-guessed) and assigned to real pads.
 - Same-component, same-net pin clusters (e.g. U5/U6's several adjacent

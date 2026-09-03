@@ -12165,7 +12165,7 @@ in the position claimed, with copper, drill, mask, paste and placement untouched
 and **zero** new DRC violations. Both LOW findings were fixed in this same PR
 rather than deferred.
 
-**Next free ID is `ISS-048`** (this cycle allocated ISS-046 and ISS-047). This
+**Next free ID is `ISS-048`** *(superseded by Cycle 14 below: next free is now `ISS-050`)* (this cycle allocated ISS-046 and ISS-047). This
 supersedes Cycle 12's "next free ID is `ISS-046`", which was accurate when
 written and is left unedited — a chronological review log self-corrects forward
 (the ISS-043 ruling).
@@ -12187,3 +12187,91 @@ rather than silently dropped:
 3. **`bench-imu-01-3d.png`'s camera parameters should be documented** in
    `hardware/pcb/README.md` so the artifact becomes regenerable and stops
    requiring a bespoke disposition argument every cycle.
+
+---
+
+## Hardware Reviewer — Cycle 14 (Independent generator-reproducibility audit of the Bench-IMU-01 PCB, `f2f49a1`) (2026-09-03)
+
+### Review Cycle Metadata
+
+- **Scope**: the board's own build path — `hardware/pcb/bench-imu-01/generate_pcb.py`
+  against the committed `bench-imu-01.kicad_pcb` at `f2f49a1` (`origin/main`).
+  Deliberately **not** the derived exports: Cycles 12 and 13 already audited the
+  PDF and the fabrication package. This cycle asks the question those two did
+  not — *does the generator still reproduce the board it claims to generate?*
+- **Reviewer**: `hardware-reviewer` agent, genuinely independent — did not author
+  PRs #30/#31/#32/#33 and did not author Cycles 12 or 13.
+- **Stage**: post-layout build-reproducibility review.
+- **Tooling actually used** (verified present this session, not assumed):
+  `kicad-cli` 10.0.1 (`pcb export gerbers`, `pcb export drill`, `pcb drc`),
+  KiCad's bundled Python 3.9 with an importable `pcbnew` 10.0.1, `unzip`,
+  `python3`, `git`, `gh`, `shasum`. The KiCad **MCP** tools named in this
+  reviewer's own agent profile were **not** available in this session;
+  `kicad-cli` plus bundled-`pcbnew` were the workaround, disclosed here per the
+  tooling-honesty rule (`docs/architecture.md` §5.2).
+
+### Independent verification performed
+
+| Question | Result |
+|---|---|
+| Is the ECO-044 fabrication package genuinely current, as PR #33 claimed? | **PASS — independently reproduced.** Re-exported gerbers from the committed board and compared all 11 fabrication layers against the committed zip with a timestamp/generator-comment normalizer: **11/11 byte-identical**. PR #33's claim holds; this reviewer did not take it on trust. |
+| Does `generate_pcb.py` still reproduce the committed board? | **FAIL → ISS-048.** Running the unmodified generator produced **53** footprints against the committed **54**, `Logo_GitHub_ktanino10` the sole missing one, **0** `ktanino10` matches against **2**, and a file exactly **1042** lines shorter — matching PR #30's `+1042` exactly. |
+| Is the mark recoverable from the schematic? | **No.** 0 matches for `ktanino10`/`Logo_GitHub` in `bench-imu-01.kicad_sch`; it has no symbol and appears in no netlist, so no regeneration could restore it. |
+| Is the generator otherwise faithful, or is the board broadly diverged? | **Faithful.** All **53** real footprints, **175** track segments and **42** vias matched; the *only* structural difference was the missing mark. Committed-vs-regenerated content differences reduce to `3.0`-vs-`3` number formatting, four empty auto-added `(property …)` blocks and inert `duplicate_pad_numbers_are_jumpers`/`embedded_fonts` metadata. |
+| Is the generator deterministic? | **Content-deterministic, not byte-deterministic.** Two consecutive runs differed on 13,721 raw lines but a sorted-content comparison differed on **0** — the variation is serialization *ordering* only. Recorded so a future reader does not mistake that raw diff for real churn. |
+| Does the fix work? | **PASS.** Post-fix the generator yields **54** footprints with a footprint set **identical** to the committed board's, the mark at `(131, 20)`, all **93** `fp_rect` fills preserved, and `exclude_from_pos_files`/`exclude_from_bom`/`allow_missing_courtyard` intact — so BOM and pick-and-place exports are unaffected. |
+| Is the DRC baseline stable enough to prove "no new violations"? | **No → ISS-049.** Six consecutive `kicad-cli pcb drc` runs on a **byte-identical** file (sha `068ad9df…`, re-verified unchanged before and after) returned 372 / 361 / 363 / 363 / 364 / 378. `clearance` (16), `hole_clearance` (3) and `silk_overlap` (1) were stable; `solder_mask_bridge` ranged **210–227** and dominates. |
+
+### Findings
+
+- **ISS-048 (MEDIUM, RESOLVED in this PR)** — the generator silently deleted the
+  decorative mark on every run. Fixed by vendoring the mark as a real footprint
+  in `bench-imu-01.pretty` and placing it through the same `FootprintLoad()`
+  path already used for F1's custom footprint, failing loud if absent. The
+  geometry is deliberately **not** re-derived from the upstream PNG at build
+  time: that would make the board depend on a network fetch and on Pillow's
+  threshold behaviour staying bit-identical.
+- **ISS-049 (MEDIUM, OPEN)** — filed under the `rubber-duck` premise lens, not
+  merged into ISS-048. ISS-036's word "independently-reproduced" treated a
+  366-vs-README-"~370" near-match as confirmation, but that degree of agreement
+  sits inside the noise band measured above. **ISS-036's ACCEPTED-RISK status,
+  its human sign-off and its recorded category counts are left entirely
+  unedited** — the disposition is the human Chief Engineer's to revisit, and no
+  claim is made that ISS-036's figure was wrong when written (the board has
+  genuinely changed since, via the GND zone fill and reroute overrides).
+
+### Why Cycles 12 and 13 did not catch ISS-048
+
+Recorded because the miss is structural, not careless. Both prior cycles scoped
+their currency audit to derived **exports** — Cycle 12 to the public PDF, Cycle
+13 to the fabrication package — and both were right on their own terms: the
+gerbers really are current, as re-verified 11/11 above. Neither asked whether the
+*source* board could still be rebuilt. A hand-edit to a generated file is
+invisible to any check that only compares exports against that file, because the
+hand-edit is already baked into the thing being treated as ground truth.
+
+### Verdict — **PASS-WITH-FINDINGS**
+
+**No CRITICAL. No HIGH.** Merge is not blocked under `docs/architecture.md` §8
+or `.github/workflows/hardware-gate.yml`. The committed board, its fabrication
+package and every requirement, dimension, BOM and firmware artifact are
+**unchanged** — board sha `068ad9df…` verified identical before and after — so
+this PR carries no board churn and ECO-044's re-export stays valid. ISS-048 is
+fixed here; ISS-049 is left open and surfaced rather than self-dispositioned.
+
+**Next free ID is `ISS-050`** (this cycle allocated ISS-048 and ISS-049). This
+supersedes Cycle 13's "next free ID is `ISS-048`", accurate when written and
+left unedited — a chronological review log self-corrects forward (the ISS-043
+ruling).
+
+### Reviewer Foresight notes — recorded, deliberately **not** actioned in this PR
+
+Outside this PR's scope; surfaced for the Hardware Lead / human Chief Engineer:
+
+1. **The hand-edit-onto-generated-artifact pattern is not unique to the PCB.**
+   Any repo artifact that has both a generator and a history of direct edits
+   carries the same silent-revert risk; the mechanical OpenSCAD/STL pipeline is
+   the obvious place to check next, and was **not** examined this cycle.
+2. **`docs/workflow.md` §4.2 covers stale *figures* propagating, but not this
+   variant** — a generator that has silently diverged from the artifact it
+   generates. Worth considering whether §4.2 should be widened.
