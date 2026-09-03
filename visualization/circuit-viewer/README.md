@@ -65,6 +65,35 @@ every one of them is traceable back to a real, explained purpose.
   simplified) — attached per the request for the real circuit drawings
   alongside the animated explainer.
 
+  **These two PDFs are derived artifacts and go stale the moment their
+  source `.kicad_sch` / `.kicad_pcb` is revised** — the same "stale
+  load-bearing figure propagation" hazard `docs/workflow.md` §4.2
+  describes, made worse here because these are republished to a *public*
+  GitHub Pages site. Re-run the exact commands below (never hand-edit the
+  PDFs) in the same change that revises the source, exactly as ECO-043 did
+  for the schematic PDF:
+
+  ```sh
+  # Schematic — one page per sheet, no extra arguments needed
+  kicad-cli sch export pdf \
+    -o visualization/circuit-viewer/reference/bench-imu-01-schematic.pdf \
+    hardware/schematic/bench-imu-01/bench-imu-01.kicad_sch
+
+  # PCB — kicad-cli 10 REQUIRES an explicit --layers list; this exact
+  # five-layer set is what the committed PDF was originally produced with
+  # (re-derived and confirmed pixel-identical against the pre-existing file
+  # before it was regenerated, so this is the real parameter set, not a guess)
+  kicad-cli pcb export pdf --mode-single \
+    --layers F.Cu,B.Cu,F.SilkS,B.SilkS,Edge.Cuts \
+    -o visualization/circuit-viewer/reference/bench-imu-01-pcb.pdf \
+    hardware/pcb/bench-imu-01/bench-imu-01.kicad_pcb
+  ```
+
+  Verify a regeneration the way this repo already verifies PDF changes —
+  render both the old and new file at 150 dpi (`pdftoppm -r 150`) and diff
+  the pixels, confirming the changed region is only what the source change
+  should have moved.
+
 ## Known limitations (disclosed)
 
 - Wire routing is a simplified block-diagram layout for legibility/animation,
