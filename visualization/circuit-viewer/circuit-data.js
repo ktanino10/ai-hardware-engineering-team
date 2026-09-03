@@ -136,7 +136,7 @@ const WIRES = [
   { from:'D2', to:'U6', fromSide:'right', toSide:'left', category:'powervm', net:'VM_MOTOR', dir:1,
     why:'After D2\'s series diode blocks any reverse-polarity wiring mistake, this is the real motor-rail voltage the eFuse supervisor (U6) sees — also where D3\'s surge clamp attaches.' },
   { from:'D3', to:'D2', fromSide:'top',   toSide:'bottom', category:'powervm', net:'VM_MOTOR', dir:0,
-    why:'D3 sits across this same rail as a surge clamp, not a separate power path — it does nothing at all unless voltage spikes past its ~16V breakdown, then shunts the excess straight to GND.' },
+    why:'D3 sits across this same rail as a surge clamp, not a separate power path — it does nothing at all unless voltage spikes above its ~16V standoff rating, then starts conducting and shunts the excess straight to GND.' },
   { from:'J4', to:'F2', fromSide:'bottom',toSide:'left', category:'powervm', net:'J4_GND_RAW', dir:1, yoff:20,
     why:'A second fuse in the GND return leg, added specifically so a wiring mistake inside J4 itself can\'t create an unprotected current path — D2 alone only protects the other (positive) leg.' },
   { from:'U6', to:'U5', fromSide:'right', toSide:'left', category:'powervm', net:'U5_VCC', dir:1,
@@ -165,7 +165,7 @@ const WIRES = [
   { from:'U1', to:'U5', fromSide:'bottom', toSide:'top', category:'i2c', net:'I2C1_SCL/SDA', dir:1, xoff:15, toXoff:0,
     why:'A separate bus for reading U5\'s own status/fault registers and writing its configuration — distinct from the SPEED_PWM/DIR control lines, which carry the actual speed command.' },
   { from:'U5', to:'U1', fromSide:'top', toSide:'bottom', category:'feedback', net:'FG_TACH', dir:1, xoff:30, toXoff:45,
-    why:'A pulse train whose frequency is proportional to real motor RPM. The MCU uses this for exactly one thing — check_overspeed(): if RPM crosses a hard limit it can disarm the motor. It does NOT feed any speed or position control loop.' },
+    why:'A pulse train whose frequency is proportional to real motor RPM. The MCU uses this for exactly one control decision — check_overspeed(): if RPM crosses a hard limit it can disarm the motor. (The RPM value is also reported outward in the motor status telemetry line, but nothing on this board acts on that reading.) It does NOT feed any speed or position control loop.' },
 
   // ---- debug / static (all modes, dim, no motion) ----
   { from:'SW1', to:'U1', fromSide:'top', toSide:'left', category:'debug', net:'NRST', dir:0, yoff:80,
