@@ -1777,3 +1777,136 @@ audit-trail convention (what was true before this change vs. after).
   merge — same process every prior change in this repository's history
   went through.
 
+## 40. GitHub Attribution Silkscreen Mark on Bench-IMU-01 PCB (Addendum — decorative, not an ECO)
+
+Added when a small GitHub "Invertocat" logo plus the designer's own GitHub
+handle (`@ktanino10`) was added to `hardware/pcb/bench-imu-01/bench-imu-01.kicad_pcb`'s
+front silkscreen layer, as a personal attribution/decoration mark. Recorded
+as its own numbered addendum (not a "Phase", no `.agent.md`/`SKILL.md`
+touched) for this document's own audit-trail convention — **and explicitly
+because, unlike §39, this change does touch `hardware/pcb/**`**, so the
+"was this an ECO?" question needed a real, written answer rather than being
+obviously moot.
+
+- **Trigger**: the human (Kyosuke) asked, via the creator/"General Chat"
+  session, 2026-09-03, for a small GitHub logo plus his own handle to be
+  added to the real PCB as a decorative/attribution mark — not a design
+  change.
+- **What was added**: one graphical footprint, `Logo_GitHub_ktanino10`, at
+  board position (134.0, 76.0) mm, layer `F.Cu` anchor / geometry on
+  `F.SilkS` only — 93 run-length-merged `fp_rect` silkscreen fills
+  (a 64×64 monochrome downsample of the logo) plus one `fp_text` reading
+  `@ktanino10`. Carries `(attr exclude_from_pos_files exclude_from_bom
+  allow_missing_courtyard)`: **zero pads, zero nets, not part of the BOM or
+  pick-and-place file** — confirmed directly in the committed file, not
+  assumed.
+- **Brand-guideline check**: GitHub's own logo-usage guidance
+  (github.com/logos → brand.github.com) permits small, secondary-placement
+  use of the mark (its own published "social button" pattern) that does not
+  imply GitHub's endorsement or claim the project IS GitHub. This usage —
+  small, paired with the account holder's own handle, on a personal,
+  non-commercial hobby PCB — matches that permitted pattern, not the
+  guidelines' prohibited "use as your own logo" / "imply affiliation" cases.
+  Source asset: the official GitHub-Mark PNG served from GitHub's own CDN
+  (`github.githubassets.com`), not a third-party redraw.
+- **Verified, not assumed** (mirroring every prior addendum's own
+  discipline — re-derived independently by this session, not taken on the
+  word of the session that produced the ready-to-splice fragment):
+  - **Parses/renders**: `kicad-cli pcb export svg` (F.SilkS + Edge.Cuts) and
+    `kicad-cli pcb export pdf` both succeed against the modified board (exit
+    0) — confirms the file is syntactically valid, not just "looks right."
+    A visual render of the exported silkscreen (converted to PNG via
+    `rsvg-convert`) shows the mark sitting cleanly in empty board space,
+    clear of the R6/R7/R9/R10 resistor column and the MH4 mounting hole.
+  - **DRC re-derived from scratch, not trusted at face value**: this
+    board's DRC engine is confirmed run-to-run non-deterministic
+    independent of any file change — 5 consecutive `kicad-cli pcb drc`
+    passes against the **unmodified** baseline board returned **358, 360,
+    363, 374, 358** violations (identical violation-type composition each
+    run: `tracks_crossing`≈81-82, `shorting_items`≈48-50,
+    `clearance`=16 constant, `hole_clearance`=3 constant,
+    `solder_mask_bridge`≈205-222 — the dominant noise source,
+    `silk_overlap`=1 constant, pre-existing and unrelated to this change).
+    5 further passes against the **modified** board (with the logo
+    footprint present) returned **369, 355, 363, 372, 366** — the same
+    violation types, same approximate per-type ranges, fully overlapping
+    the baseline band. Across all 5 modified-board DRC JSON reports,
+    **zero violations reference the new footprint** (checked by grepping
+    every violation for the footprint's name/UUID) — the addition is DRC-
+    silent, not merely "within noise by coincidence." This independently
+    reproduces (with different specific numbers, same phenomenon and same
+    conclusion) the verification the fragment arrived with.
+  - `git diff --stat` confirms the change is exactly **+1042/-0** lines in
+    exactly one file — matching the spliced fragment's own line count
+    precisely, confirming no accidental corruption/duplication during
+    integration.
+- **Explicitly not an ECO, despite touching `hardware/pcb/**`**:
+  `.github/instructions/hardware-design.instructions.md` requires a
+  `validation/change-log.md` entry for any **non-cosmetic** change to
+  `hardware/**`/`bom/**` — the qualifier is load-bearing. This addition has
+  no net, no pad, no BOM line, no footprint standing in for a real
+  component, `exclude_from_pos_files`/`exclude_from_bom` set, zero new
+  unrouted items (confirmed in the DRC log output itself), and — per the
+  re-derived DRC comparison above — zero measurable effect on the board's
+  manufacturability posture. It changes nothing `requirements/
+  traceability-matrix.md`, `validation/fmea.md`, or the Design Complete
+  Gate (`docs/architecture.md` §8, already GRANTED per ECO-005) depend on.
+  This is squarely the "cosmetic" case the instructions carve out, not a
+  borderline one.
+- **Explicitly not an `open-issues.md` entry either**: that file tracks
+  reviewer findings (defects/risks/open questions), and this is not one —
+  it is an intentional, human-requested, non-defective addition with no
+  observed adverse effect. Filing a finding for a working, verified,
+  zero-impact change would misuse the findings ledger, not add rigor to it.
+- **Two real, disclosed limitations — deliberately not fixed in this same
+  change, per the task's own narrow file-scope instruction (only the
+  `.kicad_pcb` file, optionally one `.pretty` file, plus documentation)**,
+  flagged here so a future session doesn't lose them silently:
+  1. `hardware/pcb/bench-imu-01/fab/README.md` states its own package is
+     stale the moment `bench-imu-01.kicad_pcb` is revised and "must be
+     regenerated... never hand-patch." That is now literally true of the
+     committed Gerbers/positions.csv relative to this silkscreen addition.
+     **Not regenerated here** — no real fabrication order is imminent (the
+     same README already frames "actually spending money with a real
+     vendor" as its own separate future action), and doing so was outside
+     this change's requested scope. Regenerate `fab/` from the exact
+     commands in that README before this board is next actually submitted
+     to a fab house.
+  2. `generate_pcb.py` programmatically rebuilds `bench-imu-01.kicad_pcb`
+     from scratch from the schematic/netlist (see its own module
+     docstring) and was **not** taught about this footprint. If it is ever
+     re-run (e.g., to carry a future functional ECO), it will silently
+     **not** reproduce this logo/handle mark — a known gap, not an
+     oversight, mirroring the "landmine" lesson from ECO-006/the J1-MPN
+     fix (PR #26): a hand-patch to a generated artifact doesn't survive
+     regeneration unless the generator is also updated. Left as a disclosed
+     follow-up rather than expanding this change's scope into the generator
+     script.
+- **`.pretty` library route considered, not taken**: the fragment was also
+  provided as a standalone `.kicad_mod` for optional registration in
+  `hardware/schematic/bench-imu-01/bench-imu-01.pretty` (this project's one
+  `fp-lib-table`). Not used — the PCB project directory
+  (`hardware/pcb/bench-imu-01/`) has no `fp-lib-table` of its own at all
+  (every footprint on this board is already fully embedded inline in the
+  `.kicad_pcb`, which is how KiCad boards work regardless of original
+  library), this is a one-off, non-reusable graphic, and direct embedding
+  was the path actually re-verified above. Registering a new PCB-side
+  library for a single decorative graphic would be more machinery than the
+  change warrants.
+- **Files edited**: `hardware/pcb/bench-imu-01/bench-imu-01.kicad_pcb`
+  (+1042/-0 lines, one new footprint block, byte-identical to the supplied,
+  DRC-pre-verified fragment); `docs/architecture-evolution.md` (this
+  addendum).
+- **Confirmed untouched**: `hardware/schematic/**`, `bom/**`, `firmware/**`,
+  `requirements/**`, `validation/**`, `datasheets/**`,
+  `hardware/pcb/bench-imu-01/generate_pcb.py`,
+  `hardware/pcb/bench-imu-01/fab/**`, every `.agent.md`/`SKILL.md` file,
+  `docs/architecture.md`, `docs/workflow.md`, `README.md` — confirmed via
+  `git status`/`git diff --stat` before commit.
+  `tools/check_agent_frontmatter.py`, `tools/check_id_uniqueness.py`, and
+  `tools/check_open_issues.py` were run (not edited) and all three still
+  pass, confirming no regression.
+- **Status**: implemented, PR opened, awaiting independent audit before
+  merge — same process every prior change in this repository's history
+  went through.
+
