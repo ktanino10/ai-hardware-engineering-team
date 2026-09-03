@@ -227,6 +227,22 @@ MOUNTING_HOLES = [
     (BOARD_W - BOARD_MARGIN - 3.0, BOARD_H - BOARD_MARGIN - 3.0),
 ]
 
+# Decorative silkscreen mark (GitHub Invertocat + the designer's own handle).
+# Purely graphical: no pads, no net, excluded from BOM and pick-and-place, zero
+# electrical/mechanical function. It is NOT schematic-derived (it has no symbol
+# and appears in no netlist), so unlike every other footprint above it cannot be
+# recovered from the schematic -- it therefore has to be placed explicitly here
+# or a regeneration run would silently drop it (ISS-048).
+#
+# Geometry is not re-derived from the upstream PNG asset at build time (that
+# would make the board depend on a network fetch and on Pillow's threshold
+# behaviour staying bit-identical). It is instead vendored as a real footprint
+# in this project's own library, `bench-imu-01.pretty`, and loaded through the
+# exact same `FootprintLoad()` path already used for F1's custom footprint.
+LOGO_FP_NAME = "Logo_GitHub_ktanino10"
+LOGO_POS = (131.0, 20.0)  # DRC-verified clear of MH2, D2/D3 and the R-row at y=44
+LOGO_ROT = 0
+
 
 
 
@@ -472,6 +488,20 @@ def build_board(footprints: dict[str, str], nets: dict[str, list[tuple[str, str]
         mh.SetReference(f"MH{i}")
         mh.SetPosition(pcbnew.VECTOR2I(MM(x), MM(y)))
         board.Add(mh)
+
+    # --- Decorative silkscreen mark (ISS-048) ----------------------------
+    # Placed from this project's own footprint library rather than rebuilt
+    # from the upstream image, so a regeneration run reproduces the exact
+    # committed geometry. Fail loud if the library entry is missing: dropping
+    # it silently is precisely the regression this block exists to prevent.
+    logo = pcbnew.FootprintLoad(str(LOCAL_FP), LOGO_FP_NAME)
+    if logo is None:
+        raise RuntimeError(
+            f"Could not load decorative footprint {LOGO_FP_NAME!r} from {LOCAL_FP}"
+        )
+    logo.SetPosition(pcbnew.VECTOR2I(MM(LOGO_POS[0]), MM(LOGO_POS[1])))
+    logo.SetOrientationDegrees(LOGO_ROT)
+    board.Add(logo)
 
     # --- Nets: create one NETINFO_ITEM per net, assign every pad --------
     net_items: dict[str, "pcbnew.NETINFO_ITEM"] = {}
