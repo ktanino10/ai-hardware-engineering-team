@@ -12218,7 +12218,7 @@ rather than silently dropped:
 | Does `generate_pcb.py` still reproduce the committed board? | **FAIL → ISS-048.** Running the unmodified generator produced **53** footprints against the committed **54**, `Logo_GitHub_ktanino10` the sole missing one, **0** `ktanino10` matches against **2**, and a file exactly **1042** lines shorter — matching PR #30's `+1042` exactly. |
 | Is the mark recoverable from the schematic? | **No.** 0 matches for `ktanino10`/`Logo_GitHub` in `bench-imu-01.kicad_sch`; it has no symbol and appears in no netlist, so no regeneration could restore it. |
 | Is the generator otherwise faithful, or is the board broadly diverged? | **Faithful.** All **53** real footprints, **175** track segments and **42** vias matched; the *only* structural difference was the missing mark. Committed-vs-regenerated content differences reduce to `3.0`-vs-`3` number formatting, four empty auto-added `(property …)` blocks and inert `duplicate_pad_numbers_are_jumpers`/`embedded_fonts` metadata. |
-| Is the generator deterministic? | **Content-deterministic, not byte-deterministic.** Two consecutive runs differed on 13,721 raw lines but a sorted-content comparison differed on **0** — the variation is serialization *ordering* only. Recorded so a future reader does not mistake that raw diff for real churn. |
+| Is the generator deterministic? | **Content-deterministic, not byte-deterministic.** Two consecutive runs differed on 13,721 raw lines but a sorted-content comparison ~~differed on **0**~~ **excluding UUID lines differed on 0** — the variation is serialization *ordering* only. *(Corrected in-PR per Cycle 15 / ISS-053: the original wording omitted the UUID-normalisation qualifier the measurement actually used. Without it the sorted comparison yields 2744, i.e. 2 x the 1372 UUID lines the generator emits per run — the same mechanism behind ISS-050. The raw-line figure is inherently ordering-dependent and is not itself evidence.)* Recorded so a future reader does not mistake that raw diff for real churn. |
 | Does the fix work? | **PASS.** Post-fix the generator yields **54** footprints with a footprint set **identical** to the committed board's, the mark at `(131, 20)`, all **93** `fp_rect` fills preserved, and `exclude_from_pos_files`/`exclude_from_bom`/`allow_missing_courtyard` intact — so BOM and pick-and-place exports are unaffected. |
 | Is the DRC baseline stable enough to prove "no new violations"? | **No → ISS-049.** Six consecutive `kicad-cli pcb drc` runs on a **byte-identical** file (sha `068ad9df…`, re-verified unchanged before and after) returned 372 / 361 / 363 / 363 / 364 / 378. `clearance` (16), `hole_clearance` (3) and `silk_overlap` (1) were stable; `solder_mask_bridge` ranged **210–227** and dominates. |
 
@@ -12259,7 +12259,7 @@ package and every requirement, dimension, BOM and firmware artifact are
 this PR carries no board churn and ECO-044's re-export stays valid. ISS-048 is
 fixed here; ISS-049 is left open and surfaced rather than self-dispositioned.
 
-**Next free ID is `ISS-050`** (this cycle allocated ISS-048 and ISS-049). This
+**Next free ID is `ISS-050`** *(superseded by Cycle 15 below: next free is now `ISS-054`)* (this cycle allocated ISS-048 and ISS-049). This
 supersedes Cycle 13's "next free ID is `ISS-048`", accurate when written and
 left unedited — a chronological review log self-corrects forward (the ISS-043
 ruling).
@@ -12275,3 +12275,90 @@ Outside this PR's scope; surfaced for the Hardware Lead / human Chief Engineer:
 2. **`docs/workflow.md` §4.2 covers stale *figures* propagating, but not this
    variant** — a generator that has silently diverged from the artifact it
    generates. Worth considering whether §4.2 should be widened.
+
+---
+
+## Hardware Reviewer — Cycle 15 (Independent adversarial review of PR #34, the ISS-048 generator-reproducibility fix, `7169de6`) (2026-09-03)
+
+### Review Cycle Metadata
+
+- **Scope**: PR #34 / commit `7169de6` against parent `f2f49a1` — 6 files: the
+  new `Logo_GitHub_ktanino10.kicad_mod`, the `generate_pcb.py` placement block,
+  `hardware/pcb/README.md`, and the ISS-048 / ISS-049 / ECO-045 / Cycle 14
+  bookkeeping.
+- **Reviewer**: `hardware-reviewer` agent, **genuinely independent — did not
+  author PR #34 and did not author Cycle 14**. Commissioned specifically because
+  Cycle 14 was written by the session that made the change; a self-audit is not
+  a substitute for an independent pass.
+- **Stage**: post-layout build-reproducibility review.
+- **Tooling actually used** (verified present, not assumed): `kicad-cli` 10.0.1,
+  KiCad's bundled Python 3.9 with importable `pcbnew` 10.0.1, `git`, `gh`,
+  `python3`, `unzip`, `shasum`. The KiCad **MCP** tools named in the reviewer's
+  own agent profile were **not** available; `kicad-cli` plus bundled-`pcbnew`
+  were the workaround, disclosed per `docs/architecture.md` §5.2.
+- **Working-tree discipline**: the reviewer ran both generators from
+  `git archive` exports under `/tmp/hwrev/`, never against the live worktree, and
+  finished with `git status --short` empty and the board sha unchanged.
+
+### Independent verification performed
+
+| Question | Result |
+|---|---|
+| Did the pre-fix generator really drop the mark? | **VERIFIED EXACTLY** — parent-gen 53 footprints / 0 `ktanino10` / 13788 lines vs committed 54 / 2 / 14830; `14830 − 13788 = 1042` = PR #30's `+1042`. |
+| Corroboration the PR did *not* claim | The committed logo block is **itself exactly 1042 lines**, and `F_Silkscreen` coordinate records land on ECO-044's own recorded figures: committed **3539**, parent-gen (pre-logo) **2844**, head-gen **3539**. |
+| Does the fix reproduce the board? | **VERIFIED, and stronger than claimed** — footprint `(FPID, Ref)` multiset equal, **0** footprints differing in (x, y, rot, layer); logo at exactly `(131000000, 20000000)` nm; whole-board `tracks+vias` **217/217 multiset-identical**, pads 264/264, nets 40/40, and **all 11 gerber layers geometrically identical** under aperture-aware fingerprinting. |
+| Was stripping the board-level `(at 131.0 20.0 0)` correct? | **Yes** — the `@ktanino10` text lands at `(131000000, 27400000)` nm = the `.kicad_mod`'s local `(at 0 7.4 0)` plus the 20 mm offset. |
+| Does the logo leak into BOM / pick-and-place? | **No** — committed `fab/bench-imu-01-positions.csv` has 0 logo rows / 49 data rows, and is **byte-identical** to a fresh export from the regenerated board. |
+| Does the fix add DRC violations? | **No** — union-across-8-runs, position-keyed: `silk_overlap` committed=1, head-gen=1, **identical set**. The lone violation is pre-existing and unrelated (J2 silkscreen vs J3 reference field at x≈60–62), while the logo's bounding box is x=[124.31, 137.69], y=[15.50, 28.67]. |
+| Board / fab untouched? | **VERIFIED** — board sha `068ad9df…` identical at `f2f49a1`, `7169de6` and the worktree; `0` files changed under `fab/`; ISS-036's row byte-identical at both commits; `open-issues.md` diff **2 additions, 0 deletions**. |
+| ECO-044 fab package current? | **VERIFIED 11/11.** Reviewer's caution for future reproducers: gerbers carry **two** timestamp forms (`%TF.CreationDate` *and* `G04 Created by KiCad … date …`); normalizing only the first makes all 11 layers falsely "differ". |
+| DRC instability (ISS-049) | **CONFIRMED** — 8 runs, totals 360/372/360/365/361/365/356/357, spread **16** vs the claimed 17; the three categories called stable matched **exactly** (`clearance`=16, `hole_clearance`=3, `silk_overlap`=1). |
+
+### Findings — all four fixed in this same PR before merge
+
+- **ISS-050 (MEDIUM)** — DRC output is UUID-dependent, so it cannot validly
+  compare a *regenerated* board to the committed one at all: same-file control
+  symmetric difference median **37** items vs committed-vs-regenerated median
+  **208**, on boards proven identical. ISS-049 amended to say so and to direct
+  future cycles to the geometric comparisons instead.
+- **ISS-051 (LOW)** — ISS-049's "type plus location" option is refuted
+  (`solder_mask_bridge` UNION=228 vs INTERSECTION=133 across 8 runs); withdrawn,
+  leaving only the union-across-N form.
+- **ISS-052 (LOW)** — ISS-048's "byte-equal" claim for the 93 rects is wrong
+  (`(fill solid)` vs `(fill yes)`, regenerated UUIDs); restated as
+  "geometrically identical". Independently re-confirmed by this session before
+  acceptance.
+- **ISS-053 (LOW)** — Cycle 14's "sorted-content differed on 0" holds only when
+  UUID lines are excluded; qualifier restored.
+
+All four were applied as **visible in-place corrections that preserve the
+withdrawn claim**, per the ECO-043/ISS-044 precedent recorded in ISS-047 — not
+silent rewordings.
+
+### Verdict — **PASS-WITH-FINDINGS**
+
+**No CRITICAL. No HIGH.** Merge is not blocked under `docs/architecture.md` §8.
+Every substantive claim in PR #34 survived an adversarial attempt to break it;
+all four findings are documentation/method-accuracy defects in the PR's own
+write-up, not defects in the fix. In the reviewer's own words: *"I tried hard to
+break claims 1–4 and could not."*
+
+**Next free ID is `ISS-054`** (this cycle allocated ISS-050 through ISS-053).
+This supersedes Cycle 14's "next free ID is `ISS-050`", accurate when written and
+left unedited — a chronological review log self-corrects forward (the ISS-043
+ruling).
+
+### Reviewer Foresight notes — recorded, deliberately **not** actioned in this PR
+
+Outside this PR's scope; surfaced for the Hardware Lead / human Chief Engineer:
+
+1. **Regeneration would churn the fab package with zero design change.**
+   Regenerated gerbers are geometrically identical but byte-different (aperture
+   renumbering/ordering), so a regenerate-then-re-export cycle produces a large
+   `fab/` diff with no design change. **Pre-existing** — parent-gen behaves the
+   same — and worth documenting in `fab/README.md`.
+2. **Raw `diff` line counts on gerbers are actively misleading**; an aperture
+   renumbering cascades into thousands of diff lines at zero geometry change.
+   Future cycles should use aperture-aware geometry fingerprinting.
+3. **The single pre-existing `silk_overlap`** (J2 silkscreen vs J3 reference
+   field, x≈60–62) appears to be untracked in `validation/open-issues.md`.
