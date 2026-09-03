@@ -12016,3 +12016,67 @@ mid-review, and the reviewer re-verified all affected conclusions against pinned
 git objects (`git show 6073d72:<path>`) rather than the working tree, explicitly
 confirming that one finding it had drafted was **not** an artifact of the stale
 read. Recorded here rather than quietly omitted.
+
+## Hardware Reviewer — Cycle 12 (Independent derived-artifact currency audit of the PRs #30/#31 silkscreen change, `a255119`/`46486b0`) (2026-09-03)
+
+### Review Cycle Metadata
+
+- **Scope**: the *derived-artifact* consequences of PRs #30/#31, which added
+  and then repositioned a GitHub logo + `@ktanino10` attribution mark on
+  `F.SilkS` in `hardware/pcb/bench-imu-01/bench-imu-01.kicad_pcb`. Deliberately
+  **not** a re-review of the silkscreen design decision itself (already merged
+  and human-visible) — this cycle asks only the narrower question every
+  §4.2-class hazard turns on: *which committed artifacts derive from the file
+  that changed, and did all of them get regenerated?*
+- **Reviewer**: `hardware-reviewer` lens, independent — did not author PRs
+  #30/#31/#32. Commissioned by the scheduled autonomous check-in loop.
+- **Stage**: post-layout derived-artifact currency review. No schematic,
+  netlist, footprint or placement decision was reopened, and no DRC re-run was
+  warranted once copper/drill/mask/paste data were proven unchanged (below).
+- **Tooling actually used** (not assumed): `kicad-cli` 10.0.1 — the *same*
+  version string recorded in the committed Gerber headers, so version drift is
+  excluded as a confounder — via `pcb export gerbers`, `pcb export drill`,
+  `pcb export pos`, `pcb export pdf` and `sch export pdf`; `pdftoppm -r 150`
+  raster diffs; `unzip -t`/`-l`; a Python coordinate-set differ over the raw
+  RS-274X `X…Y…` records; and `git log`/`git show` against pinned paths.
+
+### Independent verification performed
+
+| Question | Result |
+|---|---|
+| Which committed artifacts derive from `bench-imu-01.kicad_pcb`? | Enumerated **four**: the fab package `fab/bench-imu-01-gerbers.zip`, `fab/bench-imu-01-positions.csv`, the public viewer `visualization/circuit-viewer/reference/bench-imu-01-pcb.pdf`, and the `bench-imu-01-3d.png` snapshot. Each was then checked individually rather than by commit-date inference alone. |
+| Is the fab package stale? | **FAIL → ISS-045.** Re-exporting with `fab/README.md`'s own documented commands changes exactly **1 of 16** files. `F_Silkscreen.gto`: 2862 → 3743 data lines, 1702 → 2113 distinct coordinates, **zero removed** — the committed layer is a strict subset missing only the logo. |
+| Is the staleness electrically consequential? | **No — and this was proven, not assumed.** Timestamp-normalized, all 10 other Gerber layers, both Excellon drill files and the `.gbrjob` are byte-identical; both drill-map PDFs are 150-dpi pixel-identical; `bench-imu-01-positions.csv` re-exports byte-identical. Copper, drill, mask, paste and placement data were never at risk, so no DRC or electrical re-review is implied and ISS-045 is correctly LOW, not MEDIUM. |
+| Is the added geometry actually the claimed logo? | **PASS** — positive confirmation, not merely "it differs". The added-only coordinate set forms a single 12.43 × 12.80 mm cluster at X 124.79–137.21 mm, Y 15.50–28.30 mm from the top edge of the board's own Edge.Cuts extents (X 0–150, Y −95–0), i.e. **upper-right** — matching PR #31's own title claim independently of that claim. |
+| Did PR #32's viewer-PDF fix genuinely land? | **PASS** — not taken on the PR's self-report. The committed `bench-imu-01-pcb.pdf` was re-exported with PR #32's own documented parameter set and 150-dpi raster-diffed: **pixel-identical**. PR #32 did real, correct work; its only gap was sweep *scope*. |
+| Any third stale instance? | **No** — `bench-imu-01-schematic.pdf` re-exported and 150-dpi raster-diffed **pixel-identical** (its 2-byte file delta is PDF metadata only). |
+| Should `bench-imu-01-3d.png` be regenerated? | **No — deliberately left stale, and this is the correct disposition.** It is referenced only from this file, as a dated Cycle-8 snapshot ("committed in `a454b0c`"), never as the board's current state. Regenerating it would falsify historical review evidence; its exact camera parameters are also undocumented, so any regeneration would silently substitute a different view. Recorded here rather than quietly skipped. |
+| Are `fab/README.md`'s own verification claims still true of the new package? | **PASS, all re-confirmed independently**: 16/16 files, `unzip -t` clean, `LayerNumber` 4, 150.15 × 95.15 mm, 101 PTH / 6 NPTH holes, 49 position rows. |
+
+### Findings raised this cycle
+
+| ID | Severity | Status | Summary |
+|---|---|---|---|
+| ISS-045 | LOW | RESOLVED | The committed fabrication package's `F_Silkscreen.gto` omits the PRs #30/#31 logo + attribution mark entirely, so a board ordered from it would ship without the silkscreen the merged design specifies — and the package no longer reproduces from the commands its own README documents. Fixed in the same PR by re-running those commands verbatim. |
+
+Severity was argued in both directions rather than defaulted. **Not MEDIUM**:
+there is no electrical, drill, mask, paste or placement consequence, and that
+was demonstrated byte-for-byte rather than asserted. **Not dismissible as
+non-issue**: this is the one artifact a fab house consumes, and a
+self-documenting "re-run these exact commands" package that no longer
+reproduces is a real audit-trail break. Two further candidate findings were
+**considered and rejected as manufactured**: the stale 3D render (a correctly
+dated historical snapshot, see above) and PR #32's decision not to file an
+ISS/ECO for its own fix (defensible — it was itself a derived-artifact
+re-export, and this cycle files the finding that covers the class).
+
+### Verdict — **PASS-WITH-FINDINGS**
+
+**No CRITICAL finding. No HIGH finding.** Merge is **not blocked** under
+`docs/architecture.md` §8 or `.github/workflows/hardware-gate.yml`. The single
+LOW finding was fixed in the same PR before merge rather than deferred, and
+`fab/README.md` gained the explicit staleness warning that should stop the
+next PCB revision from repeating the omission.
+
+**Next free ID is `ISS-046`** (this cycle allocated `ISS-045`, which Cycle 11
+had correctly published as the next free ID).
