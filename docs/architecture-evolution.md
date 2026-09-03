@@ -1793,7 +1793,7 @@ obviously moot.
   added to the real PCB as a decorative/attribution mark — not a design
   change.
 - **What was added**: one graphical footprint, `Logo_GitHub_ktanino10`, at
-  board position (134.0, 76.0) mm, layer `F.Cu` anchor / geometry on
+  board position (131.0, 20.0) mm, layer `F.Cu` anchor / geometry on
   `F.SilkS` only — 93 run-length-merged `fp_rect` silkscreen fills
   (a 64×64 monochrome downsample of the logo) plus one `fp_text` reading
   `@ktanino10`. Carries `(attr exclude_from_pos_files exclude_from_bom
@@ -1817,7 +1817,8 @@ obviously moot.
     0) — confirms the file is syntactically valid, not just "looks right."
     A visual render of the exported silkscreen (converted to PNG via
     `rsvg-convert`) shows the mark sitting cleanly in empty board space,
-    clear of the R6/R7/R9/R10 resistor column and the MH4 mounting hole.
+    clear of the D2/D3/F1 protection-circuit cluster and the MH2 mounting
+    hole.
   - **DRC re-derived from scratch, not trusted at face value**: this
     board's DRC engine is confirmed run-to-run non-deterministic
     independent of any file change — 5 consecutive `kicad-cli pcb drc`
