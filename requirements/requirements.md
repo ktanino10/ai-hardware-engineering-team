@@ -724,7 +724,11 @@ open-issues.md` **MISS-034** (CRITICAL, OPEN) establishes that `hardware/
 mechanical-interface.md`'s current PCB basis (100×50mm) is stale — the real,
 already-laid-out board is **150×95mm** with a **134×79mm** M2.5
 mounting-hole pattern (`hardware/pcb/bench-imu-01/bench-imu-01.kicad_pcb`
-`Edge.Cuts`). This is **not** a Rev 5 finding and is **not resolved, silently
+`Edge.Cuts`) — put concretely by `validation/design-review.md`'s own
+"Mechanical Reviewer — Cycle 10" entry, the real board's 150mm X extent is
+larger than the *entire* current base-assembly STL's own measured bounding
+box (123.0mm X), so it does not fit under any operating condition, not a
+tolerance/corner case. This is **not** a Rev 5 finding and is **not resolved, silently
 dispositioned, or pre-empted by this revision** — which side moves (grow the
 enclosure, or re-lay-out the board) is an explicit Chief-Engineer
 architecture/scope decision (`docs/architecture.md` §10). It is recorded
