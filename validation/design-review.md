@@ -12045,12 +12045,12 @@ read. Recorded here rather than quietly omitted.
 | Question | Result |
 |---|---|
 | Which committed artifacts derive from `bench-imu-01.kicad_pcb`? | Enumerated **four**: the fab package `fab/bench-imu-01-gerbers.zip`, `fab/bench-imu-01-positions.csv`, the public viewer `visualization/circuit-viewer/reference/bench-imu-01-pcb.pdf`, and the `bench-imu-01-3d.png` snapshot. Each was then checked individually rather than by commit-date inference alone. |
-| Is the fab package stale? | **FAIL → ISS-045.** Re-exporting with `fab/README.md`'s own documented commands changes exactly **1 of 16** files. `F_Silkscreen.gto`: 2862 → 3743 data lines, 1702 → 2113 distinct coordinates, **zero removed** — the committed layer is a strict subset missing only the logo. |
+| Is the fab package stale? | **FAIL → ISS-045.** Re-exporting with `fab/README.md`'s own documented commands changes exactly **1 of 16** files. `F_Silkscreen.gto`: **2844 → 3539 coordinate records** (stated definition: lines matching `^X-?[0-9]+Y-?[0-9]+D0[123]\*$`), 1702 → 2113 distinct coordinates, **zero removed** — the committed layer is a strict subset missing only the logo. |
 | Is the staleness electrically consequential? | **No — and this was proven, not assumed.** Timestamp-normalized, all 10 other Gerber layers, both Excellon drill files and the `.gbrjob` are byte-identical; both drill-map PDFs are 150-dpi pixel-identical; `bench-imu-01-positions.csv` re-exports byte-identical. Copper, drill, mask, paste and placement data were never at risk, so no DRC or electrical re-review is implied and ISS-045 is correctly LOW, not MEDIUM. |
 | Is the added geometry actually the claimed logo? | **PASS** — positive confirmation, not merely "it differs". The added-only coordinate set forms a single 12.43 × 12.80 mm cluster at X 124.79–137.21 mm, Y 15.50–28.30 mm from the top edge of the board's own Edge.Cuts extents (X 0–150, Y −95–0), i.e. **upper-right** — matching PR #31's own title claim independently of that claim. |
 | Did PR #32's viewer-PDF fix genuinely land? | **PASS** — not taken on the PR's self-report. The committed `bench-imu-01-pcb.pdf` was re-exported with PR #32's own documented parameter set and 150-dpi raster-diffed: **pixel-identical**. PR #32 did real, correct work; its only gap was sweep *scope*. |
 | Any third stale instance? | **No** — `bench-imu-01-schematic.pdf` re-exported and 150-dpi raster-diffed **pixel-identical** (its 2-byte file delta is PDF metadata only). |
-| Should `bench-imu-01-3d.png` be regenerated? | **No — deliberately left stale, and this is the correct disposition.** It is referenced only from this file, as a dated Cycle-8 snapshot ("committed in `a454b0c`"), never as the board's current state. Regenerating it would falsify historical review evidence; its exact camera parameters are also undocumented, so any regeneration would silently substitute a different view. Recorded here rather than quietly skipped. |
+| Should `bench-imu-01-3d.png` be regenerated? | **No — deliberately left untouched.** *(Row corrected post-review under ISS-047; the original reasoning was wrong on both facts and is preserved as withdrawn rather than silently rewritten.)* The image is embedded under **Hardware Reviewer — Cycle 6** (§7754), **not** Cycle 8, and repo practice **has** been to regenerate it on board-changing commits — 7 consecutive (`a454b0c`, `e63e62c`, `6353fa6`, `6fd4226`, `c436ca9`, `e9a173f`, `fad3ea5`) — so the withdrawn claim that it is frozen historical evidence which regeneration "would falsify" was false. The disposition still stands, on the one reason that survives verification: its camera parameters are undocumented and **empirically not recoverable** — a default `kicad-cli pcb render` of the current board yields 1568×872 against the committed image's 1568×984 — so any regeneration would silently substitute a different view, and no downstream artifact consumes it. |
 | Are `fab/README.md`'s own verification claims still true of the new package? | **PASS, all re-confirmed independently**: 16/16 files, `unzip -t` clean, `LayerNumber` 4, 150.15 × 95.15 mm, 101 PTH / 6 NPTH holes, 49 position rows. |
 
 ### Findings raised this cycle
@@ -12080,3 +12080,110 @@ next PCB revision from repeating the omission.
 
 **Next free ID is `ISS-046`** (this cycle allocated `ISS-045`, which Cycle 11
 had correctly published as the next free ID).
+
+## Hardware Reviewer — Cycle 13 (Independent adversarial review of PR #33, the ISS-045 fab-package re-export, `a28ceee`) (2026-09-03)
+
+### Review Cycle Metadata
+
+- **Scope**: commit `a28ceee` (PR #33) against parent `c0ed211` (`origin/main`) —
+  5 files, +98 lines: the regenerated `fab/bench-imu-01-gerbers.zip`, its
+  README's new staleness warning and regeneration-history table, and the
+  ISS-045 / ECO-044 / Cycle 12 bookkeeping.
+- **Reviewer**: `hardware-reviewer` agent, **genuinely independent — did not
+  author PRs #30/#31/#32/#33 and did not author Cycle 12**. Commissioned
+  explicitly because Cycle 12 was written by the same session that made the
+  change, which is *disclosed* in that entry but is not a substitute for an
+  independent pass. This entry exists so the record does not rest on a
+  self-audit.
+- **Stage**: post-layout derived-artifact currency + bookkeeping review.
+- **Tooling actually used** (verified present, not assumed): `kicad-cli` 10.0.1
+  (`pcb export gerbers/drill/pos/pdf`, `sch export pdf`, `pcb drc`,
+  `pcb render`), `pdftoppm`, `unzip`, `python3`, `git`. The reviewer recorded
+  honestly that the KiCad **MCP** tools named in its own agent profile were
+  **not** available in this session and that `kicad-cli` was the workaround —
+  the tooling-honesty rule (`docs/architecture.md` §5.2) applied to itself.
+
+### Independent verification performed
+
+| Question | Result |
+|---|---|
+| "Exactly 1 of 16 files changed" | **PASS** — reviewer wrote a deliberately *narrow* timestamp normalizer (ISO-8601 patterns only, so geometry cannot hide behind it) → 13/16 byte-identical; both drill-map PDFs rasterized at 150 dpi → PNG pairs byte-identical. |
+| "1702 → 2113 distinct coordinates, **zero removed**" (the load-bearing claim) | **PASS, exactly** — `old ⊆ new` = True, 0 removed, 411 added. Reviewer's own first attempt read 1703/2114 and it self-corrected: the `%FSLAX46Y46*%` header had matched a naive regex as coordinate (46,46). It recorded its own error rather than filing it as a finding. |
+| "2862 → 3743 data lines" | **FAIL → ISS-046** — not reproducible under ~15 definitions plus a brute-force over line-category subsets. |
+| Logo geometry / position / axis transform | **PASS** — extents re-derived independently (span 12.4286 × 12.7965 mm; Edge.Cuts rectangle X 0–150, Y −95–0, so Y=0 is the top edge and `\|Y\|` → "from top edge" is the correct transform). Centre ≈ 87% across, 23% down; F.SilkS viewed from above ⇒ +X is right. **"Upper-right" is honest.** |
+| **Could a silkscreen change alter the DRC violation count?** (reviewer's own added check — not asked for, and the strongest candidate finding) | **PASS, and properly tested.** Silk checks are enabled (`ignored_checks` has no silk key). DRC on the **pre-silkscreen** board (`4c5b227`) = **373**; current board = **362**; `silk_overlap` **1 → 1** at *identical* coordinates (J2/J3 @ 60.62,19.0 / 62.0,19.62) — a pre-existing footprint clash ~64 mm from the logo. The total delta is the copper/mask nondeterminism ISS-036 already documents, which the reviewer proved by re-running the **same** board twice (362, then 361). **The logo introduced zero new DRC violations.** |
+| `positions.csv` byte-identical | **PASS** — reviewer's own fresh `pcb export pos`, MD5 `9dbc489266e3085831feb50b97a86893`. |
+| Viewer PCB PDF + schematic PDF current | **PASS** — both re-exported and 150-dpi raster-diffed pixel-identical. Notable as a genuine trap: the PCB PDF's layer set *does* include `F.SilkS`, so it really would have staled had PR #32 not already fixed it. |
+| Is the four-artifact enumeration complete? | **PASS** — reviewer independently enumerated every candidate via `git ls-files`. `circuit-data.js` is netlist/BOM/firmware-derived (0 hits for silks/pcb/gerber/footprint/layout); `bom/bench-imu-01-fab-bom.csv` is schematic-derived. **No fifth layout-derived artifact exists.** |
+| 3D-render disposition | **FAIL → ISS-047** — the embed is under **Cycle 6** (§7754), not Cycle 8, and the PNG had been regenerated on 7 consecutive board-changing commits, so the "frozen historical evidence" premise was false. |
+| ECO-036 claim-set re-confirmed | **PASS** — including a detail the PR's own check had got right only by luck: PTH = 97 simple + **4 `G85` slot rows** = 101; a naive `^X…Y…$` regex under-counts by missing slots. |
+| Reproducibility beyond what the PR claimed | **PASS** — reviewer re-ran all three documented commands into a clean staging dir: all 14 text files timestamp-normalized identical to the committed package (including `F_Silkscreen.gto`), both drill-map PDFs pixel-identical, positions MD5-identical. **Nothing was hand-edited; the package genuinely reproduces from its own README.** |
+| Three CI gates | **PASS** — all rc=0. |
+
+### Findings raised this cycle
+
+| ID | Severity | Status | Summary |
+|---|---|---|---|
+| ISS-046 | LOW | RESOLVED | The published "2862 → 3743 data lines" silkscreen-growth figure is not independently reproducible (it came from a never-published, idiosyncratic regex), and had propagated to 4 files. Replaced with a stated-definition coordinate-record metric (2844 → 3539). |
+| ISS-047 | LOW | RESOLVED | The 3D-render disposition cited the wrong review cycle (Cycle 6, not Cycle 8) and rested on a false premise ("regenerating would falsify historical evidence") contradicted by 7 consecutive regenerations of that PNG. Corrected in 3 files; the surviving justification — undocumented, empirically unrecoverable camera parameters — was then confirmed empirically (default render 1568×872 vs committed 1568×984). |
+
+**No CRITICAL. No HIGH.** Both findings are documentation-accuracy only and were
+fixed in this same PR before merge.
+
+### Candidate findings the reviewer considered and **rejected as manufactured**
+
+Recorded in full because this repo penalises inflated finding counts: (1) the
+DRC-count concern above — tested properly and rejected on evidence; (2)
+"ISS-045 should be MEDIUM per the ISS-042 precedent" — rejected, the right
+discriminator is functional-vs-cosmetic (ISS-042 was a wrong **MPN** with a BOM
+consequence; ISS-045 is cosmetic with copper/drill/mask/paste/placement identity
+proven byte-for-byte), though the reviewer explicitly noted the calculus would
+change had a fabrication order actually been placed, so ECO-036/ECO-044's
+order-authorization disclaimers are doing real load-bearing work; (3) "ECO-044
+usurps Chief Engineer sign-off" — rejected, no design decision was made, while
+honestly naming the non-parallel axis that ECO-036/ECO-032 were *human-requested*
+whereas ECO-044 is self-initiated; (4) "the sweep missed an artifact" —
+rejected after independent enumeration; (5) "the viewer PDFs are stale too" —
+rejected, pixel-identical; (6) "positions.csv should have changed" — rejected;
+(7) "Cycle 12 falsely presents itself as independent" — rejected, its
+independence claim is narrowly and literally true and the finder-equals-fixer
+relationship is disclosed twice, though the reviewer flagged that two rows of
+Cycle 12's "Independent verification performed" table verify that session's own
+output, which is precisely why it re-derived those numbers itself — they all
+held; (8) an apparent off-by-one in the coordinate counts, which turned out to
+be **the reviewer's own regex error**, recorded because it materially
+strengthens the PR.
+
+### Verdict — **PASS-WITH-FINDINGS**
+
+**No CRITICAL. No HIGH.** Merge is **not blocked** under `docs/architecture.md`
+§8 or `.github/workflows/hardware-gate.yml`. The artifact that matters — the
+fabrication package — is correct, complete, and was **independently reproduced
+bit-for-bit** by a reviewer that did not author it, from the commands its own
+README documents. Its single substantive change is provably additive silkscreen
+in the position claimed, with copper, drill, mask, paste and placement untouched
+and **zero** new DRC violations. Both LOW findings were fixed in this same PR
+rather than deferred.
+
+**Next free ID is `ISS-048`** (this cycle allocated ISS-046 and ISS-047). This
+supersedes Cycle 12's "next free ID is `ISS-046`", which was accurate when
+written and is left unedited — a chronological review log self-corrects forward
+(the ISS-043 ruling).
+
+### Reviewer Foresight notes — recorded, deliberately **not** actioned in this PR
+
+Outside this PR's scope; surfaced for the Hardware Lead / human Chief Engineer
+rather than silently dropped:
+
+1. **A §4.2 instance now sits inside the review log itself** — the Cycle 6
+   caption "committed in `a454b0c`" mis-describes the bytes a reader actually
+   sees, which came from `fad3ea5` after six silent regenerations. Pre-existing,
+   not introduced by this PR.
+2. **Process signal, not just another loop-back** — the repo has now had a §4.2
+   recurrence in four consecutive cycles (ISS-042, ISS-043, ISS-045, and
+   ISS-046/047 here). The reviewer recommends the Hardware Lead consider a CI
+   check that re-runs the documented export commands and fails on drift, which
+   would have caught ISS-045 automatically with no human in the loop.
+3. **`bench-imu-01-3d.png`'s camera parameters should be documented** in
+   `hardware/pcb/README.md` so the artifact becomes regenerable and stops
+   requiring a bespoke disposition argument every cycle.
