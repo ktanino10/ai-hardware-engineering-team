@@ -2167,6 +2167,30 @@ and this addendum only.
   touched), this PR must **not** be admin-overridden and is left open,
   exactly like PR #40/#41 — a direct, immediate self-application of the
   policy this addendum documents, not a hypothetical.
+- **Post-disposition update, same day: `required_pull_request_reviews`
+  restored, with a technical correction to how that actually changes
+  merging.** Kyosuke decided to restore the rule; the creator/orchestrator
+  session re-enabled it via the GitHub API
+  (`required_approving_review_count: 1`) — independently confirmed here via
+  `gh api .../branches/main/protection` before recording it, not taken on
+  the relay. The relayed operational note assumed Kyosuke could satisfy it
+  by clicking "Approve" on GitHub himself; independently checked against
+  GitHub's actual documented behavior before writing anything down, since
+  it affects how every future PR merges, not just this one: GitHub does
+  not allow a pull request's own author to approve their own PR,
+  unconditionally, regardless of admin/owner status, and this repository's
+  `require_last_push_approval` field (a different, narrower setting about
+  stale approvals surviving a later push) is `false` and does not change
+  that. Because every PR here is authored under the same single account
+  regardless of whether a human or an autonomous session drove it, no
+  distinct second identity exists to supply a genuine approving review —
+  so, as configured, the review requirement does not add an independent
+  approval gate; it folds into the same admin-bypass action §17.1 already
+  governs (`enforce_admins.enabled` is still `false`). Recorded in
+  `docs/architecture.md` §17.1 (operational note) and §17.5 (updated to
+  reflect both attribution and configuration now closed); not this
+  session's call to resolve further, only to record accurately for
+  Kyosuke's awareness.
 - **Files added/edited**: `docs/architecture.md` (§10 bullet + §17
   appended); `docs/architecture-evolution.md` (this addendum).
 - **Confirmed untouched**: every `.agent.md`/`SKILL.md` file; all of

@@ -854,6 +854,32 @@ formally revisited in light of that; it is left as originally decided
 (not implemented now) rather than unilaterally reversed here, since
 closing it was an explicit call by the session that made it.
 
+**Operational note (2026-09-04): required reviews now fold into the same
+admin-bypass mechanism, not a separate path.** `required_pull_request_
+reviews` (`required_approving_review_count: 1`) was restored on `main`
+the same day (§17.5). Independently verified before writing this down,
+because it materially changes how *every* future PR merges, not just this
+one: GitHub does not allow a pull request's own author to submit an
+approving review on it, unconditionally, regardless of admin/owner status
+— this is separate from, and not fixed by, the `require_last_push_
+approval` toggle (confirmed `false` here; that setting only governs
+whether an *earlier* approver's review survives a *later* push, a
+different question). Because every commit and PR in this repository is
+authored under the same single GitHub account regardless of whether a
+human or an autonomous session drove it (already noted at §17.5 and
+§17.1's own admin-override discussion), there is no second, distinct
+identity available to supply a genuine approving review. Concretely: with
+`enforce_admins.enabled: false` unchanged, the *only* way any PR — however
+clean, however thoroughly independently audited — now merges is via the
+same admin-bypass action §17.1's decision tree already governs, which
+bypasses the review-count requirement together with any failing status
+checks in one action. The review requirement does not add an independent
+"someone else checks it" gate in this single-account repository as
+configured; it adds one more thing folded into the same bypass. Worth
+Kyosuke's awareness (a second reviewing collaborator/account would restore
+an independent review gate; without one, this is the practical reality)
+— not this section's call to resolve, only to record accurately.
+
 ### 17.2 Verification-before-acting standard
 
 Any session must **independently verify** a claimed human decision before
@@ -966,13 +992,15 @@ value. It was independently checked against the primary record
 configuration slip, not agent tampering and not a security concern — now
 attributed and closed.
 
-**Attribution and configuration are two different questions — only the
-first is closed.** *Who* removed the rule is resolved (above). *Whether
-the rule is restored* is not: `main`'s branch protection is, as of this
-writing, still without `required_pull_request_reviews` — a separate,
-still-open, human-reserved decision (the creator/orchestrator session has
-already asked Kyosuke his intent on restoring it; no autonomous session
-should restore it unilaterally in the meantime). Do not read this section
-as implying protection has been put back. See
-`docs/architecture-evolution.md` §42 for the full dated record, including
-the verification trail.
+**Attribution and configuration were two different questions — both are
+now closed, at two different times.** *Who* removed the rule was resolved
+first (above). *Whether the rule would be restored* was a separate,
+human-reserved decision — Kyosuke subsequently decided to restore it, and
+the creator/orchestrator session re-enabled `required_pull_request_
+reviews` (`required_approving_review_count: 1`) via the GitHub API.
+Independently confirmed here via `gh api repos/ktanino10/
+ai-hardware-engineering-team/branches/main/protection` before recording it
+— not taken on the relay alone, consistent with §17.2. See §17.1's new
+operational note on what this concretely changes for how PRs merge in a
+single-account repository, and `docs/architecture-evolution.md` §42 for
+the full dated record, including the verification trail.
