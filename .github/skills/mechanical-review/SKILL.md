@@ -118,6 +118,56 @@ isn't yet a concrete-enough finding for *this* handoff, record it under the
 optional "Foresight notes" subsection (see Output) rather than silently
 dropping it.
 
+## Foundational Change Cascade Checklist (reviewing a resize/revision, not a first-time design)
+
+Added following MISS-034 (CRITICAL) — a 100×50mm board proposal survived
+three merged PRs after the real 150×95mm board existed, undetected by any
+review cycle, because every cycle checked internal self-consistency, never
+"has anything this design depends on changed since the last time someone
+looked?" (`docs/workflow.md` §4.2/§4.2.1). **When reviewing a fix that was
+triggered by a foundational physical fact changing (not a from-scratch
+design), do not treat your mandatory checklist above as sufficient by
+itself — it verifies internal consistency, which MISS-034 already proves
+is not the same thing as correctness.** Additionally:
+
+1. **Re-derive the root fact yourself, from the same upstream Source of
+   Truth the Lead cited — do not just check that the Lead's own numbers are
+   internally consistent with each other.** If a machine-readable upstream
+   file exists (a KiCad project, a datasheet), read it yourself; if a
+   targeted automated check exists for this class of fact (e.g.
+   `tools/check_mechanical_pcb_sync.py`), run it yourself rather than
+   trusting that the Lead ran it.
+2. **Independently re-render/re-measure at least one exported binary
+   (STL/etc.), not just the `.scad` source.** A clean render is not the
+   same claim as a correct one — actually measure the bounding box/volume
+   yourself (`trimesh`/`numpy-stl` or equivalent) and compare to what the
+   Lead's own report claims.
+3. **Check every hardcoded-but-empirically-measured constant that could be
+   affected**, not only formula-derived ones. A rotating-envelope radius, a
+   measured minimum clearance height, or any other "we rendered it once and
+   wrote down the number" constant does not auto-update — confirm the Lead
+   actually re-measured it (or explicitly, correctly argued it's
+   unaffected) rather than silently carrying the old number forward.
+4. **Check whether any `ACCEPTED-RISK` disposition in
+   `validation/open-issues.md` was signed off against numbers this change
+   just altered.** If so, per this project's own REQ-408 precedent, that
+   acceptance does not auto-extend to the new configuration — the Lead
+   should have re-opened it with a fresh trade-off presentation, not left
+   it silently marked accepted, and not silently re-decided it themselves
+   either (only a named human Chief Engineer sign-off can accept a HIGH
+   finding).
+5. **Verify a formula-independence claim by actually diffing output, not by
+   trusting the comment that says so.** "This part's geometry doesn't
+   depend on the changed input" is a testable claim (re-render it and
+   compare bytes/bounding box/volume to the pre-change version) — test it,
+   don't just read it.
+6. **Check that anything explicitly left out of scope was actually logged
+   as a new, separate finding, not silently dropped.** A resize fix
+   legitimately does not have to re-derive every adjacent field, but a
+   deliberately-bounded scope should leave a visible trace (a new
+   MISS-XXX, or a cross-reference to an existing FMEA entry), not a silent
+   gap discoverable only by someone else re-doing the same investigation.
+
 ## Failure analysis — for each potential issue found, work out
 
 - What actually happens physically if this ships as-is (the **failure
