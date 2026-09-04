@@ -2060,23 +2060,35 @@ and this addendum only.
      had been explicitly declined pending exactly this confirmation, per
      that commit's own message. §17.2 codifies this exact behavior as a
      standing requirement.
-  4. **Unattributed branch-protection change**: confirmed via direct `gh
-     api .../branches/main/protection` that `required_pull_request_reviews`
-     is absent from current protection. Prior autonomous sessions have
-     reported this rule was present at an earlier point; that specific
-     claim cannot be independently re-confirmed by this or any future
-     session, since there is no mechanism to query GitHub's branch-
-     protection state as of a past moment. What is independently
-     verifiable, and was verified here: no audit-log API is available for
-     a personal-account repository to establish when/why/by whom any such
-     change happened, and `merged_by` cannot distinguish a human account
-     action from an agent-session action authenticated as that same
-     account. Recorded as `docs/architecture.md` §17.5, an open item — not
-     resolved by assumption.
+  4. **Branch-protection change — initially unattributed, resolved during
+     this same PR's review**: confirmed via direct `gh api
+     .../branches/main/protection` that `required_pull_request_reviews` was
+     absent from current protection, with no audit-log API available for a
+     personal-account repository to establish when/why/by whom, and
+     `merged_by` unable to distinguish a human account action from an
+     agent-session action authenticated as that same account — recorded at
+     that point as a genuinely open, unattributed item. Kyosuke was then
+     asked directly, in the creator/"General Chat" session, whether he had
+     changed it intentionally; his verbatim reply (turn 425, that session,
+     2026-09-04T00:47:46.630Z, independently confirmed via
+     `session_store_sql` against the local session store before being
+     relied on — the cloud store showed the same replication lag as the Rev
+     5 incident on the first, narrower query) was **"私が間違って外しまし
+     た。"** ("I removed it by mistake.") A genuine human configuration
+     slip, not agent tampering, now attributed and closed. See
+     `docs/architecture.md` §17.5 for the resolved record.
 - **What was added**: `docs/architecture.md` new §17 (five subsections —
   admin-override policy, verification-before-acting standard, cross-session
-  conflict/staleness handling, grounding/sources, and the open item above —
-  plus one bullet appended to the existing §10 list); this addendum.
+  conflict/staleness handling, grounding/sources, and the branch-protection
+  item above — plus one bullet appended to the existing §10 list); this
+  addendum.
+- **This PR's own §17.2 self-application**: within hours of this PR being
+  opened, the scenario in item 4 above played out for real — a claimed
+  human decision arrived relayed through the creator session, and per
+  §17.2's own standard it was independently verified via `session_store_sql`
+  (not taken on the relay alone) before this document was updated to
+  reflect it as resolved. A second live self-application of the policy
+  this addendum documents, alongside §17.1's (below).
 - **Grounding, verified rather than merely asserted**: the branch-protection/
   CI-override guidance and the multi-agent/agentic-AI governance guidance
   cited in §17.4 were independently corroborated by this session via live

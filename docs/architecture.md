@@ -905,24 +905,29 @@ literature generally). This section exists *because* of that last
 principle: it is itself the postmortem-driven update, not a preemptive
 design.
 
-### 17.5 Open item carried by this policy
+### 17.5 The branch-protection change — resolved
 
-**Unattributed branch-protection change.** At time of writing (2026-09-04),
-`main`'s branch protection has no `required_pull_request_reviews` rule —
-independently confirmed by this session via `gh api repos/ktanino10/
-ai-hardware-engineering-team/branches/main/protection`. Prior autonomous
-sessions have reported that this rule was present at an earlier point and
-is absent now; that specific claim is **not** independently re-confirmable
-by this or any future session, because there is no mechanism to query
-GitHub's branch-protection state as of a past moment. What *is*
-independently verifiable, and was verified here: no actor is identifiable
-for any such change via the GitHub API, full stop — this repository is a
-personal-account (not organization) repository, and GitHub's audit-log API
-for branch-protection changes is an Enterprise/organization-only feature,
-structurally unavailable here, not merely unqueried. Independent of that,
-`merged_by`/commit-author fields cannot distinguish a human acting directly
-from an autonomous session acting through the same authenticated GitHub
-account, so actor attribution would remain ambiguous even if audit history
-existed. Recorded here as a genuinely open, unresolved item — not closed by
-assumption in either direction. See `docs/architecture-evolution.md` §42
-for the full dated record.
+**Branch-protection change, initially unattributed, now resolved by direct
+human confirmation.** `main`'s branch protection lost its
+`required_pull_request_reviews` rule at some point — independently
+confirmed via `gh api repos/ktanino10/ai-hardware-engineering-team/
+branches/main/protection` — with no actor identifiable via the GitHub API:
+this is a personal-account (not organization) repository, and GitHub's
+audit-log API for branch-protection changes is an Enterprise/
+organization-only feature, structurally unavailable here; `merged_by`/
+commit-author fields also cannot distinguish a human acting directly from
+an autonomous session acting through the same authenticated GitHub
+account. That structural gap is still true and worth keeping as a general
+lesson — but it is no longer why this item is closed.
+
+This section originally recorded the change as a genuinely open,
+unattributed item on exactly that basis. A relayed claim then arrived (via
+the creator/orchestrator session) that Kyosuke had confirmed removing it
+himself — and per §17.2's own standard, that relay was not taken at face
+value. It was independently checked against the primary record
+(`session_store_sql`): the human was asked directly, in that session,
+"did you change this intentionally?", and replied, verbatim, **"私が間違っ
+て外しました。"** ("I removed it by mistake.") A genuine human
+configuration slip, not agent tampering and not a security concern — now
+attributed and closed. See `docs/architecture-evolution.md` §42 for the
+full dated record, including the verification trail.
