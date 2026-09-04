@@ -18,6 +18,22 @@ name: Hardware Gate
 # trigger below keeps its path filter -- required-check semantics don't apply
 # there, and a targeted signal on `main` is still useful.
 
+# NOTE (diff-aware CRITICAL/HIGH exemption): the job below still runs,
+# unfiltered, on every `pull_request` exactly as the note above describes --
+# this does NOT reintroduce the PR #25/#27 stuck-"Expected" failure mode.
+# What's new lives entirely INSIDE tools/check_open_issues.py: it computes
+# this PR's own changed-file set (via PR_BASE_SHA/PR_HEAD_SHA below) and, only
+# when that set touches neither hardware/**/bom/** nor this gate's own
+# mechanism, reports PASS regardless of pre-existing CRITICAL/HIGH findings
+# elsewhere in validation/open-issues.md -- see docs/architecture.md section
+# 17.1 and docs/architecture-evolution.md for the full rationale and the
+# MISS-034/MISS-023 incident that motivated it. Any PR that can't have its
+# diff computed for any reason still gets the exact original whole-file
+# check (fail-safe, not fail-open). `fetch-depth: 0` below is required so
+# both PR endpoints' commits, and a computable merge-base between them, are
+# always present locally -- the script itself also asserts the checkout
+# isn't shallow at runtime rather than trusting this stays correct.
+
 on:
   pull_request:
   push:
@@ -36,8 +52,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
       - name: Run hardware gate check
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: python3 tools/check_open_issues.py
+

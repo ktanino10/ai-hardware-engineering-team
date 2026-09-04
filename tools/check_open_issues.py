@@ -26,15 +26,54 @@ coincidence.
 Keep this in sync with the table header documented in
 validation/open-issues.md and .github/instructions/validation.instructions.md.
 If that header/column order changes, update EXPECTED_HEADER_PREFIX below.
+
+Diff-aware CRITICAL/HIGH exemption (added docs/architecture-evolution.md,
+see the addendum introducing this): on a `pull_request` run, this script
+additionally computes the PR's OWN changed-file set (via `git merge-base` +
+`git diff` against PR_BASE_SHA/PR_HEAD_SHA -- see compute_pr_changed_files())
+and, if that set touches none of hardware/**, bom/**, nor this gate's own
+mechanism (this file / .github/workflows/hardware-gate.yml, guarded so a
+change to the gate can never exempt itself -- see is_exempt_eligible()),
+reports PASS regardless of pre-existing CRITICAL/HIGH findings elsewhere in
+validation/open-issues.md. If the PR's own diff DOES touch
+validation/open-issues.md, only the rows that diff itself added or changed
+are evaluated (see compute_touched_new_lines()) -- so a PR that raises its
+own brand-new unresolved CRITICAL/HIGH (the normal way a Reviewer finding
+gets recorded here -- PR #38/MISS-034 touched only
+validation/open-issues.md + design-review.md, zero hardware/bom) still
+fails, exactly as today. Any failure to compute the diff (wrong event,
+missing SHAs, a git error) fails SAFE to this script's original,
+unconditional, whole-file behavior -- never a silent exemption. See
+docs/architecture.md section 17.1 for the full rationale.
+
+NOTE on `firmware/**` -- deliberately NOT one of the disqualifying prefixes,
+despite section 17.1's own literal wording listing "hardware/**,
+firmware/**, bom/**": `docs/workflow.md`'s Phase 8 exit criteria states
+Firmware Bring-up "does *not* feed Phase 7's gate ... intentionally *not*
+wired into the Design Complete Gate", and `docs/architecture.md` records
+that Firmware Reviewer findings are deliberately kept in a firmware-scoped
+file, not `validation/open-issues.md`, "so a firmware-only finding cannot
+silently block the Design Complete Gate" (`docs/architecture-evolution.md`
+section 32). This script only ever reads `validation/open-issues.md`, which
+by that same design can structurally never contain a firmware finding --
+disqualifying `firmware/**` here would buy no additional protection for
+anything this script actually checks, while re-coupling firmware PRs to an
+unrelated hardware gate that section 32 explicitly designed them out of.
+Treated as a correction to section 17.1's own wording, not a silent
+deviation -- see the architecture-evolution addendum for this change for
+the full record.
 """
 from __future__ import annotations
 
+import os
 import pathlib
 import re
+import subprocess
 import sys
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 OPEN_ISSUES_PATH = REPO_ROOT / "validation" / "open-issues.md"
+OPEN_ISSUES_REL_PATH = "validation/open-issues.md"
 
 EXPECTED_HEADER_PREFIX = ["ID", "Severity", "Status"]
 # Used only as a plausibility check when deciding whether a row found just
@@ -45,6 +84,30 @@ EXPECTED_HEADER_PREFIX = ["ID", "Severity", "Status"]
 ID_PATTERN = re.compile(r"^(ISS|MISS)-\d+$")
 RESOLVED = "RESOLVED"
 ACCEPTED_RISK = "ACCEPTED-RISK"
+
+# Diff-aware exemption path sets. These two prefixes disqualify a PR from
+# the exemption -- NOT validation/**, requirements/**, docs/**, firmware/**,
+# etc. (see the module docstring's NOTE on firmware/** above for why that
+# one is a deliberate correction to docs/architecture.md section 17.1's own
+# literal wording, not an oversight). requirements/**/validation/** (other
+# than open-issues.md, handled separately below) are excluded on purpose
+# too: PR #39 (Requirements Engineering) touches requirements/** +
+# validation/change-log.md and is one of the PRs this exemption exists to
+# unblock -- disqualifying either prefix would leave it blocked, defeating
+# the point.
+DISQUALIFYING_PATH_PREFIXES = ("hardware/", "bom/")
+# Self-referential guard, added beyond section 17.1's literal wording: a PR
+# that edits the gate's OWN enforcement code touches neither hardware/ nor
+# bom/, so without this it could exempt itself from scrutiny while changing
+# what the gate does. These two files ARE the gate's actual runtime
+# behavior (unlike, say, docs/architecture.md's *prose* description of it,
+# which has no runtime effect and is not guarded this way).
+GATE_MECHANISM_PATHS = frozenset(
+    {
+        "tools/check_open_issues.py",
+        ".github/workflows/hardware-gate.yml",
+    }
+)
 
 
 def _split_row(line: str) -> list[str]:
@@ -98,9 +161,18 @@ def _is_placeholder(id_cell: str) -> bool:
     return not id_cell or id_cell.startswith("<") or id_cell.startswith("ISS-XXX")
 
 
-def parse_backlog_rows(text: str) -> tuple[list[list[str]], list[str], int]:
+def parse_backlog_rows(
+    text: str,
+) -> tuple[list[tuple[int, list[str]]], list[str], int]:
     """Return (data rows of the Backlog table, parser warning messages,
     the table's expected column count).
+
+    Each row is returned as `(line_no, cells)`, where `line_no` is the
+    row's own 1-indexed line number in `text`. This is additive -- it does
+    not change any of the scanning/gap-recovery logic below -- and exists
+    so callers can restrict evaluation to only the rows a PR's own diff
+    touched (the diff-aware exemption's line-scoped check; see `main()`
+    and `compute_touched_new_lines()`), instead of every row in the file.
 
     The expected column count is returned so callers (see `main()`) can
     validate a row's actual length before trusting fixed-position
@@ -198,7 +270,7 @@ def parse_backlog_rows(text: str) -> tuple[list[list[str]], list[str], int]:
         id_cell = cells[0]
         return _is_placeholder(id_cell) or bool(ID_PATTERN.match(id_cell))
 
-    rows: list[list[str]] = []
+    rows: list[tuple[int, list[str]]] = []
     warnings: list[str] = []
     while j < len(lines):
         stripped = lines[j].strip()
@@ -206,7 +278,7 @@ def parse_backlog_rows(text: str) -> tuple[list[list[str]], list[str], int]:
         if stripped.startswith("|"):
             cells = _split_row(stripped)
             if any(cell != "" for cell in cells):
-                rows.append(cells)
+                rows.append((j + 1, cells))
             j += 1
             continue
 
@@ -279,27 +351,36 @@ def parse_backlog_rows(text: str) -> tuple[list[list[str]], list[str], int]:
     return rows, warnings, expected_ncols
 
 
-def main() -> int:
-    if not OPEN_ISSUES_PATH.exists():
-        print(f"OK: {OPEN_ISSUES_PATH} not found, nothing to check.")
-        return 0
+def evaluate_rows(
+    rows: list[tuple[int, list[str]]],
+    expected_ncols: int,
+    only_lines: set[int] | None,
+) -> tuple[list[str], list[str], int]:
+    """Evaluate CRITICAL/HIGH violations among Backlog `rows`.
 
-    text = OPEN_ISSUES_PATH.read_text(encoding="utf-8")
-    rows, parse_warnings, expected_ncols = parse_backlog_rows(text)
+    When `only_lines` is None, every row is evaluated -- this is today's
+    original, unconditional whole-file behavior, used whenever this PR
+    isn't exemption-eligible (or isn't running against a `pull_request` at
+    all). When `only_lines` is a set of line numbers, a row is evaluated
+    only if its own line number is in that set; every other row is
+    skipped entirely (neither a violation nor a length issue can be
+    reported for it) -- this is the diff-aware exemption's line-scoped
+    check, used only when this PR's own diff touches
+    validation/open-issues.md but touches none of hardware/**, bom/**, nor
+    this gate's own mechanism.
 
-    if parse_warnings:
-        print(
-            "Parser warning(s) -- recovered automatically, but please "
-            "clean these up (each is a stray blank line inside the "
-            "Backlog table):"
-        )
-        for w in parse_warnings:
-            print(f"  - {w}")
-        print()
-
+    Returns (violations, length_issues, rows_checked_count). The
+    per-row logic itself is unchanged from before this function was
+    extracted out of `main()`.
+    """
     violations: list[str] = []
     length_issues: list[str] = []
-    for row in rows:
+    checked = 0
+    for line_no, row in rows:
+        if only_lines is not None and line_no not in only_lines:
+            continue
+        checked += 1
+
         issue_id = row[0] if row else ""
         if not issue_id or issue_id.startswith("<") or issue_id.startswith("ISS-XXX"):
             continue  # placeholder row, not a real finding
@@ -334,6 +415,240 @@ def main() -> int:
                 f"ACCEPTED-RISK (status={status or 'EMPTY'})"
             )
 
+    return violations, length_issues, checked
+
+
+def _run_git(args: list[str]) -> str | None:
+    """Run `git <args>` from REPO_ROOT; return stripped stdout, or None on
+    ANY failure (git missing, command error, commit not present locally,
+    timeout, ...). Callers must treat None as "cannot determine" and fail
+    SAFE -- fall back to the full whole-file check -- never as "touches
+    nothing"/"exempt". Prints a warning on failure so a CI log always
+    shows why the fallback happened, rather than silently doing it.
+    """
+    try:
+        result = subprocess.run(
+            ["git", *args],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        print(f"WARNING: 'git {' '.join(args)}' could not be run: {exc}")
+        return None
+    if result.returncode != 0:
+        print(
+            f"WARNING: 'git {' '.join(args)}' failed (exit "
+            f"{result.returncode}): {result.stderr.strip()}"
+        )
+        return None
+    return result.stdout.strip()
+
+
+def compute_pr_changed_files() -> tuple[str, str, list[str]] | None:
+    """Return `(merge_base, head_sha, changed_files)` for this PR, or None
+    if this isn't a usable `pull_request` context (wrong event, missing
+    SHAs, or the diff can't be computed for any reason) -- callers must
+    treat None as "run the full check", never as "touches nothing".
+    `merge_base`/`head_sha` are returned alongside `changed_files` so a
+    caller that also needs the line-scoped check
+    (`compute_touched_new_lines()`) doesn't have to re-derive the same
+    merge-base a second time.
+
+    The diff basis is `merge-base(base_sha, head_sha)` vs. `head_sha` --
+    i.e. this PR's own commits relative to where it forked from its
+    target branch, matching exactly what GitHub's own PR "Files changed"
+    view shows. This deliberately is NOT a plain two-dot
+    `base_sha..head_sha` diff: if the target branch has advanced since
+    the PR forked (routine on a shared `main`), a two-dot diff would also
+    include those unrelated upstream changes as if they were part of
+    this PR's own diff.
+
+    Requires the local git history to actually contain both `base_sha`
+    and `head_sha` and a computable merge-base between them -- the
+    workflow's checkout step uses `fetch-depth: 0` for exactly this
+    reason. Rather than silently trust that YAML stays correct, this
+    function checks `git rev-parse --is-shallow-repository` up front so
+    a shallow checkout fails with a clearly-named reason instead of an
+    opaque `git merge-base` error.
+    """
+    if os.environ.get("GITHUB_EVENT_NAME") != "pull_request":
+        return None
+
+    base_sha = os.environ.get("PR_BASE_SHA", "").strip()
+    head_sha = os.environ.get("PR_HEAD_SHA", "").strip()
+    if not base_sha or not head_sha:
+        print(
+            "WARNING: GITHUB_EVENT_NAME=pull_request but PR_BASE_SHA/"
+            "PR_HEAD_SHA are not both set; falling back to the full check."
+        )
+        return None
+
+    is_shallow = _run_git(["rev-parse", "--is-shallow-repository"])
+    if is_shallow is None:
+        return None
+    if is_shallow == "true":
+        print(
+            "WARNING: this checkout is shallow (the workflow's checkout "
+            "step did not fetch full history -- expected `fetch-depth: 0`) "
+            "-- cannot reliably compute a merge-base; falling back to the "
+            "full check."
+        )
+        return None
+
+    merge_base = _run_git(["merge-base", base_sha, head_sha])
+    if merge_base is None:
+        return None
+
+    diff_output = _run_git(["diff", "--name-only", merge_base, head_sha])
+    if diff_output is None:
+        return None
+
+    changed_files = [line for line in diff_output.splitlines() if line.strip()]
+    return merge_base, head_sha, changed_files
+
+
+def is_exempt_eligible(changed_files: list[str]) -> bool:
+    """True if `changed_files` touches none of hardware/**, bom/**, nor
+    this gate's own enforcement mechanism. (`firmware/**` is deliberately
+    NOT included -- see the module docstring's NOTE on it.)
+
+    The mechanism-path guard is deliberate and goes beyond
+    docs/architecture.md section 17.1's literal text: without it, a PR
+    that edits the gate's own code touches neither hardware/ nor bom/, so
+    it could exempt ITSELF from scrutiny while changing what the gate
+    does. docs/architecture.md's own *prose* description of the gate is
+    not guarded the same way -- it has no runtime effect; these two files
+    are the gate's actual behavior.
+    """
+    for f in changed_files:
+        if f in GATE_MECHANISM_PATHS:
+            return False
+        if any(f.startswith(prefix) for prefix in DISQUALIFYING_PATH_PREFIXES):
+            return False
+    return True
+
+
+_HUNK_HEADER = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
+
+
+def compute_touched_new_lines(
+    merge_base: str, head_sha: str, rel_path: str
+) -> set[int] | None:
+    """Return the set of 1-indexed line numbers, in `rel_path`'s content
+    AT `head_sha`, that this PR's own diff added or changed -- derived
+    from `git diff --unified=0`'s hunk headers (`@@ -a,b +c,d @@`; the new
+    file's touched range is `[c, c+d-1]`, using an implicit `d=1` when
+    omitted per unified-diff convention). `--unified=0` (no context lines)
+    is essential: with default context, unrelated unchanged neighboring
+    rows would also appear inside a hunk and be wrongly counted as
+    "touched by this PR".
+
+    A MODIFIED row (e.g. an existing HIGH's Status flipped back from
+    RESOLVED/ACCEPTED-RISK to OPEN) is deliberately treated the same as a
+    newly-added one here: git represents a same-position content change as
+    the old line removed and the new line added, and the new line's
+    position is exactly what this function reports -- there is no
+    separate "added vs. modified" case to handle.
+
+    Returns None (never an empty-but-valid set standing in for "nothing
+    to worry about") if the diff can't be computed or a hunk header can't
+    be parsed -- callers must fail SAFE to the full check.
+    """
+    diff_output = _run_git(
+        ["diff", "--unified=0", merge_base, head_sha, "--", rel_path]
+    )
+    if diff_output is None:
+        return None
+
+    touched: set[int] = set()
+    for line in diff_output.splitlines():
+        if not line.startswith("@@"):
+            continue
+        match = _HUNK_HEADER.match(line)
+        if not match:
+            print(f"WARNING: could not parse diff hunk header: {line!r}")
+            return None
+        new_start = int(match.group(1))
+        new_count = int(match.group(2)) if match.group(2) is not None else 1
+        touched.update(range(new_start, new_start + new_count))
+    return touched
+
+
+def main() -> int:
+    if not OPEN_ISSUES_PATH.exists():
+        print(f"OK: {OPEN_ISSUES_PATH} not found, nothing to check.")
+        return 0
+
+    text = OPEN_ISSUES_PATH.read_text(encoding="utf-8")
+    rows, parse_warnings, expected_ncols = parse_backlog_rows(text)
+
+    if parse_warnings:
+        print(
+            "Parser warning(s) -- recovered automatically, but please "
+            "clean these up (each is a stray blank line inside the "
+            "Backlog table):"
+        )
+        for w in parse_warnings:
+            print(f"  - {w}")
+        print()
+
+    # --- Diff-aware exemption (docs/architecture.md section 17.1) ------
+    # `only_lines` stays None (== "evaluate every row", today's original
+    # behavior) unless we positively establish this PR is exemption-
+    # eligible AND its own diff touches validation/open-issues.md, in
+    # which case it becomes the set of lines THIS PR's diff touched. Any
+    # inability to establish eligibility/diff falls back to None (the
+    # full check) -- see compute_pr_changed_files()/
+    # compute_touched_new_lines() docstrings for why that's the safe
+    # default, not the exempting one.
+    only_lines: set[int] | None = None
+
+    pr_diff = compute_pr_changed_files()
+    if pr_diff is None:
+        pass  # not a usable pull_request context -- full check, as today
+    else:
+        merge_base, head_sha, changed_files = pr_diff
+        if not is_exempt_eligible(changed_files):
+            pass  # touches hardware/bom or the gate's own files
+        elif OPEN_ISSUES_REL_PATH not in changed_files:
+            print(
+                "OK: this PR's changed-file set touches none of "
+                "hardware/**, bom/** (firmware/** is deliberately not "
+                "gated here -- docs/architecture.md section 17.1's own "
+                "corrected wording), and does not modify "
+                f"{OPEN_ISSUES_REL_PATH} -- exempt from the whole-file "
+                "Design Complete Gate check per docs/architecture.md "
+                f"section 17.1 ({len(rows)} pre-existing finding(s) in "
+                "the file were not evaluated)."
+            )
+            return 0
+        else:
+            touched = compute_touched_new_lines(
+                merge_base, head_sha, OPEN_ISSUES_REL_PATH
+            )
+            if touched is None:
+                print(
+                    "WARNING: could not determine which lines of "
+                    f"{OPEN_ISSUES_REL_PATH} this PR's own diff touched; "
+                    "falling back to the full whole-file check."
+                )
+            else:
+                only_lines = touched
+                print(
+                    f"This PR modifies {OPEN_ISSUES_REL_PATH} but touches "
+                    "none of hardware/**, bom/**: only the "
+                    f"row(s) this PR's own diff added or changed (line(s) "
+                    f"{sorted(touched) or '(none)'}) are evaluated below; "
+                    "pre-existing, untouched finding(s) elsewhere in the "
+                    "file are exempt per docs/architecture.md section "
+                    "17.1."
+                )
+                print()
+
+    violations, length_issues, checked = evaluate_rows(rows, expected_ncols, only_lines)
+
     if length_issues:
         print(
             "Hardware gate FAILED - cannot verify these Backlog row(s) "
@@ -356,10 +671,19 @@ def main() -> int:
     if length_issues:
         return 1
 
-    print(
-        "OK: no unresolved CRITICAL / unsigned-off HIGH findings "
-        f"({len(rows)} finding(s) checked)."
-    )
+    if only_lines is not None:
+        print(
+            "OK: no unresolved CRITICAL / unsigned-off HIGH findings among "
+            f"the {checked} row(s) this PR's own diff touched in "
+            f"{OPEN_ISSUES_REL_PATH} ({len(rows) - checked} pre-existing, "
+            "untouched finding(s) elsewhere in the file were not "
+            "evaluated -- exempt per docs/architecture.md section 17.1)."
+        )
+    else:
+        print(
+            "OK: no unresolved CRITICAL / unsigned-off HIGH findings "
+            f"({len(rows)} finding(s) checked)."
+        )
     return 0
 
 
