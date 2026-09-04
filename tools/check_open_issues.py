@@ -533,6 +533,22 @@ def is_exempt_eligible(changed_files: list[str]) -> bool:
 _HUNK_HEADER = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
 
 
+def _finding_id_of_diff_line(line_without_marker: str) -> str | None:
+    """If `line_without_marker` (a hunk content line with its leading
+    `+`/`-` diff marker already stripped) looks like a Backlog table row,
+    return its ID cell (e.g. `"MISS-034"`); otherwise None. Reuses
+    `_split_row`/`ID_PATTERN` -- the same parsing this script already
+    trusts for the real table -- rather than a fresh ad hoc check.
+    """
+    stripped = line_without_marker.strip()
+    if not stripped.startswith("|"):
+        return None
+    cells = _split_row(stripped)
+    if cells and ID_PATTERN.match(cells[0]):
+        return cells[0]
+    return None
+
+
 def compute_touched_new_lines(
     merge_base: str, head_sha: str, rel_path: str
 ) -> set[int] | None:
@@ -552,9 +568,31 @@ def compute_touched_new_lines(
     position is exactly what this function reports -- there is no
     separate "added vs. modified" case to handle.
 
+    A row DELETED with nothing replacing it is a different, unsafe case,
+    found by independent review of PR #44 (this exemption's own PR) after
+    it shipped: a pure deletion has NO "+" side at all, so the hunk-header
+    scan above alone would silently produce an empty result for it --
+    which callers would otherwise read as "this PR's diff has nothing
+    here worth evaluating" and, per `main()`'s own logic, exempt every
+    OTHER pre-existing row in the file too, not just the deleted one (the
+    concrete, verified reproduction: a PR whose only change deletes an
+    OPEN CRITICAL row, leaving a completely unrelated OPEN HIGH row
+    untouched elsewhere in the same file, was wrongly exempted -- `main`'s
+    unmodified script still correctly failed on that untouched HIGH row).
+    Guarded against here by tracking every Backlog-row ID that appears on
+    either side of the WHOLE diff (not just within one hunk, so a row
+    replaced by a different-shaped edit spanning hunks is still matched):
+    an ID present in a removed line but absent from every added line was
+    deleted without replacement, and this function fails SAFE for the
+    whole diff (returns None) rather than silently returning a
+    still-technically-valid empty set. A same-ID modification (the
+    RESOLVED/ACCEPTED-RISK case above) is unaffected because that ID
+    *does* reappear on an added line, in the same or a different hunk.
+
     Returns None (never an empty-but-valid set standing in for "nothing
-    to worry about") if the diff can't be computed or a hunk header can't
-    be parsed -- callers must fail SAFE to the full check.
+    to worry about") if the diff can't be computed, a hunk header can't be
+    parsed, or a finding row was deleted without replacement -- callers
+    must fail SAFE to the full check in all three cases.
     """
     diff_output = _run_git(
         ["diff", "--unified=0", merge_base, head_sha, "--", rel_path]
@@ -563,16 +601,40 @@ def compute_touched_new_lines(
         return None
 
     touched: set[int] = set()
+    added_ids: set[str] = set()
+    removed_ids: set[str] = set()
     for line in diff_output.splitlines():
-        if not line.startswith("@@"):
+        if line.startswith("@@"):
+            match = _HUNK_HEADER.match(line)
+            if not match:
+                print(f"WARNING: could not parse diff hunk header: {line!r}")
+                return None
+            new_start = int(match.group(1))
+            new_count = int(match.group(2)) if match.group(2) is not None else 1
+            touched.update(range(new_start, new_start + new_count))
             continue
-        match = _HUNK_HEADER.match(line)
-        if not match:
-            print(f"WARNING: could not parse diff hunk header: {line!r}")
-            return None
-        new_start = int(match.group(1))
-        new_count = int(match.group(2)) if match.group(2) is not None else 1
-        touched.update(range(new_start, new_start + new_count))
+
+        if line.startswith("+") and not line.startswith("+++"):
+            found = _finding_id_of_diff_line(line[1:])
+            if found:
+                added_ids.add(found)
+        elif line.startswith("-") and not line.startswith("---"):
+            found = _finding_id_of_diff_line(line[1:])
+            if found:
+                removed_ids.add(found)
+
+    deleted_without_replacement = removed_ids - added_ids
+    if deleted_without_replacement:
+        print(
+            "WARNING: this PR's diff to "
+            f"{rel_path} deletes existing finding row(s) "
+            f"{sorted(deleted_without_replacement)} with nothing "
+            "replacing them (no added line carries the same ID) -- "
+            "cannot safely restrict evaluation to only this PR's own "
+            "added/changed rows; falling back to the full check."
+        )
+        return None
+
     return touched
 
 

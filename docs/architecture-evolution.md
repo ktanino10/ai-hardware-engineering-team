@@ -2235,5 +2235,38 @@ merge.
   self-referential guard working as designed) — not admin-overridden by
   this session; awaiting independent audit and a human-approving review
   the same as every other PR in this repository.
+- **Post-open review finding, fixed in the same PR (real regression, not
+  a style nit)**: independent review of PR #44 — built a standalone git
+  harness and *executed* the script rather than reading it — found that a
+  pure DELETION of an existing finding row (no replacement) causes
+  `compute_touched_new_lines()` to return a technically-valid **empty**
+  set, not `None`: a deletion has no `+` side at all, so the hunk-header
+  scan alone sees nothing to add to `touched`. Per `evaluate_rows()`'s own
+  logic, an empty `only_lines` set means zero rows get evaluated —
+  exempting every OTHER pre-existing row in the file too, not just the
+  deleted one. Concretely and independently reproduced: a PR whose sole
+  change deletes an OPEN CRITICAL row, leaving a completely unrelated OPEN
+  HIGH row untouched elsewhere in the same file, was wrongly exempted;
+  `main`'s unmodified script still correctly failed on that untouched HIGH
+  row. This directly contradicted `compute_touched_new_lines()`'s own
+  docstring guarantee ("never an empty-but-valid set standing in for
+  'nothing to worry about'") — the guarantee was written against
+  *computation failure*, and a deletion reached the same observable state
+  by a route the docstring hadn't considered. **Fix**: the function now
+  also tracks every Backlog-row ID appearing on either side of the whole
+  diff (added and removed), and returns `None` (the existing fail-safe
+  convention, not a new mechanism) if any ID was removed without a
+  same-ID line reappearing among the added lines -- i.e. deleted, not
+  merely modified. A same-ID modification (the RESOLVED/ACCEPTED-RISK-
+  flip case already handled) is unaffected, since that ID *does* reappear
+  on an added line. Re-verified all 6 original scenarios still pass
+  unchanged after the fix, plus a 7th (the deletion case itself, now
+  correctly falling back to the full check and failing on the untouched
+  HIGH row, matching `main`'s own behavior exactly) — commands and output
+  in this session's history. `tools/check_id_uniqueness.py`,
+  `tools/check_agent_frontmatter.py`, and `python3 -m pyflakes` all
+  re-confirmed clean after the fix. Left this entry standing next to the
+  original "Status" bullet above rather than editing it, per this
+  document's own forward-correcting convention.
 
 
