@@ -31,6 +31,13 @@
   #fetch-status{color:var(--accent);}
   #fetch-status.err{color:var(--crit);}
 
+  .lang-toggle{display:flex;}
+  .lang-toggle button{background:transparent;border:1px solid var(--line);color:var(--dim);
+    padding:6px 12px;font-size:12px;cursor:pointer;border-radius:6px 0 0 6px;transition:.15s;}
+  .lang-toggle button:last-child{border-radius:0 6px 6px 0;border-left:none;}
+  .lang-toggle button.active{background:var(--accent);color:#04121f;border-color:var(--accent);font-weight:700;}
+  .lang-toggle button:not(.active):hover{border-color:var(--accent);color:var(--accent);}
+
   main{display:flex;flex-direction:column;gap:16px;margin-top:18px;}
   .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
   @media (max-width:820px){ .grid-2{grid-template-columns:1fr;} }
@@ -143,67 +150,69 @@
 <div id="app">
   <header>
     <div>
-      <h1>Bench-IMU-01 — Project Dashboard</h1>
+      <h1>Bench-IMU-01 — <span id="i18n-title-suffix">Project Dashboard</span></h1>
       <div class="sub">
-        <b>A live view, not a snapshot.</b> Every number below is fetched
-        directly from this repository's own requirements, findings,
-        change-log, and mechanical-interface files on <code>main</code> at
-        page load, and re-parsed in your browser — nothing here is
-        generated ahead of time or committed to git.
+        <b id="i18n-subtitle-bold">A live view, not a snapshot.</b>
+        <span id="i18n-subtitle-body-1">Every number below is fetched directly from this repository's own requirements, findings, change-log, and mechanical-interface files on</span>
+        <code>main</code>
+        <span id="i18n-subtitle-body-2">at page load, and re-parsed in your browser — nothing here is generated ahead of time or committed to git.</span>
         <span id="fetch-status">Loading live data from GitHub…</span>
       </div>
     </div>
     <div class="header-actions">
+      <div class="lang-toggle">
+        <button data-lang="en" class="active" type="button">EN</button>
+        <button data-lang="ja" type="button">JA</button>
+      </div>
       <button id="refresh-btn" type="button">⟳ Refresh</button>
-      <a href="../index.html">&larr; back</a>
+      <a href="../index.html" id="i18n-back-link">&larr; back</a>
     </div>
   </header>
 
   <main>
     <section class="panel pending" id="section-pending">
-      <h2>⚠ Pending Human Decisions</h2>
+      <h2>⚠ <span id="i18n-pending-title">Pending Human Decisions</span></h2>
       <div class="body" id="pending-body"><span class="placeholder">Loading…</span></div>
     </section>
 
     <section class="panel" id="section-phases">
-      <h2>Phase / Process Pipeline
-        <span class="src">from <a href="https://github.com/ktanino10/ai-hardware-engineering-team/blob/main/docs/workflow.md" target="_blank" rel="noopener">docs/workflow.md</a></span>
+      <h2><span id="i18n-phases-title">Phase / Process Pipeline</span>
+        <span class="src"><span class="i18n-src-prefix">from</span> <a href="https://github.com/ktanino10/ai-hardware-engineering-team/blob/main/docs/workflow.md" target="_blank" rel="noopener">docs/workflow.md</a></span>
       </h2>
       <div class="body" id="phases-body"><span class="placeholder">Loading…</span></div>
     </section>
 
     <div class="grid-2">
       <section class="panel" id="section-findings">
-        <h2>Findings &amp; Quality Snapshot
-          <span class="src">from <a href="https://github.com/ktanino10/ai-hardware-engineering-team/blob/main/validation/open-issues.md" target="_blank" rel="noopener">open-issues.md</a></span>
+        <h2><span id="i18n-findings-title">Findings &amp; Quality Snapshot</span>
+          <span class="src"><span class="i18n-src-prefix">from</span> <a href="https://github.com/ktanino10/ai-hardware-engineering-team/blob/main/validation/open-issues.md" target="_blank" rel="noopener">open-issues.md</a></span>
         </h2>
         <div class="body" id="findings-body"><span class="placeholder">Loading…</span></div>
       </section>
 
       <section class="panel" id="section-requirements">
-        <h2>Requirements Snapshot
-          <span class="src">from <a href="https://github.com/ktanino10/ai-hardware-engineering-team/blob/main/requirements/requirements.md" target="_blank" rel="noopener">requirements.md</a></span>
+        <h2><span id="i18n-requirements-title">Requirements Snapshot</span>
+          <span class="src"><span class="i18n-src-prefix">from</span> <a href="https://github.com/ktanino10/ai-hardware-engineering-team/blob/main/requirements/requirements.md" target="_blank" rel="noopener">requirements.md</a></span>
         </h2>
         <div class="body" id="requirements-body"><span class="placeholder">Loading…</span></div>
       </section>
     </div>
 
     <section class="panel" id="section-activity">
-      <h2>Recent Activity
-        <span class="src">from <a href="https://github.com/ktanino10/ai-hardware-engineering-team/blob/main/validation/change-log.md" target="_blank" rel="noopener">change-log.md</a></span>
+      <h2><span id="i18n-activity-title">Recent Activity</span>
+        <span class="src"><span class="i18n-src-prefix">from</span> <a href="https://github.com/ktanino10/ai-hardware-engineering-team/blob/main/validation/change-log.md" target="_blank" rel="noopener">change-log.md</a></span>
       </h2>
       <div class="body" id="activity-body"><span class="placeholder">Loading…</span></div>
     </section>
 
     <section class="panel" id="section-mechanical">
-      <h2>Electrical &amp; Mechanical Snapshot</h2>
+      <h2><span id="i18n-mechanical-title">Electrical &amp; Mechanical Snapshot</span></h2>
       <div class="body" id="mechanical-body"><span class="placeholder">Loading…</span></div>
     </section>
   </main>
 
   <footer id="dashboard-footer">
-    Data sources (fetched live from <code>main</code> on every page load —
-    GitHub's raw-content CDN may serve a cache up to a few minutes old):
+    <span id="i18n-footer-1">Data sources (fetched live from</span> <code>main</code> <span id="i18n-footer-2">on every page load — GitHub's raw-content CDN may serve a cache up to a few minutes old):</span>
     <code>requirements/requirements.md</code>,
     <code>requirements/traceability-matrix.md</code>,
     <code>validation/open-issues.md</code>,
@@ -212,12 +221,13 @@
     <code>hardware/mechanical-interface.md</code>,
     <code>docs/workflow.md</code>,
     <code>datasheets/evidence-log.md</code>.
-    This page never writes anything back to the repository.
+    <span id="i18n-footer-3">This page never writes anything back to the repository.</span>
     <a href="https://github.com/ktanino10/ai-hardware-engineering-team" target="_blank" rel="noopener">github/ai-hardware-engineering-team ↗</a>
   </footer>
 </div>
 
 <script src="dashboard-live.js"></script>
+<script src="dashboard-i18n.js"></script>
 <script src="dashboard-render.js"></script>
 </body>
 </html>
