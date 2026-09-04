@@ -2004,6 +2004,411 @@ for this document's own audit-trail convention.
   merge — same process every prior change in this repository's history
   went through.
 
+## 42. Autonomous Operation & Cross-Session Coordination Governance Policy (Addendum — documentation only)
+
+Added after a single overnight monitoring window (2026-09-03/04) surfaced
+three concrete gaps in how this project's own autonomous sessions must
+behave once several of them operate on the same shared repository
+concurrently and asynchronously: no written rule for when a required CI
+gate may be bypassed, no standard for verifying a claimed human decision
+before acting on it, and no protocol for handling disagreement between two
+autonomous sessions. Unlike §33/§35/§36/§37 (each of which introduced or
+extended a discipline agent), and like §39/§41, this is **not** a new
+discipline and touches **zero** `.agent.md`/`SKILL.md` files — it adds
+`docs/architecture.md` §17 ("Autonomous Operation & Cross-Session
+Coordination Policy," plus one bullet appended to the existing §10 list)
+and this addendum only.
+
+- **Trigger**: real, verified incidents from the same overnight window,
+  each independently re-checked against primary sources before being cited
+  here (not taken on any session's self-report):
+  1. **PR #38** (merged, commit `816379e`) raised MISS-034 (CRITICAL — the
+     Bench-IMU-01 enclosure is dimensioned for a 100×50mm board that no
+     longer exists; the real board is 150×95mm) as a documentation-only PR
+     that intentionally failed `hardware-gate`, and was admin-merged by the
+     creator/orchestrator session after independently re-verifying every
+     load-bearing figure. **PR #40** (ISS-056, still OPEN at time of
+     writing) and **PR #41** (MISS-035, still OPEN at time of writing) each
+     subsequently declined the same option on the same class of PR,
+     reasoning that unilaterally freezing `main`'s clean-merge capability is
+     not an autonomous loop's call to make — confirmed via `gh pr view
+     38/40/41`, whose bodies this addendum cites accurately, not
+     paraphrases speculatively. `gh api repos/ktanino10/
+     ai-hardware-engineering-team/branches/main/protection` confirms
+     `enforce_admins.enabled = false` (bypass is technically available) and
+     confirms the same three required checks ("Check open-issues.md for
+     unresolved CRITICAL/HIGH findings," "Check ECO/Issue/Evidence IDs for
+     cross-branch duplicates," "Check agent/skill frontmatter") PR #38
+     actually saw. `gh api repos/ktanino10/ai-hardware-engineering-team/
+     commits/main/check-runs` independently confirms `main` itself still
+     fails the open-issues check today, from MISS-034 alone — the
+     disagreement this section resolves was real and, as of this writing,
+     still live, not historical.
+  2. The **disclosure-with-freeze vs. disclosure-without-freeze** reframing
+     (§17.1) — that an open, complete, cross-referenced PR already delivers
+     its disclosure value without a merge, so admin-override adds freeze
+     risk without adding incremental disclosure — surfaced in the same
+     discussion and is preserved here because it is the actual mechanism
+     that reconciles PR #38 against #40/#41 into one rule rather than
+     leaving both as unexplained exceptions to each other.
+  3. **Verification-before-acting**: commit `c51c516` ("Rev 5: record
+     verified human decision on §9h Q2 = YES (ECO-049)") shows the Rev 5
+     Requirements session declining to record a relayed human decision
+     until it independently confirmed the human's verbatim words via
+     `session_store_sql` against the creator/"General Chat" session's own
+     turn history (session `7fab99ef`, turn 415) — a first relay (turn 414)
+     had been explicitly declined pending exactly this confirmation, per
+     that commit's own message. §17.2 codifies this exact behavior as a
+     standing requirement.
+  4. **Branch-protection change — initially unattributed, resolved during
+     this same PR's review**: confirmed via direct `gh api
+     .../branches/main/protection` that `required_pull_request_reviews` was
+     absent from current protection, with no audit-log API available for a
+     personal-account repository to establish when/why/by whom, and
+     `merged_by` unable to distinguish a human account action from an
+     agent-session action authenticated as that same account — recorded at
+     that point as a genuinely open, unattributed item. Kyosuke was then
+     asked directly, in the creator/"General Chat" session, whether he had
+     changed it intentionally; his verbatim reply (turn 425, that session,
+     2026-09-04T00:47:46.630Z, independently confirmed via
+     `session_store_sql` against the local session store before being
+     relied on — the cloud store showed the same replication lag as the Rev
+     5 incident on the first, narrower query) was **"私が間違って外しまし
+     た。"** ("I removed it by mistake.") A genuine human configuration
+     slip, not agent tampering, now attributed and closed. See
+     `docs/architecture.md` §17.5 for the resolved record.
+- **What was added**: `docs/architecture.md` new §17 (five subsections —
+  admin-override policy, verification-before-acting standard, cross-session
+  conflict/staleness handling, grounding/sources, and the branch-protection
+  item above — plus one bullet appended to the existing §10 list); this
+  addendum.
+- **This PR's own §17.2 self-application**: within hours of this PR being
+  opened, the scenario in item 4 above played out for real — a claimed
+  human decision arrived relayed through the creator session, and per
+  §17.2's own standard it was independently verified via `session_store_sql`
+  (not taken on the relay alone) before this document was updated to
+  reflect it as resolved. A second live self-application of the policy
+  this addendum documents, alongside §17.1's (below).
+- **§17.1's diff-aware CI-exemption recommendation — disposition closed,
+  not left open**: the independent auditing session reviewed this PR in
+  full and, exercising its own delegated technical judgment (explicitly
+  not escalated to Kyosuke — a routine engineering-triage call, not an
+  architecture decision), directed that the recommendation not be
+  implemented now: MISS-034, the finding actually blocking merges, is
+  already being resolved through the normal route by a separate,
+  independently-confirmed session (`ktanino10-fix-miss-034-enclosure-150x95`),
+  so building new CI machinery for a problem about to resolve itself would
+  be premature. §17.1 now records this as a closed disposition — revisit
+  only if the same blocking pattern recurs in a later cycle, with a fresh
+  concrete instance — rather than as a standing open question, per that
+  session's explicit instruction.
+- **Post-disposition update, same day: MISS-034's own resolution does not
+  unfreeze `main`, partially undermining the disposition above's stated
+  premise.** A second independent autonomous session (scheduled overnight
+  check-in, cycle 32) audited this PR, agreed with its content, and
+  reported that the MISS-034 fix worktree's own Mechanical Reviewer pass
+  had correctly re-opened `MISS-023` (HIGH) from a prior human
+  `ACCEPTED-RISK` — that sign-off had been reasoned against a 126.424mm
+  hazard-band radius and 77.7% pinch-guard coverage which the 150×95mm
+  rescale invalidates, so carrying it forward silently would have been the
+  actual error (the Foresight checklist working as intended). This session
+  independently re-verified the claim directly, not on the report alone: in
+  that worktree (`ktanino10-fix-miss-034-enclosure-150x95`, still
+  uncommitted as of this writing), `MISS-034`'s row reads `RESOLVED` and
+  `MISS-023`'s reads `OPEN` (13 well-formed cells, the 126.424mm/77.7%
+  figures present in its Notes column, no self-granted replacement
+  `ACCEPTED-RISK`); running `tools/check_open_issues.py` there directly
+  reproduces cycle 32's exact reported failure, `MISS-023: HIGH finding is
+  neither RESOLVED nor ACCEPTED-RISK (status=OPEN)`. So `main` stays
+  frozen pending a fresh human ACCEPTED-RISK-or-redesign call on MISS-023,
+  not merely on MISS-034 — while the human is asleep. **One correction to
+  cycle 32's own figure**, in the same spirit this document asks of
+  everyone else: cycle 32 reported `main` frozen "~16 hours"; independently
+  computed from PR #38's confirmed merge timestamp
+  (`2026-09-03T17:31:43Z`, when MISS-034 first became the blocking OPEN
+  CRITICAL) to time of writing, the figure is closer to **7.5 hours** —
+  noted as a correction, not an accusation; the substantive point (the
+  freeze duration is now open-ended, not merely long) holds regardless.
+  This weakens part of the "not implemented now" disposition's own stated
+  premise (that MISS-034 landing alone reopens the gate) — flagged back to
+  the session that made that call for reconsideration with this new fact,
+  rather than unilaterally reversed here; whether the CI-exemption's
+  priority should change in light of it is that session's call to revisit,
+  not this addendum's to pre-empt. See `docs/architecture.md` §17.1's own
+  forward pointer to this entry.
+- **Disposition reversed, same day: implementation commissioned.** The
+  session that closed the "not implemented now" disposition revisited it
+  in light of the MISS-023 chain above, plus the practical fact that four
+  independently-audited, documentation-only PRs (#39, #40, #41, and #42
+  itself — all confirmed zero-diff under `hardware/**`/`firmware/**`/
+  `bom/**`) were genuinely blocked by an open-ended freeze rather than a
+  short wait for one known fix — a materially different situation than the
+  one the original disposition was reasoned against. Updated call: **build
+  the diff-aware exemption**, explicitly as its own separate,
+  properly-reviewed PR (a real change to the Design Complete Gate's own
+  enforcement mechanism, `tools/check_open_issues.py` /
+  `.github/workflows/hardware-gate.yml`), not folded into this
+  documentation-only PR, and explicitly cautioned not to let the urgency of
+  unblocking four PRs compress that review. This session commissioned a
+  dedicated child session to carry it out (kicked off in `plan` mode, so it
+  pauses for a reviewed plan before touching CI logic; given full context
+  on the PR #27 path-filter lesson, the required diff-aware shape, and an
+  instruction to coordinate with the creator/orchestrator session rather
+  than this one) rather than implementing it in-session, which would have
+  mixed a real code change into this PR's otherwise purely-documentation
+  diff. §17.1's original disposition text is left standing, not deleted,
+  per this document's own forward-correcting convention — this bullet is
+  the record of the reversal; the eventual implementing PR gets its own
+  addendum for the actual change.
+- **Cycle 32 self-corrected its own "~16 hours" figure — and named a
+  reusable trap, not just a one-off slip.** Independently re-derived its
+  own number rather than simply accepting the correction above, reproduced
+  this session's 7.5-hour figure almost exactly (7.61h), and posted a
+  public correction in place on PR #42 (verified: comment present, "##
+  Correction to my cycle-32 audit — freeze duration was wrong",
+  `2026-09-04T01:09:57Z`) rather than letting the wrong figure stand. Root
+  cause, per that correction: `PR #38`'s `mergedAt` is UTC (`17:31:43Z`),
+  read against this project's sessions' local JST wall clock without
+  converting first — a timezone conflation (`17:31:43` treated as JST
+  yields the erroneous 16.6h), not a rounding error, and a genuinely
+  reusable trap given `gh`/the GitHub API return UTC while session clocks
+  here report JST. Added as `docs/architecture.md` §17.2's new method note,
+  per cycle 32's own suggestion (offered, not insisted on, since it is this
+  document's section to own). Also worth recording plainly: this is the
+  third error cycle 32 has caught and withdrawn in its own audit work this
+  cycle (a naive `str.split('|')` producing phantom misaligned rows; a
+  `/tmp`-invocation path-resolution bug that made a working check look
+  like a no-op; this timezone conflation) — all three surfaced by
+  re-deriving rather than trusting a first measurement, the same standard
+  §17.2 asks of everyone else, applied by an auditing session to its own
+  output, not only to what it audits.
+- **Session-liveness misdiagnosis, same day: real, but only partially
+  independently reproduced.** The creator/orchestrator session reported
+  that it and an independent autonomous cycle (`2ec312f3`) each separately
+  misread a dedicated child session's (`914e4e71`, commissioned earlier
+  the same day to implement the diff-aware CI exemption above) frozen
+  `updated_at` and zero diff as "stalled/died," compounding into duplicate
+  sessions and a near-miss report of a fictitious platform failure, before
+  self-correcting via that session's plan-approval state. Existence of
+  `2ec312f3` (a real, later overnight-check-in-cycle session) and of
+  `914e4e71` itself were independently confirmed here via
+  `list_sessions_and_chats`/`get_session` before recording anything. The
+  specific claimed mechanism (a `pending_plan` field on `get_session`,
+  present with `awaiting_response: true`) was **not** independently
+  reproduced by this session: querying `914e4e71` directly at the time of
+  writing showed zero diff and no such field, one way or the other —
+  consistent with the plan having already been resolved by the time of
+  this check (a timing gap, not necessarily a contradiction), but not
+  confirmed either. §17.3 point 5 (first version) was worded to the
+  well-corroborated general lesson (frozen `updated_at`/zero diff alone is
+  not a stall signal; check actual plan/approval state first) rather than
+  asserting the specific field schema as independently confirmed fact —
+  consistent with this document's own standard of not writing down a
+  technical mechanism as verified when it wasn't. Flagged back to the
+  creator session for the exact `get_session` output it saw.
+- **That flag surfaced a real flaw in the original suggestion itself, same
+  day.** The creator session, with the overnight audit session's help, own
+  self-corrected: `pending_plan` only appears *after* a session has
+  produced a plan — during the pre-plan research/design window
+  beforehand, which can run many hours, `pending_plan` is absent,
+  `updated_at` is frozen, and there may be no branch/diff either. Their
+  original rule ("check `pending_plan`; treat it as authoritative") would
+  have read that healthy window as "not awaiting approval, therefore
+  dead," reproducing the exact misdiagnosis it was meant to prevent — and
+  it independently explains this session's own unreproduced-field
+  observation just above: `914e4e71` most likely was, and may still be, in
+  that same pre-plan window, not in some anomalous state. Corrected model,
+  now in §17.3 point 5: a positive "awaiting approval" signal is solid
+  evidence of life; its *absence* is inconclusive, not evidence of death;
+  the only check that actually distinguishes "working silently" from
+  "genuinely dead" is direct interrogation with a reasonable reply window,
+  and metadata alone should never justify re-commissioning duplicate work
+  or archiving another session's task. General principle: absence of a
+  positive signal is not itself a negative signal. §17.3 point 5 was
+  edited in place to this corrected model (not left as a superseded
+  paragraph alongside a new one) because the original wording was already
+  appropriately hedged/provisional rather than a firm, since-falsified
+  claim — refining an acknowledged gap, not reversing a settled position,
+  per the same distinction §17.1's own forward-correcting entries draw.
+- **The `pending_plan` field mechanism, subsequently confirmed with raw
+  evidence, not just description.** Flagged back to the creator session
+  for the exact `get_session` output it had seen; it supplied the actual
+  captured JSON (`pending_plan: {actions, awaiting_response: true,
+  plan_content, recommended_action, summary}`) rather than redescribing it
+  — and explained the apparent non-reproduction cleanly: it had called
+  `respond_to_session_plan(approved: true)` on `914e4e71` shortly after
+  capturing that output, which clears `pending_plan` once actioned, so by
+  the time this session queried `914e4e71` the field was legitimately gone
+  — consistent with "alive and past that checkpoint," not "never had one."
+  Re-querying `914e4e71` after receiving this still showed the same frozen
+  `updated_at` and zero diff as every prior check, which does not
+  contradict the account: per §17.3 point 5's own corrected model, a
+  session can be genuinely alive and working (here, presumably deep in
+  the rigorous pre-implementation verification this session's own kickoff
+  prompt demanded) without yet having made a git-visible change. §17.3
+  point 5 now cites the specific field/shape, attributed to the creator
+  session's captured output rather than claimed as independently
+  re-executed by this session — a real, verifiable-in-principle technical
+  mechanism (not a one-time human utterance), corroborated by a specific
+  raw artifact and a coherent, checked-consistent timing explanation,
+  which this document treats as a different, lower evidentiary bar than
+  §17.2's human-decision-verification standard, not the same one relaxed.
+- **Grounding, verified rather than merely asserted**: the branch-protection/
+  CI-override guidance and the multi-agent/agentic-AI governance guidance
+  cited in §17.4 were independently corroborated by this session via live
+  web search and direct retrieval of the source articles (Arthur AI's
+  "Human-in-the-Loop Governance for AI Agents"; the Architecture &
+  Governance Institute's "Governing Multi-Agent AI Systems" enterprise
+  blueprint; current tiered-risk agentic-AI-governance guidance including
+  Tigera's; and NIST AI RMF/ISO 42001-style continuous-improvement/
+  postmortem practice) — not transcribed from a single prior pass without
+  checking, per this project's own Source-of-Truth culture applied to
+  process documentation rather than component datasheets.
+- **Explicitly not an ECO, not a new discipline**: this addendum and
+  `docs/architecture.md` §17 (plus the one §10 bullet) are the only content
+  added; nothing under `hardware/**`, `bom/**`, `firmware/**`,
+  `requirements/**`, or `validation/**` is modified, and no `.agent.md`/
+  `SKILL.md` file is touched — per
+  `.github/instructions/hardware-design.instructions.md`'s own ECO trigger,
+  no design change occurred, so no `validation/change-log.md` entry is
+  created or needed. This mirrors §39/§40/§41's own precedent exactly.
+- **This PR's own gate status, verified rather than assumed**: because
+  `.github/workflows/hardware-gate.yml`'s required check deliberately runs
+  unfiltered on every `pull_request` (that file's own header comment,
+  added by PR #27) and validates the *entire* current
+  `validation/open-issues.md`, **this PR is expected to show `hardware-gate`
+  as failing** — inherited from MISS-034 on `main`, not introduced by
+  anything in this PR's own diff (which touches zero files under
+  `hardware/**`, `firmware/**`, `bom/**`, or `validation/**`). Per §17.1's
+  own decision tree (case 2: inherited failure, zero design-artifact paths
+  touched), this PR must **not** be admin-overridden and is left open,
+  exactly like PR #40/#41 — a direct, immediate self-application of the
+  policy this addendum documents, not a hypothetical.
+- **Post-disposition update, same day: `required_pull_request_reviews`
+  restored, with a technical correction to how that actually changes
+  merging.** Kyosuke decided to restore the rule; the creator/orchestrator
+  session re-enabled it via the GitHub API
+  (`required_approving_review_count: 1`) — independently confirmed here via
+  `gh api .../branches/main/protection` before recording it, not taken on
+  the relay. The relayed operational note assumed Kyosuke could satisfy it
+  by clicking "Approve" on GitHub himself; independently checked against
+  GitHub's actual documented behavior before writing anything down, since
+  it affects how every future PR merges, not just this one: GitHub does
+  not allow a pull request's own author to approve their own PR,
+  unconditionally, regardless of admin/owner status, and this repository's
+  `require_last_push_approval` field (a different, narrower setting about
+  stale approvals surviving a later push) is `false` and does not change
+  that. Because every PR here is authored under the same single account
+  regardless of whether a human or an autonomous session drove it, no
+  distinct second identity exists to supply a genuine approving review —
+  so, as configured, the review requirement does not add an independent
+  approval gate; it folds into the same admin-bypass action §17.1 already
+  governs (`enforce_admins.enabled` is still `false`). Recorded in
+  `docs/architecture.md` §17.1 (operational note) and §17.5 (updated to
+  reflect both attribution and configuration now closed); not this
+  session's call to resolve further, only to record accurately for
+  Kyosuke's awareness.
+- **Files added/edited**: `docs/architecture.md` (§10 bullet + §17
+  appended); `docs/architecture-evolution.md` (this addendum).
+- **Confirmed untouched**: every `.agent.md`/`SKILL.md` file; all of
+  `hardware/**`, `bom/**`, `firmware/**`, `requirements/**`, `validation/**`,
+  `datasheets/**`; `docs/workflow.md`; `README.md`;
+  `tools/check_open_issues.py`; `.github/workflows/hardware-gate.yml`.
+- **Closing note: the commissioned session completed, resolving the
+  session-liveness question with a concrete positive.** `914e4e71`
+  reported completion — **PR #44**, "ci: diff-aware CRITICAL/HIGH
+  exemption for hardware-gate," open against `main`. Independently
+  confirmed via `gh pr view`, not taken on the report: the PR exists, its
+  diff is confined to `tools/check_open_issues.py`,
+  `.github/workflows/hardware-gate.yml`, and its own
+  `docs/architecture-evolution.md` §43 (this branch's `docs/architecture.md`
+  §17 is genuinely untouched, as promised), and it shows
+  `mergeStateStatus: BLOCKED` / `reviewDecision: REVIEW_REQUIRED` — the
+  same self-consistent, non-self-overridden state §17.5 already documents,
+  applied correctly by a session that had never read this file's prose,
+  only its kickoff instructions. It also independently caught a real error
+  in this session's own kickoff spec (listing `firmware/**` as a
+  disqualifying path, which its PR body correctly identifies as
+  re-coupling an intentionally-decoupled discipline for no protective
+  benefit) and added a self-referential guard and row-scoped evaluation
+  neither this session nor its kickoff prompt had specified — improvements
+  on the original design, not just faithful execution of it. This is the
+  concrete, positive resolution to §17.3 point 5's own worked example: the
+  session was never dead, exactly as the corrected model predicts. Full
+  design/verification detail belongs in PR #44's own addendum, not
+  duplicated here.
+- **Branch protection reverted again, same day — caught by a third
+  independent audit (cycle 34), verified four ways.** Cycle 34 (a later
+  scheduled overnight check-in) audited this PR and found §17.5/§17.1
+  asserting a superseded configuration: Kyosuke had instructed, at
+  `2026-09-04T02:40:56Z`, 「元に戻してください」, and the orchestrator
+  removed `required_pull_request_reviews` again. Independently confirmed
+  here, not taken on the relay: `gh api .../branches/main/protection`'s
+  top-level keys genuinely omit the rule; `reviewDecision` is empty on all
+  six then-open PRs (#39–#44); `session_store_sql` (local store) turn 465
+  of the creator session carries the exact verbatim instruction and its
+  execution, timestamped exactly as cited. §17.5 and §17.1 updated with a
+  forward-correcting paragraph recording this second transition — the
+  paragraph describing the first restoration is left standing, per this
+  document's own convention, as an accurate record of that window rather
+  than a mistake to erase.
+- **A genuine API trap, flagged by cycle 34 and independently
+  reproduced here before writing it down.** `gh api
+  .../branches/main/protection` (top-level) correctly omits
+  `required_pull_request_reviews` once the rule is off, but
+  `.../branches/main/protection/required_pull_request_reviews` (that
+  rule's own dedicated sub-endpoint) returns a confident, well-formed HTTP
+  200 with the rule's *stale, last-configured* content — no error, no
+  staleness signal, even though the rule is not in force. Querying both
+  endpoints against this repository at the same moment reproduces the
+  contradiction directly, not on cycle 34's report alone. Added as a new
+  §17.2 method note: querying an authoritative API is not the same as
+  querying the authoritative view of it — trust a resource's top-level key
+  *set*, not a narrower sub-endpoint's always-200 response, and corroborate
+  with an independent signal where one exists.
+- **Commit-author corruption, same day: three commits carried a wrong
+  author identity — caught by cycle 34, independently verified and
+  repaired.** Cause: the PR #44 session ran `git config user.email`/
+  `user.name` without `--global` inside a scratch worktree; since
+  `extensions.worktreeConfig` is not enabled on this repository (confirmed:
+  `git config --get extensions.worktreeConfig` returns nothing), that write
+  landed in the **shared** `.git/config` in the main checkout, which every
+  worktree — including this one — reads. For a window, this session's own
+  commits silently picked up that identity. Independently confirmed before
+  acting, not taken on the report: `git log --format='%an <%ae>'` showed
+  `62193ee`, `210ff0a`, `0bfb54c` authored as `Gate Test <test@example.com>`
+  (bounded exactly as cited, between the last clean commit `e3d14b8` and
+  the next clean one, `f3dc692`); local `user.name`/`user.email` were
+  already unset by the time this was checked, confirming the fix the PR
+  #44 session had already applied to the shared config after cycle 34
+  flagged the defect. Repaired here rather than left as a known defect:
+  verified nobody else had pushed to this branch since the last push
+  (`git fetch`
+  showed local and remote `HEAD` identical), then
+  `git rebase e3d14b8 --exec 'git commit --amend --no-edit --author=
+  "KyosukeT <ktanino10@github.com>"'`, confirmed **every rewritten
+  commit's tree hash matched its pre-rebase original exactly** (metadata-only
+  change, zero content risk — the same check cycle 34 had run for PR #44,
+  independently re-run here rather than assumed to transfer), re-ran
+  `check_id_uniqueness.py`/`check_agent_frontmatter.py` clean, then pushed
+  with `--force-with-lease` (not a bare `--force`) so the push would abort
+  if the remote had changed unexpectedly. `origin/main` was never touched —
+  this branch has not merged.
+- **Why this belongs here and sharpens §17.5's own point.** §17.5 already
+  argues commit-author fields can't distinguish a human from an autonomous
+  session acting through the same account. This incident is a stronger,
+  concrete case: here the author field was wrong in a way **no GitHub-side
+  API could have detected** — a purely local git-config artifact in a
+  *different* worktree, invisible to branch-protection logs, `merged_by`,
+  or any audit endpoint. Recorded here, in the evolution log, as a dated
+  incident rather than folded into §17.5's own policy prose — it is a
+  concrete case the existing claim already covers in substance, not a new
+  rule, per cycle 34's own suggested framing.
+- **Status**: implemented, PR opened, awaiting independent audit before
+  merge, deliberately left gate-blocked per its own §17.1 case-2 rule —
+  same process every prior change in this repository's history went
+  through.
+
 ## 43. Diff-Aware CRITICAL/HIGH Exemption for the Hardware Gate (Addendum — CI/tooling only)
 
 Numbered 43 rather than 42 because §42 ("Autonomous Operation &

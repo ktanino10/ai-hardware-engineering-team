@@ -1,0 +1,55 @@
+name: Mechanical<->PCB Sync Check
+
+# Guards against a real, dated incident this repo hit once and does not want
+# to hit silently again: a mechanical enclosure's own recorded board
+# geometry (pcb_length/pcb_width/mount_holes in a `.scad` source file)
+# drifting away from the real KiCad PCB layout it is supposed to fit, with
+# no automated signal until a scheduled audit loop happened to measure the
+# real geometry by hand (MISS-034, CRITICAL, validation/open-issues.md).
+# See tools/check_mechanical_pcb_sync.py and docs/workflow.md section 4.2.1
+# ("Cross-Discipline Handoff Snapshot Drift") for the full rationale.
+#
+# This is a separate workflow from hardware-gate.yml on purpose, mirroring
+# id-uniqueness-check.yml's own precedent -- it is a narrow, deterministic,
+# structured-data cross-check between two specific machine-generated file
+# formats, not part of the Design Complete gate's severity/status logic.
+#
+# NOT a required status check (unlike hardware-gate.yml/id-uniqueness-check.yml)
+# -- deliberately advisory today: only one (enclosure, PCB) project pair
+# exists in this repo so far, and this check's own failure mode (a real
+# geometry drift) should be triaged the same way MISS-034 itself was, not
+# treated as an unconditional merge-blocker before that triage happens.
+# Revisit this choice (promote to required) if this class of drift recurs.
+
+on:
+  pull_request:
+    paths:
+      - "hardware/mechanical/*.scad"
+      - "hardware/pcb/**/*.kicad_pcb"
+      - "tools/check_mechanical_pcb_sync.py"
+  push:
+    branches: [main]
+    paths:
+      - "hardware/mechanical/*.scad"
+      - "hardware/pcb/**/*.kicad_pcb"
+      - "tools/check_mechanical_pcb_sync.py"
+  workflow_dispatch: {}
+
+# Least-privilege GITHUB_TOKEN (CodeQL finding, PR #43): this job only
+# checks out the repo and runs a read-only Python script -- it never
+# writes to the repo, opens issues/PRs, or otherwise needs elevated
+# access, so the default (broader) token permissions are unnecessary.
+permissions:
+  contents: read
+
+jobs:
+  mechanical-pcb-sync:
+    name: Check enclosure board-geometry constants against the real PCB layout
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Run mechanical<->PCB sync check
+        run: python3 tools/check_mechanical_pcb_sync.py

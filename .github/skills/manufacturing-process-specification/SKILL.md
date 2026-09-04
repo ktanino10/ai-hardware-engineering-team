@@ -167,6 +167,70 @@ overhang angle, bridge span).
   unverified for the actual part (`ESTIMATE`) unless real, physical testing
   of that exact printed part has been performed.
 
+## Foundational Change Cascade Checklist (revising an existing process spec, not writing the first one)
+
+Added following this project's already-documented manufacturing precedent
+`MISS-021` (`validation/open-issues.md`): after the Rev 3.3 motor-voltage/RPM
+correction, `bench-imu-01-manufacturing-spec.md` still cited the superseded
+121.60 J / 69.74 m/s / 22,200 RPM figures in six places until a later audit
+found and corrected them. This is the Manufacturing discipline's own concrete
+instance of the broader snapshot-drift failure mode now documented in
+`docs/workflow.md` §4.2/§4.2.1: a downstream handoff artifact stayed
+internally consistent with *itself* while silently drifting out of sync with
+its live upstream Source of Truth. **Whenever you are revising an existing
+manufacturing/process document because a governing load-case fact changed —
+energy, RPM, mass, geometry, threat path, or which surface is primary vs.
+secondary — do not only patch the one sentence that first exposed the issue.
+Re-verify every category below against the *current* upstream figure(s):**
+
+1. **The load-case table and every repeated citation of it.** If the current
+   process spec quotes RPM, energy, mass, tip speed, launch radius, impact
+   direction, or names a specific governing requirement, grep the whole file
+   and re-check every repeated occurrence — not just the first table row or
+   summary paragraph. `MISS-021` exists precisely because six stale copies of
+   the same superseded figures survived one upstream correction.
+2. **Each process rationale keyed to the old number, not just the number
+   itself.** Re-read every infill / pattern / perimeter / orientation /
+   material rationale and ask: does this paragraph argue "100% infill because
+   121.60 J," "upright orientation because the primary strike is radial at
+   69.74 m/s," or otherwise depend on the prior magnitude or threat picture?
+   A numerical edit alone is not enough if the prose still reflects the old
+   severity or old failure mechanism.
+3. **Geometry-sensitive manufacturing assumptions.** If the upstream change is
+   geometric (for example a resize like `MISS-034`, longer unsupported spans,
+   a moved wall, a different flange width, altered mass distribution, or a
+   new primary load path), re-check whether wall-count, top/bottom-solid-layer
+   guidance, print orientation, or material rationale still matches the *new*
+   geometry rather than the shape that existed when the process spec was first
+   written. Manufacturing recommendations are downstream of geometry even
+   though they do not edit the geometry.
+4. **Primary-vs-secondary containment/load-path claims.** If the document says
+   one printed feature intercepts the hazard first and another is only backup,
+   re-derive that statement from the current upstream geometry/load-case
+   artifact rather than carrying it forward by habit. A geometry or threat-path
+   revision can invalidate which surface is actually load-bearing first, which
+   in turn changes which part most needs conservative shells/orientation.
+5. **Adequacy/disclaimer sections tied to the old severity picture.** Re-check
+   the "FDM adequate or not?" conclusion and the human-escalation wording
+   against the new governing figures. A higher corrected hazard can make a
+   formerly borderline recommendation clearly prototype-only; a lower corrected
+   hazard may still not make it validated, but the prose should reflect the
+   real current reason, not stale caution language copied forward.
+6. **Upstream re-verification from the live Source of Truth, not from a stale
+   snapshot note.** Per `docs/workflow.md` §4.2/§4.2.1, do not trust the last
+   downstream document that mentioned the figures. Re-open the current source
+   artifact that owns the load case (`hardware/mechanical/...-dimensional-spec.md`,
+   requirement text, schematic-side correction, or equivalent) and re-copy from
+   there this pass. If a figure has mixed-confidence inputs (`ASSUMPTION` /
+   `ESTIMATE` / `UNKNOWN`), preserve that lineage honestly instead of upgrading
+   certainty while touching the numbers.
+7. **Anything deliberately left out of the re-verification pass.** If you
+   conclude a foundational upstream change does *not* require reworking some
+   adjacent manufacturing claim, say so explicitly in the document handoff or
+   review notes with the reason ("board resize changed enclosure footprint but
+   not the flywheel containment load case"). Do not leave it as a silent
+   omission for a later audit to rediscover.
+
 ## When FDM is not adequate — escalate, do not rubber-stamp
 
 Do not let a written process specification imply a safety requirement is
