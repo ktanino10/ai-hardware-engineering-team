@@ -157,6 +157,29 @@ Z-stepping (e.g. the mounting flange rising above the stand plate/pinch
 guard) is what the front/side views are for. Verified by cross-checking
 against the front/side renders, not assumed.
 
+**A second, related limitation (found REV 5, MISS-043)**: an *interior
+floor* feature entirely enclosed within an assembly's own exterior walls
+is invisible from **all three** standard views, not just the top one.
+When `mid_span_support()` (a 6mm-tall pad on the PCB bay floor, well
+below the ~19mm wall rim) was added, `base-assembly-{top,front,side}.png`
+were re-rendered as a sanity check and found **pixel-identical
+(MD5-verified)** to the pre-pad renders — confirmed as a real, expected
+consequence of this rendering technique, not a stale/skipped render: the
+front/side elevation views show only the assembly's opaque exterior
+silhouette (the pad, entirely inside and shorter than the walls, is fully
+occluded, the same as looking at a closed box from outside), and the top
+view's flat per-normal shading gives the pad's same-colored, same-facing
+(+Z) top surface no visible boundary against the floor around it (same
+root cause as the Z-height-step limitation just above, applied to a
+feature that never breaks the assembly's own outer silhouette in any of
+the 3 fixed camera angles used here). **Net implication**: this method
+cannot visually verify small interior floor features at all — such
+features must be verified via the exported STL's own bounding-box/volume
+delta (as MISS-043 was: +169.16mm³ against the real board's own
+`mid_span_support()` addition, closely matching the ideal cylinder volume
+of 169.65mm³ for `$fn=48`'s own facet discretization), not via these 2D
+drawings.
+
 ### Regenerating the 2D drawings
 
 ```sh

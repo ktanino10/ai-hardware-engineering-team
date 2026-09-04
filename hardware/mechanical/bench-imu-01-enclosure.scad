@@ -283,6 +283,41 @@ standoff_pilot_dia   = 2.0;
 standoff_h           = 6.0;
 standoff_pilot_depth = 5.0;
 
+// --- Mid-span passive support pad (NEW, REV 5, MISS-043) ---
+// MH-5/MH-6's own removal above (real board has only 4 holes) did NOT
+// remove the PHYSICAL CONCERN that originally motivated them: Rev 3's own
+// comment (now-removed, quoted for the record in MISS-043) justified
+// MH-5/6 because "a board supported only at 4 corners risks excess
+// flex/vibration transmission near the motor-driver components" -- and
+// the real board (150mm) is 50% LONGER than the 100mm Rev 3 proposal that
+// raised that concern in the first place, so the underlying physical
+// worry is, if anything, stronger now, not weaker (independently flagged
+// by a sibling session's own PR #41/MISS-035 finding; see MISS-043 for
+// the full disclosure and this repo's own precedent that a mid-span
+// concern must be addressed, not silently dropped, when its enabling
+// hole disappears). This design does NOT have a real mid-span PCB
+// mounting hole to bolt a standoff into (the real board only has the 4
+// corner holes) -- adding one would be an Electronics-side PCB revision,
+// out of this Mechanical-only pass's own scope. What IS in this pass's
+// own scope: a PASSIVE (non-fastened) support pad the board simply RESTS
+// on, at the same height as the 4 real standoffs so it does not tilt or
+// bow the board, reducing (not eliminating) unsupported-span sag/flex at
+// the board's own physical mid-point. `bottom_component_clearance`=0
+// (interface A3: no bottom-side components populated) means this pad can
+// sit anywhere in XY without risking a component collision -- verified
+// against the real board's own component list this session
+// (`hardware/pcb/bench-imu-01/generate_pcb.py` PLACEMENT dict has zero
+// entries needing bottom-side clearance).
+mid_support_dia = standoff_od; // mm = 6.0. ASSUMPTION -- reuses the
+                    // existing standoff diameter for a consistent
+                    // print-boss family, not independently sized.
+mid_support_h   = standoff_h;  // mm = 6.0. DERIVED -- MUST equal
+                    // standoff_h exactly so the passive pad's own top
+                    // face sits at the same Z as the 4 real standoffs'
+                    // own top faces; a mismatched height here would
+                    // itself introduce a new bow/tilt defect, the
+                    // opposite of this feature's own purpose.
+
 // --- Single PCB/lid fastener type -- UNCHANGED M2.5 self-tap, used for all
 //     PCB standoffs (4) + all 4 PCB-lid corner tabs. Reserved
 //     EXCLUSIVELY for these static, low-duty joints -- Rev 3 introduces
@@ -312,15 +347,15 @@ pcb_bay_total_height = base_total_h + lid_roof_t;  // DERIVED = 23.1mm
                        // see fw_bay_total_height below for the other.)
 
 // --- XY footprint, PCB bay -- DERIVED unless noted ---
-interior_x = pcb_length + 2*board_xy_keepout;      // DERIVED = 103.0mm
-interior_y = pcb_width  + 2*board_xy_keepout;      // DERIVED = 53.0mm
-base_outer_x = interior_x + 2*wall_t;              // DERIVED = 107.0mm
-base_outer_y = interior_y + 2*wall_t;              // DERIVED = 57.0mm
+interior_x = pcb_length + 2*board_xy_keepout;      // DERIVED = 153.0mm (was 103.0mm pre-Rev-5)
+interior_y = pcb_width  + 2*board_xy_keepout;      // DERIVED = 98.0mm (was 53.0mm pre-Rev-5)
+base_outer_x = interior_x + 2*wall_t;              // DERIVED = 157.0mm (was 107.0mm pre-Rev-5)
+base_outer_y = interior_y + 2*wall_t;              // DERIVED = 102.0mm (was 57.0mm pre-Rev-5)
 
-lid_skirt_inner_x = base_outer_x + 2*fit_clearance;    // DERIVED = 107.4mm
-lid_skirt_inner_y = base_outer_y + 2*fit_clearance;    // DERIVED = 57.4mm
-lid_skirt_outer_x = lid_skirt_inner_x + 2*lid_skirt_t; // DERIVED = 111.4mm
-lid_skirt_outer_y = lid_skirt_inner_y + 2*lid_skirt_t; // DERIVED = 61.4mm
+lid_skirt_inner_x = base_outer_x + 2*fit_clearance;    // DERIVED = 157.4mm (was 107.4mm pre-Rev-5)
+lid_skirt_inner_y = base_outer_y + 2*fit_clearance;    // DERIVED = 102.4mm (was 57.4mm pre-Rev-5)
+lid_skirt_outer_x = lid_skirt_inner_x + 2*lid_skirt_t; // DERIVED = 161.4mm (was 111.4mm pre-Rev-5)
+lid_skirt_outer_y = lid_skirt_inner_y + 2*lid_skirt_t; // DERIVED = 106.4mm (was 61.4mm pre-Rev-5)
 lid_x0 = (base_outer_x - lid_skirt_outer_x) / 2;   // DERIVED = -2.2mm
 lid_y0 = (base_outer_y - lid_skirt_outer_y) / 2;   // DERIVED = -2.2mm (this
                        // specific -2.2/-2.2 result is unchanged from Rev 2
@@ -622,7 +657,31 @@ wire_bridge_h = wire_duct_dia + 2*wall_t; // DERIVED = 9.0mm, Z-span,
 //     minor trade-off since wires are flexible and floor-routing space is
 //     free, whereas footprint is the thing REQ-308 actually asks to
 //     minimize. ---
-fw_cx = base_outer_x / 2;              // DERIVED = 53.5mm
+// REV 5 DISCLOSURE (MISS-043, 2026-09-04, flagged by independent
+// cross-session review): the numbers in the paragraph immediately above
+// are BOTH stale after the MISS-034 PCB resize, but only ONE side is
+// honestly re-derivable this pass. The CHOSEN option's own real footprint
+// is corrected below (157x207mm = 32,499mm^2, computed from this file's
+// own current base_outer_x/shell_footprint_y -- see those variables'
+// own updated comments) -- the pre-Rev-5 "107x162mm" figure understated
+// it by ~47%, not a rounding difference. The REJECTED "centroid-aligned"
+// alternative's own "~88.5mm motor-zone X-centroid" and "140x160mm-class"
+// figures CANNOT be honestly recomputed here: both depend on the Rev 3
+// "motor zone" concept (a proposed X=70-100mm zone on the superseded
+// 100x50mm board), which MISS-037 (`validation/open-issues.md`) already
+// separately flags as not describing the real board's own actual
+// component placement at all. Re-deriving a real, current centroid-aligned
+// comparison would require first resolving MISS-037's own broader gap
+// (real connector/component positions), not something this narrower
+// annotation fix can respond to in isolation. **Net effect: whether
+// width-centering still wins on footprint at the real 150x95mm scale is
+// UNVERIFIED in either direction** -- the conclusion is preserved as
+// this file's own historical decision (still fully valid: `fw_cx`'s own
+// formula centers on the PCB bay regardless of board size, so nothing
+// about the actual built geometry depends on this comparison being
+// re-checked), but the comparison itself should not be read as
+// re-confirmed at the current scale.
+fw_cx = base_outer_x / 2;              // DERIVED = 78.5mm (was 53.5mm pre-Rev-5)
 fw_cy = fw_flange_or;                  // DERIVED = 52.5mm (places the
                     // flange's own outer edge exactly tangent to global
                     // Y=0, the assembly's own southernmost extent)
@@ -646,23 +705,26 @@ pcb_bay_y0 = fw_cy + fw_flange_or;     // DERIVED = 105.0mm (places the PCB
 // overhangs') -- corrected here, before this file was ever committed. See
 // dimensional-spec.md §3/§7 for the full plain-arithmetic derivation and
 // the caught-and-fixed narrative.
-shell_footprint_x = base_outer_x;               // DERIVED = 107.0mm (main
-                    // shell only -- PCB bay + flywheel bay walls/flange,
-                    // excludes every fastener protrusion below)
-shell_footprint_y = pcb_bay_y0 + base_outer_y;  // DERIVED = 162.0mm
+shell_footprint_x = base_outer_x;               // DERIVED = 157.0mm (was
+                    // 107.0mm pre-Rev-5; main shell only -- PCB bay +
+                    // flywheel bay walls/flange, excludes every fastener
+                    // protrusion below)
+shell_footprint_y = pcb_bay_y0 + base_outer_y;  // DERIVED = 207.0mm (was 162.0mm pre-Rev-5)
 
 // True assembled envelope, ALL protrusions included. X: the PCB LID's own
 // skirt (lid_skirt_outer_x) turns out to be the single widest X feature in
 // this whole assembly -- wider even than the containment cap's own skirt
 // (fw_flange_dia+2*fit_clearance+2*wall_t = 109.4mm) -- both were checked;
-// the lid wins by 2.0mm. Y: the containment cap's skirt sets the southern
+// the lid wins by 2.0mm (REV 5: now by 52.0mm, since lid_skirt_outer_x
+// grew with the board while the containment cap's own skirt did not).
+// Y: the containment cap's skirt sets the southern
 // extreme (it overhangs slightly past the flywheel flange's own Y=0
 // tangent point); the PCB lid's own corner tabs set the northern extreme
 // (the WIDER lid_tab_project reaches further out than the base's own
 // tab_project -- the same "lid tab is the true outward extreme" finding
 // Rev 2 first made, re-confirmed unchanged here since neither
 // tab_project/lid_tab_project changed).
-assembled_envelope_x = lid_skirt_outer_x;                  // DERIVED = 111.4mm
+assembled_envelope_x = lid_skirt_outer_x;                  // DERIVED = 161.4mm (was 111.4mm pre-Rev-5)
 cap_skirt_od          = fw_flange_dia + 2*fit_clearance + 2*wall_t; // = 109.4mm
 assembled_envelope_y_south = fw_cy - cap_skirt_od/2;       // DERIVED = -2.2mm
 assembled_envelope_y_north = pcb_bay_y0 + base_outer_y
@@ -1152,6 +1214,17 @@ module standoff() {
     }
 }
 
+module mid_span_support() {
+    // NEW, REV 5 (MISS-043). A solid (no pilot hole -- nothing fastens
+    // here) cylindrical pad, exactly `standoff_h` tall, that the board
+    // simply RESTS on at its own physical mid-span. See this module's own
+    // constants (mid_support_dia/_h) above for the full rationale: this
+    // is a passive flex/sag mitigation addressing the physical concern
+    // that originally motivated Rev 3's MH-5/6, which the real 4-hole
+    // board has no mounting hole to bolt a real standoff into.
+    cylinder(d = mid_support_dia, h = mid_support_h);
+}
+
 module base_standoffs() {
     // 4 instances (MH-1..4, the real board's own mounting-hole pattern --
     // REV 5 FIX, MISS-034: Rev 3's MH-5/6 never existed on the real board)
@@ -1160,6 +1233,13 @@ module base_standoffs() {
     for (m = mount_holes)
         translate([board_offset_x + m[0], board_offset_y + m[1], floor_t])
             standoff();
+    // NEW, REV 5 (MISS-043): one passive mid-span support pad, centered on
+    // the board's own physical midpoint (pcb_length/2, pcb_width/2) --
+    // the point of greatest expected sag for a plate supported only at
+    // its 4 corners, and confirmed clear of any real component (interface
+    // A3: bottom_component_clearance=0, no bottom-side parts populated).
+    translate([board_offset_x + pcb_length/2, board_offset_y + pcb_width/2, floor_t])
+        mid_span_support();
 }
 
 module base_tab(pos) {
