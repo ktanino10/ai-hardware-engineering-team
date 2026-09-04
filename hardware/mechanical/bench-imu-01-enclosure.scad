@@ -2400,3 +2400,75 @@ if (show_mode == "assembled") {
 // Mechanical Reviewer pass against this geometry is required next and has
 // not yet occurred -- do not treat this file as reviewed/approved.
 // ============================================================================
+
+// ============================================================================
+// REV 5 ADDENDUM TO END-OF-FILE BANNER (new, additive only -- the Rev 3
+// banner and the Rev 4/4.1 addenda immediately above are all unchanged).
+//
+// STALENESS NOTE on the Rev 4.1 addendum immediately above (found by an
+// independent cross-session review, MISS-049; not caught by this
+// Mechanical Lead's own prior passes -- the same class of gap MISS-044
+// already found 12 instances of elsewhere in this file, recurring here
+// in the one place explicitly designed to "travel with the file"):
+//
+// 1. "MISS-023 is only PARTIALLY closed by pinch_guard() alone -- it
+//    covers ~77.7% of the exposed hazard-band area with an 11.4mm
+//    residual radial gap" is STALE and now directly contradicts this
+//    file's own current geometry. MISS-023 went through two further
+//    revisions since that sentence was written: first the Rev 5 PCB
+//    resize (100x50mm -> real 150x95mm) grew `rotating_env_max_r`
+//    126.424mm -> 176.259mm as a side effect, degrading the SAME
+//    unchanged 115.0mm guard's coverage to ~35.0% (re-opening MISS-023
+//    from its own then-ACCEPTED-RISK disposition back to OPEN); then the
+//    human Chief Engineer directly decided full coverage (verbatim,
+//    "完全カバーを選んでください"), implemented by growing
+//    `pinch_guard_or` to 176.3mm. **Current, correct status: MISS-023 is
+//    RESOLVED -- 100% coverage, 0.0mm residual gap** (matching
+//    `pinch_guard()`'s own header comment, ~line 1926, which was already
+//    correct -- this end-of-file block was the one place in the file
+//    still stating the superseded figures). See
+//    `validation/open-issues.md` MISS-023 for the full resolution.
+// 2. "Neither finding should be closed as a 'full, no-caveats fix'" no
+//    longer holds for MISS-023 specifically (it is now a genuine full
+//    closure, human-decided and independently re-verified) -- it remains
+//    accurate for MISS-024, which is still a bounded/proceduralized
+//    mitigation (turn-count limit + service-loop spec + index pointer +
+//    anchor tabs), not a full realization of REQ-012's own aspirational
+//    "ideally continuous/unlimited" rotation case. MISS-024 itself is
+//    otherwise UNAFFECTED by the Rev 5 resize or MISS-023's own
+//    full-closure decision -- J1/J4's own board-local positions,
+//    `pinch_guard_turn_limit`, and the anchor-tab/index-pointer geometry
+//    are all formula-independent of `pcb_length`/`pcb_width`/
+//    `pinch_guard_or` (only `cable_service_loop_min`, a pure derived
+//    formula of `rotating_env_max_r`, moved -- 2.5m -> 3.75m -- and that
+//    move was itself fixed directly during the Rev 5 pass, not left
+//    stale).
+// 3. "This Rev 4.1 addition has NOT been independently reviewed" is
+//    STALE. Independent review has since occurred twice: Mechanical
+//    Reviewer Cycle 11 (`validation/design-review.md`) re-verified the
+//    Rev 5 PCB resize itself (board geometry, parametric cascade, all 5
+//    STLs, the pinch_guard() print_layout quadrant-cut fix, and the
+//    rotating-envelope/coverage numbers behind MISS-023's own
+//    re-opening) and returned CONDITIONAL, blocked only by MISS-023's
+//    then-still-open disposition. Mechanical Reviewer Cycle 12 then
+//    independently re-verified MISS-023's own full-closure implementation
+//    specifically (direct boolean CSG non-overlap, coverage/gap
+//    recomputation, mass re-measurement, the corrected assembled-envelope
+//    and print-quadrant-comment findings) and returned PASS. Do not
+//    treat this staleness note as implying the file is now permanently
+//    exempt from needing review after a future change -- any FURTHER
+//    revision to this file still requires its own fresh independent
+//    pass, exactly as this same discipline has required at every prior
+//    revision.
+//
+// Tooling honesty (re-verified this session, not assumed carried over):
+// no CAD/3D modeling MCP tool is connected in this environment (checked
+// again this pass). The local `openscad` CLI (v2026.08.30) IS present
+// and was used throughout -- manifold renders, live `echo()` cascade
+// verification, and the direct `intersection()` boolean CSG proof behind
+// MISS-023's own closure. STL exports were produced and independently
+// measured via `trimesh` (bounding boxes, volumes, mass) -- unlike the
+// Rev 4/4.1 addenda above, this pass's own claims are not "no STL export
+// has been produced," since full STL re-export/re-measurement was
+// central to how this pass's own claims were verified.
+// ============================================================================
