@@ -35,6 +35,13 @@ on:
       - "tools/check_mechanical_pcb_sync.py"
   workflow_dispatch: {}
 
+# Least-privilege GITHUB_TOKEN (CodeQL finding, PR #43): this job only
+# checks out the repo and runs a read-only Python script -- it never
+# writes to the repo, opens issues/PRs, or otherwise needs elevated
+# access, so the default (broader) token permissions are unnecessary.
+permissions:
+  contents: read
+
 jobs:
   mechanical-pcb-sync:
     name: Check enclosure board-geometry constants against the real PCB layout
