@@ -2314,6 +2314,29 @@ and this addendum only.
   `hardware/**`, `bom/**`, `firmware/**`, `requirements/**`, `validation/**`,
   `datasheets/**`; `docs/workflow.md`; `README.md`;
   `tools/check_open_issues.py`; `.github/workflows/hardware-gate.yml`.
+- **Closing note: the commissioned session completed, resolving the
+  session-liveness question with a concrete positive.** `914e4e71`
+  reported completion — **PR #44**, "ci: diff-aware CRITICAL/HIGH
+  exemption for hardware-gate," open against `main`. Independently
+  confirmed via `gh pr view`, not taken on the report: the PR exists, its
+  diff is confined to `tools/check_open_issues.py`,
+  `.github/workflows/hardware-gate.yml`, and its own
+  `docs/architecture-evolution.md` §43 (this branch's `docs/architecture.md`
+  §17 is genuinely untouched, as promised), and it shows
+  `mergeStateStatus: BLOCKED` / `reviewDecision: REVIEW_REQUIRED` — the
+  same self-consistent, non-self-overridden state §17.5 already documents,
+  applied correctly by a session that had never read this file's prose,
+  only its kickoff instructions. It also independently caught a real error
+  in this session's own kickoff spec (listing `firmware/**` as a
+  disqualifying path, which its PR body correctly identifies as
+  re-coupling an intentionally-decoupled discipline for no protective
+  benefit) and added a self-referential guard and row-scoped evaluation
+  neither this session nor its kickoff prompt had specified — improvements
+  on the original design, not just faithful execution of it. This is the
+  concrete, positive resolution to §17.3 point 5's own worked example: the
+  session was never dead, exactly as the corrected model predicts. Full
+  design/verification detail belongs in PR #44's own addendum, not
+  duplicated here.
 - **Status**: implemented, PR opened, awaiting independent audit before
   merge, deliberately left gate-blocked per its own §17.1 case-2 rule —
   same process every prior change in this repository's history went
