@@ -631,6 +631,108 @@ human-stated requirement, an ASSUMPTION/ESTIMATE with no upstream file to
 diff against), this narrower automated check is not applicable, and §4.2's
 own general, reactive convention remains the right tool.
 
+### 4.3 Audit-Method Failure on Single-Line Records (Pattern-Grep vs. Whole-Line Diff)
+
+§4.1 and §4.2 are failures in how *authors* propagate a change. This one
+is a failure in how a *reviewer* reads it, and it produced a worse outcome
+than either: an audit that blocked and reverted a change that was, in
+fact, correct and human-approved.
+
+The mechanism is structural, not carelessness. `validation/open-issues.md`
+and `validation/change-log.md` store one record per **physical line** —
+a MISS/ISS/ECO row's entire Notes column, often several hundred words, is
+part of the same line as its `Opened`/`Resolved` cells. So a reviewer who
+audits a diff by grepping for the *shape* of the expected change
+(`git diff | grep -E "2026-09-[0-9]{2}"`, a word-diff filtered to date
+tokens, etc.) will see the date edit and **structurally cannot see prose
+added to the same row in the same commit**. The grep does not fail loudly;
+it returns exactly what was asked for, and the reviewer concludes the
+change was narrower than it was.
+
+Two further effects compound it, and both actually occurred:
+
+- **Reporting a self-inflicted absence as the original defect.** If the
+  reviewer reverts on that mistaken reading, the revert deletes the prose
+  it never saw. A later audit of the resulting state then finds that
+  context genuinely missing — and can report it as a defect in the
+  *original* change, when it is an artifact of the reviewer's own revert.
+  The evidence for the mistake has been destroyed by the mistake.
+- **Deriving a correct number that answers the wrong question.** An
+  independently-computed value can be arithmetically right and still be
+  the wrong basis for a block, if a human has already chosen a different
+  value on purpose. Correct arithmetic is not the same as a correct
+  premise.
+
+This is not hypothetical — it happened in this repository, and the record
+is deliberately preserved rather than tidied away:
+
+- **ECO-063**: a scheduled audit reverted MISS-016's human `ACCEPTED-RISK`
+  sign-off date **twice** (ECO-060/PR #51, ECO-062/PR #53), on the premise
+  that `2026-09-04` was a miscomputed historical date which should have
+  been the git-verified `2026-09-01`, and that the edit lacked human
+  authority. Both premises were false: the human Chief Engineer had been
+  offered three named options and answered verbatim `今日で再承認`
+  ("re-affirm at today's date"), explicitly declining the `2026-09-01`
+  option. The value was his deliberate choice, and the authority existed.
+- **Same cycle**: that audit also reported the row as self-contradicting
+  when the change under review had *already* added a paragraph reconciling
+  the two dates — missed precisely by the pattern-grep method above, then
+  deleted by the revert.
+- **ECO-064**: the same audit asserted the changes had been "self-merged
+  before independent audit completed." The merge commits (`7bac4e1`,
+  `89964d4`) each record a documented independent audit by a *different*
+  session. What actually occurred was two concurrent independent audits
+  racing, seconds apart. A governance recommendation built on that false
+  premise had to be withdrawn.
+- **ECO-065**: the same audit labelled its own reverts
+  `Approved by: PENDING — NOT AI-approved` and then merged them itself —
+  applying a human-approval standard to a peer that it did not apply to
+  its own merges. Caught by that peer, not self-caught.
+
+**Resolution convention, empirically grounded (judgment still applies —
+this is not a rigid rule):**
+
+1. **Read the whole changed line on single-line records.** For a diff
+   touching `validation/open-issues.md` or `validation/change-log.md`,
+   read the full before/after of each changed row — `git diff -U0 --
+   <file>` and actually read it, or diff the extracted row. Never let a
+   pattern-grep for the expected token be the *only* look at a row you are
+   about to act on. A `+4/-3` diffstat on these files can carry several
+   hundred words of prose.
+2. **Verify the human-decision record before calling an edit
+   unauthorized.** For anything touching a named-human disposition
+   (`ACCEPTED-RISK`, a Design Complete gate, a safety sign-off), query the
+   creator session's own turn history via `session_store_sql` per
+   `docs/architecture.md` §17.2 *before* blocking — not after. In the case
+   above the decision was plainly visible there; it simply was not looked
+   for. Distinguish "I checked the record and the approval is absent" from
+   "I have not checked" — only the first justifies a block. Note also that
+   a query returning zero rows for an entire session is a *vacuous
+   negative*: an instrument that cannot tell "did not happen" from "not
+   recorded," and not evidence of absence.
+3. **Prefer a blocking review over a unilateral revert on a human
+   record.** A review comment is reversible and costs nothing if wrong; a
+   revert of a human's own decision destroys context and can outrun the
+   evidence that would have corrected it. Reserve reverting for cases
+   where the record has actually been checked.
+4. **Do not write `PENDING`/`NOT AI-approved` on a change and then merge
+   it.** Either wait for the human, or state plainly that it is being
+   landed on the author's own authority and why (ECO-064 and ECO-065 both
+   take the latter form deliberately).
+5. **Correct in public, at the same visibility as the original claim.**
+   Where an audit's accusation was recorded in `validation/change-log.md`
+   and on PRs, the withdrawal belongs in the same places — not only in a
+   summary the next reader may never see.
+
+Deliberately **not** a CI script or a new reviewer role. The failure is a
+reading habit under time pressure, not something a checker can assert:
+"was this diff read in full" is not machine-checkable, and the useful
+guard (query the decision record before blocking) is a sequencing rule for
+a human-facing judgment call. This mirrors §4.1's and §4.2's own invocation
+of `docs/architecture.md` §14's caution against role/file proliferation
+ahead of demonstrated need.
+
+
 ## 5. How to Start a New Design Cycle
 
 Use `docs/commands/make-circuit.md` for the copy-pasteable kickoff prompt.
