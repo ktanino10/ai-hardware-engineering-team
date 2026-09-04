@@ -244,12 +244,16 @@ be an Electronics-side PCB revision, out of this file's own Mechanical
 scope). `bench-imu-01-enclosure.scad` now adds a **passive (non-fastened)
 mid-span support pad** (`mid_span_support()`, ASSUMPTION) that the board
 simply rests on at its own physical midpoint, as a partial mitigation that
-does not require a PCB revision — see
+does not require a PCB revision — deliberately undersized 0.4mm below the
+4 real standoffs' own height (`mid_support_gap`, MISS-045 — biases the
+pad toward a benign "travel limiter" role rather than an at-rest preload
+that a real, in-spec board bow could otherwise turn harmful) — see
 `bench-imu-01-dimensional-spec.md`'s own new subsection for the full
-rationale, and MISS-043 (`validation/open-issues.md`) for the complete
-disclosure, including this mitigation's own real limitations (not
-fastened, no real vibration/FEA analysis performed, not a substitute for
-a true fastened mid-span mounting point).
+rationale, and MISS-043/MISS-045 (`validation/open-issues.md`) for the
+complete disclosure, including this mitigation's own real limitations (not
+fastened, no real vibration/FEA analysis performed, the 0.4mm height bias
+not independently verified by a manufacturing-process-level analysis, not
+a substitute for a true fastened mid-span mounting point).
 
 All four holes assume M2.5 screws with a standard 0.3mm/side clearance
 (2.5+0.3×2=3.1mm → rounded to a common 2.8mm clearance-drill convention,

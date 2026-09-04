@@ -283,7 +283,7 @@ standoff_pilot_dia   = 2.0;
 standoff_h           = 6.0;
 standoff_pilot_depth = 5.0;
 
-// --- Mid-span passive support pad (NEW, REV 5, MISS-043) ---
+// --- Mid-span passive support pad (NEW, REV 5, MISS-043; height revised MISS-045) ---
 // MH-5/MH-6's own removal above (real board has only 4 holes) did NOT
 // remove the PHYSICAL CONCERN that originally motivated them: Rev 3's own
 // comment (now-removed, quoted for the record in MISS-043) justified
@@ -300,23 +300,70 @@ standoff_pilot_depth = 5.0;
 // corner holes) -- adding one would be an Electronics-side PCB revision,
 // out of this Mechanical-only pass's own scope. What IS in this pass's
 // own scope: a PASSIVE (non-fastened) support pad the board simply RESTS
-// on, at the same height as the 4 real standoffs so it does not tilt or
-// bow the board, reducing (not eliminating) unsupported-span sag/flex at
-// the board's own physical mid-point. `bottom_component_clearance`=0
-// (interface A3: no bottom-side components populated) means this pad can
-// sit anywhere in XY without risking a component collision -- verified
-// against the real board's own component list this session
-// (`hardware/pcb/bench-imu-01/generate_pcb.py` PLACEMENT dict has zero
-// entries needing bottom-side clearance).
+// on, at the board's own physical mid-point, reducing (not eliminating)
+// unsupported-span sag/flex there.
+//
+// Placement-safety citation CORRECTED, MISS-045 (independently found:
+// the original citation below, `bottom_component_clearance`=0, does not
+// itself cover through-hole lead/via protrusion, which is what actually
+// occupies the space directly under a populated board -- a real gap in
+// the original justification, not merely an imprecise phrasing). The
+// citation that actually covers this hazard, re-derived directly from the
+// raw `.kicad_pcb` this pass: of the board's 10 through-hole footprints,
+// the nearest to this pad's own board-local center (75, 47.5) is
+// `SW_PUSH_6mm` at (60, 58), 18.31mm away -- versus this pad's own
+// 3.0mm radius, a wide margin; separately, 0 of the board's 42 vias fall
+// within 9.0mm of that same center. `bottom_component_clearance`=0 (no
+// bottom-side SMT components) remains true and is retained as
+// supporting context, but is not by itself the check that rules out a
+// physical collision.
+//
+// HEIGHT rationale CORRECTED, MISS-045 (independently found: the
+// original "MUST equal standoff_h exactly" reasoning below assumed a
+// perfectly flat board, which is not a real manufacturing condition).
+// IPC-6012 permits up to 0.75% bow/twist (this board uses SMT
+// components, so the SMT figure applies, not the 1.5% through-hole-only
+// figure) measured across a board's largest dimension -- over this
+// board's 150mm, that is up to +/-1.125mm of IN-SPEC deviation from
+// flat, concentrated (by construction) at the mid-point, exactly where
+// this pad sits. A pad at EXACTLY the same height as the 4 corner
+// standoffs is not the safe choice this originally assumed: if the real
+// board bows upward at center, the pad never contacts anything (merely
+// inert -- harmless); but if it bows DOWNWARD at center, the pad
+// contacts FIRST, and tightening the 4 real corner fasteners afterward
+// forces the board to flex OVER the pad -- a permanent pre-load that
+// itself introduces the exact mid-span flex stress this feature exists
+// to relieve. The two error directions are NOT symmetric (too-short is
+// merely inert; too-tall is actively harmful), so nominal-exact is the
+// wrong target -- the design should bias into the benign (too-short)
+// direction. Fixed by undersizing this pad by `mid_support_gap` (below)
+// relative to `standoff_h`, so it acts as a passive TRAVEL LIMITER that
+// only engages once real sag exceeds the disclosed in-spec bow band,
+// rather than a preload at rest. Residual, disclosed limitation (not
+// silently accepted): this is a CAD-level design bias, not a
+// manufacturing-process-verified one -- whether a real FDM print
+// reliably realizes this exact 0.4mm gap (first-layer squish, bed-level
+// variance, per-print calibration drift) has not been separately
+// verified by a Manufacturing-Engineer-level process analysis; flagged
+// as a candidate for that discipline's review, not resolved here.
 mid_support_dia = standoff_od; // mm = 6.0. ASSUMPTION -- reuses the
                     // existing standoff diameter for a consistent
                     // print-boss family, not independently sized.
-mid_support_h   = standoff_h;  // mm = 6.0. DERIVED -- MUST equal
-                    // standoff_h exactly so the passive pad's own top
-                    // face sits at the same Z as the 4 real standoffs'
-                    // own top faces; a mismatched height here would
-                    // itself introduce a new bow/tilt defect, the
-                    // opposite of this feature's own purpose.
+mid_support_gap = 0.4; // mm, ASSUMPTION, new MISS-045. Deliberate
+                    // undersizing below `standoff_h`, chosen from the
+                    // middle of a 0.3-0.5mm suggested range -- small
+                    // relative to the disclosed +/-1.125mm in-spec bow
+                    // band (so it still meaningfully caps deflection
+                    // well before the unsupported span's own full sag
+                    // potential is reached), but large enough to clear
+                    // ordinary dimensional noise between this pad and
+                    // the 4 standoffs (both printed in the same part, at
+                    // the same nominal height, from the same datum --
+                    // so print-to-print Z-accuracy is NOT the dominant
+                    // term here; real board bow is).
+mid_support_h   = standoff_h - mid_support_gap; // mm = 5.6 (was 6.0,
+                    // exactly `standoff_h` -- MISS-045). DERIVED.
+
 
 // --- Single PCB/lid fastener type -- UNCHANGED M2.5 self-tap, used for all
 //     PCB standoffs (4) + all 4 PCB-lid corner tabs. Reserved
