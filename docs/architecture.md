@@ -626,11 +626,12 @@ framework can add them without restructuring)
 | **Test Engineer** | Owns `validation/bring-up-procedure.md` formally, designs bench test plans, HIL/environmental test plans | When bring-up moves beyond a one-off MVP bench test |
 | **Datasheet Specialist** | Advanced/high-volume operator of `.github/skills/datasheet-analysis/SKILL.md`; owns `datasheets/evidence-log.md` quality and consistency | When datasheet volume/complexity outgrows ad hoc extraction by whichever agent needs a number |
 | **Safety/Compliance Reviewer** | Regulatory/standards review (e.g. UL/CE/FCC/EMC compliance where applicable) | When the project needs to target a regulated market or a safety-relevant certification |
+| ~~**Systems Engineer**~~ **[IMPLEMENTED — Phase 7 of the multidisciplinary evolution, see `docs/architecture-evolution.md` §43]** | Interface Control for cross-discipline boundary contracts (Electronics ⇔ Mechanical ⇔ Firmware, e.g. `hardware/mechanical-interface.md`); technical trade-off criteria for "which discipline yields" when Hardware Lead's mediation (`docs/workflow.md` §3) surfaces a genuine engineering trade-off, not a process disagreement; methodology ownership for proactive interface-drift detection (e.g. `tools/check_mechanical_pcb_sync.py`) | Met: **MISS-034** (CRITICAL, `validation/open-issues.md`) — a cross-discipline board-geometry interface contract drifted silently for 2+ days across 3 merged PRs because no role owned the *boundary itself* (only each side's own internal self-consistency), caught only by an unrelated scheduled audit. Combined with the human Chief Engineer's own repeated, increasingly specific request across one session for exactly this kind of judgment role. See `.github/agents/systems-engineer.agent.md`, `.github/skills/systems-integration/SKILL.md` |
 
 These are **not** created as `.github/agents/*.agent.md` files yet (except
-Firmware Engineer, Power Engineer, and Firmware Reviewer, now implemented
-above) — introduce the rest only when their trigger condition is met, to
-avoid role/file proliferation ahead of actual need.
+Firmware Engineer, Power Engineer, Firmware Reviewer, and Systems Engineer,
+now implemented above) — introduce the rest only when their trigger
+condition is met, to avoid role/file proliferation ahead of actual need.
 
 **Manufacturing Engineer** (§3, `.github/agents/manufacturing-engineer.agent.md`,
 Phase 4) is a fourth implemented discipline **not previously listed in this
@@ -642,6 +643,34 @@ manufacturing process parameters — infill, wall/perimeter count, print
 orientation, material — that determine whether a fabricated part actually
 has that solid material once printed). See
 `docs/architecture-evolution.md` §35 for the full, dated trigger record.
+
+**Systems Engineer** (`.github/agents/systems-engineer.agent.md`, Phase 7 of
+the multidisciplinary evolution) is, like Manufacturing Engineer above, not
+previously listed in this table before its own addition — it was never a
+pre-registered future role with its own named trigger either. Unlike
+Manufacturing Engineer (recorded in prose only, with no table row), it is
+given a struck-through/`[IMPLEMENTED]` row above, consistent with the Power
+Engineer/PCB Engineer/Firmware Engineer pattern, because its own trigger
+reads naturally as filling a gap this table's own Electronics/Mechanical-
+boundary rows had never named. It is also unlike every prior addition in a
+different way: it is not "Electronics-adjacent" (Power Engineer, PCB
+Engineer) or "Mechanical-adjacent" (Manufacturing Engineer) — it spans all
+three disciplines from its own introduction, cross-cutting like Hardware
+Reviewer rather than tied to one subsystem's arrival the way Power Engineer/
+Manufacturing Engineer were. It does not take over any existing artifact's
+ownership: `hardware/mechanical-interface.md` remains the Mechanical Lead's
+own file to populate (`.github/agents/mechanical-lead.agent.md`), and
+`tools/check_mechanical_pcb_sync.py` remains a standing CI mechanism already
+consulted by the Mechanical Reviewer's own Foundational Change Cascade
+Checklist (`.github/skills/mechanical-review/SKILL.md`) — Systems Engineer's
+role is judgment and methodology ownership across these existing artifacts/
+mechanisms, not a new competing owner of any one of them. This addition's own
+§3 "Agents (MVP)" table row and §16 Directory Map entry are deliberately left
+for a follow-up change, not silently added here, since this addition's own
+scope was explicitly bounded to this table, `docs/architecture-evolution.md`,
+and `docs/workflow.md` §3 — see `docs/architecture-evolution.md` §43 for the
+full, dated trigger record (MISS-034) and the repeated human request that led
+to it.
 
 ## 15. Evaluation
 

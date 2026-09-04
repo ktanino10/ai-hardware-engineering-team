@@ -307,13 +307,34 @@ severity.
    against `requirements/` and the evidence log. Request missing evidence
    from either side if the picture is incomplete. Optionally invoke
    `rubber-duck` for a neutral third read of the disagreement itself.
-3. **Escalate if still unresolved.** Genuine trade-offs, safety-relevant
+3. **Route a genuine cross-discipline technical trade-off to Systems
+   Engineer.** If step 2's mediation determines this is a substantive
+   Electrical-vs-Mechanical (or vs. Firmware) engineering trade-off — not a
+   communication misunderstanding or an evidence gap that step 2 alone
+   resolves — hand it to the Systems Engineer
+   (`.github/agents/systems-engineer.agent.md`,
+   `.github/skills/systems-integration/SKILL.md`) to apply its trade-off
+   criteria (which side rests on a verified constraint vs. an unvalidated
+   assumption; the cost/risk of changing each side, including
+   already-independently-reviewed work that would be invalidated;
+   preserving already-validated work where possible; explicitly surfacing
+   ripple effects before a resolution is finalized) and produce a
+   recommendation. Added following MISS-034
+   (`docs/architecture-evolution.md` §43), where exactly this class of
+   disagreement — which discipline's stale figure should yield — had a
+   mediation *procedure* to surface it but no substantive technical criteria
+   to resolve it once surfaced.
+4. **Escalate if still unresolved.** Genuine trade-offs, safety-relevant
    ambiguity, or business/schedule trade-offs go to the human Chief Engineer
    as a short decision brief: both positions, evidence, trade-offs, and the
-   Lead's recommendation if it has one. The human decides — this is the same
+   Lead's recommendation — or, where step 3 applied, the Systems Engineer's
+   recommendation — if either has one. The human decides — this is the same
    authority already established for architecture/major-component decisions
-   (architecture.md §10), not a new channel.
-4. **Record the outcome.** Log the resolution and rationale in
+   (architecture.md §10), not a new channel. The Systems Engineer's own
+   recommendation is never self-executing on a safety-relevant or
+   architecture-level question (`docs/architecture.md` §10) — it informs
+   this escalation, it does not replace it.
+5. **Record the outcome.** Log the resolution and rationale in
    `validation/change-log.md` (if it changes something already designed) and/
    or `validation/open-issues.md` (if it resolves/reclassifies a finding),
    with cross-references to the Evidence IDs used.

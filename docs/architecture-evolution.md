@@ -2409,3 +2409,110 @@ and this addendum only.
   same process every prior change in this repository's history went
   through.
 
+## 43. Systems Engineer — Interface Control & Cross-Discipline Trade-off Judgment (Phase 7 of the multidisciplinary evolution)
+
+Added a new agent role, **Systems Engineer**
+(`.github/agents/systems-engineer.agent.md`,
+`.github/skills/systems-integration/SKILL.md`), owning two things nothing in
+this framework owned before: the technical content of cross-discipline
+boundary contracts (Electronics ⇔ Mechanical ⇔ Firmware), and the substantive
+engineering criteria for deciding which discipline should yield when two
+genuinely conflict — as distinct from Hardware Lead's existing *procedure*
+for mediating that disagreement (`docs/workflow.md` §3), which had a process
+for surfacing conflict but no criteria for resolving one once surfaced.
+
+- **Trigger, stated honestly as two real, independent things, not one
+  dressed up as the other**:
+  1. **MISS-034** (CRITICAL, `validation/open-issues.md`, RESOLVED) — the
+     concrete, dated incident. `hardware/mechanical-interface.md` recorded a
+     100×50mm board (populated `2026-08-31`, commit `350ac36`, a genuine
+     proposal at the time) for over 2 days and across 3 merged PRs after the
+     real PCB was laid out at 150×95mm (`2026-09-02`, commit `a454b0c`, a
+     legitimate Electronics-side change). The board did not physically fit
+     the enclosure built for it — longer in X (150mm) than the entire base
+     assembly (123mm). Every review cycle involved was internally
+     self-consistent in isolation: Hardware Reviewer's cycles reviewed the
+     PCB, which was correct; Mechanical Reviewer's cycles 5-9 reviewed the
+     enclosure against its own recorded interface snapshot, which was also
+     internally consistent. Nothing owned the *seam* between the two
+     snapshots. Caught only by Mechanical Reviewer Cycle 10's own scheduled
+     autonomous post-merge audit, measuring real geometry by hand — not by
+     any agent's own design or review process. Resolving it required a real
+     Chief-Engineer-level architecture call ("which side moves") that this
+     framework had a Human-in-the-loop gate for (`docs/architecture.md` §10)
+     but no substantive engineering criteria to *prepare* that decision with
+     — Hardware Lead's mediation procedure (`docs/workflow.md` §3) covered
+     "state positions with evidence" and "escalate if unresolved," but not
+     "here is how to weigh a verified constraint against an unvalidated
+     assumption, or how to weigh change cost against preserving already-
+     validated work." The fix itself then produced real, dated ripple
+     effects that had to be caught by separate, later passes rather than
+     anticipated up front: **MISS-023** (HIGH) re-opened from a prior human
+     `ACCEPTED-RISK` whose 126.424mm hazard-radius/77.7%-coverage reasoning
+     the resize invalidated, and **MISS-047** (MEDIUM, resolved) — an
+     assembled-envelope calculation gap that had existed since Rev 4.1 but
+     only became visually obvious once the resize made it dominate the
+     reading. **MISS-037** (MEDIUM, still OPEN as of this writing) —
+     connector/component cutout positions never re-verified against the real
+     PCB placement — remains a live, concrete pointer for this new role's
+     first practical use.
+  2. **The human Chief Engineer's own repeated, increasingly specific
+     request**, across this same session: first "a system-engineer-like
+     orchestrator role," then refined to "an agent that can judge which
+     discipline should yield when they conflict," then finally explicit
+     approval to create a new system/design-level agent, contingent on no
+     contradiction with existing roles — checked (see the role-boundary
+     resolution below) and confirmed clear.
+  Neither alone would have been sufficient grounds by this project's own
+  standard (`docs/architecture.md` §14's own repeated "avoid role/file
+  proliferation ahead of actual need" caution) — a single dated incident
+  without a standing human ask could plausibly have been left as a one-off
+  process note; a role request without a concrete, named failure mode to
+  scope it against would have risked exactly the abstract "what does a
+  systems engineer do in general" role definition this addition's own
+  scoping work explicitly avoided. Both together are what justified it.
+- **Role-boundary check performed before writing anything (per this
+  project's own standing practice of checking before creating, not after)**:
+  the natural first reading of "own the boundary contracts" would have Systems
+  Engineer take over `hardware/mechanical-interface.md`, which would directly
+  contradict Mechanical Lead's own existing, explicit, sole ownership of that
+  file (`.github/agents/mechanical-lead.agent.md`: "You are the single owner
+  of the mechanical/enclosure geometry state for this project — do not let a
+  second mechanical agent maintain a competing model of the same geometry").
+  Resolved, not escalated as a contradiction, because a clean non-overlapping
+  split already exists in standard systems-engineering practice and fits this
+  framework's own conventions: Mechanical Lead keeps writing the file's
+  content; Systems Engineer audits it against its live upstream Source of
+  Truth and owns the trade-off criteria for boundary disputes about it,
+  exactly the same "recommend, don't take over" pattern this framework
+  already uses for Power Engineer (defines what a rail must deliver; Circuit
+  Engineer implements it) and Manufacturing Engineer (specifies process
+  parameters; never self-certifies, Mechanical Reviewer independently
+  cross-checks).
+- **What was added**: `.github/agents/systems-engineer.agent.md` (frontmatter
+  `reports_to: hardware-lead`, cross-cutting `handoff_from`/`handoff_to` like
+  Hardware Reviewer rather than a single linear pipeline like Power Engineer,
+  since any discipline lead can surface a cross-discipline boundary concern);
+  `.github/skills/systems-integration/SKILL.md` (the four trade-off criteria
+  — verified constraint vs. unvalidated assumption; change cost/risk
+  including already-reviewed work invalidated; preserving already-validated
+  work; explicitly surfacing ripple effects before deciding — plus a MISS-034
+  worked example and the interface-drift-detection methodology connecting to
+  `tools/check_mechanical_pcb_sync.py`); a `docs/architecture.md` §14 table
+  row + explanatory paragraph; and a `docs/workflow.md` §3 amendment routing
+  a genuine cross-discipline technical trade-off through this role before
+  (not instead of) human escalation.
+- **Deliberately not touched, flagged rather than silently expanded into**:
+  `docs/architecture.md` §3's "Agents (MVP)" table (every other implemented
+  role has a row there; this addition's own scope was explicitly bounded to
+  §14) and §16's Directory Map (already stale before this addition — it does
+  not list `tools/check_mechanical_pcb_sync.py` or
+  `tools/check_id_uniqueness.py` either); `.github/copilot-instructions.md`'s
+  own role roster (still names 11 roles, not yet 12). Each is a reasonable
+  follow-up, not silently done here alongside a task whose own brief
+  explicitly bounded the diff to this file, the two new agent/skill files,
+  and `docs/workflow.md` §3.
+- **Status**: implemented, PR opened, awaiting independent audit before
+  merge — same process every prior change in this repository's history has
+  gone through.
+
