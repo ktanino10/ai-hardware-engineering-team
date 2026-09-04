@@ -12695,3 +12695,82 @@ expected); `tools/check_id_uniqueness.py` passes at 514 IDs, 0 duplicates.
 Cycle 11's own correct assessment, that disposition remains a reserved
 human Chief Engineer decision (`docs/architecture.md` §10), not something
 this same-session loop-back pass should or could resolve unilaterally.
+
+
+## Mechanical Reviewer — Cycle 12 (Independent Review of MISS-023 Full-Closure Commit `691d3b0`) (2026-09-04)
+
+### Review Cycle Metadata
+
+- **Design revision reviewed**: `hardware/mechanical/bench-imu-01-enclosure.scad` and companion validation/traceability artifacts as modified by commit `691d3b0` (`Resolve MISS-023 (HIGH): full pinch-guard closure, human Chief Engineer decision`).
+- **Reviewer**: Mechanical Reviewer sub-agent, Cycle 12.
+- **Independence statement**: I did not trust the commit message, `validation/open-issues.md`, or the Mechanical Lead's prose claims. I independently re-derived the live `.scad` constants via `include<>`+`echo()`, built fresh OpenSCAD isolation wrappers for the rotating union and guard-intersection test, exported fresh STL geometry with the required `-D 'show_mode="export"'` flag, measured volumes/bounding boxes via `trimesh`, and ran the named CI scripts directly.
+- **Scope**: Narrow re-review of commit `691d3b0` only, exactly per the task brief: MISS-023's full-closure change (`pinch_guard_or` 115.0→176.3mm), MISS-047 assembled-envelope correction, MISS-048 print-quadrant-comment correction, the linked ECO/RTM/open-issues rows, and a bounded Foresight pass for side effects of enlarging the stationary guard ring.
+- **Tooling disclosure**: `git show --stat/show`, OpenSCAD (`--backend=manifold --render --export-format=binstl` with explicit `-D 'show_mode="export"'`), Python 3 + `trimesh`, raw Markdown-table parsing, and `python3 tools/check_open_issues.py`, `tools/check_id_uniqueness.py`, `tools/check_mechanical_pcb_sync.py`.
+- **Parallel sub-scans run**: None.
+- **KiCad / CAD tool cross-checks used**: KiCad-side sync check only via `tools/check_mechanical_pcb_sync.py`; no Blender/CAD visualization claim relied upon.
+
+---
+
+### A. Targeted re-verification results
+
+| # | Check requested | Independent result |
+|---|---|---|
+| 1 | Direct CSG non-overlap between `pinch_guard(-1)` and the complete rotating union | **PASS.** Fresh wrapper built this cycle with exactly the requested rotating solids: `base()`, `translate([0, pcb_bay_y0, base_total_h - lid_lip_h]) pcb_lid()`, `containment_cap()`, `bmount_flange()`, `rotation_index_pointer()`, `cable_anchor_tab(false)`, `cable_anchor_tab(true)`. Rendering the `intersection()` wrapper with `openscad -D 'show_mode="export"' --backend=manifold --render --export-format=binstl ...` returned **`Current top level object is empty.`** No intersection STL was emitted, which is the correct empty-result behavior. |
+| 2 | Live constants + coverage/residual-gap recomputation | **PASS.** Fresh `echo()` wrapper reproduced `rotating_env_max_r=176.259`, `pinch_guard_ir=60.0`, `pinch_guard_or=176.3`, `pinch_hazard_min_z_clear=19.9`, `pinch_guard_h=14.9`, `pinch_guard_z_margin=5.0`. Recomputed `coverage = min(100, (176.3^2-60^2)/(176.259^2-60^2)×100) = 100.0%`; `residual_gap = max(0,176.259-176.3) = 0.0mm`. |
+| 3 | Full-ring / quadrant export mass check | **PASS.** Fresh full-ring export measured **1,282,739.9207 mm^3** and **1629.0797 g** at 1.27 g/cm³. Fresh quadrant export measured **320,684.9802 mm^3** and **407.2699 g**. **4× quadrant = full ring exactly** to the precision reported by `trimesh` (delta 0.0 mm^3 / 0.0%). This independently confirms MISS-036's earlier quadrant-cut fix still holds at the larger radius. |
+| 4 | Quadrant bounding box / MISS-048 comment accuracy | **PASS.** Fresh quadrant STL bounds: `[0,0,0]`→`[176.300003,176.300003,14.8999996]`, i.e. **176.3×176.3×14.9mm**. The revised comment in `pinch_guard()` now states the real larger footprint and explicitly retracts the old “virtually any consumer FDM printer” overclaim. |
+| 5 | Assembled-envelope correction / MISS-047 | **PASS.** Fresh `echo()` wrapper reproduced `fw_cx=78.5`, `fw_cy=52.5`, `lid_x0=-2.2`, `lid_skirt_outer_x=161.4`, `assembled_envelope_y_south=-2.2`, `assembled_envelope_y_north=213.4`, `true_assembled_envelope_x=352.6`, `true_assembled_envelope_y=352.6`. Independently: `fw_cx ± pinch_guard_or = 78.5 ± 176.3 = [-97.8, 254.8]`, span **352.6mm**; `fw_cy ± pinch_guard_or = 52.5 ± 176.3 = [-123.8, 228.8]`, span **352.6mm**. These exceed the lid-only extents (`lid_x0..lid_x0+lid_skirt_outer_x = -2.2..159.2`) exactly as the new variables intend. |
+| 6 | CI/gate scripts | **PASS.** `tools/check_open_issues.py`: `OK: no unresolved CRITICAL / unsigned-off HIGH findings (99 finding(s) checked).` `tools/check_id_uniqueness.py`: `OK: no duplicate IDs ... (523 ID(s) checked).` `tools/check_mechanical_pcb_sync.py`: `OK: board outline 150.0x95.0mm and 4 mounting hole(s) match the real KiCad project exactly.` |
+| 7 | Markdown-table integrity | **PASS.** Header pipe counts independently verified: `open-issues.md` **14 pipes**, `change-log.md` **8**, `requirements/traceability-matrix.md` **8**. The target rows `MISS-023`, `MISS-047`, `MISS-048`, `ECO-057`, and `REQ-011` / `REQ-205` / `REQ-407` all match their parent table's column count — no accidental extra-cell corruption detected. |
+| 8 | Human-decision citation integrity | **PASS.** `validation/open-issues.md`'s `MISS-023` row records Kyosuke's direct quote **“完全カバーを選んでください”** explicitly as a **human Chief Engineer** decision relayed through the HITL channel, and distinguishes it from a Mechanical-Lead self-disposition. That process boundary is preserved correctly. |
+
+---
+
+### B. Z-height / collision-basis assessment
+
+The commit's own explanatory prose characterizes the non-overlap guarantee as fundamentally **Z-based**: `pinch_guard_h = pinch_hazard_min_z_clear - pinch_guard_z_margin = 14.9mm`, leaving a nominal 5.0mm vertical margin to the rotating envelope floor (`19.9mm`). I independently confirmed the governing constants by live `echo()` (`pinch_hazard_min_z_clear=19.9`, `pinch_guard_h=14.9`, margin 5.0), and the direct boolean result above is the stronger practical result: the fully assembled rotating union and the grown full ring have **zero shared volume** under exact CSG.
+
+One nuance matters for record accuracy: a naive vertex/triangle-height sweep of the rotating union over the enlarged radial band `[60, 176.259]mm` does encounter vertices as low as **Z=0** and **Z=2** at large radii, coming from the rotating base's own outer floor/wall geometry in the same union (for example vertex `[0.0, 105.0, 0.0]`, radius ≈94.44mm from the bearing axis). So the phrase “global floor across the full radius band is 19.9mm” is **not** a correct literal description of the entire rotating union's absolute lowest Z over that band. The actual safety conclusion still stands, because the direct CSG test already proves the enlarged full ring does not intersect any rotating solid even with those low-Z outer features present. In other words: **the fix is genuinely safe; the boolean result is real; but the explanatory shorthand should be read as a clearance argument for the hazard-relevant overhang region, not as a literal statement that every rotating-solid point in the full 60–176.259mm annulus sits above Z=19.9mm.**
+
+I am **not** filing this as a new finding this cycle because the requested acceptance criterion was physical non-overlap, and that criterion independently passes. This note is recorded so a future reviewer does not over-generalize the 19.9mm figure beyond what my own re-measurement supports.
+
+---
+
+### C. Foresight checklist pass (bounded to this change)
+
+- **Physical interference, checked for real**: no new collision found. The strongest check here is again the fresh assembled-frame boolean `intersection()` between the enlarged full ring and the complete rotating union: empty result. I did not find evidence that the larger stationary ring newly collides with the motor bay, stand plate, cable-anchor tabs, or rotation pointer.
+- **Simplified/approximate-model distortion**: no new distortion found in the reviewed scope. The mass and bbox figures were measured from fresh binary STL exports, not inferred from comments.
+- **Scale/axis-transform sanity**: PASS. The full-ring bbox is **352.6×352.6×14.9mm** and the quadrant bbox is **176.3×176.3×14.9mm**, matching the corrected comment and envelope math exactly; no unit/axis mismatch surfaced.
+- **Anything else I should have noticed anyway?** The one thing worth noting is the nuance above: the direct non-overlap claim is strong and true, but the supporting “19.9mm global floor across the whole enlarged band” narrative is broader than my own sweep supports literally. Because the actual safety verdict does not depend on that narrative once the direct intersection test is available, I am recording it as a foresight note rather than a blocking finding.
+
+---
+
+### Findings
+
+**No new concrete mechanical finding is opened this cycle.**
+
+The requested re-review criteria all pass on the actual geometry and records that matter for MISS-023's closure:
+- the enlarged full ring is genuinely non-overlapping with the complete rotating union,
+- the coverage and residual-gap math independently recompute to 100.0% / 0.0mm,
+- the fresh full-ring mass is ~1629.08g and exactly matches 4× the fresh quadrant volume,
+- the new assembled-envelope variables correctly expose the real 352.6mm footprint,
+- the revised print-quadrant comment is now honest,
+- the gate scripts pass, and
+- the human safety decision is preserved as a human decision, not a self-granted one.
+
+---
+
+### Verdict
+
+- **Verdict**: **PASS**
+- **Open CRITICAL count introduced by this cycle**: 0
+- **Open HIGH count introduced by this cycle**: 0
+- **Conclusion**: Commit `691d3b0` is an adequate closure of MISS-023's previously reopened residual-gap problem. MISS-047 and MISS-048's companion corrections also independently hold up. The only caution I am carrying forward is a wording-accuracy nuance on the explanatory `pinch_hazard_min_z_clear` narrative; it does **not** overturn the empty-intersection result or justify reopening the fix.
+
+---
+
+### Addendum — Z-height narrative nuance reconciled (same day, 2026-09-04)
+
+Following up on this cycle's own "caution" above (the `pinch_hazard_min_z_clear`=19.9mm narrative appearing broader than a raw union sweep literally supports): the Mechanical Lead investigated this further and found the apparent counter-example (rotating-union vertices at raw file-Z=0 and Z=2, radius ≈94.44mm) **reconciles exactly** with the existing documentation once converted to the correct reference frame. `stand_plate_bottom_z`=−19.9mm is this file's own established desk-plane datum (`bench-imu-01-dimensional-spec.md` §18.12.2 already tabulates this conversion, including a 92–93mm radius bin matching this cycle's own counter-example almost exactly). Desk-relative height = raw Z − stand_plate_bottom_z: for raw Z=0, that is 0 − (−19.9) = **19.9mm exactly** (matches the claimed floor, does not contradict it); for raw Z=2, that is **21.9mm** (comfortably above the floor). The apparent contradiction was a raw-file-Z-vs-desk-relative-height frame difference between this cycle's own fresh sweep and the file's own established convention, not a defect in the design or its prior documentation.
+
+**Resolution**: an explicit frame-conversion note was added directly at `pinch_hazard_min_z_clear`'s own definition in `bench-imu-01-enclosure.scad` (not left only in the companion spec doc), so a future reviewer encountering the same raw-Z data does not need to re-derive this reconciliation from scratch. This Cycle's reviewer independently confirmed the reconciliation and re-affirmed the **PASS** verdict is unchanged (the underlying safety guarantee never depended on this narrative's own precision — it is separately, directly proven by the empty boolean CSG intersection). No new finding logged, since there is no actual documentation gap once the frame conversion is applied — this addendum exists purely as a permanent record of the reconciliation, not as a correction to a defect.

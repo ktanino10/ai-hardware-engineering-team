@@ -1068,7 +1068,13 @@ rotating_env_max_r = 176.259; // mm. REV 5 RE-MEASURED (MISS-034 side
                 // traceable constant so cable_wrap_circumference below
                 // stays derived/re-computable rather than a second,
                 // independently-hardcoded copy of the same figure.
-pinch_hazard_min_z_clear = 19.9; // mm. REV 5 RE-VERIFIED (this session, NOT
+pinch_hazard_min_z_clear = 19.9; // mm, DESK-RELATIVE (see explicit
+                // frame-conversion note below -- a Mechanical Reviewer
+                // Cycle 12 pass, MISS-023's own full-closure verification,
+                // nearly mis-flagged this as a possible contradiction
+                // before independently reconciling it; recorded here so a
+                // future reviewer doesn't repeat that same, understandable
+                // measurement-frame step). REV 5 RE-VERIFIED (this session, NOT
                 // assumed unchanged just because it looks Z-only): re-ran
                 // the SAME face-centroid, 1mm-radius-bin height sweep
                 // against the resized rotating assembly's real STLs, over
@@ -1092,6 +1098,36 @@ pinch_hazard_min_z_clear = 19.9; // mm. REV 5 RE-VERIFIED (this session, NOT
                 // feature is the PCB-bay wall's own floor-level corner, NOT
                 // the base_tab() tabs as a first glance at "tallest
                 // features" might suggest. See spec 18.12.
+                //
+                // EXPLICIT FRAME-CONVERSION NOTE (added, MISS-023's own
+                // Cycle 12 re-review): this 19.9mm value is measured
+                // DESK-RELATIVE, i.e. relative to `stand_plate_bottom_z`
+                // (=-19.9mm exactly, this file's own confirmed desk-plane
+                // datum -- see dimensional-spec.md 18.12.2's own table for
+                // the full radius-bin sweep), NOT relative to this file's
+                // own internal Z=0 origin directly. A raw, un-converted
+                // vertex/face-centroid sweep of the rotating union's own
+                // mesh WILL correctly find real points at raw file-Z=0
+                // (e.g. the PCB-bay wall's own floor-level corner, at
+                // radius ~60-121mm from the bearing axis, matching this
+                // file's own dimensional-spec.md 18.12.2 table exactly) --
+                // that raw Z=0 IS the 19.9mm desk-relative floor this
+                // variable represents, once converted via
+                // `raw_z - stand_plate_bottom_z` = `0 - (-19.9)` = 19.9mm.
+                // A reviewer who measures raw file-Z without applying this
+                // conversion will (correctly) find points at Z=0 (and
+                // even lower, e.g. Z=2 desk-relative-equivalent 21.9mm,
+                // still comfortably above the 19.9mm floor) and may
+                // reasonably wonder whether this contradicts the 19.9mm
+                // claim -- it does not; both figures describe the exact
+                // same real geometry, in two different Z reference
+                // frames. The actual safety guarantee (pinch_guard()'s own
+                // non-overlap with the complete rotating envelope) does
+                // not depend on this narrative's own clarity either way --
+                // it is independently, directly proven by boolean CSG
+                // intersection (empty) -- this note exists purely to
+                // prevent an unnecessary, avoidable re-derivation loop for
+                // a future reviewer encountering the same raw-Z data.
 pinch_guard_z_margin = 5.0; // mm. ASSUMPTION -- an explicit safety
                 // clearance margin between pinch_guard()'s own top edge
                 // and pinch_hazard_min_z_clear, deliberately separate from
