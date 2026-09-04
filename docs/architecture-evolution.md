@@ -2379,9 +2379,11 @@ and this addendum only.
   `62193ee`, `210ff0a`, `0bfb54c` authored as `Gate Test <test@example.com>`
   (bounded exactly as cited, between the last clean commit `e3d14b8` and
   the next clean one, `f3dc692`); local `user.name`/`user.email` were
-  already unset by the time this was checked, confirming the fix cycle 34
-  applied. Repaired here rather than left as a known defect: verified
-  nobody else had pushed to this branch since the last push (`git fetch`
+  already unset by the time this was checked, confirming the fix the PR
+  #44 session had already applied to the shared config after cycle 34
+  flagged the defect. Repaired here rather than left as a known defect:
+  verified nobody else had pushed to this branch since the last push
+  (`git fetch`
   showed local and remote `HEAD` identical), then
   `git rebase e3d14b8 --exec 'git commit --amend --no-edit --author=
   "KyosukeT <ktanino10@github.com>"'`, confirmed **every rewritten
