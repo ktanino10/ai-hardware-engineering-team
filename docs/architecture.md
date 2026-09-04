@@ -918,6 +918,21 @@ reason to skip checking.
   (Rev 5's own MISS-034 note is the model: it recorded "choose whichever
   option has fewer technical obstacles" as a criterion, not as if the human
   had picked a side).
+- **Method note, added same day: normalize timezones before computing a
+  duration from an API timestamp.** Not about human-decision verification
+  specifically, but the same independent-recomputation discipline this
+  section asks for in general, and a real, dated instance of getting it
+  wrong: an independently-computed "how long has `main` been frozen" figure
+  (`docs/architecture-evolution.md` §42) was overstated by a factor of
+  ~2.2× because a GitHub API timestamp (`mergedAt`, returned in UTC) was
+  read against a session's local wall-clock display (JST) without
+  normalizing both to the same zone first — a timezone conflation, not a
+  rounding slip. Caught by a second, independent recomputation, and
+  corrected publicly, in place, by the session that had published it. When
+  computing an elapsed duration from any API-sourced timestamp, convert
+  both endpoints to the same timezone before subtracting (UTC is simplest,
+  since `gh`/GitHub API timestamps already are UTC) — do not compare a
+  `HH:MM:SS` value against a differently-zoned clock by eye.
 
 This codifies, as a standing requirement rather than a one-off act of good
 judgment, the behavior the Rev 5 Requirements session actually used before

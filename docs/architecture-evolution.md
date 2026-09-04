@@ -2160,6 +2160,28 @@ and this addendum only.
   per this document's own forward-correcting convention — this bullet is
   the record of the reversal; the eventual implementing PR gets its own
   addendum for the actual change.
+- **Cycle 32 self-corrected its own "~16 hours" figure — and named a
+  reusable trap, not just a one-off slip.** Independently re-derived its
+  own number rather than simply accepting the correction above, reproduced
+  this session's 7.5-hour figure almost exactly (7.61h), and posted a
+  public correction in place on PR #42 (verified: comment present, "##
+  Correction to my cycle-32 audit — freeze duration was wrong",
+  `2026-09-04T01:09:57Z`) rather than letting the wrong figure stand. Root
+  cause, per that correction: `PR #38`'s `mergedAt` is UTC (`17:31:43Z`),
+  read against this project's sessions' local JST wall clock without
+  converting first — a timezone conflation (`17:31:43` treated as JST
+  yields the erroneous 16.6h), not a rounding error, and a genuinely
+  reusable trap given `gh`/the GitHub API return UTC while session clocks
+  here report JST. Added as `docs/architecture.md` §17.2's new method note,
+  per cycle 32's own suggestion (offered, not insisted on, since it is this
+  document's section to own). Also worth recording plainly: this is the
+  third error cycle 32 has caught and withdrawn in its own audit work this
+  cycle (a naive `str.split('|')` producing phantom misaligned rows; a
+  `/tmp`-invocation path-resolution bug that made a working check look
+  like a no-op; this timezone conflation) — all three surfaced by
+  re-deriving rather than trusting a first measurement, the same standard
+  §17.2 asks of everyone else, applied by an auditing session to its own
+  output, not only to what it audits.
 - **Grounding, verified rather than merely asserted**: the branch-protection/
   CI-override guidance and the multi-agent/agentic-AI governance guidance
   cited in §17.4 were independently corroborated by this session via live
