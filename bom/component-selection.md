@@ -284,7 +284,7 @@ only — Circuit Engineer must not begin schematic work until Chief Engineer
 |---|---|---|---|
 | Component Engineer | Component Engineer (AI agent, via parallel research sub-agent) | 2026-09-04 | Proposed — switch to ESP32-S3, disqualify incumbent STM32G031K8T6 per REQ-508 |
 | Hardware Lead | Hardware Lead (this session) | 2026-09-04 | Concur — recommend approval, with the firmware re-platforming cost and live-pricing UNKNOWNs explicitly flagged for human weighing |
-| Chief Engineer (Human) — required, architecture-defining component (`docs/architecture.md` §10) | Human Chief Engineer | PENDING | Not yet reviewed — this is a platform/toolchain-changing decision, routed for explicit approval before Circuit Design begins against it |
+| Chief Engineer (Human) — required, architecture-defining component (`docs/architecture.md` §10) | Human Chief Engineer | 2026-09-04 | **Approved** — "確定" (Kyosuke's own direct plain-text reply, turn 616, `session_store_sql` session `7fab99ef-5578-4d79-a9c2-b24dbcfe93be`, `2026-09-04T16:00:16.240Z`), in direct reply to a specific question naming this exact recommendation by name (turn 614, `2026-09-04T15:54:20.062Z`) — both turns independently re-verified by this session directly against the raw turn history, not accepted from a relayed summary alone. Approves the ESP32-S3 MCU switch (over the incumbent STM32G031K8T6) as recommended. |
 
 ---
 
@@ -558,7 +558,7 @@ recommendation's own already-limited I2C count).
 |---|---|---|---|
 | Component Engineer | Component Engineer (AI agent, via parallel research sub-agent) | 2026-09-04 | Proposed — reuse BMI270 ×6, switch wiring architecture to SPI (1 bus + 6 CS) |
 | Hardware Lead | Hardware Lead (this session) | 2026-09-04 | Concur — recommend approval; SPI architecture change flagged for Circuit Design awareness |
-| Chief Engineer (Human) | Human Chief Engineer | PENDING | Not yet reviewed |
+| Chief Engineer (Human) | Human Chief Engineer | 2026-09-04 | **Approved** — "確定" (Kyosuke's own direct plain-text reply, turn 616, `session_store_sql` session `7fab99ef-5578-4d79-a9c2-b24dbcfe93be`, `2026-09-04T16:00:16.240Z`), in direct reply to a specific question naming this exact recommendation by name (turn 614, `2026-09-04T15:54:20.062Z`) — both turns independently re-verified by this session directly against the raw turn history, not accepted from a relayed summary alone. Approves BMI270 ×6 over a shared SPI bus + 6 CS lines as recommended. |
 
 ---
 
@@ -1085,7 +1085,7 @@ subsection below for the driver-architecture implications.
 |---|---|---|---|
 | Component Engineer | Component Engineer (AI agent, via parallel research sub-agent) | 2026-09-04 | Proposed — retain T-Motor MN2206-13 KV2000 ×3; maxon EC45 flat disqualified (NRND) |
 | Hardware Lead | Hardware Lead (this session) | 2026-09-04 | Concur — recommend approval; hard-brake control-dynamics confidence flagged as only moderate, routed to Motor Driver IC section's own escalation |
-| Chief Engineer (Human) | Human Chief Engineer | PENDING | Not yet reviewed |
+| Chief Engineer (Human) | Human Chief Engineer | 2026-09-04 | **Approved** — "確定" (Kyosuke's own direct plain-text reply, turn 616, `session_store_sql` session `7fab99ef-5578-4d79-a9c2-b24dbcfe93be`, `2026-09-04T16:00:16.240Z`), in direct reply to a specific question naming this exact recommendation by name (turn 614, `2026-09-04T15:54:20.062Z`) — both turns independently re-verified by this session directly against the raw turn history, not accepted from a relayed summary alone. Approves retaining T-Motor MN2206-13 KV2000 ×3 and disqualifying maxon EC45 flat (NRND) as recommended. |
 
 ---
 
@@ -1454,7 +1454,7 @@ braking is recommended over a discrete electromagnetic brake component.
 |---|---|---|---|
 | Component Engineer | Component Engineer (AI agent, via parallel research sub-agents — motor/driver and brake research combined for this finding) | 2026-09-04 | Proposed — retain TI DRV10983 ×3 as baseline (satisfies REQ-019 via documented BRAKE mode, no new brake hardware); TI DRV8316 named as escalation path |
 | Hardware Lead | Hardware Lead (this session) | 2026-09-04 | Concur — recommend approval; bench characterization of BRAKE-mode dynamics flagged as a load-bearing open item for REQ-409's future safety analysis |
-| Chief Engineer (Human) | Human Chief Engineer | PENDING | Not yet reviewed |
+| Chief Engineer (Human) | Human Chief Engineer | 2026-09-04 | **Approved** — "確定" (Kyosuke's own direct plain-text reply, turn 616, `session_store_sql` session `7fab99ef-5578-4d79-a9c2-b24dbcfe93be`, `2026-09-04T16:00:16.240Z`), in direct reply to a specific question naming this exact recommendation by name (turn 614, `2026-09-04T15:54:20.062Z`) — both turns independently re-verified by this session directly against the raw turn history, not accepted from a relayed summary alone. Approves retaining TI DRV10983 ×3 as baseline, with TI DRV8316 as the named escalation path, as recommended. **This approval authorizes the design direction, not a safety determination**: real bench-measured BRAKE-mode stop-time/torque (REQ-021/REQ-409) remains `UNKNOWN until bench-tested`, unchanged by this approval — see the Electromagnetic Brake section's own Approval row for the same caveat, stated once and not duplicated in full here. |
 
 ---
 
@@ -2181,7 +2181,7 @@ part choice rather than add real comparison value.)*
 |---|---|---|---|
 | Component Engineer | Component Engineer (AI agent, via parallel research sub-agent) | 2026-09-04 | Proposed — no new brake hardware; reuse TI DRV10983's own BRAKE bit; Ogura MCNB documented as discrete-brake fallback |
 | Hardware Lead | Hardware Lead (this session) | 2026-09-04 | Concur — recommend approval for the Component-Selection-level recommendation; explicitly **not** approving REQ-019's scope reduction as a done deal, nor treating BRAKE-mode adequacy as proven — both routed to the human below |
-| Chief Engineer (Human) — required: (a) this is a new-subsystem-avoiding architecture decision, (b) REQ-019's scope may be materially reduced from what was approved at kickoff | Human Chief Engineer | PENDING | Not yet reviewed |
+| Chief Engineer (Human) — required: (a) this is a new-subsystem-avoiding architecture decision, (b) REQ-019's scope may be materially reduced from what was approved at kickoff | Human Chief Engineer | 2026-09-04 | **Approved** — "確定" (Kyosuke's own direct plain-text reply, turn 616, `session_store_sql` session `7fab99ef-5578-4d79-a9c2-b24dbcfe93be`, `2026-09-04T16:00:16.240Z`), in direct reply to a specific question naming this exact recommendation by name (turn 614, `2026-09-04T15:54:20.062Z`) — both turns independently re-verified by this session directly against the raw turn history, not accepted from a relayed summary alone. Approves proceeding with TI DRV10983's own BRAKE bit (no new brake hardware) as the primary design direction, with Ogura MCNB documented as the discrete-brake fallback, as recommended. **This approval authorizes the design direction — it is explicitly not a safety determination.** REQ-021's Cubli-style hard-brake maneuver's real stop-time, torque, and repeatability on the actual motor+flywheel system remain `UNKNOWN until bench-tested`; this approval does not certify BRAKE-mode adequacy for that maneuver, and REQ-409's eventual safety analysis (Mechanical Reviewer, once the real design is finalized) is not pre-empted or waived by this record. |
 
 ---
 
@@ -2253,9 +2253,12 @@ comparison axes as a fair alternative to adding a separate module.)*
   3. A real, named fallback (B) exists and is not silently omitted if the
      MCU decision goes a different way.
 - **Trade-offs accepted**:
-  - This recommendation's validity is entirely contingent on a decision
-    (MCU) still marked `PENDING` human approval — explicitly disclosed,
-    not hidden behind a confident-sounding standalone recommendation.
+  - This recommendation's validity was, at the time it was written, entirely
+    contingent on the MCU decision — explicitly disclosed then, not hidden
+    behind a confident-sounding standalone recommendation. **Update
+    (2026-09-04): the MCU decision (ESP32-S3) is now Approved** — see this
+    section's own Approval table below — so this recommendation's
+    condition is now satisfied, not merely disclosed as pending.
   - Real per-unit pricing for Candidate B (the fallback) was not
     independently confirmed this session — acceptable since it is not
     the primary path, but flagged for re-verification before it would
@@ -2278,4 +2281,4 @@ comparison axes as a fair alternative to adding a separate module.)*
 |---|---|---|---|
 | Component Engineer | Component Engineer (AI agent, via parallel research sub-agent) | 2026-09-04 | Proposed — ESP32-S3 native Wi-Fi+BLE if MCU recommendation approved; DA14531MOD-class BLE bridge as fallback |
 | Hardware Lead | Hardware Lead (this session) | 2026-09-04 | Concur — recommend approval, explicitly conditional on the MCU Rev 5 decision; both should be reviewed as one coupled decision |
-| Chief Engineer (Human) — required: key-component decision, coupled to the MCU decision above | Human Chief Engineer | PENDING | Not yet reviewed |
+| Chief Engineer (Human) — required: key-component decision, coupled to the MCU decision above | Human Chief Engineer | 2026-09-04 | **Approved** — "確定" (Kyosuke's own direct plain-text reply, turn 616, `session_store_sql` session `7fab99ef-5578-4d79-a9c2-b24dbcfe93be`, `2026-09-04T16:00:16.240Z`), in direct reply to a specific question naming this exact recommendation by name (turn 614, `2026-09-04T15:54:20.062Z`) — both turns independently re-verified by this session directly against the raw turn history, not accepted from a relayed summary alone. Approves ESP32-S3's native Wi-Fi+BLE (with DA14531MOD-class BLE bridge documented as the fallback) as recommended, consistent with the MCU decision above. |
