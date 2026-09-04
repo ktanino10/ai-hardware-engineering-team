@@ -2,6 +2,25 @@
 """
 Bench-IMU-01 -- Exploded-view legend + fastener-callout post-process (PIL).
 
+REV 5 STALENESS NOTE (this session, MISS-034 -- read before touching
+ANCHOR_PX or the world-space points below): the Bench-IMU-01 PCB was
+resized from a 100x50mm proposal to the real 150x95mm board this session.
+This grows the PCB lid's own bounding box and shifts `fw_cx` (53.5mm ->
+78.5mm), both of which make the world-space reference points quoted in
+"Regenerating anchor points" below (and therefore the derived `ANCHOR_PX`
+pixel values) STALE relative to the current geometry. Blender is NOT
+connected this session (`blender-get_addon_status` handshake failed,
+independently re-checked, not assumed) -- so `ANCHOR_PX` below has
+DELIBERATELY NOT been hand-edited or guessed at: doing so without an
+actual `world_to_camera_view()` re-projection AND a visual re-confirmation
+against a fresh render (this docstring's own established, more rigorous
+method) would produce numbers no more trustworthy than a guess, which this
+project's own conventions treat as worse than an honest, disclosed gap.
+The base PNG render this script consumes is ALSO stale (see
+`build_exploded_view.py` and `../README.md` Method 2's own staleness
+note) -- both must be regenerated TOGETHER in a future session with
+Blender connected, using the unchanged procedure below.
+
 Takes the raw Blender render produced by `build_exploded_view.py`
 (no legend, no annotations -- pure 3D render) and adds:
 
@@ -23,7 +42,9 @@ exported STL binaries, not read off the .scad source) plus each part's own
 known OFFSETS entry. See ANCHOR_PX below for the resulting pixel
 coordinates and how they were derived -- re-run the projection snippet in
 this docstring's "Regenerating anchor points" section if OFFSETS/camera
-ever change.
+ever change **(REV 5: also re-run this because `pcb_lid_screw`'s own
+world-space point below and `motor_screw`'s own `fw_cx`-dependent point
+are both now stale, per the note at the top of this docstring)**.
 
 ## Regenerating anchor points (if OFFSETS or the camera setup ever change)
 

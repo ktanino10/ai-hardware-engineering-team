@@ -54,6 +54,56 @@ Whenever a new part is needed, or an existing part choice is challenged
 9. **Record the outcome** in `bom/component-selection.md`, including
    approval status.
 
+
+## Foundational Change Cascade Checklist (revising an existing recommendation, not making a first pick)
+
+`docs/workflow.md` §4.2/§4.2.1 documents this repository's recurring
+"stale load-bearing figure propagation" failure mode: a root fact gets fixed
+in its home artifact, but downstream citations and decisions keep silently
+carrying the old value. Electronics has real precedent here too — not just
+hypotheticals. `MISS-029` shows `bom/component-selection.md` itself carried a
+stale friction-torque margin after the rotating assembly mass changed, and
+`MISS-021`/`ISS-024` show the same pattern elsewhere in the discipline.
+**Whenever you are revising an already-issued recommendation because a
+foundational fact changed** (part substitution, datasheet revision, corrected
+Evidence ID, corrected package/mechanical drawing, lifecycle/EOL status
+change), do not stop at updating the comparison table row itself. Also:
+
+1. **Re-derive every recommendation-driving claim from the current primary
+   source, not from your own prior write-up.** If the datasheet revision or
+   manufacturer drawing changed, re-run `.github/skills/datasheet-analysis/SKILL.md`
+   from the live source and update `datasheets/evidence-log.md` before
+   touching downstream artifacts; do not let the old Evidence ID prose stand
+   in for a fresh read of the new source.
+2. **Sweep every downstream artifact that cites the changed fact, not only
+   `bom/component-selection.md`.** At minimum ask: does this changed number or
+   conclusion also appear in the schematic/design rationale,
+   `hardware/power-budget.md`, `requirements/traceability-matrix.md`,
+   `validation/open-issues.md`, or a reviewer finding/disposition note? This
+   is the Electronics analogue of §4.2.1's snapshot-drift seam: a corrected
+   recommendation with stale downstream citations is still a live defect.
+3. **Separate "part unchanged, citation corrected" from "part choice itself
+   changed."** A repaired Evidence ID or clarified datasheet note may require
+   only citation propagation; a real part substitution or materially changed
+   operating limit requires re-checking the Circuit Engineer's implementation,
+   not just the BOM prose. State explicitly which case you are in.
+4. **Re-check package/footprint-affecting facts as cross-discipline facts, not
+   only procurement facts.** If the package code, pinout variant, exposed pad,
+   connector geometry, or mounting dimensions changed, flag that the Circuit
+   Engineer and Hardware Reviewer must re-verify the live schematic/PCB
+   against the current source rather than assuming the prior implementation
+   still fits the recommendation.
+5. **Re-check accepted reviewer dispositions that were signed off against the
+   old fact.** If a prior trade-off, waiver, or `ACCEPTED-RISK` note cited the
+   superseded spec/status, it does not auto-extend to the new configuration;
+   call it out for fresh review rather than silently inheriting the old
+   disposition.
+6. **Record the propagation sweep in the changed artifact, not just in your
+   head.** Per `docs/workflow.md` §4.2's own resolution convention, a revision
+   is not complete merely because the source row is corrected; leave an
+   auditable trace of what dependent artifacts were checked/updated or why a
+   cited field was unaffected.
+
 ## Output format
 
 `bom/component-selection.md`, per its template.
