@@ -123,13 +123,37 @@ subsystem).
 | Parameter | Value | Unit | Source / Rationale | Confidence |
 |---|---|---|---|---|
 | Board outline shape | Rectangle | — | Carried forward from Rev 2; no cutouts/notches/castellated edges. A two-lobed or dog-bone outline (sensor lobe + motor lobe) was considered and rejected as over-engineering for this phase — a plain rectangle with internal zoning (below) is simpler to print/mount and still satisfies REQ-308 | ASSUMPTION |
-| Length (X-axis) | 100 | mm | See "Board growth rationale" below | ASSUMPTION |
-| Width (Y-axis) | 50 | mm | See "Board growth rationale" below | ASSUMPTION |
-| Thickness | 1.6 | mm | Unchanged from Rev 2 (standard FR4 thickness). Rev 3's motor-rail traces likely use heavier copper weight for current capacity, but that is an Electronics-domain layer-stackup detail that does not change overall board Z-thickness — not restated here | ASSUMPTION |
-| Board area | 5,000 | mm² | 100 × 50 | Derived |
-| Diagonal | ≈111.8 | mm | √(100²+50²) | Derived |
+| Length (X-axis) | 150 | mm | **REV 5 FIX (MISS-034, CRITICAL)**: read directly from the real KiCad project's own `Edge.Cuts` layer, `hardware/pcb/bench-imu-01/bench-imu-01.kicad_pcb`: `(gr_rect (start 0 0) (end 150 95))`. Independently cross-checked against `generate_pcb.py`'s own `BOARD_W = 150.0` constant and `hardware/pcb/README.md`'s own "Board outline: 150mm x 95mm" statement. Supersedes this row's own prior 100mm PROPOSAL (see "Board growth rationale — Rev 5 correction" below) | **CONFIRMED** |
+| Width (Y-axis) | 95 | mm | Same source as Length above: real KiCad `Edge.Cuts` `(end 150 95)`, cross-checked against `generate_pcb.py`'s `BOARD_H = 95.0` and `hardware/pcb/README.md` | **CONFIRMED** |
+| Thickness | 1.6 | mm | Unchanged from Rev 2 (standard FR4 thickness). Rev 3's motor-rail traces likely use heavier copper weight for current capacity, but that is an Electronics-domain layer-stackup detail that does not change overall board Z-thickness — not restated here. The real board's own layer stack-up/thickness was not independently re-confirmed this pass (out of MISS-034's own scope: board outline + hole pattern, not every A1/A3 field) | ASSUMPTION |
+| Board area | 14,250 | mm² | 150 × 95. **REV 5 FIX**: was 5,000mm² (100×50 proposal) | Derived |
+| Diagonal | ≈177.55 | mm | √(150²+95²) = √31,525 = 177.5528... **REV 5 FIX**: was ≈111.8mm. Independently re-verified by Mechanical Reviewer Cycle 11 (`validation/design-review.md`), which caught this row's own initial "≈177.8mm" arithmetic imprecision (Finding 4) — corrected here | Derived |
 
-**Board growth rationale (why 100×50mm, not some other size)**: Rev 2 was
+**Board growth rationale — Rev 5 correction (MISS-034)**: the "Board growth
+rationale" paragraph immediately below this one is the ORIGINAL Rev 3 text,
+preserved unedited for its own historical record (it explains why this file
+once *proposed* 100×50mm) — it is now **superseded, not currently
+accurate**, and must not be read as describing the real board. What
+actually happened, per `validation/open-issues.md` MISS-034's own
+chronology: this file's 100×50mm proposal (committed `350ac36`) was a
+genuine, reasonable Rev 3 estimate at the time, but the real PCB layout
+that followed (`a454b0c`) sized the board from **real, summed
+footprint/courtyard area** for all 47+ actual components (not this file's
+own component-*count* heuristic) under REQ-308's same relaxed ceiling,
+landing at 150×95mm/14,250mm² — a **2.85×** area increase over Rev 2
+(60×40mm/2,400mm²), not the 2.08× this file had proposed. No re-handoff
+back to this file followed at the time; this Rev 5 pass is that re-handoff,
+run per `docs/workflow.md` Phase 8. Both the length (150mm) and diagonal
+(≈177.8mm) now sit **outside** REQ-308's own ~150mm soft desk-scale sanity
+ceiling — see §3 "Overall envelope" re-check in
+`bench-imu-01-dimensional-spec.md` for the full, honestly-disclosed
+assessment (REQ-308 is a soft/"should" bound, not a hard ceiling, and this
+was accepted as a real, disclosed trade-off, not silently passed over).
+
+**Board growth rationale (ORIGINAL Rev 3 text, superseded — see the
+correction immediately above; preserved unedited per this project's
+additive-only historical-record convention, why 100×50mm, not some other
+size)**: Rev 2 was
 60×40mm (2,400mm²) holding 23 real components (4 ICs + 3 connectors/header +
 1 switch + 1 LED + 5 resistors + 9 capacitors, excluding mounting holes).
 Rev 3–5 add 25 new reference designators (U5, M1, J4, D2, D3, R6–R9, C10–C15
@@ -186,30 +210,63 @@ are recalculated fresh against the new edges rather than scaled.
 
 | Hole | X | Y | Diameter | Type | Rationale | Confidence |
 |---|---|---|---|---|---|---|
-| MH-1 | 3.5 | 3.5 | 2.8mm (M2.5 clearance) | Through-hole | Bottom-left, 3.5mm inset from both edges — unchanged rule from Rev 2 | ASSUMPTION |
-| MH-2 | 96.5 | 3.5 | 2.8mm (M2.5 clearance) | Through-hole | Bottom-right, 3.5mm inset from the new right/bottom edges | ASSUMPTION |
-| MH-3 | 96.5 | 46.5 | 2.8mm (M2.5 clearance) | Through-hole | Top-right, 3.5mm inset from the new right/top edges | ASSUMPTION |
-| MH-4 | 3.5 | 46.5 | 2.8mm (M2.5 clearance) | Through-hole | Top-left, 3.5mm inset from the new left/top edges | ASSUMPTION |
-| **MH-5** *(new)* | 85 | 3.5 | 2.8mm (M2.5 clearance) | Through-hole | New — bottom edge of the motor zone, near its X-centroid (70–100mm zone, midpoint 85mm) | ASSUMPTION |
-| **MH-6** *(new)* | 85 | 46.5 | 2.8mm (M2.5 clearance) | Through-hole | New — top edge of the motor zone, mirrors MH-5 | ASSUMPTION |
+| MH-1 | 8 | 8 | 2.8mm (M2.5 clearance) | Through-hole | Bottom-left. **REV 5 FIX (MISS-034, CRITICAL)**: real KiCad `MountingHole_2.7mm_M2.5` footprint position, `hardware/pcb/bench-imu-01/bench-imu-01.kicad_pcb` (raw `(at 8 8)`), independently re-derivable from `generate_pcb.py`'s own `BOARD_MARGIN(5.0) + 3.0` formula. Supersedes this row's own prior 3.5mm-inset PROPOSAL | **CONFIRMED** |
+| MH-2 | 142 | 8 | 2.8mm (M2.5 clearance) | Through-hole | Bottom-right. Real KiCad footprint `(at 142 8)` = `BOARD_W(150) - BOARD_MARGIN(5.0) - 3.0` | **CONFIRMED** |
+| MH-3 | 142 | 87 | 2.8mm (M2.5 clearance) | Through-hole | Top-right. Real KiCad footprint `(at 142 87)` = `(BOARD_W-8, BOARD_H(95)-BOARD_MARGIN-3.0)` | **CONFIRMED** |
+| MH-4 | 8 | 87 | 2.8mm (M2.5 clearance) | Through-hole | Top-left. Real KiCad footprint `(at 8 87)` = `(8, BOARD_H-BOARD_MARGIN-3.0)` | **CONFIRMED** |
 
-**Why two new mounting holes**: REQ-304's floor is "≥4 mounting holes,
-positioned at corners or edges for support" — MH-1–4 alone already satisfy
-that floor on the new 100×50mm outline. MH-5/MH-6 are proposed **beyond**
-the floor specifically because Rev 3 introduces a new vibration source
-(M1, however it ends up mounted — see Part B) roughly 15–30mm from the
-nearest original corner hole; two additional anchor points straddling the
-motor zone give the board firmer, more local support against motor-induced
-vibration in that region, directly serving REQ-307. This is this
-Mechanical Lead's own judgment call, not dictated by any upstream document
-— flagged as ASSUMPTION accordingly, open to revision once an actual motor-
-mounting decision (Part B) makes the true vibration path concrete.
+**REV 5 FIX (MISS-034)**: the real board has exactly **4** mounting holes —
+independently counted directly in the raw `.kicad_pcb` file this session (4
+instances of footprint `MountingHole_2.7mm_M2.5`, at the 4 coordinates
+above). The prior **MH-5/MH-6** rows (a Rev 3 "motor zone" mid-edge pair,
+proposed for extra rigidity near the then-hypothesized on-board
+motor-driver hot zone) **do not exist on the real board** and are removed,
+not merely repositioned — there is no real second hole pair, because the
+"motor zone" concept itself does not describe the real board (the real M1
+is a 3-pin phase-wire terminal block for an OFF-board motor, per
+`hardware/pcb/bench-imu-01/generate_pcb.py`'s own `PLACEMENT` dict, not an
+on-board motor-driver hot zone needing extra local stiffening). REQ-304's
+own floor ("≥4 mounting holes") remains satisfied by the real 4-hole
+pattern alone, same as it was intended to be before MH-5/6 were proposed as
+an enhancement beyond that floor.
 
-All six holes assume M2.5 screws with a standard 0.3mm/side clearance
+**MISS-043 correction (2026-09-04) to the paragraph immediately above**:
+describing MH-5/6 as a "(now-moot) enhancement" when this file was first
+corrected for MISS-034 was itself an incomplete framing, flagged by a
+cross-session review (PR #41/MISS-035, independently corroborated) — only
+the "motor zone" FRAMING was fictional; the underlying PHYSICAL CONCERN
+Rev 3's own MH-5/6 comment stated ("a board supported only at 4 corners
+risks excess flex/vibration transmission") is **not moot** — if anything
+it is stronger now, since the real board (150mm) is 50% longer than the
+100mm Rev 3 proposal that first raised it, with no mid-span mounting hole
+anywhere on the real board to bolt a real standoff into (adding one would
+be an Electronics-side PCB revision, out of this file's own Mechanical
+scope). `bench-imu-01-enclosure.scad` now adds a **passive (non-fastened)
+mid-span support pad** (`mid_span_support()`, ASSUMPTION) that the board
+simply rests on at its own physical midpoint, as a partial mitigation that
+does not require a PCB revision — deliberately undersized 0.4mm below the
+4 real standoffs' own height (`mid_support_gap`, MISS-045 — biases the
+pad toward a benign "travel limiter" role rather than an at-rest preload
+that a real, in-spec board bow could otherwise turn harmful) — see
+`bench-imu-01-dimensional-spec.md`'s own new subsection for the full
+rationale, and MISS-043/MISS-045 (`validation/open-issues.md`) for the
+complete disclosure, including this mitigation's own real limitations (not
+fastened, no real vibration/FEA analysis performed, the 0.4mm height bias
+not independently verified by a manufacturing-process-level analysis, not
+a substitute for a true fastened mid-span mounting point).
+
+All four holes assume M2.5 screws with a standard 0.3mm/side clearance
 (2.5+0.3×2=3.1mm → rounded to a common 2.8mm clearance-drill convention,
-unchanged reasoning from Rev 2), and PCB material sufficient annular ring
-around each hole — not independently re-verified this revision, carried
-forward as an ASSUMPTION.
+unchanged reasoning from Rev 2) — **note, disclosed not silently
+corrected**: the real footprint's own name ("`MountingHole_2.7mm_M2.5`")
+implies the real PCB's own drill is 2.7mm nominal, slightly smaller than
+this file's own 2.8mm clearance-hole assumption; this is a trivial (0.1mm),
+non-blocking difference between two different holes (the PCB's own drill
+vs. the enclosure standoff's own pilot-hole clearance target) — not
+reconciled further this pass, out of MISS-034's own scope (board outline +
+hole PATTERN, not exact drill-diameter cross-referencing). PCB material
+sufficient annular ring around each hole — not independently re-verified
+this revision, carried forward as an ASSUMPTION.
 
 ## A3. Component height clearance
 
@@ -304,10 +361,51 @@ size cutouts correctly.
 
 | Item | Mass | Confidence | Rationale |
 |---|---|---|---|
-| Bare PCB substrate | 14.8g | ESTIMATE | 100mm × 50mm × 1.6mm × 1.85g/cm³ (standard FR4 density, same method/density as Rev 2) = 8.0cm³ × 1.85g/cm³. Scales consistently with the 2.08× board-area growth vs. Rev 2's own 7.1g bare-board figure |
-| Rev 2 components (U1–U4, J1–J3, SW1, D1, R1–R5, C1–C9) | ≈1.8–2.0g | ESTIMATE (carried forward) | Unchanged from Rev 2's own figure |
-| Rev 3–5 components (U5, U6, J4, D2, D3, F1, R6–R15, C10–C17) | ≈2.5–3.0g | ESTIMATE | J4 (barrel jack, metal-bodied) dominates at ≈1.5g; U5/U6 (HTSSOP) ≈0.15–0.2g each; D2/D3 (SMB) ≈0.1g each; F1 (radial PTC, epoxy body) ≈0.3–0.4g; R6–R15/C10–C17 (small SMD) negligible individually, ≈0.1–0.15g combined |
-| **Subtotal: populated board assembly** | **≈19–20g** | ESTIMATE | Sum of the above three rows |
+| Bare PCB substrate | 42.2g | ESTIMATE | **REV 5 FIX (MISS-034, CRITICAL)**: 150mm × 95mm × 1.6mm × 1.85g/cm³ (standard FR4 density, same method/density as Rev 2/3) = 22.8cm³ × 1.85g/cm³ = 42.18g, rounded. Was 14.8g (100mm×50mm×1.6mm proposal) — the prior figure's own "2.08× area growth vs. Rev 2's 7.1g" framing is now superseded: the real board is a **2.85×** area increase over Rev 2 (60×40mm), giving 42.18g/2.85≈14.8g cross-check against Rev 2's own 7.1g×2×... — more directly, 42.18g/7.1g=5.94×, consistent with (150×95)/(60×40)=5.94× exactly, i.e. this recompute is internally consistent against Rev 2's own bare-board figure by the real area ratio, not the stale proposal's ratio |
+| Rev 2 components (U1–U4, J1–J3, SW1, D1, R1–R5, C1–C9) | ≈1.8–2.0g | ESTIMATE (carried forward) | Unchanged from Rev 2's own figure — component masses don't change with board area |
+| Rev 3–5 components (U5, U6, J4, D2, D3, F1, R6–R15, C10–C17) | ≈2.5–3.0g | ESTIMATE | Unchanged from the prior estimate — component masses don't change with board area. J4 (barrel jack, metal-bodied) dominates at ≈1.5g; U5/U6 (HTSSOP) ≈0.15–0.2g each; D2/D3 (SMB) ≈0.1g each; F1 (radial PTC, epoxy body) ≈0.3–0.4g; R6–R15/C10–C17 (small SMD) negligible individually, ≈0.1–0.15g combined |
+| **Subtotal: populated board assembly** | **≈46.5–47.2g** | ESTIMATE | Sum of the above three rows. **REV 5 FIX**: was ≈19–20g, +≈27.4g driven entirely by the bare-substrate correction above |
+
+**Reconciliation against the current total system mass baseline (REV 5,
+MISS-034)**: this file's own Part C (Rev 4/4.1 free-rotation mechanism)
+already independently reconciled the FULL assembled-system mass at
+**≈1173.4g** (`hardware/mechanical/bench-imu-01-dimensional-spec.md` §18,
+cross-checked against `validation/design-review.md`'s own Cycle 6
+independent re-render, agreeing to within 0.05g) — this is the figure this
+bare-board recompute must be consistent with, **not** a stale ≈300g figure
+that appears in unrelated prose elsewhere in this repo (e.g.
+`bom/component-selection.md`'s own friction-torque margin calc, tracked
+separately as MISS-029, RESOLVED, and `requirements/requirements.md`
+REQ-310's own "~300g representative" wording — neither of those describes
+this board's own mass, and neither is touched by this fix). The +≈27.4g
+bare-board increase computed above shifts the ≈1173.4g total to
+**≈1200.8g** (+2.33%) — see `bench-imu-01-dimensional-spec.md`'s own Rev 5
+changelog for the full arithmetic and an explicit check that this small
+shift does not materially affect the bearing friction-torque margin
+(driven by rotating-assembly mass, not total mass) or the stand-plate
+CG/tip-over safety margin (a ≈6.2× margin at the old mass; a 2.33% mass
+increase moves this to ≈6.06×, still enormously non-binding) — not
+re-derived from scratch, since the shift is small enough that a
+proportional check is adequate and honestly disclosed as such, not a full
+re-sweep of `bench-imu-01-dimensional-spec.md` §18.3's own CG/tip-over
+analysis.
+
+**Superseded again, same session, by MISS-023's full closure (C9 above,
+spec §18.12.8):** `pinch_guard_or` grew 115.0mm → 176.3mm per the human
+Chief Engineer's own direct decision, growing `pinch_guard`'s own mass
+570.6g → 1629.080g (+1058.48g). This shifts the ≈1200.8g figure above to
+**≈2259.3g**. Unlike the bare-board shift (+2.33%, proportional-check
+only), this is a large enough change (+88.1%) that it is **not** waived
+with a proportional check: `pinch_guard` is stationary, coaxial with the
+bearing axis (C9's own tip-over observation above — adding coaxial,
+non-rotating mass can only improve, never worsen, the stand-plate's own
+CG/tip-over margin and does not touch the rotating-assembly mass the
+bearing friction-torque margin depends on), so neither safety-relevant
+metric this file tracks is put at risk by this mass increase — a
+qualitative argument already established in this file's own C9 section,
+re-applied here rather than re-derived, since the underlying physical
+reasoning (coaxial, stationary, zero net horizontal moment) is unchanged
+by the guard's own radius growing.
 
 M1 and the flywheel are deliberately **excluded** from this table and
 carried separately in Part B, because their mass may or may not load this
@@ -879,7 +977,18 @@ this design's actual ≈602g total system mass and ≈9.6mm CG offset, a
 120mm-diameter stand plate already yields a 6.2× static margin — a
 stand plate anywhere near the bearing's own generic furniture-scale
 suggestion would be wildly, unnecessarily oversized for this rig (and would
-itself blow well past the existing enclosure's own 111.4×170.6mm assembled
+itself blow well past the existing enclosure's own [**REV 5 (MISS-034,
+2026-09-04) DISCLOSURE, Mechanical Reviewer Cycle 11 Finding 3**: this
+figure was 111.4×170.6mm at the time this Part C3/C4 analysis was
+originally written (Rev 4) — the enclosure's own CURRENT assembled
+footprint is 161.4×215.6mm, per `bench-imu-01-dimensional-spec.md` §3
+(Rev 5). 120mm remains comfortably smaller than BOTH the old and current
+figures in both dimensions, so this section's own qualitative conclusion
+is unaffected — but the ≈602g mass/≈9.61mm CG-offset/6.2× margin numbers
+elsewhere in this same C3/C4 section are themselves ALSO now stale relative
+to Rev 5 (and, separately, relative to Rev 4.1's own later `pinch_guard()`
+mass addition) — this is the same gap already tracked in full at MISS-038
+(`validation/open-issues.md`), not re-derived here] 111.4×170.6mm assembled
 footprint in one dimension). This is exactly the outcome the task's own
 framing anticipated: the generic suggestion is for a completely different
 load class and use case, and this file's own computed analysis — not that
@@ -995,11 +1104,11 @@ resulting interface-level facts only.
 |---|---|---|---|---|
 | True max swept radius of the rotating assembly (`rotating_env_max_r`) | 126.424 | mm | **DERIVED** (tool-verified, direct mesh measurement, not hand geometry) | Independently re-computed this pass — corrects the Cycle 5 Reviewer's own hand-derived 115.9mm figure, which measured only a pure Y-axis distance and missed the governing corner's X-offset; the true figure is larger (more conservative), not smaller — spec §18.12.1 |
 | Guard inner radius (`pinch_guard_ir`) | 60.0 | mm | **DERIVED** = `stand_plate_or` exactly (C4) | Flush-adjacent to, not overlapping or fastened to, the existing stand plate — verified via direct boolean intersection (≈0 shared volume) — spec §18.12.5 |
-| Guard outer radius (`pinch_guard_or`) | 115.0 | mm | **DECIDED** from an explicit coverage-vs-footprint trade-off (77.7% hazard-band coverage, 11.4mm residual radial gap, 230mm assembled diameter) | Not sized to full theoretical closure (126.424mm) deliberately — see spec §18.12.3 for the full table and the margin-vs-coverage reasoning |
-| Guard height (`pinch_guard_h`) | 14.9 | mm | **DERIVED** = 19.9mm confirmed rotating-envelope height floor − 5.0mm stated margin | Height floor independently re-derived via direct mesh measurement (not assumed carried over) — spec §18.12.2 |
-| Residual unguarded radial gap | 11.4 | mm | **DISCLOSED, not fully closed** | Backstopped by an operational keep-clear-zone warning (REQ-205 tightening), not by further geometry this pass — spec §18.12.6 |
-| Mass (this feature only) | ≈570.6 | g | **ESTIMATE** (computed from the exact modeled/mesh volume, same method as C2/C3) | 449,258mm³ solid PETG @ 1.27g/cm³ — see mass-rollup note below; this is the single heaviest new part this pass introduces, larger than the bearing (C1), flange (C2), and stand plate (C4) combined |
-| Print approach | 4 separate 90° quadrants (assembled ring only touches, not fastened) | — | **DECIDED** | Avoids inventing an undocumented printer-bed-size assumption (none exists anywhere in this project) — each quadrant's own bounding box (~115×115mm) is small enough for virtually any consumer FDM printer — spec §18.12.4 |
+| Guard outer radius (`pinch_guard_or`) | 176.3 (was 115.0) | mm | **DECIDED, human Chief Engineer direct decision (Rev 5)** — full closure, verbatim "完全カバーを選んでください" | Selects the trade-off table's own full-closure option (spec §18.12.8) — not a Mechanical Lead default; sized to exceed `rotating_env_max_r`=176.259mm by construction |
+| Guard height (`pinch_guard_h`) | 14.9 | mm | **DERIVED** = 19.9mm confirmed rotating-envelope height floor − 5.0mm stated margin | Height floor independently re-derived via direct mesh measurement (not assumed carried over) — spec §18.12.2. Unaffected by the radius growth (non-overlap is Z-based, not radial — see spec §18.12.8) |
+| Residual unguarded radial gap | 0.0 (was 11.4, then 61.3 post-Rev-5-resize) | mm | **RESOLVED — full closure** | Guard now reaches beyond the hazard radius; re-verified via direct boolean CSG (empty intersection with the complete rotating envelope), not merely arithmetic — spec §18.12.8 |
+| Mass (this feature only) | 1629.080 (table's own earlier ESTIMATE was ≈1633g — close, not identical; superseded by this real measurement) | g | **DERIVED** (real `trimesh` volume of a fresh export × PETG density, matches the same method as C2/C3/the original ≈570.6g figure) | 1,282,739.90mm³ solid PETG @ 1.27g/cm³; independently cross-checked against the actual 4-quadrant print total (1,282,739.92mm³, 0.0000015% difference) — see mass-rollup note below |
+| Print approach | 4 separate 90° quadrants (assembled ring only touches, not fastened) | — | **DECIDED, unchanged** | Each quadrant's own bounding box is now ~176×176mm (was ~115×115mm) — **flagged, not silently passed through**: this exceeds some smaller consumer FDM printer beds (~180mm-class), though still no specific printer is named/required anywhere in this repository — spec §18.12.8 |
 
 **MISS-024 fix — bounded/proceduralized cable-entanglement mitigation
 (no new cutout; small features added to the existing rotating base print
@@ -1017,15 +1126,17 @@ job):**
 | Coaxial-bore routing (C6) as the long-term fix instead | Considered, rejected this pass | — | **DECIDED** (rejected) | J1/J4 are fixed Rev 3 connector positions ≈81mm from the bore's own axis; routing a new wire from the bore to J1/J4 needs either PCB-level rework (out of Mechanical scope) or an unsourced slip-ring (no candidate part/Evidence ID exists) — flagged CONSIDER LATER, not delivered — spec §18.13.6 |
 | REQ-012 "ideally continuous/unlimited" rotation aspiration | Not achieved by this fix | — | **DISCLOSED** (not fully closed) | This fix closes the bounded, "several full turns" case REQ-113 itself actually mandates; unlimited rotation remains contingent on a future slip-ring decision REQ-113 itself already defers — spec §18.13.7 |
 
-**Mass-rollup note (extends, does not edit, C8's own table above):**
-`pinch_guard`'s own mass (≈570.6g) plus `rotation_index_pointer()` +
-`cable_anchor_tab()`×2 (≈1.1g combined, computed from the exact mesh
-volume — negligible next to `pinch_guard`) add **≈571.6g** to C8's own
-prior ≈601.8g total, giving an **updated total system mass of ≈1173.4g**.
-This roughly **doubles the system mass again** — disclosed prominently
-here, in the same spirit as C8's own "roughly double the human's own
-estimate" disclosure, not buried. The dominant contributor by far is
-`pinch_guard`'s own solid annulus volume (449,258mm³) — computed on
+**Mass-rollup note (extends, does not edit, C8's own table above); UPDATED
+Rev 5 for MISS-023's full closure:**
+`pinch_guard`'s own mass (**1629.080g, was ≈570.6g**) plus
+`rotation_index_pointer()` + `cable_anchor_tab()`×2 (≈1.1g combined,
+unaffected by the radius change) add **≈1630.2g** (was ≈571.6g) to C8's own
+prior ≈601.8g total, giving an **updated total system mass of ≈2232.0g**
+(was ≈1173.4g pre-full-closure, ≈601.8g pre-Rev-4.1). This nearly
+**doubles the system mass yet again** — disclosed prominently here, same
+convention as every prior mass-doubling in this file's own history, not
+buried. The dominant contributor is, by an even wider margin than before,
+`pinch_guard`'s own solid annulus volume (1,282,739.90mm³ — computed on
 **exactly the same solid-CAD-volume-times-density basis** every other row
 in C8 uses (i.e., this is not a print-time, infill-adjusted filament-mass
 estimate; a real single-material FDM print of a purely-protective,
@@ -1033,10 +1144,11 @@ non-structural guard ring like this would very plausibly use partial
 infill in practice, which this file has no established methodology for
 modeling anywhere, so none is invented here either — flagged as a genuine
 **CONSIDER LATER** opportunity if material/print-time economy becomes a
-real constraint in a future revision, not attempted this pass, since
-REQ-505's BOM ceiling is explicitly waived for this cycle and
-`pinch_guard`'s sizing was driven entirely by the coverage-vs-footprint
-trade-off (spec §18.12.3), not by mass).
+real constraint in a future revision, more pressing now than before given
+the mass involved, not attempted this pass, since REQ-505's BOM ceiling is
+explicitly waived for this cycle and `pinch_guard`'s sizing was driven
+entirely by the human Chief Engineer's own direct full-coverage decision
+(spec §18.12.8), not by mass).
 
 **One-line, non-exhaustive observation on C3's tip-over analysis (flagged
 for the Reviewer/Hardware Lead's own discretion, not re-derived this
@@ -1155,12 +1267,17 @@ phase where it becomes load-bearing.
     bonds or keys them together; the guard could in principle drift out of
     rotational/radial alignment over time or handling. Disclosed as a
     limitation, not an oversight (C9).
-21. **11.4mm residual unguarded radial gap** (`pinch_guard_or`=115.0mm vs.
-    `rotating_env_max_r`=126.424mm) — mitigated only by an operational
-    keep-clear-zone warning (tightening REQ-205), not by further geometry
-    this pass. Whether this residual-gap disposition is acceptable is a
-    judgment call for the Hardware Lead/human, not resolved unilaterally
-    here (C9).
+21. **~~11.4mm residual unguarded radial gap~~ — RESOLVED, Rev 5.** Was
+    `pinch_guard_or`=115.0mm vs. `rotating_env_max_r`=126.424mm (11.4mm
+    gap), then degraded to a 61.3mm gap once the Rev 5 PCB resize grew
+    `rotating_env_max_r` to 176.259mm (same unchanged 115.0mm guard).
+    **Human Chief Engineer direct decision** ("完全カバーを選んでください,"
+    spec §18.12.8) grew `pinch_guard_or` to 176.3mm — full closure,
+    0.0mm residual gap, re-verified via direct boolean CSG (empty
+    intersection with the complete rotating envelope), not merely
+    arithmetic. No longer a disclosed limitation requiring a Hardware
+    Lead/human judgment call — that call was made, and the geometry now
+    implements it (C9, spec §18.12.8).
 22. **Turn-count re-centering is a human-procedural control, not a sensed
     or firmware-enforced one** — nothing measures or limits actual turn
     count; the 3-turn limit and re-centering procedure rely entirely on
@@ -1181,8 +1298,11 @@ phase where it becomes load-bearing.
     actually mandates, but explicitly does NOT achieve unlimited rotation;
     that remains contingent on a future slip-ring decision REQ-113 itself
     already treats as deferred (C9).
-26. **Updated total system mass (≈1173.4g, up from ≈601.8g)** —
-    `pinch_guard`'s own solid-volume mass (≈570.6g) dominates; computed on
+26. **Updated total system mass (≈2232.0g, up from ≈601.8g pre-Rev-4.1,
+    ≈1173.4g pre-Rev-5-full-closure)** — `pinch_guard`'s own solid-volume
+    mass (**1629.080g, was ≈570.6g** before the human's own full-closure
+    decision grew the guard from 115.0mm to 176.3mm, spec §18.12.8)
+    dominates by an even wider margin than before; computed on
     the same solid-CAD-volume-times-density basis as every other mass
     figure in this file (not a print-time, infill-adjusted filament-mass
     estimate — a real print of this purely-protective, non-structural part
@@ -1190,8 +1310,10 @@ phase where it becomes load-bearing.
     material/cost/print-time well below this figure, but this file has no
     established methodology for modeling that discount). Flagged as a
     CONSIDER LATER opportunity for a lighter/ribbed redesign if material
-    economy becomes a real constraint in a future revision — not attempted
-    this pass (C9).
+    economy becomes a real constraint in a future revision — more
+    pressing now given the mass involved, still not attempted this pass
+    since `pinch_guard`'s sizing was driven entirely by the human Chief
+    Engineer's own direct decision, not by mass (C9).
 27. **Mechanical Reviewer's 10-item self-check checklist has no explicit
     safety-hazard/REQ-407 assessment item** — a process observation, not a
     new mechanical fact: this is judged the root cause of why MISS-023/024
