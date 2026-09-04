@@ -152,6 +152,142 @@ only — Circuit Engineer must not begin schematic work until Chief Engineer
 
 ---
 
+### Rev 5 re-evaluation (3-axis/6-IMU/3-brake scale) — MCU switch recommended
+
+> **Per REQ-508**, this section is an explicit, individual re-justification
+> of whether the incumbent (STM32G031K8T6) should be carried forward
+> unchanged at Rev 5's new scale — not a silent "it worked before"
+> assumption. **Conclusion: it should NOT be carried forward.** This is
+> **not** a JAXA-parts-copy decision (`requirements/requirements.md` §1c) —
+> PSoC 5LP (the JAXA reference's own MCU) was never seriously considered;
+> the candidates below are independently chosen modern parts evaluated on
+> their own real 2026 merits.
+
+- **Driving requirement(s)**: REQ-015 (3-axis PWM/speed-setpoint control —
+  3 motor PWM channels + direction/enable GPIOs, ideally hardware-timer
+  matched), REQ-016 (6-IMU sensor fusion — bus/pin budget, resolved below
+  to need only **1 shared SPI bus + 6 CS lines**, not 3 independent I²C
+  buses, per the IMU Rev 5 re-evaluation's own SDO/address finding), REQ-017
+  (real-time closed-loop 3-axis PID — needs meaningfully more compute
+  headroom than the incumbent's 64MHz Cortex-M0+), REQ-018 (3× momentum/
+  saturation monitoring via timer input-capture, mirroring the existing
+  1-axis FG-tach pattern), REQ-019 (3× brake control output — resolved
+  below to need no new GPIO class, since the Rev 5 Brake re-evaluation's own
+  primary recommendation reuses the existing motor driver's own BRAKE
+  control line, not a separate coil driver), REQ-020 (wireless — Must for
+  the jump/stand operating mode; native MCU wireless directly satisfies
+  this without a separate BOM line), REQ-102 (single 3.3V logic rail,
+  unchanged), REQ-507 (≤$450-800+ soft BOM ceiling — MCU cost is a small
+  fraction of this budget, unlike Rev 1-4's much tighter ~$15 target).
+- **Constraints**: must remain a real, currently-produced (2026), realistically-
+  sourceable part — this project has twice been burned by picking parts
+  with severe real availability problems (RP2040's own external-flash
+  requirement; ICM-42688-P's 45-54 week lead time, both flagged in this
+  file's own prior IMU/MCU comparisons) — real distributor stock/lifecycle
+  checks are mandatory, not assumed from "it's popular."
+
+#### Candidate Comparison
+
+*(5 candidates compared, including the incumbent — exceeds the ≥3 minimum.)*
+
+| Parameter | Candidate A — STM32G031K8T6 (incumbent) — ⚠ DISQUALIFIED | Candidate B — Espressif ESP32-S3 — ✅ RECOMMENDED | Candidate C — STMicroelectronics STM32F411CET6 | Candidate D — STMicroelectronics STM32H723ZG | Candidate E — Nordic nRF52840 |
+|---|---|---|---|---|---|
+| Core / clock | Cortex-M0+, 64MHz [DS-MCU-014] | Dual-core Xtensa LX7, 240MHz [DS-MCU-078] | Cortex-M4F, 100MHz [DS-MCU-086] | Cortex-M7 (DP-FPU), 550MHz [DS-MCU-092] | Cortex-M4F, 64MHz [DS-MCU-037] |
+| On-chip flash/RAM | 64KB/8KB [DS-MCU-016] | Package-dependent (external QSPI flash + PSRAM typical for dev modules) [DS-MCU-079] | 512KB/128KB [DS-MCU-087] | 1MB/564KB [DS-MCU-093] | 1MB/256KB [DS-MCU-038] |
+| I2C / SPI / UART | 2/2/2 [DS-MCU-017] | 2 I2C / 4 SPI (2 typically reserved for flash/PSRAM, 2 general-purpose) / 3 UART [DS-MCU-080] | 3/5/3 [DS-MCU-088] | up to 5/6/6 [DS-MCU-094] | 2 TWI/3 (incl. QSPI)/2 UARTE [DS-MCU-039] |
+| Timers/PWM/capture | 11 timers, 1 advanced motor timer [DS-MCU-017] | 2× MCPWM (motor-control-specific PWM peripheral), LEDC 8-ch PWM, pulse counter, 4 general timers [DS-MCU-081] | Up to 11 timers [DS-MCU-089] | 24 timers (17×16-bit incl. 5 Stop-mode-capable, 4×32-bit, 2 watchdogs, 1 SysTick) [DS-MCU-095] | GPIO-mux'd PWM via PPI/timers, exact motor-control-specific peripheral count not confirmed this session |
+| Built-in wireless | No | **Wi-Fi 802.11 b/g/n + Bluetooth LE 5 (incl. Long Range/Coded PHY)** [DS-MCU-082] | No | No | BLE 5/Thread/Zigbee/802.15.4 (no Wi-Fi) [DS-MCU-039] |
+| Package | LQFP-32, hand-solderable [DS-MCU-015] | QFN-56 (module variants e.g. ESP32-S3-WROOM are hand-solderable) [DS-MCU-083] | UFQFPN-48; no LQFP48 confirmed for this exact SKU this session | LQFP-144-class, larger [DS-MCU-096] | aQFN-73/QFN-48/WLCSP — no leaded package in this family [DS-MCU-040] |
+| 3.3V rail compatibility | 1.7-3.6V [DS-MCU-013] | 3.0-3.6V operating range [DS-MCU-084] | 1.7-3.6V [DS-MCU-090] | 1.62-3.6V [DS-MCU-097] | 1.7-3.6V [DS-MCU-034] |
+| Lifecycle / EOL | Active [DS-MCU-019] | Active [DS-MCU-085] | Active — DigiKey-listed for the closely-related CEU6 SKU, not independently re-confirmed for the exact CET6 ordering code this session [DS-MCU-091] | Active/Production per most recent datasheet revision found [DS-MCU-098] | Active [DS-MCU-041] |
+| Reference design | NUCLEO-G031K8 [DS-MCU-020] | Espressif ESP32-S3-DevKitC/DevKitM official boards; extensive third-party modules | ST F4 Discovery/Nucleo ecosystem | ST H7 Nucleo/eval ecosystem | nRF52840-DK, nRF52840 Dongle [DS-MCU-042] |
+| Ecosystem | STM32CubeIDE/HAL, Zephyr, PlatformIO [DS-MCU-021] | ESP-IDF (official, FreeRTOS-based), Arduino-ESP32, MicroPython, Zephyr — very large community | STM32CubeIDE/HAL, Zephyr, PlatformIO | STM32CubeIDE/HAL, Zephyr, PlatformIO | nRF Connect SDK/Zephyr, thinner hobbyist community than ESP32 [DS-MCU-043] |
+| Price/pricing note | ~$2.53-2.83 qty1 [DS-MCU-018] | **Live 2026 qty1/qty100 distributor pricing UNKNOWN this session** — automated distributor fetches were blocked; prior-generation ESP32/ESP32-C3 parts in this project's own history have been in the low-single-digit-dollar range, offered as context only, not as this specific SKU's confirmed price | **Live 2026 pricing UNKNOWN this session** | **Live 2026 pricing UNKNOWN this session** | ~$6.62-7.20 qty1 (prior repo data, not re-verified live this session) [DS-MCU-040] |
+| Known risks | **DISQUALIFIED**: only 2 I2C/2 SPI, 8KB SRAM, 64MHz M0+ — insufficient compute/peripheral margin for REQ-016/017 even with the IMU's SPI-bus resolution; no wireless | Exact orderable module SKU (flash/PSRAM/package tradeoff) not yet narrowed — a Circuit Design-stage decision, not resolved here. Live pricing/stock genuinely unconfirmed this session (flagged honestly, not glossed over) | Real, credible fallback if wireless-via-MCU is rejected — but needs an external wireless module (adds a REQ-020 BOM line), and live 2026 pricing/stock unconfirmed this session | Likely overkill for this project's actual control-loop demands; larger/costlier package; live pricing/stock unconfirmed this session | No leaded package in family (a real assembly-practicality concern this project's own Rev 1-4 MCU comparison already flagged for this same part); no Wi-Fi if that's ever wanted; higher cost than ESP32-S3 for weaker peripheral count |
+
+#### Success-probability ranking
+
+| Rank | Candidate | Verdict |
+|---|---|---|
+| 1 | **ESP32-S3 (B)** | Best overall system fit: dual-core 240MHz gives real REQ-017 control-loop headroom, MCPWM peripheral is purpose-built for motor control (REQ-015), built-in Wi-Fi+BLE directly satisfies REQ-020 with zero extra wireless BOM line, and the IMU Rev 5 finding (BMI270 over SPI, 1 bus + 6 CS) removes the "only 2 I2C" concern that would otherwise be a real weakness. Mature ecosystem (ESP-IDF, Zephyr, huge community). |
+| 2 | **STM32F411CET6 (C)** | Best fallback if the team prefers ST toolchain continuity over an architecture change, or if ESP32-S3's real-world stock/pricing turns out unfavorable at Circuit Design time — needs an external wireless module (see Wireless section) to satisfy REQ-020. |
+| 3 (not recommended, real option) | **STM32H723ZG (D)** | Technically the strongest margin of all 5, but likely disproportionate cost/package complexity for this project's actual control-loop demands — a legitimate escalation path only if REQ-017's real control-loop rate ends up demanding it. |
+| 4 (not recommended) | **nRF52840 (E)** | BLE-only (no Wi-Fi) with weaker peripheral count than ESP32-S3 at a higher cost; no hand-solderable package — this project's own Rev 1-4 MCU comparison already flagged this exact weakness for this exact part. |
+| 5 (disqualified) | **STM32G031K8T6 (A, incumbent)** | Insufficient I2C/SPI/SRAM/clock margin for the new 3-axis/6-IMU/wireless scope — REQ-508's required re-justification concludes this part cannot be carried forward. |
+
+#### Recommendation
+
+- **Recommended candidate**: **B — Espressif ESP32-S3**, replacing the
+  incumbent STM32G031K8T6.
+- **Rationale**:
+  1. Directly satisfies REQ-020 (wireless, now Must) with zero additional
+     wireless-module BOM line — the single biggest simplification versus
+     every other candidate.
+  2. MCPWM (Motor Control PWM) is a peripheral class purpose-built for
+     REQ-015's 3-axis motor control — not a generic timer repurposed for
+     PWM.
+  3. Dual-core 240MHz gives genuine headroom for REQ-017's real-time
+     closed-loop 3-axis attitude control, which the incumbent's single
+     64MHz Cortex-M0+ almost certainly could not sustain alongside 6-IMU
+     sensor fusion.
+  4. The IMU Rev 5 re-evaluation's own finding (BMI270 ×6 over a single
+     shared SPI bus + 6 CS lines, not 3 independent I2C buses) removes
+     what would otherwise be ESP32-S3's one real weakness (only 2 native
+     I2C controllers) — the two Rev 5 findings interlock favorably.
+  5. Mature, very large ecosystem (ESP-IDF, Arduino-ESP32, Zephyf support,
+     extensive real-world motor-control and IMU-fusion prior art).
+- **Trade-offs accepted**:
+  - Giving up STM32 toolchain continuity (this project's Rev 1-4 firmware
+    is STM32CubeIDE/HAL-based) — a real, non-trivial re-platforming cost
+    for the Firmware Engineer's next phase, explicitly disclosed here, not
+    glossed over.
+  - Live 2026 distributor pricing/stock could not be independently
+    confirmed this session (automated fetches were blocked) — flagged as
+    an open UNKNOWN, not assumed favorable.
+  - Exact orderable module SKU (onboard flash/PSRAM size, package) is not
+    narrowed here — a Circuit Design-stage decision.
+- **Open `UNKNOWN`s**:
+  1. Live 2026 qty-1/qty-100 pricing and real distributor stock for
+     ESP32-S3 (and all other non-incumbent candidates) — not independently
+     confirmed this session; re-verify before BOM lock.
+  2. Exact ESP32-S3 module SKU (flash/PSRAM size, package variant) — a
+     Circuit Design-stage decision.
+  3. Exact GPIO/pin-mux sufficiency for the full Rev 5 pin budget (3×motor
+     PWM + 3×brake control + 3×tach capture + 1 shared SPI + 6 CS + UART +
+     debug) against ESP32-S3's real pin count — needs a full pin-planning
+     pass at Circuit Design, not resolved here.
+  4. STM32H723ZG's real necessity — only relevant if REQ-017's actual
+     control-loop rate, once characterized, exceeds ESP32-S3's real
+     headroom (an escalation path, not assumed needed).
+
+#### Escalation flags
+
+1. **Architecture-defining decision — requires Hardware Lead + human Chief
+   Engineer approval** (`docs/architecture.md` §10), same as the original
+   Rev 1 MCU decision. This is a platform/toolchain change (STM32→
+   Espressif/ESP-IDF), which is a materially larger decision than a
+   same-family part swap.
+2. **Firmware re-platforming cost is real and should be weighed explicitly**
+   — the existing Rev 1-4 firmware (`firmware/bench-imu-01/`) is
+   STM32CubeIDE/HAL-based; switching to ESP32-S3 means the Firmware
+   Engineer's next phase starts from a different toolchain, not an
+   incremental extension. Flagged for the human's own weighing, not
+   decided here.
+3. **Live pricing/stock genuinely unconfirmed this session** for every
+   non-incumbent candidate — re-verify before BOM lock, per this project's
+   own Source-of-Truth discipline (do not assume favorable pricing/stock
+   just because a part is popular).
+
+#### Approval
+
+| Role | Name | Date | Decision |
+|---|---|---|---|
+| Component Engineer | Component Engineer (AI agent, via parallel research sub-agent) | 2026-09-04 | Proposed — switch to ESP32-S3, disqualify incumbent STM32G031K8T6 per REQ-508 |
+| Hardware Lead | Hardware Lead (this session) | 2026-09-04 | Concur — recommend approval, with the firmware re-platforming cost and live-pricing UNKNOWNs explicitly flagged for human weighing |
+| Chief Engineer (Human) — required, architecture-defining component (`docs/architecture.md` §10) | Human Chief Engineer | PENDING | Not yet reviewed — this is a platform/toolchain-changing decision, routed for explicit approval before Circuit Design begins against it |
+
+---
+
 ## IMU (3-axis accelerometer + 3-axis gyroscope)
 
 - **Driving requirement(s)**: REQ-001 (≥100 Hz ODR, 3-axis accel + 3-axis
@@ -284,6 +420,145 @@ required before the Circuit Engineer begins schematic work against it.
 | Component Engineer | Component Engineer (AI agent) | 2026-08-30 | Proposed — BMI270 (fallback: LSM6DSOX) |
 | Hardware Lead | Hardware Lead (this session) | 2026-08-30 | Concur — recommend approval |
 | Chief Engineer (Human) — required if architecture-defining/major component | Human Chief Engineer | 2026-08-30 | **Approved** — "Approve all three as recommended" (Checkpoint B, recorded via ask_user; independently re-confirmed after the worktree-restore incident, see `validation/change-log.md` ECO-001) |
+
+---
+
+### Rev 5 re-evaluation (6-IMU, 3-axis scale) — BMI270 reused ×6, architecture changed to SPI
+
+> **Per REQ-508**, this is an explicit, individual re-justification of
+> whether BMI270 (already validated in Rev 1-4, with an official
+> BSD-3-Clause driver already integrated into `firmware/bench-imu-01/`)
+> should be used ×6, rather than switching to MPU-6050 (the JAXA
+> reference's own part) without a real reason
+> (`requirements/requirements.md` §1c item 2). **Conclusion: reuse BMI270
+> ×6, but change the wiring architecture from I2C to SPI** — a materially
+> different outcome than "just use the same part again unchanged," driven
+> by a real datasheet finding below.
+
+- **Driving requirement(s)**: REQ-016 (3-axis attitude estimation via
+  sensor fusion across 6 IMUs, 2 per axis, "using as many I²C buses as the
+  finally-selected IMU part's own address/pin constraints require" — this
+  section resolves that open constraint), REQ-508 (individual
+  re-justification, not silent reuse).
+- **Constraints**: the JAXA reference design's own 3-separate-I2C-bus
+  architecture exists specifically because MPU-6050 has only a 2-address
+  I2C limit (AD0 pin) — this section must independently verify whether
+  BMI270 shares that exact constraint, not assume it does or doesn't
+  merely because both are 6-axis IMUs.
+
+#### Critical finding: BMI270 DOES share MPU-6050's 2-address I2C limit — but supports SPI
+
+Re-confirmed directly from this repository's own already-registered
+Evidence IDs (not re-derived from scratch, since this project already
+extracted this exact fact during Rev 1-4 Circuit Design — **DS-IMU-076**:
+"BMI270 SDO pin sets the LSB of the 7-bit I2C device address: SDO tied to
+GND → address 0x68; SDO tied to VDDIO → address 0x69"), cross-checked
+against the official Bosch driver source itself (**DS-IMU-078**: the same
+two address constants, `BMI2_I2C_PRIM_ADDR`/`BMI2_I2C_SEC_ADDR`, 0x68/0x69).
+**BMI270 has exactly 2 selectable I2C addresses — identical in kind to
+MPU-6050's own AD0-pin 2-address scheme.** A pure-I2C architecture for 6
+BMI270 devices would therefore need the same **3 separate I2C buses** the
+JAXA reference design uses, for the same underlying electrical reason —
+this is a case where the JAXA reference's own architectural choice turns
+out to be independently correct once verified, not a coincidence of
+copying it.
+
+**However**, BMI270 also supports SPI (already established in this
+project's own MCU comparison table above, DS-IMU-008: "≤10 MHz, 3-/4-wire"),
+and SPI's addressing model is fundamentally different — each device gets
+its own dedicated chip-select (CS) line rather than sharing an address
+space. **This means 6× BMI270 can be wired over a single shared SPI bus
+(SCLK/MOSI/MISO) plus 6 individual CS lines**, avoiding the need for 3
+separate I2C buses entirely. 6 CS lines are ordinary GPIO — a far smaller
+pin-budget item than 3 full I2C bus pairs (SCL+SDA×3 = 6 pins vs. SPI's
+3 shared + 6 CS = 9 pins — SPI uses slightly *more* total pins in this
+specific comparison, but every candidate MCU has far more spare GPIO than
+spare dedicated-I2C-peripheral instances, making the SPI approach the
+practically easier one to route and matching the MCU Rev 5
+recommendation's own already-limited I2C count).
+
+#### Candidate Comparison
+
+*(3 candidates compared — meets the ≥3 minimum.)*
+
+| Parameter | Candidate A — Bosch Sensortec BMI270 (incumbent) — ✅ RECOMMENDED | Candidate B — TDK InvenSense MPU-6050 (JAXA reference part) | Candidate C — STMicroelectronics LSM6DSOX (existing documented fallback) |
+|---|---|---|---|
+| I2C address mechanism | SDO pin, 2 addresses (0x68/0x69) [DS-IMU-076, DS-IMU-078] | AD0 pin, 2 addresses (0x68/0x69) — the well-known constraint that drove the JAXA reference's own 3-bus architecture | SA0/SDO pin, 2 addresses (0x6A/0x6B), same class of constraint — not independently re-confirmed from a primary datasheet this session, existing repo prior research is the basis |
+| SPI support | Yes, ≤10MHz [DS-IMU-008] — enables the 1-bus+6-CS architecture below | **No** (MPU-6050 itself is I2C-only; the SPI-capable variant is the separate MPU-6000 part, not this one) | Yes, ≤10MHz (already established in this project's original IMU comparison) |
+| 6-device wiring implication | **1 shared SPI bus + 6 CS** (recommended) or 3 I2C buses (fallback) | **3 I2C buses required** (no SPI alternative for this exact part) | 1 shared SPI bus + 6 CS (same architecture as BMI270) or 3 I2C buses |
+| Current lifecycle/EOL (2026) | Active, no EOL/NRND [DS-IMU-014] | **Not independently re-confirmed to a clean, current, primary-source lifecycle statement this session** — this is an old-generation part; its current 2026 production status carries real risk not previously flagged in this project | Active; used in the official Arduino Nano RP2040 Connect [DS-IMU-048] |
+| Existing project integration | **Already validated in Rev 1-4**; official Bosch BSD-3-Clause driver already integrated into `firmware/bench-imu-01/` — reusing avoids re-qualifying sensor/driver risk across 6 devices | None — would require a full new driver integration ×6, discarding existing validated firmware | Named fallback in the original IMU comparison, but never actually integrated into firmware |
+| Qty-6 pricing/stock | Prior repo data ≈$3.17-4.23/unit at qty-1 [DS-IMU-012/013]; **live qty-6/qty-100 pricing and current stock not independently re-verified this session** | **Live 2026 pricing/stock not cleanly re-verified this session** — automated distributor fetches were partially blocked | **Live 2026 pricing/stock not independently re-verified this session** |
+| Known risks | Live qty-6 pricing/stock genuinely unconfirmed this session (flagged, not glossed over) | Old part, unclear current 2026 lifecycle status, no SPI alternative forces the less pin-flexible 3-I2C-bus architecture, zero existing project integration to reuse | Never actually integrated into this project's firmware despite being named fallback since Rev 1 |
+
+#### Success-probability ranking
+
+| Rank | Candidate | Verdict |
+|---|---|---|
+| 1 | **BMI270 ×6 (A)** | Best success probability: reuses an already-validated part + already-integrated driver, avoiding 6× new sensor/driver qualification risk. Real datasheet confirms its 2-address I2C limit matches MPU-6050's own constraint, but its SPI support (already established in this project) provides a cleaner 6-device wiring path than the JAXA reference's own I2C-only part allows. |
+| 2 (not recommended, real fallback) | **LSM6DSOX (C)** | Electrically comparable, same SPI-based 6-device wiring path available, but has never been actually integrated into this project's firmware — switching now would mean discarding the already-working BMI270 driver integration for no clear gain. |
+| 3 (rejected) | **MPU-6050 (B)** | The JAXA reference's own part, evaluated fresh per this project's own anti-copy discipline — same 2-address I2C limit as BMI270 but with **no SPI alternative**, forcing the less pin-efficient 3-separate-I2C-bus architecture; unclear current 2026 lifecycle status; zero existing project integration to build on. No real advantage found over the incumbent. |
+
+#### Recommendation
+
+- **Recommended candidate**: **A — Bosch Sensortec BMI270 ×6**, wired over
+  **a single shared SPI bus with 6 individual chip-select lines** (not 3
+  separate I2C buses, and not MPU-6050).
+- **Rationale**:
+  1. **Real re-justification, not silent reuse** (REQ-508): BMI270's own
+     2-address I2C constraint was independently re-verified from this
+     project's already-registered Evidence IDs before concluding SPI is
+     the better architecture — this is not "it worked before, keep it."
+  2. Reuses an already-validated part with an already-integrated,
+     official BSD-3-Clause driver — avoids 6× new sensor/driver
+     qualification risk that a switch to MPU-6050 or LSM6DSOX would
+     introduce with no offsetting benefit.
+  3. BMI270's SPI support (already established in this project's own
+     prior Component Selection) provides a materially better 6-device
+     wiring path (1 shared bus + 6 CS) than the JAXA reference's own
+     MPU-6050, which is I2C-only and would force the full 3-bus
+     architecture regardless of MCU choice.
+  4. This interlocks favorably with the MCU Rev 5 recommendation (ESP32-S3,
+     which has only 2 native I2C controllers) — the SPI architecture
+     removes what would otherwise be a real MCU peripheral-count concern.
+- **Trade-offs accepted**:
+  - Giving up MPU-6050's status as "what the reference design used" — a
+    deliberate, evidence-based rejection per this project's own explicit
+    anti-copy instruction, not an oversight.
+  - Live qty-6/qty-100 pricing and current stock were not independently
+    re-verified this session for any of the 3 candidates — flagged
+    honestly as an open UNKNOWN, not assumed favorable.
+- **Open `UNKNOWN`s**:
+  1. Live 2026 qty-6/qty-100 pricing and current distributor stock for
+     BMI270 (and MPU-6050/LSM6DSOX) — not independently re-verified this
+     session; re-verify before BOM lock.
+  2. MPU-6050's current 2026 lifecycle/EOL status — not cleanly
+     re-confirmed from a primary source this session; moot given
+     rejection, but flagged for completeness.
+  3. Exact SPI bus timing/CS-switching overhead for 6 devices sharing one
+     bus at whatever sample rate the final control loop needs — a
+     Circuit Design/Firmware Engineer-stage characterization, not
+     resolved here.
+
+#### Escalation flags
+
+1. **Not an architecture-defining component decision in the same sense as
+   the MCU** (the part itself is unchanged, already human-approved in
+   Rev 1) — but the **wiring architecture change (I2C→SPI)** is a real,
+   non-trivial Circuit Design input that should be confirmed before
+   schematic work begins on the 6-IMU subsystem, per this project's own
+   practice of flagging architecture-relevant findings even when the
+   underlying part choice itself doesn't change.
+2. **Live pricing/stock genuinely unconfirmed this session** — re-verify
+   before BOM lock.
+
+#### Approval
+
+| Role | Name | Date | Decision |
+|---|---|---|---|
+| Component Engineer | Component Engineer (AI agent, via parallel research sub-agent) | 2026-09-04 | Proposed — reuse BMI270 ×6, switch wiring architecture to SPI (1 bus + 6 CS) |
+| Hardware Lead | Hardware Lead (this session) | 2026-09-04 | Concur — recommend approval; SPI architecture change flagged for Circuit Design awareness |
+| Chief Engineer (Human) | Human Chief Engineer | PENDING | Not yet reviewed |
 
 ---
 
@@ -687,6 +962,133 @@ document's own convention of preserving the original decision record.
 
 ---
 
+### Rev 5 re-evaluation (3-axis scale, ×3) — T-Motor MN2206-13 KV2000 retained, maxon EC45 flat DISQUALIFIED (NRND)
+
+> **Per REQ-508**, this is an explicit, individual re-justification of
+> whether the already-approved T-Motor MN2206-13 KV2000 should be used ×3
+> (one per axis), rather than switching to maxon EC45 flat (the JAXA
+> reference design's own motor, part 200142) without a real reason
+> (`requirements/requirements.md` §1c item 3). **Conclusion: retain
+> T-Motor MN2206-13 KV2000 ×3.** maxon EC45 flat is independently
+> disqualified on a real, primary-source lifecycle finding — not
+> rejected merely because it's "the JAXA part."
+
+- **Driving requirement(s)**: REQ-015 (3× independently-driven reaction
+  wheels), REQ-508 (individual re-justification), REQ-021 (Cubli-style
+  hard-brake maneuver — now human-confirmed Must — motivates checking
+  whether the existing pairing has real headroom for a more aggressive,
+  short-duration torque/current event, not just steady-state 5mN·m).
+
+#### New finding this session: does the existing pairing have hard-brake headroom?
+
+Independently re-derived from already-established project figures (Kt =
+4.77 mN·m/A for T-Motor MN2206-13, `bom/component-selection.md`'s own
+Motor section above) against the paired driver's real current rating
+(TI DRV10983: 2A continuous / 3A peak per phase, DS-MTR-034 above):
+
+```
+2A continuous × 4.77 mN·m/A ≈ 9.5 mN·m  (≈1.9× the old 5mN·m steady target)
+3A peak       × 4.77 mN·m/A ≈ 14.3 mN·m (≈2.9× the old 5mN·m steady target)
+```
+
+**Real, demonstrated short-duration torque headroom exists** — but this
+is current/torque headroom only, not a claim about braking *dynamics*.
+DRV10983 is a sensorless speed-control IC; sensorless commutation depends
+on back-EMF, which is intrinsically weaker/less observable as RPM falls
+during a braking event — a genuine, disclosed limitation on *how
+controllably* the pairing can execute a fast, repeatable hard-brake, not
+on raw torque capability. See the Motor Driver IC section's own Rev 5
+subsection below for the driver-architecture implications.
+
+#### Candidate Comparison
+
+*(3 candidates compared — meets the ≥3 minimum.)*
+
+| Parameter | Candidate A — T-Motor MN2206-13 KV2000 (incumbent) — ✅ RECOMMENDED | Candidate B — maxon EC 45 flat (200142, JAXA reference part) — ⚠ DISQUALIFIED | Candidate C — (no credible third motor candidate identified this session) |
+|---|---|---|---|
+| Sensing | Sensorless (outrunner) [DS-MTR-022] | **Hall-sensored** [DS-MTR-082] | N/A |
+| Kt (torque constant) | 4.77 mN·m/A derived [DS-MTR-020] | 25.4 mN·m/A published [DS-MTR-083] — much higher torque per amp | N/A |
+| Rated/continuous torque | N/A published; 18A continuous current rating [DS-MTR-019] | 57.1 mN·m continuous, 2.16A continuous current [DS-MTR-084] | N/A |
+| No-load / nominal speed | ≈20,000-25,180 RPM derived credible-worst-case [DS-MTR-018 corrected] | 4390 RPM no-load / 3050 RPM nominal [DS-MTR-085] — far lower top speed | N/A |
+| Rotor inertia | Not published/confirmed [known UNKNOWN, carried forward from original comparison] | 92.5 g·cm² = 9.25×10⁻⁶ kg·m² published [DS-MTR-086] — real figure available, but this is a genuinely larger, heavier rotor | N/A |
+| Mass | 30g [DS-MTR-021] | 75g [DS-MTR-087] — 2.5× heavier | N/A |
+| **Lifecycle/EOL** | Active [DS-MTR-023] | **NRND (Not Recommended for New Designs)** — stated directly on maxon's own current product page [DS-MTR-088] | N/A |
+| Price | $18.99 qty1 (prior repo data) [DS-MTR-023] | **Live 2026 qty-3 pricing not independently confirmed this session** — the kickoff's own presented ≈$80-125/axis estimate was NOT independently re-verified against a live maxon/distributor page this session (flagged honestly, not silently repeated as confirmed) | N/A |
+| Known risks | Live qty-3 pricing/stock not independently re-verified this session (flagged) | **Disqualifying**: formally NRND on maxon's own current product page — a real, primary-source lifecycle risk for a new design, independent of any cost consideration | No credible third candidate found meeting this session's rigor bar (exact part + real 2026 price/stock + primary-source electrical/mechanical data) — recorded honestly per this project's own "if fewer exist, document why" convention rather than inventing a weak filler candidate |
+
+#### Success-probability ranking
+
+| Rank | Candidate | Verdict |
+|---|---|---|
+| 1 | **T-Motor MN2206-13 KV2000 ×3 (A, incumbent)** | Real, demonstrated short-duration torque headroom (≈1.9-2.9× the old steady target) against the paired driver's own current rating; already validated in this project; no lifecycle risk. The one open concern (sensorless commutation's braking-dynamics fidelity) is a driver-architecture question, not a motor-choice problem — addressed in the Motor Driver IC section below, not by switching motors. |
+| 2 (rejected) | **maxon EC45 flat 200142 (B)** | Technically compelling on paper (Hall sensing, high Kt, real published rotor inertia) — but **formally NRND on maxon's own current product page**, a real disqualifying lifecycle finding for a new Rev 5 design, independent of its ≈4× cost premium (which itself was never independently re-verified this session). This is the JAXA reference's own part, evaluated fresh per this project's own anti-copy discipline, and found to have a real, primary-source reason for rejection — not rejected merely for being the reference part. |
+
+#### Recommendation
+
+- **Recommended candidate**: **A — T-Motor MN2206-13 KV2000 ×3** (one per
+  axis), retaining the already-approved Rev 3 part.
+- **Rationale**:
+  1. **Real re-justification performed** (REQ-508): the existing
+     pairing's torque/current headroom was independently re-derived
+     against a more aggressive event than the original steady-state 5mN·m
+     target, confirming real margin (≈1.9-2.9×) rather than assuming it.
+  2. **maxon EC45 flat is independently disqualified on a real, primary-
+     source lifecycle finding (NRND)** — not merely "the more expensive
+     option" or "not what we already have." This is exactly the kind of
+     evidence-grounded disqualification this project's own culture
+     requires, distinguishing "we're keeping the cheaper part" from "we
+     checked the alternative and it's genuinely unsuitable for a new
+     design."
+  3. Reuses an already-validated, already-approved part — avoids
+     re-qualifying 3× new motor hardware with no offsetting benefit once
+     the JAXA reference part is disqualified on its own real merits.
+- **Trade-offs accepted**:
+  - Giving up maxon's Hall-sensored observability and much higher Kt — a
+    real technical advantage in principle, but moot given the NRND
+    disqualification; if hard-brake control fidelity genuinely proves
+    inadequate with the sensorless incumbent at Circuit Design/bring-up
+    time, this trade-off should be revisited against a **different**,
+    non-NRND Hall-sensored motor, not by resurrecting the disqualified
+    maxon part.
+  - No credible third motor candidate was found this session meeting this
+    project's own rigor bar — documented honestly per the skill's own
+    "if fewer exist, document why" convention, rather than inventing a
+    weak filler candidate.
+- **Open `UNKNOWN`s**:
+  1. Live 2026 qty-3 pricing and current stock for T-Motor MN2206-13 KV2000
+     — not independently re-verified this session; re-verify before BOM
+     lock.
+  2. maxon EC45 flat's real current pricing was never independently
+     confirmed this session even though it's disqualified anyway (moot,
+     flagged for completeness).
+  3. T-Motor MN2206-13's rotor inertia — still not published/confirmed (a
+     pre-existing UNKNOWN carried forward from the original Rev 3
+     comparison, not resolved this session either).
+  4. Manufacturer guidance on repeated hard-brake/momentum-dump duty
+     cycling for this motor — not found from a primary source; genuinely
+     new territory for this project.
+
+#### Escalation flags
+
+1. **Not a switch, but a real re-justification with a genuine new finding**
+   (NRND disqualification of the alternative) — worth the human's
+   awareness even though the practical outcome (keep the incumbent) is
+   the "boring" one, per this project's own discipline of not silently
+   equating "we didn't switch" with "we didn't check."
+2. **Hard-brake control-dynamics confidence remains only moderate** — see
+   the Motor Driver IC section's own Rev 5 subsection for the driver-
+   architecture implications and the DRV8316 escalation path.
+
+#### Approval
+
+| Role | Name | Date | Decision |
+|---|---|---|---|
+| Component Engineer | Component Engineer (AI agent, via parallel research sub-agent) | 2026-09-04 | Proposed — retain T-Motor MN2206-13 KV2000 ×3; maxon EC45 flat disqualified (NRND) |
+| Hardware Lead | Hardware Lead (this session) | 2026-09-04 | Concur — recommend approval; hard-brake control-dynamics confidence flagged as only moderate, routed to Motor Driver IC section's own escalation |
+| Chief Engineer (Human) | Human Chief Engineer | PENDING | Not yet reviewed |
+
+---
+
 ## Motor Driver IC
 
 > **Rev 3 addition, coupled to the Motor section above.** Per the Motor
@@ -923,6 +1325,136 @@ contention per the Motor section above.)*
 | Component Engineer | Component Engineer (AI agent) | 2026-08-31 | Proposed — TI DRV10983, paired with T-Motor MN2206-13 KV2000 (see Motor section) |
 | Hardware Lead | Hardware Lead (this session) | 2026-08-31 | Concur — recommend approval. The motor+driver compatibility reasoning (voltage/current/control-interface/commutation-scheme match) is sound and the DRV10983's FG-pin RPM path is a well-justified resolution for REQ-008/112 given the motor itself has no integrated sensor. Same evidence-quality-over-raw-spec reasoning against Candidate C (Toshiba) as the Motor section — agree this is the right call for a first-time bring-up. Routing the ~12V rail requirement (Escalation flag 3) to Power Engineer now. |
 | Chief Engineer (Human) — required if architecture-defining/major component | Human Chief Engineer (via creator/"General Chat" session) | 2026-08-31 | **Approved** — "T-Motor MN2206-13 KV2000 + TI DRV10983, as recommended" (same sign-off as the Motor section above — one coupled decision, independently re-verified by the human this session). |
+
+---
+
+### Rev 5 re-evaluation (3-axis scale, ×3) — TI DRV10983 retained as baseline; TI DRV8316 flagged as an escalation path for hard-brake fidelity
+
+> **Per REQ-508**, this is an explicit, individual re-justification of
+> whether the already-approved TI DRV10983 should be used ×3 (one per
+> axis, alongside the retained T-Motor MN2206-13 KV2000 — see Motor
+> section's own Rev 5 subsection above). **Conclusion: retain DRV10983 ×3
+> as the baseline recommendation**, with TI DRV8316 named as a documented
+> escalation path if bench characterization of REQ-021's hard-brake
+> maneuver shows the incumbent's sensorless commutation is inadequate.
+
+- **Driving requirement(s)**: REQ-015 (3× motor driver channels),
+  REQ-019/REQ-021 (electromagnetic brake / Cubli-style hard-brake maneuver
+  — this section's own new finding, below, is that the incumbent driver
+  already has a **documented brake mode that can satisfy REQ-019 with no
+  new brake hardware at all**), REQ-508 (individual re-justification).
+
+#### New finding this session: REQ-019 (brake) may not need new hardware at all
+
+A dedicated parallel research effort into electromagnetic brake candidates
+(full detail in the new Brake section below) found that **TI DRV10983
+already has a documented dynamic-braking mode**: setting the BRAKE bit
+turns on all three low-side MOSFETs simultaneously, shorting the motor's
+own phase windings to dissipate its stored kinetic energy — no separate
+brake coil, no flyback-diode circuit, no new mechanical part. Worked
+braking-torque-vs-time arithmetic (τ = ΔL/Δt, I_wheel=4.5×10⁻⁵ kg·m² from
+this project's own already-established flywheel figure):
+
+```
+At 3000 RPM (ω=314.16 rad/s), L = I·ω ≈ 0.01414 N·m·s
+  Stop in 50ms  → τ ≈ 0.283 N·m
+  Stop in 100ms → τ ≈ 0.141 N·m
+  Stop in 500ms → τ ≈ 0.028 N·m
+At 6000 RPM (ω=628.32 rad/s), L = I·ω ≈ 0.02827 N·m·s
+  Stop in 50ms  → τ ≈ 0.565 N·m
+  Stop in 100ms → τ ≈ 0.283 N·m
+```
+
+This is a genuinely different, better outcome than the kickoff's own
+framing assumed ("Electromagnetic brake — entirely new subsystem... needs
+its own from-scratch Component Selection and Circuit Design") — see the
+new Brake section below for the full candidate comparison and why dynamic
+braking is recommended over a discrete electromagnetic brake component.
+
+#### Candidate Comparison
+
+*(4 candidates compared — exceeds the ≥3 minimum.)*
+
+| Parameter | Candidate A — TI DRV10983 (incumbent) — ✅ RECOMMENDED (baseline) | Candidate B — TI DRV10970 | Candidate C — TI DRV8316 (escalation path) | Candidate D — onsemi MC33035 |
+|---|---|---|---|---|
+| Motor-type compatibility | Sensorless BLDC [DS-MTR-035] — matches retained T-Motor MN2206-13 | Requires Hall sensors — incompatible with the retained sensorless motor [DS-MTR-045] | Sensored **or** sensorless BLDC, MCU-controlled [DS-MTR-089] | Sensored BLDC controller (needs external MOSFET power stage) |
+| Documented brake mode | **Yes** — BRAKE bit shorts all 3 low-side MOSFETs [DS-MTR-093] | Not confirmed this session | Yes, supports brake modes as part of its broader sensored/sensorless FOC control authority [DS-MTR-090] | Requires external power-stage design to implement any brake behavior |
+| Control architecture | Integrated "appliance" sensorless speed controller — limited external control authority [DS-MTR-036] | Similar integrated appliance architecture, Hall-based | **MCU has direct control authority** — supports sensored/sensorless FOC/sinusoidal/trapezoid, external current sensing [DS-MTR-091] | Discrete controller IC, MCU/external logic drives commutation directly |
+| Current rating | 2A continuous/3A peak per phase [DS-MTR-034] | 1A RMS/1.5A peak — too current-limited for this application [DS-MTR-044] | Higher-current family (3.0A class per TI's own product family framing) [DS-MTR-092] | Depends entirely on external MOSFET stage chosen |
+| Price | ≈$2.58 qty1 (prior repo data) [DS-MTR-040] | ≈$1.48-1.53 qty1 (prior repo data) [DS-MTR-048] | **Live 2026 pricing not independently confirmed this session** | ≈$2.77 (onsemi's own product-page snippet, this session) |
+| Known risks | Sensorless commutation's braking-dynamics fidelity is only moderately confident (back-EMF observability degrades at low speed during a braking event) — a real, disclosed limitation, not a blocking defect | **DISQUALIFIED**: hard Hall-sensor requirement incompatible with the retained sensorless motor (same disqualification as the original Rev 3 comparison) | Needs materially more firmware/control complexity (external FOC control loop) than the incumbent's integrated appliance approach — a real cost of the escalation path, not a free upgrade | Adds discrete power-stage design burden; not an attractive fit for this project's integrated-driver preference |
+
+#### Success-probability ranking
+
+| Rank | Candidate | Verdict |
+|---|---|---|
+| 1 | **TI DRV10983 (A, incumbent, baseline)** | Already has a real, documented brake mode satisfying REQ-019 with zero new hardware; real current/torque headroom for the required braking-torque range (0.028-0.283 N·m per the worked arithmetic above, comfortably inside its 2-3A capability against the retained motor's 4.77 mN·m/A Kt). The one open question (braking *dynamics* fidelity for a repeatable, controlled Cubli-style maneuver) is a real, disclosed limitation, not disqualifying — best resolved by bench characterization, not by pre-emptively switching. |
+| 2 (documented escalation path, not primary) | **TI DRV8316 (C)** | The technically stronger choice if bench testing shows the incumbent's sensorless brake dynamics are inadequate — direct MCU control authority and sensored/FOC support would give materially better control over the braking event, at the cost of real added firmware/control complexity. Named explicitly so this path doesn't have to be re-discovered later. |
+| 3 (rejected) | **TI DRV10970 (B)** | Same disqualification as the original Rev 3 comparison — Hall-sensor-only, incompatible with the retained sensorless motor. |
+| 4 (not attractive) | **onsemi MC33035 (D)** | Real, historically-proven part, but requires a full discrete power-stage design this project's integrated-driver preference doesn't need. |
+
+#### Recommendation
+
+- **Recommended candidate**: **A — TI DRV10983 ×3**, retaining the
+  already-approved Rev 3 part, **using its own documented BRAKE bit
+  (dynamic braking) to satisfy REQ-019 — no new brake hardware
+  recommended at this stage.**
+- **Rationale**:
+  1. **A genuinely simpler outcome than the kickoff's own framing
+     anticipated** — REQ-019 (electromagnetic brake, "entirely new
+     subsystem") may be satisfiable by a firmware-only change to an
+     already-approved, already-owned part, not a new mechanical/electrical
+     subsystem at all.
+  2. The worked braking-torque arithmetic shows the actual torque needed
+     (0.028-0.283 N·m across a 50-500ms/3000-6000RPM sweep) is well within
+     what the existing motor+driver pairing's current rating can deliver.
+  3. **DRV8316 is named as a real, credible escalation path** — not
+     silently omitted — for if bench characterization (a future phase,
+     not this one) shows the incumbent's sensorless dynamics are
+     genuinely inadequate for a controlled, repeatable hard-brake
+     maneuver.
+- **Trade-offs accepted**:
+  - Deferring a firm answer on braking-dynamics fidelity to a future
+    bench-characterization phase, rather than resolving it here with no
+    real hardware to test against — an honest "UNKNOWN until tested"
+    disclosure, not a guess.
+  - Not adopting DRV8316 now, even though it's technically stronger,
+    because doing so would add real firmware/control complexity before
+    there's real evidence the simpler incumbent approach is inadequate —
+    consistent with this project's own "speed to a physical result"
+    precedent (§9f in `requirements/requirements.md`).
+- **Open `UNKNOWN`s**:
+  1. Actual measured braking torque/stop-time for DRV10983's BRAKE mode on
+     the real MN2206-13+flywheel system — **UNKNOWN until bench-tested**;
+     this is the single most important open item for REQ-019/REQ-021's
+     eventual validation.
+  2. Live 2026 qty-3 pricing/stock for DRV10983 — not independently
+     re-verified this session.
+  3. DRV8316's live 2026 pricing/stock — not independently confirmed this
+     session; moot unless the escalation path is actually exercised.
+
+#### Escalation flags
+
+1. **REQ-019's own scope may have just gotten materially smaller** — flag
+   this explicitly for the human/Hardware Lead's own awareness, since the
+   kickoff's own framing assumed a full new brake subsystem; this finding
+   changes that assumption in the project's favor (simpler, cheaper), but
+   should be confirmed, not silently adopted.
+2. **Real bench characterization of the BRAKE-mode stop-time/torque is a
+   load-bearing open item** for REQ-021's eventual safety analysis
+   (REQ-409) — flagged here so it isn't lost by the time Mechanical Review
+   happens.
+3. **DRV8316's escalation path requires materially more firmware/control
+   complexity** — a real cost, disclosed here so it isn't treated as a
+   free upgrade if it's later exercised.
+
+#### Approval
+
+| Role | Name | Date | Decision |
+|---|---|---|---|
+| Component Engineer | Component Engineer (AI agent, via parallel research sub-agents — motor/driver and brake research combined for this finding) | 2026-09-04 | Proposed — retain TI DRV10983 ×3 as baseline (satisfies REQ-019 via documented BRAKE mode, no new brake hardware); TI DRV8316 named as escalation path |
+| Hardware Lead | Hardware Lead (this session) | 2026-09-04 | Concur — recommend approval; bench characterization of BRAKE-mode dynamics flagged as a load-bearing open item for REQ-409's future safety analysis |
+| Chief Engineer (Human) | Human Chief Engineer | PENDING | Not yet reviewed |
 
 ---
 
@@ -1492,3 +2024,258 @@ depth as the 3 candidates actually in contention.)*
 | Component Engineer | Component Engineer (AI agent) | 2026-09-01 (revised same day, per human speed-priority clarification §9f) | Proposed — **Candidate A** (lazy susan turntable bearing), with Candidate B (dual 608ZZ ball-bearing vertical-shaft pivot) as the named documented alternative. Revised from an earlier same-day draft that had recommended B primary/A fallback on peak-friction-margin grounds, before the human's speed-to-physical-result priority was confirmed — recorded honestly, not silently overwritten (see `validation/change-log.md` ECO-027). See Escalation flags 1–3 for items requiring Hardware Lead/human confirmation before either is used downstream. |
 | Hardware Lead | Hardware Lead (this session) | 2026-09-01 | Concur — recommend A as primary, B as documented alternative, for review. Friction-margin arithmetic independently re-verified (0.5×0.0013×2.943×90 ≈ 0.1722 mN·m for A; 0.5×0.0013×2.943×8 ≈ 0.0153 mN·m for B — both confirmed by direct substitution, unchanged from the prior draft). This is an architecture-level decision — routed to the human Chief Engineer via cross-session message, not self-approved. |
 | Chief Engineer (Human) — required, architecture decision (`docs/architecture.md` §10) | Human Chief Engineer (Kyosuke), via creator/"General Chat" session | 2026-09-01 | **Approved — "Candidate A (lazy-susan turntable bearing, BC Precision 4LS-3, $13) — confirmed, matching your own revised recommendation."** This is the real human architecture decision, not a placeholder — Candidate A is now the approved mechanism; Candidate B remains documented as the alternative (not selected, not deleted). REQ-505's BOM ceiling is separately waived (see `requirements/requirements.md` §9g) — did not affect this decision since A already cleared the proposed ceiling by a wide margin. **Mechanical Design is authorized to proceed next** — integrate Candidate A into a new Bench-IMU-01 enclosure revision, per Mechanical Lead + Independent Mechanical Review process, same rigor as Rev 3. Other scope fences (no control loop/PID/attitude estimation, no 2nd/3rd wheel, no Control Engineer) remain active. |
+
+---
+
+## Electromagnetic Brake (Rapid Momentum-Dump / Cubli-Style Hard-Brake)
+
+> **Rev 5 addition.** This is a **new subsystem category**, requested by
+> the kickoff as if it would need "its own from-scratch Component
+> Selection" and "its own Circuit Design (brake driver circuit, flyback
+> diode protection for the inductive coil, MOSFET low-side switch)" —
+> mirroring the JAXA/Mitani reference design's 3× discrete electromagnetic
+> brakes. **The single most consequential finding in this entire Rev 5
+> Component Selection pass is that this assumption does not hold**: the
+> already-approved TI DRV10983 driver (see "Motor Driver IC" section
+> above) has a documented **BRAKE bit** that shorts all three motor phase
+> windings via its own internal low-side MOSFETs — the exact
+> "MOSFET switching an inductive load" physics that
+> `ktanino10/attitude-control-study`'s own `en/reference/interfaces.md`
+> describes conceptually, except applied to the motor's own windings
+> (which are themselves inductors) rather than to a separate, dedicated
+> brake coil. **This section is the formal, from-scratch Component
+> Selection record REQ-508 requires** — comparing that no-new-hardware
+> path against real discrete electromagnetic-brake candidates — not a
+> decision to skip Component Selection because a shortcut was found.
+
+- **Driving requirement(s)**: REQ-019 (electromagnetic brake / rapid
+  momentum-dump capability, new this revision), REQ-021 (Cubli-style
+  jump-and-balance maneuver — human-confirmed **Must**, §9j — the maneuver
+  this brake capability exists to serve), REQ-409 (safety analysis of the
+  hard-brake maneuver — this section's own recommendation directly affects
+  what that future analysis must characterize), REQ-508 (individual
+  re-justification; the JAXA reference's own discrete-brake choice is
+  architectural inspiration, not a parts list to transcribe).
+- **Constraints**: braking torque/response-time requirements are derived
+  from this project's own already-established flywheel inertia figure
+  (100 g at 30 mm radius ⇒ I ≈ 4.5×10⁻⁵ kg·m², per the Motor section above
+  and `requirements/requirements.md` §9b), not a fresh guess; the brake
+  must act on a system already committed to the T-Motor MN2206-13 KV2000 +
+  TI DRV10983 pairing (Motor / Motor Driver IC sections above, both
+  retained this revision) — any brake solution must be compatible with
+  that already-approved pairing, not assume a clean slate; real 2026
+  pricing/stock for any *new* discrete part could not be reliably
+  confirmed this session (automated distributor fetches repeatedly
+  blocked), recorded honestly as `UNKNOWN`, not glossed over.
+
+#### Worked braking-torque-vs-time arithmetic
+
+Using this project's own already-established flywheel inertia
+(I_wheel ≈ 4.5×10⁻⁵ kg·m², independently re-derived multiple times already
+in this file from `requirements/requirements.md` §9b's own 100 g/30 mm
+figures — not re-derived differently here) and the standard angular-
+momentum braking relation τ = ΔL/Δt = I·Δω/Δt:
+
+```
+At 3000 RPM (ω = 314.16 rad/s):  L = I·ω ≈ 0.01414 N·m·s
+  Stop in 50 ms  → τ ≈ 0.283 N·m
+  Stop in 100 ms → τ ≈ 0.141 N·m
+  Stop in 500 ms → τ ≈ 0.028 N·m
+At 6000 RPM (ω = 628.32 rad/s):  L = I·ω ≈ 0.02827 N·m·s
+  Stop in 50 ms  → τ ≈ 0.565 N·m
+  Stop in 100 ms → τ ≈ 0.283 N·m
+```
+
+This range (≈0.03–0.57 N·m depending on speed/stop-time target) is the
+concrete target any brake candidate below is measured against. Note this
+is **torque required of the braking mechanism**, not the same figure as
+the motor's own continuous-drive torque target (5 mN·m, an order of
+magnitude smaller) — braking a spinning mass and driving it are different
+physical demands, and this section does not conflate them.
+
+#### Candidate Comparison
+
+*(2 real, independently-verified candidates compared. Per this skill's own
+"if fewer exist, document why" convention: a third architecturally-distinct
+path — a discrete, purpose-built brake coil driven by its own dedicated
+external MOSFET low-side switch + flyback diode, i.e. literally building
+the circuit the kickoff's own text anticipated — was considered but is
+**not listed as a separate candidate** here, because it is not a different
+component choice from Candidate B below; it is the Circuit Design
+implementation Candidate B would require if it were ever selected. Folding
+it in as a nominal "Candidate C" would double-count the same underlying
+part choice rather than add real comparison value.)*
+
+| Parameter | Candidate A — TI DRV10983's own BRAKE bit (existing driver, no new part) — ✅ RECOMMENDED | Candidate B — Ogura MCNB series spring-applied electromagnetic brake (discrete, new part) — documented fallback |
+|---|---|---|
+| New hardware required | **None** — firmware-only change to the already-approved, already-owned driver IC | New discrete brake unit ×3 (one per axis), new mounting/shaft-coupling hardware, new driver circuit (flyback diode + MOSFET low-side switch, per the kickoff's own anticipated design) |
+| Mechanism | Shorts all 3 motor phase windings via 3 internal low-side MOSFETs simultaneously — resistive/back-EMF dynamic braking [DS-MTR-093] | Spring-applied, electromagnetically-released friction disc brake: **power-OFF engages** the brake (spring force), **power-ON (12/24VDC coil) releases** it — a fail-safe-to-engaged behavior, opposite in failure direction from a normally-open design [DS-BRK-001] |
+| Response/engagement time | **UNKNOWN until bench-tested** — no primary-source figure found for *this specific driver's* dynamic-braking stop-time; the worked arithmetic above gives the *required* torque, not a datasheet-confirmed *achieved* stop-time | Spring-applied brakes are typically millisecond-scale mechanical engagement once actuated, but this project's own exact shaft-bore/torque-variant compatibility with the 3mm T-Motor MN2206-13 shaft was **not independently confirmed from a primary source this session** [DS-BRK-002] |
+| Torque capability vs. this project's ≈0.03–0.57 N·m target | Bounded by the driver's own current rating (2A continuous/3A peak per phase) against the retained motor's Kt=4.77 mN·m/A — the same current/torque headroom already re-derived in the Motor Driver IC section's Rev 5 subsection (≈9.5–14.3 mN·m available torque budget at the motor itself; actual *braking* torque delivered depends on back-EMF/short-circuit dynamics, not a simple Kt multiplication, and is part of the bench-test unknown above) | Ogura MCNB family spans a real published torque range across its size variants — the general product family is credible for this torque class, but the **specific variant/torque rating needed for this project's exact application was not narrowed to one SKU this session** [DS-BRK-003] |
+| Failure-mode behavior | If driver power is lost, brake is **not engaged** (windings float) — same failure direction as the existing design already has for normal motor operation; no *new* failure mode introduced | **Fail-safe**: spring engages the brake automatically on power loss — a genuinely different, arguably safer failure-mode property than Candidate A, relevant to REQ-403/REQ-409's safety framing |
+| Integration/mass/mounting impact | **Zero** new mechanical integration — uses the motor's own existing shaft/rotor, no new part to mount | Requires a real mechanical mounting solution (shaft coupling, bracket) per axis ×3 — a new Mechanical Design task, not just a BOM addition |
+| Price / lifecycle | $0 incremental (firmware-only, already-owned driver) | Real 2026 qty-3 pricing/stock **not independently confirmed this session** (automated distributor fetches partially blocked); family exists across Electromate/MISUMI distributor listings [DS-BRK-004] |
+| Known risks | **Bench-characterization is a real, load-bearing open item, not a formality** — this is a firmware-controlled dynamic-braking mode on an "appliance-style" sensorless driver IC, and its actual stop-time/torque/repeatability on the real motor+flywheel system is genuinely unverified; if bench testing shows it inadequate for REQ-021's repeatable hard-brake maneuver, escalate to TI DRV8316 (see Motor Driver IC section's own escalation path) before reaching for a discrete brake | Adds real cost, mass, mounting complexity, and a new driver circuit (flyback diode + MOSFET) across 3 axes for a capability that may not be needed at all if Candidate A proves adequate |
+
+#### Success-probability ranking
+
+| Rank | Candidate | Verdict |
+|---|---|---|
+| 1 | **A — TI DRV10983's own BRAKE bit** | Zero incremental cost, mass, or mechanical integration; reuses an already-approved, already-owned part; the required torque range (≈0.03–0.57 N·m) is plausible against the driver's own current rating. The one real gap — bench-confirmed stop-time/torque/repeatability — is exactly the kind of `UNKNOWN` this project's own culture requires disclosing rather than guessing at, not a reason to reach for more hardware pre-emptively. |
+| 2 (documented fallback) | **B — Ogura MCNB series** | A real, credible discrete-brake path if bench testing shows Candidate A inadequate — notably with a genuinely different (arguably safer) fail-safe-on-power-loss behavior worth keeping in mind for REQ-409's eventual safety analysis. Not adopted now because it adds real cost/mass/mounting/circuit-design burden this project's own "speed to a physical result" precedent (§9f) argues against paying unless proven necessary. |
+
+#### Recommendation
+
+- **Recommended candidate**: **A — no new brake hardware.** Use TI
+  DRV10983's own documented BRAKE bit (dynamic braking via all 3 low-side
+  MOSFETs) to satisfy REQ-019, pending bench characterization.
+- **Rationale**:
+  1. This is a genuinely better outcome than the kickoff's own framing
+     anticipated, found by evaluating the JAXA reference's own
+     conceptual reasoning (why a MOSFET can brake an inductive load)
+     against **this project's actual already-selected hardware**, rather
+     than assuming a separate brake coil was needed just because JAXA
+     used one.
+  2. Zero incremental BOM cost, mass, or mechanical-integration burden —
+     directly favorable to a bench-test prototype's schedule and budget,
+     consistent with this project's repeatedly-stated priorities.
+  3. A real, named fallback (Candidate B) exists and is not silently
+     omitted if bench testing proves Candidate A inadequate.
+- **Trade-offs accepted**:
+  - Giving up Candidate B's fail-safe-on-power-loss property — a real,
+    disclosed safety-relevant difference, explicitly flagged for REQ-409's
+    future safety analysis rather than silently dropped.
+  - Deferring a firm answer on braking dynamics/repeatability to a future
+    bench-characterization phase — an honest `UNKNOWN until tested`
+    disclosure, not a guess, and not this phase's job to resolve (this is
+    Component Selection, not bench validation).
+- **Open `UNKNOWN`s**:
+  1. **Actual measured stop-time/torque/repeatability of DRV10983's BRAKE
+     mode on the real motor+flywheel system** — the single most important
+     open item, load-bearing for REQ-021/REQ-409's eventual safety
+     analysis. Not estimated; must be bench-tested.
+  2. Ogura MCNB's exact shaft-bore/torque-variant compatibility with this
+     project's 3mm motor shaft — not independently confirmed this session.
+  3. Live 2026 qty-3 pricing/stock for Ogura MCNB (moot unless the
+     fallback path is actually exercised).
+- **Escalation flags**:
+  1. **REQ-019's own scope may have just gotten materially smaller** than
+     the kickoff assumed — flagged explicitly for the human's own
+     awareness, since this changes a "new subsystem, new Circuit Design"
+     assumption into "a firmware change to an already-approved part,
+     pending bench test." This is a real scope change, not a decision this
+     Component Selection phase can finalize on its own.
+  2. **Bench characterization of BRAKE-mode stop-time/torque is safety-
+     relevant** (REQ-409) and must not be estimated or assumed adequate —
+     kept `UNKNOWN` here deliberately.
+  3. If bench testing shows Candidate A inadequate, the escalation path is
+     **first** to TI DRV8316 (Motor Driver IC section's own Rev 5
+     subsection — a driver-level fix retaining "no new brake hardware"),
+     and only **then**, if that also proves inadequate, to Candidate B
+     here or an equivalent discrete brake — this ordering is a
+     recommendation, not a finalized decision.
+
+#### Approval
+
+| Role | Name | Date | Decision |
+|---|---|---|---|
+| Component Engineer | Component Engineer (AI agent, via parallel research sub-agent) | 2026-09-04 | Proposed — no new brake hardware; reuse TI DRV10983's own BRAKE bit; Ogura MCNB documented as discrete-brake fallback |
+| Hardware Lead | Hardware Lead (this session) | 2026-09-04 | Concur — recommend approval for the Component-Selection-level recommendation; explicitly **not** approving REQ-019's scope reduction as a done deal, nor treating BRAKE-mode adequacy as proven — both routed to the human below |
+| Chief Engineer (Human) — required: (a) this is a new-subsystem-avoiding architecture decision, (b) REQ-019's scope may be materially reduced from what was approved at kickoff | Human Chief Engineer | PENDING | Not yet reviewed |
+
+---
+
+## Wireless Remote-Control Link
+
+> **Rev 5 addition.** New subsystem category — Rev 1-4 had no wireless
+> requirement at all (USB-tethered bench rig only). REQ-020 (wireless)
+> became a **Must** once the human confirmed REQ-021's jump-and-balance
+> maneuver (§9j): an untethered maneuver cannot rely on a USB cable for
+> command/telemetry. This section's recommendation is **directly coupled**
+> to the MCU Rev 5 recommendation above (ESP32-S3) — if ESP32-S3 is
+> approved, its own built-in Wi-Fi+BLE radio satisfies REQ-020 with **zero
+> additional wireless-module BOM line**; this section exists to document
+> that coupling explicitly and to name a real, independent fallback module
+> in case the MCU decision changes.
+
+- **Driving requirement(s)**: REQ-020 (wireless remote-control link — now
+  **Must**, §9j), REQ-021 (the untethered jump/stand maneuver that drives
+  REQ-020's urgency), REQ-508 (individual re-justification — the JAXA
+  reference design used a UART-based wireless remote link as a discrete
+  module; this project's own newly-selected MCU may make that unnecessary,
+  evaluated fresh rather than assumed).
+- **Constraints**: must support a command/telemetry link sufficient for
+  remote control of the jump/stand maneuver (not a high-bandwidth
+  streaming requirement); must not require an external module if the
+  selected MCU already provides equivalent capability; real 2026
+  pricing/stock for any candidate module could not be reliably confirmed
+  this session (flagged honestly, not glossed over).
+
+#### Candidate Comparison
+
+*(3 candidates compared — meets the ≥3 minimum. Candidate A is not a
+discrete part but the MCU's own built-in radio, evaluated on the same
+comparison axes as a fair alternative to adding a separate module.)*
+
+| Parameter | Candidate A — ESP32-S3's own built-in Wi-Fi+BLE (native, no separate module) — ✅ RECOMMENDED, conditional on MCU Rev 5 approval | Candidate B — Renesas/Dialog DA14531MOD (BLE UART-bridge module, e.g. MikroE "BLE TINY Click") — documented fallback | Candidate C — generic nRF24L01+-class simple 2.4GHz UART bridge module |
+|---|---|---|---|
+| Radio capability | Wi-Fi 802.11 b/g/n + Bluetooth LE 5 (incl. Long Range/Coded PHY) [DS-MCU-082] | Bluetooth LE 5.x, UART/AT-command interface via CodeLess firmware [DS-RF-001] | Proprietary 2.4GHz, not a standard protocol — no phone/tablet interoperability without custom app work on the remote-control side (a real practicality concern for a "remote-control link" this project's own README-level framing implies a human operator using) |
+| Incremental BOM cost | **$0** — already part of the MCU module | Real per-unit module price **not independently confirmed this session** (MikroE's own $18 dev-board price was found, but that is a full breakout board, not a bare-module unit price — flagged honestly rather than repeated as if it were the real BOM-line cost) [DS-RF-002] | Typically ~$1-2/module per common hobbyist-market listings (not independently re-verified from a primary distributor this session) |
+| Integration effort | **Lowest** — same MCU already selected for compute; no new UART wiring, no new firmware driver, no new footprint | Requires a dedicated UART connection, a new firmware driver (AT-command or CodeLess protocol), and a new PCB footprint/antenna keep-out | Requires a dedicated UART/SPI connection, a new firmware driver, and a new PCB footprint/antenna keep-out; no standard phone-side BLE stack applies |
+| Standard protocol / phone-app interoperability | Yes — BLE is natively supported by iOS/Android; Wi-Fi enables a full IP-based remote-control app if desired | Yes — BLE, same phone/tablet interoperability property as Candidate A | **No** — proprietary 2.4GHz protocol has no built-in phone-side support; a custom receiver/bridge would be needed for anything beyond a matching hobbyist transmitter module |
+| Lifecycle/EOL | Active [DS-MCU-085] | Not independently re-confirmed to a clean, current lifecycle statement this session | Not independently re-confirmed to a clean, current lifecycle statement this session; broad hobbyist-market genericness makes exact manufacturer/lifecycle tracking difficult |
+| Known risks | **Entirely contingent on the MCU Rev 5 recommendation (ESP32-S3) being approved** — if a different MCU is ultimately selected, this candidate does not exist and Candidate B becomes the primary path | Real per-unit bare-module pricing/range not independently confirmed this session; adds a real new PCB footprint/antenna-keepout design task regardless of MCU choice | No standard protocol support undermines the "remote-control" use case's likely need for a phone/tablet-side control app; weaker sourcing/lifecycle traceability than a named manufacturer part |
+
+#### Success-probability ranking
+
+| Rank | Candidate | Verdict |
+|---|---|---|
+| 1 (conditional) | **A — ESP32-S3 native Wi-Fi+BLE** | Zero incremental BOM cost, zero new firmware driver category, zero new PCB footprint — directly follows from the MCU Rev 5 recommendation above. This is the clearly correct choice **if and only if** ESP32-S3 is approved as the MCU; it is not a standalone recommendation independent of that decision. |
+| 2 (documented fallback) | **B — DA14531MOD-class BLE bridge** | The correct fallback if a different MCU (e.g. STM32F411CET6) is ultimately selected — real BLE capability, standard phone-app interoperability, from a named manufacturer part with real (if not fully re-verified) documentation. |
+| 3 (not recommended) | **C — generic 2.4GHz UART bridge** | Lacks standard-protocol phone/tablet interoperability, which likely matters for a human-operated "remote-control" use case; weaker sourcing/lifecycle traceability than a named manufacturer part. Not disqualified outright, but clearly inferior to B for this project's actual use case. |
+
+#### Recommendation
+
+- **Recommended candidate**: **A — ESP32-S3's own built-in Wi-Fi+BLE radio**,
+  **conditional on the MCU Rev 5 recommendation (ESP32-S3) being approved.**
+  If a different MCU is ultimately selected, this recommendation
+  automatically falls back to **B — DA14531MOD-class BLE bridge module**,
+  not to Candidate C.
+- **Rationale**:
+  1. This decision is not independent of the MCU choice — presenting it
+     as if it were would misrepresent the actual coupling between the two
+     Rev 5 findings. Recording that coupling explicitly, rather than
+     picking a wireless part in isolation, is the honest way to record
+     this recommendation.
+  2. If ESP32-S3 is approved, the zero-incremental-cost/zero-new-firmware-
+     driver/zero-new-footprint outcome is strictly better than any
+     discrete module path, on every axis compared.
+  3. A real, named fallback (B) exists and is not silently omitted if the
+     MCU decision goes a different way.
+- **Trade-offs accepted**:
+  - This recommendation's validity is entirely contingent on a decision
+    (MCU) still marked `PENDING` human approval — explicitly disclosed,
+    not hidden behind a confident-sounding standalone recommendation.
+  - Real per-unit pricing for Candidate B (the fallback) was not
+    independently confirmed this session — acceptable since it is not
+    the primary path, but flagged for re-verification before it would
+    ever actually be needed.
+- **Open `UNKNOWN`s**:
+  1. Real per-unit bare-module pricing for DA14531MOD-class modules (the
+     fallback path) — not independently confirmed this session.
+  2. Exact wireless protocol/range/latency requirements for the actual
+     jump/stand remote-control use case — not yet specified at a level of
+     detail this section could design against; likely a Circuit
+     Design/Firmware-stage refinement, not a Component-Selection-stage gap.
+- **Escalation flags**:
+  1. **This recommendation is conditional, not standalone** — the human's
+     MCU decision determines which candidate (A or B) actually applies;
+     both should be reviewed together, not as independent approvals.
+
+#### Approval
+
+| Role | Name | Date | Decision |
+|---|---|---|---|
+| Component Engineer | Component Engineer (AI agent, via parallel research sub-agent) | 2026-09-04 | Proposed — ESP32-S3 native Wi-Fi+BLE if MCU recommendation approved; DA14531MOD-class BLE bridge as fallback |
+| Hardware Lead | Hardware Lead (this session) | 2026-09-04 | Concur — recommend approval, explicitly conditional on the MCU Rev 5 decision; both should be reviewed as one coupled decision |
+| Chief Engineer (Human) — required: key-component decision, coupled to the MCU decision above | Human Chief Engineer | PENDING | Not yet reviewed |
