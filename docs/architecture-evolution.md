@@ -2136,6 +2136,30 @@ and this addendum only.
   priority should change in light of it is that session's call to revisit,
   not this addendum's to pre-empt. See `docs/architecture.md` §17.1's own
   forward pointer to this entry.
+- **Disposition reversed, same day: implementation commissioned.** The
+  session that closed the "not implemented now" disposition revisited it
+  in light of the MISS-023 chain above, plus the practical fact that four
+  independently-audited, documentation-only PRs (#39, #40, #41, and #42
+  itself — all confirmed zero-diff under `hardware/**`/`firmware/**`/
+  `bom/**`) were genuinely blocked by an open-ended freeze rather than a
+  short wait for one known fix — a materially different situation than the
+  one the original disposition was reasoned against. Updated call: **build
+  the diff-aware exemption**, explicitly as its own separate,
+  properly-reviewed PR (a real change to the Design Complete Gate's own
+  enforcement mechanism, `tools/check_open_issues.py` /
+  `.github/workflows/hardware-gate.yml`), not folded into this
+  documentation-only PR, and explicitly cautioned not to let the urgency of
+  unblocking four PRs compress that review. This session commissioned a
+  dedicated child session to carry it out (kicked off in `plan` mode, so it
+  pauses for a reviewed plan before touching CI logic; given full context
+  on the PR #27 path-filter lesson, the required diff-aware shape, and an
+  instruction to coordinate with the creator/orchestrator session rather
+  than this one) rather than implementing it in-session, which would have
+  mixed a real code change into this PR's otherwise purely-documentation
+  diff. §17.1's original disposition text is left standing, not deleted,
+  per this document's own forward-correcting convention — this bullet is
+  the record of the reversal; the eventual implementing PR gets its own
+  addendum for the actual change.
 - **Grounding, verified rather than merely asserted**: the branch-protection/
   CI-override guidance and the multi-agent/agentic-AI governance guidance
   cited in §17.4 were independently corroborated by this session via live

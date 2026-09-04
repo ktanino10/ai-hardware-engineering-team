@@ -846,13 +846,21 @@ change and should go through the same review any other change to
 pre-approved it in the abstract.
 
 **Update — this disposition's own premise was partially undermined the
-same day.** It assumed `main` unfreezes once MISS-034 lands. A newly
-re-opened HIGH finding (MISS-023) means that is not so — see
-`docs/architecture-evolution.md` §42's dated post-disposition entry for
-the independently-verified detail. This disposition has not yet been
-formally revisited in light of that; it is left as originally decided
-(not implemented now) rather than unilaterally reversed here, since
-closing it was an explicit call by the session that made it.
+same day, and the disposition has now been superseded.** It assumed
+`main` unfreezes once MISS-034 lands. A newly re-opened HIGH finding
+(MISS-023) means that is not so — see `docs/architecture-evolution.md`
+§42's dated post-disposition entry for the independently-verified detail.
+The session that made the original "not implemented now" call has since
+revisited it in light of that fact, plus the practical reality that four
+independently-audited, documentation-only PRs are genuinely blocked by an
+open-ended freeze (not a short wait for one known fix) — **and reversed
+it: the diff-aware exemption is now being implemented**, as its own
+separate, properly-reviewed PR, explicitly not folded into this
+documentation-only one, commissioned in a dedicated session rather than
+rushed to unblock four PRs quickly. This paragraph is left standing rather
+than deleted, per this document's own forward-correcting convention — see
+`docs/architecture-evolution.md` §42 for the record of who reversed the
+call and when, and the eventual implementing PR for its own addendum.
 
 **Operational note (2026-09-04): required reviews now fold into the same
 admin-bypass mechanism, not a separate path.** `required_pull_request_
