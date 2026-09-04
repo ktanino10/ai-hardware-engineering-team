@@ -966,6 +966,22 @@ independently-checked repository state:
 4. Document that the disagreement occurred and how it was resolved (this
    section, and its evolution-log addendum, is that record for tonight's
    case).
+5. **A frozen `updated_at` and a zero/empty diff are not, by themselves,
+   evidence that a session has stalled or failed.** A session legitimately
+   in `plan` mode can research and draft a plan without touching its
+   working tree or committing anything, so those liveness-adjacent signals
+   can correctly read as frozen for an extended period while the session
+   is healthy and simply awaiting a plan-approval decision — not stalled.
+   Real, same-day incident: the creator/orchestrator session and an
+   independent autonomous cycle each separately misread exactly this
+   signature, for the same session, as "it died" — to the point of
+   spawning duplicate sessions and coming close to reporting a fictitious
+   platform failure to the human, before self-correcting (see
+   `docs/architecture-evolution.md` §42 for the dated record). Before
+   concluding a session has stalled: check its actual plan/approval state
+   through whatever session-inspection tooling is available, not
+   `updated_at`/diff-size alone. Only a prolonged period with *no* pending
+   plan *and* no diff is a genuine stall signal.
 
 ### 17.4 Grounding
 

@@ -2182,6 +2182,31 @@ and this addendum only.
   re-deriving rather than trusting a first measurement, the same standard
   §17.2 asks of everyone else, applied by an auditing session to its own
   output, not only to what it audits.
+- **Session-liveness misdiagnosis, same day: real, but only partially
+  independently reproduced.** The creator/orchestrator session reported
+  that it and an independent autonomous cycle (`2ec312f3`) each separately
+  misread a dedicated child session's (`914e4e71`, commissioned earlier
+  the same day to implement the diff-aware CI exemption above) frozen
+  `updated_at` and zero diff as "stalled/died," compounding into duplicate
+  sessions and a near-miss report of a fictitious platform failure, before
+  self-correcting via that session's plan-approval state. Existence of
+  `2ec312f3` (a real, later overnight-check-in-cycle session) and of
+  `914e4e71` itself were independently confirmed here via
+  `list_sessions_and_chats`/`get_session` before recording anything. The
+  specific claimed mechanism (a `pending_plan` field on `get_session`,
+  present with `awaiting_response: true`) was **not** independently
+  reproduced by this session: querying `914e4e71` directly at the time of
+  writing showed zero diff and no such field, one way or the other —
+  consistent with the plan having already been resolved by the time of
+  this check (a timing gap, not necessarily a contradiction), but not
+  confirmed either. §17.3 point 5 is worded to the well-corroborated
+  general lesson (frozen `updated_at`/zero diff alone is not a stall
+  signal; check actual plan/approval state first) rather than asserting
+  the specific field schema as independently confirmed fact — consistent
+  with this document's own standard of not writing down a technical
+  mechanism as verified when it wasn't. Flagged back to the creator session
+  for the exact `get_session` output it saw, in case the field-level detail
+  is worth tightening later.
 - **Grounding, verified rather than merely asserted**: the branch-protection/
   CI-override guidance and the multi-agent/agentic-AI governance guidance
   cited in §17.4 were independently corroborated by this session via live
