@@ -2004,3 +2004,118 @@ for this document's own audit-trail convention.
   merge — same process every prior change in this repository's history
   went through.
 
+## 42. Autonomous Operation & Cross-Session Coordination Governance Policy (Addendum — documentation only)
+
+Added after a single overnight monitoring window (2026-09-03/04) surfaced
+three concrete gaps in how this project's own autonomous sessions must
+behave once several of them operate on the same shared repository
+concurrently and asynchronously: no written rule for when a required CI
+gate may be bypassed, no standard for verifying a claimed human decision
+before acting on it, and no protocol for handling disagreement between two
+autonomous sessions. Unlike §33/§35/§36/§37 (each of which introduced or
+extended a discipline agent), and like §39/§41, this is **not** a new
+discipline and touches **zero** `.agent.md`/`SKILL.md` files — it adds
+`docs/architecture.md` §17 ("Autonomous Operation & Cross-Session
+Coordination Policy," plus one bullet appended to the existing §10 list)
+and this addendum only.
+
+- **Trigger**: real, verified incidents from the same overnight window,
+  each independently re-checked against primary sources before being cited
+  here (not taken on any session's self-report):
+  1. **PR #38** (merged, commit `816379e`) raised MISS-034 (CRITICAL — the
+     Bench-IMU-01 enclosure is dimensioned for a 100×50mm board that no
+     longer exists; the real board is 150×95mm) as a documentation-only PR
+     that intentionally failed `hardware-gate`, and was admin-merged by the
+     creator/orchestrator session after independently re-verifying every
+     load-bearing figure. **PR #40** (ISS-056, still OPEN at time of
+     writing) and **PR #41** (MISS-035, still OPEN at time of writing) each
+     subsequently declined the same option on the same class of PR,
+     reasoning that unilaterally freezing `main`'s clean-merge capability is
+     not an autonomous loop's call to make — confirmed via `gh pr view
+     38/40/41`, whose bodies this addendum cites accurately, not
+     paraphrases speculatively. `gh api repos/ktanino10/
+     ai-hardware-engineering-team/branches/main/protection` confirms
+     `enforce_admins.enabled = false` (bypass is technically available) and
+     confirms the same three required checks ("Check open-issues.md for
+     unresolved CRITICAL/HIGH findings," "Check ECO/Issue/Evidence IDs for
+     cross-branch duplicates," "Check agent/skill frontmatter") PR #38
+     actually saw. `gh api repos/ktanino10/ai-hardware-engineering-team/
+     commits/main/check-runs` independently confirms `main` itself still
+     fails the open-issues check today, from MISS-034 alone — the
+     disagreement this section resolves was real and, as of this writing,
+     still live, not historical.
+  2. The **disclosure-with-freeze vs. disclosure-without-freeze** reframing
+     (§17.1) — that an open, complete, cross-referenced PR already delivers
+     its disclosure value without a merge, so admin-override adds freeze
+     risk without adding incremental disclosure — surfaced in the same
+     discussion and is preserved here because it is the actual mechanism
+     that reconciles PR #38 against #40/#41 into one rule rather than
+     leaving both as unexplained exceptions to each other.
+  3. **Verification-before-acting**: commit `c51c516` ("Rev 5: record
+     verified human decision on §9h Q2 = YES (ECO-049)") shows the Rev 5
+     Requirements session declining to record a relayed human decision
+     until it independently confirmed the human's verbatim words via
+     `session_store_sql` against the creator/"General Chat" session's own
+     turn history (session `7fab99ef`, turn 415) — a first relay (turn 414)
+     had been explicitly declined pending exactly this confirmation, per
+     that commit's own message. §17.2 codifies this exact behavior as a
+     standing requirement.
+  4. **Unattributed branch-protection change**: confirmed via direct `gh
+     api .../branches/main/protection` that `required_pull_request_reviews`
+     is absent from current protection. Prior autonomous sessions have
+     reported this rule was present at an earlier point; that specific
+     claim cannot be independently re-confirmed by this or any future
+     session, since there is no mechanism to query GitHub's branch-
+     protection state as of a past moment. What is independently
+     verifiable, and was verified here: no audit-log API is available for
+     a personal-account repository to establish when/why/by whom any such
+     change happened, and `merged_by` cannot distinguish a human account
+     action from an agent-session action authenticated as that same
+     account. Recorded as `docs/architecture.md` §17.5, an open item — not
+     resolved by assumption.
+- **What was added**: `docs/architecture.md` new §17 (five subsections —
+  admin-override policy, verification-before-acting standard, cross-session
+  conflict/staleness handling, grounding/sources, and the open item above —
+  plus one bullet appended to the existing §10 list); this addendum.
+- **Grounding, verified rather than merely asserted**: the branch-protection/
+  CI-override guidance and the multi-agent/agentic-AI governance guidance
+  cited in §17.4 were independently corroborated by this session via live
+  web search and direct retrieval of the source articles (Arthur AI's
+  "Human-in-the-Loop Governance for AI Agents"; the Architecture &
+  Governance Institute's "Governing Multi-Agent AI Systems" enterprise
+  blueprint; current tiered-risk agentic-AI-governance guidance including
+  Tigera's; and NIST AI RMF/ISO 42001-style continuous-improvement/
+  postmortem practice) — not transcribed from a single prior pass without
+  checking, per this project's own Source-of-Truth culture applied to
+  process documentation rather than component datasheets.
+- **Explicitly not an ECO, not a new discipline**: this addendum and
+  `docs/architecture.md` §17 (plus the one §10 bullet) are the only content
+  added; nothing under `hardware/**`, `bom/**`, `firmware/**`,
+  `requirements/**`, or `validation/**` is modified, and no `.agent.md`/
+  `SKILL.md` file is touched — per
+  `.github/instructions/hardware-design.instructions.md`'s own ECO trigger,
+  no design change occurred, so no `validation/change-log.md` entry is
+  created or needed. This mirrors §39/§40/§41's own precedent exactly.
+- **This PR's own gate status, verified rather than assumed**: because
+  `.github/workflows/hardware-gate.yml`'s required check deliberately runs
+  unfiltered on every `pull_request` (that file's own header comment,
+  added by PR #27) and validates the *entire* current
+  `validation/open-issues.md`, **this PR is expected to show `hardware-gate`
+  as failing** — inherited from MISS-034 on `main`, not introduced by
+  anything in this PR's own diff (which touches zero files under
+  `hardware/**`, `firmware/**`, `bom/**`, or `validation/**`). Per §17.1's
+  own decision tree (case 2: inherited failure, zero design-artifact paths
+  touched), this PR must **not** be admin-overridden and is left open,
+  exactly like PR #40/#41 — a direct, immediate self-application of the
+  policy this addendum documents, not a hypothetical.
+- **Files added/edited**: `docs/architecture.md` (§10 bullet + §17
+  appended); `docs/architecture-evolution.md` (this addendum).
+- **Confirmed untouched**: every `.agent.md`/`SKILL.md` file; all of
+  `hardware/**`, `bom/**`, `firmware/**`, `requirements/**`, `validation/**`,
+  `datasheets/**`; `docs/workflow.md`; `README.md`;
+  `tools/check_open_issues.py`; `.github/workflows/hardware-gate.yml`.
+- **Status**: implemented, PR opened, awaiting independent audit before
+  merge, deliberately left gate-blocked per its own §17.1 case-2 rule —
+  same process every prior change in this repository's history went
+  through.
+

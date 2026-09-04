@@ -557,6 +557,10 @@ required:
   (Phase 2, `docs/architecture-evolution.md` §32). Not yet applicable to
   any session without a physical board to flash (§5.4) — flagged here so a
   future session with real hardware doesn't skip it.
+- Admin-overriding a required CI status check on a pull request — added
+  after a real same-night disagreement between autonomous sessions over
+  exactly this question; see §17 for the standing decision tree
+  (`docs/architecture-evolution.md` §42).
 
 ## 11. Benchmark Project & Roadmap
 
@@ -722,3 +726,203 @@ docs/
 tools/check_open_issues.py                 CI gate parser for open-issues.md
 tools/check_agent_frontmatter.py           CI lint for agent/skill frontmatter (Phase 1)
 ```
+
+## 17. Autonomous Operation & Cross-Session Coordination Policy
+
+Added 2026-09-04 after a single overnight monitoring window (full incident
+record: `docs/architecture-evolution.md` §42) exposed three real gaps in how
+this project's own autonomous sessions must behave once they operate
+concurrently and asynchronously against the same shared repository: (a) no
+rule for when a required CI gate may be bypassed, (b) no standard for
+verifying a claimed human decision before acting on it, and (c) no protocol
+for handling disagreement between two autonomous sessions working the same
+repo. This section is grounded in established DevOps branch-protection
+practice and current multi-agent/agentic-AI governance literature (sources
+in §17.4), applied to this project's own real incidents rather than invented
+in the abstract.
+
+### 17.1 Admin-override / required-gate-bypass policy
+
+**Default: do not bypass a required status check.** `enforce_admins` being
+`false` on this repository means bypass is *technically* available to an
+admin — that is a capability, not a standing permission to use it. Bypass is
+the deliberate exception on a shared `main`, never the routine path.
+
+This project's own history produced two different answers to the same
+question on the same night: PR #38 (MISS-034, a genuine CRITICAL) was
+admin-merged past a red `hardware-gate`; PRs #40 (ISS-056) and #41
+(MISS-035) each explicitly declined the same option, reasoning that
+freezing `main`'s clean-merge capability isn't an autonomous loop's call to
+make. Both were defensible in isolation. This subsection replaces both with
+one standing rule.
+
+**The reframing that resolves it**: a PR that is open, complete, and public
+already delivers its disclosure value the moment it is opened — it is
+linkable, permanent in git history, and (per this repo's convention) already
+cross-referenced from related artifacts. Merging it into `main` past a
+required gate adds a **repository-wide merge freeze** as a side effect,
+without adding any *incremental* disclosure. The real trade-off is
+**"disclosure-with-freeze" vs. "disclosure-without-freeze,"** not "truth vs.
+silence" — the latter framing can be used to justify almost any override and
+must not be treated as self-sufficient justification on its own.
+
+**Standing rule** (decision tree, evaluated in order):
+
+1. Does the PR's diff modify an *existing* finding's Severity/Status in
+   `validation/open-issues.md`, or touch a path under `hardware/`,
+   `firmware/`, or `bom/`? → **Never admin-override.** A gate failure here
+   means the gate is doing exactly its job; fix the underlying issue or get
+   a proper human disposition instead of bypassing.
+2. Is the gate failure entirely **inherited** — caused by a different,
+   already-disclosed, pre-existing OPEN finding elsewhere in the file, not
+   by anything this PR's own diff introduces (the PR #40/#41 situation, and
+   the default state of `main` today because of MISS-034)? → **Default: do
+   not admin-override.** Leave the PR open. It merges cleanly the moment the
+   blocking finding is dispositioned. No autonomous session may override
+   this default on its own judgment that its content is "too important to
+   wait."
+3. Is this PR's **own new row** what turns the gate red for the first time
+   (the PR #38/MISS-034 situation)? The disclosure-vs-freeze reframing above
+   still applies: opening the PR already discloses the finding. **Default is
+   still no admin-override.** An override may be used **only** with explicit
+   human Chief Engineer authorization, given *after* being shown the
+   disclosure-with-freeze/disclosure-without-freeze trade-off explicitly
+   (not a "hiding a CRITICAL" framing) — this is a human-reserved decision
+   (§10), not an autonomous-session self-authorization.
+4. **Whenever an override is used** (by human authorization, case 3 only),
+   record in the same PR and in `validation/change-log.md` or a future
+   `docs/architecture-evolution.md` addendum: the reason, the authorizing
+   human, exactly which check(s) were bypassed, that the bypass was scoped
+   to this one PR (not a standing change to branch protection), and a
+   same-day follow-up dispositioning the underlying finding. This mirrors
+   PR #38's own informal practice, made a hard requirement rather than a
+   courtesy.
+
+**A structural alternative, evaluated, not implemented here**: a CI rule
+that mechanically exempts a PR from the CRITICAL/HIGH gate when its diff
+touches zero paths under `hardware/**`, `firmware/**`, `bom/**` (regardless
+of pre-existing OPEN findings elsewhere) would remove the temptation to
+admin-override *and* the temptation to self-classify a PR as "documentation
+only" without a mechanical test backing that claim. **It must not be
+implemented as a path-filtered `pull_request` trigger** — this repository
+already tried that shape and reverted it (PR #27): a required status check
+that a path filter skips never reports a conclusion at all, so it stays
+"Expected" forever and paradoxically *forces* admin bypass on any PR that
+doesn't happen to touch every required check's path set. The technically
+sound shape is a **diff-aware check**: keep the job running (and reporting)
+on every PR as today, but have `tools/check_open_issues.py` compute the PR's
+changed-file set and pass the CRITICAL/HIGH gate whenever that set touches
+none of `hardware/**`, `firmware/**`, `bom/**` — independent of what is
+currently OPEN elsewhere in the file. This is a **recommendation for a
+separate, future, human-approved change** to `tools/check_open_issues.py` /
+`.github/workflows/hardware-gate.yml` (itself an architecture/CI decision
+under §10) — not implemented by this documentation-only change. Until it
+exists, the decision tree above is the only mechanism.
+
+### 17.2 Verification-before-acting standard
+
+Any session must **independently verify** a claimed human decision before
+acting on it, whenever the action is safety-relevant, scope-changing (e.g. a
+requirement's MoSCoW priority, an architecture/major-component decision, or
+anything else already on the §10 Human-in-the-Loop list), regardless of how
+the claim arrived — **including a relay from the creator/orchestrator
+session itself.** A trusted channel is a reason to check promptly, not a
+reason to skip checking.
+
+- **Method**: query the primary record — the actual session's own turn
+  history via `session_store_sql` (or the equivalent tool available in a
+  given session) — for the human's verbatim words. Do not act on a
+  paraphrase of a paraphrase.
+- **If verification is inconclusive** (e.g., an empty result caused by
+  replication lag between a local and cloud session store, as actually
+  happened during Rev 5's own verification pass): do not treat an empty
+  result as either confirmation or denial. Retry after a reasonable wait; if
+  still inconclusive, treat the decision as **unverified** and do not
+  proceed with the consequential action. Record that verification was
+  attempted and was inconclusive, so a later session or the human knows the
+  gap was noticed rather than silently skipped.
+- **Once verified**, record the verbatim quote (with translation, if
+  applicable), the verification method, and a session/turn reference in the
+  artifact the decision affects (`requirements.md`, `change-log.md`, etc.)
+  — the citation format Rev 5's ECO-049 already established. Distinguish a
+  *specific verdict* from a *decision criterion* the human gave instead
+  (Rev 5's own MISS-034 note is the model: it recorded "choose whichever
+  option has fewer technical obstacles" as a criterion, not as if the human
+  had picked a side).
+
+This codifies, as a standing requirement rather than a one-off act of good
+judgment, the behavior the Rev 5 Requirements session actually used before
+recording ECO-049.
+
+### 17.3 Cross-session conflict / staleness handling
+
+When a session receives cross-session information — a message, a relayed
+status, another session's claimed conclusion — that conflicts with its own
+independently-checked repository state:
+
+1. **Re-verify against primary sources** before acting either way: `git
+   log`, `gh pr view`/`gh api`, `validation/open-issues.md`,
+   `session_store_sql`. Do not assume the incoming message is right, and do
+   not assume it is wrong — check.
+2. **If verification resolves it** (one side was simply stale or mistaken),
+   **correct the record publicly** — a PR comment, a Notes field, a reply to
+   the other session — rather than quietly overwriting it or silently
+   ignoring the conflicting claim. (ISS-056's own withdrawn-hypothesis
+   pattern and MISS-035's withdrawn R11-fouling claim are the model: a
+   disproven claim is recorded as withdrawn, not deleted from history.)
+3. **If it is a genuine, unresolved policy disagreement** between two
+   autonomous sessions rather than a factual staleness question (tonight's
+   actual #38-vs-#40/#41 admin-override disagreement is the example) —
+   neither session unilaterally decides it holds the correct position.
+   Escalate to the human Chief Engineer with both positions stated, exactly
+   as `docs/workflow.md` §3 already prescribes for agent-vs-agent conflict
+   within one design cycle — this subsection is that same protocol extended
+   across session boundaries and across time, not a second, competing
+   protocol.
+4. Document that the disagreement occurred and how it was resolved (this
+   section, and its evolution-log addendum, is that record for tonight's
+   case).
+
+### 17.4 Grounding
+
+Adapted from established DevOps branch-protection convention (bypass
+restricted to a small authorized group, always justified in writing, always
+scoped and time-limited, always followed up on, policy changes audited as
+rigorously as code changes) and from current multi-agent/agentic-AI
+governance practice: action-specific rather than blanket oversight, scored
+by reversibility/blast-radius/sensitivity (Arthur AI, "Human-in-the-Loop
+Governance for AI Agents"); system-level governance surviving individual
+model/agent changes, with decision governance, full audit trails, and
+explicit conflict-resolution protocols for inter-agent interaction
+(Architecture & Governance Institute, "Governing Multi-Agent AI Systems: An
+Enterprise Blueprint"); tiered oversight scaled to an action's/agent's risk
+(industry tiered-risk-model practice, e.g. Tigera's agent-governance
+guidance); and — the principle this project weights most heavily —
+governance itself must be revisited and updated after real incidents and
+near-misses rather than staying static (reflected across NIST AI RMF,
+ISO/IEC 42001-style postmortem practice, and the agentic-AI governance
+literature generally). This section exists *because* of that last
+principle: it is itself the postmortem-driven update, not a preemptive
+design.
+
+### 17.5 Open item carried by this policy
+
+**Unattributed branch-protection change.** At time of writing (2026-09-04),
+`main`'s branch protection has no `required_pull_request_reviews` rule —
+independently confirmed by this session via `gh api repos/ktanino10/
+ai-hardware-engineering-team/branches/main/protection`. Prior autonomous
+sessions have reported that this rule was present at an earlier point and
+is absent now; that specific claim is **not** independently re-confirmable
+by this or any future session, because there is no mechanism to query
+GitHub's branch-protection state as of a past moment. What *is*
+independently verifiable, and was verified here: no actor is identifiable
+for any such change via the GitHub API, full stop — this repository is a
+personal-account (not organization) repository, and GitHub's audit-log API
+for branch-protection changes is an Enterprise/organization-only feature,
+structurally unavailable here, not merely unqueried. Independent of that,
+`merged_by`/commit-author fields cannot distinguish a human acting directly
+from an autonomous session acting through the same authenticated GitHub
+account, so actor attribution would remain ambiguous even if audit history
+existed. Recorded here as a genuinely open, unresolved item — not closed by
+assumption in either direction. See `docs/architecture-evolution.md` §42
+for the full dated record.
