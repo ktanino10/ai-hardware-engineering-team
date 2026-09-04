@@ -320,7 +320,7 @@ severity.
    preserving already-validated work where possible; explicitly surfacing
    ripple effects before a resolution is finalized) and produce a
    recommendation. Added following MISS-034
-   (`docs/architecture-evolution.md` §43), where exactly this class of
+   (`docs/architecture-evolution.md` §44), where exactly this class of
    disagreement — which discipline's stale figure should yield — had a
    mediation *procedure* to surface it but no substantive technical criteria
    to resolve it once surfaced.

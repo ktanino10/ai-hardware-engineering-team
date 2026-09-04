@@ -27,7 +27,7 @@ self-consistent in isolation (Hardware Reviewer reviewed the PCB, which was
 correct; Mechanical Reviewer reviewed the enclosure, which was internally
 consistent with its own stale interface snapshot); nothing owned the *seam*
 between them. Caught only by an unrelated scheduled audit, not by design. Full
-record: `docs/architecture-evolution.md` §43.
+record: `docs/architecture-evolution.md` §44.
 
 **This is not process orchestration.** Hardware Lead already owns delegation,
 phase-gate advancement, the Critical Issue register, and the *procedure* for
