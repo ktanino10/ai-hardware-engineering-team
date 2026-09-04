@@ -2102,6 +2102,40 @@ and this addendum only.
   only if the same blocking pattern recurs in a later cycle, with a fresh
   concrete instance — rather than as a standing open question, per that
   session's explicit instruction.
+- **Post-disposition update, same day: MISS-034's own resolution does not
+  unfreeze `main`, partially undermining the disposition above's stated
+  premise.** A second independent autonomous session (scheduled overnight
+  check-in, cycle 32) audited this PR, agreed with its content, and
+  reported that the MISS-034 fix worktree's own Mechanical Reviewer pass
+  had correctly re-opened `MISS-023` (HIGH) from a prior human
+  `ACCEPTED-RISK` — that sign-off had been reasoned against a 126.424mm
+  hazard-band radius and 77.7% pinch-guard coverage which the 150×95mm
+  rescale invalidates, so carrying it forward silently would have been the
+  actual error (the Foresight checklist working as intended). This session
+  independently re-verified the claim directly, not on the report alone: in
+  that worktree (`ktanino10-fix-miss-034-enclosure-150x95`, still
+  uncommitted as of this writing), `MISS-034`'s row reads `RESOLVED` and
+  `MISS-023`'s reads `OPEN` (13 well-formed cells, the 126.424mm/77.7%
+  figures present in its Notes column, no self-granted replacement
+  `ACCEPTED-RISK`); running `tools/check_open_issues.py` there directly
+  reproduces cycle 32's exact reported failure, `MISS-023: HIGH finding is
+  neither RESOLVED nor ACCEPTED-RISK (status=OPEN)`. So `main` stays
+  frozen pending a fresh human ACCEPTED-RISK-or-redesign call on MISS-023,
+  not merely on MISS-034 — while the human is asleep. **One correction to
+  cycle 32's own figure**, in the same spirit this document asks of
+  everyone else: cycle 32 reported `main` frozen "~16 hours"; independently
+  computed from PR #38's confirmed merge timestamp
+  (`2026-09-03T17:31:43Z`, when MISS-034 first became the blocking OPEN
+  CRITICAL) to time of writing, the figure is closer to **7.5 hours** —
+  noted as a correction, not an accusation; the substantive point (the
+  freeze duration is now open-ended, not merely long) holds regardless.
+  This weakens part of the "not implemented now" disposition's own stated
+  premise (that MISS-034 landing alone reopens the gate) — flagged back to
+  the session that made that call for reconsideration with this new fact,
+  rather than unilaterally reversed here; whether the CI-exemption's
+  priority should change in light of it is that session's call to revisit,
+  not this addendum's to pre-empt. See `docs/architecture.md` §17.1's own
+  forward pointer to this entry.
 - **Grounding, verified rather than merely asserted**: the branch-protection/
   CI-override guidance and the multi-agent/agentic-AI governance guidance
   cited in §17.4 were independently corroborated by this session via live

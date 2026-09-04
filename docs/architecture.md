@@ -845,6 +845,15 @@ change and should go through the same review any other change to
 `hardware-gate.yml` would, not be fast-tracked because this section
 pre-approved it in the abstract.
 
+**Update — this disposition's own premise was partially undermined the
+same day.** It assumed `main` unfreezes once MISS-034 lands. A newly
+re-opened HIGH finding (MISS-023) means that is not so — see
+`docs/architecture-evolution.md` §42's dated post-disposition entry for
+the independently-verified detail. This disposition has not yet been
+formally revisited in light of that; it is left as originally decided
+(not implemented now) rather than unilaterally reversed here, since
+closing it was an explicit call by the session that made it.
+
 ### 17.2 Verification-before-acting standard
 
 Any session must **independently verify** a claimed human decision before
@@ -955,5 +964,15 @@ value. It was independently checked against the primary record
 "did you change this intentionally?", and replied, verbatim, **"私が間違っ
 て外しました。"** ("I removed it by mistake.") A genuine human
 configuration slip, not agent tampering and not a security concern — now
-attributed and closed. See `docs/architecture-evolution.md` §42 for the
-full dated record, including the verification trail.
+attributed and closed.
+
+**Attribution and configuration are two different questions — only the
+first is closed.** *Who* removed the rule is resolved (above). *Whether
+the rule is restored* is not: `main`'s branch protection is, as of this
+writing, still without `required_pull_request_reviews` — a separate,
+still-open, human-reserved decision (the creator/orchestrator session has
+already asked Kyosuke his intent on restoring it; no autonomous session
+should restore it unilaterally in the meantime). Do not read this section
+as implying protection has been put back. See
+`docs/architecture-evolution.md` §42 for the full dated record, including
+the verification trail.
