@@ -592,6 +592,38 @@ was therefore stale until the fix cascaded through. See §4.4 and §11.G for
 the full corrected derivation. **Unaffected by Rev 5's PCB resize** (Z-stack
 is board-size-independent, confirmed above).
 
+**MISS-023's full-closure resolution and a newly-surfaced pre-existing gap
+(MISS-047), both this session:** neither the "Shell-only" nor "True
+assembled" row above has ever included `pinch_guard()`'s own footprint —
+a gap present since Rev 4.1 (the guard's own introduction), not created by
+this session, logged as **MISS-047** (`validation/open-issues.md`). It went
+unnoticed because the guard's prior 115.0mm radius (230.0mm diameter),
+while already exceeding the 161.4mm "True assembled" X reading above, did
+not dominate the picture as visibly as it does now. Per the human Chief
+Engineer's direct decision to fully close MISS-023 (`pinch_guard_or`
+115.0mm → **176.3mm**, `validation/open-issues.md` MISS-023), the guard's
+own 352.6mm diameter now vastly exceeds every other feature's own extent
+in every direction from its center (`fw_cx`, `fw_cy`) — confirmed via the
+`.scad`'s own new `true_assembled_envelope_x`/`_y` variables (min()/max()
+reduction against the guard's own circular footprint, not a hardcoded
+assumption), both resolving to **352.6mm**. **This is 135% over REQ-308's
+soft ~150mm ceiling** — flagged explicitly, exactly as this fix's own task
+brief requires, not silently passed through: REQ-308 is a "Should"/soft
+desk-scale sanity bound, and a 352.6mm-diameter guard ring is a
+qualitatively different scale than anything this bound was written
+against (the prior largest reading, 215.6mm, was already the largest
+figure this project had disclosed against REQ-308, at "only" 43.7% over).
+This overshoot is the direct, necessary, and human-decided consequence of
+choosing full geometric closure of a HIGH safety finding over a partial
+closure with a smaller footprint — the trade-off table presented for that
+decision (`validation/open-issues.md` MISS-023) explicitly named this
+footprint growth as the cost of the full-closure option, and the human
+Chief Engineer chose it with that cost visible, not blind to it. Not
+treated as invalidating REQ-308 or requiring further Mechanical Lead
+action — the decision authority for this exact trade-off (safety coverage
+vs. desk-scale footprint) was already exercised by the same human whose
+decision REQ-308 itself exists to serve.
+
 ---
 
 ## 4. Full dimensional parameter tables
@@ -2967,6 +2999,62 @@ drift out of alignment over time/handling. **This Mechanical Lead's own
 assessment: MISS-023 should be considered partially closed by geometry, with
 the residual gap closed only by a procedural warning — not a full,
 no-caveats resolution.** See §18.17 for the specific handoff recommendation.
+
+**18.12.8 Rev 5 — MISS-023 FULL CLOSURE, human Chief Engineer direct
+decision.** After the Rev 5 PCB resize (`pcb_length`/`pcb_width` 100×50mm
+→ 150×95mm) grew `rotating_env_max_r` 126.424mm → 176.259mm (§18.0.1,
+`validation/open-issues.md` MISS-023's own re-opened entry), the SAME
+unchanged 115.0mm guard's coverage degraded from 77.7% to ~35.0% —
+re-opening MISS-023 from ACCEPTED-RISK back to OPEN per this project's own
+REQ-408 "disposition does not auto-extend" precedent (§18.12.7 above was
+itself superseded the moment the guard's covered geometry changed). A full
+remedy trade-off table (candidate `pinch_guard_or` values 115/130/140/150/
+157.9/165/176.3mm, each with coverage %, residual gap, and an ESTIMATED
+mass) was presented to the human Chief Engineer for a fresh decision.
+
+**Decision, verbatim, relayed via the cross-session HITL channel:**
+"完全カバーを選んでください" ("please choose full coverage"). This selects
+the trade-off table's own full-closure row — not a Mechanical-Lead default,
+not a self-granted ACCEPTED-RISK, a direct human instruction, cited as
+such.
+
+**Implementation and RE-VERIFICATION this session** (the table's own
+mass figure was an ESTIMATE at the time it was presented; none of the
+numbers below are re-used from that estimate without independently
+re-deriving them against the real, grown geometry):
+
+| Quantity | Value | Method |
+|---|---|---|
+| `pinch_guard_or` | 176.3mm (was 115.0mm) | Set directly per the human decision; a small, deliberate round-up from the confirmed 176.259mm `rotating_env_max_r` matching the already-reviewed table row exactly, not a freshly-invented number |
+| Non-overlap with the complete rotating envelope | **Empty** — zero shared volume | Direct `intersection()` boolean CSG between `pinch_guard()` (full ring) and the SAME isolated-rotating-solid union §18.12.1/§18.13.4-5 used (`base()`+`pcb_lid()`+`containment_cap()`+`bmount_flange()`+`rotation_index_pointer()`+`cable_anchor_tab()`x2), re-rendered fresh this session (`show_mode="export"` isolation, matching this file's own established convention) — reported "Current top level object is empty," not inferred from the Z-height-floor argument alone |
+| Coverage | **100.0%** (was 77.7% pre-Rev-5, then 35.0% post-Rev-5-resize-pre-closure) | `π·(176.3²−60.0²) / π·(176.259²−60.0²)` = 86,336.28 / 86,290.86 mm² = 100.05%, capped/reported at 100.0% since `pinch_guard_or` now exceeds `rotating_env_max_r` |
+| Residual gap | **0.0mm** (was 11.4mm, then 61.3mm) | `max(0, 176.259 − 176.3)` = 0 (guard now reaches beyond the hazard radius) |
+| Mass, full ring | **1629.080g** (table's own earlier ESTIMATE: ≈1633g — close, not identical; this is the real, re-measured figure and supersedes the estimate) | `trimesh` volume (1,282,739.90mm³) of a fresh `pinch_guard(-1)` export × PETG density (1.27 g/cm³, this project's own established constant) |
+| Mass, 4-quadrant print total (the ACTUAL printed pieces) | **1629.080g** (matches the full-ring figure to 5 significant figures — 4×quadrant volume = 1,282,739.92mm³ vs. full-ring's 1,282,739.90mm³, a 0.0000015% difference, confirming the print_layout quadrant-cut fix, MISS-036, still correctly reconstructs the full ring's own material budget at this new, much larger radius) | `trimesh` volume of one re-exported `bench-imu-01-pinch-guard-quadrant.stl` × 4 × PETG density |
+| Quadrant printed-piece bounding box | 176.3 × 176.3 × 14.9mm (was 115.0 × 115.0 × 14.9mm) | `trimesh` bounds of the re-exported quadrant STL. **Flagged, not silently passed through**: this is now large enough that consumer FDM print-bed size is a genuinely closer practical consideration than it was at 115mm (many common beds are 220-250mm square; a few smaller/older models are ~180mm square and would NOT fit this quadrant) — still not a hard, sourced requirement anywhere in this repository (no specific printer has ever been named), so not treated as a blocking constraint, but worth a builder's own awareness before printing |
+| Assembled envelope (X and Y) | **352.6mm** both (was 161.4×215.6mm) | See §3's own new note and MISS-047 (newly logged, this session) — the guard's own footprint was never previously included in this reading, a pre-existing Rev-4.1-era gap this session's own REQ-308 check surfaced and fixed |
+
+**Print_layout quadrant-cut integrity at the new scale, independently
+re-confirmed (not assumed carried forward from MISS-036's own 115mm-radius
+fix):** the 4×quadrant-vs-full-ring volume match above (0.0000015%
+difference) directly confirms `r_cut = pinch_guard_or/cos(half_angle) +
+pinch_guard_quadrant_margin`'s own formula continues to correctly avoid
+the chord-clipping bug at 176.3mm, not only at the 115.0mm radius it was
+originally fixed and verified against.
+
+**Disposition: MISS-023 is now genuinely RESOLVED, not another
+ACCEPTED-RISK.** Unlike §18.12.7's own prior partial-closure assessment,
+this is a full geometric closure directed and confirmed by the human
+Chief Engineer, with 100% coverage and 0mm residual gap verified by direct
+measurement against the real, current hazard geometry — not a risk
+judgment call requiring an ongoing acceptance of residual exposure. The
+guard's own unfastened/unkeyed limitation (§18.12.7) remains true as a
+disclosed fact, but no longer backstops any COVERAGE gap (there is none) —
+it is now purely a "could this guard someday shift out of its own
+as-designed position" durability question, distinct from "does the
+as-designed geometry cover the hazard," which it now fully does. See
+`validation/open-issues.md` MISS-023 for the resolved entry and
+`validation/change-log.md` for the corresponding ECO.
 
 ---
 

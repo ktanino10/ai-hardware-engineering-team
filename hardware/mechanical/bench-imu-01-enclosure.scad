@@ -1104,28 +1104,39 @@ pinch_guard_ir = stand_plate_or; // mm. DERIVED = 60.0mm -- flush-adjacent
                 // remain SEPARATE, unfastened, desk-resting parts this
                 // pass (not unioned/keyed together) -- a disclosed
                 // limitation; see spec 18.12.
-pinch_guard_or = 115.0; // mm. UNCHANGED this session, DELIBERATELY --
-                // NOT re-grown to chase rotating_env_max_r's new, larger
-                // value. Originally DECIDED from an explicit coverage-vs-
-                // footprint trade-off table (candidates 90-120mm; spec
-                // 18.12 has the full table) against the OLD 126.424mm
-                // hazard radius, covering ~77.7% of that hazard band.
-                // Against the NEW 176.259mm hazard radius (same guard,
-                // unchanged), this now covers only ~35.0% of the
-                // (larger) hazard band -- a genuine, quantified
-                // degradation, not a rounding difference. Growing this to
-                // ~157.9mm would restore ~77.7%-equivalent coverage, but
-                // at ~2.2x this feature's own mass (~570.6g -> ~1268g) and
-                // footprint (230mm -> ~316mm diameter) -- a real
-                // engineering trade-off with its own cost/footprint/
-                // printability consequences, not a same-day unilateral
-                // resize. Left at 115.0mm this session; the full trade-off
-                // table (candidate values 115/130/140/150/157.9/165/176.3mm
-                // with coverage %, residual gap, and estimated mass each)
-                // is recorded in MISS-023's own re-opened entry in
-                // validation/open-issues.md for the human Chief Engineer
-                // to decide, mirroring this project's own REQ-403/MISS-016
-                // precedent for exactly this class of decision.
+pinch_guard_or = 176.3; // mm. GROWN this session (was 115.0mm) --
+                // **human Chief Engineer (Kyosuke) DIRECT DECISION**,
+                // verbatim: "完全カバーを選んでください" ("please choose
+                // full coverage"), relayed via the cross-session HITL
+                // channel and recorded in MISS-023's own resolved entry
+                // in validation/open-issues.md with full citation. This
+                // selects the trade-off table's own "176.3mm / 100% /
+                // 0mm gap / ~1268g[NOTE: re-verify, see below]" row
+                // (candidates 115/130/140/150/157.9/165/176.3mm were
+                // presented; this is the full-closure end of that same,
+                // already-reviewed table -- not a newly-invented number).
+                // 176.3mm is a small, deliberate round-up from the
+                // confirmed 176.259mm swept radius (rotating_env_max_r
+                // above) -- chosen to exactly match the pre-reviewed
+                // table entry rather than introduce an unreviewed value;
+                // note the actual non-overlap guarantee is Z-based, not
+                // radial (pinch_guard_h is independently bounded below
+                // pinch_hazard_min_z_clear -- see that constant's own
+                // comment), so this 0.041mm margin is not itself load-
+                // bearing for collision-avoidance, only a clean round
+                // number matching the reviewed table. VERIFIED this
+                // session (not assumed from the table's own earlier
+                // ESTIMATE): re-rendered full_ring() and re-confirmed
+                // EMPTY boolean intersection with the complete rotating
+                // envelope (same method Cycle 6/this session's own
+                // MISS-023 re-opening used); recomputed coverage = 100%,
+                // residual gap = 0mm (guard_or now exceeds
+                // rotating_env_max_r by construction); recomputed mass
+                // via direct STL export + trimesh (see
+                // dimensional-spec.md 18.12 for the actual measured
+                // figure, NOT the table's own earlier back-of-envelope
+                // estimate, which this session's real measurement may
+                // differ from slightly).
 pinch_guard_h = pinch_hazard_min_z_clear - pinch_guard_z_margin; // mm.
                 // DERIVED = 14.9mm. By construction (a stated margin below
                 // the CONFIRMED global-minimum rotating-envelope height
@@ -1144,6 +1155,57 @@ pinch_guard_quadrant_margin = 10.0; // mm. ASSUMPTION -- residual radial
                 // added directly to pinch_guard_or as if that alone
                 // guaranteed full coverage, which a real re-measurement
                 // showed it did not).
+
+// --- NEW finding, this session (MISS-047): assembled_envelope_x/_y above
+//     (Section 2B, defined before pinch_guard_or exists -- OpenSCAD's own
+//     strictly sequential top-down variable evaluation, confirmed
+//     empirically this session, does not allow referencing pinch_guard_or
+//     there) have NEVER included pinch_guard()'s own footprint in the
+//     "true assembled envelope" reading, a gap present since Rev 4.1 (the
+//     guard's own introduction) and NOT specific to this session's
+//     changes -- re-checked: even at the OLD pinch_guard_or=115.0mm, the
+//     guard's own diameter (230.0mm) already exceeded
+//     assembled_envelope_x (161.4mm), meaning that reading was already
+//     wrong before this session touched anything. This went unnoticed
+//     because the gap was small relative to the guard's own prior size
+//     and no prior review's own REQ-308 check happened to compare
+//     against the guard specifically. Impossible to keep ignoring now
+//     that MISS-023's own full-closure fix (176.3mm) makes the guard the
+//     overwhelmingly dominant feature. Fixed here (not by hand-editing
+//     assembled_envelope_x/_y above, which would break their own
+//     documented "shell/lid/cap-only" reading that other, still-valid
+//     history/citations point at) by defining the TRUE overall envelope
+//     as a further min()/max() reduction against the guard's own
+//     independently-computed circular footprint -- so this stays
+//     parametrically correct even if pinch_guard_or is ever revised
+//     again, rather than hardcoding "the guard always wins" as a new
+//     silent assumption.
+guard_envelope_x_min = fw_cx - pinch_guard_or; // mm
+guard_envelope_x_max = fw_cx + pinch_guard_or; // mm
+guard_envelope_y_min = fw_cy - pinch_guard_or; // mm
+guard_envelope_y_max = fw_cy + pinch_guard_or; // mm
+true_assembled_envelope_x_min = min(lid_x0, guard_envelope_x_min); // mm
+true_assembled_envelope_x_max = max(lid_x0 + lid_skirt_outer_x, guard_envelope_x_max); // mm
+true_assembled_envelope_x = true_assembled_envelope_x_max - true_assembled_envelope_x_min; // mm. DERIVED = 352.6mm (was 161.4mm reading above, now superseded -- see this block's own header comment)
+true_assembled_envelope_y_min = min(assembled_envelope_y_south, guard_envelope_y_min); // mm
+true_assembled_envelope_y_max = max(assembled_envelope_y_north, guard_envelope_y_max); // mm
+true_assembled_envelope_y = true_assembled_envelope_y_max - true_assembled_envelope_y_min; // mm. DERIVED = 352.6mm (was 215.6mm reading above, now superseded)
+                // Both readings now come out to the SAME 352.6mm value --
+                // not a coincidence, but a direct consequence of
+                // pinch_guard_or (176.3mm) alone exceeding, in EVERY
+                // direction from its own center (fw_cx, fw_cy), the
+                // distance to every other feature's own previously-
+                // computed extreme point (confirmed by the min()/max()
+                // calls above resolving to the guard's own bounds in
+                // every case, not asserted) -- the guard is a full,
+                // XY-symmetric circle, so once its radius exceeds every
+                // other feature's own max reach from that same center,
+                // it alone defines a symmetric square bounding envelope.
+                // See dimensional-spec.md 3 for the REQ-308 disclosure
+                // this now requires (352.6mm is far beyond the ~150mm
+                // soft ceiling -- flagged explicitly, not silently
+                // passed through, exactly as this fix's own task brief
+                // requires).
 
 // --- MISS-024 (HIGH): REQ-407(c)/REQ-113 cable-entanglement/strain hazard
 //     for J1/J4 (mounted on base()'s PCB-bay walls, which now rotate with
@@ -1816,26 +1878,52 @@ module stand_plate() {
 // ----------------------------------------------------------------------
 
 module pinch_guard(quadrant = -1) {
-    // NEW, Rev 4.1 (MISS-023 fix). A 5th printed piece: a STATIONARY
-    // annular guard, desk-resting, flush-adjacent to (NOT fastened to,
-    // NOT overlapping) stand_plate()'s own outer edge. Reduces the
-    // unguarded pinch/strike zone around the rotating overhang from the
-    // full [stand_plate_or, rotating_env_max_r] = [60.0, 126.424]mm
-    // annular band down to [pinch_guard_or, rotating_env_max_r] =
-    // [115.0, 126.424]mm (an 11.4mm residual radial gap -- see spec 18.12
-    // for the disclosed partial-closure honesty and the keep-clear-zone
-    // warning that backstops this residual gap).
+    // NEW, Rev 4.1 (MISS-023 fix); GROWN to full closure this session
+    // (MISS-023's own final resolution, human Chief Engineer decision --
+    // see pinch_guard_or's own comment above for the full citation). A
+    // 5th printed piece: a STATIONARY annular guard, desk-resting,
+    // flush-adjacent to (NOT fastened to, NOT overlapping)
+    // stand_plate()'s own outer edge. Now covers the COMPLETE
+    // [stand_plate_or, rotating_env_max_r] = [60.0, 176.259]mm annular
+    // hazard band (pinch_guard_or=176.3mm exceeds rotating_env_max_r by
+    // construction, per the human's own "full coverage" decision) -- 0mm
+    // residual radial gap, 100% coverage, superseding the earlier
+    // partial-closure (11.4mm gap @ 115.0mm, then a further-degraded
+    // 61.3mm gap @ the same 115.0mm after the Rev 5 PCB resize) history
+    // recorded in MISS-023's own resolved entry.
     //
     // quadrant = -1 (default) draws the FULL ring, used in the
     // "assembled" show_mode for visual/clearance sanity-checking.
     // quadrant = 0..3 draws only that 90-degree segment, used in
-    // "print_layout" -- NOT because any printer-bed-size limit is known
-    // for this project (none is documented anywhere in this repository;
-    // this Mechanical Lead deliberately avoided INVENTING one), but so
-    // each printed piece's own bounding box (~pinch_guard_or x
-    // pinch_guard_or =~115x115mm) is small enough to be printable on
-    // virtually any consumer FDM printer without needing that assumption
-    // at all. The 2 straight radial cut edges are exact (bounded by
+    // "print_layout". **CORRECTED, MISS-048** (independently found by a
+    // cross-session review, immediately after this same session's own
+    // full-closure resize): the ORIGINAL version of this comment (at
+    // pinch_guard_or=115.0mm) claimed each printed piece's own bounding
+    // box was "small enough to be printable on virtually any consumer
+    // FDM printer" -- that claim does NOT survive the resize unedited.
+    // Each quadrant's own real bounding box is now
+    // pinch_guard_or x pinch_guard_or = 176.3 x 176.3mm (was
+    // 115.0 x 115.0mm) -- confirmed via direct STL export + `trimesh`,
+    // not asserted. This still fits many common consumer FDM print beds
+    // (a frequent class is ~220-250mm square) but does NOT fit some
+    // smaller/older/compact models (a frequent class is ~180mm square) --
+    // "virtually any" was true at 115mm and is simply no longer an
+    // honest claim at 176.3mm. This Mechanical Lead deliberately still
+    // avoids INVENTING a specific minimum-bed-size requirement (none is
+    // documented anywhere in this repository, and inventing one now would
+    // be exactly the kind of unsourced constraint this file's own
+    // established convention avoids) -- kept at 4 quadrants this pass, a
+    // deliberate choice disclosed as such (re-splitting into more/smaller
+    // segments, e.g. 6 or 8, was considered and would restore a
+    // universally-small per-piece footprint at zero coverage/mass cost,
+    // but was NOT done this pass, trading a real fit-on-my-printer
+    // question for a real seam-count-on-a-safety-guard question -- see
+    // MISS-048, `validation/open-issues.md`, for the full disclosure and
+    // the 3 options considered). A builder with a smaller print bed
+    // should check their own printer's own build volume against this
+    // real 176.3mm figure before printing, rather than trust the
+    // superseded "virtually any" framing. The 2 straight
+    // radial cut edges are exact (bounded by
     // planes through the origin at the wedge's own a0/a1 angles). The
     // 3rd (chord/far) edge of the cutting polygon is NOT itself a source
     // of faceting/approximation error beyond the ring's own pre-existing

@@ -390,6 +390,23 @@ proportional check is adequate and honestly disclosed as such, not a full
 re-sweep of `bench-imu-01-dimensional-spec.md` §18.3's own CG/tip-over
 analysis.
 
+**Superseded again, same session, by MISS-023's full closure (C9 above,
+spec §18.12.8):** `pinch_guard_or` grew 115.0mm → 176.3mm per the human
+Chief Engineer's own direct decision, growing `pinch_guard`'s own mass
+570.6g → 1629.080g (+1058.48g). This shifts the ≈1200.8g figure above to
+**≈2259.3g**. Unlike the bare-board shift (+2.33%, proportional-check
+only), this is a large enough change (+88.1%) that it is **not** waived
+with a proportional check: `pinch_guard` is stationary, coaxial with the
+bearing axis (C9's own tip-over observation above — adding coaxial,
+non-rotating mass can only improve, never worsen, the stand-plate's own
+CG/tip-over margin and does not touch the rotating-assembly mass the
+bearing friction-torque margin depends on), so neither safety-relevant
+metric this file tracks is put at risk by this mass increase — a
+qualitative argument already established in this file's own C9 section,
+re-applied here rather than re-derived, since the underlying physical
+reasoning (coaxial, stationary, zero net horizontal moment) is unchanged
+by the guard's own radius growing.
+
 M1 and the flywheel are deliberately **excluded** from this table and
 carried separately in Part B, because their mass may or may not load this
 PCB at all, depending on the still-open mounting decision (B3). The combined
@@ -1087,11 +1104,11 @@ resulting interface-level facts only.
 |---|---|---|---|---|
 | True max swept radius of the rotating assembly (`rotating_env_max_r`) | 126.424 | mm | **DERIVED** (tool-verified, direct mesh measurement, not hand geometry) | Independently re-computed this pass — corrects the Cycle 5 Reviewer's own hand-derived 115.9mm figure, which measured only a pure Y-axis distance and missed the governing corner's X-offset; the true figure is larger (more conservative), not smaller — spec §18.12.1 |
 | Guard inner radius (`pinch_guard_ir`) | 60.0 | mm | **DERIVED** = `stand_plate_or` exactly (C4) | Flush-adjacent to, not overlapping or fastened to, the existing stand plate — verified via direct boolean intersection (≈0 shared volume) — spec §18.12.5 |
-| Guard outer radius (`pinch_guard_or`) | 115.0 | mm | **DECIDED** from an explicit coverage-vs-footprint trade-off (77.7% hazard-band coverage, 11.4mm residual radial gap, 230mm assembled diameter) | Not sized to full theoretical closure (126.424mm) deliberately — see spec §18.12.3 for the full table and the margin-vs-coverage reasoning |
-| Guard height (`pinch_guard_h`) | 14.9 | mm | **DERIVED** = 19.9mm confirmed rotating-envelope height floor − 5.0mm stated margin | Height floor independently re-derived via direct mesh measurement (not assumed carried over) — spec §18.12.2 |
-| Residual unguarded radial gap | 11.4 | mm | **DISCLOSED, not fully closed** | Backstopped by an operational keep-clear-zone warning (REQ-205 tightening), not by further geometry this pass — spec §18.12.6 |
-| Mass (this feature only) | ≈570.6 | g | **ESTIMATE** (computed from the exact modeled/mesh volume, same method as C2/C3) | 449,258mm³ solid PETG @ 1.27g/cm³ — see mass-rollup note below; this is the single heaviest new part this pass introduces, larger than the bearing (C1), flange (C2), and stand plate (C4) combined |
-| Print approach | 4 separate 90° quadrants (assembled ring only touches, not fastened) | — | **DECIDED** | Avoids inventing an undocumented printer-bed-size assumption (none exists anywhere in this project) — each quadrant's own bounding box (~115×115mm) is small enough for virtually any consumer FDM printer — spec §18.12.4 |
+| Guard outer radius (`pinch_guard_or`) | 176.3 (was 115.0) | mm | **DECIDED, human Chief Engineer direct decision (Rev 5)** — full closure, verbatim "完全カバーを選んでください" | Selects the trade-off table's own full-closure option (spec §18.12.8) — not a Mechanical Lead default; sized to exceed `rotating_env_max_r`=176.259mm by construction |
+| Guard height (`pinch_guard_h`) | 14.9 | mm | **DERIVED** = 19.9mm confirmed rotating-envelope height floor − 5.0mm stated margin | Height floor independently re-derived via direct mesh measurement (not assumed carried over) — spec §18.12.2. Unaffected by the radius growth (non-overlap is Z-based, not radial — see spec §18.12.8) |
+| Residual unguarded radial gap | 0.0 (was 11.4, then 61.3 post-Rev-5-resize) | mm | **RESOLVED — full closure** | Guard now reaches beyond the hazard radius; re-verified via direct boolean CSG (empty intersection with the complete rotating envelope), not merely arithmetic — spec §18.12.8 |
+| Mass (this feature only) | 1629.080 (table's own earlier ESTIMATE was ≈1633g — close, not identical; superseded by this real measurement) | g | **DERIVED** (real `trimesh` volume of a fresh export × PETG density, matches the same method as C2/C3/the original ≈570.6g figure) | 1,282,739.90mm³ solid PETG @ 1.27g/cm³; independently cross-checked against the actual 4-quadrant print total (1,282,739.92mm³, 0.0000015% difference) — see mass-rollup note below |
+| Print approach | 4 separate 90° quadrants (assembled ring only touches, not fastened) | — | **DECIDED, unchanged** | Each quadrant's own bounding box is now ~176×176mm (was ~115×115mm) — **flagged, not silently passed through**: this exceeds some smaller consumer FDM printer beds (~180mm-class), though still no specific printer is named/required anywhere in this repository — spec §18.12.8 |
 
 **MISS-024 fix — bounded/proceduralized cable-entanglement mitigation
 (no new cutout; small features added to the existing rotating base print
@@ -1109,15 +1126,17 @@ job):**
 | Coaxial-bore routing (C6) as the long-term fix instead | Considered, rejected this pass | — | **DECIDED** (rejected) | J1/J4 are fixed Rev 3 connector positions ≈81mm from the bore's own axis; routing a new wire from the bore to J1/J4 needs either PCB-level rework (out of Mechanical scope) or an unsourced slip-ring (no candidate part/Evidence ID exists) — flagged CONSIDER LATER, not delivered — spec §18.13.6 |
 | REQ-012 "ideally continuous/unlimited" rotation aspiration | Not achieved by this fix | — | **DISCLOSED** (not fully closed) | This fix closes the bounded, "several full turns" case REQ-113 itself actually mandates; unlimited rotation remains contingent on a future slip-ring decision REQ-113 itself already defers — spec §18.13.7 |
 
-**Mass-rollup note (extends, does not edit, C8's own table above):**
-`pinch_guard`'s own mass (≈570.6g) plus `rotation_index_pointer()` +
-`cable_anchor_tab()`×2 (≈1.1g combined, computed from the exact mesh
-volume — negligible next to `pinch_guard`) add **≈571.6g** to C8's own
-prior ≈601.8g total, giving an **updated total system mass of ≈1173.4g**.
-This roughly **doubles the system mass again** — disclosed prominently
-here, in the same spirit as C8's own "roughly double the human's own
-estimate" disclosure, not buried. The dominant contributor by far is
-`pinch_guard`'s own solid annulus volume (449,258mm³) — computed on
+**Mass-rollup note (extends, does not edit, C8's own table above); UPDATED
+Rev 5 for MISS-023's full closure:**
+`pinch_guard`'s own mass (**1629.080g, was ≈570.6g**) plus
+`rotation_index_pointer()` + `cable_anchor_tab()`×2 (≈1.1g combined,
+unaffected by the radius change) add **≈1630.2g** (was ≈571.6g) to C8's own
+prior ≈601.8g total, giving an **updated total system mass of ≈2232.0g**
+(was ≈1173.4g pre-full-closure, ≈601.8g pre-Rev-4.1). This nearly
+**doubles the system mass yet again** — disclosed prominently here, same
+convention as every prior mass-doubling in this file's own history, not
+buried. The dominant contributor is, by an even wider margin than before,
+`pinch_guard`'s own solid annulus volume (1,282,739.90mm³ — computed on
 **exactly the same solid-CAD-volume-times-density basis** every other row
 in C8 uses (i.e., this is not a print-time, infill-adjusted filament-mass
 estimate; a real single-material FDM print of a purely-protective,
@@ -1125,10 +1144,11 @@ non-structural guard ring like this would very plausibly use partial
 infill in practice, which this file has no established methodology for
 modeling anywhere, so none is invented here either — flagged as a genuine
 **CONSIDER LATER** opportunity if material/print-time economy becomes a
-real constraint in a future revision, not attempted this pass, since
-REQ-505's BOM ceiling is explicitly waived for this cycle and
-`pinch_guard`'s sizing was driven entirely by the coverage-vs-footprint
-trade-off (spec §18.12.3), not by mass).
+real constraint in a future revision, more pressing now than before given
+the mass involved, not attempted this pass, since REQ-505's BOM ceiling is
+explicitly waived for this cycle and `pinch_guard`'s sizing was driven
+entirely by the human Chief Engineer's own direct full-coverage decision
+(spec §18.12.8), not by mass).
 
 **One-line, non-exhaustive observation on C3's tip-over analysis (flagged
 for the Reviewer/Hardware Lead's own discretion, not re-derived this
@@ -1247,12 +1267,17 @@ phase where it becomes load-bearing.
     bonds or keys them together; the guard could in principle drift out of
     rotational/radial alignment over time or handling. Disclosed as a
     limitation, not an oversight (C9).
-21. **11.4mm residual unguarded radial gap** (`pinch_guard_or`=115.0mm vs.
-    `rotating_env_max_r`=126.424mm) — mitigated only by an operational
-    keep-clear-zone warning (tightening REQ-205), not by further geometry
-    this pass. Whether this residual-gap disposition is acceptable is a
-    judgment call for the Hardware Lead/human, not resolved unilaterally
-    here (C9).
+21. **~~11.4mm residual unguarded radial gap~~ — RESOLVED, Rev 5.** Was
+    `pinch_guard_or`=115.0mm vs. `rotating_env_max_r`=126.424mm (11.4mm
+    gap), then degraded to a 61.3mm gap once the Rev 5 PCB resize grew
+    `rotating_env_max_r` to 176.259mm (same unchanged 115.0mm guard).
+    **Human Chief Engineer direct decision** ("完全カバーを選んでください,"
+    spec §18.12.8) grew `pinch_guard_or` to 176.3mm — full closure,
+    0.0mm residual gap, re-verified via direct boolean CSG (empty
+    intersection with the complete rotating envelope), not merely
+    arithmetic. No longer a disclosed limitation requiring a Hardware
+    Lead/human judgment call — that call was made, and the geometry now
+    implements it (C9, spec §18.12.8).
 22. **Turn-count re-centering is a human-procedural control, not a sensed
     or firmware-enforced one** — nothing measures or limits actual turn
     count; the 3-turn limit and re-centering procedure rely entirely on
@@ -1273,8 +1298,11 @@ phase where it becomes load-bearing.
     actually mandates, but explicitly does NOT achieve unlimited rotation;
     that remains contingent on a future slip-ring decision REQ-113 itself
     already treats as deferred (C9).
-26. **Updated total system mass (≈1173.4g, up from ≈601.8g)** —
-    `pinch_guard`'s own solid-volume mass (≈570.6g) dominates; computed on
+26. **Updated total system mass (≈2232.0g, up from ≈601.8g pre-Rev-4.1,
+    ≈1173.4g pre-Rev-5-full-closure)** — `pinch_guard`'s own solid-volume
+    mass (**1629.080g, was ≈570.6g** before the human's own full-closure
+    decision grew the guard from 115.0mm to 176.3mm, spec §18.12.8)
+    dominates by an even wider margin than before; computed on
     the same solid-CAD-volume-times-density basis as every other mass
     figure in this file (not a print-time, infill-adjusted filament-mass
     estimate — a real print of this purely-protective, non-structural part
@@ -1282,8 +1310,10 @@ phase where it becomes load-bearing.
     material/cost/print-time well below this figure, but this file has no
     established methodology for modeling that discount). Flagged as a
     CONSIDER LATER opportunity for a lighter/ribbed redesign if material
-    economy becomes a real constraint in a future revision — not attempted
-    this pass (C9).
+    economy becomes a real constraint in a future revision — more
+    pressing now given the mass involved, still not attempted this pass
+    since `pinch_guard`'s sizing was driven entirely by the human Chief
+    Engineer's own direct decision, not by mass (C9).
 27. **Mechanical Reviewer's 10-item self-check checklist has no explicit
     safety-hazard/REQ-407 assessment item** — a process observation, not a
     new mechanical fact: this is judged the root cause of why MISS-023/024
