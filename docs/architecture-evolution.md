@@ -2366,6 +2366,42 @@ and this addendum only.
   querying the authoritative view of it — trust a resource's top-level key
   *set*, not a narrower sub-endpoint's always-200 response, and corroborate
   with an independent signal where one exists.
+- **Commit-author corruption, same day: three commits carried a wrong
+  author identity — caught by cycle 34, independently verified and
+  repaired.** Cause: the PR #44 session ran `git config user.email`/
+  `user.name` without `--global` inside a scratch worktree; since
+  `extensions.worktreeConfig` is not enabled on this repository (confirmed:
+  `git config --get extensions.worktreeConfig` returns nothing), that write
+  landed in the **shared** `.git/config` in the main checkout, which every
+  worktree — including this one — reads. For a window, this session's own
+  commits silently picked up that identity. Independently confirmed before
+  acting, not taken on the report: `git log --format='%an <%ae>'` showed
+  `62193ee`, `210ff0a`, `0bfb54c` authored as `Gate Test <test@example.com>`
+  (bounded exactly as cited, between the last clean commit `e3d14b8` and
+  the next clean one, `f3dc692`); local `user.name`/`user.email` were
+  already unset by the time this was checked, confirming the fix cycle 34
+  applied. Repaired here rather than left as a known defect: verified
+  nobody else had pushed to this branch since the last push (`git fetch`
+  showed local and remote `HEAD` identical), then
+  `git rebase e3d14b8 --exec 'git commit --amend --no-edit --author=
+  "KyosukeT <ktanino10@github.com>"'`, confirmed **every rewritten
+  commit's tree hash matched its pre-rebase original exactly** (metadata-only
+  change, zero content risk — the same check cycle 34 had run for PR #44,
+  independently re-run here rather than assumed to transfer), re-ran
+  `check_id_uniqueness.py`/`check_agent_frontmatter.py` clean, then pushed
+  with `--force-with-lease` (not a bare `--force`) so the push would abort
+  if the remote had changed unexpectedly. `origin/main` was never touched —
+  this branch has not merged.
+- **Why this belongs here and sharpens §17.5's own point.** §17.5 already
+  argues commit-author fields can't distinguish a human from an autonomous
+  session acting through the same account. This incident is a stronger,
+  concrete case: here the author field was wrong in a way **no GitHub-side
+  API could have detected** — a purely local git-config artifact in a
+  *different* worktree, invisible to branch-protection logs, `merged_by`,
+  or any audit endpoint. Recorded here, in the evolution log, as a dated
+  incident rather than folded into §17.5's own policy prose — it is a
+  concrete case the existing claim already covers in substance, not a new
+  rule, per cycle 34's own suggested framing.
 - **Status**: implemented, PR opened, awaiting independent audit before
   merge, deliberately left gate-blocked per its own §17.1 case-2 rule —
   same process every prior change in this repository's history went
