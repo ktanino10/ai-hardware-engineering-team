@@ -2409,3 +2409,304 @@ and this addendum only.
   same process every prior change in this repository's history went
   through.
 
+## 43. Diff-Aware CRITICAL/HIGH Exemption for the Hardware Gate (Addendum — CI/tooling only)
+
+Numbered 43 rather than 42 because §42 ("Autonomous Operation &
+Cross-Session Coordination Governance Policy") is already claimed on
+`ktanino10-autonomous-operation-governance-policy` (PR #42, not yet merged
+to `main` at the time this addendum was written) — confirmed by checking
+the highest `## N.` heading actually present across `main` plus every
+currently-open branch that touches this file (§41 everywhere except that
+one branch, which has §42), the same cross-branch union discipline
+`docs/workflow.md` §4.1 already requires for ECO/ISS/MISS/DS IDs, applied
+here to section numbers for the same reason: a fresh, un-cross-checked
+"next number" is exactly what produces a collision once two branches
+merge.
+
+- **Trigger**: `.github/workflows/hardware-gate.yml`'s required
+  "Check open-issues.md for unresolved CRITICAL/HIGH findings" check
+  validates the *entire* current `validation/open-issues.md` on every
+  `pull_request`, regardless of what a given PR's own diff touches. As of
+  this writing, `main` carries MISS-034 (CRITICAL, OPEN) — confirmed via
+  `gh api .../commits/main/check-runs` and by direct inspection of
+  `validation/open-issues.md` — which alone was enough to block four
+  independently-audited, documentation-only PRs (#39 Requirements
+  Engineering; #40 raising ISS-056; #41 raising MISS-035; #42 this
+  project's own governance-policy addendum), each confirmed via
+  `gh pr diff --name-only` to touch zero paths under `hardware/**`,
+  `firmware/**`, or `bom/**`. `docs/architecture.md` §17.1 (on the PR #42
+  branch) already recorded a structural-alternative recommendation for
+  exactly this shape and, after an initial "not implemented now"
+  disposition was reversed the same day in light of the freeze proving
+  open-ended rather than short (MISS-034's own fix re-opening MISS-023,
+  HIGH), commissioned this as its own dedicated, plan-mode-gated
+  implementation task — see that section and its own forward pointer here
+  for the full incident record this addendum does not repeat.
+
+- **Explicit non-goal, verified before implementing, not just asserted**:
+  this is **not** a path-filtered `pull_request` trigger. That exact shape
+  was tried and reverted in this repository once already (PR #27, see
+  `hardware-gate.yml`'s own header comment): a required status check that
+  a path filter skips is never reported by GitHub, so it sits `Expected`
+  forever and the PR it belongs to is permanently
+  `mergeStateStatus=BLOCKED`, fixable only by an admin bypass — strictly
+  worse than the freeze this addendum exists to relieve. The
+  `pull_request` trigger is unchanged; the job still runs, and still
+  reports a real conclusion, on every PR exactly as before.
+
+- **What was added**, entirely inside `tools/check_open_issues.py` and
+  `.github/workflows/hardware-gate.yml`:
+  1. The workflow's checkout step gains `fetch-depth: 0`, and its run step
+     passes `PR_BASE_SHA`/`PR_HEAD_SHA` (from
+     `github.event.pull_request.base.sha`/`.head.sha`) as env vars.
+  2. `compute_pr_changed_files()` computes this PR's own changed-file set
+     as `git merge-base(base, head)` vs. `head` (a three-dot,
+     merge-base-relative diff — deliberately not a plain two-dot diff,
+     which would also pick up unrelated commits landed on the target
+     branch after the PR forked). Chosen over `gh pr diff`/parsing the
+     raw event payload: no GitHub API/token/rate-limit dependency, and it
+     matches exactly what GitHub's own PR "Files changed" view shows.
+     Asserts `git rev-parse --is-shallow-repository` itself before
+     trusting a computed merge-base, rather than silently relying on the
+     workflow YAML staying correct.
+  3. `is_exempt_eligible()` returns false — not exemption-eligible, full
+     check as today — if that changed-file set touches any path under
+     `hardware/**` or `bom/**`, **or** touches `tools/check_open_issues.py`
+     or `.github/workflows/hardware-gate.yml` themselves. That second
+     condition is a self-referential guard beyond §17.1's literal text: a
+     PR editing the gate's own enforcement code touches neither
+     `hardware/` nor `bom/`, so without this guard it could exempt
+     *itself* from scrutiny while changing what the gate does. Direct,
+     immediate self-application, not a hypothetical: this very PR touches
+     both guarded files, so it is **not** exemption-eligible and is
+     expected to show `hardware-gate` red on its own, inherited from
+     whatever is currently OPEN in `validation/open-issues.md` — this
+     addendum's author will not admin-override that; per §17.1's own
+     decision tree that is a human/orchestrator-reserved call, not this
+     session's.
+  4. If the PR is eligible and its diff does **not** touch
+     `validation/open-issues.md`, it is fully exempt regardless of any
+     pre-existing OPEN CRITICAL/HIGH elsewhere in that file.
+  5. If it **is** eligible but its diff **does** touch
+     `validation/open-issues.md`, `compute_touched_new_lines()` parses
+     `git diff --unified=0`'s hunk headers to find exactly which HEAD-side
+     lines this PR's own diff added or changed, and `evaluate_rows()` (the
+     original per-row severity/status logic, extracted unchanged into its
+     own function) is restricted to only those rows — pre-existing,
+     untouched rows elsewhere are not evaluated. `parse_backlog_rows()`
+     was extended, additively, to also return each row's own line number
+     for this purpose, without altering any of its existing
+     scanning/gap-recovery logic. Any failure at any of these steps (wrong
+     event, missing SHAs, a git error, an unparseable hunk header, a
+     shallow checkout) fails **safe** — falls back to the script's
+     original, unconditional, whole-file behavior — never a silent
+     exemption.
+
+- **Row-scoping closes a real gap a pure path test would have left open,
+  verified against actual repository history, not a hypothetical**: PR #38
+  itself (which raised MISS-034, the CRITICAL now blocking `main`) touched
+  *only* `validation/open-issues.md` + `validation/design-review.md` —
+  confirmed via `gh pr diff --name-only` — zero `hardware/`/`bom/**`. That
+  is the *normal* shape for how a Reviewer records a new finding here, not
+  an edge case. A path-only exemption (§17.1's literal "touches none of
+  hardware/**, firmware/**, bom/**", full stop) would have let any future
+  PR shaped like #38 exempt itself from the exact thing the gate exists to
+  catch. The row-scoped check closes this: a PR that raises its own
+  brand-new unresolved CRITICAL/HIGH, or flips an existing row's Status
+  back to a violating state (the real shape of PR #43's own re-opening of
+  MISS-023 — an existing HIGH's Status regressing from ACCEPTED-RISK back
+  to OPEN once the 150×95mm rescale invalidated the geometry that
+  sign-off was reasoned against), still fails — both were independently
+  verified as test scenarios (below), not merely reasoned about.
+
+- **`firmware/**` deliberately excluded, correcting §17.1's own literal
+  wording rather than silently deviating from it**: §17.1's text (and this
+  addendum's own kickoff) both listed "hardware/**, firmware/**, bom/**"
+  as the three disqualifying prefixes. Independently verified before
+  implementing that this conflicts with already-established,
+  deliberately-designed architecture: `docs/workflow.md`'s Phase 8 exit
+  criteria states Firmware Bring-up "does *not* feed Phase 7's gate ...
+  intentionally *not* wired into the Design Complete Gate", and
+  `docs/architecture.md` records that Firmware Reviewer findings are kept
+  in a firmware-scoped file specifically "so a firmware-only finding
+  cannot silently block the Design Complete Gate" (§32). Since
+  `tools/check_open_issues.py` only ever reads `validation/open-issues.md`
+  — which, by that same existing design, can structurally never contain a
+  firmware finding — disqualifying `firmware/**` here would add no
+  protection for anything this script actually checks, while re-coupling
+  firmware PRs to an unrelated hardware gate that §32 explicitly designed
+  them out of. `firmware/**` is therefore not in
+  `DISQUALIFYING_PATH_PREFIXES`; a firmware-only PR is exemption-eligible
+  the same way a docs-only or requirements-only one is. Recorded here as a
+  correction to §17.1's own wording (which should be read as superseded on
+  this one point), not as an unexplained silent divergence — flagged
+  during implementation by an independent reviewing session, verified
+  directly against the cited primary sources before accepting it.
+
+- **`requirements/**` and `validation/**` (other than `open-issues.md`)
+  are likewise deliberately NOT disqualifying paths**, despite appearing
+  in `hardware-gate.yml`'s own `push`-trigger path list: PR #39
+  (Requirements Engineering) touches `requirements/**` +
+  `validation/change-log.md` and is one of the four PRs this exemption
+  exists to unblock — disqualifying either prefix would leave it blocked,
+  defeating the point. The `push` trigger's path list answers a different
+  question ("is this worth re-running the check on `main` as a signal at
+  all") than the exemption's own eligibility test ("should this PR be held
+  to the full, un-exempted gate"); the two lists are not required to
+  match, and this addendum records why they now knowingly don't, rather
+  than leaving that as an implicit, easily-miscopied assumption for
+  whoever reads both files next.
+
+- **`push` trigger on `main` — deliberately left untouched, not assumed to
+  transfer unchanged**: it is not a required status check in that context,
+  so the PR #25/#27 "stuck `Expected`" failure mode this whole feature
+  exists to avoid does not apply there in the first place; it already has
+  its own, differently-motivated path filter (a targeted signal, not a
+  merge gate); and there is no clean, single "PR diff" basis for an
+  arbitrary push (which may span multiple commits, force-pushes, or carry
+  no PR metadata at all). Diff-awareness is a `pull_request`-only concept
+  here.
+
+- **Verification performed, not merely asserted** (full commands/output
+  available in this session's history; summarized here): a scratch git
+  worktree sharing this repository's own object database was used to
+  construct/replay six scenarios against the actual modified script.
+  1. Docs-only (PR #42's real base/head) against a checkout with MISS-034
+     CRITICAL/OPEN → **exit 0**, exempt.
+  2. MEDIUM-only `open-issues.md` change (PR #40's real base/head, adds
+     ISS-056) → **exit 0**, row-scoped exempt (1 row touched, not a
+     violation; MISS-034 elsewhere untouched/unevaluated).
+  3. Same shape (PR #41's real base/head, adds MISS-035) → **exit 0**.
+  4. A synthetic PR touching a `hardware/` file while MISS-034 is OPEN →
+     **exit 1**, full check, `MISS-034: CRITICAL finding is not RESOLVED`
+     — identical to today's behavior.
+  5. PR #38's own real base/head (the actual commit that introduced
+     MISS-034) → **exit 1**: row-scoped check correctly still evaluates
+     the one touched row (MISS-034 itself) and fails, proving the
+     self-exemption gap is closed, not merely reasoned about.
+  6. A synthetic PR touching only `open-issues.md`, flipping MISS-023 from
+     ACCEPTED-RISK back to OPEN (mirroring PR #43's real regression) →
+     **exit 1**, proving a *modified* existing row is caught, not only a
+     newly-added one.
+  Additionally confirmed: the original (pre-change) script and the
+  modified script produce byte-for-byte identical output for a
+  non-exemption-eligible case; `push`/`workflow_dispatch`/no-event-var runs
+  all take the full-check path unchanged; a missing `PR_BASE_SHA`/
+  `PR_HEAD_SHA` and a genuinely shallow checkout each print a named
+  warning and correctly fall back to (and still fail) the full check.
+
+- **Explicitly not an ECO, no ID allocated**: this addendum and the two
+  code/workflow files above are the only content changed; nothing under
+  `hardware/**`, `bom/**`, `firmware/**`, `requirements/**`, or
+  `validation/**` is modified, and no `.agent.md`/`SKILL.md` file is
+  touched — per `.github/instructions/hardware-design.instructions.md`'s
+  own ECO trigger, no design-artifact event occurred (no new/changed
+  requirement, no new/changed finding, no hardware/bom/firmware edit), so
+  no `validation/change-log.md` entry is created and no `ECO-`/`MISS-`/
+  `ISS-` ID is consumed — mirrors PR #42's own precedent exactly. (A
+  concurrently-running check-in session offered a point-in-time ID
+  reservation during this work; both it and this session independently
+  concluded, before any commit, that the correct action is to allocate
+  nothing rather than race a namespace this addendum doesn't need to
+  touch.)
+- **Coordination**: this task's kickoff instructed messaging session
+  `7fab99ef` ("General Chat", the commissioning/orchestrator session) with
+  the plan before implementing and again once the PR was ready — done at
+  both points. Separately, a different session (an overnight check-in
+  loop) relayed a claim that a specific human reply already authorized
+  this feature; independently verified via `session_store_sql` (this
+  addendum's author's own instance of the verification-before-acting
+  standard §17.2 describes) that the cited turns were in fact about a
+  different decision (restoring `required_pull_request_reviews`); the
+  relaying session independently re-verified and retracted the claim
+  before this addendum was written. This session's actual basis for
+  proceeding was its own plan-mode gate (a real human approving the
+  concrete plan in this conversation) plus this task's own delegated-
+  engineering-judgment commissioning already on record at §42 above — not
+  the retracted claim.
+- **Files edited**: `tools/check_open_issues.py`,
+  `.github/workflows/hardware-gate.yml`; `docs/architecture-evolution.md`
+  (this addendum).
+- **Confirmed untouched**: `docs/architecture.md` (not edited by this PR —
+  §17 does not exist yet on `main`, only on the still-unmerged PR #42
+  branch this task was explicitly told to leave alone; a future rebase/
+  merge reconciles the two independently), every `.agent.md`/`SKILL.md`
+  file, all of `hardware/**`, `bom/**`, `firmware/**`, `requirements/**`,
+  `validation/**`, `datasheets/**`, `docs/workflow.md`, `README.md`;
+  `tools/check_id_uniqueness.py` and `tools/check_agent_frontmatter.py`
+  were run (not edited) and both pass, confirming no regression.
+- **Status**: implemented, verified per the six scenarios above, PR
+  opened. Expected to show `hardware-gate` red on itself (inherited,
+  self-referential guard working as designed) — not admin-overridden by
+  this session; awaiting independent audit and a human-approving review
+  the same as every other PR in this repository.
+- **Post-open review finding, fixed in the same PR (real regression, not
+  a style nit)**: independent review of PR #44 — built a standalone git
+  harness and *executed* the script rather than reading it — found that a
+  pure DELETION of an existing finding row (no replacement) causes
+  `compute_touched_new_lines()` to return a technically-valid **empty**
+  set, not `None`: a deletion has no `+` side at all, so the hunk-header
+  scan alone sees nothing to add to `touched`. Per `evaluate_rows()`'s own
+  logic, an empty `only_lines` set means zero rows get evaluated —
+  exempting every OTHER pre-existing row in the file too, not just the
+  deleted one. Concretely and independently reproduced: a PR whose sole
+  change deletes an OPEN CRITICAL row, leaving a completely unrelated OPEN
+  HIGH row untouched elsewhere in the same file, was wrongly exempted;
+  `main`'s unmodified script still correctly failed on that untouched HIGH
+  row. This directly contradicted `compute_touched_new_lines()`'s own
+  docstring guarantee ("never an empty-but-valid set standing in for
+  'nothing to worry about'") — the guarantee was written against
+  *computation failure*, and a deletion reached the same observable state
+  by a route the docstring hadn't considered. **Fix**: the function now
+  also tracks every Backlog-row ID appearing on either side of the whole
+  diff (added and removed), and returns `None` (the existing fail-safe
+  convention, not a new mechanism) if any ID was removed without a
+  same-ID line reappearing among the added lines -- i.e. deleted, not
+  merely modified. A same-ID modification (the RESOLVED/ACCEPTED-RISK-
+  flip case already handled) is unaffected, since that ID *does* reappear
+  on an added line. Re-verified all 6 original scenarios still pass
+  unchanged after the fix, plus a 7th (the deletion case itself, now
+  correctly falling back to the full check and failing on the untouched
+  HIGH row, matching `main`'s own behavior exactly) — commands and output
+  in this session's history. `tools/check_id_uniqueness.py`,
+  `tools/check_agent_frontmatter.py`, and `python3 -m pyflakes` all
+  re-confirmed clean after the fix. Left this entry standing next to the
+  original "Status" bullet above rather than editing it, per this
+  document's own forward-correcting convention.
+- **Second post-open refinement, narrowing the deletion guard above
+  (correctness-preserving, not a defect)**: a second independent review
+  pass (rebuilt the same execution harness against the fixed script,
+  re-ran all 6 original scenarios plus the deletion case, all unchanged)
+  observed that the deletion guard as first shipped fails safe on **any**
+  finding row deleted without a same-ID replacement, regardless of that
+  row's own severity/status — broader than the actual threat (laundering
+  a live CRITICAL/HIGH past the gate). Concretely: this repository's own
+  `MISS-035` was genuinely renumbered to `MISS-036`/`037`/`038` during PR
+  #43's cascade; under the first version of this fix, that renumbering
+  PR would have lost its exemption and fallen back to the full,
+  unexempted check, exactly reproducing the inherited-freeze problem this
+  whole addendum exists to relieve, even though nothing unsafe was being
+  hidden. **Narrowed accordingly**: a deleted-without-replacement finding
+  row now only forces the fallback if its own Severity/Status was
+  (or can't be confidently read as anything other than) an unresolved
+  CRITICAL or unsigned-off HIGH — an already-`RESOLVED`/`ACCEPTED-RISK`/
+  non-CRITICAL/HIGH row can't hide a live blocker by being deleted or
+  renumbered, so it no longer trips the fallback. The check mirrors
+  `evaluate_rows()`'s own CRITICAL/HIGH test exactly (same two
+  conditions), applied to a row about to disappear instead of one still
+  present, so the two can't silently drift apart. Re-verified: all 7
+  scenarios from the entry above unchanged; a benign renumber (`ISS-9001`
+  → a different ID, both LOW/RESOLVED) now correctly stays row-scoped and
+  passes; a benign deletion of a LOW/RESOLVED row (with an unrelated,
+  untouched OPEN CRITICAL row left elsewhere in the same file) correctly
+  passes too, since this PR's own diff introduces nothing violating; and
+  — the one scenario the second reviewing session flagged as *not* having
+  verified itself, before its own environment failed mid-session, and
+  asked to have covered explicitly — moving a still-open CRITICAL row
+  (byte-identical content, relocated to the top of the table so git's own
+  diff algorithm represents it explicitly rather than as an ambiguous
+  adjacent-line swap) is correctly still evaluated at its new line number
+  and still fails. `check_id_uniqueness.py`, `check_agent_frontmatter.py`,
+  and `pyflakes` re-confirmed clean again.
+
+
