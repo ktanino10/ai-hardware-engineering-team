@@ -37,7 +37,7 @@ const COMPONENTS = [
     roleJa:'6軸加速度・ジャイロセンサ。I2C2経由で100Hz以上でサンプリング（REQ-001）。生のレジスタ値のみで、単位変換やセンサフュージョンはこのMCU上では行わない。',
     datasheet:'https://www.bosch-sensortec.com/products/motion-sensors/imus/bmi270/' },
   { id:'SW1', x:165, y:400, w:55, h:55, ref:'SW1',
-    nameEn:'Reset Button', nameJa:'リセットボタン', part:'SW_PUSH (generic 6mm THT)',
+    nameEn:'Reset Button', nameJa:'リセットボタン', part:'B3F-1000 (Omron, now Aratas)',
     roleEn:'Momentary push-button tied to NRST — manual MCU reset.',
     roleJa:'NRSTに接続されたタクトスイッチ。MCUを手動リセットする。', datasheet:null },
   { id:'D1', x:235, y:400, w:55, h:55, ref:'D1',

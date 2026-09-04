@@ -226,6 +226,17 @@ derivation) — has been updated for the record (see that file), but the
 actual pixel output (`ANCHOR_PX` itself, and the base render) requires a
 real Blender render to regenerate and was NOT recomputed or guessed at.
 
+**ADDENDUM (MISS-050, 2026-09-05)**: the note above, written the same day
+as MISS-034's own fix, only accounts for that PCB-bay resize. This image
+(and the `ANCHOR_PX` reference data) additionally predates MISS-023's own
+*later* full closure (`a1638ec`, same day but afterward) — `pinch_guard_or`
+grew 115.0mm → 176.3mm outer radius (ring outer diameter 230mm → 352.6mm)
+*after* this REV 5 STALENESS NOTE was first written, so the pinch guard
+(item 5) shown here is stale in a second, independent way this note did
+not originally cover. A future Blender-connected regeneration must pick up
+BOTH changes, not just the PCB bay — see `validation/open-issues.md`
+MISS-050 for the full record.
+
 OpenSCAD has no built-in "explode along an axis" primitive; Blender's
 transform tools do, so this step uses the newly-verified Blender MCP
 connection. Approach, in full: export each of the 5 printed pieces (plus
@@ -337,6 +348,12 @@ full record.
 **REV 5 STALENESS NOTE (this session)**: same as Method 2 above — not
 regenerated (Blender not connected this session), both video files still
 depict the OLD, pre-MISS-034 geometry.
+
+**ADDENDUM (MISS-050, 2026-09-05)**: as with Method 2's own addendum above,
+these files also predate MISS-023's own later full closure (`a1638ec`) —
+the pinch guard grew 115.0mm → 176.3mm outer radius after this note was
+written, a second, independent source of staleness this note did not
+originally cover. See `validation/open-issues.md` MISS-050.
 
 An animated companion to the static exploded view, added per a follow-up
 request: each part moves from its exploded position back to its true
@@ -484,6 +501,15 @@ motor-platform geometry, which is formula-independent of `pcb_length`/
 Method 2's own assembled-position STL pipeline, so it still depicts the
 OLD, smaller PCB bay geometry alongside those still-valid physics numbers.
 
+**ADDENDUM (MISS-050, 2026-09-05)**: the same reasoning applies to
+MISS-023's own later full closure (`a1638ec`) as to MISS-034 above — the
+pinch guard is part of the stationary, non-rotating half of the assembly,
+so it does not enter `I_wheel`/`I_platform` and the physics numbers remain
+valid, but the render (reusing Method 2's own stale pipeline) also depicts
+the OLD 115.0mm-radius guard, not the current 176.3mm one — a second,
+independent source of visual staleness this note did not originally
+cover. See `validation/open-issues.md` MISS-050.
+
 **This is a SIMULATION / PREDICTION, not a measurement.** No PCB has been
 fabricated/populated yet (`../assembly-instructions.md` §4.1 placeholder;
 366 unresolved DRC items on the still-open PCB-layout branch) and no
@@ -536,6 +562,12 @@ connected this session) — same visual-only staleness as Method 5 above
 (the concept being illustrated is unaffected by the PCB resize, but the
 render itself would still show the old PCB bay geometry if the underlying
 assembled-position STL pipeline is reused).
+
+**ADDENDUM (MISS-050, 2026-09-05)**: same as Method 5's own addendum above
+— the concept remains unaffected, but the reused render pipeline also
+depicts the OLD, pre-MISS-023 pinch guard (115.0mm radius, not the current
+176.3mm), a second, independent source of staleness beyond the PCB-bay
+note above. See `validation/open-issues.md` MISS-050.
 
 **This is a CONCEPT, not a literal capability of this rig.**
 Bench-IMU-01 rotates about exactly ONE (vertical/yaw) axis
