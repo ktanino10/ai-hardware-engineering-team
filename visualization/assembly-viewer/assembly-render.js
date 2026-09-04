@@ -121,6 +121,7 @@ function afterAllLoaded(){
   loadingEl.style.display = 'none';
   buildPrimitivesAndScrews();
   renderLegendCounts();
+  frameCameraToScene();
 }
 
 function buildPrimitivesAndScrews(){
@@ -142,12 +143,101 @@ function buildPrimitivesAndScrews(){
   });
 }
 
+// Bakes a Z-up -> Y-up axis correction into a loaded mesh's own geometry
+// (in LOCAL space, before centering/positioning). This project's
+// OpenSCAD/STL export pipeline is Z-up (see assembly-data.js's own
+// sourceUpAxis comment for the citation), but this scene is Y-up —
+// loading such a mesh unrotated puts its real vertical extent on this
+// scene's Z (depth) axis and one of its horizontal footprint extents on
+// the scene's Y (up) axis instead. Parts NOT marked sourceUpAxis:'z' (the
+// PCB, already Y-up from its KiCad glTF/GLB export) are left untouched.
+function applyAxisFix(obj, part){
+  if (part.sourceUpAxis !== 'z') return;
+  obj.traverse(child => {
+    if (child.isMesh){
+      child.geometry = child.geometry.clone();
+      child.geometry.rotateX(-Math.PI / 2);
+    }
+  });
+}
+
+// Some printed parts (e.g. the Pinch Guard) are one physical segment
+// printed/molded N times and assembled into a full radially-symmetric
+// part — see this part's own `quadrant` count in assembly-data.js. The
+// source OBJ is only the single print-ready segment. This builds the
+// N-instance assembled whole from that one segment, rotated about the
+// vertical (Y) axis, WITHOUT the general centerGeometry() XZ-recentering
+// (which would drag the segment's pivot away from the true rotational-
+// symmetry axis at local X=0,Z=0 and break the reassembly). Only the
+// segment's own vertical (thickness) extent is centered, matching what
+// centerGeometry() does on that one axis.
+function buildRadialAssembly(obj, part){
+  const box = new THREE.Box3().setFromObject(obj);
+  const centerY = (box.min.y + box.max.y) / 2;
+  obj.traverse(child => { if (child.isMesh) child.geometry.translate(0, -centerY, 0); });
+  const ringGroup = new THREE.Group();
+  const step = (Math.PI * 2) / part.quadrant;
+  for (let i = 0; i < part.quadrant; i++){
+    const instance = (i === 0) ? obj : obj.clone(true);
+    instance.rotation.y = i * step;
+    ringGroup.add(instance);
+  }
+  return { group: ringGroup, size: box.getSize(new THREE.Vector3()) };
+}
+
+// Auto-fit framing: computes the REAL combined bounding box of every
+// loaded part (mesh geometry for the printed/PCB parts, defined
+// dimensions for the primitive purchased parts) once everything has
+// loaded, and positions the camera to frame the whole assembly with a
+// comfortable margin — instead of a hardcoded position that only matches
+// today's dimensions and silently stops fitting the next time a part's
+// geometry changes (e.g. a future enclosure resize or guard-radius
+// change). Keeps the existing 45deg PerspectiveCamera and OrbitControls
+// untouched — only recomputes where the camera starts and what it orbits
+// around. CAMERA_START supplies the preferred VIEWING DIRECTION/ANGLE (so
+// this still opens on the same near-isometric angle the original viewer
+// used) and is the fallback position/target if the scene is ever empty.
+function frameCameraToScene(){
+  const box = new THREE.Box3();
+  scene.traverse(obj => {
+    if (obj.isGroup && obj.userData && obj.userData.part) box.expandByObject(obj);
+  });
+  if (box.isEmpty()) return;
+
+  const sphere = box.getBoundingSphere(new THREE.Sphere());
+  const { center, radius } = sphere;
+
+  const dir = new THREE.Vector3(...CAMERA_START.pos).sub(new THREE.Vector3(...CAMERA_START.target));
+  if (dir.lengthSq() < 1e-6) dir.set(1, 0.6, 1);
+  dir.normalize();
+
+  const vFov = THREE.MathUtils.degToRad(camera.fov);
+  const hFov = 2 * Math.atan(Math.tan(vFov / 2) * camera.aspect);
+  const effectiveFov = Math.min(vFov, hFov);
+  const margin = 1.25; // breathing room so parts aren't touching the frame edge
+  const distance = (radius / Math.sin(effectiveFov / 2)) * margin;
+
+  camera.position.copy(center).addScaledVector(dir, distance);
+  camera.near = Math.max(1, distance - radius * 4);
+  camera.far = distance + radius * 4;
+  camera.updateProjectionMatrix();
+  controls.target.copy(center);
+  controls.update();
+}
+
 meshParts.forEach(part => {
   loader.load(`models/${part.mesh}`, obj => {
     obj.traverse(child => { if (child.isMesh) child.material = materialFor(part.category); });
-    const size = centerGeometry(obj);
+    applyAxisFix(obj, part);
+    let renderObject, size;
+    if (part.quadrant && part.quadrant > 1){
+      ({ group: renderObject, size } = buildRadialAssembly(obj, part));
+    } else {
+      size = centerGeometry(obj);
+      renderObject = obj;
+    }
     part._measuredSize = size;
-    addSelectableWrapper(obj, part);
+    addSelectableWrapper(renderObject, part);
     loaded++;
     loadingBar.style.width = Math.round((loaded / total) * 100) + '%';
     if (loaded === total) afterAllLoaded();
