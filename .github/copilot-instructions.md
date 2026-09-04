@@ -24,7 +24,7 @@ follow regardless of which specific role it's playing.
 
 ## Roles
 
-Twelve agents across three top-level disciplines (plus two
+Twelve agents across three top-level disciplines (plus three
 discipline-adjacent extensions and one role spanning all three disciplines
 at once), each with a narrow, non-overlapping responsibility — defined as
 real GitHub Copilot custom agent profiles in `.github/agents/*.agent.md`
