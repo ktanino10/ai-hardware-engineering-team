@@ -4,8 +4,8 @@ A bird's-eye status view for the human Chief Engineer: what phase things are
 in, what's waiting on a human decision right now, findings/quality
 snapshot, recent activity, and an electrical/mechanical snapshot. Open
 `index.html` directly in a browser, or view it hosted on GitHub Pages.
-English-only, matching this site's actual current convention (see "Known
-limitations" below).
+Bilingual UI chrome (EN/JA toggle, top-right) — see "Bilingual UI, English
+data" below for exactly what does and doesn't get translated, and why.
 
 ## Why this page works completely differently from the other two viewers
 
@@ -78,6 +78,47 @@ needs to be fast for a large public audience.
 6. **Requirements Snapshot** — Must/Should/Could/Won't priority counts and
    a Rev-tag breakdown, tallied live across every requirement row in
    `requirements/requirements.md`.
+
+## Bilingual UI, English data
+
+An EN/JA toggle (top-right, styled after `circuit-viewer/`'s own dormant
+`.lang-toggle` CSS pattern from before it was simplified to English-only)
+switches this dashboard's **own UI chrome** — titles, section headings,
+buttons, my own template sentences and badge labels, stat/fact labels,
+footnotes, and error-fallback messages. The choice persists via
+`localStorage` across visits. Toggling never re-fetches data — it re-renders
+the already-loaded content from memory in the new language.
+
+This is scoped to this dashboard only, per an explicit request: `circuit-viewer/`
+and `assembly-viewer/` are untouched and stay English-only, matching their
+own prior, explicitly-requested simplification.
+
+**Deliberately never translated, in either language** — agreed with the
+human Chief Engineer before implementing, given the same
+mistranslation/meaning-shift concern that motivated the request in the
+first place:
+
+- Anything actually fetched and parsed from this repository's own files:
+  component-selection.md decision text, finding titles, ECO revision/
+  changed text, self-reported status lines, and phase names extracted live
+  from `docs/workflow.md`.
+- This project's own **defined governance vocabulary** — severity
+  (`CRITICAL`/`HIGH`/`MEDIUM`/`LOW`), status (`OPEN`/`RESOLVED`/
+  `ACCEPTED-RISK`), and priority (`Must`/`Should`/`Could`/`Won't`) — these
+  are precise terms-of-art defined in `docs/architecture.md` §7.1/§8 and
+  appear verbatim in the source files; a translated gloss (e.g. for
+  `ACCEPTED-RISK`, which carries a specific governance meaning) risks the
+  reader not recognizing the term when they go read the real English
+  source documents, which is the opposite of what was asked for.
+- IDs (`ISS-005`, `ECO-068`, `REQ-021`), file paths, and `Rev N`/`Phase N`
+  designators.
+
+Everything else — the actual majority of visible text on the page — is
+genuine chrome I authored for this dashboard, and is fully bilingual.
+`dashboard-i18n.js` owns this split: a `STRINGS` dictionary (`{en, ja}`
+pairs, some parameterized as small functions so word order can differ
+between the two languages around a number), a `t(key, ...args)` lookup, and
+`setLang()`/`applyStaticChrome()` to apply it.
 
 ## A deliberate design decision: no single "Rev N / current phase" claim
 
@@ -158,13 +199,15 @@ during development:
 
 ## Known limitations (disclosed)
 
-- **English-only.** The brief this page was built from assumed the site
-  uses `nameEn`/`nameJa` bilingual labels throughout. In fact only
-  `circuit-viewer/`'s data file still carries an unused `nameJa` field —
-  its own README states it went English-only "per explicit user
-  preference," and neither the landing page nor `assembly-viewer/` have
-  ever had a Japanese variant. This page matches that actual, current,
-  deliberate convention.
+- **Bilingual UI, not bilingual data — by design, not oversight.** The
+  original brief this page was first built from assumed the whole site
+  uses `nameEn`/`nameJa` bilingual labels throughout; that turned out to be
+  inaccurate for the *other two* viewers (`circuit-viewer/`'s own README
+  states it went English-only "per explicit user preference"; neither it
+  nor `assembly-viewer/` nor the landing page has a live Japanese variant,
+  and this page doesn't touch them). This dashboard's *own* chrome, added
+  in a follow-up request, is bilingual — see "Bilingual UI, English data"
+  above for exactly what does/doesn't get translated and why.
 - **GitHub raw-content CDN caching**: `raw.githubusercontent.com` can serve
   a cached response up to a few minutes stale after a very recent commit —
   "live" here means "fetched fresh every page load," not "guaranteed
