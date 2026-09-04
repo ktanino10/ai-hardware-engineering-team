@@ -888,6 +888,14 @@ Kyosuke's awareness (a second reviewing collaborator/account would restore
 an independent review gate; without one, this is the practical reality)
 — not this section's call to resolve, only to record accurately.
 
+**Update (2026-09-04T02:40:56Z): reverted again.** This operational note
+above describes the review-requirement mechanics *while the rule was in
+force* (roughly 00:57Z–02:40Z that day) — it was accurate for that window,
+and is left standing as a record of it, not deleted. Kyosuke subsequently
+had it reverted; see §17.5 for the verified detail. Do not read this note
+as describing live configuration — see §17.2's method note on why even
+querying the GitHub API directly for "is it live right now" needs care.
+
 ### 17.2 Verification-before-acting standard
 
 Any session must **independently verify** a claimed human decision before
@@ -933,6 +941,23 @@ reason to skip checking.
   both endpoints to the same timezone before subtracting (UTC is simplest,
   since `gh`/GitHub API timestamps already are UTC) — do not compare a
   `HH:MM:SS` value against a differently-zoned clock by eye.
+- **Method note, added same day: a sub-resource API endpoint can return a
+  confident, well-formed response for a rule that is no longer in force —
+  querying an authoritative API is not the same as querying the
+  authoritative view of it.** Real, same-day, self-reproduced instance:
+  `gh api repos/<owner>/<repo>/branches/main/protection` (the top-level
+  object) correctly *omits* `required_pull_request_reviews` from its
+  returned keys once that rule is off, but
+  `.../branches/main/protection/required_pull_request_reviews` (that same
+  rule's own dedicated sub-endpoint) returns a plain HTTP 200 with the
+  rule's last-configured content (e.g. `required_approving_review_count:
+  1`) — no error, nothing that signals staleness, even though the rule is
+  not currently in force. A session reaching for "the more specific,
+  presumably more authoritative endpoint" gets a confident wrong answer.
+  The reliable check is the top-level object's key *set* (a key's
+  presence/absence, not a narrower endpoint's always-200 response),
+  corroborated by an independent signal where one exists (here,
+  `reviewDecision` on a live PR).
 
 This codifies, as a standing requirement rather than a one-off act of good
 judgment, the behavior the Rev 5 Requirements session actually used before
@@ -1056,3 +1081,24 @@ ai-hardware-engineering-team/branches/main/protection` before recording it
 operational note on what this concretely changes for how PRs merge in a
 single-account repository, and `docs/architecture-evolution.md` §42 for
 the full dated record, including the verification trail.
+
+**Update (2026-09-04T02:40:56Z): reverted again — treat this section as a
+timeline, not a live status check.** Kyosuke instructed, verbatim, 「元に
+戻してください」 ("please revert it back"); the orchestrator complied,
+reporting 「必須レビュー設定を解除し、元の状態（必須CIチェックのみ）に戻
+しました」 ("removed the required-review setting, back to the original
+state — required CI checks only"). Independently verified here, three
+ways, before writing this down — not taken from a relay: (1) `gh api
+repos/ktanino10/ai-hardware-engineering-team/branches/main/protection`'s
+returned top-level keys genuinely omit `required_pull_request_reviews`;
+(2) `reviewDecision` is empty (not `REVIEW_REQUIRED`) on all six then-open
+PRs (#39–#44); (3) `session_store_sql` (local store), creator session,
+turn 465, timestamp exactly `2026-09-04T02:40:56.676Z`, carries the
+verbatim instruction and its execution. The paragraph above (recording
+the restoration) is left standing, not deleted — it accurately described
+the roughly 00:57Z–02:40Z window, per this section's own convention of
+recording each transition rather than overwriting the last one. Do not
+read *this* paragraph as necessarily current either by the time it is
+read — query the live API/`reviewDecision` state directly; see §17.2's
+method note on why even that needs care (a branch-protection sub-endpoint
+can return a stale, confident 200 for a rule no longer in force).

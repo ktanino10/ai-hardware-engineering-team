@@ -2337,6 +2337,35 @@ and this addendum only.
   session was never dead, exactly as the corrected model predicts. Full
   design/verification detail belongs in PR #44's own addendum, not
   duplicated here.
+- **Branch protection reverted again, same day — caught by a third
+  independent audit (cycle 34), verified four ways.** Cycle 34 (a later
+  scheduled overnight check-in) audited this PR and found §17.5/§17.1
+  asserting a superseded configuration: Kyosuke had instructed, at
+  `2026-09-04T02:40:56Z`, 「元に戻してください」, and the orchestrator
+  removed `required_pull_request_reviews` again. Independently confirmed
+  here, not taken on the relay: `gh api .../branches/main/protection`'s
+  top-level keys genuinely omit the rule; `reviewDecision` is empty on all
+  six then-open PRs (#39–#44); `session_store_sql` (local store) turn 465
+  of the creator session carries the exact verbatim instruction and its
+  execution, timestamped exactly as cited. §17.5 and §17.1 updated with a
+  forward-correcting paragraph recording this second transition — the
+  paragraph describing the first restoration is left standing, per this
+  document's own convention, as an accurate record of that window rather
+  than a mistake to erase.
+- **A genuine API trap, flagged by cycle 34 and independently
+  reproduced here before writing it down.** `gh api
+  .../branches/main/protection` (top-level) correctly omits
+  `required_pull_request_reviews` once the rule is off, but
+  `.../branches/main/protection/required_pull_request_reviews` (that
+  rule's own dedicated sub-endpoint) returns a confident, well-formed HTTP
+  200 with the rule's *stale, last-configured* content — no error, no
+  staleness signal, even though the rule is not in force. Querying both
+  endpoints against this repository at the same moment reproduces the
+  contradiction directly, not on cycle 34's report alone. Added as a new
+  §17.2 method note: querying an authoritative API is not the same as
+  querying the authoritative view of it — trust a resource's top-level key
+  *set*, not a narrower sub-endpoint's always-200 response, and corroborate
+  with an independent signal where one exists.
 - **Status**: implemented, PR opened, awaiting independent audit before
   merge, deliberately left gate-blocked per its own §17.1 case-2 rule —
   same process every prior change in this repository's history went
