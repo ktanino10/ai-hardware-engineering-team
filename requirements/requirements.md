@@ -899,6 +899,165 @@ obstacles. I also want to do the part where the body stands up.")
   already-dispositioned Rev 3/4 flywheel) or edit MISS-034's own
   disposition text in `validation/open-issues.md`.
 
+## 9k. Rev 5 — Direct human confirmation of REQ-409, exactly as written (new)
+
+Unlike §9i's Q5 entry (the creator/"General Chat" session's own
+confirmation of REQ-409's framing on **delegated authority**), this is
+Kyosuke's own **direct** confirmation: the creator/"General Chat" session
+presented REQ-409's exact, current row text to him personally and asked
+whether it should stand as written or be adjusted first. He confirmed it
+should stand **exactly as currently written — no wording or scope
+change.**
+
+**Verification, per `docs/architecture.md` §17.2 (disclosed rather than
+glossed over, mirroring `validation/change-log.md` ECO-061's own handling
+of an inconclusive check):** independently queried `session_store_sql`
+(source: local) against the creator/"General Chat" session's own turn
+history (`7fab99ef-5578-4d79-a9c2-b24dbcfe93be`) before writing this
+section, retrying after a wait per §17.2's own guidance rather than
+accepting the relay at face value.
+
+- **Independently verified, verbatim** (turns 570-573, all present at
+  final query time, timestamps `2026-09-04T06:50:19Z`-`06:59:43Z`): turn
+  570, Kyosuke asks for a status update ("現在の状況は"); turn 571, an
+  unrelated tangent about a project dashboard; turn 572, Kyosuke says "ご確
+  認したいです" ("I want to check/confirm"), and the creator session's own
+  reply in that same turn presents REQ-021's and REQ-409's exact current
+  row text verbatim and asks directly: "このまま進めてよろしいですか、それ
+  とも何か条件を追加されますか？" ("Is it fine to proceed as-is, or would
+  you like to add any conditions?"); turn 573, Kyosuke replies "REQ-409
+  （Must、新規）からやりたいです。これを確定させた後に次のやつをして下さ
+  い。" ("Let's do REQ-409 first — after finalizing this, please do the
+  next one"), and the creator session's own same-turn response states "REQ
+  -409の正式承認を記録するセッションを起動しました" ("I've launched a
+  session to record REQ-409's formal approval") before turning to ask
+  about REQ-021 next.
+- **Not itself a separately queryable turn**: the specific interactive
+  selection ("proceed as-is" vs. "add conditions") that turn 573's own
+  response already treats as resolved does not appear as its own distinct
+  row in `session_store_sql` — consistent with this project's own
+  established understanding that an interactive, `ask_user`-style
+  selection is a tool-level exchange within a turn's processing, not
+  always a separate queryable turn (`validation/change-log.md` ECO-064's
+  "I personally posed this as an interactive `ask_user` choice and
+  witnessed his selection directly — this is first-hand knowledge, not a
+  relayed claim" citation shape; §17.2's own replication-lag precedent).
+  Turn 573's own text is itself independently, directly verified and
+  corroborates the outcome (an approval was reached; a recording task was
+  launched) even though it does not re-quote Kyosuke's selection in his
+  own words. (§9l below records that the analogous REQ-021 exchange *did*
+  fully replicate on a later retry — turn 574 — so this is a genuine,
+  turn-specific gap, not a systematic one.)
+- **What this confirms**: REQ-409's requirement text, priority (Must), and
+  Notes column stand **exactly as currently written** in this revision —
+  this section records that a direct human confirmation occurred; it does
+  **not** itself edit REQ-409's own row.
+- **How this differs from §9i's Q5**: §9i recorded the creator/"General
+  Chat" session's own delegated-authority confirmation ("framing is
+  pitched correctly"). This section is a **stronger, direct** confirmation
+  from Kyosuke himself, of the identical, unchanged text — it supersedes
+  §9i's Q5 entry as the operative confirmation of REQ-409, without
+  contradicting it (both reach the same conclusion: REQ-409 stands as
+  written).
+- **What this does NOT resolve**: REQ-021 (reviewed in the same exchange)
+  is **not** confirmed by this section. Kyosuke's own stated intent was to
+  handle REQ-409 first, then move to the next item sequentially — see
+  §9l below (added in this same revision, not a future PR) for REQ-021's
+  own separate, conditional confirmation and independent
+  contradiction-check record.
+
+## 9l. Rev 5 — Direct human confirmation of REQ-021, conditional on an independent contradiction check (performed; none found) (new)
+
+Kyosuke's own direct instruction for REQ-021 — **independently verified
+against the creator/"General Chat" session's own turn history**
+(`session_store_sql`, session `7fab99ef-5578-4d79-a9c2-b24dbcfe93be`, turn
+574, timestamp `2026-09-04T07:06:20.901Z`), not accepted on the strength
+of a relayed summary alone, mirroring §9j's own discipline.
+
+**Verbatim (Kyosuke's own message, turn 574):**
+
+> 今の文言のままでいいです。矛盾があるようなら教えて下さい。必要に応じて見直して
+
+("The current wording is fine. If there are any contradictions, let me
+know. Revise as needed.")
+
+Unlike REQ-409's unconditional confirmation (§9k), this is a
+**conditional** grant: keep the current wording unless an actual
+contradiction is found — in which case revise it and record clearly what
+changed and why. It is not a simple yes/no approval.
+
+**Independent contradiction check performed**, per the creator/"General
+Chat" session's own explicit instruction not to accept its preliminary
+assessment at face value (that session's own hedge, in substance: REQ-021's
+"1+ reaction wheels" versus REQ-015's "3 independently-driven" and
+REQ-409's "3 simultaneous" look like a difference of role — specific
+maneuver mechanism vs. system capability vs. safety-analysis worst case —
+not a contradiction, "but check this yourself, don't take my assessment on
+faith"). Checked against every item named:
+
+- **REQ-015** ("3 independently-driven reaction wheels... extending
+  REQ-007's single-axis capability to all 3 axes"): describes the system's
+  overall **capability ceiling** (3-wheel control is available). REQ-021's
+  "spin up 1+ reaction wheels" describes the Cubli maneuver's own
+  **minimum mechanism** (the jump can be performed using at least 1
+  wheel). A capability ceiling of 3 and a specific maneuver's
+  minimum-viable use of ≥1 describe different scopes, not competing
+  counts — no conflict.
+- **REQ-409** ("aggregate stored rotational energy across 3 simultaneous
+  reaction wheels... hard electromagnetic braking"): this is the safety
+  analysis's own **conservative worst-case** framing (all 3 wheels
+  energized and braked together), required precisely *because* the
+  system's 3-wheel capability (REQ-015) makes that worst case physically
+  realizable during general operation — not a claim that every jump
+  maneuver itself always uses 3 wheels. REQ-021's "1+" (a maneuver's
+  minimum mechanism) and REQ-409's "3 simultaneous" (a safety analysis's
+  required worst-case bound) describe different things — no conflict.
+- **REQ-312** (enclosure clearance for "all 3 flywheels simultaneously"):
+  a structural/mechanical clearance requirement sized for the system's
+  full capability, independent of how many wheels any specific maneuver
+  actually engages. No conflict with REQ-021.
+- **REQ-403/MISS-016** (single-flywheel containment `ACCEPTED-RISK`,
+  `validation/open-issues.md`): REQ-021's own row does not mention or
+  reference REQ-403 or MISS-016 anywhere, and a repo-wide search of
+  `validation/open-issues.md` turns up no REQ-021 cross-reference either —
+  REQ-021 has not reopened, edited, or silently relied on that
+  disposition. (REQ-409's own row is the one that explicitly guards this
+  boundary — "Explicitly does not reopen or edit REQ-403/MISS-016" — and
+  is unaffected by this section.)
+- **§9h/§9i/§9j** (checking for stale "proposed Won't" language): §9h's
+  own "Proposed default: no — deferred (REQ-021)" text is a historical
+  record of the open question *as it stood when §9h was written*,
+  explicitly superseded by §9j ("ANSWERED — YES"), not a live, current
+  disposition. §9i's Q2 entry ("EXPLICITLY NOT DECIDED, reserved for the
+  human") is likewise historically accurate as of its own writing and is
+  explicitly superseded by §9j. REQ-021's own row text states it
+  "**Supersedes** this row's own prior 'proposed Won't (this cycle), NOT
+  YET FINALIZED' disposition" — that phrase appears only as a quoted
+  reference to what was superseded, mirroring this project's own
+  additive-only historical-record convention (e.g. §9h's own MISS-034
+  note, explicitly marked superseded but left unedited). No stale
+  "proposed Won't" language remains as a *live* disposition anywhere in
+  this file.
+- **`requirements/traceability-matrix.md`** (REQ-021 row): already reads
+  "**ANSWERED YES, in scope (Rev 5)**" with the same turn-415 verification
+  citation as §9j, and already explains its own "Pending" status column
+  as "because Component Selection/Circuit/Mechanical Design haven't yet
+  implemented it — not because the decision itself is still open." Fully
+  consistent with `requirements.md`; needs no change.
+
+**Conclusion: no contradiction found.** Per Kyosuke's own conditional
+instruction, REQ-021's own row (Must, requirement text, Notes) is
+therefore **left completely unchanged** by this section — this is a
+confirmation record, not an edit. Had a contradiction actually been found,
+this section would instead document the specific fix made and why; none
+was necessary.
+
+- **Pairs with §9k above**: together, §9k (REQ-409) and §9l (REQ-021)
+  close out the two items Kyosuke said he would review sequentially (his
+  own words, turn 573: "REQ-409（Must、新規）からやりたいです。これを確定
+  させた後に次のやつをして下さい。") — both are now directly confirmed, in
+  this same revision.
+
 ## 10. Approval
 
 | Role | Name | Date | Decision |
