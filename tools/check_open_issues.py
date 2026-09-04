@@ -549,6 +549,35 @@ def _finding_id_of_diff_line(line_without_marker: str) -> str | None:
     return None
 
 
+def _deleted_row_needs_fail_safe(cells: list[str]) -> bool:
+    """True if a Backlog row that's being deleted (with nothing replacing
+    its ID elsewhere in the same diff) cannot be safely assumed
+    non-violating, i.e. either its own Severity/Status can't be read with
+    confidence, or it genuinely was an unresolved CRITICAL/unsigned-off
+    HIGH. Mirrors `evaluate_rows()`'s own CRITICAL/HIGH test exactly
+    (same two conditions), applied here to a row about to disappear
+    instead of one still present, so the two can't silently drift apart.
+
+    Deleting a row that was already RESOLVED, ACCEPTED-RISK, or any
+    non-CRITICAL/HIGH severity cannot hide a live blocker -- it wasn't one
+    -- so that case returns False and the deletion is treated as
+    inconsequential (the caller simply won't have anything to evaluate at
+    that position, which correctly reflects that this PR's own diff didn't
+    add or change a violation there). A malformed row (fewer than 3
+    cells, so Severity/Status can't be read at a fixed position) returns
+    True: with no confident read, the safe assumption is that it might
+    have been a violation, not that it wasn't.
+    """
+    if len(cells) < 3:
+        return True
+    severity, status = cells[1].upper(), cells[2].upper()
+    if severity == "CRITICAL" and status != RESOLVED:
+        return True
+    if severity == "HIGH" and status not in (RESOLVED, ACCEPTED_RISK):
+        return True
+    return False
+
+
 def compute_touched_new_lines(
     merge_base: str, head_sha: str, rel_path: str
 ) -> set[int] | None:
@@ -579,20 +608,31 @@ def compute_touched_new_lines(
     OPEN CRITICAL row, leaving a completely unrelated OPEN HIGH row
     untouched elsewhere in the same file, was wrongly exempted -- `main`'s
     unmodified script still correctly failed on that untouched HIGH row).
-    Guarded against here by tracking every Backlog-row ID that appears on
+
+    Guarded against by tracking every Backlog-row ID that appears on
     either side of the WHOLE diff (not just within one hunk, so a row
-    replaced by a different-shaped edit spanning hunks is still matched):
-    an ID present in a removed line but absent from every added line was
-    deleted without replacement, and this function fails SAFE for the
-    whole diff (returns None) rather than silently returning a
-    still-technically-valid empty set. A same-ID modification (the
-    RESOLVED/ACCEPTED-RISK case above) is unaffected because that ID
-    *does* reappear on an added line, in the same or a different hunk.
+    replaced by a different-shaped edit spanning hunks is still matched).
+    An ID present in a removed line but absent from every added line was
+    deleted, not merely modified -- but a deletion only fails SAFE
+    (returns None) if `_deleted_row_needs_fail_safe()` says that specific
+    row can't be assumed non-violating. Narrowed to this (rather than
+    failing safe on ANY deletion, an earlier, blunter version of this
+    fix) after independent review found the blunter version would have
+    forced a real, already-occurred benign case -- MISS-035 being
+    renumbered to MISS-036/037/038 during PR #43's cascade -- through the
+    full, unexempted check for no security benefit: deleting/renumbering
+    an already-RESOLVED/ACCEPTED-RISK/non-CRITICAL/HIGH row cannot hide a
+    live blocker, so it doesn't need to trip the fallback. A same-ID
+    modification (the RESOLVED/ACCEPTED-RISK-flip case above) is
+    unaffected either way because that ID *does* reappear on an added
+    line, in the same or a different hunk.
 
     Returns None (never an empty-but-valid set standing in for "nothing
     to worry about") if the diff can't be computed, a hunk header can't be
-    parsed, or a finding row was deleted without replacement -- callers
-    must fail SAFE to the full check in all three cases.
+    parsed, or a finding row that may have been an unresolved CRITICAL/
+    HIGH (or couldn't be confidently read) was deleted without
+    replacement -- callers must fail SAFE to the full check in all such
+    cases.
     """
     diff_output = _run_git(
         ["diff", "--unified=0", merge_base, head_sha, "--", rel_path]
@@ -602,7 +642,7 @@ def compute_touched_new_lines(
 
     touched: set[int] = set()
     added_ids: set[str] = set()
-    removed_ids: set[str] = set()
+    removed_rows: dict[str, list[str]] = {}
     for line in diff_output.splitlines():
         if line.startswith("@@"):
             match = _HUNK_HEADER.match(line)
@@ -619,21 +659,25 @@ def compute_touched_new_lines(
             if found:
                 added_ids.add(found)
         elif line.startswith("-") and not line.startswith("---"):
-            found = _finding_id_of_diff_line(line[1:])
-            if found:
-                removed_ids.add(found)
+            stripped = line[1:].strip()
+            if stripped.startswith("|"):
+                cells = _split_row(stripped)
+                if cells and ID_PATTERN.match(cells[0]):
+                    removed_rows[cells[0]] = cells  # last occurrence wins
 
-    deleted_without_replacement = removed_ids - added_ids
-    if deleted_without_replacement:
-        print(
-            "WARNING: this PR's diff to "
-            f"{rel_path} deletes existing finding row(s) "
-            f"{sorted(deleted_without_replacement)} with nothing "
-            "replacing them (no added line carries the same ID) -- "
-            "cannot safely restrict evaluation to only this PR's own "
-            "added/changed rows; falling back to the full check."
-        )
-        return None
+    for finding_id, cells in removed_rows.items():
+        if finding_id in added_ids:
+            continue  # modified (same ID reappears), not deleted
+        if _deleted_row_needs_fail_safe(cells):
+            print(
+                "WARNING: this PR's diff to "
+                f"{rel_path} deletes existing finding row {finding_id!r} "
+                "with nothing replacing it, and it cannot be confidently "
+                "treated as already non-violating -- cannot safely "
+                "restrict evaluation to only this PR's own added/changed "
+                "rows; falling back to the full check."
+            )
+            return None
 
     return touched
 

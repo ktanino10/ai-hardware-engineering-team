@@ -2268,5 +2268,40 @@ merge.
   re-confirmed clean after the fix. Left this entry standing next to the
   original "Status" bullet above rather than editing it, per this
   document's own forward-correcting convention.
+- **Second post-open refinement, narrowing the deletion guard above
+  (correctness-preserving, not a defect)**: a second independent review
+  pass (rebuilt the same execution harness against the fixed script,
+  re-ran all 6 original scenarios plus the deletion case, all unchanged)
+  observed that the deletion guard as first shipped fails safe on **any**
+  finding row deleted without a same-ID replacement, regardless of that
+  row's own severity/status — broader than the actual threat (laundering
+  a live CRITICAL/HIGH past the gate). Concretely: this repository's own
+  `MISS-035` was genuinely renumbered to `MISS-036`/`037`/`038` during PR
+  #43's cascade; under the first version of this fix, that renumbering
+  PR would have lost its exemption and fallen back to the full,
+  unexempted check, exactly reproducing the inherited-freeze problem this
+  whole addendum exists to relieve, even though nothing unsafe was being
+  hidden. **Narrowed accordingly**: a deleted-without-replacement finding
+  row now only forces the fallback if its own Severity/Status was
+  (or can't be confidently read as anything other than) an unresolved
+  CRITICAL or unsigned-off HIGH — an already-`RESOLVED`/`ACCEPTED-RISK`/
+  non-CRITICAL/HIGH row can't hide a live blocker by being deleted or
+  renumbered, so it no longer trips the fallback. The check mirrors
+  `evaluate_rows()`'s own CRITICAL/HIGH test exactly (same two
+  conditions), applied to a row about to disappear instead of one still
+  present, so the two can't silently drift apart. Re-verified: all 7
+  scenarios from the entry above unchanged; a benign renumber (`ISS-9001`
+  → a different ID, both LOW/RESOLVED) now correctly stays row-scoped and
+  passes; a benign deletion of a LOW/RESOLVED row (with an unrelated,
+  untouched OPEN CRITICAL row left elsewhere in the same file) correctly
+  passes too, since this PR's own diff introduces nothing violating; and
+  — the one scenario the second reviewing session flagged as *not* having
+  verified itself, before its own environment failed mid-session, and
+  asked to have covered explicitly — moving a still-open CRITICAL row
+  (byte-identical content, relocated to the top of the table so git's own
+  diff algorithm represents it explicitly rather than as an ambiguous
+  adjacent-line swap) is correctly still evaluated at its new line number
+  and still fails. `check_id_uniqueness.py`, `check_agent_frontmatter.py`,
+  and `pyflakes` re-confirmed clean again.
 
 
