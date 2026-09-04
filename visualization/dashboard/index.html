@@ -140,6 +140,49 @@
   .rev-tag{background:#0f2543;border-radius:8px;padding:6px 12px;font-size:11.5px;}
   .rev-tag .v{color:var(--accent);font-weight:700;}
 
+  /* AI Agent Organization */
+  .org-summary{font-size:12px;color:var(--dim);margin-bottom:12px;}
+  .org-group{margin-bottom:16px;}
+  .org-group:last-child{margin-bottom:0;}
+  .org-group h3{font-size:11.5px;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;
+    margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid var(--line);}
+  .org-cards{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;}
+  .org-arrow{align-self:center;color:var(--dim);font-size:16px;flex:0 0 auto;}
+  .org-card{background:#0f2543;border:1px solid var(--line);border-radius:8px;
+    padding:10px 12px;font-size:11.5px;flex:1 1 210px;max-width:270px;}
+  .org-card.apex{border-color:var(--accent);background:#132b52;}
+  .org-card .role{color:var(--accent);font-weight:700;font-size:11.5px;}
+  .org-card .name{color:var(--dim);font-size:10px;margin-bottom:5px;}
+  .org-card .desc{color:var(--ink);line-height:1.5;margin-bottom:6px;}
+  .org-card .rel{color:var(--dim);font-size:10.5px;line-height:1.7;
+    border-top:1px solid var(--line);padding-top:5px;margin-top:5px;}
+  .org-card .rel b{color:var(--ink);font-weight:600;}
+  .org-card .skill-tag{display:inline-block;margin-top:6px;font-size:9.5px;
+    background:rgba(79,211,255,.12);color:var(--accent);padding:2px 7px;border-radius:8px;}
+  .org-card .indep{margin-top:6px;font-size:10px;color:var(--mid);font-style:italic;line-height:1.4;}
+
+  /* GitHub Feature Map */
+  .fmap-block{margin-bottom:16px;}
+  .fmap-block:last-child{margin-bottom:0;}
+  .fmap-heading{font-size:12px;color:var(--dim);margin-bottom:8px;display:flex;
+    align-items:center;gap:8px;flex-wrap:wrap;}
+  .badge{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.03em;
+    padding:3px 8px;border-radius:10px;white-space:nowrap;}
+  .badge-live{background:rgba(62,224,138,.15);color:var(--good);}
+  .badge-static{background:rgba(255,176,58,.15);color:var(--warn);}
+  .badge-static-note{background:rgba(92,118,153,.25);color:var(--dim);}
+  .static-intro{font-size:11px;color:var(--dim);margin-bottom:8px;line-height:1.6;}
+  .static-row{font-size:12px;color:var(--ink);padding:7px 0;border-bottom:1px solid var(--line);
+    line-height:1.55;}
+  .static-row:last-child{border-bottom:none;}
+  .static-row code{color:var(--dim);}
+  .wf-list{margin-top:10px;}
+  .wf-list-title{font-size:11px;color:var(--dim);margin-bottom:6px;}
+  .wf-row{font-size:11.8px;padding:5px 0;border-bottom:1px solid var(--line);}
+  .wf-row:last-child{border-bottom:none;}
+  .wf-row.err a{color:var(--crit);}
+  .wf-triggers{color:var(--dim);font-size:10.5px;margin-left:6px;}
+
   footer{margin-top:26px;padding-top:16px;border-top:1px solid var(--line);
     font-size:11px;color:var(--dim);line-height:1.8;}
   footer a{color:var(--dim);}
@@ -209,6 +252,20 @@
       <h2><span id="i18n-mechanical-title">Electrical &amp; Mechanical Snapshot</span></h2>
       <div class="body" id="mechanical-body"><span class="placeholder">Loading…</span></div>
     </section>
+
+    <section class="panel" id="section-agent-org">
+      <h2><span id="i18n-agentorg-title">AI Agent Organization</span>
+        <span class="src"><span class="i18n-src-prefix">from</span> <a href="https://github.com/ktanino10/ai-hardware-engineering-team/tree/main/.github/agents" target="_blank" rel="noopener">.github/agents/*.agent.md</a></span>
+      </h2>
+      <div class="body" id="agent-org-body"><span class="placeholder">Loading…</span></div>
+    </section>
+
+    <section class="panel" id="section-feature-map">
+      <h2><span id="i18n-featuremap-title">GitHub Feature Map</span>
+        <span class="src"><span class="i18n-src-prefix">from</span> <a href="https://github.com/ktanino10/ai-hardware-engineering-team/tree/main/.github" target="_blank" rel="noopener">.github/</a></span>
+      </h2>
+      <div class="body" id="feature-map-body"><span class="placeholder">Loading…</span></div>
+    </section>
   </main>
 
   <footer id="dashboard-footer">
@@ -220,7 +277,13 @@
     <code>bom/component-selection.md</code>,
     <code>hardware/mechanical-interface.md</code>,
     <code>docs/workflow.md</code>,
-    <code>datasheets/evidence-log.md</code>.
+    <code>datasheets/evidence-log.md</code>,
+    <code>.github/agents/*.agent.md</code>,
+    <code>.github/skills/</code>,
+    <code>.github/prompts/</code>,
+    <code>.github/instructions/</code>,
+    <code>.github/workflows/*.yml</code>,
+    <code>.github/CODEOWNERS</code> (last 6 via the GitHub Contents API for directory listings, plus the same raw-content fetch as everything else).
     <span id="i18n-footer-3">This page never writes anything back to the repository.</span>
     <a href="https://github.com/ktanino10/ai-hardware-engineering-team" target="_blank" rel="noopener">github/ai-hardware-engineering-team ↗</a>
   </footer>

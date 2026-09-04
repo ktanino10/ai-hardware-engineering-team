@@ -46,6 +46,28 @@ on every load/Refresh (sizes at time of writing: `open-issues.md` 446KB,
 internal status dashboard served off GitHub's own CDN, not something that
 needs to be fast for a large public audience.
 
+### A second fetch mechanism: GitHub Contents API (for "AI Agent Organization" and "GitHub Feature Map" only)
+
+Every section above reads real file *content*, which
+`raw.githubusercontent.com` (no auth, no meaningful rate limit) already
+covers. The two sections added after them need something that endpoint
+can't do at all: **list a directory** — "how many files are in
+`.github/agents/`", not "what's inside one specific file". That requires
+GitHub's REST Contents API (`api.github.com/repos/.../contents/<path>`),
+which — also confirmed to send `access-control-allow-origin: *` for this
+public repo — works from an unauthenticated browser `fetch()` the same
+way, but *is* subject to GitHub's documented 60 requests/hour/IP limit
+(a limit the raw-content CDN above is not subject to). Kept deliberately
+cheap: exactly 5 Contents API calls per page load/Refresh — one per
+directory (`agents`, `skills`, `prompts`, `instructions`, `workflows`) —
+regardless of how many files live inside each one. Every actual file's
+content (each agent's frontmatter, each workflow's YAML, `CODEOWNERS`)
+is then still fetched via the same raw-content path as everything else.
+A rate-limited Contents API call degrades gracefully: the specific
+metric/section that needed it shows its own inline fallback link,
+exactly like every other parser on this page — it does not blank
+anything else.
+
 ## What it shows
 
 1. **⚠ Pending Human Decisions** (top, most prominent) — every
@@ -78,6 +100,55 @@ needs to be fast for a large public audience.
 6. **Requirements Snapshot** — Must/Should/Could/Won't priority counts and
    a Rev-tag breakdown, tallied live across every requirement row in
    `requirements/requirements.md`.
+7. **AI Agent Organization** — an org-chart-style view of every
+   `.github/agents/*.agent.md` custom agent, live-fetched (directory
+   listing via the Contents API, then each file's YAML frontmatter parsed
+   in the browser) and grouped into Electronics / Mechanical / Firmware /
+   Cross-discipline (a curated grouping matching `docs/architecture.md`
+   §3 — the one hardcoded part of this section; an agent this page
+   doesn't recognize still renders, in an auto "Other" group, rather than
+   silently vanishing). Every card's role/description and its
+   "Reports to / Delegates to / Receives from / Hands off to" lines are
+   the agent's own live frontmatter — this is what makes the
+   Engineer→Reviewer independent-review structure visible without this
+   page asserting which agent reviews which by name.
+8. **GitHub Feature Map** — a table of this repository's own GitHub-native
+   configuration, split unmistakably into what this page fetched live
+   just now (`.github/agents|skills|prompts|instructions|workflows`
+   counts, live-parsed workflow triggers, `CODEOWNERS` protected-path
+   count) versus what it's showing as a static, dated fact because
+   verifying it live would require repository-admin authentication this
+   public page doesn't have (branch protection, secret scanning, code
+   scanning, Pages settings) — see "Live vs. static honesty" below.
+
+## Live vs. static honesty (GitHub Feature Map)
+
+Two of this table's rows are genuinely different in kind from the rest of
+the page, and are deliberately never allowed to *look* like the other,
+live-fetched ones:
+
+- **Confirmed via authenticated API, once, on a fixed date.** Branch
+  protection, secret scanning + push protection, Dependabot security
+  updates, code scanning (CodeQL), and GitHub Pages visibility/build type
+  all 401 for an unauthenticated request — confirmed directly against
+  this repo (`api.github.com/repos/.../branches/main/protection` etc.) while
+  building this feature. So these five facts are captured as literal,
+  hand-verified values with a **fixed date constant**
+  (`STATIC_FACTS_CONFIRMED_DATE` in `dashboard-render.js`) — deliberately
+  never `new Date()`. Computing "today" here would silently claim a
+  same-day re-check that never happened on every future page load, for
+  settings this page has no way to actually re-verify; a fixed date is
+  the honest choice, at the cost of needing a manual update (both the
+  date and the values) if these settings are ever intentionally changed.
+  Each row links directly to the real GitHub Settings page so a reader
+  can check the live value themselves.
+- **A design-convention note (Pull Requests / Issues), not gated by
+  authentication at all** — this one links to the repo's public Pull
+  Requests tab (which anyone, unauthenticated, can actually check) rather
+  than a Settings page, and is badged distinctly ("STATIC — design
+  note") from the five authenticated-only facts above, so the two
+  different *reasons* something is static are never blended into one
+  undifferentiated "not live" bucket.
 
 ## Bilingual UI, English data
 
@@ -101,7 +172,10 @@ first place:
 - Anything actually fetched and parsed from this repository's own files:
   component-selection.md decision text, finding titles, ECO revision/
   changed text, self-reported status lines, and phase names extracted live
-  from `docs/workflow.md`.
+  from `docs/workflow.md`. This now also covers every AI Agent
+  Organization card's role/description/relationship text (live agent
+  frontmatter) and every GitHub Feature Map workflow's live-parsed
+  `name:`/trigger values.
 - This project's own **defined governance vocabulary** — severity
   (`CRITICAL`/`HIGH`/`MEDIUM`/`LOW`), status (`OPEN`/`RESOLVED`/
   `ACCEPTED-RISK`), and priority (`Must`/`Should`/`Could`/`Won't`) — these
@@ -112,6 +186,16 @@ first place:
   source documents, which is the opposite of what was asked for.
 - IDs (`ISS-005`, `ECO-068`, `REQ-021`), file paths, and `Rev N`/`Phase N`
   designators.
+- **GitHub's own product/feature names and their configured literal
+  values**, in the GitHub Feature Map's static block — `Branch
+  Protection`, `Secret Scanning`, `Push Protection`, `Dependabot Security
+  Updates`, `Code Scanning`/`CodeQL`, `GitHub Pages`, `Pull Requests`,
+  `Issues`, and the three required-status-check job-name strings
+  themselves — same reasoning as the governance vocabulary above: these
+  are GitHub's own terms-of-art, not this dashboard's prose, so only the
+  surrounding sentence (the "confirmed as of/can't verify live" caveat,
+  column headers, badges, settings-link labels) is chrome I authored and
+  goes through `STRINGS`.
 
 Everything else — the actual majority of visible text on the page — is
 genuine chrome I authored for this dashboard, and is fully bilingual.
@@ -192,6 +276,20 @@ during development:
   after `§9h`) — a later letter existing is a strong, not certain, sign the
   question set was already addressed, so this dashboard doesn't flag it as
   live-pending. This generalizes to a future Rev 6 etc. without new code.
+- **Agent frontmatter / workflow YAML** (AI Agent Organization / GitHub
+  Feature Map): verified byte-for-byte, across all 12 real
+  `.github/agents/*.agent.md` files, that every frontmatter field is a
+  genuine single physical line (no YAML block scalars) — so a tiny
+  line-based "split on the first colon" parser is correct here without
+  pulling in a full YAML library; only `description` is CI-enforced
+  (`tools/check_agent_frontmatter.py`), so every other field is treated
+  as optional, not a parse error, when absent. The workflow-file reader
+  matches the top-level `name:` **unindented** specifically so it can't
+  pick up a job-level `name:` (e.g. a required check's own display name,
+  always indented under a job key in every real file); its `on:`-block
+  capture was checked against a real file with an unindented comment
+  line between the `on:` block and the next top-level key, to confirm it
+  stops there rather than over-capturing into `permissions:`/`jobs:`.
 - Every parser above is wrapped so a shape mismatch returns
   `{ok:false, error}` for that section alone — verified this actually
   matters, not just a defensive nicety nobody will hit, given how much this
@@ -208,6 +306,31 @@ during development:
   and this page doesn't touch them). This dashboard's *own* chrome, added
   in a follow-up request, is bilingual — see "Bilingual UI, English data"
   above for exactly what does/doesn't get translated and why.
+- **The GitHub Feature Map's static block goes stale on purpose, not by
+  accident.** Its 5 authenticated-only facts (branch protection, secret
+  scanning, Dependabot, code scanning, Pages) are captured once, by hand,
+  as of the fixed date shown in its own badge — this page has no way to
+  re-verify them (they 401 unauthenticated), so it doesn't pretend to.
+  If any of those 5 settings changes, this page will keep showing the
+  old value under an old date until someone updates
+  `STATIC_FACTS_CONFIRMED_DATE` and the row text in `dashboard-render.js`
+  by hand — the date itself is the disclosure that this can happen, not
+  a guarantee it hasn't.
+- **AI Agent Organization's grouping is curated, not derived.** Which of
+  the 4 discipline groups each agent belongs to (and its position within
+  that group) is a hardcoded table in `dashboard-render.js`, matching
+  `docs/architecture.md` §3 — a future 13th agent this table doesn't
+  know about still renders (in an auto "Other" group) rather than
+  vanishing, but it won't land in the "correct" discipline group until
+  someone updates that table by hand.
+- **GitHub Contents API's own 60 requests/hour/IP limit** (distinct from
+  `raw.githubusercontent.com`'s much higher one, used by every other
+  fetch on this page) applies only to the 5 directory-listing calls the
+  two newest sections make. A rate-limited call degrades to that
+  specific metric/section's own inline fallback link — it was verified
+  (by temporarily forcing every `api.github.com` call to fail) that this
+  does not blank the rest of either section, or any other section on the
+  page.
 - **GitHub raw-content CDN caching**: `raw.githubusercontent.com` can serve
   a cached response up to a few minutes stale after a very recent commit —
   "live" here means "fetched fresh every page load," not "guaranteed

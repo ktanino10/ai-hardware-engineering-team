@@ -38,6 +38,27 @@ const SOURCES = {
   evidenceLog: 'datasheets/evidence-log.md',
 };
 
+// GitHub Contents API — the ONLY thing raw.githubusercontent.com can't do is
+// list a directory. Used exclusively for that (agent/skill/prompt/
+// instruction/workflow file listings feeding the "AI Agent Organization"
+// and "GitHub Feature Map" sections below); every file's actual content is
+// still fetched via RAW_BASE/fetchText, same as the rest of this file.
+// Confirmed (like RAW_BASE above) to send `access-control-allow-origin: *`
+// for this public repo, so an unauthenticated browser fetch() works — but
+// unlike raw.githubusercontent.com, this endpoint IS subject to GitHub's
+// documented unauthenticated 60 requests/hour/IP limit. Kept cheap on
+// purpose: exactly one call per directory below (5 total) per page
+// load/Refresh, regardless of how many files are inside each one.
+const API_BASE = 'https://api.github.com/repos/ktanino10/ai-hardware-engineering-team/contents/';
+
+const GH_DIRS = {
+  agents: '.github/agents',
+  skills: '.github/skills',
+  prompts: '.github/prompts',
+  instructions: '.github/instructions',
+  workflows: '.github/workflows',
+};
+
 // ---- small shared helpers (also used by dashboard-render.js) -------------
 
 function truncate(s, n) {
@@ -421,6 +442,169 @@ function parseEvidenceLog(text) {
   }
 }
 
+// ---- .github/agents/*.agent.md — YAML frontmatter parser ------------------
+//
+// Verified (byte-for-byte, across all 12 real files at time of writing)
+// that every frontmatter field here is a genuine single physical line —
+// no YAML block scalars (`|`/`>`), no wrapped/folded lines. That makes a
+// tiny line-based "split on the first colon" parser both correct and far
+// simpler/lighter than pulling in a full YAML library for 8 known scalar
+// fields. `delegates_to` is the one field written as a flow-style list
+// (`[a, b, c]`) — left as a raw bracketed string here; stripping/splitting
+// it is a display concern, done in dashboard-render.js.
+//
+// Only `description` is enforced by this repo's own
+// tools/check_agent_frontmatter.py — every other field (role, reports_to,
+// handoff_from, handoff_to, delegates_to, skill, independence) is
+// genuinely optional and must be treated that way here (absent, not a
+// parse error).
+function parseAgentFrontmatter(text, filename) {
+  try {
+    const m = text.match(/^---\r?\n([\s\S]*?)\r?\n---\s*(?:\r?\n|$)/);
+    if (!m) throw new Error('no --- frontmatter block found');
+    const fm = {};
+    m[1].split(/\r?\n/).forEach(line => {
+      const idx = line.indexOf(':');
+      if (idx === -1) return;
+      const key = line.slice(0, idx).trim();
+      const val = line.slice(idx + 1).trim();
+      if (key) fm[key] = val;
+    });
+    if (!fm.name) throw new Error("missing required 'name' field");
+    return {
+      ok: true,
+      file: filename,
+      name: fm.name,
+      description: fm.description || '',
+      role: fm.role || '',
+      reports_to: fm.reports_to || '',
+      handoff_from: fm.handoff_from || '',
+      handoff_to: fm.handoff_to || '',
+      delegates_to: fm.delegates_to || '',
+      skill: fm.skill || '',
+      independence: fm.independence || '',
+    };
+  } catch (e) {
+    return { ok: false, file: filename, error: String((e && e.message) || e) };
+  }
+}
+
+// Fetches the .github/agents directory listing (Contents API), then
+// raw-fetches (via the same fetchText/RAW_BASE used everywhere else in
+// this file) every *.agent.md file it finds and parses its frontmatter.
+// The agent COUNT and every card's content are therefore always live —
+// nothing here is a hardcoded "12 agents" assumption; a future add/
+// remove is picked up automatically on next page load.
+async function loadAgentOrg(listings, dirErrors) {
+  if (!listings.agents) {
+    return { ok: false, error: 'Directory listing failed: ' + (dirErrors.agents || 'unknown error') };
+  }
+  try {
+    const files = listings.agents.filter(x => x.type === 'file' && /\.agent\.md$/i.test(x.name));
+    const settled = await Promise.allSettled(files.map(f => fetchText(f.path)));
+    const agents = [];
+    const fileErrors = [];
+    files.forEach((f, idx) => {
+      const r = settled[idx];
+      if (r.status === 'fulfilled') {
+        agents.push(parseAgentFrontmatter(r.value, f.name));
+      } else {
+        fileErrors.push({ file: f.name, error: String((r.reason && r.reason.message) || r.reason) });
+      }
+    });
+    return { ok: true, total: files.length, agents, fileErrors };
+  } catch (e) {
+    return { ok: false, error: String((e && e.message) || e) };
+  }
+}
+
+// ---- .github/workflows/*.yml — lightweight, bounded-regex YAML reader -----
+//
+// Deliberately not a real YAML parser (no library loaded on this page at
+// all) — just enough structure to answer "what is this workflow called"
+// and "what triggers it", which is all this dashboard shows. The
+// top-level `name:` is matched unindented (column 0) specifically so it
+// can't accidentally pick up a job-level `name:` (e.g. the required
+// status check's own display name), which is always indented under a
+// job key in every real file here. The `on:` block is captured as every
+// line immediately after `on:` that is either blank or indented,
+// stopping at the first unindented non-blank line (a comment, a sibling
+// top-level key like `permissions:`/`jobs:`, etc.) — verified against
+// all 5 real files, including one with an unindented comment line
+// between its `on:` block and `permissions:`.
+function parseWorkflowYaml(text, filename) {
+  try {
+    const nameMatch = text.match(/^name:[ \t]*(.+)$/m);
+    if (!nameMatch) throw new Error("no top-level 'name:' field found");
+    const name = nameMatch[1].trim();
+
+    const triggers = [];
+    const blockMatch = text.match(/^on:[ \t]*\r?\n((?:(?:[ \t]+.*)?\r?\n?)*)/m);
+    if (blockMatch) {
+      const block = blockMatch[1];
+      if (/^[ \t]*pull_request[ \t]*:/m.test(block)) triggers.push('pull_request');
+      if (/^[ \t]*push[ \t]*:/m.test(block)) triggers.push('push');
+      if (/^[ \t]*workflow_dispatch[ \t]*:/m.test(block)) triggers.push('workflow_dispatch');
+    } else {
+      // Fallback for a single-line flow form, e.g. `on: [push, pull_request]`
+      // — not used by any real file today, but cheap to also handle.
+      const flowMatch = text.match(/^on:[ \t]*\[([^\]]*)\]/m);
+      if (flowMatch) flowMatch[1].split(',').forEach(s => { const v = s.trim(); if (v) triggers.push(v); });
+    }
+    if (!blockMatch && !triggers.length) throw new Error("no 'on:' trigger block found");
+
+    return { ok: true, file: filename, name, triggers };
+  } catch (e) {
+    return { ok: false, file: filename, error: String((e && e.message) || e) };
+  }
+}
+
+// Fetches the Contents-API directory listings once (shared with
+// loadAgentOrg — never re-fetched here), reads live counts straight off
+// those listings for agents/skills/prompts/instructions, raw-fetches and
+// parses every workflow file, and raw-fetches CODEOWNERS to count its
+// real protected-path lines. Every one of these numbers is live; nothing
+// here is a hardcoded "5 workflows"/"14 skills" assumption.
+async function loadFeatureMapFacts(listings, dirErrors) {
+  const dirCount = (key, typeFilter) => {
+    if (!listings[key]) return { ok: false, error: 'Directory listing failed: ' + (dirErrors[key] || 'unknown error') };
+    return { ok: true, count: listings[key].filter(x => x.type === typeFilter).length };
+  };
+
+  const agents = dirCount('agents', 'file');
+  const skills = dirCount('skills', 'dir');
+  const prompts = dirCount('prompts', 'file');
+  const instructions = dirCount('instructions', 'file');
+
+  let workflows;
+  if (!listings.workflows) {
+    workflows = { ok: false, error: 'Directory listing failed: ' + (dirErrors.workflows || 'unknown error') };
+  } else {
+    const files = listings.workflows.filter(x => x.type === 'file' && /\.ya?ml$/i.test(x.name));
+    const settled = await Promise.allSettled(files.map(f => fetchText(f.path)));
+    const items = files.map((f, idx) => {
+      const r = settled[idx];
+      if (r.status === 'fulfilled') return parseWorkflowYaml(r.value, f.name);
+      return { ok: false, file: f.name, error: String((r.reason && r.reason.message) || r.reason) };
+    });
+    workflows = { ok: true, count: files.length, items };
+  }
+
+  let codeowners;
+  try {
+    const text = await fetchText('.github/CODEOWNERS');
+    const count = text.split(/\r?\n/).filter(l => {
+      const s = l.trim();
+      return s.length > 0 && !s.startsWith('#');
+    }).length;
+    codeowners = { ok: true, count };
+  } catch (e) {
+    codeowners = { ok: false, error: String((e && e.message) || e) };
+  }
+
+  return { agents, skills, prompts, instructions, workflows, codeowners };
+}
+
 // ---- orchestration ----------------------------------------------------------
 
 async function fetchText(path) {
@@ -429,9 +613,34 @@ async function fetchText(path) {
   return res.text();
 }
 
+async function fetchJson(path) {
+  const res = await fetch(API_BASE + path, { cache: 'no-store', headers: { Accept: 'application/vnd.github+json' } });
+  if (!res.ok) throw new Error('HTTP ' + res.status + ' fetching ' + path);
+  return res.json();
+}
+
+// One Contents-API call per GH_DIRS entry (5 total), run in parallel and
+// each failing independently — feeds both loadAgentOrg and
+// loadFeatureMapFacts below without either re-fetching the same listing.
+async function loadGithubDirListings() {
+  const keys = Object.keys(GH_DIRS);
+  const settled = await Promise.allSettled(keys.map(k => fetchJson(GH_DIRS[k])));
+  const listings = {};
+  const errors = {};
+  keys.forEach((k, idx) => {
+    const r = settled[idx];
+    if (r.status === 'fulfilled') listings[k] = r.value;
+    else errors[k] = String((r.reason && r.reason.message) || r.reason);
+  });
+  return { listings, errors };
+}
+
 async function loadDashboardData() {
   const keys = Object.keys(SOURCES);
-  const settled = await Promise.allSettled(keys.map(k => fetchText(SOURCES[k])));
+  const [settled, dirs] = await Promise.all([
+    Promise.allSettled(keys.map(k => fetchText(SOURCES[k]))),
+    loadGithubDirListings(),
+  ]);
   const texts = {};
   const fetchErrors = {};
   keys.forEach((k, idx) => {
@@ -441,6 +650,11 @@ async function loadDashboardData() {
   });
 
   const missing = (k) => ({ ok: false, error: fetchErrors[k] ? ('Fetch failed: ' + fetchErrors[k]) : 'Fetch failed' });
+
+  const [agentOrg, featureMap] = await Promise.all([
+    loadAgentOrg(dirs.listings, dirs.errors),
+    loadFeatureMapFacts(dirs.listings, dirs.errors),
+  ]);
 
   return {
     fetchedAt: new Date(),
@@ -454,6 +668,8 @@ async function loadDashboardData() {
     requirements: texts.requirements ? parseRequirements(texts.requirements) : missing('requirements'),
     phases: texts.workflow ? parsePhases(texts.workflow) : missing('workflow'),
     evidenceLog: texts.evidenceLog ? parseEvidenceLog(texts.evidenceLog) : missing('evidenceLog'),
+    agentOrg,
+    featureMap,
   };
 }
 
