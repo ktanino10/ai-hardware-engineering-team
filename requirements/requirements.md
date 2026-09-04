@@ -710,7 +710,16 @@ Architecture decision (REQ-115) are answered later, at their own dedicated
 phases/HITL gates, once real datasheet/current/voltage numbers exist — not
 guessed now with no data behind them.
 
-**Note — a real, independently-verified cross-branch dependency for REQ-312
+**MISS-034/REQ-312 dependency note (Rev 5 mid-session text, SUPERSEDED —
+see §9j below for the current, correct state: MISS-034 RESOLVED, the
+enclosure grown to the real 150×95mm PCB / 134×79mm mounting-hole
+pattern; preserved unedited per this project's own additive-only
+historical-record convention — e.g. `hardware/mechanical-interface.md`'s
+"Board growth rationale... ORIGINAL... superseded" block and
+`validation/open-issues.md` MISS-035's own "records the pre-Rev-5 state
+as it stood when the finding was filed" precedent — this is this
+session's own contemporaneous finding at the time it was written, not a
+live claim)**: **Note — a real, independently-verified cross-branch dependency for REQ-312
 (added after `main` was merged into this branch mid-session, per an
 automated overnight-check-in cross-session message; the specific claim was
 independently re-verified against `origin/main` before being recorded here,
