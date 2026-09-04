@@ -24,11 +24,11 @@ follow regardless of which specific role it's playing.
 
 ## Roles
 
-Eleven agents across three top-level disciplines (plus two
-discipline-adjacent extensions), each with a narrow, non-overlapping
-responsibility — defined as real GitHub Copilot custom agent profiles in
-`.github/agents/*.agent.md` (see `docs/architecture.md` §3 for the
-responsibility table):
+Twelve agents across three top-level disciplines (plus three
+discipline-adjacent extensions and one role spanning all three disciplines
+at once), each with a narrow, non-overlapping responsibility — defined as
+real GitHub Copilot custom agent profiles in `.github/agents/*.agent.md`
+(see `docs/architecture.md` §3 for the responsibility table):
 
 **Electronics** (original 4, unchanged):
 
@@ -131,6 +131,24 @@ Power Engineer:
     hands off to Hardware Reviewer's now-extended checklist (above) for
     independent review, per the "before PCB fabrication" Human-in-the-loop
     gate.
+
+**Systems Engineer** (Phase 7 of the multidisciplinary evolution —
+`docs/architecture-evolution.md` §44), a cross-discipline addition spanning
+all three top-level disciplines from its own introduction — unlike Power
+Engineer/PCB Engineer (Electronics-adjacent) or Manufacturing Engineer
+(Mechanical-adjacent), it is not tied to extending any single discipline's
+own team:
+
+12. **Systems Engineer** — owns the technical content of cross-discipline
+    boundary contracts (Electronics ⇔ Mechanical ⇔ Firmware, e.g.
+    `hardware/mechanical-interface.md`) and the substantive trade-off
+    criteria for which discipline should yield when two genuinely conflict,
+    once Hardware Lead's own mediation procedure (`docs/workflow.md` §3)
+    identifies a real engineering trade-off rather than a process
+    disagreement. Does not populate `hardware/mechanical-interface.md`
+    itself (stays Mechanical Lead's own ownership) or take over process
+    orchestration (stays Hardware Lead's); recommends, and never
+    self-finalizes, a safety-relevant or architecture-level call.
 
 If you are asked to act as one of these roles — or invoked directly as
 that custom agent — load/follow the corresponding
