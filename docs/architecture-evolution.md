@@ -2230,6 +2230,29 @@ and this addendum only.
   appropriately hedged/provisional rather than a firm, since-falsified
   claim — refining an acknowledged gap, not reversing a settled position,
   per the same distinction §17.1's own forward-correcting entries draw.
+- **The `pending_plan` field mechanism, subsequently confirmed with raw
+  evidence, not just description.** Flagged back to the creator session
+  for the exact `get_session` output it had seen; it supplied the actual
+  captured JSON (`pending_plan: {actions, awaiting_response: true,
+  plan_content, recommended_action, summary}`) rather than redescribing it
+  — and explained the apparent non-reproduction cleanly: it had called
+  `respond_to_session_plan(approved: true)` on `914e4e71` shortly after
+  capturing that output, which clears `pending_plan` once actioned, so by
+  the time this session queried `914e4e71` the field was legitimately gone
+  — consistent with "alive and past that checkpoint," not "never had one."
+  Re-querying `914e4e71` after receiving this still showed the same frozen
+  `updated_at` and zero diff as every prior check, which does not
+  contradict the account: per §17.3 point 5's own corrected model, a
+  session can be genuinely alive and working (here, presumably deep in
+  the rigorous pre-implementation verification this session's own kickoff
+  prompt demanded) without yet having made a git-visible change. §17.3
+  point 5 now cites the specific field/shape, attributed to the creator
+  session's captured output rather than claimed as independently
+  re-executed by this session — a real, verifiable-in-principle technical
+  mechanism (not a one-time human utterance), corroborated by a specific
+  raw artifact and a coherent, checked-consistent timing explanation,
+  which this document treats as a different, lower evidentiary bar than
+  §17.2's human-decision-verification standard, not the same one relaxed.
 - **Grounding, verified rather than merely asserted**: the branch-protection/
   CI-override guidance and the multi-agent/agentic-AI governance guidance
   cited in §17.4 were independently corroborated by this session via live

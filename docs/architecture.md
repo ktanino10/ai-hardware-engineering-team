@@ -973,20 +973,24 @@ independently-checked repository state:
    every metadata field frozen: silent research/design first (nothing yet
    to report — no plan, no diff, sometimes no branch/PR either), then,
    once a plan is drafted, paused awaiting an approval decision (which
-   *does* surface a positive signal via session-inspection tooling, when
-   present). A positive signal, when present, is solid evidence of life;
-   its *absence* only means "not yet at the approval phase," not "dead" —
-   it looks metadata-identical to the first, healthy phase. The only check
-   that actually distinguishes "working silently" from "genuinely dead" is
-   direct interrogation: message the session directly and allow a
-   reasonable reply window before concluding otherwise. Never
-   re-commission duplicate work or archive another session's task on
-   metadata alone — the cost of a duplicate spawned on a false premise
-   exceeds the cost of waiting for a reply. General principle: **absence
-   of a positive signal is not itself a negative signal.** Real, same-day
-   grounding: the creator/orchestrator session and an independent
-   autonomous cycle each separately misread exactly this metadata
-   signature, for the same session, as "it died," to the point of
+   *does* surface a positive signal — session-inspection tooling exposes
+   this as a `pending_plan` object with `awaiting_response: true` while
+   genuinely pending, confirmed against a captured raw output, not a
+   secondhand description). A positive signal, when present, is solid
+   evidence of life; its *absence* only means "not yet at the approval
+   phase, or already past it," not "dead" — both look metadata-identical
+   to the first, healthy phase once the plan has been actioned and the
+   field clears. The only check that actually distinguishes "working
+   silently" from "genuinely dead" is direct interrogation: message the
+   session directly and allow a reasonable reply window before concluding
+   otherwise. Never re-commission duplicate work or archive another
+   session's task on metadata alone — the cost of a duplicate spawned on a
+   false premise exceeds the cost of waiting for a reply. General
+   principle: **absence of a positive signal is not itself a negative
+   signal.** Real, same-day grounding: the creator/orchestrator session
+   and an independent autonomous cycle each separately misread exactly
+   this metadata signature, for the same session, as "it died," to the
+   point of
    spawning duplicate sessions and coming close to reporting a fictitious
    platform failure to the human, before self-correcting — see
    `docs/architecture-evolution.md` §42 for the dated record, including an
