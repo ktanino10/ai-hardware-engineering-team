@@ -81,6 +81,81 @@ rather than unilaterally dismissing it. Log the change in
 `validation/change-impact-matrix.md`'s existing "Mechanical" impact row if
 the fix could ripple back into Electronics.
 
+## Foundational Change Cascade Checklist (revising an existing design)
+
+Added following MISS-034 (CRITICAL, `validation/open-issues.md`): the
+enclosure was dimensioned around a 100×50mm PCB proposal for two days and
+three merged PRs after the real board was laid out at 150×95mm — nothing
+caught the drift until a scheduled audit measured real geometry by hand.
+See `docs/workflow.md` §4.2/§4.2.1 for the general failure mode. **Whenever
+you are revising an existing enclosure because a foundational physical fact
+changed (a board outline, a mounting-hole pattern, a purchased component's
+confirmed dimension) — not designing from scratch — work through every
+category below, not only the file where the fact itself lives:**
+
+1. **The parametric cascade in the `.scad` file itself.** Change the root
+   variable(s) only, then re-render (`openscad --backend=manifold --render`)
+   and independently re-derive every DERIVED value that depends on it — via
+   a live `echo()`/`include<>` dump against the actual file, not hand
+   arithmetic — before touching any downstream document. Distinguish
+   variables that are genuine formulas (which cascade automatically once the
+   root changes) from ones that only *look* related but are independent
+   hardcoded literals (e.g. a mid-assembly axis-centering constant, a
+   different subsystem's own geometry) — verify which is which by tracing
+   the actual formula, not by assuming symmetry.
+2. **Exported binaries** (STL/OBJ/etc.). Re-export every affected piece
+   using this project's own documented wrapper-script convention
+   (`hardware/mechanical/stl/export/*.scad` or equivalent), then
+   independently re-measure the real output (`trimesh`/`numpy-stl`
+   bounding box + volume, not the `.scad` source's own claimed numbers) —
+   confirm both what changed AND what a formula-independence claim says did
+   *not* change (a real re-measurement, e.g. comparing byte sizes/bounding
+   boxes before and after, is stronger evidence than a comment claiming
+   independence).
+3. **Visualizations and drawings** derived from those binaries (2D
+   orthographic renders, exploded views, drafting sheets, 3D viewers). Some
+   are regenerable with the same toolchain used for the `.scad`/STL work
+   (e.g. pure OpenSCAD CLI); others may depend on a separately-verified tool
+   (e.g. Blender via MCP) that might not be connected this session — check
+   per-session, per `docs/architecture.md` §5.3/§13's own convention, and
+   disclose honestly (do not fabricate updated pixel/render output for a
+   tool you could not actually invoke).
+4. **Safety-margin-dependent constants that are measured, not formulas.**
+   A hardcoded-but-empirically-measured constant (e.g. a rotating envelope's
+   own max radius, obtained by rendering and measuring a mesh rather than by
+   a closed-form equation) does NOT automatically update when its own
+   inputs change — it must be re-measured with the same method that
+   produced it originally. Explicitly ask: does anything this design change
+   affects feed into a *previously measured* (not formula-derived) safety or
+   clearance constant elsewhere in the same file?
+5. **Already-human-accepted risk dispositions computed against the OLD
+   numbers.** If step 4 turns up a materially changed safety-relevant
+   constant, check whether any `ACCEPTED-RISK` finding in
+   `validation/open-issues.md` was signed off against the specific old
+   numbers — per this project's own REQ-408 precedent ("a disposition does
+   not auto-extend" to a materially different configuration), do not treat
+   a prior sign-off as still covering a new, more severe picture. Re-open
+   the finding with the new numbers and a concrete remedy trade-off table
+   for fresh human review, rather than silently carrying the old acceptance
+   forward or silently re-deciding it yourself.
+6. **The interface-file snapshot's own re-verification against its live
+   upstream Source of Truth**, not just internal consistency. Where the
+   upstream fact comes from a machine-readable file (a KiCad project, a
+   generated BOM), re-derive it directly from that file this pass — do not
+   only check that your own downstream numbers are internally consistent
+   with each other, since the entire MISS-034 defect was internally
+   consistent within Mechanical the whole time. Where a targeted automated
+   check exists for this pair of facts (see `tools/check_mechanical_pcb_sync.py`
+   for the current board-outline/mounting-hole instance), run it yourself
+   before handoff rather than waiting for CI.
+7. **Anything explicitly out of this pass's own bounded scope.** A resize
+   fix does not obligate re-deriving every other field that happens to sit
+   near the changed one (e.g. connector/component cutout positions, a
+   from-scratch CG/tip-over re-sweep) — but log what you deliberately did
+   NOT re-derive as a new, separate, honestly-scoped finding (cross-
+   referencing any FMEA entry that already anticipated the gap), not a
+   silent omission.
+
 ## Output
 
 `.scad` file + dimensional-spec table (both under `hardware/mechanical/`) +

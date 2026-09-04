@@ -174,3 +174,16 @@ of discovering them after the fact. Cross-reference by ID with
 | Grounding | None | N | Not applicable. |
 | BOM / lifecycle (does this affect other line items, e.g. shared connector) | None | N | No component added, removed, or re-specified. |
 | Requirements coverage (`requirements/traceability-matrix.md`) | None | N | Not applicable — no requirement touched. |
+
+### For `ECO-052` — Resolve MISS-034: grow Bench-IMU-01 enclosure to the real 150×95mm PCB
+
+| Impact Domain | Impact Level (None/Low/Medium/High) | Cross-check Required? | Verification Result |
+|---|---|---|---|
+| Power (rail loading, `hardware/power-budget.md`) | None | N | Not applicable — no electrical/power change. Bare-board mass grew (A5) but power budget is unaffected (mass, not electrical loading). |
+| Thermal | None | N | Not applicable — no thermal path changed. |
+| EMI/EMC | None | N | Not applicable. |
+| Timing (interface/bus timing) | None | N | Not applicable. |
+| Mechanical (fit, connectors, mounting; vibration if a rotating body is present — `docs/architecture.md` §12) | **High** | Y | **Verified in this pass**: the entire mechanical scope is the subject of this ECO. `pcb_length`/`pcb_width`/`mount_holes`/`tab_positions` corrected to the real board; full parametric cascade re-verified via live OpenSCAD evaluation (not hand-derivation); all 5 STLs re-exported and re-measured (`trimesh`); `containment_cap()`/`stand_plate()` independently confirmed formula-independent of the resize (byte-identical STL re-export). **Vibration/rotating-body-specific**: the rotating assembly's own max swept radius grew 126.424mm→176.259mm (confirmed 2 independent methods), degrading MISS-023's pinch-guard coverage 77.7%→35.0% — re-opened for fresh human review rather than silently carried forward or silently re-decided; `cable_service_loop_min` fixed directly (no-tradeoff item). A real, pre-existing (unrelated) `pinch_guard()` manufacturing-geometry bug (MISS-036) was also found and fixed this pass. CG/tip-over analysis (§18.3) explicitly NOT re-derived — disclosed gap (MISS-038), not silently assumed fine. |
+| Grounding | None | N | Not applicable — no electrical change. |
+| BOM / lifecycle (does this affect other line items, e.g. shared connector) | None | N | No component added, removed, or re-specified — enclosure geometry only. |
+| Requirements coverage (`requirements/traceability-matrix.md`) | **Medium** | Y | **Verified in this pass**: REQ-308 (envelope vs. soft ~150mm ceiling) row updated — X now also exceeds the ceiling (new), Y's own overshoot grew from 13.7% to 43.7%; REQ-306 (flywheel rotation clearance) and REQ-403 (containment geometry) rows re-confirmed unaffected (formula-independent of the PCB resize, independently verified via STL re-export byte/bbox comparison, not merely re-read from a comment); REQ-407(b) (pinch-point mitigation) row updated to reflect the re-opened MISS-023 coverage-percentage change. REQ-304 (≥4 mounting holes) remains satisfied by the real 4-hole pattern. |

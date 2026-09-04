@@ -136,6 +136,16 @@ dropping it.
   was built against were themselves wrong or incomplete — needs to go back
   through the Hardware Lead / Circuit Engineer, not the Firmware Engineer)
 
+## Foundational Change Cascade Checklist (reviewing a schematic-driven firmware revision, not first-pass bring-up)
+
+Added following MISS-034 (CRITICAL, resolved) and grounded in **MISS-019 (LOW, OPEN)** as Firmware's own dated, repo-local evidence that stale downstream firmware artifacts can survive an upstream correction. See `docs/workflow.md` §4.2/§4.2.1. **When reviewing firmware changed because the schematic/pin-map/peripheral contract moved, do not stop at "the edited code is self-consistent" -- independently ask whether every firmware-side snapshot of that contract was re-verified against the current schematic.** Additionally:
+
+1. **Re-derive the current pin/interface contract yourself from the live schematic, then compare it against the code and against the firmware's prose artifacts separately.** Do not trust the Firmware Engineer's own updated pin table, comments, or rationale as proof that the rest of the tree followed.
+2. **Audit stale-snapshot surfaces beyond executable code.** Review headers, README/setup guidance, design-rationale markdown, operator instructions, fault text, and any review notes that restate the same pin/margin/instance facts. MISS-019 is exactly this class of still-open drift in `firmware/bench-imu-01/*`: the firmware-side prose remained on superseded figures after upstream documents were corrected.
+3. **Check dependency boundaries in both directions.** Confirm the reviewer can explain which facts should have changed (pin numbers, AF selections, addresses, margin rationale, setup instructions) and which should have remained unchanged (for example, a peripheral base address when only GPIO muxing moved). A convincing review distinguishes these explicitly rather than praising a broad search/replace.
+4. **Treat compile success as insufficient evidence here.** A stale pin map or stale rationale often compiles perfectly. The core §4.2.1 failure mode is drift between a firmware snapshot and a moving upstream Source of Truth, so your review must include a deliberate live-upstream-vs-current-firmware comparison, not just a source or binary sanity check.
+5. **If no machine-readable pin-map export/check exists, say so -- but do not let that relax the review.** The absence of a targeted automation path makes independent manual re-derivation more important, not less. If you think this discipline now warrants a narrower automated guard for a specific board/repo pattern, record that as a recommendation or foresight note rather than silently assuming the current process is enough.
+
 ## Finding record format (mandatory fields)
 
 - **Issue**

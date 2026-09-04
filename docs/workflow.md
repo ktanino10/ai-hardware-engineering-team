@@ -486,6 +486,20 @@ files):
   locations in the *same document* and with `hardware/power-budget.md`
   (all state "≈7.5–13.0°C") — a live instance of exactly this failure
   mode sitting in the repo right now, not a closed historical example.
+- **MISS-034** (**CRITICAL**, RESOLVED) — the most severe instance yet, and
+  a distinct *sub-case* worth naming on its own (§4.2.1 below): the real
+  PCB was laid out at 150×95mm (a legitimate, correct Electronics-side
+  change, `a454b0c`), but `hardware/mechanical-interface.md` — a
+  **snapshot handoff file**, not a live query against the PCB — still
+  recorded the *proposed* 100×50mm board that predated the real layout.
+  Unlike the examples above (a citation of an already-superseded number),
+  this was an entire downstream discipline's parametric design
+  (`bench-imu-01-enclosure.scad`, all 5 STL exports, the dimensional spec,
+  every derived drawing/visualization) built on the stale snapshot — the
+  board (150mm) literally did not fit the enclosure it was meant for
+  (123mm). Caught only by a scheduled autonomous audit loop measuring real
+  geometry, not by either discipline's own review cycles, both of which
+  were internally self-consistent in isolation.
 
 **Resolution convention, empirically grounded (judgment still applies —
 this is not a rigid rule):**
@@ -523,6 +537,54 @@ time, not a new mandatory CI script or a new agent/reviewer role —
 mirroring how §4.1 itself invokes this same architecture.md §14 caution
 against role/file proliferation ahead of actual demonstrated need for
 something more rigid.
+
+### 4.2.1 Cross-Discipline Handoff Snapshot Drift (a named sub-case of §4.2)
+
+MISS-034 above is not merely "a number went uncorrected somewhere" — it is
+a specific, recurring *shape* of §4.2's general failure, worth naming
+because it has its own distinct mitigation: a **snapshot handoff file**
+(`hardware/mechanical-interface.md` is the concrete instance today, but
+this generalizes to any interface file one discipline populates from
+another's Source of Truth — e.g. a PCB-layout-derived footprint list
+consumed by Manufacturing, or a schematic-derived pin-map consumed by
+Firmware) is populated once, at handoff time, from an upstream Source of
+Truth that can *itself keep changing after the snapshot is taken* (here,
+the PCB layout, which continued from a proposal to a real, DRC-clean
+board). §4.2's own general resolution convention above (repo-wide grep
+for the old value's numeric string) is real and works, but is reactive —
+it only fires once someone happens to notice the old number looks
+suspicious enough to search for. It also does not by itself answer "has
+the upstream Source of Truth moved *again* since my snapshot was taken?",
+which is the actual question MISS-034 needed answered.
+
+**Where the upstream Source of Truth is itself machine-readable (a real
+file with a stable, parseable format — a `.kicad_pcb`, a generated BOM, a
+pin-map export), this sub-case admits a narrower, more reliable automated
+check than §4.2's general free-text approach can offer**: rather than
+searching for old *values* (which, as §4.2 already notes, have "many valid
+spellings" and would both over- and under-flag), directly re-derive the
+handful of specific, structured facts the snapshot recorded (a board
+outline, a hole pattern, a pin count) from the live upstream file, and
+compare them to what the snapshot currently states. This is exact,
+structured comparison, not fuzzy text matching, so it does not carry
+§4.2's own stated objection to a generic script. The Mechanical discipline
+now has a concrete instance of this (`tools/check_mechanical_pcb_sync.py`
+or equivalent — see `.github/skills/enclosure-design/SKILL.md`'s own
+cascade-checklist addition and `.github/workflows/hardware-gate.yml`),
+cross-checking `bench-imu-01-enclosure.scad`'s `pcb_length`/`pcb_width`/
+`mount_holes` directly against the real `.kicad_pcb`'s own `Edge.Cuts`/
+mounting-hole footprints on every CI run, so this exact class of drift is
+now caught mechanically rather than only by a reviewer noticing by eye.
+Each discipline's own skill file should ask the same question during its
+own periodic audit (see each skill's own "Foundational Change Cascade
+Checklist" subsection, added following this same MISS-034 review): *does a
+machine-readable upstream Source of Truth exist for a fact this discipline
+snapshots into its own interface file, and if so, is there a check that
+the snapshot still matches it — not just at handoff time, but on an
+ongoing basis?* Where no machine-readable Source of Truth exists (e.g. a
+human-stated requirement, an ASSUMPTION/ESTIMATE with no upstream file to
+diff against), this narrower automated check is not applicable, and §4.2's
+own general, reactive convention remains the right tool.
 
 ## 5. How to Start a New Design Cycle
 

@@ -123,13 +123,37 @@ subsystem).
 | Parameter | Value | Unit | Source / Rationale | Confidence |
 |---|---|---|---|---|
 | Board outline shape | Rectangle | — | Carried forward from Rev 2; no cutouts/notches/castellated edges. A two-lobed or dog-bone outline (sensor lobe + motor lobe) was considered and rejected as over-engineering for this phase — a plain rectangle with internal zoning (below) is simpler to print/mount and still satisfies REQ-308 | ASSUMPTION |
-| Length (X-axis) | 100 | mm | See "Board growth rationale" below | ASSUMPTION |
-| Width (Y-axis) | 50 | mm | See "Board growth rationale" below | ASSUMPTION |
-| Thickness | 1.6 | mm | Unchanged from Rev 2 (standard FR4 thickness). Rev 3's motor-rail traces likely use heavier copper weight for current capacity, but that is an Electronics-domain layer-stackup detail that does not change overall board Z-thickness — not restated here | ASSUMPTION |
-| Board area | 5,000 | mm² | 100 × 50 | Derived |
-| Diagonal | ≈111.8 | mm | √(100²+50²) | Derived |
+| Length (X-axis) | 150 | mm | **REV 5 FIX (MISS-034, CRITICAL)**: read directly from the real KiCad project's own `Edge.Cuts` layer, `hardware/pcb/bench-imu-01/bench-imu-01.kicad_pcb`: `(gr_rect (start 0 0) (end 150 95))`. Independently cross-checked against `generate_pcb.py`'s own `BOARD_W = 150.0` constant and `hardware/pcb/README.md`'s own "Board outline: 150mm x 95mm" statement. Supersedes this row's own prior 100mm PROPOSAL (see "Board growth rationale — Rev 5 correction" below) | **CONFIRMED** |
+| Width (Y-axis) | 95 | mm | Same source as Length above: real KiCad `Edge.Cuts` `(end 150 95)`, cross-checked against `generate_pcb.py`'s `BOARD_H = 95.0` and `hardware/pcb/README.md` | **CONFIRMED** |
+| Thickness | 1.6 | mm | Unchanged from Rev 2 (standard FR4 thickness). Rev 3's motor-rail traces likely use heavier copper weight for current capacity, but that is an Electronics-domain layer-stackup detail that does not change overall board Z-thickness — not restated here. The real board's own layer stack-up/thickness was not independently re-confirmed this pass (out of MISS-034's own scope: board outline + hole pattern, not every A1/A3 field) | ASSUMPTION |
+| Board area | 14,250 | mm² | 150 × 95. **REV 5 FIX**: was 5,000mm² (100×50 proposal) | Derived |
+| Diagonal | ≈177.55 | mm | √(150²+95²) = √31,525 = 177.5528... **REV 5 FIX**: was ≈111.8mm. Independently re-verified by Mechanical Reviewer Cycle 11 (`validation/design-review.md`), which caught this row's own initial "≈177.8mm" arithmetic imprecision (Finding 4) — corrected here | Derived |
 
-**Board growth rationale (why 100×50mm, not some other size)**: Rev 2 was
+**Board growth rationale — Rev 5 correction (MISS-034)**: the "Board growth
+rationale" paragraph immediately below this one is the ORIGINAL Rev 3 text,
+preserved unedited for its own historical record (it explains why this file
+once *proposed* 100×50mm) — it is now **superseded, not currently
+accurate**, and must not be read as describing the real board. What
+actually happened, per `validation/open-issues.md` MISS-034's own
+chronology: this file's 100×50mm proposal (committed `350ac36`) was a
+genuine, reasonable Rev 3 estimate at the time, but the real PCB layout
+that followed (`a454b0c`) sized the board from **real, summed
+footprint/courtyard area** for all 47+ actual components (not this file's
+own component-*count* heuristic) under REQ-308's same relaxed ceiling,
+landing at 150×95mm/14,250mm² — a **2.85×** area increase over Rev 2
+(60×40mm/2,400mm²), not the 2.08× this file had proposed. No re-handoff
+back to this file followed at the time; this Rev 5 pass is that re-handoff,
+run per `docs/workflow.md` Phase 8. Both the length (150mm) and diagonal
+(≈177.8mm) now sit **outside** REQ-308's own ~150mm soft desk-scale sanity
+ceiling — see §3 "Overall envelope" re-check in
+`bench-imu-01-dimensional-spec.md` for the full, honestly-disclosed
+assessment (REQ-308 is a soft/"should" bound, not a hard ceiling, and this
+was accepted as a real, disclosed trade-off, not silently passed over).
+
+**Board growth rationale (ORIGINAL Rev 3 text, superseded — see the
+correction immediately above; preserved unedited per this project's
+additive-only historical-record convention, why 100×50mm, not some other
+size)**: Rev 2 was
 60×40mm (2,400mm²) holding 23 real components (4 ICs + 3 connectors/header +
 1 switch + 1 LED + 5 resistors + 9 capacitors, excluding mounting holes).
 Rev 3–5 add 25 new reference designators (U5, M1, J4, D2, D3, R6–R9, C10–C15
@@ -186,30 +210,38 @@ are recalculated fresh against the new edges rather than scaled.
 
 | Hole | X | Y | Diameter | Type | Rationale | Confidence |
 |---|---|---|---|---|---|---|
-| MH-1 | 3.5 | 3.5 | 2.8mm (M2.5 clearance) | Through-hole | Bottom-left, 3.5mm inset from both edges — unchanged rule from Rev 2 | ASSUMPTION |
-| MH-2 | 96.5 | 3.5 | 2.8mm (M2.5 clearance) | Through-hole | Bottom-right, 3.5mm inset from the new right/bottom edges | ASSUMPTION |
-| MH-3 | 96.5 | 46.5 | 2.8mm (M2.5 clearance) | Through-hole | Top-right, 3.5mm inset from the new right/top edges | ASSUMPTION |
-| MH-4 | 3.5 | 46.5 | 2.8mm (M2.5 clearance) | Through-hole | Top-left, 3.5mm inset from the new left/top edges | ASSUMPTION |
-| **MH-5** *(new)* | 85 | 3.5 | 2.8mm (M2.5 clearance) | Through-hole | New — bottom edge of the motor zone, near its X-centroid (70–100mm zone, midpoint 85mm) | ASSUMPTION |
-| **MH-6** *(new)* | 85 | 46.5 | 2.8mm (M2.5 clearance) | Through-hole | New — top edge of the motor zone, mirrors MH-5 | ASSUMPTION |
+| MH-1 | 8 | 8 | 2.8mm (M2.5 clearance) | Through-hole | Bottom-left. **REV 5 FIX (MISS-034, CRITICAL)**: real KiCad `MountingHole_2.7mm_M2.5` footprint position, `hardware/pcb/bench-imu-01/bench-imu-01.kicad_pcb` (raw `(at 8 8)`), independently re-derivable from `generate_pcb.py`'s own `BOARD_MARGIN(5.0) + 3.0` formula. Supersedes this row's own prior 3.5mm-inset PROPOSAL | **CONFIRMED** |
+| MH-2 | 142 | 8 | 2.8mm (M2.5 clearance) | Through-hole | Bottom-right. Real KiCad footprint `(at 142 8)` = `BOARD_W(150) - BOARD_MARGIN(5.0) - 3.0` | **CONFIRMED** |
+| MH-3 | 142 | 87 | 2.8mm (M2.5 clearance) | Through-hole | Top-right. Real KiCad footprint `(at 142 87)` = `(BOARD_W-8, BOARD_H(95)-BOARD_MARGIN-3.0)` | **CONFIRMED** |
+| MH-4 | 8 | 87 | 2.8mm (M2.5 clearance) | Through-hole | Top-left. Real KiCad footprint `(at 8 87)` = `(8, BOARD_H-BOARD_MARGIN-3.0)` | **CONFIRMED** |
 
-**Why two new mounting holes**: REQ-304's floor is "≥4 mounting holes,
-positioned at corners or edges for support" — MH-1–4 alone already satisfy
-that floor on the new 100×50mm outline. MH-5/MH-6 are proposed **beyond**
-the floor specifically because Rev 3 introduces a new vibration source
-(M1, however it ends up mounted — see Part B) roughly 15–30mm from the
-nearest original corner hole; two additional anchor points straddling the
-motor zone give the board firmer, more local support against motor-induced
-vibration in that region, directly serving REQ-307. This is this
-Mechanical Lead's own judgment call, not dictated by any upstream document
-— flagged as ASSUMPTION accordingly, open to revision once an actual motor-
-mounting decision (Part B) makes the true vibration path concrete.
+**REV 5 FIX (MISS-034)**: the real board has exactly **4** mounting holes —
+independently counted directly in the raw `.kicad_pcb` file this session (4
+instances of footprint `MountingHole_2.7mm_M2.5`, at the 4 coordinates
+above). The prior **MH-5/MH-6** rows (a Rev 3 "motor zone" mid-edge pair,
+proposed for extra rigidity near the then-hypothesized on-board
+motor-driver hot zone) **do not exist on the real board** and are removed,
+not merely repositioned — there is no real second hole pair, because the
+"motor zone" concept itself does not describe the real board (the real M1
+is a 3-pin phase-wire terminal block for an OFF-board motor, per
+`hardware/pcb/bench-imu-01/generate_pcb.py`'s own `PLACEMENT` dict, not an
+on-board motor-driver hot zone needing extra local stiffening). REQ-304's
+own floor ("≥4 mounting holes") remains satisfied by the real 4-hole
+pattern alone, same as it was intended to be before MH-5/6 were proposed as
+an (now-moot) enhancement beyond that floor.
 
-All six holes assume M2.5 screws with a standard 0.3mm/side clearance
+All four holes assume M2.5 screws with a standard 0.3mm/side clearance
 (2.5+0.3×2=3.1mm → rounded to a common 2.8mm clearance-drill convention,
-unchanged reasoning from Rev 2), and PCB material sufficient annular ring
-around each hole — not independently re-verified this revision, carried
-forward as an ASSUMPTION.
+unchanged reasoning from Rev 2) — **note, disclosed not silently
+corrected**: the real footprint's own name ("`MountingHole_2.7mm_M2.5`")
+implies the real PCB's own drill is 2.7mm nominal, slightly smaller than
+this file's own 2.8mm clearance-hole assumption; this is a trivial (0.1mm),
+non-blocking difference between two different holes (the PCB's own drill
+vs. the enclosure standoff's own pilot-hole clearance target) — not
+reconciled further this pass, out of MISS-034's own scope (board outline +
+hole PATTERN, not exact drill-diameter cross-referencing). PCB material
+sufficient annular ring around each hole — not independently re-verified
+this revision, carried forward as an ASSUMPTION.
 
 ## A3. Component height clearance
 
@@ -304,10 +336,34 @@ size cutouts correctly.
 
 | Item | Mass | Confidence | Rationale |
 |---|---|---|---|
-| Bare PCB substrate | 14.8g | ESTIMATE | 100mm × 50mm × 1.6mm × 1.85g/cm³ (standard FR4 density, same method/density as Rev 2) = 8.0cm³ × 1.85g/cm³. Scales consistently with the 2.08× board-area growth vs. Rev 2's own 7.1g bare-board figure |
-| Rev 2 components (U1–U4, J1–J3, SW1, D1, R1–R5, C1–C9) | ≈1.8–2.0g | ESTIMATE (carried forward) | Unchanged from Rev 2's own figure |
-| Rev 3–5 components (U5, U6, J4, D2, D3, F1, R6–R15, C10–C17) | ≈2.5–3.0g | ESTIMATE | J4 (barrel jack, metal-bodied) dominates at ≈1.5g; U5/U6 (HTSSOP) ≈0.15–0.2g each; D2/D3 (SMB) ≈0.1g each; F1 (radial PTC, epoxy body) ≈0.3–0.4g; R6–R15/C10–C17 (small SMD) negligible individually, ≈0.1–0.15g combined |
-| **Subtotal: populated board assembly** | **≈19–20g** | ESTIMATE | Sum of the above three rows |
+| Bare PCB substrate | 42.2g | ESTIMATE | **REV 5 FIX (MISS-034, CRITICAL)**: 150mm × 95mm × 1.6mm × 1.85g/cm³ (standard FR4 density, same method/density as Rev 2/3) = 22.8cm³ × 1.85g/cm³ = 42.18g, rounded. Was 14.8g (100mm×50mm×1.6mm proposal) — the prior figure's own "2.08× area growth vs. Rev 2's 7.1g" framing is now superseded: the real board is a **2.85×** area increase over Rev 2 (60×40mm), giving 42.18g/2.85≈14.8g cross-check against Rev 2's own 7.1g×2×... — more directly, 42.18g/7.1g=5.94×, consistent with (150×95)/(60×40)=5.94× exactly, i.e. this recompute is internally consistent against Rev 2's own bare-board figure by the real area ratio, not the stale proposal's ratio |
+| Rev 2 components (U1–U4, J1–J3, SW1, D1, R1–R5, C1–C9) | ≈1.8–2.0g | ESTIMATE (carried forward) | Unchanged from Rev 2's own figure — component masses don't change with board area |
+| Rev 3–5 components (U5, U6, J4, D2, D3, F1, R6–R15, C10–C17) | ≈2.5–3.0g | ESTIMATE | Unchanged from the prior estimate — component masses don't change with board area. J4 (barrel jack, metal-bodied) dominates at ≈1.5g; U5/U6 (HTSSOP) ≈0.15–0.2g each; D2/D3 (SMB) ≈0.1g each; F1 (radial PTC, epoxy body) ≈0.3–0.4g; R6–R15/C10–C17 (small SMD) negligible individually, ≈0.1–0.15g combined |
+| **Subtotal: populated board assembly** | **≈46.5–47.2g** | ESTIMATE | Sum of the above three rows. **REV 5 FIX**: was ≈19–20g, +≈27.4g driven entirely by the bare-substrate correction above |
+
+**Reconciliation against the current total system mass baseline (REV 5,
+MISS-034)**: this file's own Part C (Rev 4/4.1 free-rotation mechanism)
+already independently reconciled the FULL assembled-system mass at
+**≈1173.4g** (`hardware/mechanical/bench-imu-01-dimensional-spec.md` §18,
+cross-checked against `validation/design-review.md`'s own Cycle 6
+independent re-render, agreeing to within 0.05g) — this is the figure this
+bare-board recompute must be consistent with, **not** a stale ≈300g figure
+that appears in unrelated prose elsewhere in this repo (e.g.
+`bom/component-selection.md`'s own friction-torque margin calc, tracked
+separately as MISS-029, RESOLVED, and `requirements/requirements.md`
+REQ-310's own "~300g representative" wording — neither of those describes
+this board's own mass, and neither is touched by this fix). The +≈27.4g
+bare-board increase computed above shifts the ≈1173.4g total to
+**≈1200.8g** (+2.33%) — see `bench-imu-01-dimensional-spec.md`'s own Rev 5
+changelog for the full arithmetic and an explicit check that this small
+shift does not materially affect the bearing friction-torque margin
+(driven by rotating-assembly mass, not total mass) or the stand-plate
+CG/tip-over safety margin (a ≈6.2× margin at the old mass; a 2.33% mass
+increase moves this to ≈6.06×, still enormously non-binding) — not
+re-derived from scratch, since the shift is small enough that a
+proportional check is adequate and honestly disclosed as such, not a full
+re-sweep of `bench-imu-01-dimensional-spec.md` §18.3's own CG/tip-over
+analysis.
 
 M1 and the flywheel are deliberately **excluded** from this table and
 carried separately in Part B, because their mass may or may not load this
@@ -879,7 +935,18 @@ this design's actual ≈602g total system mass and ≈9.6mm CG offset, a
 120mm-diameter stand plate already yields a 6.2× static margin — a
 stand plate anywhere near the bearing's own generic furniture-scale
 suggestion would be wildly, unnecessarily oversized for this rig (and would
-itself blow well past the existing enclosure's own 111.4×170.6mm assembled
+itself blow well past the existing enclosure's own [**REV 5 (MISS-034,
+2026-09-04) DISCLOSURE, Mechanical Reviewer Cycle 11 Finding 3**: this
+figure was 111.4×170.6mm at the time this Part C3/C4 analysis was
+originally written (Rev 4) — the enclosure's own CURRENT assembled
+footprint is 161.4×215.6mm, per `bench-imu-01-dimensional-spec.md` §3
+(Rev 5). 120mm remains comfortably smaller than BOTH the old and current
+figures in both dimensions, so this section's own qualitative conclusion
+is unaffected — but the ≈602g mass/≈9.61mm CG-offset/6.2× margin numbers
+elsewhere in this same C3/C4 section are themselves ALSO now stale relative
+to Rev 5 (and, separately, relative to Rev 4.1's own later `pinch_guard()`
+mass addition) — this is the same gap already tracked in full at MISS-038
+(`validation/open-issues.md`), not re-derived here] 111.4×170.6mm assembled
 footprint in one dimension). This is exactly the outcome the task's own
 framing anticipated: the generic suggestion is for a completely different
 load class and use case, and this file's own computed analysis — not that

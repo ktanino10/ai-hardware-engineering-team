@@ -1,44 +1,62 @@
-# Bench-IMU-01 — 2D Drawings + Exploded Assembly View + Assembly Animation + Drafting Sheets + Physics/Concept Demos (Rev 4/4.1, Mechanical scope)
+# Bench-IMU-01 — 2D Drawings + Exploded Assembly View + Assembly Animation + Drafting Sheets + Physics/Concept Demos (Rev 4/4.1 base, Rev 5 PCB-resize partial update)
 
-Visual documentation of the already-Design-Complete mechanical assembly
-(`validation/change-log.md` ECO-031/032/033) — 2D orthographic drawings of
+Visual documentation of the mechanical assembly — 2D orthographic drawings of
 each of the 5 printed pieces plus the full assembled unit, a Blender-built
 exploded assembly view, an assembly animation, Fusion-style engineering
 drafting sheets (Method 4), a physics-based conservation-of-angular-
 momentum **SIMULATION** animation (Method 5), and a **CONCEPT**
-reference-attitude-hold demonstration animation (Method 6). **This is the
-first time this project has generated 2D drawings, an exploded view, or an
-animation** — this document establishes the convention so it is
-reproducible, not a one-off.
+reference-attitude-hold demonstration animation (Method 6).
+
+**REV 5 STATUS (MISS-034, this session)**: the mechanical assembly was
+resized to fit the real 150×95mm PCB (was a 100×50mm proposal). **Methods 1
+(2D orthographic) and 4 (drafting sheets) were regenerated this session**
+against the resized geometry (pure OpenSCAD CLI / OpenSCAD+matplotlib, no
+Blender dependency — see each method's own section below for what changed).
+**Methods 2/3/5/6 (exploded view, assembly animation, physics-demo,
+concept-demo) all require Blender via the `blender-*` MCP tools, which are
+NOT connected this session** (`blender-get_addon_status` → "Communication
+error with Blender: name 'bl_info' is not defined", independently
+re-checked this session, not assumed) — **these could not be regenerated
+and remain visually stale relative to the Rev 5 geometry** (they still
+depict the old, smaller PCB bay). This is a disclosed, known limitation,
+not a silent gap — see the "Tooling honesty" section immediately below,
+re-verified fresh this session per this project's own "per-session, not a
+standing guarantee" convention, and each of Methods 2/3/5/6's own section
+for the specific stale-artifact note. A future session with Blender
+connected should regenerate these 4 artifacts using the same, unchanged
+regeneration commands documented below.
 
 No dimension, tolerance, or module body in `bench-imu-01-enclosure.scad`
 was touched to produce any of this — every file here is either a small,
-new, `include`-only wrapper script (same convention already established by
+`include`-only wrapper script (same convention already established by
 `hardware/mechanical/stl/export/*.scad`) or a downstream rendered image
 or video.
 
-## Tooling honesty (verified this session)
+## Tooling honesty (re-verified fresh this session — not assumed carried over)
 
 - **OpenSCAD CLI** (v2026.08.30, `--backend=manifold`) — already this
   project's established CAD tool throughout its history. Used here for
-  the STL isolation, the 2D orthographic renders, and the new drafting-
-  sheet DXF projections (Method 4).
-- **Blender, via the `blender-*` MCP tools** — confirmed connected and
-  working this session (`blender-get_addon_status`, Blender 5.1.1,
-  `bpy.ops.wm.stl_import` available). This was **not** true in earlier
-  sessions (`hardware/mechanical/README.md`'s own tooling-honesty note, and
-  `.github/agents/mechanical-lead.agent.md`, both still correctly describe
-  the *previously* verified state of "no CAD/3D modeling MCP tool
-  connected" as of when they were written) — treat Blender's availability
-  as **verified per-session, not a standing guarantee**
-  (`docs/architecture.md` §5.3/§13's own convention). If Blender is not
-  connected in a future session, the exploded view/animations cannot be
-  regenerated until it is.
-- **matplotlib + a hand-written DXF parser** (Method 4) — `ezdxf` is
-  **not** installed this session; a small, purpose-built parser is used
-  instead (see `drafting-sheets/build_drafting_sheet.py`'s own docstring
-  for exactly which DXF entity types this project's OpenSCAD version
-  actually emits).
+  the STL isolation, the 2D orthographic renders, and the drafting-
+  sheet DXF projections (Method 4) — all re-run successfully this session
+  against the Rev 5 (resized) geometry.
+- **Blender, via the `blender-*` MCP tools** — **NOT connected this
+  session** (`blender-get_addon_status` returned an addon-handshake error,
+  not a successful connection) — a DIFFERENT state than the immediately
+  preceding session that authored Methods 2/3/5/6 (which found it
+  connected, Blender 5.1.1). Per this project's own established
+  convention (`docs/architecture.md` §5.3/§13, and this file's own prior
+  paragraph already anticipating exactly this situation: "If Blender is
+  not connected in a future session, the exploded view/animations cannot
+  be regenerated until it is"), Methods 2/3/5/6 were **not** attempted
+  this session — the committed artifacts for those 4 methods are
+  unchanged and now stale relative to Rev 5's resized geometry.
+- **matplotlib + a hand-written DXF parser** (Method 4) — confirmed
+  available and used this session, re-run successfully against Rev 5
+  geometry (see Method 4's own section below).
+- **`trimesh` + `numpy-stl`** — confirmed available this session, used to
+  independently cross-check every re-exported STL's bounding box (matching
+  this project's own established verification convention).
+
 
 ## Directory layout
 
@@ -173,6 +191,18 @@ openscad --backend=manifold --projection=ortho --render --autocenter --viewall \
 
 ## Method 2: Exploded assembly view (`exploded/`)
 
+**REV 5 STALENESS NOTE (this session)**: `bench-imu-01-exploded-view.png`
+is **NOT regenerated this session** — Blender is not connected (see
+"Tooling honesty" above) — and now depicts the OLD (pre-MISS-034,
+100×50mm-proposal-era) PCB bay/lid geometry, which is smaller than the
+current, real, resized geometry. Do not treat this image as representative
+of the current assembly. What COULD be corrected without a render — the
+world-space bounding-box reference points documented in
+`build_exploded_view_annotations.py`'s own docstring (`ANCHOR_PX`'s
+derivation) — has been updated for the record (see that file), but the
+actual pixel output (`ANCHOR_PX` itself, and the base render) requires a
+real Blender render to regenerate and was NOT recomputed or guessed at.
+
 OpenSCAD has no built-in "explode along an axis" primitive; Blender's
 transform tools do, so this step uses the newly-verified Blender MCP
 connection. Approach, in full: export each of the 5 printed pieces (plus
@@ -280,6 +310,10 @@ full record.
    actually committed as `bench-imu-01-exploded-view.png`.
 
 ## Method 3: Assembly animation (`animation/`)
+
+**REV 5 STALENESS NOTE (this session)**: same as Method 2 above — not
+regenerated (Blender not connected this session), both video files still
+depict the OLD, pre-MISS-034 geometry.
 
 An animated companion to the static exploded view, added per a follow-up
 request: each part moves from its exploded position back to its true
@@ -418,6 +452,15 @@ python3 build_drafting_sheet.py --part <part> --dxf /tmp/<part>.dxf \
 
 ## Method 5: Physics-based conservation-of-angular-momentum SIMULATION animation (`physics-demo/`)
 
+**REV 5 STALENESS NOTE (this session)**: not regenerated (Blender not
+connected this session). The underlying physics numbers below
+(`I_wheel`/`I_platform`/rotation-rate ratio) are unaffected by the
+Bench-IMU-01 PCB resize (MISS-034) — they depend only on the flywheel/
+motor-platform geometry, which is formula-independent of `pcb_length`/
+`pcb_width` (confirmed this session) — but the VISUAL render itself reuses
+Method 2's own assembled-position STL pipeline, so it still depicts the
+OLD, smaller PCB bay geometry alongside those still-valid physics numbers.
+
 **This is a SIMULATION / PREDICTION, not a measurement.** No PCB has been
 fabricated/populated yet (`../assembly-instructions.md` §4.1 placeholder;
 366 unresolved DRC items on the still-open PCB-layout branch) and no
@@ -464,6 +507,12 @@ plain `python3`, no Blender needed), then `ffmpeg` (2-pass MP4 + palette-
 GIF, same technique as Method 3's own header).
 
 ## Method 6: CONCEPT reference-attitude-hold demonstration animation (`concept-demo/`)
+
+**REV 5 STALENESS NOTE (this session)**: not regenerated (Blender not
+connected this session) — same visual-only staleness as Method 5 above
+(the concept being illustrated is unaffected by the PCB resize, but the
+render itself would still show the old PCB bay geometry if the underlying
+assembled-position STL pipeline is reused).
 
 **This is a CONCEPT, not a literal capability of this rig.**
 Bench-IMU-01 rotates about exactly ONE (vertical/yaw) axis

@@ -46,9 +46,11 @@
 // comments here are brief pointers, not the full "why".
 //
 // Coordinate convention -- BOARD-LOCAL frame (matches
-// hardware/mechanical-interface.md exactly, Rev 3): origin (0,0) at the PCB
-// bottom-left corner, viewed from the top/component side. X: 0->100mm
-// (PCB length, was 60mm in Rev 2). Y: 0->50mm (PCB width, was 40mm).
+// hardware/mechanical-interface.md exactly, REV 5 FIX MISS-034): origin
+// (0,0) at the PCB bottom-left corner, viewed from the top/component side.
+// X: 0->150mm (PCB length, real KiCad board -- was a Rev 3 100mm PROPOSAL,
+// itself was 60mm in Rev 2). Y: 0->95mm (PCB width, real KiCad board --
+// was a Rev 3 50mm PROPOSAL, itself was 40mm in Rev 2).
 // This file's GLOBAL frame (used for all actual solid-modeling coordinates)
 // has its own separate origin: (0,0,0) = the OVERALL ASSEMBLY's external
 // bottom-left-floor corner, at the FLYWHEEL BAY end (Rev 3 NEW: the
@@ -113,28 +115,53 @@ $fn = 48; // facet count for circles/cylinders -- cosmetic smoothness only,
 // ----------------------------------------------------------------------
 
 // --- Board Geometry (interface: A1 Board Geometry) ---
-pcb_length    = 100.0; // mm, X extent. ASSUMPTION (interface file A1).
-pcb_width     = 50.0;  // mm, Y extent. ASSUMPTION (interface file A1).
+// REV 5 FIX (MISS-034, CRITICAL): pcb_length/pcb_width below were a Rev 3
+// PROPOSAL (100x50mm) that was superseded when the real board was laid out
+// at 150x95mm -- confirmed this session directly from the real KiCad
+// project's own Edge.Cuts layer (`hardware/pcb/bench-imu-01/
+// bench-imu-01.kicad_pcb`: `(gr_rect (start 0 0) (end 150 95))`), with no
+// re-handoff back to Mechanical ever recorded. See
+// bench-imu-01-dimensional-spec.md's own Rev 5 changelog entry and
+// hardware/mechanical-interface.md A1/A2 (now CONFIRMED, not ASSUMPTION)
+// for the full re-derivation. This one root value is now CONFIRMED, not
+// ASSUMPTION -- it is read directly from the real board file, not proposed.
+pcb_length    = 150.0; // mm, X extent. CONFIRMED (real KiCad Edge.Cuts).
+pcb_width     = 95.0;  // mm, Y extent. CONFIRMED (real KiCad Edge.Cuts).
 pcb_thickness = 1.6;   // mm, Z extent. ASSUMPTION (standard 2-layer stock,
-                        // unchanged from Rev 2).
+                        // unchanged from Rev 2 -- the real board's actual
+                        // layer stack-up/thickness was not independently
+                        // re-confirmed this pass, out of MISS-034's own
+                        // scope).
 
 // --- Mounting holes (interface: A2 Mounting), [x, y, clearance_dia] ---
-// MH-1..4 unchanged CORNER positions rescaled to the new board size; MH-5/6
-// are Rev 3 NEW mid-edge standoffs near the motor zone (X=70-100), added by
-// this Mechanical Lead because a 100x50mm board supported only at 4 corners
-// risks excess flex/vibration transmission near the motor-driver components
-// (U5/U6, D2/D3) on a board this much larger than Rev 2's 60x40mm -- good
-// practice regardless of the motor ITSELF being off-board (only the motor
-// is off-board; the motor-driver ELECTRONICS are still on this PCB). All
-// ASSUMPTION, all sized for M2.5 (2.8mm clearance dia), same convention as
-// Rev 2.
+// REV 5 FIX (MISS-034): the Rev 3 MH-1..6 six-hole scheme below (4 corner
+// holes + 2 Rev-3-invented "motor-zone" mid-edge holes, MH-5/6) does not
+// match the real board -- the real KiCad project has exactly 4
+// `MountingHole_2.7mm_M2.5` footprints, independently confirmed this
+// session by counting footprint instances directly in the real
+// `bench-imu-01.kicad_pcb` (4 found, at raw `(at ...)` coordinates
+// (8,8)/(142,8)/(8,87)/(142,87) -- these equal `generate_pcb.py`'s own
+// `BOARD_MARGIN(5.0) + 3.0` / `BOARD_W(150)-5.0-3.0` / `BOARD_H(95)-5.0-3.0`
+// formula, i.e. independently re-derivable from that script too, not just
+// read off the raw file once). MH-5/6 (and the "motor zone" concept that
+// motivated them) do not correspond to anything on the real board -- there
+// is no second mounting-hole pair near the real M1 (which is a 3-pin
+// phase-wire terminal block on the real board, not a Rev 3-imagined
+// on-board motor-driver hot zone needing extra local stiffening). Reduced
+// to the real 4-hole, 134x79mm pattern. Clearance kept at 2.8mm (this
+// design's own established M2.5-clearance convention, unchanged) --
+// NOTE, disclosed not silently corrected: the real footprint's own name
+// ("2.7mm") implies a slightly smaller nominal PCB drill than this
+// enclosure design's own 2.8mm standoff-clearance assumption; a trivial,
+// non-blocking 0.1mm difference between two different holes (the PCB's own
+// drill vs. this standoff's pilot clearance) -- not reconciled further,
+// out of MISS-034's own scope (board outline + hole PATTERN, not exact
+// drill-diameter cross-referencing).
 mount_holes = [
-    [ 3.5,  3.5, 2.8], // MH-1 (corner)
-    [96.5,  3.5, 2.8], // MH-2 (corner)
-    [96.5, 46.5, 2.8], // MH-3 (corner)
-    [ 3.5, 46.5, 2.8], // MH-4 (corner)
-    [85.0,  3.5, 2.8], // MH-5 (Rev 3 NEW, motor-zone support)
-    [85.0, 46.5, 2.8], // MH-6 (Rev 3 NEW, motor-zone support)
+    [  8.0,  8.0, 2.8], // MH-1 (corner, real board)
+    [142.0,  8.0, 2.8], // MH-2 (corner, real board)
+    [142.0, 87.0, 2.8], // MH-3 (corner, real board)
+    [  8.0, 87.0, 2.8], // MH-4 (corner, real board)
 ];
 
 // --- Component height clearance (interface: A3 Component Height
@@ -247,15 +274,17 @@ floor_t = min_wall_t;
 // --- PCB-to-interior-cavity keepout (unchanged concept/value from Rev 2) --
 board_xy_keepout = 1.5; // mm, per side. ASSUMPTION.
 
-// --- PCB standoffs (unchanged formula/values from Rev 2; now 6 instances
-//     at the mount_holes positions above, incl. new MH-5/6). ---
+// --- PCB standoffs (unchanged formula/values from Rev 2; 4 instances at
+//     the mount_holes positions above -- REV 5 FIX (MISS-034): back to 4,
+//     matching the real board's own 4 mounting holes; Rev 3's MH-5/6 never
+//     existed on the real board, see the mount_holes note above). ---
 standoff_od          = 6.0;
 standoff_pilot_dia   = 2.0;
 standoff_h           = 6.0;
 standoff_pilot_depth = 5.0;
 
 // --- Single PCB/lid fastener type -- UNCHANGED M2.5 self-tap, used for all
-//     PCB standoffs (now 6) + all 4 PCB-lid corner tabs. Reserved
+//     PCB standoffs (4) + all 4 PCB-lid corner tabs. Reserved
 //     EXCLUSIVELY for these static, low-duty joints -- Rev 3 introduces
 //     two NEW, DIFFERENT fastener classes below for the motor mount and
 //     the safety-critical containment cap, each re-justified on its own
@@ -350,10 +379,10 @@ bay_y_min = (pcb_width - 6) - bay_edge_margin; // = 42.5mm (Rev2 was 32.5mm
 d1_hole_dia = 3.0; // mm. ESTIMATE, unchanged from Rev 2.
 
 // --- External corner mounting tabs (PCB-lid-to-base fastening). UNCHANGED
-//     formulas/values from Rev 2; repositioned to the new MH-1..4 CORNER
-//     coordinates only (MH-5/6, mid-edge, do NOT get tabs -- tabs are a
-//     lid-fastening feature at the 4 true corners, a separate concern from
-//     how many mid-board PCB standoffs exist). ---
+//     formulas/values from Rev 2; repositioned to the real MH-1..4 CORNER
+//     coordinates -- REV 5 FIX (MISS-034): MH-5/6 never existed on the
+//     real board (see mount_holes note above), so the "MH-5/6 do not get
+//     tabs" carve-out is now moot, not just inapplicable. ---
 tab_w             = 8.0;
 tab_project       = 6.0;
 tab_base_t        = 5.6;
@@ -365,10 +394,10 @@ tab_pilot_dia     = standoff_pilot_dia;
 tab_chamfer_run   = tab_project;
 
 tab_positions = [
-    [ 3.5,  3.5, -1], // near MH-1, front-left
-    [96.5,  3.5, -1], // near MH-2, front-right
-    [96.5, 46.5, +1], // near MH-3, rear-right
-    [ 3.5, 46.5, +1], // near MH-4, rear-left
+    [  8.0,  8.0, -1], // near MH-1, front-left
+    [142.0,  8.0, -1], // near MH-2, front-right
+    [142.0, 87.0, +1], // near MH-3, rear-right
+    [  8.0, 87.0, +1], // near MH-4, rear-left
 ];
 
 // Rev 3.1 FIX (MISS-010, HIGH -- Independent Mechanical Review Cycle 1
@@ -887,9 +916,32 @@ stand_plate_bottom_z = stand_plate_top_z - stand_plate_t; // DERIVED
 // --- MISS-023 (HIGH): REQ-407(b) pinch-point/rotating-overhang hazard was
 //     never assessed. Fix: a new stationary annular guard, pinch_guard()
 //     below. ---
-rotating_env_max_r = 126.424; // mm. CONFIRMED this session via a dedicated
-                // isolated-rotating-solid mesh analysis: unioned ONLY the
-                // solids that actually rotate with the bearing's top plate
+rotating_env_max_r = 176.259; // mm. REV 5 RE-MEASURED (MISS-034 side
+                // effect, this session): was 126.424mm (Rev 4.1 figure,
+                // quoted below unchanged for its own history) -- the
+                // Rev 5 PCB-bay resize (100x50mm -> real 150x95mm) grows
+                // the rotating assembly's own farthest point (still a PCB
+                // LID corner tab, per the note below) outward by
+                // +49.8mm/+39.4%. Re-measured with the exact same method
+                // Rev 4.1 used (see the ORIGINAL Rev 4.1 note immediately
+                // below, unedited, for that method's own full description)
+                // -- re-run fresh this session against the resized
+                // assembled-frame STLs, independently confirmed by BOTH
+                // `trimesh` and `numpy-stl` agreeing to <0.001mm. **This
+                // change directly stales MISS-023's own ACCEPTED-RISK
+                // coverage-percentage numbers (77.7% -> 35.0% for the
+                // SAME, unchanged pinch_guard_or=115.0mm) -- see MISS-023's
+                // own re-opened entry in validation/open-issues.md and
+                // pinch_guard_or's own comment below. Per this project's
+                // established REQ-408 "a disposition does not auto-extend
+                // to a materially changed input" precedent, this was NOT
+                // silently treated as still-covered by the old sign-off.**
+                //
+                // ORIGINAL Rev 4.1 note (unedited, describes the method that
+                // was re-run unchanged this session): CONFIRMED via a
+                // dedicated isolated-rotating-solid mesh analysis: unioned
+                // ONLY the solids that actually rotate with the bearing's
+                // top plate
                 // (base(), pcb_lid(), containment_cap(), bmount_flange() --
                 // EXCLUDES the stationary stand_plate()), rendered with
                 // `openscad --backend=manifold` (manifold, NoError), then
@@ -907,7 +959,18 @@ rotating_env_max_r = 126.424; // mm. CONFIRMED this session via a dedicated
                 // traceable constant so cable_wrap_circumference below
                 // stays derived/re-computable rather than a second,
                 // independently-hardcoded copy of the same figure.
-pinch_hazard_min_z_clear = 19.9; // mm. CONFIRMED this session via a fine
+pinch_hazard_min_z_clear = 19.9; // mm. REV 5 RE-VERIFIED (this session, NOT
+                // assumed unchanged just because it looks Z-only): re-ran
+                // the SAME face-centroid, 1mm-radius-bin height sweep
+                // against the resized rotating assembly's real STLs, over
+                // the NEW radius range [60, 176.259]mm. Result: still
+                // exactly 19.9mm -- confirmed for a real physical reason,
+                // not a coincidence: this floor is set by the PCB bay
+                // wall's own floor-level corner sitting at global Z=0 (the
+                // base's own external bottom face), which is independent of
+                // the bay's XY footprint -- growing the PCB bay in X/Y
+                // does not move its own floor plane in Z. Original Rev 4.1
+                // method description (unedited): CONFIRMED via a fine
                 // (1mm-radius-bin, face-centroid-sampled -- denser than
                 // vertex-only sampling) height-vs-radius sweep of the SAME
                 // isolated rotating solid above: the GLOBAL MINIMUM height
@@ -915,12 +978,11 @@ pinch_hazard_min_z_clear = 19.9; // mm. CONFIRMED this session via a fine
                 // every point with radius in [stand_plate_or,
                 // rotating_env_max_r] (i.e. every radius a stationary
                 // guard could occupy), confirmed to hold at this SAME
-                // value across multiple distinct radius bins (60-61mm,
-                // 73-75mm, 92-93mm, 121-122mm) -- a genuine floor, not a
-                // single-radius coincidence. The true limiting feature is
-                // the PCB-bay wall's own floor-level corner, NOT the
-                // base_tab() tabs as a first glance at "tallest features"
-                // might suggest. See spec 18.12.
+                // value across multiple distinct radius bins -- a genuine
+                // floor, not a single-radius coincidence. The true limiting
+                // feature is the PCB-bay wall's own floor-level corner, NOT
+                // the base_tab() tabs as a first glance at "tallest
+                // features" might suggest. See spec 18.12.
 pinch_guard_z_margin = 5.0; // mm. ASSUMPTION -- an explicit safety
                 // clearance margin between pinch_guard()'s own top edge
                 // and pinch_hazard_min_z_clear, deliberately separate from
@@ -933,18 +995,28 @@ pinch_guard_ir = stand_plate_or; // mm. DERIVED = 60.0mm -- flush-adjacent
                 // remain SEPARATE, unfastened, desk-resting parts this
                 // pass (not unioned/keyed together) -- a disclosed
                 // limitation; see spec 18.12.
-pinch_guard_or = 115.0; // mm. DECIDED from an explicit coverage-vs-
+pinch_guard_or = 115.0; // mm. UNCHANGED this session, DELIBERATELY --
+                // NOT re-grown to chase rotating_env_max_r's new, larger
+                // value. Originally DECIDED from an explicit coverage-vs-
                 // footprint trade-off table (candidates 90-120mm; spec
-                // 18.12 has the full table) -- covers ~77.7% of the
-                // exposed hazard-band area (the annulus from
-                // stand_plate_or to rotating_env_max_r) while keeping the
-                // assembled diameter (230mm) practical for a benchtop rig.
-                // Deliberately falls short of rotating_env_max_r (an
-                // 11.4mm residual radial gap remains at the outer edge) --
-                // an intentional, disclosed PARTIAL closure, backstopped
-                // by an explicit keep-clear-zone warning (spec 18.12,
-                // tightens REQ-205) rather than claimed as a hermetic
-                // guard.
+                // 18.12 has the full table) against the OLD 126.424mm
+                // hazard radius, covering ~77.7% of that hazard band.
+                // Against the NEW 176.259mm hazard radius (same guard,
+                // unchanged), this now covers only ~35.0% of the
+                // (larger) hazard band -- a genuine, quantified
+                // degradation, not a rounding difference. Growing this to
+                // ~157.9mm would restore ~77.7%-equivalent coverage, but
+                // at ~2.2x this feature's own mass (~570.6g -> ~1268g) and
+                // footprint (230mm -> ~316mm diameter) -- a real
+                // engineering trade-off with its own cost/footprint/
+                // printability consequences, not a same-day unilateral
+                // resize. Left at 115.0mm this session; the full trade-off
+                // table (candidate values 115/130/140/150/157.9/165/176.3mm
+                // with coverage %, residual gap, and estimated mass each)
+                // is recorded in MISS-023's own re-opened entry in
+                // validation/open-issues.md for the human Chief Engineer
+                // to decide, mirroring this project's own REQ-403/MISS-016
+                // precedent for exactly this class of decision.
 pinch_guard_h = pinch_hazard_min_z_clear - pinch_guard_z_margin; // mm.
                 // DERIVED = 14.9mm. By construction (a stated margin below
                 // the CONFIRMED global-minimum rotating-envelope height
@@ -953,13 +1025,16 @@ pinch_guard_h = pinch_hazard_min_z_clear - pinch_guard_z_margin; // mm.
                 // rotation angle. Uniform height (no shelf/rim step) --
                 // the global-floor confirmation above means a stepped
                 // profile is unnecessary.
-pinch_guard_quadrant_margin = 10.0; // mm. ASSUMPTION -- extra radial reach
-                // of the print_layout quadrant-cutting polygon beyond
-                // pinch_guard_or, purely so the boolean cut tool fully
-                // spans the ring being cut -- has NO effect on the final
-                // printed/assembled shape (an intersection-tool oversize,
-                // the same "+1"/"+2" convention this file already uses
-                // elsewhere for cut-tool cylinder/cube heights).
+pinch_guard_quadrant_margin = 10.0; // mm. ASSUMPTION -- residual radial
+                // safety margin the print_layout quadrant-cutting tool's
+                // chord keeps beyond pinch_guard_or at the wedge's own
+                // angular midpoint, on top of the geometrically-exact
+                // r_cut = pinch_guard_or/cos(half_angle) minimum (see
+                // pinch_guard()'s own SELF-CAUGHT FIX comment -- this
+                // variable's role changed this session: it used to be
+                // added directly to pinch_guard_or as if that alone
+                // guaranteed full coverage, which a real re-measurement
+                // showed it did not).
 
 // --- MISS-024 (HIGH): REQ-407(c)/REQ-113 cable-entanglement/strain hazard
 //     for J1/J4 (mounted on base()'s PCB-bay walls, which now rotate with
@@ -968,7 +1043,12 @@ pinch_guard_quadrant_margin = 10.0; // mm. ASSUMPTION -- extra radial reach
 //     counting index pointer, and a strain-relief cable-tie anchor point
 //     near each connector (both new, additive geometry). ---
 cable_wrap_circumference = 2 * PI * rotating_env_max_r; // mm. DERIVED
-                // ~= 794.345mm. CONSERVATIVE (safe-direction) model: this
+                // ~= 1107.52mm (REV 5: was 794.345mm pre-MISS-034-resize --
+                // this is a pure formula of rotating_env_max_r, so it
+                // cascaded automatically once that constant was
+                // re-measured above; no separate edit needed here beyond
+                // this comment's own updated numbers).
+                // CONSERVATIVE (safe-direction) model: this
                 // assumes the externally-routed J1/J4 cable winds at the
                 // rotating assembly's own LARGEST reachable radius
                 // (rotating_env_max_r), not the smaller radius of the J1/
@@ -992,13 +1072,23 @@ pinch_guard_turn_limit = 3; // full turns, single direction, before
                 // procedure and the honest disclosure that this does NOT
                 // achieve REQ-012's aspirational "ideally continuous/
                 // unlimited" rotation case.
-cable_service_loop_min = 2.5; // meters. DECIDED -- minimum external
-                // service-loop length for EACH of the J1 and J4 cables,
-                // comfortably above the exact
-                // (pinch_guard_turn_limit * cable_wrap_circumference =
-                // 2.383m) requirement (~117mm/4.7% spare). NOT a modeled/
-                // geometric dimension (no reasonable enclosure-scale
-                // feature enforces a 2.5m cable length) -- recorded here,
+cable_service_loop_min = 3.75; // meters. REV 5 FIX (MISS-034 side effect,
+                // this session): was 2.5m, DECIDED against the OLD
+                // cable_wrap_circumference (794.345mm) with a 4.7% margin
+                // over the exact 2.383m requirement. The Rev 5 PCB-bay
+                // resize grew rotating_env_max_r (+39.4%), which pushed the
+                // exact requirement to `pinch_guard_turn_limit *
+                // cable_wrap_circumference` = 3*1.10752m = 3.3226m -- the
+                // OLD 2.5m spec is now 0.823m SHORT of that, not
+                // "comfortably above" it. This is an unambiguous,
+                // safe-direction, no-geometry-tradeoff fix (a longer
+                // recommended service loop has no downside, unlike
+                // pinch_guard_or's own footprint/mass trade-off below) --
+                // applied directly rather than left as an open question.
+                // New value gives 3.75-3.3226=0.427m/12.9% spare, a
+                // comparable-or-better margin than the original 4.7%. NOT
+                // a modeled/geometric dimension (no reasonable enclosure-
+                // scale feature enforces a cable length) -- recorded here,
                 // rather than only in prose, purely so the numeric chain
                 // from rotating_env_max_r through to this operational
                 // requirement stays in one traceable, re-computable place.
@@ -1063,9 +1153,10 @@ module standoff() {
 }
 
 module base_standoffs() {
-    // Now 6 instances (MH-1..6, incl. Rev 3 NEW MH-5/6) in the PCB bay's
-    // own local frame -- caller (pcb_bay_base()) translates into the
-    // shared global frame via pcb_bay_y0.
+    // 4 instances (MH-1..4, the real board's own mounting-hole pattern --
+    // REV 5 FIX, MISS-034: Rev 3's MH-5/6 never existed on the real board)
+    // in the PCB bay's own local frame -- caller (pcb_bay_base()) translates
+    // into the shared global frame via pcb_bay_y0.
     for (m = mount_holes)
         translate([board_offset_x + m[0], board_offset_y + m[1], floor_t])
             standoff();
@@ -1617,11 +1708,17 @@ module pinch_guard(quadrant = -1) {
     // each printed piece's own bounding box (~pinch_guard_or x
     // pinch_guard_or =~115x115mm) is small enough to be printable on
     // virtually any consumer FDM printer without needing that assumption
-    // at all. The 2 straight radial cut edges are exact (a 3-point
-    // triangle polygon spanning the full quadrant angle, from the axis
-    // out past pinch_guard_or) -- no faceting/approximation error is
-    // introduced by the cut, only the ring's own pre-existing cylinder
-    // facet count (unchanged from stand_plate()'s own $fn convention).
+    // at all. The 2 straight radial cut edges are exact (bounded by
+    // planes through the origin at the wedge's own a0/a1 angles). The
+    // 3rd (chord/far) edge of the cutting polygon is NOT itself a source
+    // of faceting/approximation error beyond the ring's own pre-existing
+    // cylinder facet count (unchanged from stand_plate()'s own $fn
+    // convention) -- but an EARLIER version of this comment additionally,
+    // and WRONGLY, implied that edge was "exact" for the ring's own
+    // outer radius at every angle; it is not, unless `r_cut` is sized
+    // correctly (see the SELF-CAUGHT FIX comment below, at this
+    // module's own quadrant-cut branch, for the real, once-shipped bug
+    // this corrects).
     module full_ring() {
         translate([fw_cx, fw_cy, stand_plate_bottom_z])
             difference() {
@@ -1635,7 +1732,47 @@ module pinch_guard(quadrant = -1) {
     } else {
         a0 = quadrant * 90;
         a1 = a0 + 90;
-        r_cut = pinch_guard_or + pinch_guard_quadrant_margin;
+        // SELF-CAUGHT FIX (new, this session -- pre-existing since Rev 4.1,
+        // independent of and unrelated to the Rev 5/MISS-034 PCB resize;
+        // found while independently re-rendering/re-measuring pinch_guard()
+        // for MISS-034's own rotating-envelope re-verification, per this
+        // project's Foresight-checklist habit of noticing a second effect
+        // while checking a first one, not because this pass's task asked
+        // for it -- mirrors the MISS-007/MISS-008/MISS-009/MISS-010
+        // precedent).
+        //
+        // BUG: the old `r_cut = pinch_guard_or + pinch_guard_quadrant_margin`
+        // (=125.0mm) sized the two OUTER CORNER vertices of the cutting
+        // triangle correctly, but the STRAIGHT CHORD connecting those two
+        // corners is not equidistant from the origin at every angle in
+        // between -- at the wedge's own angular midpoint (45 deg into a
+        // 90 deg quadrant) the chord sits only `r_cut*cos(45)`=88.39mm from
+        // the origin, 26.61mm INSIDE `pinch_guard_or`=115.0mm. The claimed
+        // "2 straight radial cut edges are exact... no faceting/
+        // approximation error" was true only for those 2 radial edges
+        // themselves (which are exact) -- it did not hold for the 3rd
+        // (chord/hypotenuse) edge, which silently bit a real, confirmed
+        // chunk out of each quadrant's own outer ring material, all along
+        // the outer band nearest each quadrant's own 45-degree midpoint.
+        // Independently re-measured this session (3 methods: OpenSCAD's
+        // own manifold/CGAL volume-adjacent stats, `trimesh`, and a
+        // from-scratch divergence-theorem triangle-sum in `numpy-stl`, all
+        // agreeing to <0.001mm3): the pre-fix quadrant STL's real volume
+        // was 72,803.19mm3 against an ideal quarter-annulus of
+        // 112,635.9mm3 -- a genuine ~35.4% material shortfall per printed
+        // quadrant (was NOT reflected in this design's own previously
+        // recorded ~570.6g full-ring mass figure, which was computed by
+        // rendering the FULL ring (`quadrant=-1`) directly and is
+        // therefore itself correct -- the bug was specific to the
+        // quadrant-SPLIT print pieces actually shipped/measured for
+        // print_layout, not to the full-ring reference figure).
+        // FIX: derive `r_cut` from the wedge's own half-angle so the
+        // chord's closest approach to the origin (`r_cut*cos(half_angle)`)
+        // clears `pinch_guard_or` with `pinch_guard_quadrant_margin` to
+        // spare, instead of assuming (incorrectly) that sizing only the 2
+        // corner vertices to `r_cut` was sufficient.
+        half_angle = (a1 - a0) / 2;
+        r_cut = pinch_guard_or / cos(half_angle) + pinch_guard_quadrant_margin;
         intersection() {
             full_ring();
             translate([fw_cx, fw_cy, stand_plate_bottom_z - 1])

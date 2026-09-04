@@ -532,26 +532,54 @@ this document is a single-interface, deterministic clearance computation.
 Two ways of reading "footprint," both reported (same convention Rev 2 used
 for its own two-tier reporting, extended here across two bays):
 
+**REV 5 FIX (MISS-034, CRITICAL)**: every figure in this section is
+recomputed below for the real 150×95mm board (was a 100×50mm proposal) —
+`hardware/mechanical-interface.md` A1/A2, `validation/open-issues.md`
+MISS-034. Flagged explicitly, per this fix's own task brief, rather than
+silently passed through: **the X dimension now ALSO exceeds REQ-308's soft
+~150mm ceiling**, not just Y as before.
+
 | Reading | X | Y | Z (height) | vs. REQ-308 (~150mm-class, "relaxed... generous soft ceiling... not to be over-engineered against") |
 |---|---|---|---|---|
-| **Shell-only** (both bay footprints as designed, tabs/skirt overhang excluded) | 107.0mm | 162.0mm | — | Y is 8.0% over the ~150mm reading |
-| **True assembled** (includes PCB-lid tab projection and containment-cap flange, the actual outermost physical extent) | 111.4mm | 170.6mm | 49.0mm | Y is 13.7% over the ~150mm reading |
+| **Shell-only** (both bay footprints as designed, tabs/skirt overhang excluded) | 157.0mm | 207.0mm | — | X is 4.7% over (**NEW** — was under the ~150mm reading pre-Rev-5); Y is 38.0% over (was 8.0%) |
+| **True assembled** (includes PCB-lid tab projection and containment-cap flange, the actual outermost physical extent) | 161.4mm | 215.6mm | 49.0mm | X is 7.6% over (**NEW**); Y is 43.7% over (was 13.7%) |
 
 REQ-308 explicitly frames ~150mm as a relaxed, generous **soft** ceiling, not
 a hard limit, and explicitly cautions against over-engineering to hit it
-exactly. 8–14% over is judged acceptable given: (a) the flywheel's own
-rotation-clearance diameter (76mm) plus a structurally-justified 4mm
-containment wall plus a 9mm flange projection for the cap-bolt bosses is a
-real physical lower bound, not a padding choice — the flywheel bay's own
-minimum footprint is 2×(43.5+9.0) = 105.0mm across; (b) the PCB bay's own
-107mm side was inherited from the interface file's own board width (§4), not
-from the Mechanical Lead's discretion. The Y-dimension overrun is
-acknowledged as a genuine, disclosed trade-off (see §10 for the alternative
-layout that was considered and rejected), not something silently absorbed.
+exactly. This revision's own overshoot is materially larger than Rev 3/4's
+own 8–14% (X now also overshoots, and Y's own overshoot roughly tripled from
+13.7% to 43.7%), judged against the same standard that already accepted the
+smaller Rev 3/4 overshoot: (a) the flywheel bay's own footprint (the
+dominant driver of the Y overshoot) is unchanged by this resize — it was
+already a real, structurally-justified physical lower bound, not a padding
+choice, and remains exactly as it was; (b) the PCB bay's own now-157×102mm
+footprint is not this Mechanical Lead's own discretionary choice either —
+it is `interior_x`/`interior_y` (real board 150×95mm + a fixed keepout/wall
+margin, §4.2) plus `board_xy_keepout`(1.5mm)/`wall_t`(2.0mm), both of which
+were independently re-checked this pass (see the sanity-check note at the
+end of §4.2) and remain reasonable at this new scale, not blindly carried
+over. Unlike the Rev 3/4 overshoot (driven by the flywheel/containment
+subsystem's own real physical minimums), this revision's ADDITIONAL
+overshoot is driven entirely by a real, external, non-negotiable fact — the
+real PCB is 2.85× the area of the Rev 3 proposal this envelope was
+originally sized against — not by a Mechanical Lead design choice at all.
+REQ-308 remains a "Should"/soft sanity bound, not a hard ceiling, and the
+design still fits comfortably on a desk and is liftable one-handed per
+REQ-308's own qualitative intent, but this is flagged here explicitly, per
+this fix's own task brief, rather than silently passed through uncommented
+— a human Chief Engineer re-affirmation that this larger overshoot remains
+acceptable is recommended (mirroring how the original 8-14% overshoot was
+itself an explicit, disclosed trade-off, not a silent pass) even though
+REQ-308 is a soft bound and this fix does not treat it as a new blocking
+finding on its own.
 The X/Y figures above are unaffected by the Rev 3.1 fixes (MISS-008 is a
 Z-only correction; MISS-009's void and MISS-010's relief notches are both
 internal/inset and never touch an outer boundary) — only the height column
-changed.
+changed, and that height column is itself unaffected by THIS revision's own
+PCB resize (confirmed: `pcb_bay_total_height`=23.1mm and
+`fw_bay_total_height`=49.0mm are both formula-independent of
+`pcb_length`/`pcb_width` — neither depends on board XY size, only on
+Z-stack constants that this resize did not touch).
 
 **Total height corrected, Rev 3.1 (MISS-008):** 43.0mm → **49.0mm**, set
 entirely by the **flywheel bay's** own Z-stack (§7, §4.4), which is more
@@ -561,7 +589,8 @@ of the two, not their sum. The pre-fix 43.0mm figure was itself computed
 from a Z-stack that omitted `fw_hub_collar_h` in `fw_disk_bottom` (MISS-008)
 — every downstream figure derived from it, including this overall height,
 was therefore stale until the fix cascaded through. See §4.4 and §11.G for
-the full corrected derivation.
+the full corrected derivation. **Unaffected by Rev 5's PCB resize** (Z-stack
+is board-size-independent, confirmed above).
 
 ---
 
@@ -571,56 +600,101 @@ the full corrected derivation.
 
 | Parameter | Value | Unit | Confidence | Source |
 |---|---|---|---|---|
-| `pcb_length` | 100 | mm | CONFIRMED | Interface A2 |
-| `pcb_width` | 50 | mm | CONFIRMED | Interface A2 |
+| `pcb_length` | 150 | mm | CONFIRMED | Interface A2. **REV 5 FIX (MISS-034, CRITICAL)**: was 100, marked CONFIRMED against a proposal the interface file itself only ever marked ASSUMPTION — that mislabeling (a stale value hardened into an unqualified CONFIRMED) was itself the defect MISS-034 identified. The real value is sourced directly to the KiCad `Edge.Cuts` layer, independently re-verified this session (not re-derived secondhand from the interface file alone) |
+| `pcb_width` | 95 | mm | CONFIRMED | Interface A2. **REV 5 FIX**: was 50, same defect/correction as above |
 | `pcb_thickness` | 1.6 | mm | CONFIRMED | Interface A2 (standard 2-layer stack, unchanged from Rev 2) |
-| `top_component_clearance` | 11 | mm | CONFIRMED | Interface A3 — tallest top-side part is J4 barrel jack (per interface's own component-height table) |
+| `top_component_clearance` | 11 | mm | CONFIRMED | Interface A3 — tallest top-side part is J4 barrel jack (per interface's own component-height table). **Not re-verified against the real board's own component set this pass** — out of MISS-034's own scope (board outline + hole pattern), see the disclosure note after this table |
 | `bottom_component_clearance` | 0 | mm | CONFIRMED | Interface A3 — no bottom-side components populated |
-| Board mounting holes MH-1..4 | (3.5,3.5), (96.5,3.5), (96.5,46.5), (3.5,46.5), ⌀2.8mm clearance (M2.5) | mm | CONFIRMED | Interface A1 (corner pattern, unchanged in kind from Rev 2, repositioned for the new 100×50 outline) |
-| Board mounting holes MH-5/6 | (85,3.5), (85,46.5), ⌀2.8mm clearance (M2.5) | mm | CONFIRMED | Interface A1 — added specifically near the motor-driver zone for extra board rigidity close to the new high-current/switching components |
-| J1 (existing header) | (0,25), 9.5×6mm cutout, ref. height 3.2mm | mm | CONFIRMED | Interface A4, unchanged position/size from Rev 2 |
-| J2, J3 (existing headers) | (16,50), (30,50) | mm | CONFIRMED | Interface A4, unchanged from Rev 2 |
-| SW1 (button) | (44,50) | mm | CONFIRMED | Interface A4, unchanged from Rev 2 |
-| D1 (LED) | (10,37.5) | mm | CONFIRMED | Interface A4 — Y-position rescaled from Rev 2's 30mm by the same 1.25× board-width growth ratio applied to all original sensor-zone parts |
-| J4 (barrel jack, motor supply) | (100,25), edge-mounted | mm | CONFIRMED position / **ESTIMATE cutout diameter** | Interface A4 for position; `j4_cut_dia`=10.0mm is this Mechanical Lead's own outside-knowledge estimate for a generic 5.5/2.1mm barrel jack, no datasheet cited in the interface file — flagged for pre-build re-verification |
-| MC-1 (motor phase-wire pigtail) | (92,0), bottom edge, wire exit −Y | mm | CONFIRMED | Interface A4 — **wire-lead, not PCB-trace**, per interface's explicit note; this is a board-edge exit point, not a component footprint |
+| Board mounting holes MH-1..4 | (8,8), (142,8), (142,87), (8,87), ⌀2.8mm clearance (M2.5) | mm | CONFIRMED | Interface A2. **REV 5 FIX (MISS-034)**: real KiCad `MountingHole_2.7mm_M2.5` footprint positions (4 found, independently counted in the raw `.kicad_pcb` this session), replacing the prior 3.5mm-inset PROPOSAL |
+| ~~Board mounting holes MH-5/6~~ | ~~(85,3.5), (85,46.5)~~ | — | **REMOVED, REV 5 FIX** | The real board has only 4 mounting holes — this Rev 3 "motor-zone" mid-edge pair never existed on the real board (see interface file A2's own re-derivation note) |
+| J1 (existing header) | (0,25), 9.5×6mm cutout, ref. height 3.2mm | mm | CONFIRMED | Interface A4, unchanged position/size from Rev 2. **Disclosure, new this session**: NOT re-verified against the real board's own component placement — see the disclosure note after this table |
+| J2, J3 (existing headers) | (16,50), (30,50) | mm | CONFIRMED | Interface A4, unchanged from Rev 2. Same disclosure as J1 above |
+| SW1 (button) | (44,50) | mm | CONFIRMED | Interface A4, unchanged from Rev 2. Same disclosure as J1 above |
+| D1 (LED) | (10,37.5) | mm | CONFIRMED | Interface A4 — Y-position rescaled from Rev 2's 30mm by the same 1.25× board-width growth ratio applied to all original sensor-zone parts. Same disclosure as J1 above |
+| J4 (barrel jack, motor supply) | (100,25), edge-mounted | mm | CONFIRMED position / **ESTIMATE cutout diameter** | Interface A4 for position; `j4_cut_dia`=10.0mm is this Mechanical Lead's own outside-knowledge estimate for a generic 5.5/2.1mm barrel jack, no datasheet cited in the interface file — flagged for pre-build re-verification. Same disclosure as J1 above — **and note this table's own (100,25) is now stale relative to the `.scad`'s own live formula** (`j4_x=pcb_length`, `j4_y=pcb_width/2`), which auto-cascaded to (150,47.5) once `pcb_length`/`pcb_width` were fixed, since that formula was never itself wrong, only its INPUTS were |
+| MC-1 (motor phase-wire pigtail) | (92,0), bottom edge, wire exit −Y | mm | CONFIRMED | Interface A4 — **wire-lead, not PCB-trace**, per interface's explicit note; this is a board-edge exit point, not a component footprint. Same disclosure as J1 above (this coordinate is a hardcoded literal in the `.scad`, not a formula, so it did NOT auto-cascade with the resize) |
 | M1 motor body | ⌀27mm × 18.5mm height, ⌀3mm shaft | mm | CONFIRMED | Interface B1, `DS-MTR-021` |
 | M1 mounting-bolt pattern | 12mm square, 4× holes | mm | **ASSUMPTION** | Interface B1 flags this as an open item — no confirmed datasheet bolt-pattern; a generic hobbyist-brushless-outrunner convention is assumed here, explicitly flagged NOT T-Motor-specific |
 | Flywheel disk | ⌀60mm × 4.5mm, mild steel, ρ=7850 kg/m³ | mm / kg/m³ | **ASSUMPTION** | Interface B2 — back-computed against the electrical team's target rotational inertia; 4.505mm recomputed vs. 4.5mm stated is a consistency check, not an independent confirmation |
 | Rotation clearance envelope | ⌀76mm × 10.5mm axial | mm | CONFIRMED (derivation) | Interface B5 — `fw_radial_margin`=8mm, `fw_axial_margin_per_face`=3mm, both interface-stated safety margins around the disk's own swept volume |
 | Print material | PETG | — | ASSUMPTION | Interface B6 |
-| Total assembly mass | ≈149–150g (board ≈19–20g populated + motor ≈30g + flywheel 100g, enclosure plastic itself is additional) | g | ESTIMATE | Interface A5/B1/B2/B7 — context only, not a driving mechanical dimension at this scale; no structural deflection/FEA analysis performed (out of Phase 1 scope) |
+| Total assembly mass | ≈176.5–177.2g (board ≈46.5–47.2g populated + motor ≈30g + flywheel 100g, enclosure plastic itself is additional) | g | ESTIMATE | Interface A5/B1/B2/B7 — context only, not a driving mechanical dimension at this scale; no structural deflection/FEA analysis performed (out of Phase 1 scope). **REV 5 FIX**: was ≈149–150g, +≈27.4g driven by the bare-board mass recompute (interface A5) |
+
+**Disclosure, new this session (connector/component positions, A4)**: this
+fix's own scope (MISS-034) is the board **outline** (`pcb_length`/
+`pcb_width`) and **mounting-hole pattern** (MH-1..4) only — it does
+**not** re-derive J1/J2/J3/SW1/D1/J4/MC-1's own positions against the real
+board's actual component placement, which a real cross-check against
+`hardware/pcb/bench-imu-01/generate_pcb.py`'s own `PLACEMENT` dict this
+session shows are at materially different real coordinates for every one of
+these reference designators (e.g. real J1 at (13,25) not (0,25); real J2 at
+(62,10) not (16,50)). This is a genuinely separate, larger undertaking
+(full footprint/courtyard re-analysis, not a dimensional resize) — logged
+as a new, separate finding (see `validation/open-issues.md`, cross-
+referencing the already-open FMEA-007, which anticipated exactly this gap:
+"before physical fabrication..., produce a real PCB layout... and re-run
+Independent Mechanical Review against the real component placement,
+re-confirming every ASSUMPTION/ESTIMATE row"). **Not fixed in this pass.**
 
 ### 4.2 PCB-bay own-design values (formulas unchanged from Rev 2; only resulting numbers changed because the board itself grew)
+
+**Sanity-check, new this session (per this fix's own task brief — "don't
+assume Rev 2-era margins are still appropriate for a board 2.85× the
+assumed area without a moment's real check")**: `board_xy_keepout`(1.5mm)
+and `wall_t`(2.0mm) are both ABSOLUTE (not board-size-proportional) margins,
+so the question is whether they remain physically adequate for a board
+this much larger, not whether they need to scale with area. Back-of-
+envelope against typical FR4 bow/twist guidance (no board-specific
+datasheet/IPC-6012 class citation exists in this repo for this exact
+board — flagged as a real gap, not silently assumed away): at a
+commonly-cited ~0.75% of diagonal, the new 177.8mm diagonal (was 111.8mm)
+implies up to ≈1.33mm of potential bow (was ≈0.84mm) — this consumes
+roughly 89% of the 1.5mm `board_xy_keepout` margin (was ≈56%), leaving
+comparatively little spare for standoff-position tolerance stack-up on top
+of bow alone. This is **flagged as a real, tightened margin, not a
+pass/fail verdict** (no FEA or physical bow measurement exists for this
+board, consistent with this project's own already-disclosed "no structural
+deflection/FEA analysis performed, out of Phase 1 scope" limitation) —
+recommended for explicit re-confirmation before physical fabrication,
+alongside the connector-position disclosure above. `wall_t`(2.0mm) is
+this design's own minimum-FDM-wall-thickness convention (a print-process
+property, not a board-size-driven one) and remains adequate for
+printability at any board size; whether the now-longer, larger flat wall
+PANELS (not the wall thickness itself) need additional stiffening ribs
+against handling flex is an unquantified, un-FEA'd question at this scale,
+same disclosed-limitation class as the rest of this project's structural
+treatment — not newly introduced by this fix, but more consequential at
+this larger scale, and noted here rather than silently carried forward
+unremarked.
 
 | Parameter | Value | Unit | Confidence | Rationale |
 |---|---|---|---|---|
 | `fit_clearance` | 0.2 | mm | Carried, re-justified §2 | FDM fit allowance |
-| `min_wall_t`/`wall_t`/`floor_t` | 2.0 | mm | Carried, re-justified §2 | Minimum FDM wall |
-| `board_xy_keepout` | 1.5 | mm | DERIVED | Same margin rule as Rev 2, applied around the new 100×50 outline |
+| `min_wall_t`/`wall_t`/`floor_t` | 2.0 | mm | Carried, re-justified §2 | Minimum FDM wall — see this section's own sanity-check note above for the Rev 5 re-check at the new scale |
+| `board_xy_keepout` | 1.5 | mm | DERIVED | Same margin rule as Rev 2, applied around the real 150×95 outline (**REV 5 FIX**: was applied around the 100×50 proposal) — see this section's own sanity-check note above |
 | `standoff_od` | 6.0 | mm | DERIVED | Unchanged formula (2× `standoff_pilot_dia` + wall margin) |
 | `standoff_pilot_dia` | 2.0 | mm | Carried | Self-tap pilot for M2.5, unchanged |
 | `standoff_h` | 6.0 | mm | DERIVED | = `bottom_component_clearance`(0) + margin — same formula as Rev 2, coincidentally close in value only because Rev 2's own bottom clearance was also small |
 | `screw_len` | 6.0 | mm | Carried | M2.5 self-tap screw length, unchanged |
 | `z_margin` | 0.5 | mm | Carried | Same stack-up margin convention as Rev 2 |
-| `base_interior_h` | 19.1 | mm | DERIVED | = `standoff_h` + `pcb_thickness` + `top_component_clearance` + `z_margin` = 6.0+1.6+11.0+0.5 |
-| `base_total_h` | 21.1 | mm | DERIVED | = `base_interior_h` + `floor_t` |
+| `base_interior_h` | 19.1 | mm | DERIVED | = `standoff_h` + `pcb_thickness` + `top_component_clearance` + `z_margin` = 6.0+1.6+11.0+0.5 — **unaffected by the Rev 5 PCB-outline resize** (formula-independent of `pcb_length`/`pcb_width`) |
+| `base_total_h` | 21.1 | mm | DERIVED | = `base_interior_h` + `floor_t` — unaffected by Rev 5 |
 | `lid_lip_h` | 3.0 | mm | Carried | Unchanged skirt-overlap depth |
 | `lid_roof_t`/`lid_skirt_t` | 2.0 | mm | Carried | = `min_wall_t` |
-| `pcb_bay_total_height` | 23.1 | mm | DERIVED | = `base_total_h` + `lid_roof_t` |
-| `interior_x` / `interior_y` | 103 / 53 | mm | DERIVED | = `pcb_length`/`pcb_width` + 2×`board_xy_keepout` |
-| `base_outer_x` / `base_outer_y` | 107 / 57 | mm | DERIVED | = interior + 2×`wall_t` |
-| `lid_skirt_inner_x` / `_y` | 107.4 / 57.4 | mm | DERIVED | = `base_outer` + 2×`fit_clearance` |
-| `lid_skirt_outer_x` / `_y` | 111.4 / 61.4 | mm | DERIVED | = skirt-inner + 2×`lid_skirt_t` |
-| `board_offset_x` / `_y` | 3.5 / 3.5 | mm | DERIVED | = `wall_t` + `board_xy_keepout` |
-| `j1_cut_w`/`_h`/`_z` | 9.5 / 6 / 6 | mm | Carried | Unchanged from Rev 2 — same connector, same size |
-| `j4_cut_dia`/`_z` | 10 / 6 | mm | **ESTIMATE** | New Rev 3 cutout — see §4.1 flag |
+| `pcb_bay_total_height` | 23.1 | mm | DERIVED | = `base_total_h` + `lid_roof_t` — unaffected by Rev 5 |
+| `interior_x` / `interior_y` | 153 / 98 | mm | DERIVED | = `pcb_length`/`pcb_width` + 2×`board_xy_keepout`. **REV 5 FIX**: was 103/53 |
+| `base_outer_x` / `base_outer_y` | 157 / 102 | mm | DERIVED | = interior + 2×`wall_t`. **REV 5 FIX**: was 107/57 |
+| `lid_skirt_inner_x` / `_y` | 157.4 / 102.4 | mm | DERIVED | = `base_outer` + 2×`fit_clearance`. **REV 5 FIX**: was 107.4/57.4 |
+| `lid_skirt_outer_x` / `_y` | 161.4 / 106.4 | mm | DERIVED | = skirt-inner + 2×`lid_skirt_t`. **REV 5 FIX**: was 111.4/61.4 |
+| `board_offset_x` / `_y` | 3.5 / 3.5 | mm | DERIVED | = `wall_t` + `board_xy_keepout` — unaffected by Rev 5 (a fixed-margin formula, not board-size-dependent) |
+| `j1_cut_w`/`_h`/`_z` | 9.5 / 6 / 6 | mm | Carried | Unchanged from Rev 2 — same connector, same size. See §4.1's own new connector-position disclosure |
+| `j4_cut_dia`/`_z` | 10 / 6 | mm | **ESTIMATE** | New Rev 3 cutout — see §4.1 flag. See §4.1's own new connector-position disclosure |
 | `bay_edge_margin` | 1.5 | mm | Carried | Unchanged component-keepout-to-bay-wall rule |
-| `bay_x_min`/`_max` | 9.5 / 48.0 | mm | DERIVED | Numerically **unchanged from Rev 2** — governed entirely by the original sensor-zone parts (J2 at X=16, SW1 at X=44), whose X-positions did not move when the board grew in length |
-| `bay_y_min` | 42.5 | mm | DERIVED | Rescaled from Rev 2's 32.5mm by the board's own Y-growth |
-| Tab positions (corners only) | (3.5,3.5,dy−1), (96.5,3.5,dy−1), (96.5,46.5,dy+1), (3.5,46.5,dy+1) | mm | DERIVED | Repositioned to the new board corners; same 4-corner convention as Rev 2 |
+| `bay_x_min`/`_max` | 9.5 / 48.0 | mm | DERIVED | Numerically **unchanged, still**, by Rev 5 — governed entirely by the sensor-zone parts' own board-local X positions (J2 at X=16, SW1 at X=44), which the `.scad`'s own formula never rescales with board length (only Rev-2→Rev-3's original board-length extension changed length, not these already-carried-forward X positions) |
+| `bay_y_min` | 87.5 | mm | DERIVED | **REV 5 FIX**: was 42.5 — rescaled by the board's own Y-growth (`pcb_width`), same formula/mechanism Rev 3 itself already used once (`(pcb_width-6)-bay_edge_margin`) |
+| Tab positions (corners only) | (8,8,dy−1), (142,8,dy−1), (142,87,dy+1), (8,87,dy+1) | mm | DERIVED | **REV 5 FIX**: was (3.5,3.5)/(96.5,3.5)/(96.5,46.5)/(3.5,46.5) — repositioned to the real board's own 4 corner mounting holes (MH-1..4 above); same 4-corner convention as Rev 2/3 |
 | `tab_w`/`tab_project`/`tab_base_t` | 8 / 6 / 5.6 | mm | Carried | Unchanged tab geometry |
-| `tab_relief_margin` | 1.0 | mm | **ASSUMPTION, new Rev 3.1 (MISS-010 fix)** | Y-direction margin added on each side of `lid_skirt_t`(2.0mm) when sizing the relief notch `lid_shell()` now cuts at each of the 4 `tab_positions`, so the notch (4.0mm total Y) clears `base_tab()`'s outward projection with margin rather than exactly at the boundary — same "small explicit cut-tool overshoot" convention already used throughout this file (e.g. the existing "+1"/"+2" pattern on cylinder/cube heights elsewhere), not a newly-invented rule. See §11.C, §11.G. |
+| `tab_relief_margin` | 1.0 | mm | **ASSUMPTION, new Rev 3.1 (MISS-010 fix)** | Y-direction margin added on each side of `lid_skirt_t`(2.0mm) when sizing the relief notch `lid_shell()` now cuts at each of the 4 `tab_positions`, so the notch (4.0mm total Y) clears `base_tab()`'s outward projection with margin rather than exactly at the boundary — same "small explicit cut-tool overshoot" convention already used throughout this file (e.g. the existing "+1"/"+2" pattern on cylinder/cube heights elsewhere), not a newly-invented rule. See §11.C, §11.G. **Confirmed still adequate at the Rev 5 scale**: this margin is a fixed Z-band-width quantity (independent of board XY size, only depends on `lid_skirt_t`/`fit_clearance`, neither of which changed) — re-checked, not merely assumed. |
 
 ### 4.3 Motor-mount own-design values (new in Rev 3)
 
@@ -677,10 +751,12 @@ the full corrected derivation.
 Numbered to match the Mechanical Reviewer's own 10-item checklist (§15
 reproduces it verbatim for the self-check):
 
-1. **PCB mounting** — 6 standoffs (`base_standoffs()`) at MH-1..6, unchanged
-   mechanism from Rev 2 (heat-formed/self-tap pilot bosses), now 6 instead of
-   4 because the interface file added MH-5/6 for rigidity near the new
-   motor-driver zone.
+1. **PCB mounting** — 4 standoffs (`base_standoffs()`) at MH-1..4. **REV 5
+   FIX (Mechanical Reviewer Cycle 11, Finding 1)**: was "6 standoffs at
+   MH-1..6" — the real board has only 4 mounting holes; the Rev 3 MH-5/6
+   "motor-zone rigidity" pair never existed on the real board and has been
+   removed, not repositioned (see `hardware/mechanical-interface.md` A2's
+   own re-derivation note).
 2. **Connector accessibility** — see §10, all cutouts sized/positioned from
    interface-file coordinates; the one new judgment call (the ~42mm wire run
    from the duct to MC-1's actual position) is disclosed there, not buried.
@@ -1532,30 +1608,40 @@ folded into this one).
 
 ## 10. Connector / header / button / LED / motor-wiring accessibility
 
+**REV 5 FIX (Mechanical Reviewer Cycle 11, Finding 1, 2026-09-04)**: 5 of
+the 7 rows below were left stale after the MISS-034 PCB resize — this
+table's own values were not reconciled in the same pass that correctly
+updated §3/§4.1/§4.2, an independently-confirmed real documentation-
+traceability defect (the underlying `.scad` geometry itself was always
+correct — this table's own prose fell behind it). Corrected below directly
+from a live `openscad echo()` of the current `.scad` file, matching the
+same live-derivation method used everywhere else in this Rev 5 pass —
+**not** re-derived from A4 (out of MISS-034's/MISS-037's own scope, see
+§4.1's own disclosure note).
+
 | Ref | Board-local position | Cutout | Confidence | Note |
 |---|---|---|---|---|
-| J1 | (0,25) | 9.5×6mm, Z 0–6mm | CONFIRMED | Unchanged from Rev 2 |
-| J2 | (16,50) | pass-through header, no dedicated cutout beyond the bay opening | CONFIRMED | Unchanged from Rev 2 |
-| J3 | (30,50) | pass-through header | CONFIRMED | Unchanged from Rev 2 |
-| SW1 | (44,50) | accessible through bay opening | CONFIRMED | Unchanged from Rev 2 |
-| D1 | (10,37.5) | visible through bay opening | CONFIRMED | Y-position rescaled from Rev 2's 30mm |
-| J4 | (100,25), edge | ⌀10.0mm, Z 0–6mm | ESTIMATE (diameter) | New in Rev 3; position confirmed, diameter is this Mechanical Lead's own estimate |
-| MC-1 | (92,0), bottom edge | No dedicated board-edge cutout modeled — wire exits the board at this point and is routed internally to the wire duct | CONFIRMED (position) | New in Rev 3; wire-lead, not a component footprint |
+| J1 | (0,47.5) | 9.5×6mm, Z 0–6mm | CONFIRMED | **REV 5 FIX**: was (0,25) — `j1_y`=`pcb_width`/2 is a live formula, auto-re-centered on the new 95mm board width |
+| J2 | (16,95) | pass-through header, no dedicated cutout beyond the bay opening | CONFIRMED | **REV 5 FIX**: was (16,50) — `j2_y`=`pcb_width`, auto-tracks the board's new top edge |
+| J3 | (30,95) | pass-through header | CONFIRMED | **REV 5 FIX**: was (30,50), same mechanism as J2 |
+| SW1 | (44,95) | accessible through bay opening | CONFIRMED | **REV 5 FIX**: was (44,50), same mechanism as J2 |
+| D1 | (10,37.5) | visible through bay opening | CONFIRMED | Y-position rescaled from Rev 2's 30mm. Unaffected by Rev 5 — `d1_y` is a hardcoded literal in the `.scad`, not a formula referencing `pcb_width`, so it does not auto-track board-width changes (unlike J1–SW1 above) |
+| J4 | (150,47.5), edge | ⌀10.0mm, Z 0–6mm | ESTIMATE (diameter) | **REV 5 FIX**: was (100,25) — `j4_x`=`pcb_length`, `j4_y`=`pcb_width`/2, both live formulas, auto-moved to the new right edge and re-centered. Diameter is this Mechanical Lead's own estimate, unaffected by the resize |
+| MC-1 | (92,0), bottom edge | No dedicated board-edge cutout modeled — wire exits the board at this point and is routed internally to the wire duct | CONFIRMED (position) | New in Rev 3; wire-lead, not a component footprint. Unaffected by Rev 5 — `mc1_x`/`mc1_y` are hardcoded literals, not formulas |
 
-**The wire-routing disclosure (important, not to be glossed over):** the
-flywheel bay's own wire duct is centered at `fw_cx`=53.5mm — the PCB's own
-X-midpoint — because the flywheel bay's own layout was centered on the PCB
-bay's width for a cleaner, narrower overall footprint (§3, the "master XY
-layout trade-off," `.scad` lines 497–519). MC-1's actual proposed board
-position is X=92mm. This means the wire duct's exit point does **not** land
-directly under or adjacent to MC-1 — there is a real ~42mm X-offset between
-where the motor's wire pigtail enters the enclosure interior (at the duct)
-and where it must connect on the board (at MC-1). The wire must run along
-the interior floor for that distance. This was a deliberate, disclosed
-trade-off (a width-centered flywheel bay vs. a motor-zone-centroid-aligned
-one, which would have produced a wider but shorter overall footprint,
-closer to 140×160mm-class rather than 107×162mm) — not an oversight. No
-routing channel/clip is modeled for this 42mm run (out of the detailed
+**The wire-routing disclosure (important, not to be glossed over) — REV 5
+FIX (Mechanical Reviewer Cycle 11, Finding 1)**: the flywheel bay's own
+wire duct is centered at `fw_cx`=**78.5mm** (was 53.5mm pre-Rev-5) — still
+the PCB bay's own X-midpoint (`base_outer_x`/2), because the flywheel
+bay's own layout is centered on the PCB bay's width for a cleaner,
+narrower overall footprint (§3, the "master XY layout trade-off," `.scad`
+lines 497–519, formula unchanged by Rev 5). MC-1's actual proposed board
+position is still X=92mm (a hardcoded literal, unaffected by the resize —
+see table above). This means the duct-to-MC-1 X-offset is now
+**|92−78.5|=13.5mm** (was ~42mm pre-Rev-5) — a **smaller**, more favorable
+offset than before, not a new problem; the resize happened to move the
+flywheel-bay axis closer to MC-1's own fixed X-position. No routing
+channel/clip is modeled for this run (out of the detailed
 cable-exit-geometry scope this project has explicitly deferred,
 `docs/architecture-evolution.md` §13) — the wire is expected to simply lie
 along the interior floor, which is judged acceptable for a low-wire-count,
@@ -1566,7 +1652,8 @@ idealized, condition.
 `top_component_clearance`=11mm (driven by J4, the tallest top-side part per
 the interface file) sets `base_interior_h` via the same formula Rev 2 used;
 `bottom_component_clearance`=0mm means no standoff-height allowance is needed
-beyond the base standoff height itself.
+beyond the base standoff height itself. Both figures are unaffected by the
+Rev 5 PCB resize (component-height facts, not board-XY-size facts).
 
 ---
 
@@ -1796,7 +1883,7 @@ Three fastener classes this revision (Rev 2 had one):
 
 | Joint | Fastener | Count | Placement rationale |
 |---|---|---|---|
-| PCB lid ↔ base | M2.5 self-tapping, into `standoff()` pilot bosses | 6 (at MH-1..6) | Unchanged mechanism from Rev 2, now at 6 positions instead of 4 |
+| PCB lid ↔ base | M2.5 self-tapping, into `standoff()` pilot bosses | 4 (at MH-1..4) | **REV 5 FIX (Mechanical Reviewer Cycle 11, Finding 1)**: was "6 (at MH-1..6)" — the real board has only 4 mounting holes (see §10's own Rev 5 fix note). Mechanism unchanged from Rev 2 |
 | Motor ↔ platform boss | Plain M3 clearance-fit, through-hole | 4 (assumed square pattern, §4.3) | Deliberately a **reversible, direction-agnostic** joint — which side of the joint is threaded is UNKNOWN (not in the interface file), so plain through-holes were chosen specifically because they work regardless of which side ends up threaded, avoiding a decision that depends on an unconfirmed fact |
 | Containment cap ↔ base flange | M3 into heat-set brass inserts | 6 (evenly spaced, `bolt_circle_r`=48mm) | Heat-set inserts chosen (over self-tapping directly into PETG) specifically because this joint is a **safety-relevant** one (§8) — a threaded metal insert holds torque and resists strip-out far better than a directly-tapped plastic hole, appropriate for a joint that must not fail under the same event it is meant to contain |
 
@@ -1895,8 +1982,12 @@ either.)
 Re-derived from scratch for 3 pieces (Rev 2's 2-piece sequence does not
 extend directly):
 
-1. Insert PCB into the base, seating on the 6 standoffs (MH-1..6).
-2. Fasten the PCB lid onto the base with 6× M2.5 self-tapping screws through
+1. Insert PCB into the base, seating on the 4 standoffs (MH-1..4). **REV 5
+   FIX (Mechanical Reviewer Cycle 11, Finding 1)**: was "6 standoffs
+   (MH-1..6)" — see §10/§12's own Rev 5 fix notes; the sequence itself is
+   unaffected by the corrected count.
+2. Fasten the PCB lid onto the base with 4× M2.5 self-tapping screws
+   (**REV 5 FIX**: was "6×") through
    the lid tabs into the base standoffs — this closes and seals the PCB bay
    completely before any motor/flywheel work begins, so the board is fully
    protected during the more manual motor/flywheel assembly steps that
@@ -1950,7 +2041,11 @@ item below states both the pre-existing Rev 3 assessment and what Rev 3.1
 specifically re-checked or changed.
 
 1. **PCB mounting** — ✅ 6 standoffs at interface-confirmed MH-1..6 positions
-   (§5.1, §4.1). **Rev 3.1 re-check:** unaffected — none of the 3 fixes touch
+   (§5.1, §4.1) — historical Rev 3.1 assessment, preserved as-written.
+   **REV 5 status (2026-09-04, Mechanical Reviewer Cycle 11 sweep)**: no
+   longer current — the real board has only 4 mounting holes; see
+   §5/§10/§12/§14's own Rev 5 fix notes for the corrected, current 4-standoff
+   figure. **Rev 3.1 re-check:** unaffected — none of the 3 fixes touch
    PCB-bay standoff geometry.
 2. **Connector accessibility** — ✅ all 7 connectors/features addressed; one
    disclosed trade-off (MC-1 wire-run distance, §10), not a silent gap.
@@ -2166,6 +2261,38 @@ interface-level summary) and `bench-imu-01-enclosure.scad`'s new "2B. REV 4"
 "reviewed" or "approved" — a fresh Independent Mechanical Review pass
 covering this section specifically is the required next step
 (`.github/agents/mechanical-lead.agent.md`, "Out of scope").
+
+**18.0.1 REV 5 DISCLOSED GAP (new this session, MISS-034 side effect —
+NOT independently re-derived, flagged rather than silently carried
+forward or guessed at).** This entire §18 (CG/tip-over analysis, §18.3
+specifically) was derived against the Rev 3 `fw_cx`=53.5mm axis and a
+≈601.8g/≈404.5g (total/rotating) mass baseline that itself assumed the
+100×50mm board proposal. Rev 5's PCB resize (MISS-034) moves `fw_cx` to
+78.5mm (still exactly `base_outer_x`/2, by the same formula — the
+assembly's own X-symmetry-about-the-axis relationship is preserved in
+KIND, so the CG offset's own X-component, already reported as
+"negligible, +0.11mm" pre-Rev-5, likely remains small) and increases the
+bare-board mass by +27.4g (§4.1's own reconciliation, a modest +6.8% of
+the ≈405.55g rotating-assembly mass). **What was, and was not, checked
+this session**: `hardware/mechanical-interface.md` A5's own reconciliation
+note computes the MASS-ONLY effect on the total system mass (≈1173.4g →
+≈1200.8g, a proportional, order-of-magnitude tip-over-margin sanity check,
+concluding ≈6.2×→≈6.06×) — this is a real but DELIBERATELY BOUNDED check,
+not a full re-derivation. It does NOT re-derive the CG OFFSET DISTANCE
+itself (the 14.30mm figure in §18.3 below), which depends on WHERE the
+now-larger PCB bay's own added mass sits relative to the new axis, not
+merely how much of it there is — since the PCB bay extends further north
+(larger `base_outer_y`) at a materially heavier mass, the true CG offset
+plausibly grows by more than the mass-only 6.8% figure suggests, and this
+session did not compute by how much. **This is a genuine, disclosed,
+unresolved gap** — not asserted safe, not asserted unsafe — requiring a
+dedicated Mechanical Lead pass to re-run §18.3's own from-scratch CG/
+tip-over sweep (the same method, against the Rev 5 geometry/mass) before
+this revision's own tip-over safety margin can be re-confirmed with the
+same rigor the original Rev 4 analysis used. Logged as a new, separate,
+non-blocking (LOW/MEDIUM pending actual re-derivation — severity not yet
+determinable without doing the recompute) open item — see
+`validation/open-issues.md`.
 
 **18.1 Bearing physical facts.** Source: BC Precision 4LS-3 lazy-susan
 turntable ball bearing, Evidence ID **DS-BRG-001**
