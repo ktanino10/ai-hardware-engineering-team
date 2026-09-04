@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bench-IMU-01 — Project Dashboard</title>
+<style>
+  :root{
+    --bg:#0a1628; --panel:#0d1f3c; --line:#1c3a63;
+    --ink:#dce8f7; --dim:#5c7699; --accent:#4fd3ff;
+    --warn:#ffb03a; --crit:#ff5a5a; --good:#3ee08a; --mid:#f0c96a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:"Segoe UI",Arial,sans-serif;}
+  a{color:var(--accent);}
+  #app{max-width:1180px;margin:0 auto;padding:0 20px 60px;}
+
+  header{display:flex;align-items:flex-start;justify-content:space-between;
+    gap:16px;padding:20px 0;border-bottom:1px solid var(--line);
+    flex-wrap:wrap;}
+  header h1{font-size:20px;margin:0 0 4px;font-weight:600;}
+  header .sub{font-size:12px;color:var(--dim);line-height:1.6;max-width:640px;}
+  header .sub b{color:var(--ink);}
+  .header-actions{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+  .header-actions a{font-size:12.5px;text-decoration:none;}
+  #refresh-btn{background:var(--panel);border:1px solid var(--line);color:var(--ink);
+    padding:7px 14px;border-radius:6px;font-size:12.5px;cursor:pointer;transition:.15s;}
+  #refresh-btn:hover{border-color:var(--accent);color:var(--accent);}
+  #refresh-btn:disabled{opacity:.5;cursor:default;}
+  #fetch-status{color:var(--accent);}
+  #fetch-status.err{color:var(--crit);}
+
+  main{display:flex;flex-direction:column;gap:16px;margin-top:18px;}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media (max-width:820px){ .grid-2{grid-template-columns:1fr;} }
+
+  section.panel{background:var(--panel);border:1px solid var(--line);
+    border-radius:10px;padding:18px 20px;}
+  section.panel h2{font-size:14.5px;margin:0 0 12px;font-weight:600;
+    display:flex;align-items:center;gap:8px;}
+  section.panel h2 .src{font-weight:400;font-size:11px;color:var(--dim);margin-left:auto;}
+  section.panel h2 .src a{color:var(--dim);}
+  section.panel h2 .src a:hover{color:var(--accent);}
+  section.pending{border-color:#4a3820;background:#16200d;background:linear-gradient(180deg,#1a1408,#0d1f3c 60%);}
+  section.pending.clear{border-color:#1f3a2c;}
+  section.pending h2{color:var(--warn);}
+  section.pending.clear h2{color:var(--good);}
+
+  .body{font-size:12.8px;line-height:1.65;}
+  .placeholder{color:var(--dim);}
+  .err-box{color:var(--dim);font-size:12px;border:1px dashed var(--line);
+    border-radius:6px;padding:10px 12px;background:#0a1730;}
+  .err-box a{white-space:nowrap;}
+
+  /* Pending decision rows */
+  .decision-row{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);}
+  .decision-row:last-child{border-bottom:none;}
+  .decision-tag{flex:0 0 auto;font-size:9.5px;font-weight:700;letter-spacing:.04em;
+    padding:3px 7px;border-radius:10px;height:fit-content;white-space:nowrap;}
+  .decision-tag.component{background:rgba(255,176,58,.15);color:var(--warn);}
+  .decision-tag.finding-critical{background:rgba(255,90,90,.18);color:var(--crit);}
+  .decision-tag.finding-high{background:rgba(255,138,61,.18);color:#ff8a3d;}
+  .decision-tag.soft{background:rgba(92,118,153,.25);color:var(--dim);}
+  .decision-main .t{font-weight:600;color:var(--ink);}
+  .decision-main .d{color:var(--dim);margin-top:2px;}
+  .all-clear{color:var(--good);font-size:13px;font-weight:600;}
+  .all-clear .d{color:var(--dim);font-weight:400;font-size:12px;margin-top:4px;}
+
+  /* Phase pipeline */
+  .phase-row{display:flex;flex-wrap:wrap;gap:8px;}
+  .phase-chip{background:#0f2543;border:1px solid var(--line);border-radius:8px;
+    padding:8px 12px;font-size:11.8px;min-width:120px;}
+  .phase-chip .n{color:var(--dim);font-size:10px;}
+  .phase-chip .name{color:var(--ink);font-weight:600;margin-top:1px;}
+  .phase-chip .badge{display:inline-block;margin-top:5px;font-size:10px;
+    padding:2px 6px;border-radius:8px;background:rgba(255,176,58,.15);color:var(--warn);}
+  .status-lines{margin-top:14px;display:flex;flex-direction:column;gap:8px;}
+  .status-line{font-size:12px;border-left:3px solid var(--line);padding:4px 10px;color:var(--dim);}
+  .status-line b{color:var(--ink);}
+  .status-line .doc{color:var(--accent);font-size:11px;}
+
+  /* Findings grid */
+  table.mini{border-collapse:collapse;width:100%;font-size:12px;}
+  table.mini th,table.mini td{padding:5px 8px;text-align:center;border:1px solid var(--line);}
+  table.mini th{color:var(--dim);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;}
+  table.mini td.rowhead{text-align:left;font-weight:600;}
+  table.mini td.zero{color:var(--dim);}
+  .sev-CRITICAL{color:var(--crit);}
+  .sev-HIGH{color:#ff8a3d;}
+  .sev-MEDIUM{color:var(--mid);}
+  .sev-LOW{color:var(--dim);}
+  .stat-row{display:flex;gap:18px;margin-top:14px;flex-wrap:wrap;}
+  .stat{background:#0f2543;border-radius:8px;padding:8px 14px;min-width:90px;}
+  .stat .v{font-size:18px;font-weight:700;color:var(--accent);}
+  .stat .l{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.03em;}
+  .gate-check{margin-top:14px;border-top:1px solid var(--line);padding-top:12px;}
+  .gate-check .cond{display:flex;gap:8px;padding:4px 0;font-size:12px;}
+  .gate-check .ok{color:var(--good);}
+  .gate-check .bad{color:var(--crit);}
+  .gate-check .na{color:var(--dim);}
+
+  /* Activity timeline */
+  .eco-row{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:12.3px;}
+  .eco-row:last-child{border-bottom:none;}
+  .eco-row .id{flex:0 0 68px;color:var(--accent);font-weight:700;}
+  .eco-row .date{flex:0 0 82px;color:var(--dim);font-size:11px;}
+  .eco-row .txt{flex:1;color:var(--ink);}
+  .eco-row .txt .rev{color:var(--dim);display:block;font-size:11px;margin-bottom:2px;}
+  .milestones{margin-top:12px;padding-top:10px;border-top:1px solid var(--line);}
+  .milestone{font-size:11.5px;color:var(--dim);padding:3px 0;}
+  .milestone b{color:var(--warn);}
+
+  /* Mechanical/electrical */
+  .viewer-cards{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+  a.viewer-card{flex:1 1 220px;display:block;background:#0f2543;border:1px solid var(--line);
+    border-radius:8px;padding:14px 16px;color:var(--ink);text-decoration:none;transition:.15s;}
+  a.viewer-card:hover{border-color:var(--accent);}
+  a.viewer-card .t{font-size:13.5px;font-weight:600;color:var(--accent);}
+  a.viewer-card .d{font-size:11.5px;color:var(--dim);margin-top:5px;line-height:1.5;}
+  .fact-row{display:flex;gap:24px;flex-wrap:wrap;margin-top:6px;}
+  .fact{}
+  .fact .v{font-size:16px;font-weight:700;color:var(--ink);}
+  .fact .l{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.03em;}
+
+  /* Requirements snapshot */
+  .bar-row{display:flex;align-items:center;gap:10px;margin:6px 0;font-size:12px;}
+  .bar-row .label{flex:0 0 60px;color:var(--dim);}
+  .bar-row .bar-bg{flex:1;background:#0f2543;border-radius:4px;height:14px;overflow:hidden;}
+  .bar-row .bar-fg{height:100%;background:var(--accent);border-radius:4px;}
+  .bar-row .count{flex:0 0 32px;text-align:right;color:var(--ink);font-weight:600;}
+  .rev-tags{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
+  .rev-tag{background:#0f2543;border-radius:8px;padding:6px 12px;font-size:11.5px;}
+  .rev-tag .v{color:var(--accent);font-weight:700;}
+
+  footer{margin-top:26px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:11px;color:var(--dim);line-height:1.8;}
+  footer a{color:var(--dim);}
+  footer a:hover{color:var(--accent);}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div>
+      <h1>Bench-IMU-01 — Project Dashboard</h1>
+      <div class="sub">
+        <b>A live view, not a snapshot.</b> Every number below is fetched
+        directly from this repository's own requirements, findings,
+        change-log, and mechanical-interface files on <code>main</code> at
+        page load, and re-parsed in your browser — nothing here is
+        generated ahead of time or committed to git.
+        <span id="fetch-status">Loading live data from GitHub…</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="refresh-btn" type="button">⟳ Refresh</button>
+      <a href="../index.html">&larr; back</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel pending" id="section-pending">
+      <h2>⚠ Pending Human Decisions</h2>
+      <div class="body" id="pending-body"><span class="placeholder">Loading…</span></div>
+    </section>
+
+    <section class="panel" id="section-phases">
+      <h2>Phase / Process Pipeline
+        <span class="src">from <a href="https://github.com/ktanino10/ai-hardware-engineering-team/blob/main/docs/workflow.md" target="_blank" rel="noopener">docs/workflow.md</a></span>
+      </h2>
+      <div class="body" id="phases-body"><span class="placeholder">Loading…</span></div>
+    </section>
+
+    <div class="grid-2">
+      <section class="panel" id="section-findings">
+        <h2>Findings &amp; Quality Snapshot
+          <span class="src">from <a href="https://github.com/ktanino10/ai-hardware-engineering-team/blob/main/validation/open-issues.md" target="_blank" rel="noopener">open-issues.md</a></span>
+        </h2>
+        <div class="body" id="findings-body"><span class="placeholder">Loading…</span></div>
+      </section>
+
+      <section class="panel" id="section-requirements">
+        <h2>Requirements Snapshot
+          <span class="src">from <a href="https://github.com/ktanino10/ai-hardware-engineering-team/blob/main/requirements/requirements.md" target="_blank" rel="noopener">requirements.md</a></span>
+        </h2>
+        <div class="body" id="requirements-body"><span class="placeholder">Loading…</span></div>
+      </section>
+    </div>
+
+    <section class="panel" id="section-activity">
+      <h2>Recent Activity
+        <span class="src">from <a href="https://github.com/ktanino10/ai-hardware-engineering-team/blob/main/validation/change-log.md" target="_blank" rel="noopener">change-log.md</a></span>
+      </h2>
+      <div class="body" id="activity-body"><span class="placeholder">Loading…</span></div>
+    </section>
+
+    <section class="panel" id="section-mechanical">
+      <h2>Electrical &amp; Mechanical Snapshot</h2>
+      <div class="body" id="mechanical-body"><span class="placeholder">Loading…</span></div>
+    </section>
+  </main>
+
+  <footer id="dashboard-footer">
+    Data sources (fetched live from <code>main</code> on every page load —
+    GitHub's raw-content CDN may serve a cache up to a few minutes old):
+    <code>requirements/requirements.md</code>,
+    <code>requirements/traceability-matrix.md</code>,
+    <code>validation/open-issues.md</code>,
+    <code>validation/change-log.md</code>,
+    <code>bom/component-selection.md</code>,
+    <code>hardware/mechanical-interface.md</code>,
+    <code>docs/workflow.md</code>,
+    <code>datasheets/evidence-log.md</code>.
+    This page never writes anything back to the repository.
+    <a href="https://github.com/ktanino10/ai-hardware-engineering-team" target="_blank" rel="noopener">github/ai-hardware-engineering-team ↗</a>
+  </footer>
+</div>
+
+<script src="dashboard-live.js"></script>
+<script src="dashboard-render.js"></script>
+</body>
+</html>
