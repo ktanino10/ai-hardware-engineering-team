@@ -2089,6 +2089,19 @@ and this addendum only.
   (not taken on the relay alone) before this document was updated to
   reflect it as resolved. A second live self-application of the policy
   this addendum documents, alongside §17.1's (below).
+- **§17.1's diff-aware CI-exemption recommendation — disposition closed,
+  not left open**: the independent auditing session reviewed this PR in
+  full and, exercising its own delegated technical judgment (explicitly
+  not escalated to Kyosuke — a routine engineering-triage call, not an
+  architecture decision), directed that the recommendation not be
+  implemented now: MISS-034, the finding actually blocking merges, is
+  already being resolved through the normal route by a separate,
+  independently-confirmed session (`ktanino10-fix-miss-034-enclosure-150x95`),
+  so building new CI machinery for a problem about to resolve itself would
+  be premature. §17.1 now records this as a closed disposition — revisit
+  only if the same blocking pattern recurs in a later cycle, with a fresh
+  concrete instance — rather than as a standing open question, per that
+  session's explicit instruction.
 - **Grounding, verified rather than merely asserted**: the branch-protection/
   CI-override guidance and the multi-agent/agentic-AI governance guidance
   cited in §17.4 were independently corroborated by this session via live

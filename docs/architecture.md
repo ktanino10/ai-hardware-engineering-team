@@ -798,7 +798,7 @@ must not be treated as self-sufficient justification on its own.
    PR #38's own informal practice, made a hard requirement rather than a
    courtesy.
 
-**A structural alternative, evaluated, not implemented here**: a CI rule
+**A structural alternative, evaluated and explicitly deferred**: a CI rule
 that mechanically exempts a PR from the CRITICAL/HIGH gate when its diff
 touches zero paths under `hardware/**`, `firmware/**`, `bom/**` (regardless
 of pre-existing OPEN findings elsewhere) would remove the temptation to
@@ -809,15 +809,41 @@ already tried that shape and reverted it (PR #27): a required status check
 that a path filter skips never reports a conclusion at all, so it stays
 "Expected" forever and paradoxically *forces* admin bypass on any PR that
 doesn't happen to touch every required check's path set. The technically
-sound shape is a **diff-aware check**: keep the job running (and reporting)
-on every PR as today, but have `tools/check_open_issues.py` compute the PR's
-changed-file set and pass the CRITICAL/HIGH gate whenever that set touches
-none of `hardware/**`, `firmware/**`, `bom/**` — independent of what is
-currently OPEN elsewhere in the file. This is a **recommendation for a
-separate, future, human-approved change** to `tools/check_open_issues.py` /
-`.github/workflows/hardware-gate.yml` (itself an architecture/CI decision
-under §10) — not implemented by this documentation-only change. Until it
-exists, the decision tree above is the only mechanism.
+sound shape, if it is ever built, is a **diff-aware check**: keep the job
+running (and reporting) on every PR as today, but have
+`tools/check_open_issues.py` compute the PR's changed-file set and pass the
+CRITICAL/HIGH gate whenever that set touches none of `hardware/**`,
+`firmware/**`, `bom/**` — independent of what is currently OPEN elsewhere in
+the file.
+
+**Disposition: not implemented now, revisit only if the pattern recurs.**
+The finding actually blocking merges as of this writing (MISS-034) is
+already being actively resolved through the normal route — a dedicated
+session enlarging the enclosure to the real board geometry — and once it
+lands, `hardware-gate` goes green on `main` and every currently-blocked PR
+merges cleanly with no CI change needed. Building new CI machinery to solve
+a problem that is already resolving itself through the normal route would
+be premature, and conflicts with this project's own established discipline
+of introducing new mechanisms only at a demonstrated, sustained trigger
+rather than speculatively — the same pattern §14's Future Roles table
+already uses for every future role (each implemented only once its own
+named trigger condition was actually met). Revisit this specific
+recommendation only if the same blocking pattern — a documentation-only PR
+touching zero `hardware/`/`firmware`/`bom/` paths, gated by an unrelated,
+already-disclosed OPEN finding elsewhere — recurs in a later cycle *after*
+MISS-034 is resolved, with a fresh concrete instance to justify it, not
+tonight's one-off cluster. Until then, the decision tree above is the sole,
+standing mechanism; this recommendation itself remains on record (§17.1
+above, and `docs/architecture-evolution.md` §42) so it isn't rediscovered
+from scratch if the trigger is ever met. Note that deferring *whether to
+build it* is a routine engineering-judgment call (made here without
+escalation, mirroring how the Hardware Lead already resolves most
+disagreements without going to the human per §9/`docs/workflow.md` §3) —
+but *actually changing* the Design Complete Gate's own enforcement
+mechanism, if that trigger is ever met, is still a real CI/architecture
+change and should go through the same review any other change to
+`hardware-gate.yml` would, not be fast-tracked because this section
+pre-approved it in the abstract.
 
 ### 17.2 Verification-before-acting standard
 
