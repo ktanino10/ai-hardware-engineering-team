@@ -427,6 +427,30 @@ applies — this is not a rigid rule):**
 5. **Re-run `check_id_uniqueness.py`** after the sweep to confirm zero
    collisions remain before treating the merge as done.
 
+**A related blind spot, also observed here for real (dated 2026-09-04):**
+a "next-free ID" recommendation derived purely from a cross-branch `git`
+scan is **advisory, not authoritative**, when a reservation exists only in
+an in-flight cross-session message and has not yet landed as a row (even
+a placeholder one) in any branch's own `validation/change-log.md` or
+`open-issues.md`. Two sibling sessions each independently made this exact
+mistake from opposite directions on the same PR, in the same short
+window: one issued a static reservation against a branch that was
+actively allocating IDs of its own (colliding with what that branch had
+already, legitimately taken); the other later ran a fresh, thorough
+six-branch-plus-`main` union scan, found the reserved-but-not-yet-used ID
+absent everywhere in git, and (reasonably, but wrongly) concluded it was
+free and recommended allocating it — which would have caused a real
+collision had the recommendation been followed. Both errors come from
+treating one half of a two-part namespace (committed `git` state *and*
+in-flight session coordination) as the whole of it. **The durable fix is
+for a reservation to land in `git` immediately** — even as a minimal
+placeholder row (e.g. `| MISS-046 | — | RESERVED | (session `<id>`, not
+yet used) | ... |`) — rather than living only in a message that a
+different tool/session/scan cannot see. Until reservations are
+routinely recorded this way, treat any "next free" figure computed from
+`git` alone as a starting point to cross-check against known live
+cross-session coordination, not as a final answer.
+
 This is deliberately handled as tooling + process documentation, not a new
 agent/reviewer role: detecting a duplicate ID is a deterministic bookkeeping
 check, not an engineering-judgment task, and a new discipline for it would
