@@ -34,7 +34,9 @@
   Reviewer Finding 1, HIGH, PR #14, 2026-09-12 — see the third Update note
   at the end of this file), plus DS-MTR-081 (added by the PCB Engineer
   closing Hardware Reviewer finding ISS-031, HIGH, 2026-09-02 — see the
-  fourth Update note at the end of this file)
+  fourth Update note at the end of this file), plus DS-MTR-093 (added by the
+  Component Engineer during Bench-IMU-01 Rev 5 Component Selection,
+  2026-09-04 — see the fifth Update note at the end of this file)
 
 ## Update (Circuit Engineer, 2026-09-04, Bench-IMU-01 Rev 3)
 
@@ -150,3 +152,30 @@ the exact D2xE2 exposed-pad numeric dimension is still UNKNOWN, unchanged
 from the "Known gaps" section above; this Update only adds the layout
 *guideline* text, not a new pad dimension. One new row cites this same
 datasheet record; no new metadata file was needed.
+
+## Update (Component Engineer, 2026-09-04, Bench-IMU-01 Rev 5 Component Selection — Electromagnetic Brake re-evaluation)
+
+Re-read TI's already-fetched HTML product/register-reference material
+(same source already cited above; no new fetch performed this session,
+since this session's research focus was the driver's existing documented
+brake capability, not new register-map territory) to source the fact
+behind Rev 5's most consequential Motor Driver IC/Brake finding: DRV10983
+implements a documented **BRAKE bit** (register-level dynamic-braking
+control) that, when set, turns on all three low-side MOSFETs
+simultaneously — shorting the motor's own phase windings together to
+dissipate the flywheel's stored kinetic energy through resistive/back-EMF
+braking, with no separate brake coil, flyback-diode circuit, or new
+mechanical part required (DS-MTR-093, new). This directly informs
+`bom/component-selection.md`'s new top-level "Electromagnetic Brake"
+section and the Motor Driver IC section's own Rev 5 subsection: REQ-019
+(electromagnetic brake) may be satisfiable via a firmware-only change to
+this already-approved, already-owned part, pending future bench
+characterization of the real stop-time/torque this mode achieves on the
+actual motor+flywheel system (recorded as `UNKNOWN until bench-tested`,
+not estimated). This is the same physical principle described generically
+in `ktanino10/attitude-control-study`'s own `en/reference/interfaces.md`
+"MOSFET: switching an inductive load" section (a motor phase winding is
+itself an inductor) — applied here to the motor's own windings via a
+capability the already-selected driver IC already implements, rather than
+via a newly-added discrete brake coil + external MOSFET circuit. One new
+row cites this same datasheet record; no new metadata file was needed.
