@@ -2199,14 +2199,37 @@ and this addendum only.
   writing showed zero diff and no such field, one way or the other —
   consistent with the plan having already been resolved by the time of
   this check (a timing gap, not necessarily a contradiction), but not
-  confirmed either. §17.3 point 5 is worded to the well-corroborated
-  general lesson (frozen `updated_at`/zero diff alone is not a stall
-  signal; check actual plan/approval state first) rather than asserting
-  the specific field schema as independently confirmed fact — consistent
-  with this document's own standard of not writing down a technical
-  mechanism as verified when it wasn't. Flagged back to the creator session
-  for the exact `get_session` output it saw, in case the field-level detail
-  is worth tightening later.
+  confirmed either. §17.3 point 5 (first version) was worded to the
+  well-corroborated general lesson (frozen `updated_at`/zero diff alone is
+  not a stall signal; check actual plan/approval state first) rather than
+  asserting the specific field schema as independently confirmed fact —
+  consistent with this document's own standard of not writing down a
+  technical mechanism as verified when it wasn't. Flagged back to the
+  creator session for the exact `get_session` output it saw.
+- **That flag surfaced a real flaw in the original suggestion itself, same
+  day.** The creator session, with the overnight audit session's help, own
+  self-corrected: `pending_plan` only appears *after* a session has
+  produced a plan — during the pre-plan research/design window
+  beforehand, which can run many hours, `pending_plan` is absent,
+  `updated_at` is frozen, and there may be no branch/diff either. Their
+  original rule ("check `pending_plan`; treat it as authoritative") would
+  have read that healthy window as "not awaiting approval, therefore
+  dead," reproducing the exact misdiagnosis it was meant to prevent — and
+  it independently explains this session's own unreproduced-field
+  observation just above: `914e4e71` most likely was, and may still be, in
+  that same pre-plan window, not in some anomalous state. Corrected model,
+  now in §17.3 point 5: a positive "awaiting approval" signal is solid
+  evidence of life; its *absence* is inconclusive, not evidence of death;
+  the only check that actually distinguishes "working silently" from
+  "genuinely dead" is direct interrogation with a reasonable reply window,
+  and metadata alone should never justify re-commissioning duplicate work
+  or archiving another session's task. General principle: absence of a
+  positive signal is not itself a negative signal. §17.3 point 5 was
+  edited in place to this corrected model (not left as a superseded
+  paragraph alongside a new one) because the original wording was already
+  appropriately hedged/provisional rather than a firm, since-falsified
+  claim — refining an acknowledged gap, not reversing a settled position,
+  per the same distinction §17.1's own forward-correcting entries draw.
 - **Grounding, verified rather than merely asserted**: the branch-protection/
   CI-override guidance and the multi-agent/agentic-AI governance guidance
   cited in §17.4 were independently corroborated by this session via live
