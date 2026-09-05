@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "status": "SECONDARY_MECHANISM_SOURCE_NOT_ACTUATOR_RATINGS",
+  "repository": "ktanino10/attitude-control-study",
+  "revision": "a927d1ae3409ba143631077824cdf3c904ea27b9",
+  "license": "CC BY 4.0 for original study-note text/figures; no figures or article PDFs copied here.",
+  "license_url": "https://github.com/ktanino10/attitude-control-study/blob/a927d1ae3409ba143631077824cdf3c904ea27b9/LICENSE",
+  "attribution": "Mechanism interpretation informed by ktanino10's study notes, citing Shinji Mitani/JAXA, Transistor Gijutsu June-August 2020 and the Cubli papers. This file is our own implementation summary, not a reproduction of the notes or original article.",
+  "sources": [
+    {
+      "path": "ja/session-2-modeling/06-standup-energy.md",
+      "sha256": "8b08823681a0446d1d52610cd9a5ae6d21a848342bae8aad31d8b69a538ecd89",
+      "url": "https://github.com/ktanino10/attitude-control-study/blob/a927d1ae3409ba143631077824cdf3c904ea27b9/ja/session-2-modeling/06-standup-energy.md"
+    },
+    {
+      "path": "ja/reference/mechanical.md",
+      "sha256": "d0e27254bdfe563f7fe419f244ff132026dfd4c307024f7e0cf19c40b8ba29c4",
+      "url": "https://github.com/ktanino10/attitude-control-study/blob/a927d1ae3409ba143631077824cdf3c904ea27b9/ja/reference/mechanical.md"
+    },
+    {
+      "path": "ja/reference/interfaces.md",
+      "sha256": "df20ec89c3a2bb3d98d014df08dd88897fbd629a5313a6ad0270590f8e204fde",
+      "url": "https://github.com/ktanino10/attitude-control-study/blob/a927d1ae3409ba143631077824cdf3c904ea27b9/ja/reference/interfaces.md"
+    }
+  ],
+  "mechanism": [
+    "Accelerate a wheel from rest while face-supported; store wheel angular momentum.",
+    "Apply an independent brake, not ordinary motor reverse effort or a generic DRV10983 BRAKE bit.",
+    "Try the first face-to-edge rise; subsequent capture/edge-to-vertex is a separate requirement.",
+    "The note's instantaneous-lock/fixed-pivot idealization is a conditional comparator, not a valid universal free-contact conservation assumption."
+  ],
+  "not_imported": [
+    "The reference module's 100 mm geometry, maxon motor constants, electromagnetic brake hardware, sensor/MCU or circuit parts.",
+    "A qualified current, torque, rated RPM, brake latency, stop/hold/restart time or actual source/regeneration capability."
+  ],
+  "target_only_operating_point": {
+    "rpm": 3000,
+    "source": "Previously supplied Rev5 intake baseline/results.json /constants/rpm_TARGET_ONLY",
+    "source_sha256": "a181bc328b61ecdad52a0b8acdcc6e7cc5c0e5c4748b680ec8fcad0aa5e44c36",
+    "rated_or_safe": false
+  },
+  "experiment_assumptions": {
+    "minimum_simulation_and_video_duration_s": 10.0,
+    "spin_command_until_s": 3.0,
+    "brake_command_at_s": 3.5,
+    "brake_engagement_delay_s": 0.02,
+    "brake_limit_ramp_s": 0.001,
+    "nominal_H_over_t_brake_capacity_time_s": 0.005,
+    "speed_gain_nm_per_rad_s": 0.0005,
+    "stop_relative_speed_rad_s": 1.0,
+    "integrator_step_s": 0.0001,
+    "brake_constraint_solref": [0.0005, 1],
+    "brake_constraint_solimp": [0.99, 0.99, 0.001, 0.5, 2],
+    "interpretation": "Ideal numerical comparison only. Brake torque capacity is I_axis*target_omega/0.005, not a measured brake rating or promised stopping time. Actual simulated stopping time is reported. Do not adopt hardware or increase RPM to force success."
+  },
+  "actual_driver_case": "BLOCKED_UNKNOWN",
+  "hardware_approval": false
+}

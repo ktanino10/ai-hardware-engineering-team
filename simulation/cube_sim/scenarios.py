@@ -5,6 +5,7 @@ import math
 
 import mujoco
 import numpy as np
+from .braking import Startup
 
 
 def axis_angle(axis, angle):
@@ -52,8 +53,13 @@ class Scenario:
     kp_nm_rad: float = 0.08
     kd_nm_s_rad: float = 0.018
     command_delay_s: float = 0.02
+    startup: Startup | None = None
 
     def __post_init__(self):
+        if isinstance(self.startup, dict):
+            object.__setattr__(self, "startup", Startup(**self.startup))
+        if self.startup is not None and not isinstance(self.startup, Startup):
+            raise ValueError("Invalid startup program.")
         for quat in (self.target, self.initial_quat):
             if quat is not None and (np.asarray(quat).shape != (4,) or
                                     not np.all(np.isfinite(quat)) or
@@ -67,8 +73,12 @@ class Scenario:
                 raise ValueError("Scenario clearance, delay and gains must be nonnegative.")
         if not np.isfinite(self.perturbation_rad) or np.asarray(self.pulse_nm).shape != (3,) or not np.all(np.isfinite(self.pulse_nm)):
             raise ValueError("Invalid perturbation/pulse parameters.")
-        if self.controller not in {"off", "pulse", "pd"}:
+        if self.controller not in {"off", "pulse", "pd", "spin-brake"}:
             raise ValueError("Unknown controller.")
+        if (self.controller == "spin-brake") != (self.startup is not None):
+            raise ValueError("Spin/brake controller and explicit startup program must appear together.")
+        if self.startup and self.duration_s <= self.startup.dense_end_s:
+            raise ValueError("Startup trial must include the complete braking observation window.")
 
     def record(self):
         return asdict(self)
@@ -107,6 +117,14 @@ def initialize(model, data, config, scenario):
     mujoco.mj_forward(model, data)
 
 
+def startup_scenario(config=None):
+    if config is not None:
+        return Scenario(**config["scenario"])
+    return Scenario("spin-brake", "Rest -> wheel spin -> coast -> independent finite brake; first edge attempt only.",
+                    duration_s=10.0, target=tuple(axis_angle([1, 0, 0], math.pi / 4)),
+                    initial_quat=(1, 0, 0, 0), controller="spin-brake", startup=Startup())
+
+
 def command(data, scenario):
     if scenario.controller == "off":
         return np.zeros(3)
@@ -118,4 +136,6 @@ def command(data, scenario):
         body_torque = (scenario.kp_nm_rad * error_vector(data.qpos[3:7], scenario.target)
                        - scenario.kd_nm_s_rad * data.qvel[3:6])
         return -body_torque
+    if scenario.controller == "spin-brake":
+        return scenario.startup.requested_motor(data.time, data.qvel[6:])
     raise ValueError(f"Unknown simulation-only controller: {scenario.controller}")

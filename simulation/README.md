@@ -4,6 +4,11 @@
 MuJoCoで計算します。**実機の成立性・安全性・Design Completeの承認ではありません。**
 初期コントローラーはシミュレーション専用です。Fusionの組立工程アニメーションとは別物です。
 
+**最新の10秒始動試験**: [高速回転→有限制動の手順と条件](STARTUP.md)。
+閲覧入口は `evidence/startup-v2/index.html`。合成機構モデルと不完全な実機プロキシを
+別ケースにし、XYZ反力を内部制動と床接触から計算します。
+Blenderの10秒再描画とCERN ROOT形式への解析出力も、それぞれ役割を分けています。
+
 ## ローカル実行
 
 リポジトリのルートから実行します。Python 3.14、ffmpegが必要です。
@@ -47,7 +52,7 @@ macOSのネイティブ再生には通常のPythonではなく、MuJoCo同梱の
 # ブラウザーで http://127.0.0.1:8765/runs/my-suite/index.html を開く
 ```
 
-収録済み結果は `evidence/initial-v1/index.html` です。同じサーバーなら
+初回の短い収録結果（履歴）は `evidence/initial-v1/index.html` です。同じサーバーなら
 `http://127.0.0.1:8765/evidence/initial-v1/index.html` で閲覧できます。
 サーバーはCtrl+Cで終了します。外部CDNやクラウドへの設計アップロードはありません。
 
@@ -110,7 +115,7 @@ macOSのネイティブ再生には通常のPythonではなく、MuJoCo同梱の
 古い計算を新しいレンダラーで再生成して元の証拠に上書きすることも認めません。
 
 ```sh
-.venv/bin/python -m cube_sim verify evidence/initial-v1/reference/three-wheel
+.venv/bin/python -m cube_sim verify evidence/initial-v1/reference/three-wheel --historical
 .venv/bin/python -m cube_sim witnesses --output runs/my-numerics.json
 ```
 
@@ -118,6 +123,8 @@ CSV/グラフは100 Hz、動画はその記録の該当行を25 fpsで再描画�
 `video-frames.csv` の時刻と状態ハッシュで対応を追えます。接触点数、法線力、貫入量、
 滑り速度、飽和・速度超過を記録しますが、サンプル間の衝撃ピークを保証しません。
 エネルギーは剛体の位置/運動エネルギーと、モーター・受動・拘束力の仕事を比較します。
+現在はRK4の実評価点に整合する仕事積分を使います。初回版の端点台形則の不足と
+補正/残差の扱いは [STARTUP.md](STARTUP.md) に記録しています。
 接触で散逸する試験に保存則を押し付けたり、拘束仕事を制動発熱/構造強度と読み替えたり
 しません。
 

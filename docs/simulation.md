@@ -8,6 +8,15 @@ a third Control Engineer or authorize deployable control firmware, FEA,
 thermal/SPICE simulation, broad optimization, physical operation or a
 certified digital twin. See [Japanese run/view instructions](../simulation/README.md).
 
+The subsequent user clarification adds genuine spin-up from rest followed
+by a finite independent brake, minimum ten-second published videos, an
+explicitly separate small annular-wheel mechanism fixture, Blender replay
+and CERN ROOT analysis interchange. See
+[`simulation/STARTUP.md`](../simulation/STARTUP.md) for parameter provenance,
+timing, the original-design versus synthetic boundary and tool limitations.
+These additions do not introduce direct cube XYZ impulses or new physical
+hardware/actuator approval.
+
 ## Entry, ownership and evidence states
 
 Start during requirements/interface/design work, **before Design Complete**.
@@ -96,7 +105,10 @@ state estimator, gravity/gyro feedforward, translational capture strategy,
 wheel desaturation or real-time firmware. Edge/vertex trials are initially
 pre-positioned; geometric targets do not necessarily align an asymmetric
 proxy's COM over support. A separate face-to-vertex attempt starts on a face.
-No scenario is tuned or required to succeed.
+The original cases are not tuned to succeed. Later parameter studies are
+explicitly named synthetic assumptions, never undisclosed changes to make
+the physical proxy appear successful. A target visit, small separation,
+capture and sustained balance remain distinct outcomes.
 
 The initial solver is Newton with elliptic friction cone, condim 3
 (normal plus two sliding directions), no rolling/torsional resistance.
@@ -117,6 +129,10 @@ model and every output hash. Uncommitted model/code is labeled as such.
 The 100 Hz state grid is shared by CSV and plots; 25 fps video uses exact
 recorded rows without pose/time interpolation. Frame maps include state
 hashes; terminal state is in the trajectory, not an extra video frame.
+Startup adds an explicit 10 kHz output window around the brake and uses a
+0.1 ms integration step. Full movies represent ten simulated seconds;
+separate, prominently labeled 100x slow movies show 0.1 simulated seconds
+over ten playback seconds. No padding or loop creates duration.
 
 Log quaternion attitude, body-frame/angular-world rates, relative wheel
 rates, requested/delayed/applied torque, saturation/cutoff/overspeed,
@@ -127,6 +143,21 @@ These sampled records do not bound inter-sample impact or torque peaks.
 Energy conservation is appropriate for unforced free space, not powered or
 dissipative-contact trials. Motor work uses relative joint speed; contact
 work is not electrical/brake heat or a structural load qualification.
+In the finite-brake cases, separate brake work is a **subset** of constraint
+work, not an additional term. The work of floor contact on the assembly is
+constraint work minus brake work. Computed XYZ floor force, external angular
+impulse and COM momentum residual are retained; no arbitrary lift force is
+introduced.
+
+R1 found endpoint-trapezoid work inconsistent with RK4 contact stages
+(`SIM-R1-001`). Current RK4 diagnostics record the actual four evaluation
+states read-only and reevaluate forces in a separate data object, applying
+1:2:2:1 quadrature. The main trajectory is unchanged. Maximum all-step,
+maximum recorded-grid and final energy residuals are reported separately,
+with an uncalibrated/unqualified contact-energy status. Remaining integrator
+and solver errors are not renamed physical dissipation. The global native
+control callback is temporarily owned only inside the process's step and
+restored in `finally`; a pre-existing callback is rejected, never overwritten.
 
 `verify` checks bound outputs and current implementation/model/intake hashes;
 `verify --historical` checks archived outputs only. A changed source,
@@ -157,10 +188,11 @@ criteria for a manufactured cube:
 |---|---|
 | Initial inertia/acceleration and frame/mass recomposition | 1e-10 acceleration, 1e-12 to 1e-14 tensor/frame comparisons: floating-point algebra against independent closed forms |
 | Free-space linear/angular momentum | 1e-10 kg m/s or N m s: well above observed RK4 roundoff, far below applied impulse |
-| Powered free-space rigid energy minus actuator work | 1e-7 J: regression guard for the declared sampled input and trapezoidal work integration |
+| Powered free-space rigid energy minus actuator work | 1e-7 J: regression guard for the declared sampled input and stage-consistent RK4 work integration |
 | Quaternion norm / deterministic replay | 1e-12 norm; identical same-runtime recorded arrays |
 | Passive rest | Weight within 1e-3 N, penetration below 0.2 mm: regression envelope of this uncalibrated soft-contact fixture |
 | Step/solver sensitivity | 2/1/0.5 ms; Newton 50/100 and CG 100 iterations. Free-space final state within 1e-8; rest/drop final height within 10 micrometres / 1 mm; drop penetration below 10 mm. These are model-regression guards, not physical contact bounds |
+| Finite-brake startup | 0.1/0.05 ms step and separately thinned output grid; 5e-5 J energy and 1e-7 N m s contact-momentum regression guards for the declared fixtures, not hardware limits |
 
 Near unstable edge/vertex trials, sensitivity is reported rather than
 claiming every detailed contact path converges. The fixed short trials

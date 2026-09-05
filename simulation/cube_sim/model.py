@@ -7,6 +7,7 @@ import xml.etree.ElementTree as ET
 
 import mujoco
 import numpy as np
+from .geometry import annulus_mesh
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -72,6 +73,10 @@ def validate_config(config):
         extent = np.where(wheel["axis"], thickness / 2, radius)
         if np.any(np.abs(center) + extent > half):
             raise ValueError("Wheel visual envelope exceeds the declared cube proxy.")
+        if "inner_radius_m" in wheel:
+            inner = finite(wheel["inner_radius_m"], (), "inner radius", positive=True)
+            if inner >= radius:
+                raise ValueError("Annulus inner radius must be smaller than outer radius.")
     for key in ("torque_limit_nm", "speed_cutoff_rad_s"):
         finite(config["actuation"][key], (3,), key, positive=True)
     settings = config["integration"]
@@ -88,6 +93,15 @@ def validate_config(config):
     if solref[0] < 2 * dt or not 0 < solimp[0] <= solimp[1] < 1 or floor["condim"] != 3:
         raise ValueError("Require condim=3, 0<dmin<=dmax<1, and contact time constant >=2*dt.")
     finite(config["gravity_m_s2"], (3,), "gravity")
+    brake = config["actuation"].get("independent_brake")
+    if brake is not None:
+        if brake["model"] != "IDEAL_DRY_HINGE_BRAKE_NOT_ACTUAL_DRIVER":
+            raise ValueError("Actual brake capability is unknown; only the explicit ideal fixture is supported.")
+        finite(brake["capacity_nm"], (3,), "brake capacity", nonnegative=True)
+        brake_ref = finite(brake["solref"], (2,), "brake solref", positive=True)
+        brake_imp = finite(brake["solimp"], (5,), "brake solimp", positive=True)
+        if brake_ref[0] < 2 * dt or not 0 < brake_imp[0] <= brake_imp[1] < 1 or brake_imp[3] > 1:
+            raise ValueError("Invalid numerical brake constraint parameters.")
 
 
 def make_xml(config, *, contact=True, gravity=True):
@@ -139,12 +153,24 @@ def make_xml(config, *, contact=True, gravity=True):
         rotor = ET.SubElement(cube, "body", name=name, pos=vector(wheel["center_m"]))
         ET.SubElement(rotor, "inertial", pos="0 0 0", mass=str(wheel["mass_kg"]),
                       **inertia_attributes(wheel["inertia_kg_m2"]))
+        brake = config["actuation"].get("independent_brake")
+        friction = ({"frictionloss": "0", "solreffriction": vector(brake["solref"]),
+                     "solimpfriction": vector(brake["solimp"])} if brake else {})
         ET.SubElement(rotor, "joint", name=name, type="hinge", axis=vector(wheel["axis"]),
-                      damping="0", armature="0")
-        ET.SubElement(rotor, "geom", name=name + "_visual", type="cylinder",
-                      size=vector([wheel["radius_m"], wheel["thickness_m"] / 2]),
+                      damping="0", armature="0", **friction)
+        if "inner_radius_m" in wheel:
+            vertices, faces = annulus_mesh(wheel["radius_m"], wheel["inner_radius_m"], wheel["thickness_m"])
+            ET.SubElement(asset, "mesh", name=name + "_annulus",
+                          vertex=vector(np.asarray(vertices).ravel()),
+                          face=" ".join(str(index) for face in faces for index in face))
+            shape = {"type": "mesh", "mesh": name + "_annulus"}
+        else:
+            shape = {"type": "cylinder", "size": vector([wheel["radius_m"], wheel["thickness_m"] / 2])}
+        ET.SubElement(rotor, "geom", name=name + "_visual", **shape,
                       quat=vector(rotations[i]), rgba=colors[i], contype="0", conaffinity="0")
-        marker = np.eye(3)[(i + 1) % 3] * wheel["radius_m"] * .8
+        marker_radius = ((wheel["radius_m"] + wheel["inner_radius_m"]) / 2
+                         if "inner_radius_m" in wheel else wheel["radius_m"] * .8)
+        marker = np.eye(3)[(i + 1) % 3] * marker_radius
         marker += np.asarray(wheel["axis"]) * wheel["thickness_m"] / 2
         ET.SubElement(rotor, "geom", type="sphere", size=".004", pos=vector(marker),
                       rgba="1 1 1 1", contype="0", conaffinity="0")
