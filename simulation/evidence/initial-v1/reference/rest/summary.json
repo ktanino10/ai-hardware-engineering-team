@@ -1,0 +1,65 @@
+{
+  "classification": "SYNTHETIC_REFERENCE",
+  "delta_angular_momentum_world_nms": [
+    4.3319935688951355e-16,
+    -4.332077392687519e-16,
+    5.505900284431255e-23
+  ],
+  "final_attitude_error_deg": 0.0009524329317747911,
+  "hardware_approval": false,
+  "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+  "max_attitude_error_deg": 0.0009524329318074131,
+  "max_loaded_point_slip_m_s": 6.301395657501345e-07,
+  "max_penetration_m": 4.790913957700149e-05,
+  "max_wheel_relative_rad_s": [
+    0.0004410639693831457,
+    0.0004410639693830605,
+    2.4890864489204423e-19
+  ],
+  "min_height_m": 0.11995371715771337,
+  "outcome": "NO_CONTROL_GOAL",
+  "rigid_energy_minus_logged_work_j": 4.131503419754811e-05,
+  "samples": 201,
+  "scenario": {
+    "command_delay_s": 0.02,
+    "contact": true,
+    "controller": "off",
+    "description": "Passive face rest; uncalibrated soft contact.",
+    "duration_s": 2.0,
+    "gravity": true,
+    "initial_clearance_m": 0.0,
+    "initial_quat": null,
+    "kd_nm_s_rad": 0.018,
+    "kp_nm_rad": 0.08,
+    "name": "rest",
+    "perturbation_rad": 0.0,
+    "pulse_half_period_s": 0.5,
+    "pulse_nm": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "target": [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "speed_cutoff_samples": [
+    0,
+    0,
+    0
+  ],
+  "speed_exceeded_samples": [
+    0,
+    0,
+    0
+  ],
+  "torque_saturated_samples": [
+    0,
+    0,
+    0
+  ],
+  "trial_band_deg": 5
+}

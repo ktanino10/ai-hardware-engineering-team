@@ -1,0 +1,64 @@
+{
+  "classification": "SYNTHETIC_REFERENCE",
+  "code": {
+    "simulation/cube_sim/__init__.py": "5d04a6e81f6e7fce1f8c806db80b19f051d9663cd92befaede24645bddb60be2",
+    "simulation/cube_sim/__main__.py": "bd5e33b531a4b4553cd189fe7db2439e08129ba1d9096f8f17ca526dc3cd6980",
+    "simulation/cube_sim/gallery.py": "a0092a5714556813b4d8d1997feb4284f38ccfba43e4fe0aa11013b9a02eaa68",
+    "simulation/cube_sim/intake.py": "6f300726750bf15a6a184c34dcc623674860bf9ad92ca9b4410b75d33c4c91d3",
+    "simulation/cube_sim/model.py": "cfee7d6fc94a1396342c3c27cc02992061373e93cad7d50d45c89d86c7200675",
+    "simulation/cube_sim/numerics.py": "6e5613e483de52dbdaa0180009f86850093ebbefd63fd040cf2b48c6ebd60bbc",
+    "simulation/cube_sim/runner.py": "80780cd219aebe313753d36dbe4f5c777e57b2b8962b3a279dee327e7a439172",
+    "simulation/cube_sim/scenarios.py": "1153a9ab9f32e994995534e70bacb0816a16148ee73edd16200e36e37c650436",
+    "simulation/cube_sim/visualize.py": "c95bbc72b0b249ae04ea9dd14c33128b25db19408f40f49281fe88744dad22fc"
+  },
+  "dependency_lock_sha256": "46a9c69d790ca27c38135aefa26e08d683a1e7536080b93840a90b61cbd89cb7",
+  "environment": {
+    "matplotlib": "3.11.1",
+    "mujoco": "3.12.0",
+    "numpy": "2.5.2",
+    "pillow": "12.3.0",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "python": "3.14.3"
+  },
+  "input_model": {
+    "kind": "repository_file",
+    "path": "simulation/models/reference.json",
+    "sha256": "b34b181117b7a12cf8e8356bcf1a57321deab20726d12249f39badaaba889c1f"
+  },
+  "omissions": [
+    "No CAD-derived or measured complete mass, CG or inertia.",
+    "No battery, populated electronics, harness or motor internals modeled individually.",
+    "Ideal bidirectional joint torque is NOT DRV10983 runtime braking or a motor torque-speed curve.",
+    "No compliance, fracture, thermal/FEA, rotor containment, noise or real-time firmware.",
+    "Box-plane soft contact is uncalibrated; no strength or continuous collision clearance claim."
+  ],
+  "outputs": {
+    "input.json": "9119f27fcb6d93bf0e42a9324ea9d0097a70a1664a36172d657c5ac28e284348",
+    "model.xml": "944a6adcd0a97f74af7730870ca29c3f089ffde368610089c12b49b09a798a00",
+    "motion.mp4": "5bae61cb04898561804def78fdd7ab61d0bc8c736d78fe63c2bf6bff8ecd1385",
+    "plots.png": "eed80ca212ff4069f24caca19c11af85e1cebb9f38023d56597fce4a79efb74d",
+    "preview.png": "a5a1a9cd3a9babc5821fc025b4a2424c3e9dfb8d8bb535237232701f542663b3",
+    "scenario.json": "095a465cc900fc55a30766afb1490ea0e35b6c3fc848b1bbecc8d325eb41d5c2",
+    "summary.json": "285bc6c61bd1110d13d5d17f7303461ce2960cd0dd80f89a06dd225396a11aa1",
+    "trajectory.csv": "693877ea27e866665b9bb2e6a3da9cfcc1d571f527686fbe94ac483ea6f45efd",
+    "trajectory.npz": "eaf3b2c2a0d8f89f47e7de286f928256e60fe80733b9a1e23a14fcc6d98a371a",
+    "video-frames.csv": "5ae093c8c8247726bfb53097e56e8a7947adcb9c6e0f1fd269bf12730a900501"
+  },
+  "rendering": {
+    "camera": "body-centre tracking, azimuth 135 deg, elevation -24 deg",
+    "duration_s": 3.0,
+    "ffmpeg": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+    "fps": 25,
+    "frames": 75,
+    "producer": "MuJoCo Renderer + Pillow labels + ffmpeg/libx264",
+    "state_source": "trajectory.npz; exact rows in video-frames.csv",
+    "status": "OFFSCREEN_RENDERED_AND_DECODED"
+  },
+  "sample_period_s": 0.01,
+  "schema_version": 1,
+  "source_revision": "6636b95b78bb14b94acda53a413d39f6baa8688a",
+  "source_snapshot": null,
+  "state": "WIP_SIMULATION_NOT_HARDWARE_OR_ASSEMBLY_APPROVAL",
+  "stochasticity": "NONE",
+  "uncommitted_model_code": false
+}

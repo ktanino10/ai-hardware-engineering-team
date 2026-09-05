@@ -1,0 +1,65 @@
+{
+  "classification": "SYNTHETIC_REFERENCE",
+  "delta_angular_momentum_world_nms": [
+    0.005201367812523876,
+    0.0010910987660196273,
+    -0.0036013802001389358
+  ],
+  "final_attitude_error_deg": 54.8658941222643,
+  "hardware_approval": false,
+  "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+  "max_attitude_error_deg": 59.710359199926366,
+  "max_loaded_point_slip_m_s": 0.3662948383574611,
+  "max_penetration_m": 0.003207565637435128,
+  "max_wheel_relative_rad_s": [
+    88.18176095605239,
+    83.18692926640736,
+    86.73054363606266
+  ],
+  "min_height_m": 0.11957521142508076,
+  "outcome": "DEPARTED_TARGET",
+  "rigid_energy_minus_logged_work_j": 0.13377274949107443,
+  "samples": 301,
+  "scenario": {
+    "command_delay_s": 0.02,
+    "contact": true,
+    "controller": "pd",
+    "description": "Pre-positioned vertex, perturbed 2 deg; NOT a jump/transition.",
+    "duration_s": 3.0,
+    "gravity": true,
+    "initial_clearance_m": 0.0,
+    "initial_quat": null,
+    "kd_nm_s_rad": 0.018,
+    "kp_nm_rad": 0.08,
+    "name": "vertex-balance",
+    "perturbation_rad": 0.03490658503988659,
+    "pulse_half_period_s": 0.5,
+    "pulse_nm": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "target": [
+      0.8880738339771153,
+      0.3250575836718681,
+      -0.3250575836718681,
+      0.0
+    ]
+  },
+  "speed_cutoff_samples": [
+    252,
+    220,
+    245
+  ],
+  "speed_exceeded_samples": [
+    254,
+    223,
+    245
+  ],
+  "torque_saturated_samples": [
+    261,
+    29,
+    249
+  ],
+  "trial_band_deg": 5
+}
