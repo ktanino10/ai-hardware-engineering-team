@@ -20,6 +20,10 @@
   header h1{font-size:16px;margin:0;font-weight:600;}
   header .sub{font-size:11px;color:var(--dim);margin-top:2px;}
   header a{color:var(--accent);text-decoration:none;font-size:12px;}
+  header .head-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
+  .source-links{display:flex;gap:10px;font-size:10.5px;flex-wrap:wrap;justify-content:flex-end;}
+  .source-links a{color:var(--dim);border:1px solid var(--line);border-radius:6px;padding:3px 8px;}
+  .source-links a:hover{color:var(--accent);border-color:var(--accent);}
 
   main{flex:1;display:flex;position:relative;overflow:hidden;}
   #canvas-wrap{flex:1;position:relative;}
@@ -30,11 +34,23 @@
     font-size:12px;color:var(--dim);max-width:260px;pointer-events:none;}
   #hint b{color:var(--ink);}
 
+  #controls{position:absolute;top:14px;right:14px;display:flex;gap:8px;align-items:center;}
+  .toggle-btn{background:rgba(10,18,32,.85);border:1px solid var(--accent);color:var(--accent);
+    border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:600;cursor:pointer;
+    font-family:inherit;transition:.15s;}
+  .toggle-btn:hover{background:rgba(79,211,255,.15);}
+  .toggle-btn:active{transform:translateY(1px);}
+
   #legend{position:absolute;bottom:14px;left:14px;background:rgba(10,18,32,.75);
     border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:11.5px;
-    display:flex;gap:16px;}
+    display:flex;flex-direction:column;gap:8px;}
+  #legend .row{display:flex;gap:16px;align-items:center;}
   #legend .item{display:flex;align-items:center;gap:6px;}
   #legend .sw{width:11px;height:11px;border-radius:3px;}
+  #legend .ref-thumb{display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);
+    padding-top:8px;text-decoration:none;color:var(--dim);}
+  #legend .ref-thumb img{width:48px;height:36px;object-fit:cover;border-radius:4px;border:1px solid var(--line);}
+  #legend .ref-thumb:hover{color:var(--accent);}
 
   #info{width:300px;flex:0 0 300px;background:var(--panel);border-left:1px solid var(--line);
     padding:18px;overflow-y:auto;font-size:12.8px;line-height:1.65;}
@@ -49,11 +65,64 @@
   #info .field .v{margin-top:2px;}
   #info a{color:var(--accent);}
   #info .placeholder{color:var(--dim);}
+  #info .open-modal-btn{margin-top:16px;width:100%;background:rgba(79,211,255,.12);
+    border:1px solid var(--accent);color:var(--accent);border-radius:8px;padding:9px 10px;
+    font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
+  #info .open-modal-btn:hover{background:rgba(79,211,255,.22);}
 
   #loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
     background:var(--bg);z-index:10;font-size:13px;color:var(--dim);}
   #loading .bar{width:220px;height:4px;background:#122a4d;border-radius:2px;overflow:hidden;margin-top:12px;}
   #loading .bar i{display:block;height:100%;width:0%;background:var(--accent);transition:width .2s;}
+
+  /* ---- Part-detail modal ---- */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(4,9,18,.72);z-index:50;
+    display:flex;align-items:center;justify-content:center;padding:28px;}
+  .modal-backdrop[hidden]{display:none;}
+  .modal{width:min(1080px,100%);max-height:calc(100vh - 56px);overflow-y:auto;
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    box-shadow:0 20px 60px rgba(0,0,0,.5);}
+  .modal-head{display:flex;align-items:flex-start;justify-content:space-between;
+    padding:20px 24px;border-bottom:1px solid var(--line);position:sticky;top:0;
+    background:var(--panel);z-index:2;}
+  .modal-head h2{margin:0 0 2px;font-size:18px;color:#fff;}
+  .modal-ref{font-size:12px;color:var(--dim);}
+  .modal-ref .cat{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.05em;
+    padding:2px 8px;border-radius:10px;margin-left:8px;}
+  .modal-ref .cat.print3d{background:rgba(90,200,255,.15);color:var(--print3d);}
+  .modal-ref .cat.purchase{background:rgba(255,191,64,.15);color:var(--purchase);}
+  .modal-close{background:none;border:1px solid var(--line);color:var(--ink);border-radius:8px;
+    width:32px;height:32px;font-size:15px;cursor:pointer;flex:0 0 auto;font-family:inherit;}
+  .modal-close:hover{border-color:var(--accent);color:var(--accent);}
+  .modal-body{display:flex;gap:24px;padding:22px 24px 26px;flex-wrap:wrap;}
+  .modal-col-info{flex:1 1 300px;min-width:280px;font-size:12.8px;line-height:1.65;}
+  .modal-col-visual{flex:1 1 420px;min-width:320px;}
+  .modal-body .field{margin-bottom:13px;}
+  .modal-body .field .k{color:var(--dim);font-size:10.2px;text-transform:uppercase;letter-spacing:.06em;}
+  .modal-body .field .v{margin-top:3px;}
+  .modal-body a{color:var(--accent);}
+  .modal-links{margin-top:16px;border-top:1px solid var(--line);padding-top:14px;}
+  .modal-links h3{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);
+    margin:0 0 8px;}
+  .modal-link-row{display:flex;flex-direction:column;gap:2px;margin-bottom:10px;font-size:12.2px;}
+  .modal-link-row .lbl{color:var(--dim);font-size:10.5px;}
+  .modal-link-row .na{color:var(--dim);font-style:italic;}
+  .modal-3d-wrap{position:relative;height:260px;background:#050c18;border:1px solid var(--line);
+    border-radius:10px;overflow:hidden;}
+  .modal-3d-wrap canvas{display:block;width:100%;height:100%;}
+  .modal-3d-hint{position:absolute;bottom:8px;left:10px;font-size:10.5px;color:var(--dim);
+    pointer-events:none;background:rgba(10,18,32,.6);padding:2px 8px;border-radius:6px;}
+  .modal-drawings{margin-top:16px;}
+  .modal-drawings h3{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);
+    margin:0 0 8px;}
+  .modal-drawing-grid{display:flex;gap:10px;flex-wrap:wrap;}
+  .modal-drawing-item{width:130px;text-align:center;}
+  .modal-drawing-item img{width:100%;height:98px;object-fit:contain;background:#fff;border-radius:6px;
+    border:1px solid var(--line);display:block;}
+  .modal-drawing-item .cap{font-size:10.5px;color:var(--dim);margin-top:4px;}
+  .modal-drawing-item a{display:block;}
+  .modal-na-box{background:rgba(255,255,255,.03);border:1px dashed var(--line);border-radius:8px;
+    padding:12px 14px;font-size:12px;color:var(--dim);}
 </style>
 </head>
 <body>
@@ -63,15 +132,27 @@
       <h1>Bench-IMU-01 — 3D Assembly &amp; Part Inspector</h1>
       <div class="sub">Real part geometry (KiCad PCB + OpenSCAD-derived STL exports) and real dimensions — not illustrative.</div>
     </div>
-    <a href="../index.html">&larr; back</a>
+    <div class="head-right">
+      <a href="../index.html">&larr; back</a>
+      <div class="source-links" id="source-links"><!-- populated by assembly-render.js from RAW_BASE/TREE_BASE --></div>
+    </div>
   </header>
   <main>
     <div id="canvas-wrap">
       <div id="loading">Loading real part geometry…<div class="bar"><i id="loading-bar"></i></div></div>
       <div id="hint"><b>Drag</b> to orbit &middot; <b>scroll</b> to zoom &middot; <b>click</b> any part to inspect it.</div>
+      <div id="controls">
+        <button id="layout-toggle" class="toggle-btn" type="button">⛶ Explode View</button>
+      </div>
       <div id="legend">
-        <div class="item"><span class="sw" style="background:var(--print3d)"></span>3D-printed part</div>
-        <div class="item"><span class="sw" style="background:var(--purchase)"></span>Purchased part</div>
+        <div class="row">
+          <div class="item"><span class="sw" style="background:var(--print3d)"></span>3D-printed part</div>
+          <div class="item"><span class="sw" style="background:var(--purchase)"></span>Purchased part</div>
+        </div>
+        <a id="ref-thumb" class="ref-thumb" target="_blank" rel="noopener">
+          <img id="ref-thumb-img" alt="Real assembled-unit reference photo (iso view)">
+          <span>Real assembled-unit reference (iso) ↗</span>
+        </a>
       </div>
     </div>
     <div id="info">
@@ -79,6 +160,32 @@
     </div>
   </main>
 </div>
+
+<div id="modal-backdrop" class="modal-backdrop" hidden>
+  <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-head">
+      <div>
+        <h2 id="modal-title"></h2>
+        <div id="modal-ref" class="modal-ref"></div>
+      </div>
+      <button id="modal-close" class="modal-close" type="button" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-col modal-col-info">
+        <div id="modal-info"></div>
+        <div id="modal-links" class="modal-links"></div>
+      </div>
+      <div class="modal-col modal-col-visual">
+        <div class="modal-3d-wrap" id="modal-3d-wrap">
+          <canvas id="modal-3d-canvas"></canvas>
+          <div class="modal-3d-hint">Drag to orbit &middot; scroll to zoom — same real geometry as the main scene</div>
+        </div>
+        <div class="modal-drawings" id="modal-drawings"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <script type="importmap">
 { "imports": {
