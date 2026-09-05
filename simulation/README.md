@@ -11,7 +11,9 @@ Blenderの10秒再描画とCERN ROOT形式への解析出力も、それぞれ�
 
 [以前の独立レビューと修正記録](reviews/r2b/review.md)は記載版の限定的な確認です。
 追加監査のマーカー変換・メッシュ・実効FPS・元データ整合性の指摘を修正した
-現行版は限定再確認待ちです。実機の成立性、確立した空中跳躍、倒立維持、
+`7192a73f7f93534e246ccbc6aafac76985e7fb3c` の独立した限定再確認は完了しています
+（[公開クローズ記録](https://github.com/ktanino10/ai-hardware-engineering-team/pull/70#issuecomment-5555340145)）。
+実機の成立性、確立した空中跳躍、倒立維持、
 Fusion組立工程の承認ではありません。
 現行Blender成果物は `evidence/blender-replay-v7/startup-mechanism-fixture/` です。
 
