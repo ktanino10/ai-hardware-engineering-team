@@ -67,6 +67,16 @@ or manages a workflow automatically.
 
 ## 4. Variants
 
+- **Early rigid-body physics / cube simulator**: "Have Hardware Lead
+  provide a frozen source intake to Simulation Engineer and run a bounded
+  WIP cube/floor/three-wheel experiment using `docs/simulation.md`.
+  Do not wait for Design Complete or invent missing actual actuator/mass
+  data. Use separate synthetic reference and incomplete design-proxy
+  cases, export real trajectories/plots/video, and have a fresh Simulation
+  Reviewer inspect the implementation and actual outputs. Simulated
+  feedback is not deployable firmware, physical approval or Fusion
+  assembly-process animation."
+
 - **Resuming after a Reviewer loop-back**: replace the kickoff paragraph
   with "Resume the design cycle for `requirements/requirements.md`. The last
   Hardware Reviewer verdict was <PASS/FAIL/CONDITIONAL>; open findings are in

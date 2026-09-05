@@ -40,6 +40,8 @@ applyTo: 'firmware/**'
   (`docs/architecture.md` Section 14) whose trigger ("1-axis/3-axis
   attitude-control roadmap stage") is not met by a bring-up task. Raw
   register counts are a complete, legitimate deliverable on their own.
+  The approved simulation-only controller belongs under `simulation/`
+  (`docs/simulation.md`), not here; it grants no deployable-control scope.
 - Do not silently reinterpret a requirement to match the actual schematic
   wiring, or vice versa, when they disagree (e.g. a "manual reset button"
   requirement that turns out to be wired to a hardware reset pin rather

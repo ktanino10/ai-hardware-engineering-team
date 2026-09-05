@@ -28,6 +28,10 @@ flowchart LR
     D -- "fixed pin/interface allocation" --> H11["11. Firmware\nBring-up"]
     B -- "power complexity warrants it" --> H12["12. Power\nArchitecture"]
     H12 -- "human-approved architecture" --> D
+    A -- "approved physics question / WIP input" --> S4B["4b. Rigid-body simulation\n+ computed plots/video"]
+    S4B --> SR["Independent Simulation\nmodel + result review"]
+    SR -- "model/code CRITICAL or HIGH" --> S4B
+    SR -- "conditional design implications, no gate approval" --> A
 ```
 
 Phases 8-10 (Mechanical, Phase 1 of the multidisciplinary evolution —
@@ -143,6 +147,33 @@ existing Design Complete / independent review / named human approval path.
   schematic review and mechanical planning, with one PCB geometry owner
   and explicit source-version handoffs; no competing layouts.
 
+### Phase 4b — Early WIP rigid-body simulation
+- **Owner**: Simulation Engineer; fresh Simulation Reviewer for independent
+  model/code and actual-result assessment. See `docs/simulation.md`.
+- **Entry criteria**: A human-approved bounded physics question, with a
+  frozen source intake or an explicitly separate synthetic fixture.
+  Despite its numbering, this phase may start during requirements work;
+  Phase 4 completion, full electronics and Design Complete are not required.
+- **Activities**: verify local engine/render capabilities; account for
+  mass/COM/inertia without rotor double-counting; implement real internal
+  torques/contact; run passive/reaction/feedback trials and numerical
+  witnesses; produce timestamp-linked plots and playable computed video.
+- **Exit criteria**: executable model/runner, source/assumption/UNKNOWN
+  record, actual state/plot/video evidence and source/model/output hashes,
+  plus an independent scoped verdict and unresolved fidelity gaps.
+- **Loop-back**: model/code CRITICAL/HIGH findings return to Simulation
+  Engineer, followed by independent re-review. Changed sources invalidate
+  affected conclusions; preserve old evidence and regenerate a new version.
+- **Boundary**: simulation-only feedback, not deployable firmware or a
+  new Control Engineer. No FEA/SPICE, physical action, part adoption, strength/
+  safety approval or automatic closure of hardware findings. Pre-positioned
+  edge/vertex trials are not successful free-contact transitions.
+- **Parallel-safe?** Yes alongside source owners using frozen handoffs,
+  not their mutable worktrees. Hardware Lead routes real design implications
+  without interrupting or duplicating Circuit/PCB/Mechanical ownership.
+  Simulation findings stay under `simulation/reviews/`, separate from the
+  shared hardware gate. Dynamics media never replaces Fusion assembly media.
+
 ### Phase 5 — Independent Review
 - **Owner**: Hardware Reviewer (checklist) + `rubber-duck` (premise check),
   run in parallel against the same handoff. Uses
@@ -165,8 +196,9 @@ existing Design Complete / independent review / named human approval path.
 ### Phase 6 — Validation
 - **Owner**: Hardware Lead + human (MVP); future Test/Validation Engineer.
   Uses `validation/bring-up-procedure.md` for first power-on, plus whatever
-  simulation is available (currently none — SPICE is Future Integration,
-  architecture.md §13).
+  relevant simulation is available (initial rigid-body WIP lane: Phase 4b;
+  SPICE remains separately scoped Future Integration, architecture.md §13).
+  A simulation verdict does not itself validate physical hardware.
 - **Entry criteria**: Review verdict is PASS (no open CRITICAL).
 - **Activities**: bench bring-up per `validation/bring-up-procedure.md`
   (HITL gate: human sign-off required before applying power to real
@@ -406,7 +438,7 @@ severity.
 Two layers, used together — see architecture.md §3 for the invocation model:
 
 - **File-based (durable, git-tracked, the actual Source of Truth)**:
-  `requirements/`, `bom/`, `hardware/`, `validation/`, `docs/`. This is what
+  `requirements/`, `bom/`, `hardware/`, `validation/`, `simulation/`, `docs/`. This is what
   survives across sessions and is what a human audits. Every phase's real
   exit criteria is a file being in a specific state, not a chat message.
 - **SQL `todos` / `todo_deps` (ephemeral, session-local control plane)**: used
@@ -453,6 +485,13 @@ acceptance. CI checks changed source/artifact/status linkage without
 retroactively fabricating historical evidence or blocking policy-only PRs on
 missing native artifacts. It does not certify geometry or change the existing
 hardware gate's diff-aware exemption.
+
+The simulation lane's durable handoff is instead the source/model/run
+manifest and actual trajectories/media in `simulation/evidence/`, with
+independent verdicts in `simulation/reviews/`. It reuses source-revision/
+hash/invalidation principles, not the assembly schema or physical gate.
+No synthetic run creates an assembly `current.json`; requested Fusion
+native/video delivery remains with Mechanical Lead.
 
 ### 4.1 Cross-Branch ID Collision Resolution (Shared-Namespace Files)
 

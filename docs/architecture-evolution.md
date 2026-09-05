@@ -203,11 +203,12 @@ undifferentiated future discipline. **Status update (§32)**: it has since
 split into the two future roles `docs/architecture.md` §14 always listed
 separately, each with its own trigger — **Firmware Engineer** ("when
 firmware work starts in earnest") and **Control Engineer** ("at 1-axis/
-3-axis attitude control roadmap stage"). Only Firmware Engineer's trigger
-has been met (Bench-IMU-01 reached Design Complete); Control Engineer's has
-not (no reaction wheel/motor/attitude-control project exists) and remains
-`[DEFER]` exactly as originally written below — nothing in this section's
-original Control-Engineer-relevant content changes.
+3-axis attitude control roadmap stage"). At the §32 update, only Firmware
+Engineer's trigger had been met. The then-current "no reaction wheel/
+attitude-control project" rationale is historical, not a current assertion:
+the 2026-09-05 cube request adds simulation-only feedback under the new
+Simulation Engineer (§45). A deployable Control Engineer discipline remains
+separately scoped; this does not expand bring-up firmware.
 
 Reserved as a discipline; no Control Engineer agent/skill created. Firmware
 frameworks/boards (Arduino, PlatformIO, Pico SDK, ESP-IDF, ESP32,
@@ -292,6 +293,11 @@ demands it. No automated purchasing, ever, without the existing "major BOM
 change" human gate `[repo: architecture.md §10]`.
 
 ## 16. Simulation and Real-Hardware Validation
+
+**2026-09-05 update:** the original deferral below is historical. The
+approved initial rigid-body Simulation Engineer/Reviewer pair and runnable
+MuJoCo cube are recorded in §45. SPICE, FEA and real-hardware validation
+remain separate; the new simulator does not qualify them.
 
 `[req §15]`. No simulation tool is connected today; SPICE remains Future
 Integration `[repo: architecture.md §13, verified — no SPICE tool in this
@@ -2825,3 +2831,42 @@ for surfacing conflict but no criteria for resolving one once surfaced.
 - **Status**: implemented, PR opened, awaiting independent audit before
   merge — same process every prior change in this repository's history has
   gone through.
+
+## 45. Initial rigid-body Simulation pair and cube simulator
+
+**Date: 2026-09-05.** The human explicitly selected implementation of the
+initial team and simulator: rigid cube, floor contact, three reaction wheels,
+simulation-only attitude feedback and reproducible model/plots/computed
+video. This supersedes the original general simulation deferral (§16) only
+for that bounded scope, not thermal/deformation/fracture FEA, SPICE,
+production control, physical operation or digital-twin certification.
+
+Two roles were added, not a full control department:
+`simulation-engineer` owns model/code/intake/tests/trajectory visualization;
+`simulation-reviewer` independently assesses actual implementation and
+actual output. A simulated controller is part of the experiment, not
+deployable firmware or a silently introduced third Control Engineer.
+The existing Hardware Lead orchestrates intake and routes physical
+implications to the unchanged Circuit/PCB/Mechanical/Power owners.
+
+The trigger is the explicit request for a working three-axis cube physics
+tool, not a timeless assumption that this remains only a static sensor
+board. Historical single-axis Blender physics/concept demos remain
+historical: their prescribed rotation/keyframes are not reused as current
+integrated dynamics. The new MuJoCo path uses an unconstrained floating
+body and three internal hinge actuators, computed state records and actual
+native/offscreen rendering.
+
+Physics is allowed early under WIP labels (`docs/workflow.md` Phase 4b).
+Synthetic reference inputs and a frozen partial solid-CAD design proxy
+are separate. The source-owner's locked tensor is decomposed about a common
+origin before articulating wheels; no wheel mass is added twice. Unknown
+actual motor/brake/contact/population inputs stay unknown, while explicit
+fixture assumptions allow useful numerical experiments now.
+
+`docs/simulation.md` specifies ownership, invariant scope, numerical
+tolerances, result hashes and source-change invalidation. Findings live in
+`simulation/reviews/`, not the shared hardware backlog. This changes no
+Design Complete, physical-action or named human approval gate. Dynamics
+video is not the separately requested Fusion native assembly-process
+animation or its published video.
