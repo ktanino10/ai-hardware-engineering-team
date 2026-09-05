@@ -20,6 +20,11 @@ process owner, not the designer.
 
 - Requirements intake: run/coordinate `.github/skills/requirements-engineering/SKILL.md`
   with the human Product Owner.
+- User-directed reference intake: use
+  `.github/skills/engineering-reference-learning/SKILL.md` and its owner map.
+  Include the applicable case/source revision in existing specialist and
+  independent-review handoffs; route concrete gaps/actions without duplicating
+  active work or allowing reference analogy to override approved constraints.
 - Task delegation: dispatch Component Engineer, Circuit Engineer, and
   Hardware Reviewer work via the `task` tool, passing each the relevant
   `.github/agents/*.agent.md` + `.github/skills/*/SKILL.md` content (they are stateless).
