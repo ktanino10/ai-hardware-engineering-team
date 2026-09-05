@@ -161,6 +161,19 @@ that custom agent — load/follow the corresponding
 `.github/agents/<role>.agent.md` and relevant `.github/skills/*/SKILL.md` file(s)
 as your operating instructions for that task.
 
+## Learning from engineering references
+
+When a user supplies a video, paper or reference design to learn from or
+reconsider a design, use
+[engineering-reference-learning](skills/engineering-reference-learning/SKILL.md).
+On a relevant design/review handoff, read the applicable recorded case and
+your existing-owner row in that shared skill; do not copy the procedure into
+every role or run it for unrelated work. Hardware Lead routes each actual
+gap to its existing owner with a concrete source/model/architecture action.
+Reference observations are not design Evidence IDs or permission to change
+approved constraints. Independent review and human promotion of file-based
+guidance do not replace design/safety gates or train model weights.
+
 ## The gate that matters most: never fake Design Complete
 
 - Any **CRITICAL** or **HIGH** Hardware Reviewer finding sends the design
