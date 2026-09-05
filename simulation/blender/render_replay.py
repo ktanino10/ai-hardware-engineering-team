@@ -193,6 +193,8 @@ def main():
         if "scenario" in config and config["scenario"].get("startup"):
             view_point.z = float(rows[0]["z_m"])
         offset = Vector((.53, -.72, .43)) * (config["body"]["side_m"] / .24)
+        if "scenario" in config and config["scenario"].get("startup"):
+            offset *= 1.4
         cam.location = view_point + offset
         cam.rotation_quaternion = (view_point - cam.location).to_track_quat("-Z", "Y")
         cam.keyframe_insert(data_path="location", frame=index)
@@ -215,7 +217,7 @@ def main():
         "renderer_script_sha256": sha(__file__), "frame_mapping": mapping,
         "geometry_script_sha256": sha(Path(__file__).resolve().parents[1] / "cube_sim/geometry.py"),
         "poster_sample_index": manifest["rendering"]["poster_sample_index"],
-        "camera": "size-aware XY following, fixed initial Z for startup; body following otherwise",
+        "camera": "size-aware XY following, fixed initial Z and 40 percent extra framing distance for startup; body following otherwise",
         "frames": len(mapping), "fps": scene.render.fps,
         "scope": "Display-only cube edges/cylinders, not canonical CAD. Integer-frame poses copied from computed records. Between-frame interpolation is not physics evidence.",
     }
