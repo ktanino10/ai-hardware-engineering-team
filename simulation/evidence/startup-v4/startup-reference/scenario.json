@@ -1,0 +1,47 @@
+{
+  "command_delay_s": 0.02,
+  "contact": true,
+  "controller": "spin-brake",
+  "description": "Rest -> wheel spin -> coast -> independent finite brake; first edge attempt only.",
+  "duration_s": 10.0,
+  "gravity": true,
+  "initial_clearance_m": 0.0,
+  "initial_quat": [
+    1,
+    0,
+    0,
+    0
+  ],
+  "kd_nm_s_rad": 0.018,
+  "kp_nm_rad": 0.08,
+  "name": "spin-brake",
+  "perturbation_rad": 0.0,
+  "pulse_half_period_s": 0.5,
+  "pulse_nm": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "startup": {
+    "brake_command_s": 3.5,
+    "dense_end_s": 3.6,
+    "dense_period_s": 0.0001,
+    "dense_start_s": 3.48,
+    "engagement_delay_s": 0.02,
+    "ramp_s": 0.001,
+    "speed_gain_nm_per_rad_s": 0.0005,
+    "spin_until_s": 3.0,
+    "stop_relative_rad_s": 1,
+    "target_rad_s": [
+      314.1592653589793,
+      0.0,
+      0.0
+    ]
+  },
+  "target": [
+    0.9238795325112867,
+    0.3826834323650898,
+    0.0,
+    0.0
+  ]
+}
