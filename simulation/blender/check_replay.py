@@ -12,6 +12,9 @@ import bpy
 from mathutils import Quaternion, Vector
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from blender_contract import load_source, sha, validate_provenance
+from mesh_contract import cylinder_mesh, verify_mesh
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from cube_sim.geometry import annulus_mesh
 
 
 def require(condition, message):
@@ -45,20 +48,16 @@ def parent_inverse_identity(obj):
     require(math.isfinite(error) and error < 1e-12, f"{obj.name} unsupported parent inverse")
 
 
-def cylinder_bounds(obj, radius, depth, inner=None):
+def check_display_mesh(obj, radius, depth, inner=None):
     parent_inverse_identity(obj)
     require(not obj.modifiers and not obj.constraints and obj.data.shape_keys is None,
             f"{obj.name} has an unsupported geometry modifier/constraint")
     require(obj.animation_data is None, f"{obj.name} must have a fixed local geometry transform")
-    vertices = [v.co for v in obj.data.vertices]
-    require(bool(vertices), f"{obj.name} has no mesh")
-    radii = [math.hypot(v.x, v.y) for v in vertices]
-    expected_min = radius if inner is None else inner
-    require(abs(max(radii) - radius) < 1e-6 and abs(min(radii) - expected_min) < 1e-6,
-            f"{obj.name} radial geometry mismatch")
-    require(abs(min(v.z for v in vertices) + depth / 2) < 1e-6
-            and abs(max(v.z for v in vertices) - depth / 2) < 1e-6,
-            f"{obj.name} axial geometry mismatch")
+    expected_vertices, expected_faces = (cylinder_mesh(radius, depth) if inner is None
+                                         else annulus_mesh(radius, inner, depth))
+    return verify_mesh([tuple(v.co) for v in obj.data.vertices],
+                       [tuple(face.vertices) for face in obj.data.polygons],
+                       expected_vertices, expected_faces, obj.name)
 
 
 def main():
@@ -77,8 +76,11 @@ def main():
     scene = bpy.data.scenes["CubePhysicsReplay"]
     bpy.context.window.scene = scene
     require(scene.rigidbody_world is None, "This file must not impersonate Blender dynamics.")
+    fps_base = float(scene.render.fps_base)
+    require(math.isfinite(fps_base) and fps_base > 0, "Invalid native fps_base")
+    effective_fps = scene.render.fps / fps_base
     require(scene.frame_start == 1 and scene.frame_end == provenance["frames"]
-            and scene.render.fps == provenance["fps"], "Native frame range/FPS mismatch")
+            and abs(effective_fps - provenance["fps"]) < 1e-9, "Native effective frame rate/FPS mismatch")
     root = bpy.data.objects["CUBE_BODY_REPLAY"]
     require(root.parent is None, "Unexpected parent of the recorded body root")
     require(not root.constraints, "Unexpected body constraint")
@@ -101,8 +103,9 @@ def main():
         vector_error(obj.scale, (1, 1, 1), "body edge scale")
         alignment = Vector((0, 0, 1)).rotation_difference(axis)
         quaternion_error(obj.rotation_quaternion, alignment, "body edge")
-        cylinder_bounds(obj, .002, 2 * half)
+        check_display_mesh(obj, .002, 2 * half)
         edge_transforms.append((obj, location, alignment))
+    marker_transforms = {}
     for i, item in enumerate(config["wheels"]):
         pivot = bpy.data.objects["WHEEL_" + item["name"].upper() + "_REPLAY"]
         mesh = bpy.data.objects["Wheel_" + item["name"]]
@@ -115,7 +118,7 @@ def main():
         vector_error(mesh.scale, (1, 1, 1), "rotor mesh scale")
         alignment = Vector((0, 0, 1)).rotation_difference(Vector(item["axis"]))
         quaternion_error(mesh.rotation_quaternion, alignment, "fixed rotor mesh axis")
-        cylinder_bounds(mesh, item["radius_m"], item["thickness_m"], item.get("inner_radius_m"))
+        check_display_mesh(mesh, item["radius_m"], item["thickness_m"], item.get("inner_radius_m"))
         markers = [obj for obj in pivot.children if obj.name.startswith("Physical_angle_sample_marker")]
         require(len(markers) == 1, "Expected one source-angle marker per rotor")
         parent_inverse_identity(markers[0])
@@ -125,6 +128,8 @@ def main():
         marker[(i+1) % 3] += ((item["radius_m"] + item["inner_radius_m"]) / 2
                               if "inner_radius_m" in item else item["radius_m"] * .8)
         vector_error(markers[0].location, marker, "rotation marker")
+        vector_error(markers[0].scale, (1, 1, 1), "rotation marker scale")
+        marker_transforms[item["name"]] = (markers[0], marker)
     errors = []
     for frame, entry in enumerate(source["mapping"], start=1):
         scene.frame_set(frame)
@@ -152,6 +157,8 @@ def main():
             alignment = Vector((0, 0, 1)).rotation_difference(Vector(item["axis"]))
             quaternion_error(mesh.matrix_world.to_quaternion(), expected @ wheel_q @ alignment, "rotor mesh world")
             world_transform(mesh, centre, expected @ wheel_q @ alignment)
+            marker_object, marker_position = marker_transforms[item["name"]]
+            world_transform(marker_object, centre + (expected @ wheel_q) @ marker_position, expected @ wheel_q)
         errors.append({"frame": frame, "time_s": float(entry["time_s"]), "position_error_m": position_error,
                        "quaternion_l2_error": body_error, "wheel_quaternion_l2_errors": wheel_errors,
                        "wheel_world_centre_errors_m": centre_errors})
@@ -159,10 +166,14 @@ def main():
               "blend_sha256": hashlib.sha256(Path(bpy.data.filepath).read_bytes()).hexdigest(),
               "checker_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
               "contract_sha256": sha(Path(__file__).with_name("blender_contract.py")),
+              "mesh_contract_sha256": sha(Path(__file__).with_name("mesh_contract.py")),
               "source_manifest_sha256": source["manifest_sha256"],
               "provenance_sha256": sha(sidecar),
               "tolerance": "1e-6 m / quaternion-component L2, Blender float32 render precision only; not physics qualification.",
               "frames": errors, "blender_dynamics": False}
+    record["native_fps_base"] = fps_base
+    record["native_effective_fps"] = effective_fps
+    record["native_duration_s"] = len(errors) / effective_fps
     args.output.write_text(json.dumps(record, indent=2) + "\n")
     print(record["status"], len(errors))
 

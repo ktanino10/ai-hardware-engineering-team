@@ -2,6 +2,7 @@
 
 import csv
 import hashlib
+import io
 import json
 import math
 from pathlib import Path
@@ -9,7 +10,7 @@ import struct
 
 POSE_COLUMNS = ("x_m", "y_m", "z_m", "qw", "qx", "qy", "qz",
                 "wheel_x_rad", "wheel_y_rad", "wheel_z_rad")
-SOURCE_FILES = ("input.json", "scenario.json", "trajectory.csv", "video-frames.csv")
+SOURCE_FILES = ("input.json", "scenario.json", "model.xml", "trajectory.npz", "trajectory.csv", "video-frames.csv")
 
 
 def sha(path):
@@ -17,15 +18,28 @@ def sha(path):
 
 
 def load_source(directory):
-    directory = Path(directory)
-    manifest = json.loads((directory / "manifest.json").read_text())
-    for name in SOURCE_FILES:
-        if manifest["outputs"].get(name) != sha(directory / name):
+    directory = Path(directory).resolve()
+    manifest_bytes = (directory / "manifest.json").read_bytes()
+    manifest = json.loads(manifest_bytes)
+    outputs = manifest["outputs"]
+    if not isinstance(outputs, dict) or not set(SOURCE_FILES).issubset(outputs):
+        raise ValueError("Source run lacks required canonical input/model/state dependencies.")
+    actual_hashes = {}
+    source_bytes = {}
+    for name, expected in outputs.items():
+        if not isinstance(name, str) or Path(name).name != name or name in {".", "..", "manifest.json"}:
+            raise ValueError("Unsafe or circular source output reference.")
+        path = directory / name
+        if not path.resolve().is_relative_to(directory):
+            raise ValueError("Source output escapes its run directory.")
+        content = path.read_bytes()
+        actual_hashes[name] = hashlib.sha256(content).hexdigest()
+        if expected != actual_hashes[name]:
             raise ValueError(f"Changed source {name}; refusing a stale replay/annotation.")
-    with (directory / "trajectory.csv").open(newline="") as stream:
-        rows = list(csv.DictReader(stream))
-    with (directory / "video-frames.csv").open(newline="") as stream:
-        mapping = list(csv.DictReader(stream))
+        if name in SOURCE_FILES:
+            source_bytes[name] = content
+    rows = list(csv.DictReader(io.StringIO(source_bytes["trajectory.csv"].decode("utf-8"))))
+    mapping = list(csv.DictReader(io.StringIO(source_bytes["video-frames.csv"].decode("utf-8"))))
     rendering = manifest["rendering"]
     fps, count = rendering["fps"], rendering["frames"]
     if (not isinstance(fps, (int, float)) or not math.isfinite(fps) or fps <= 0
@@ -48,18 +62,18 @@ def load_source(directory):
         if hashlib.sha256(struct.pack("<10d", *pose)).hexdigest() != entry["qpos_float64_le_sha256"]:
             raise ValueError("Source frame pose hash mismatch.")
     return {
-        "directory": directory, "manifest": manifest, "manifest_sha256": sha(directory / "manifest.json"),
-        "config": json.loads((directory / "input.json").read_text()),
-        "scenario": json.loads((directory / "scenario.json").read_text()),
+        "directory": directory, "manifest": manifest, "manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
+        "config": json.loads(source_bytes["input.json"]),
+        "scenario": json.loads(source_bytes["scenario.json"]),
         "rows": rows, "mapping": mapping,
-        "source_files_sha256": {name: sha(directory / name) for name in SOURCE_FILES},
+        "source_files_sha256": actual_hashes,
     }
 
 
 def validate_provenance(source, provenance):
     manifest, config = source["manifest"], source["config"]
     expected = {
-        "schema_version": 2, "source_manifest_sha256": source["manifest_sha256"],
+        "schema_version": 3, "source_manifest_sha256": source["manifest_sha256"],
         "contract_sha256": sha(__file__),
         "source_files_sha256": source["source_files_sha256"],
         "trajectory_csv_sha256": source["source_files_sha256"]["trajectory.csv"],
@@ -76,7 +90,9 @@ def validate_provenance(source, provenance):
 
 
 def validate_encoding(directory, source):
-    directory = Path(directory)
+    directory = Path(directory).resolve()
+    if directory == source["directory"]:
+        raise ValueError("Blender outputs must not overwrite the source run.")
     provenance = json.loads((directory / "provenance.json").read_text())
     validate_provenance(source, provenance)
     check = json.loads((directory / "native-check.json").read_text())
@@ -87,7 +103,8 @@ def validate_encoding(directory, source):
             or check["provenance_sha256"] != sha(directory / "provenance.json")
             or check["source_manifest_sha256"] != source["manifest_sha256"]
             or check["checker_sha256"] != sha(Path(__file__).with_name("check_replay.py"))
-            or check["contract_sha256"] != sha(__file__)):
+            or check["contract_sha256"] != sha(__file__)
+            or check["mesh_contract_sha256"] != sha(Path(__file__).with_name("mesh_contract.py"))):
         raise ValueError("Native file/checker/source receipt changed; recheck before encoding.")
     if (receipt["blend_sha256"] != check["blend_sha256"]
             or receipt["source_manifest_sha256"] != source["manifest_sha256"]

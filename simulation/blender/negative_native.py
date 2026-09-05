@@ -21,7 +21,8 @@ def main():
     args.blend, args.run, args.output = args.blend.resolve(), args.run.resolve(), args.output.resolve()
     args.output.mkdir(parents=True, exist_ok=False)
     results = []
-    for name in ("wheel-centre-10mm", "wheel-scale", "mesh-axis", "edge-parent-inverse-10mm"):
+    for name in ("wheel-centre-10mm", "wheel-scale", "mesh-axis", "edge-parent-inverse-10mm",
+                 "marker-delta-10mm", "annulus-half-ring", "native-fps-base"):
         bpy.ops.wm.open_mainfile(filepath=str(args.blend.resolve()))
         if name == "wheel-centre-10mm":
             bpy.data.objects["WHEEL_X_REPLAY"].location.x += .01
@@ -29,9 +30,20 @@ def main():
             bpy.data.objects["WHEEL_X_REPLAY"].scale.x = 1.1
         elif name == "mesh-axis":
             bpy.data.objects["Wheel_x"].rotation_quaternion = (1, 0, 0, 0)
-        else:
+        elif name == "edge-parent-inverse-10mm":
             edge = next(obj for obj in bpy.data.objects if obj.name.startswith("Visual_cube_edge"))
             edge.matrix_parent_inverse[0][3] += .01
+        elif name == "marker-delta-10mm":
+            pivot = bpy.data.objects["WHEEL_X_REPLAY"]
+            marker = next(obj for obj in pivot.children if obj.name.startswith("Physical_angle_sample_marker"))
+            marker.delta_location.y = .01
+        elif name == "annulus-half-ring":
+            mesh = bpy.data.objects["Wheel_x"].data
+            for vertex in mesh.vertices:
+                vertex.co.y = abs(vertex.co.y)
+            mesh.update()
+        else:
+            bpy.data.scenes["CubePhysicsReplay"].render.fps_base = 2
         directory = args.output / name
         directory.mkdir()
         path = directory / "replay.blend"

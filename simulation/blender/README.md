@@ -35,15 +35,24 @@ Open `replay.blend` in Blender or play `blender-motion.mp4`. `preview.png`,
 records, scripts, native file, frame mapping and output hashes.
 Raw `frames/` images are regenerable render intermediates, not separate
 physics evidence. Keep them local rather than adding them to the PR.
-Schema-2 provenance binds input/scenario/CSV/map bytes. Before encoding,
-every frame hash, source binding and current full native-check receipt is
-validated. The native checker covers body and rotor world transforms,
-centres, parenting, scales, fixed mesh axes and geometry, not merely local
-rotor quaternions. A moved rotor or changed speed annotation is rejected.
+Schema-3 provenance validates every file bound by the source run manifest,
+including canonical `model.xml` and `trajectory.npz`, not only displayed
+CSV rows. The bytes used for annotations/configuration are the same bytes
+that were hashed. Source and Blender output directories are separate, so
+this does not create a render/output circularity.
+
+Before encoding, every frame hash, source binding and current native-check
+receipt is validated. The checker covers body/rotor/marker world transforms,
+centres, parenting, scales, fixed mesh axes, and the expected display mesh's
+vertices/topology/winding rather than radial extrema alone. Native timing
+uses `render.fps / render.fps_base`; matching the integer FPS field alone is
+not sufficient. Marker delta shifts, folded half-annuli and altered
+`fps_base` are saved-file rejection cases alongside moved rotors.
 Older receipts are historical and cannot be reused as current acceptance.
 
 `negative_native.py` provides isolated saved-file mutation regressions
-(10 mm rotor displacement, scaling and mesh-axis errors); its output goes
+(rotor displacement/scale/axis, edge parent inverse, marker delta,
+folded annulus and effective frame rate); its output goes
 under `simulation/runs/`, never into the live Blender scene.
 New published clips require at least ten seconds of recorded motion.
 Workbench is a lightweight display renderer, not a different physics engine.

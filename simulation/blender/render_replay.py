@@ -91,6 +91,7 @@ def main():
     scene.render.resolution_x, scene.render.resolution_y = 960, 520
     scene.render.resolution_percentage = 100
     scene.render.fps = manifest["rendering"]["fps"]
+    scene.render.fps_base = 1.0
     if len(mapping) / scene.render.fps < 10:
         raise ValueError("Use a source trajectory/video map with at least ten seconds; no loops or padding.")
     scene.display.shading.color_type = "MATERIAL"
@@ -198,7 +199,7 @@ def main():
     scene.frame_start, scene.frame_end = 1, len(mapping)
     scene.frame_set(1)
     provenance = {
-        "schema_version": 2, "source_files_sha256": bound["source_files_sha256"],
+        "schema_version": 3, "source_files_sha256": bound["source_files_sha256"],
         "contract_sha256": sha(Path(__file__).with_name("blender_contract.py")),
         "status": "WIP_MUJOCO_STATE_REPLAY_NOT_BLENDER_PHYSICS",
         "blender": bpy.app.version_string, "engine": "Cycles CPU, 16 samples" if args.engine == "cycles" else "Blender Workbench",
