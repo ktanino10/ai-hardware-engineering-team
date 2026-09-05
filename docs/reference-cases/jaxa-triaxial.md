@@ -1,111 +1,140 @@
-# JAXA三軸姿勢制御モジュールから何を学ぶか
+# Lessons from JAXA's triaxial attitude-control module
 
-**ケースID: JAXA-TRIAXIAL-20260906 / 記録: Copilot、2026-09-06 JST。**
-共有手順は [engineering-reference-learning](../../.github/skills/engineering-reference-learning/SKILL.md)。
-**CANDIDATE**: 導入PRの独立レビューと人の承認・マージ後に、下記の
-「比較の問い」を再利用する。実機設計の承認やモデル学習済みという意味ではない。
+**Case ID: JAXA-TRIAXIAL-20260906 / Recorded by Copilot, 2026-09-06 JST.**
+Follow the shared
+[engineering-reference-learning](../../.github/skills/engineering-reference-learning/SKILL.md)
+procedure. **CANDIDATE**: reuse the comparison questions below only after
+independent review and human approval/merge of the introducing PR. This
+does not approve a physical design or claim that model weights were trained.
 
-## 要点と今回の範囲
+## Takeaway and scope
 
-学ぶ点は「大きなトルクの部品を買う」ことではなく、機体の質量一次モーメント・
-慣性、ホイールの角運動量、ブレーキ、支持部、制御・電源・配線を一体で比較すること。
-起き上がる動作と、その後の姿勢捕捉・維持は別の達成条件である。
+The lesson is not "buy a higher-torque part." Compare body first moment and
+inertia, wheel angular momentum, brakes, supports, control, power and wiring
+as a coupled system. Self-righting, subsequent attitude capture and maintained
+balance are separate success conditions.
 
-対象の依頼は2026-09-06の「参考にして制作を見直す」「各エージェントの
-skills/instruction・専門性に活かす」。今回閉じるギャップは、提示資料を
-専門担当の比較・次作業へ落とす共通手順がなかったこと。設計側の懸念は
-依頼元からの引継ぎであり、本ケースによる実機・シミュレーションの監査結果ではない。
-記録の基点は main `dd7e4b4a7f4ccd838edeb93b9cc9aac86dc1375d`。
-Rev5の実設計と [#70](https://github.com/ktanino10/ai-hardware-engineering-team/pull/70)
-のシミュレーションは既存担当の別作業で、ここへ未マージの実装・証拠を取り込まない。
-適用時には担当の最新リビジョン・要求へ結び直す。
+The originating request on 2026-09-06 was to reconsider the build using these
+references and improve the agents' skills, instructions and expertise. The
+gap addressed here is the missing shared procedure that turns supplied
+references into specialist comparisons and actual next work. Design concerns
+were handed off by the requester; they are not hardware/simulation audit
+results produced by this case. The record starts from main
+`dd7e4b4a7f4ccd838edeb93b9cc9aac86dc1375d`.
+Actual Rev5 design and the simulation in
+[#70](https://github.com/ktanino10/ai-hardware-engineering-team/pull/70)
+remain separate work with their existing owners. Do not import their unmerged
+implementation or evidence here. Reconnect each application to the owner's
+current revision and requirements.
 
-依頼時の保護条件: 新A基板の外形150 x 95 mm、取付パターン134 x 79 mmと現配置、
-`ESP32-S3-WROOM-1-N8R2`、Uのnative USB書込/debug + CDCに限定した例外を維持する。
-これは人の指示の記録であり、この基点での実装確認ではない。電源・ドライバ・
-ガード・ヒューズ・試験・安全判断を変更しない。メーカー問い合わせは撤回済み:
-連絡、メール、アカウント認証、新たなベンダー依頼は行わない。
+Protected decisions at intake: retain the new A-board's 150 x 95 mm outline,
+134 x 79 mm mounting pattern and current pose, `ESP32-S3-WROOM-1-N8R2`, and
+the U-only exception for native USB programming/debugging + CDC. These are
+recorded human instructions, not an implementation check against this base.
+Do not change power, drivers, guards, fuses, tests or safety decisions.
+Manufacturer inquiries were cancelled: no contact, email, account
+authentication or new vendor request.
 
-## 一次資料と不変識別
+## Primary sources and immutable identity
 
-取得日はいずれも2026-09-06 JST。P1/P2はこのケース内の資料キーであり、
-設計用Evidence IDではない。公開ページの版番号はUNKNOWN。
-下記SHA256は取得HTMLのバイト列を識別するだけで、後日の再取得を保証しない。
+Both pages were retrieved on 2026-09-06 JST. P1/P2 are case-local source keys,
+not design Evidence IDs. Published page revision numbers are UNKNOWN. The
+SHA256 values identify the fetched HTML bytes, not guaranteed future
+retrievability. English link labels below describe the Japanese source
+titles; they are not presented as official English titles.
 
-| キー | 公開元・資料と確認した範囲 | 取得HTML SHA256 |
+| Key | Publisher, source and inspected scope | Retrieved HTML SHA256 |
 |---|---|---|
-| P1 | JAXA研究開発部門 [超小型三軸姿勢制御モジュール](https://www.kenkai.jaxa.jp/research/automation/triaxial.html): 研究概要、詳細な研究内容、応用先、広報、特許一覧 | `ae4a263939ad40a3982cc87f4fd7470d12812f16879aab510dbc4a3b71273751` |
-| P2 | JAXA [Int-Ballの中に入っている超小型三軸姿勢制御モジュール](https://fanfun.jaxa.jp/topics/detail/10792.html)、2017-10-13: 大小試作機の区別、集約化、センサ複合、ブレーキ機能の説明 | `14060da8a8dd05ca034d23662299d6b8da7e725e921e97a236ea9de3c1998c03` |
+| P1 | JAXA Research and Development Directorate, [Miniaturized triaxial attitude-control module](https://www.kenkai.jaxa.jp/research/automation/triaxial.html): research overview, detailed results, applications, publicity and patent list | `ae4a263939ad40a3982cc87f4fd7470d12812f16879aab510dbc4a3b71273751` |
+| P2 | JAXA, [The miniaturized triaxial attitude-control module inside Int-Ball](https://fanfun.jaxa.jp/topics/detail/10792.html), 2017-10-13: large/small prototype distinction, integration, sensor fusion and brake function | `14060da8a8dd05ca034d23662299d6b8da7e725e921e97a236ea9de3c1998c03` |
 
-公開動画はP1の実リンクから確認した
-[研究紹介、2分01秒](https://www.youtube.com/watch?v=VamXKnQnrPg)と
-[用途は無限大?! 超小型三軸制御モジュール](https://www.youtube.com/watch?v=ummojBgEVLo)。
-後者はP1「広報」の2017年11月の紹介リンクとYouTubeページの題名を照合した。
-P2が埋め込むのは前者であり、後者へのリンクをP2に帰属させない。
-公開動画全体のバイト列ハッシュは未取得。P1には大小別の実験クリップもあるが、
-以下の時刻はそれらの再生時刻ではない。
+The public videos were verified through P1's actual links:
+[research introduction, labeled 2:01](https://www.youtube.com/watch?v=VamXKnQnrPg)
+and [Endless applications?! Miniaturized triaxial control module](https://www.youtube.com/watch?v=ummojBgEVLo).
+For the latter, P1's November 2017 publicity entry was cross-checked against
+the YouTube page title. P2 embeds the former; do not attribute the latter's
+link to P2. Full public-video byte hashes were not obtained. P1 also links
+separate large/small experiment clips; the timestamps below are not their
+playback times.
 
-提示された私有画面録画と既存の抽出フレームを参照した。原本・画像・字幕全文・
-ローカルパスは公開しない。録画SHA256を照合し、観察には既存抽出を再利用した。
+The supplied private screen recordings and existing extracted frames were
+consulted. Do not publish originals, images, full captions or local paths.
+Recording SHA256 values were checked; existing extracts were reused for
+observations.
 
-| 録画 | 長さ（引継ぎメタデータ、物理動作時間ではない） | 原本SHA256 |
+| Recording | Duration (handoff metadata, not physical-event duration) | Original SHA256 |
 |---|---|---|
 | V1 | 114.916 s | `5885da096d19621d9465f591147c0ebea4fa9a349fb7c815a07bf6d752042484` |
 | V2 | 363.532 s | `a82585f2d8c2ffbc15bcec2b33234c761cea2408d6bacd4dcfc30300ff8e6df9` |
 
-## 観察・公開主張・推論を分ける
+## Separate observations, published claims and inference
 
-**この節の数値は参考試作機に関するP1/P2の公表内容であり、当方の仕様・
-既定値・受入基準ではない。** 設計に採用する事実は、担当が適用対象と条件を
-一次資料で確認し、既存の`datasheets/evidence-log.md`へEvidence IDを登録する。
-映像だけでメーカーの動作限界を確定しない。
+**The figures here are P1/P2's published claims about reference prototypes,
+not our specifications, defaults or acceptance criteria.** Before adopting a
+fact in a design, its owner verifies the applicable configuration/conditions
+against primary documentation and registers an Evidence ID in the existing
+`datasheets/evidence-log.md`. Film alone does not establish a manufacturer's
+operating limits.
 
-| 分類 | 出典・対象 | 独自要約と限界 |
+| Class | Source and configuration | Original summary and limitations |
 |---|---|---|
-| PUBLISHED CLAIM | P1「モジュールの概要」、100 mm試作機の文脈 | 頂点に6台のMEMS慣性センサ、各レート3軸・加速度3軸。BLDC内蔵Hallによる回転数計測、新開発の薄型電磁ブレーキ、PSoCで50 Hz計測制御。31 mm版や当方の構成へ一般化しない。 |
-| PUBLISHED CLAIM | 同じ100 mm概要 | 励磁時2.1 N m、6000 rpmからゼロまで消磁時間込み100 ms以内との記述。速度・温度・デューティ別のトルク波形、許容反復回数、当方での安全性を表す値ではない。 |
-| PUBLISHED CLAIM | P1の後段「応用先」、P2の小型化説明 | 約31 mm・約50 gへの集約は別の小型モジュールの主張。上段の制動・制御数値を小型版へ移植しない。P1の重量表は重量欄と体積値の対応が不明確なので、100 mm版の欠落重量はUNKNOWNのままとする。 |
-| OBSERVED / CG | V1約16 s | 分散したセンサ位置を表すCGと6台の表示。実際の取付座標、軸校正、融合アルゴリズムは測定していない。 |
-| OBSERVED / 実写 | V1約27-35 s、約40 s | 面での静止から傾斜支持、角に近い支持姿勢へ移り、後に100 mm/31 mmの表示。編集・クロスフェードがあり、連続した無拘束試験の証明ではない。 |
-| OBSERVED / CG・PUBLISHED CLAIM / 字幕 | V1約48-64 s、V2約210-225 s、V2約135-150 s | ホイールと電磁ブレーキの説明CG、基板とホイールが展開されるCG、構体と回路基板の一体化を述べる字幕。実際の継手、製造方法、荷重限界までは立証しない。 |
-| OBSERVED / 実写・PUBLISHED CLAIM / 字幕 | V2約160 s、165-175 s、228-248 s | 小型版の重量の字幕、角でのバランスに見える姿勢、急な起き上がりがある。リード線と編集が見える。状態履歴・無拘束性・捕捉時間はUNKNOWN。 |
-| INFERENCE | 上記を当方の比較へ使う場合 | 加速、有限時間制動、解放/除荷、捕捉、維持を分けて評価すべき。これは比較手順の提案であり、映像から再構成した制御則ではない。 |
+| PUBLISHED CLAIM | P1's module overview, in the 100 mm-prototype context | Six MEMS inertial sensors at vertices, each measuring three-axis angular rate and three-axis acceleration. BLDC built-in Hall sensors measure wheel speed; newly developed thin electromagnetic brakes and PSoC measurement/control at 50 Hz are described. Do not generalize to the 31 mm version or our configuration. |
+| PUBLISHED CLAIM | The same 100 mm overview | Energized braking torque of 2.1 N m; 6000 rpm to zero within 100 ms, including demagnetization time. This is not a speed/temperature/duty-dependent torque waveform, an allowable cycle count or evidence of safety in our hardware. |
+| PUBLISHED CLAIM | P1's later applications section and P2's miniaturization account | Approximately 31 mm / 50 g describes a separate miniaturized module. Do not transfer the earlier braking/control figures to it. P1's mass heading and volume entry do not map clearly, so the missing 100 mm-prototype mass remains UNKNOWN. |
+| OBSERVED / CG | V1 approximately 16 s | Distributed sensor markers and a six-unit label in CG. Actual mounting coordinates, axis calibration and fusion algorithms were not measured. |
+| OBSERVED / apparent live action | V1 approximately 27-35 s and 40 s | Face-rest to inclined support to a corner-like stance, followed by 100 mm/31 mm labels. Editing and crossfades are present; this does not establish an uninterrupted, unconstrained test. |
+| OBSERVED / CG; PUBLISHED CLAIM / captions | V1 approximately 48-64 s; V2 approximately 210-225 s and 135-150 s | Wheel/electromagnetic-brake explanatory CG, unfolding PCB/wheel CG, and captions describing integration of the structure and circuit boards. Actual joints, manufacturing process and load limits are not established. |
+| OBSERVED / live action; PUBLISHED CLAIM / captions | V2 approximately 160 s, 165-175 s and 228-248 s | A small-module mass caption, an apparent corner-balancing pose and rapid self-righting. Leads and edits are visible. State histories, freedom from external constraint and capture time remain UNKNOWN. |
+| INFERENCE | Applying the above to our comparison | Evaluate acceleration, finite braking, release/unload, capture and maintained balance separately. This is a proposed comparison procedure, not a control law reconstructed from film. |
 
-時刻はすべて**画面録画の概略位置**。元動画の時計や校正済みの制動時間ではない。
-宇宙・飛行用途のCGは用途説明であり、撮影試作機の飛行認定・実証ではない。
+All timestamps are **approximate positions in the screen recordings**, not
+the original videos' clocks or calibrated braking durations. Space/flight
+application CG illustrates possible uses, not flight qualification or
+demonstration of the filmed prototype.
 
-## 転用する問いと既存担当の次作業
+## Transferable questions and next work for existing owners
 
-以下は引継ぎ済み作業への適用候補。重複タスクを立てず、Hardware Leadが既存の
-担当と成果物へ結ぶ。比較結果は本PRでは**NOT RUN / 実設計への採用なし**。
-数値閾値は現行の承認済み要求から取る。未定なら担当が提案し、人の必要な判断を
-得るまで成功を宣言しない。
+These are candidates for application to work already handed off. Hardware
+Lead connects them to existing owners/artifacts without duplicating tasks.
+Comparisons in this PR are **NOT RUN / no adoption into the actual design**.
+Take numeric thresholds from current approved requirements. If absent, the
+owner proposes them and does not claim success before the necessary human
+decisions.
 
-| 現在の懸念・転用する問い | 非転用・反例 | 既存担当、次の具体作業と比較出力 |
+| Current concern and transferable question | Non-transfer and counterexample | Existing owner, concrete next action and comparison output |
 |---|---|---|
-| 部品単体のトルクや筐体寸法だけでなく、機体の質量一次モーメント・慣性とホイール角運動量、ブレーキ/支持/制御/電池負担、力・反力の全経路を比較できているか。 | 「もっと強いモータ」「筐体を大きくする」だけでは全体系の改善を示さない。小型参考機は構造基板への変更許可ではない。 | Mechanicalが現配置を保つ基準案と代替案の質量・慣性・支持条件を明示。境界の衝突はLead経由でSystemsの既存4基準へ。既存の機械/interface資料に比較と波及先を記録し、Mechanical Reviewerへ渡す。 |
-| センサの目的、座標系、取付位置、時刻整合、実Hall/速度帰還とFG出力の差を説明できているか。 | 同一平面のBMI270を6個並べても分散配置の融合系と同等とは限らない。ただし、それだけで不適格やサテライト基板必須とも断定しない。 | Circuit/PCBが実ピン・機能・座標・配置の対応表を既存回路/interface資料へ。Firmwareは状態/時刻情報の可用性を確認する範囲。Componentは必要機能に対する一次資料を比較し、既存の各独立Reviewerへ。 |
-| 制動・再始動を含む電源/エネルギー分離と、無線・コネクタ・熱の負担が欠けていないか。 | 工業用ブレーキのピークトルクは反復制動の適合保証ではない。参考機の公表値から部品・許容デューティ・安全性を決めない。 | Component/Circuit/Powerが公開済み一次資料で速度・温度・デューティ・エネルギー条件を調査。欠落時は条件のある候補比較、または明示的な仮定の感度比較を出す。既存の部品比較/電源資料とHardware Reviewerへ渡し、無断で電源・ドライバを変えない。 |
-| 起き上がりの後に解放/除荷・捕捉・姿勢維持を説明できるか。 | 角度通過、転倒、小さな浮き、動画に似たマーカー軌道は維持成功ではない。隠れた基体インパルス、姿勢リセット、映像へのパラメータ合わせで埋めない。 | 既存シミュレーション担当へ、加速→有限制動→解放/除荷→捕捉→維持の段階別比較を渡す。状態可用性、飽和、残留ホイール運動量、接触継続時間、姿勢/角速度の捕捉指標を別studyで記録。既存担当の独立レビューへ渡し、#70の凍結監査・証拠を書き換えない。 |
-| 一体化の説明CGと、作れる/組める実部品を区別できているか。 | マーカー表示やCGの折り畳みは実機・飛行の証拠ではなく、一体造形と別部品の継手も同じではない。 | Mechanical/Manufacturingが部品、接合、挿入経路、工具、保持、材料/工程制限を比較。`mechanical-visualization`と`docs/assembly-evidence.md`の実装済み手順でWIP証拠を作り、Mechanical Reviewerへ。Fusionの組立順序とMuJoCo計算/Blender再生を代替関係にしない。 |
+| Are body first moment/inertia, wheel angular momentum, brake/support/controller/battery burden and the complete force/reaction path compared together, rather than only part torque or enclosure size? | A stronger motor or a larger enclosure alone does not demonstrate whole-system improvement. Reference compactness is not permission to adopt structural PCBs. | Mechanical states mass, inertia and support conditions for a baseline preserving the current pose and for alternatives. Route boundary conflicts via Lead to Systems' existing four criteria. Record comparisons and ripple effects in existing mechanical/interface artifacts and hand off to Mechanical Reviewer. |
+| Are sensing purpose, frames, physical placement, time alignment and the distinction between actual Hall/speed feedback and FG output explained? | Six coplanar BMI270s do not automatically reproduce the distributed fusion architecture. That alone also does not disqualify them or require satellite boards. | Circuit/PCB records actual pin/function/frame/placement mappings in existing circuit/interface artifacts. Firmware stays within checking state/timestamp availability. Component compares primary evidence for required functions; route to each existing independent reviewer. |
+| Are supply/energy boundaries during braking and restart, plus radio, connector and thermal burdens, accounted for? | An industrial brake's peak torque does not qualify repeated braking. Do not infer a part choice, permissible duty or safety from reference-prototype figures. | Component/Circuit/Power investigates speed/temperature/duty/energy conditions in available public primary documentation. If missing, compare documented candidates or run explicitly assumed sensitivity comparisons. Use existing component/power artifacts and Hardware Reviewer; do not change power or drivers without authorization. |
+| Can release/unload, capture and maintained balance after self-righting be explained? | Crossing an angle, tumbling, a tiny gap or a video-like marker trajectory is not maintained balance. Do not fill gaps with hidden base impulses, pose resets or parameter fitting to film. | Pass acceleration -> finite braking -> release/unload -> capture -> maintained-balance comparisons to the existing simulation owner. Record state availability, saturation, remaining wheel momentum, contact dwell and attitude/angular-rate capture metrics in a separate study. Use that owner's independent review; do not rewrite #70's frozen audit/evidence. |
+| Is integration CG distinguished from real parts that can be manufactured and assembled? | Markers or CG folding are not hardware/flight evidence; a fused print is not equivalent to joints between separate components. | Mechanical/Manufacturing compares parts, joints, insertion paths, tools, retention and material/process limits. Produce WIP evidence through the existing `mechanical-visualization` and `docs/assembly-evidence.md` procedures for Mechanical Reviewer. Fusion assembly sequencing, MuJoCo computation and Blender replay are not interchangeable. |
 
-調査しても根拠が足りない場合はUNKNOWNの反復で止めない。担当が「利用可能な
-一次資料を持つ機能候補」「限定した仮定で比較できるモデル」「保護条件を維持する
-案と、人の判断が必要な構成変更案」のうち適切な次作業を提示する。条件変更が
-必要なら既存`systems-integration`と人の判断へ戻し、独断では採用しない。
+If evidence remains insufficient, do not stop at repeated UNKNOWN checklists.
+The owner proposes an appropriate next step: functionally suitable candidates
+with available primary sources, a model comparison with bounded assumptions,
+or a constraint-preserving option alongside an architecture-change option
+requiring human judgment. If constraints must change, return to the existing
+`systems-integration` process and human decision, not unilateral adoption.
 
-P1は特許を列挙しているが、公開映像は機構の複製許可や製造/IP調査の代わりではない。
-権利・製造条件の適用可否は未評価で、ここで一般的な法的結論を出さない。
+P1 lists patents; public film is neither permission to copy a mechanism nor
+a substitute for manufacturing/IP investigation. Applicability of rights
+and manufacturing conditions is unevaluated. No broad legal conclusion is
+made here.
 
-## レビュー・再利用の境界
+## Review and reuse boundaries
 
-独立した読者は、原資料の版/試作機/条件、観察と推論の区別、上の反例、
-担当と比較指標を確認する。導入PRに担当者、レビュー対象コミット、日付、
-指摘と処置を記録し、人の承認・マージまではCANDIDATEとする。
-私有録画を参照できない読者は、公表主張の確認と録画観察の未確認を分ける。
-既存の抽出画像を見たことだけで物理性能の独立検証済みとはしない。
+An independent reader checks source version/prototype/conditions, the
+observation/inference distinction, counterexamples, owners and comparison
+metrics. Record reviewer, reviewed commit, date, findings and disposition
+in the introducing PR; remain CANDIDATE until human approval/merge. Readers
+without the private recordings distinguish verified published claims from
+unconfirmed recording observations. Viewing existing extracts alone does not
+independently validate physical performance.
 
-共有スキルの行動例は期待する出力例であり、自動エージェント評価の実績ではない。
-本ケースからのハードウェア/制御変更、性能比較、製造可能性・安全性の受入は未実施。
-資料・要求・部品・配置が変われば適用性を再レビューし、設計変更は既存ECO・
-要求トレース・独立設計レビュー・人の承認へ返す。知識PRのマージはその代行ではない。
+The shared skill's behavioral examples describe expected output, not executed
+agent evaluations. Hardware/control changes, performance comparisons and
+manufacturability/safety acceptance arising from this case have not been
+performed. Re-review applicability when sources, requirements, parts or
+placement change. Actual design changes return to existing ECOs, requirement
+traceability, independent design review and human approval; merging a
+knowledge PR does not substitute for them.
