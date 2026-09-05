@@ -9,6 +9,11 @@ MuJoCoで計算します。**実機の成立性・安全性・Design Completeの
 別ケースにし、XYZ反力を内部制動と床接触から計算します。
 Blenderの10秒再描画とCERN ROOT形式への解析出力も、それぞれ役割を分けています。
 
+[独立レビューと修正完了記録](reviews/r2b/review.md):
+報告された実装指摘はすべて解消しました。これは数値/成果物パイプラインの限定的な
+確認で、実機の成立性、確立した空中跳躍、倒立維持、Fusion組立工程の承認ではありません。
+現行Blender成果物は `evidence/blender-replay-v6/startup-mechanism-fixture/` です。
+
 ## ローカル実行
 
 リポジトリのルートから実行します。Python 3.14、ffmpegが必要です。

@@ -1,0 +1,62 @@
+{
+  "CI": {
+    "conclusion": "success",
+    "headSha": "7512042dcdf773935a0a528ee9d4617787317da3",
+    "status": "completed",
+    "url": "https://github.com/ktanino10/ai-hardware-engineering-team/actions/runs/33979993468"
+  },
+  "byte_identical_v5_v6": {
+    "blender-motion.mp4": "183b8cf349dddd528758ac8635274125b324a605d13b84cae7ba664bc587b9e8",
+    "preview.png": "cc77becc9621bab67bac546396f91b9888782a6c40820cedb7331b245e8fb604",
+    "provenance.json": "5a00397939243b8a7a74157c494ac29f103bf9be027eeecf6ac56d3c4929fbe4",
+    "render-receipt.json": "9343c57d75cda1d5e5d6b311fe74af549d4286971a5a7a928c4c87c70d1a87b8",
+    "replay.blend": "b8f10b344627ebeb214caac4a2b816e5cd71d8be9d42b157199366f635e5838f"
+  },
+  "checker_fix_commit": "1e871634f126de7aa9286954e1761d8bb7979837",
+  "checker_sha256": "03ad0b7dbc49d14f6b0169127bc6d727e08f50400e1ba7435002d4c2211d71a1",
+  "evidence_unchanged": true,
+  "finding_disposition": "SIM-R2A-001_RESOLVED",
+  "head": "7512042dcdf773935a0a528ee9d4617787317da3",
+  "movie": {
+    "duration": "10.000000",
+    "nb_read_frames": "250",
+    "r_frame_rate": "25/1"
+  },
+  "native": {
+    "blender": "5.1.1",
+    "counterexample": {
+      "object": "Visual_cube_edge",
+      "reason": "Visual_cube_edge unsupported parent inverse",
+      "rejected": true,
+      "saved_mutation_sha256": "076cc53b347ac2f2ad9e45136581d3f82c4b8d8b765e09f946e33b7c45c0bfd3",
+      "success_receipt_written": false,
+      "world_displacement_m": 0.009999999873689375
+    },
+    "fresh_receipt_matches_delivered": true,
+    "good_native_status": "NATIVE_REOPEN_TRANSFORMS_GEOMETRY_AND_SOURCES_MATCH",
+    "live_scene_accessed": false,
+    "positive_frames": 250
+  },
+  "previous_receipt_rejected_as_current": "Native file/checker/source receipt changed; recheck before encoding.",
+  "prior_reviews_unchanged_sha256": {
+    "simulation/reviews/r1/review.md": "504a82410d4baa814e6bfe56088b7caaaf5368535873d1b7b777e1b10097f4a0",
+    "simulation/reviews/r1/witness.json": "e5156dae55109b05cfa8a1f2280bb542bdc93beae6e8d3165686a0f4d7f5d087",
+    "simulation/reviews/r1/witness.py": "6e69d4417836304c456271987dc4a689eb60b7f92dae468481b1d49042a31bc8",
+    "simulation/reviews/r2/ci-portability.json": "64abe6b25283ff5569fe0d843b4213b3a0000819ddf12d9e3ff231f6fca85ab8",
+    "simulation/reviews/r2/inspect_blend.py": "e720edac7e5d46df1779f684d47cba464d17ec6ea9bc68def120886d05d3cd31",
+    "simulation/reviews/r2/inspect_root.cxx": "02538325154e2c56ffbc0483935e294218434d6c881c66d06d514133505b611d",
+    "simulation/reviews/r2/review.md": "76759c1cf3f7952ddaed6cd6bc04a206dca1912a7ac1963ed1431e2a18ec7e1a",
+    "simulation/reviews/r2/witness.json": "064b99535ee77556e35ebf6228823b759597416c9066d74bc7ec67232bdf2d75",
+    "simulation/reviews/r2/witness.py": "cb25c988948b4f75bfd6fe27ac549f68b173a31c415c23ca0745d876a0770877",
+    "simulation/reviews/r2a/native_witness.py": "c9860d9679a649654d92b45cc57455c89417933a77a28f8025a7d2f5428ae3d3",
+    "simulation/reviews/r2a/review.md": "119d0d25b0c93e2542198419edd9153b5c1fe271a1ca9d9fb8ae24c76a2bb78c",
+    "simulation/reviews/r2a/witness.json": "e46913abf79018dc9fd0dd71e299ec94a4f7827fa2d6c163444e401333602be0",
+    "simulation/reviews/r2a/witness.py": "5e5177842b172fbf55f77878c8da596d3349ae8287dc9a51307a3c454387fe59"
+  },
+  "raw_frames_unchanged_and_bound": 250,
+  "scope": "SIM-R2A-001_ONLY_NO_DYNAMICS_RERUN",
+  "source_manifest_sha256": "019b72f308fab29d9848da202d0feb395eefa60fe09c75357a6a463a215ceb09",
+  "v6_manifest_sha256": "a990ed1628ec07fc88280c1d0c257fc0df5d5d67bb1e7a80d26fe1723ceaf1be",
+  "v6_native_check_sha256": "5d80f131a7cf5332e1dec8e7225a1f598b1df0b5d3384057a24b4ec009ca68f8",
+  "witness_sha256": "f8e8fba96c79437db6eb040637696710308f0129f2f40e31b4034905d87b5b85"
+}
