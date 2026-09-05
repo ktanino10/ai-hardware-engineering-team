@@ -347,6 +347,15 @@ Review→Human Approval→Promote pipeline is, notably, a good description of
 how this very document's own proposals should eventually be handled — not
 built now.
 
+**Scoped addendum (2026-09-06):** the later, explicit request to learn from
+engineering references is addressed by
+[engineering-reference-learning](../.github/skills/engineering-reference-learning/SKILL.md)
+and its [JAXA case](reference-cases/jaxa-triaxial.md): human-directed,
+independently reviewed file guidance promoted through a human-approved PR.
+This does not implement the deferred self-rewriting/long-term learning
+system, train model weights, introduce roles/services or change design
+authority. The original proposal and deferral above remain historical context.
+
 ## 21. Security
 
 `[req §21]`. Verified live repository settings (via GitHub API, this
