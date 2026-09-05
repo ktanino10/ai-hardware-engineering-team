@@ -125,11 +125,15 @@ Engineer's output at all):
 `docs/architecture-evolution.md` §37), an Electronics-adjacent addition like
 Power Engineer:
 
-11. **PCB Engineer** — takes a Design-Complete schematic to a real,
-    DRC-clean PCB layout: footprint assignment (CONFIRMED/ASSUMPTION
+11. **PCB Engineer** — supplies bounded WIP physical-interface preparation
+    before Design Complete when assembly evidence needs populated-board/
+    mated-connector envelopes and provisional mounts/placement
+    (`docs/workflow.md` Phase 4a), then takes the Design-Complete schematic
+    through full layout/routing and DRC closure: footprint assignment (CONFIRMED/ASSUMPTION
     labeled), board outline/layer-stackup justification, placement,
     current-aware routing, DRC closure, and the flat BOM + visual snapshot a
-    fabrication decision needs. Does not self-declare "ready to fabricate" —
+    fabrication decision needs. WIP preparation grants no general routing
+    or fabrication release. Does not self-declare "ready to fabricate" —
     hands off to Hardware Reviewer's now-extended checklist (above) for
     independent review, per the "before PCB fabrication" Human-in-the-loop
     gate.

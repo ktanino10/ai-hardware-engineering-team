@@ -22,7 +22,8 @@ final readiness. An APPROVED package requires all required interfaces and
 assembly evidence resolved/reviewed, with existing human risk dispositions
 stated accurately; this contract grants no new risk acceptance.
 
-Mechanical Lead alone owns geometry. A visualization pass may implement
+Mechanical Lead alone owns mechanical assembly/enclosure geometry; PCB
+Engineer retains board-layout ownership. A visualization pass may implement
 the source-defined insertion sequence, but must not silently resize a part,
 move its installed pose, change a mating relationship, or invent a new build
 order to make a render work. Route a discovered defect back through Hardware
@@ -40,6 +41,15 @@ Manufacturing Engineer for process-dependent fits, supports and structural
 assumptions. Mechanical Lead populates the interface file; Systems Engineer
 retains technical boundary/trade-off ownership when genuine conflicts arise.
 Mechanical Reviewer independently accepts or rejects the evidence.
+
+PCB Engineer can supply bounded **WIP physical-interface preparation** before
+Design Complete (`docs/workflow.md` Phase 4a): source-grounded package/
+populated-board/mated-connector envelopes, provisional outline/mount/placement
+geometry and explicit gaps. This breaks the circular dependency between
+board geometry, mechanical evidence and the shared gate; it does not authorize
+general routing, fabrication-ready release or physical action. The full PCB
+layout/release path still requires the approved schematic, independent
+Hardware Reviewer review and existing named gates.
 
 `UNKNOWN` is a truthful state, not a terminal deliverable. Search the
 authoritative project/manufacturer sources, or recommend a concrete
@@ -217,8 +227,15 @@ Each assembly's `current.json` selects its live manifest. A change to any
 current source, artifact, independent report or approval/gate record triggers
 validation even outside the physical prefixes (for example a referenced
 `validation/` report or `requirements/` input). This prevents report-only edits
-from leaving a stale APPROVED package behind an N/A result. Changing a current
-pointer or manifest also triggers validation. Do not delete pointers or
+from leaving a stale APPROVED package behind an N/A result. All current
+reference paths must be canonical repository-relative paths with **no symlink
+in any component**, including parent directories. Path identity is checked
+before dependency selection or N/A, not only after a manifest is selected:
+an alias cannot hide changes to the real tracked target or to the alias
+itself. Use the real tracked path and refresh the manifest/review rather than
+following an alias. This path check does not retroactively inspect inactive
+historical manifests or turn hash checks into geometry/safety acceptance.
+Changing a current pointer or manifest also triggers validation. Do not delete pointers or
 manifests, or edit a pre-existing inactive historical manifest; move the
 pointer to the new revision instead. Multiple revisions may be created before
 one PR merges: Git addition status against the merge base distinguishes those

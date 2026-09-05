@@ -88,6 +88,22 @@ class AssemblyEvidenceTests(unittest.TestCase):
             "evidence_sha256": checker.evidence_fingerprint(self.data),
         }
 
+    def commit_fixture(self, message):
+        self.git("add", ".")
+        self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                 "commit", "-qm", message)
+        return self.git("rev-parse", "HEAD").strip()
+
+    def run_pr(self, base, head):
+        output, errors = io.StringIO(), io.StringIO()
+        with mock.patch.dict("os.environ", {"GITHUB_EVENT_NAME": "pull_request",
+                                          "PR_BASE_SHA": base, "PR_HEAD_SHA": head}), \
+                mock.patch.object(checker, "REPO_ROOT", self.root), \
+                mock.patch.object(hardware_gate, "REPO_ROOT", self.root), \
+                contextlib.redirect_stdout(output), contextlib.redirect_stderr(errors):
+            status = checker.main([])
+        return status, output.getvalue(), errors.getvalue()
+
     def test_wip_reports_blocker_but_cannot_claim_readiness(self):
         self.data["artifacts"]["native_animation"]["status"] = "BLOCKED"
         result = self.validate()
@@ -246,6 +262,83 @@ class AssemblyEvidenceTests(unittest.TestCase):
                 with self.assertRaisesRegex(checker.EvidenceError, "missing/empty file"):
                     checker.check_changed_files([name], self.root)
                 path.write_text(original, encoding="utf-8")
+
+    def symlink_report_fixture(self):
+        self.approve()
+        actual = "validation/reports/independent-review.md"
+        report = self.file(actual, "Synthetic current report\n")
+        self.data["artifacts"]["independent_review"]["files"] = [report]
+        self.data["approval"]["record"] = dict(report, section="Synthetic report")
+        self.assertEqual(self.validate(require_approved=True).state, "APPROVED")
+        link = self.root / "validation/report-link"
+        link.symlink_to("reports", target_is_directory=True)
+        alias = dict(report, path="validation/report-link/independent-review.md")
+        self.data["artifacts"]["independent_review"]["files"] = [alias]
+        self.data["approval"]["record"] = dict(alias, section="Synthetic report")
+        self.write_manifest()
+        base = self.commit_fixture("Legacy current package with directory-symlink reference")
+        return base, actual, link
+
+    def test_real_pr_report_target_edit_cannot_hide_behind_parent_symlink(self):
+        base, actual, _ = self.symlink_report_fixture()
+        self.file(actual, "Changed actual report without refreshing the manifest\n")
+        head = self.commit_fixture("Edit only the tracked report target")
+        self.assertEqual(self.git("diff", "--name-only", base, head).strip(), actual)
+        status, output, errors = self.run_pr(base, head)
+        self.assertEqual(status, 1, output + errors)
+        self.assertIn("symlink", errors)
+        self.assertNotIn("NOT APPLICABLE", output)
+
+    def test_real_pr_ancestor_symlink_retarget_cannot_receive_exemption(self):
+        base, _, link = self.symlink_report_fixture()
+        self.file("validation/other-reports/independent-review.md", "Different report\n")
+        base = self.commit_fixture("Preexisting alternative report target")
+        link.unlink()
+        link.symlink_to("other-reports", target_is_directory=True)
+        head = self.commit_fixture("Retarget only the tracked directory symlink")
+        self.assertEqual(self.git("diff", "--name-only", base, head).strip(), "validation/report-link")
+        status, output, errors = self.run_pr(base, head)
+        self.assertEqual(status, 1, output + errors)
+        self.assertIn("symlink", errors)
+        self.assertNotIn("NOT APPLICABLE", output)
+
+    def test_current_reference_paths_are_validated_before_unrelated_diff_exemption(self):
+        self.approve()
+        original = copy.deepcopy(self.data)
+        report = self.file("validation/reports/shared.md", "Synthetic source/report/gate\n")
+        (self.root / "validation/report-link").symlink_to("reports", target_is_directory=True)
+        for dependency in ("source", "artifact", "gate"):
+            for path in ("validation/report-link/shared.md", "validation/reports/../reports/shared.md"):
+                with self.subTest(dependency=dependency, path=path):
+                    self.data = copy.deepcopy(original)
+                    ref = dict(report, path=path)
+                    if dependency == "source":
+                        self.data["sources"].append(ref)
+                    elif dependency == "artifact":
+                        self.data["artifacts"]["independent_review"]["files"] = [ref]
+                    else:
+                        self.data["approval"]["design_complete"] = dict(ref, section="Synthetic gate")
+                    self.write_manifest()
+                    with self.assertRaisesRegex(checker.EvidenceError, "symlink|repository-relative"):
+                        checker.check_changed_files(["docs/unrelated.md"], self.root)
+
+    def test_local_path_rejects_parent_terminal_and_dangling_symlinks(self):
+        self.file("validation/reports/report.md", "Synthetic report\n")
+        (self.root / "validation/directory-link").symlink_to("reports", target_is_directory=True)
+        (self.root / "validation/file-link.md").symlink_to("reports/report.md")
+        (self.root / "validation/dangling").symlink_to("missing", target_is_directory=True)
+        for name in ("validation/directory-link/report.md", "validation/file-link.md",
+                     "validation/dangling/report.md"):
+            with self.subTest(path=name):
+                with self.assertRaisesRegex(checker.EvidenceError, "symlink"):
+                    checker.local_path(self.root, name)
+        self.assertEqual(checker.local_path(self.root, "validation/reports/report.md"),
+                         self.root / "validation/reports/report.md")
+
+    def test_valid_current_package_still_allows_unrelated_documentation_exemption(self):
+        self.approve()
+        self.assertEqual(self.validate(require_approved=True).state, "APPROVED")
+        self.assertEqual(checker.check_changed_files(["docs/unrelated.md"], self.root), [])
 
     def test_refreshed_external_report_is_checked_without_hardware_changes(self):
         self.present("independent_review")

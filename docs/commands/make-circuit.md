@@ -85,13 +85,14 @@ or manages a workflow automatically.
   (`hardware/power-architecture.md`) before Circuit Design starts on the
   power section — this is the Hardware Lead's judgment call per project,
   not automatic for every subsystem addition.
-- **Continuing into Mechanical Design once Electronics has a stable board
-  outline** (Phase 1 of the multidisciplinary evolution —
-  `docs/architecture-evolution.md` §31; `docs/workflow.md` Phase 8-10): once
-  Circuit Design has fixed the board outline, mounting holes, component
-  heights, and connector layout (this does not require the full Electronics
-  Design Complete Gate to have passed first), add to the kickoff: "Once the
-  board outline is stable, have the Mechanical Lead populate
+- **Starting WIP Mechanical/assembly planning from identified interfaces**
+  (Phase 1 of the multidisciplinary evolution —
+  `docs/architecture-evolution.md` §31; `docs/workflow.md` Phase 8-10): when
+  required physical interfaces are identified, add to the kickoff:
+  "Have Hardware Lead route missing PCB facts through scoped WIP physical
+  preparation (Phase 4a), not wait for Design Complete or general routing.
+  Use source-linked provisional inputs with explicit gaps; finalized board
+  dimensions still require confirmed sources. Have Mechanical Lead populate
   `hardware/mechanical-interface.md` and design an enclosure
   (`.github/agents/mechanical-lead.agent.md`), then get an independent
   Mechanical Reviewer pass (`.github/agents/mechanical-reviewer.agent.md`)
