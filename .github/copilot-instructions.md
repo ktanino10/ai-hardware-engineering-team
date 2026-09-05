@@ -54,8 +54,10 @@ real GitHub Copilot custom agent profiles in `.github/agents/*.agent.md`
 `docs/architecture-evolution.md` §10/§27/§31):
 
 5. **Mechanical Lead** — designs an enclosure from
-   `hardware/mechanical-interface.md`, producing text/parametric output (no
-   CAD tool verified connected); sole owner of the mechanical geometry state.
+   `hardware/mechanical-interface.md`; sole owner of the mechanical geometry
+   state and early WIP assembly-process evidence. Uses runtime-verified
+   tooling, including requested Fusion Animation, not a permanent text-only
+   assumption.
 6. **Mechanical Reviewer** — independent, adversarial mechanical review,
    mirroring the Hardware Reviewer pattern; shares
    `validation/open-issues.md` with Hardware Reviewer (`Source:
@@ -187,15 +189,28 @@ To start or resume a design cycle, use `docs/commands/make-circuit.md`. For
 phase-by-phase detail (entry/exit criteria per phase, parallelization
 rules, conflict resolution), see `docs/workflow.md`.
 
+For multi-part assemblies, follow `docs/assembly-evidence.md` and
+`.github/skills/mechanical-visualization/SKILL.md` during design, not only
+after it: **WIP - NOT ASSEMBLY READY** planning/animation and full installed/
+per-stage evidence first; independently accepted, gated **APPROVED**
+documentation later. Hardware Lead owns cross-discipline interface completion
+and source-gap routing. An explicit Fusion request includes genuine native
+storyboards and playable published video, not another renderer or stills.
+Do not silently redesign geometry in a visualization pass or equate a
+structural check with geometry/safety acceptance.
+
 ## Tooling honesty
 
 Only use tools that actually exist in the current session's toolset (e.g.
 the `kicad-*` tools, when connected — `docs/architecture.md` §5.2). Never
 write instructions or code that assume an MCP server, API, or tool exists
-without verifying it first. Things not yet available (ERC, SPICE, parts
-database/availability, test equipment, a CAD/3D modeling tool for Mechanical
-— verified not connected, `docs/architecture.md` §5.3) are listed as Future
-Integration in `docs/architecture.md` §13 — do not implement against them.
+without verifying it first. Historical availability observations are not
+permanent capability claims. Mechanical model authoring, Animation action
+authoring, native save/reopen and video publishing require separate runtime
+preflight (`docs/architecture.md` §5.3); experimental/unverified `fusion_*`
+MCP tools cannot produce real deliverables. Current public API documentation
+and the exposed MCP surface are different facts. Integrations not yet
+available are tracked in §13; do not implement against imagined tools.
 Firmware toolchain availability (an ARM embedded compiler, PlatformIO, a
 vendor IDE) must likewise be verified each session, not assumed carried
 over from a prior one — `docs/architecture.md` §5.4.

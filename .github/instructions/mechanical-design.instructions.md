@@ -1,6 +1,6 @@
 ---
-description: 'Mechanical/enclosure artifacts require Electronics->Mechanical Interface traceability, explicit CONFIRMED/ASSUMPTION/ESTIMATE/UNKNOWN marking for every dimension, and no claimed CAD-tool capability that is not verified connected.'
-applyTo: 'hardware/mechanical/**,hardware/mechanical-interface.md'
+description: 'Mechanical/assembly artifacts require source-linked WIP versus approved evidence, full installed/per-stage coverage, requested Fusion native/video delivery, dimension confidence labels and runtime tooling honesty.'
+applyTo: 'hardware/mechanical/**,hardware/mechanical-interface.md,visualization/assembly-viewer/**'
 ---
 
 - Every dimension in an enclosure design must trace to a
@@ -16,9 +16,35 @@ applyTo: 'hardware/mechanical/**,hardware/mechanical-interface.md'
   use as if confirmed, per `docs/architecture.md` §6.1).
 - Do not claim a CAD/3D modeling tool rendered, previewed, or validated a
   design unless a tool connection was actually verified in that session
-  (`docs/architecture.md` §5.3/§13) — the verified default state today is "no
-  CAD/3D tool connected," so the primary artifact is text/parametric (an
-  OpenSCAD-syntax `.scad` file + a dimensional-spec Markdown table).
+  (`docs/architecture.md` §5.3). Verify model authoring, Animation authoring,
+  native save/reopen and video export separately; no historical "no CAD"
+  claim is a permanent instruction. Unavailable execution permits source/
+  planning output with a precise blocker, not a delivered-animation claim.
+- Follow `docs/assembly-evidence.md`: generate **WIP - NOT ASSEMBLY READY**
+  assembly planning/animation and installed/per-stage evidence during
+  design; release **APPROVED** documentation only after independent evidence
+  acceptance, Design Complete and named safety decisions. Incomplete WIP
+  evidence allows early blocker review, never final readiness.
+- Maintain the current revision manifest with source commit, hashes,
+  artifact status, owner and next action, selected by the assembly's
+  `current.json` pointer. Referenced report/source changes also invalidate
+  the current package; preserve historical manifests unchanged.
+  Include populated/mated PCBs,
+  actual mounting/insulation, all required sensors/boards/drivers/power,
+  motors/hubs/swept envelopes, fasteners, retained harnesses and actual
+  insertion/seating/removal/tool access. Scalar sync, a bare board or an
+  attractive export is insufficient.
+- Fusion Animation is the standard for applicable multi-part assemblies;
+  an explicit request requires genuine native storyboards and published
+  playable video, or a named human-approved alternative. Never relabel
+  another renderer's output. Experimental/unverified `fusion_*` MCP tools
+  are not a production path; public API support must be assessed per
+  operation, not inferred from a missing tool or search result.
+- A visualization pass cannot silently redesign geometry or move an
+  installed pose to hide a gap. Route source correction through its owner.
+  Distinguish intentional fused-print/contact/process fits from forbidden
+  overlap; disclose sampled-path limits. Animation is not collision,
+  support-removal, strength, safety or functionality proof.
 - Any non-cosmetic change under `hardware/mechanical/` or to
   `hardware/mechanical-interface.md` needs a `validation/change-log.md` (ECO)
   entry, and — since it may have cross-domain effects — a filled-in

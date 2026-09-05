@@ -17,11 +17,12 @@ flowchart LR
     E -- "clear" --> F["6. Validation"]
     F -- "issue found" --> D
     F --> G["7. Design Complete\nGate"]
-    D -- "stable board outline" --> H8["8. Electronics->Mechanical\nHandoff"]
-    H8 --> H9["9. Mechanical\nDesign"]
+    D -- "known/provisional physical interfaces" --> H8["8. Electronics->Mechanical\nHandoff"]
+    H8 --> H9["9. Mechanical Design\n+ WIP assembly evidence"]
     H9 --> H10["10. Independent\nMechanical Review"]
     H10 -- "CRITICAL/HIGH" --> H9
     H10 -- "clear" --> G
+    G -- "independent package acceptance" --> R["APPROVED assembly\ndocumentation"]
     D -- "fixed pin/interface allocation" --> H11["11. Firmware\nBring-up"]
     B -- "power complexity warrants it" --> H12["12. Power\nArchitecture"]
     H12 -- "human-approved architecture" --> D
@@ -149,44 +150,61 @@ criteria below.
   findings too — see architecture.md §8 and §5.3; there is one gate, not a
   separate Electronics gate and Mechanical gate.
 - On success: reports up to the human Product Owner / Chief Engineer.
+- For assemblies, release APPROVED documentation only with the independently
+  accepted revision package (`docs/assembly-evidence.md`). WIP assembly
+  planning/animation and blocker review occur before this gate to expose
+  faults; they do not waive it or the named physical-action safety gates.
 
 ### Phase 8 — Electronics → Mechanical Handoff *(Phase 1 of the
 multidisciplinary evolution — `docs/architecture-evolution.md` §13, §27)*
-- **Owner**: Mechanical Lead (extraction), Hardware Lead (ensures the
-  Electronics artifact is accessible).
-- **Entry criteria**: Circuit Design (Phase 4) has produced a **stable board
-  outline** — mounting holes, component heights, and connector layout are not
-  expected to change further. This is deliberately **data-driven, not
-  gate-driven**: it does **not** require Phase 7 (Design Complete Gate) to
-  have passed first, since board geometry is independent of later
-  electrical-only fixes (e.g. a decoupling-capacitor value change doesn't
-  move a mounting hole). If the board outline *does* change later, re-enter
-  this phase (see Phase 9's loop-back note).
+- **Owner**: Mechanical Lead (extraction), Hardware Lead (overall interface
+  completion and source-gap routing to existing Circuit/PCB/Mechanical/
+  Manufacturing specialists; Systems Engineer for genuine boundary trade-offs).
+- **Entry criteria**: Required physical subassemblies/interfaces are
+  identified. Begin WIP planning with known/provisional inputs; a stable board
+  outline, mounting holes, component heights and connector layout are needed
+  before treating them as finalized dimensions, not before generating the
+  evidence needed to resolve them. This is **data-driven, not gate-driven**:
+  Phase 7 need not have passed. Mark assumptions/UNKNOWNs and re-enter this
+  phase when upstream geometry changes.
 - **Activities**: Mechanical Lead populates `hardware/mechanical-interface.md`
   from the existing KiCad project (via the same read-only tools documented in
   architecture.md §5.2) or from Circuit-Engineer-/human-supplied facts if no
   KiCad project exists yet. Every field is marked `CONFIRMED` / `ASSUMPTION` /
   `ESTIMATE` / `UNKNOWN` (`.github/instructions/mechanical-design.instructions.md`).
+  Include populated/mated electronics, all required boards/sensors/drivers/
+  power interfaces, mounting/insulation and retained connector/harness
+  envelopes. Hardware Lead assigns source investigations or concrete
+  alternatives; missing facts are not indefinitely parked on human approval.
 - **Exit criteria**: `hardware/mechanical-interface.md`'s required fields
   (board outline, mounting holes, max component height, connector locations)
   are at least `ASSUMPTION`/`ESTIMATE`-populated, or an `UNKNOWN` has been
-  escalated per architecture.md §10.
+  assigned an investigation/next action. This permits WIP progress only;
+  required unresolved interfaces do not count as ready for final acceptance.
+  Named architecture/safety decisions still follow architecture.md §10.
 - **Parallel-safe?** Yes, with Phases 5/6/7 (Electronics review/validation/
   gate) — this is exactly why the entry criterion above is data-driven rather
   than waiting for those phases to finish.
 
 ### Phase 9 — Mechanical Design *(Phase 1)*
-- **Owner**: Mechanical Lead. Uses `.github/skills/enclosure-design/SKILL.md`.
+- **Owner**: Mechanical Lead. Uses `.github/skills/enclosure-design/SKILL.md`
+  and `.github/skills/mechanical-visualization/SKILL.md` for early assembly evidence.
 - **Entry criteria**: Phase 8 exit criteria met.
 - **Activities**: design against the full Phase 1 checklist in
   `.github/agents/mechanical-lead.agent.md` (enclosure/spatial layout, PCB
   mounting, connector accessibility, component-height clearance, internal
   clearance, fastener placement, wall thickness, assembly order, basic
   print-fit tolerance, basic manufacturability/3D-printability); produce the
-  `.scad` file + dimensional-spec table (no CAD tool is connected — verified,
-  architecture.md §5.3); self-check against the Mechanical Reviewer's
-  checklist before handoff.
-- **Exit criteria**: design artifact + rationale log + self-check handed off.
+  source + dimensional-spec table using runtime-verified tooling
+  (architecture.md §5.3). Generate WIP assembly instructions, component/
+  coordinate mapping, full installed/per-stage evidence and requested Fusion
+  native animation/video per `docs/assembly-evidence.md`; self-check before
+  handoff. Visualization never silently redesigns geometry or changes an
+  installed pose to make a picture fit.
+- **Exit criteria**: design artifact + rationale + self-check + revision
+  manifest/evidence handed off. An early blocker-review handoff may be
+  incomplete if explicitly WIP with source/capability owners and next actions;
+  final acceptance requires the complete evidence package.
 - **Loop-back**: if `hardware/mechanical-interface.md` changes after this
   phase starts (e.g. Circuit Engineer moves a connector), re-enter Phase 8
   for the changed fields, then resume here.
@@ -195,15 +213,21 @@ multidisciplinary evolution — `docs/architecture-evolution.md` §13, §27)*
 
 ### Phase 10 — Independent Mechanical Review *(Phase 1)*
 - **Owner**: Mechanical Reviewer. Uses `.github/skills/mechanical-review/SKILL.md`.
-- **Entry criteria**: Mechanical Lead handoff received.
+- **Entry criteria**: Mechanical Lead handoff received, including incomplete
+  WIP evidence when reviewing blockers early rather than claiming readiness.
 - **Activities**: run the full adversarial mechanical checklist
   (`.github/agents/mechanical-reviewer.agent.md`); classify findings
   CRITICAL/HIGH/MEDIUM/LOW with the same taxonomy Hardware Reviewer uses
   (architecture.md §7.1); record in `validation/design-review.md` (a new
   dated instance) and `validation/open-issues.md` (`Source=mechanical-reviewer`
   — the same living backlog Hardware Reviewer uses, so it feeds the same
-  Design Complete Gate).
-- **Exit criteria**: a single consolidated verdict — PASS / FAIL / CONDITIONAL.
+  Design Complete Gate). Inspect the revision manifest and full installed/
+  per-stage evidence; independently inspect native storyboards and published
+  video when accepting the requested Fusion package. Animation is not
+  collision/continuous-path, support-removal, strength or safety proof.
+- **Exit criteria**: a single consolidated verdict — PASS / FAIL / CONDITIONAL,
+  naming early WIP blocker scope or final evidence acceptance and the exact
+  source/artifact hashes. A WIP review cannot be presented as final readiness.
 - **Loop-back rule**: any CRITICAL or HIGH → back to Phase 9, then re-review.
 - **Parallel-safe?** No — one Reviewer, one verdict (architecture.md §4).
 
@@ -362,7 +386,8 @@ Two layers, used together — see architecture.md §3 for the invocation model:
 Once a stable board outline exists, the same chain extends (Phase 1,
 Mechanical — §2 Phase 8-10 above): `circuit-integrate` → (fork)
 `mechanical-interface-extract` → `mechanical-design` →
-`independent-mechanical-review` → conditional `mechanical-rework` or
+`wip-assembly-evidence` → `independent-mechanical-review` →
+conditional `mechanical-rework` or
 `design-complete-gate` — the *same* `design-complete-gate` todo both chains
 converge on, matching the single shared `validation/open-issues.md` backlog
 (architecture.md §8). Once pin/interface allocation is fixed, a third fork
@@ -378,6 +403,15 @@ into the same `circuit-integrate` step every other sub-block does) — this
 is the one fork in the framework that runs *before* Circuit Design rather
 than alongside/after it, since Phase 12 by definition must finish before
 Circuit Engineer can correctly design the power sub-block at all.
+
+The assembly chain's durable handoff is the revision manifest in
+[`assembly-evidence.md`](assembly-evidence.md), not a verbal "looks fine."
+WIP planning/evidence iterates with geometry and early review; APPROVED
+documentation is released after the existing gates and independent package
+acceptance. CI checks changed source/artifact/status linkage without
+retroactively fabricating historical evidence or blocking policy-only PRs on
+missing native artifacts. It does not certify geometry or change the existing
+hardware gate's diff-aware exemption.
 
 ### 4.1 Cross-Branch ID Collision Resolution (Shared-Namespace Files)
 

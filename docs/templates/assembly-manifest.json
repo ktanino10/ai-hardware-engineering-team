@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "assembly": "<assembly>",
+  "revision": "<revision>",
+  "state": "WIP",
+  "author": "mechanical-lead:<session>",
+  "source_revision": "<full source snapshot commit>",
+  "sources": [
+    {"path": "<canonical source path>", "sha256": "<source SHA-256>"}
+  ],
+  "retired_sources": [],
+  "animation": {"workflow": "FUSION", "alternative_approval": null},
+  "artifacts": {
+    "tool_preflight": {"status": "PENDING", "owner": "mechanical-lead:<session>", "reason": "Runtime capabilities not recorded", "next_action": "Record operation-specific supported API/UI capability matrix"},
+    "component_map": {"status": "PENDING", "owner": "mechanical-lead:<session>", "reason": "Physical inventory not mapped", "next_action": "Map required source parts to named components, units and installed transforms"},
+    "assembly_instructions": {"status": "PENDING", "owner": "mechanical-lead:<session>", "reason": "Assembly process not recorded", "next_action": "Plan source-grounded insertion, fastening, wiring and removal stages"},
+    "installed_assembly": {"status": "PENDING", "owner": "mechanical-lead:<session>", "reason": "Integrated installed evidence absent", "next_action": "Generate full populated, mated, mounted and retained assembly evidence"},
+    "assembly_stages": {"status": "PENDING", "owner": "mechanical-lead:<session>", "reason": "Per-stage evidence absent", "next_action": "Record insertion/seating/removal and tool/retention access checks with limits"},
+    "drawings": {"status": "PENDING", "owner": "mechanical-lead:<session>", "reason": "Revision drawings absent", "next_action": "Generate and inspect labeled WIP orthographic and overview views"},
+    "native_animation": {"status": "PENDING", "owner": "mechanical-lead:<session>", "reason": "Fusion native animation not delivered", "next_action": "Author actual assembly storyboards, save/archive and reopen; record precise capability blockers if needed"},
+    "animation_video": {"status": "PENDING", "owner": "mechanical-lead:<session>", "reason": "Fusion published video not delivered", "next_action": "Publish required storyboards and verify playback in a media player"},
+    "independent_review": {"status": "PENDING", "owner": "mechanical-reviewer:<session>", "reason": "Evidence not independently reviewed", "next_action": "Review available WIP evidence now; do not equate early blocker review with release acceptance"}
+  },
+  "approval": null
+}

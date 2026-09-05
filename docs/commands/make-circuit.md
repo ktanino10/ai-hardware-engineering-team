@@ -95,6 +95,11 @@ or manages a workflow automatically.
   `hardware/mechanical-interface.md` and design an enclosure
   (`.github/agents/mechanical-lead.agent.md`), then get an independent
   Mechanical Reviewer pass (`.github/agents/mechanical-reviewer.agent.md`)
-  before Design Complete — no CAD tool is connected in this environment, so
-  expect text/parametric output (an OpenSCAD-style script + a dimensional
-  spec table), not a rendered model."
+  before Design Complete. Begin WIP assembly-process planning/animation and
+  full installed/per-stage evidence early using
+  `docs/assembly-evidence.md`, even while explicitly unresolved inputs are
+  being sourced. Verify current tool capabilities per operation; deliver
+  requested Fusion native storyboards and playable published video, or
+  record a precise capability blocker and prepared handoff, not a silent
+  substitute. Release APPROVED documentation only after independent
+  acceptance, Design Complete and named safety decisions."

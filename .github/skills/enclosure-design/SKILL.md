@@ -1,6 +1,6 @@
 ---
 name: enclosure-design
-description: Standard procedure for designing a physically buildable enclosure/mechanical structure from the Electronics->Mechanical Interface contract, covering PCB mounting, connector accessibility, component-height clearance, internal clearance, fastener placement, wall thickness, assembly order, and basic 3D-printability, producing text/parametric output when no CAD tool is connected. Use this whenever designing or revising a mechanical enclosure.
+description: Design or revise a physically buildable enclosure from sourced interfaces, with early WIP installed/per-stage assembly evidence, real mounting/wiring/tool access and Fusion assembly planning before final readiness. Use whenever creating or revising a mechanical assembly, enclosure, or its physical interfaces; verify tooling at runtime.
 ---
 
 # Skill: Enclosure Design
@@ -25,15 +25,18 @@ tolerance, and basic manufacturability/3D-printability.
   connector locations. Any field you cannot confirm is `UNKNOWN`/
   `ASSUMPTION`/`ESTIMATE`, never a silent guess
   (`.github/instructions/mechanical-design.instructions.md`).
-- No CAD/3D modeling MCP tool is connected in this environment (verified —
-  see `docs/architecture.md` §5.3/§13) — plan to produce text/parametric
-  output, not a rendered model.
+- Discover current model/animation/save/export capabilities using
+  `.github/skills/mechanical-visualization/SKILL.md`; do not treat a
+  historical no-CAD observation as current. Source/text-only output is
+  an honest WIP fallback, not a completed assembly package.
 
 ## Procedure
 
 1. **Confirm the interface data.** Read `hardware/mechanical-interface.md` in
-   full. If a needed field is `UNKNOWN`, stop and escalate
-   (`docs/architecture.md` §10) rather than substitute a guessed number.
+   full. For UNKNOWN dependencies, route source investigation or a concrete
+   alternative through Hardware Lead; stop relying on that value, not all
+   WIP evidence generation. Preserve human architecture/safety decisions
+   (`docs/architecture.md` §10); do not substitute a guessed number.
 2. **Fix the enclosure's overall envelope first, serially**: outer
    dimensions, wall split (lid/base), wall thickness. This is the mechanical
    equivalent of fixing shared rails/ground/pins before sub-block design in
@@ -64,12 +67,24 @@ tolerance, and basic manufacturability/3D-printability.
    structured `Parameter | Value | Unit | Source/Rationale` Markdown table as
    the always-readable fallback. Do not claim it has been rendered/previewed
    unless a verified-connected tool actually did so.
-8. **Self-check against the Mechanical Reviewer's checklist**
+8. **Plan and inspect the build before final readiness.** Use
+   `.github/skills/mechanical-visualization/SKILL.md` and
+   `docs/assembly-evidence.md` to generate WIP instructions, component/
+   coordinate mapping, full installed and per-stage evidence, and requested
+   Fusion Animation. Include populated/mated electronics, all required
+   sensors/boards/drivers/power, motors/hubs/swept envelopes, mounting/
+   insulation, fasteners, retained wiring and insertion/seating/removal/
+   tool access. Record unknowns and path-check limits, not cosmetic
+   installed-pose fixes. Visualization cannot silently change this design.
+9. **Self-check against the Mechanical Reviewer's checklist**
    (`.github/skills/mechanical-review/SKILL.md`) before handing off — the
    goal is to catch the obvious issues yourself so independent review finds
    the subtler ones, not to skip review.
-9. **Hand off** to the Mechanical Reviewer: `.scad` file + dimensional-spec
-   table + design rationale log + self-check results + any open `UNKNOWN`s.
+10. **Hand off** to the Mechanical Reviewer: source + dimensional table +
+    rationale + self-check + revision-linked assembly manifest and open
+    UNKNOWN/capability blockers. Request early blocker review even if
+    incomplete; APPROVED documentation remains behind independent acceptance,
+    Design Complete and named safety gates.
 
 ## Handling Mechanical Reviewer findings (loop-back)
 
@@ -113,13 +128,15 @@ category below, not only the file where the fact itself lives:**
    boxes before and after, is stronger evidence than a comment claiming
    independence).
 3. **Visualizations and drawings** derived from those binaries (2D
-   orthographic renders, exploded views, drafting sheets, 3D viewers). Some
+   orthographic renders, exploded views, drafting sheets, Fusion native
+   storyboards/published videos, 3D viewers). Some
    are regenerable with the same toolchain used for the `.scad`/STL work
    (e.g. pure OpenSCAD CLI); others may depend on a separately-verified tool
    (e.g. Blender via MCP) that might not be connected this session — check
    per-session, per `docs/architecture.md` §5.3/§13's own convention, and
    disclose honestly (do not fabricate updated pixel/render output for a
-   tool you could not actually invoke).
+   tool you could not actually invoke). Update source/artifact hashes in
+   the current revision manifest and invalidate affected acceptance.
 4. **Safety-margin-dependent constants that are measured, not formulas.**
    A hardcoded-but-empirically-measured constant (e.g. a rotating envelope's
    own max radius, obtained by rendering and measuring a mesh rather than by
@@ -159,8 +176,9 @@ category below, not only the file where the fact itself lives:**
 ## Output
 
 `.scad` file + dimensional-spec table (both under `hardware/mechanical/`) +
-design rationale log + self-check results, referencing
-`hardware/mechanical-interface.md`.
+design rationale log + self-check results + the WIP assembly evidence
+manifest/package in `docs/assembly-evidence.md`, referencing
+`hardware/mechanical-interface.md`. Release is a later, explicitly gated state.
 
 ## Common failure modes to avoid
 

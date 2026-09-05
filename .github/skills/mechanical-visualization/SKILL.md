@@ -1,32 +1,32 @@
 ---
 name: mechanical-visualization
-description: Standard procedure for producing assembly instructions, 2D orthographic technical drawings, and an exploded/animated assembly visualization from an already-Design-Complete mechanical design (OpenSCAD source + STL exports) -- documentation of an existing, approved design, not new CAD/geometry work. Use this whenever a mechanical revision has reached Design Complete and needs buildable, visual documentation for humans to actually assemble the physical rig.
+description: Produce early WIP assembly-process planning/animation and installed/per-stage evidence, then separately gated approved assembly documentation. Use whenever a multi-part assembly must be understood, checked or built, and whenever Fusion animation is requested; deliver genuine Autodesk Fusion native storyboards and a playable published video, not a substitute render.
 ---
 
 # Skill: Mechanical Visualization
 
 ## Purpose
 
-Turn an already-Design-Complete mechanical design (a `.scad` file + STL
-exports + dimensional-spec table, all owned by the Mechanical Lead) into
-the visual and procedural documentation a human actually needs to build
-the physical rig: a real, buildable assembly-instructions document, 2D
-orthographic drawings of each printed piece, an exploded assembly view,
-and (optionally) an assembly animation. This is the standard operating
-procedure behind `.github/agents/mechanical-lead.agent.md` for the
-**documentation phase**, distinct from `.github/skills/enclosure-design/SKILL.md`
-(which is for *creating* the parametric CAD model from an
-Electronics->Mechanical Interface contract in the first place). Run this
-skill **after** a revision has already passed the Design Complete Gate —
-it produces no new geometry, dimension, or design decision, only
-downstream artifacts describing what already exists.
+Make the real assembly process inspectable **during design**, not only after
+approval: instructions, orthographic drawings, full installed/per-stage
+geometric evidence and Autodesk Fusion Animation. Follow
+`docs/assembly-evidence.md`'s two states and revision manifest:
+**WIP - NOT ASSEMBLY READY** for early planning, animation and blocker review;
+**APPROVED assembly documentation** only after complete evidence, independent
+acceptance, Design Complete and the named safety decisions. WIP labels belong
+in the artifacts/storyboards/videos as well as the manifest.
+
+For applicable multi-part assemblies here, Fusion Animation is the standard
+workflow and native/archive plus playable published video are deliverables,
+mandatory when explicitly requested. Do not silently replace them with
+Blender, three.js, stills, a script, or an attractive exploded view.
 
 ## The core distinction this skill exists to close
 
 `enclosure-design` answers "what should this part's geometry be, and why."
-This skill answers "now that the geometry is approved and final, how does
-a human actually put the physical parts together, and how do we show that
-clearly." Conflating the two is a real risk: a visualization/documentation
+This skill answers "can a human actually put these parts together, and how
+do we show and inspect that process." Conflating the two is a real risk:
+a visualization/documentation
 pass must **never** silently redesign, resize, reorder, or reinterpret a
 dimension or assembly step while producing a drawing or animation of it —
 if something looks wrong while visualizing it (parts that don't actually
@@ -36,20 +36,18 @@ something to unilaterally fix or quietly smooth over in the render.
 
 ## Preconditions
 
-- The mechanical revision has reached **Design Complete**
-  (`docs/architecture.md` §8: zero open CRITICAL findings, every HIGH
-  `RESOLVED` or human `ACCEPTED-RISK`, traceability matrix
-  fully-verified/waived, FMEA reviewed, an ECO entry for the revision).
-  Producing polished visuals of a design that has not actually cleared this
-  gate risks making an unfinished/unreviewed design look more final than it
-  is — confirm the gate was actually granted (`validation/change-log.md`)
-  before starting.
-- Print-ready STL exports already exist (`hardware/mechanical/stl/`,
-  produced by the existing `stl/export/*.scad` wrapper-script convention)
-  and/or the source `.scad` file is available to isolate geometry from
-  directly. If STLs don't exist yet, that is itself a prerequisite export
-  step (mirroring `validation/change-log.md`'s own STL-export ECO
-  precedent), not something this skill invents around.
+- Identify the source revision, canonical geometry owner and available
+  interface/BOM facts. **Design Complete is not an entry condition for WIP.**
+  Missing source dimensions/interfaces remain UNKNOWN, with owner and source
+  investigation/alternative action; continue the evidence work that does
+  not depend on guessing them.
+- Use existing source `.scad`/CAD and exports where available. Prepare missing
+  per-part exports from that source using verified tools; do not call them
+  print-ready merely because they exported successfully.
+- Before APPROVED release, verify the actual Design Complete decision
+  (`docs/architecture.md` §8), independent evidence acceptance and named
+  safety decisions. The same five conditions and human fabrication/power/
+  flashing gates still apply. Early blocker review is not final readiness.
 - Never invent a dimension, fastener spec, or assembly step this skill
   can't trace to the source `.scad` file, the dimensional-spec document, an
   Evidence ID (`datasheets/evidence-log.md`), or a real BOM line item.
@@ -60,34 +58,62 @@ something to unilaterally fix or quietly smooth over in the render.
 
 ## Tool availability — verify each session, do not assume
 
-Mirrors `docs/architecture.md` §5.3's own discipline: check what's actually
-connected **this session** before promising an output format.
+Record a dated `tool_preflight` matrix, not a single "Fusion connected" flag:
 
-- **OpenSCAD**: this project's established CAD tool throughout its
-  history — confirm with `openscad --version`, don't assume it's still on
-  `PATH` in a future session.
-- **Blender (via `blender-*` MCP tools)**: requires a **live, verified
-  connection** (`blender-get_addon_status` and/or `blender-get_scene_info`
-  actually returning a real scene) — never assumed available, and known to
-  have been disconnected in earlier sessions of this same project. If
-  Blender is **not** connected when this skill runs:
-  - The 2D orthographic drawings (OpenSCAD-only, see Procedure step 3) and
-    the written assembly-instructions document (Procedure step 2) are
-    **still fully producible** without it.
-  - The exploded-view render and the assembly animation (Procedure steps 4
-    and 5) **cannot** be produced — say so plainly (mirrors the
-    `enclosure-design` skill's own "no rendered preview unless a
-    verified-connected tool actually produced it" rule) rather than
-    describing a hypothetical render as if it existed.
-- **`ffmpeg`** (only needed for the optional animation, step 5): check
-  `ffmpeg -version` on `PATH`, and separately check whether Blender's own
-  build has FFMPEG support compiled in
-  (`bpy.app.build_options.codec_ffmpeg`) — both were confirmed present in
-  this project's own history, but re-verify rather than assume.
+| Operation | Record separately |
+|---|---|
+| Application/tool discovery | Installed/running version, exposed tool schema and actual connection/execution result this session |
+| Model preparation/import/authoring | Supported units, physical components/occurrences, coordinate placement and observed import result |
+| Animation authoring | Workspace access, storyboard creation, timed component transforms, view/visibility/callout actions; which operations were actually exercised |
+| Native persistence | Save/archive format, external-reference handling, saved storyboards and actual reopen result |
+| Published video | Publish path/scope/format, observed export result and real media-player playback |
+
+For each operation distinguish **documented public API**, **documented UI**
+and **agent execution availability**. Mark unexercised behavior UNCONFIRMED,
+even if a version is installed or SDK symbols exist. Cite official
+documentation; an absent search result proves neither support nor absence.
+
+Official references checked 2026-09-05 (documentation, not a standing runtime
+claim): [Animation workspace/storyboards/actions][fusion-animation],
+[AnimationManager][animation-manager] and [Storyboard][storyboard].
+The latter two say introduced May 2026: do not preserve an obsolete "no
+Animation API" rule. Storyboard creation/playback/view recording do not by
+themselves establish component-action authoring or video publishing.
+`Occurrence.transform2` describes model placement; camera view recording is
+not evidence that component transforms become animation actions. Verify
+each intended API operation against its current authoritative reference
+and the running version before depending on it.
+
+Exposed `fusion_*` MCP tools marked EXPERIMENTAL/UNVERIFIED are **prohibited
+for real deliverables**; the observed experimental surface does not expose
+Animation authoring. This says nothing about the application's entire public
+API. Use an actually available supported API execution path or documented
+UI operated through approved host controls, not invented tools, undocumented
+command/click macros or a shell-driven UI workaround. Do not install plugins,
+create a new MCP/extension, or change user Fusion preferences to evade a
+blocker; such integration work is a separate approved task.
+
+If a required UI/API operation cannot be executed, record its exact
+capability blocker and observed error/absence, prepare the source files,
+component/transform map and stage plan, and hand off only the smallest missing
+operation with named inputs, documented UI steps, expected outputs and a
+reopen/playback check. Keep native/video status BLOCKED, not delivered.
+
+OpenSCAD (`openscad --version`), Blender (discover its actual tools and verify
+a live scene) and any `ffmpeg` export path must likewise be checked each
+session before use. They can support source preparation, supplementary
+drawings or explicitly allowed alternative workflows; none silently
+satisfies an explicit Fusion deliverable.
+
+[fusion-animation]: https://help.autodesk.com/cloudhelp/ENU/Fusion-Animate/files/GUID-25E6D2E0-8057-4BFF-93B3-E7AEE2C4404A.htm
+[animation-manager]: https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/fusion_AnimationManager.htm
+[storyboard]: https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/fusion_Storyboard.htm
 
 ## Procedure
 
-1. **Verify tooling** (above) before promising any specific output format.
+1. **Start the revision-linked WIP manifest and verify tooling** (above).
+   Reconcile the complete required inventory against requirements, BOM and
+   interfaces; include missing parts as gaps, not invisible omissions.
 2. **Determine the real assembly order and fastener facts from existing
    source documents — never invent them.** Read the dimensional-spec
    document's own assembly-order section(s) (e.g. this project's
@@ -106,8 +132,9 @@ connected **this session** before promising an output format.
    defect — see "The core distinction" above).
 3. **Write the assembly-instructions document**
    (`hardware/mechanical/assembly-instructions.md` or equivalent),
-   structured as: scope/status (which revision, citing the Design Complete
-   ECO), safety notices restating any existing safety-relevant disposition
+   structured as: scope/status (source revision and WIP label, or actual
+   Design Complete/approval references for release), safety notices
+   restating any existing safety-relevant disposition
    honestly (a REQ-403/`MISS-016`-class or REQ-407(b)/`MISS-023`-class
    ACCEPTED-RISK disposition must be presented as exactly that —
    defense-in-depth, not proven-adequate — never upgraded to "solved" for
@@ -121,8 +148,8 @@ connected **this session** before promising an output format.
    for any step that depends on a part not yet fabricated (e.g. a PCB still
    in progress on a separate branch) rather than fabricating specifics that
    don't exist yet.
-4. **Generate 2D orthographic drawings.** Technique used successfully in
-   this project: write small, new, `include`-only OpenSCAD wrapper scripts
+4. **Generate 2D orthographic drawings with verified tooling.** The existing
+   OpenSCAD technique is: write small, new, `include`-only wrapper scripts
    (mirroring the existing `stl/export/*.scad` convention exactly — never
    edit the source `.scad` file itself) that isolate each printed piece's
    module call(s) in its real **assembled-frame** position (the same bare,
@@ -141,7 +168,62 @@ connected **this session** before promising an output format.
    views are for, not a defect to chase. **Visually view every rendered
    image before including it** — do not assume a non-error exit code means
    the image shows what you think it shows.
-5. **Build the exploded assembly view (requires Blender).**
+5. **Author the requested Autodesk Fusion assembly animation.**
+   - Prepare one source-linked physical component per manufactured/purchased
+     part instance (including repeated fasteners and sensor modules), not a
+     single anonymous mesh of the entire assembly. Map stable part/BOM IDs
+     to named Fusion components/occurrences in `component_map`.
+   - Export/import in the **real assembled coordinate frame**, not the
+     print-bed layout. Record source files/hashes, units, axis/handedness,
+     origin and each instance's installed transform. STL has no dependable
+     unit metadata: specify the import units and verify known source
+     dimensions. Do not silently recenter each part or apply print rotations.
+   - Inspect one imported part/assembly relationship before scaling up;
+     compare bounding boxes, known dimensions, part counts and transforms
+     against the source, then check the whole installed assembly. Retain
+     distinctions between sourced dimensions, allocations and UNKNOWNs.
+     Do not move an installed pose to make a visual fit.
+   - In the documented **Animation workspace**, name storyboards for the
+     actual source-defined build/service sequence. At time zero or the
+     scratch zone transforms set up the scene without recording actions;
+     positive timeline positions capture actions (official workspace
+     reference above). Use timed component, view, visibility and callout
+     actions with explicit stage IDs. Use documented, runtime-confirmed API
+     equivalents only where they genuinely author those actions.
+   - Show real insertion, seating, fastening, connection and retention
+     order, including fastener/tool approach and temporary support before
+     closure. Call out hidden hardware, harness retention, sensor identity/
+     orientation and safety stops; reveal views rather than hiding a
+     collision with visibility changes. An exploded overview can help
+     identify parts but is not a feasible path by itself.
+   - For every stage and the installed state, generate the evidence in
+     `docs/assembly-evidence.md`: populated/mated PCBs with mounts/insulation,
+     all required electronics, motors/bells/hubs/swept envelopes, fasteners
+     and retained harnesses, insertion/removal and tool access. Distinguish
+     fused-print unions/bearing contacts/qualified process interference
+     from forbidden separate-part overlap. Record measurements, tolerances,
+     sampling and untested intervals. Animation alone proves neither
+     collision-free continuous motion, support removal, strength, safety
+     nor functionality.
+   - Save the real Fusion design and export the supported native archive:
+     `.f3d` for a self-contained design or `.f3z` for a package with external
+     design references, per [Autodesk's format explanation][fusion-archives].
+     Reopen the archive and verify named components, coordinate alignment,
+     linked parts and the saved storyboards; a design-only archive without
+     animation does not satisfy `native_animation`.
+   - Use **Animation > Publish > Publish Video**, select the required
+     current storyboard or whole-document scope and resolution, then save
+     the actual output ([official procedure][fusion-publish]). Autodesk's
+     [publish tutorial][fusion-playback] documents AVI on PC and MP4 on Mac
+     and explicitly requires media-player playback. Recheck the running
+     version's options, play the delivered file, inspect start/intermediate/
+     end stages and record duration/scope. Keep the original published file
+     and its hash if producing a separately labeled compressed derivative.
+   - If an operation is unavailable, preserve prepared inputs and the precise
+     supported UI/API handoff from the preflight; do not call a script,
+     static model, renamed Blender video or screen still a Fusion animation.
+6. **Supplementary or explicitly allowed alternative exploded view
+   (Blender example, not a Fusion substitute).**
    - Export each printed piece (plus any bought part worth showing as
      context, e.g. a bearing — as a reference-only ghost, not counted
      among the printed pieces) as an **assembled-position** STL, using the
@@ -178,11 +260,13 @@ connected **this session** before promising an output format.
    - Color each part distinctly and add a caption/legend (a short Pillow
      (PIL) post-process onto the rendered PNG works well) so the render is
      self-explanatory without a separate cross-reference.
-6. **Build the assembly animation (optional; requires Blender + a verified
-   video-export path).** Extends the same exploded-view scene: keyframe
-   each part's `location` from its exploded position to its assembled
-   position (or the reverse), **staggered across stages that follow the
-   real build order determined in step 2** — not an arbitrary order.
+7. **Alternative animation only when explicitly allowed** (Blender example;
+   requires a verified video-export path). An explicit Fusion request can
+   change only through `animation.alternative_approval` in the manifest.
+   Keyframe the source-defined stage waypoints and fastening/retention
+   sequence, not arbitrary straight-line explode/home interpolation. If
+   explode/home motion is used only to identify parts, label it a
+   presentation view, not an assembly-feasibility demonstration.
    - **Direction**: exploded→assembled reads as "watching it get built";
      assembled→exploded reads as a teardown/disassembly view. Either is
      valid — state which was chosen and why.
@@ -210,13 +294,23 @@ connected **this session** before promising an output format.
      between sample frames is a cheap, objective sanity check if the
      motion looks subtler than expected at a given camera framing) before
      committing to the full render.
-7. **Document the methodology.** Write (or update) a `drawings/README.md`-
-   style document explaining what was generated, with which tool, and the
+8. **Document the methodology and hand off evidence.** Write (or update) a
+   `drawings/README.md`-style document explaining what was generated, with which tool, and the
    exact regeneration commands — this is the first time most projects will
    have done 2D drawings/exploded views/animations, so the convention needs
    to be written down, not left as tribal knowledge in a chat transcript.
-   Include any real bugs hit and fixed along the way (see "Common failure
-   modes" below) so a future run of this same skill doesn't rediscover them.
+   Include source revisions, units/transforms, tool versions, generated
+   hashes, stage IDs, measurements and actual capability limitations.
+   Update all nine artifact statuses in the revision manifest and run
+   `python3 tools/check_assembly_evidence.py --manifest <current-manifest>`.
+   Request independent Mechanical Reviewer inspection now, including early
+   WIP blocker review if incomplete. Only complete, independently accepted
+   evidence and the existing gates permit APPROVED documentation; run
+   `--require-approved` for that structural check, not as safety certification.
+
+[fusion-archives]: https://www.autodesk.com/support/technical/article/caas/sfdcarticles/sfdcarticles/The-differences-between-an-f3z-and-f3d-file-in-Fusion.html
+[fusion-publish]: https://help.autodesk.com/cloudhelp/ENU/Fusion-Animate/files/GUID-5C687D49-7714-469F-A8CA-FA0C5A89F823.htm
+[fusion-playback]: https://help.autodesk.com/cloudhelp/ENU/Fusion-Animate/files/GUID-A3204116-91D7-4F57-B6DA-3CDF3C70C54E.htm
 
 ## Output
 
@@ -226,14 +320,21 @@ connected **this session** before promising an output format.
   wrapper scripts (assembled-frame per-part isolation).
 - `hardware/mechanical/drawings/2d/` — rendered 2D orthographic PNGs.
 - `hardware/mechanical/drawings/exploded/` — exploded-view render + its
-  own reproducible Blender build script.
-- `hardware/mechanical/drawings/animation/` (optional) — assembly
-  animation (video + reproducible build script).
+  source/tool provenance (Blender script only if that path was used).
+- Revision-specific native Fusion archive and published video, with saved
+  storyboards, component map and installed/per-stage evidence. Existing
+  `drawings/animation/` or the manifest's revision directory may hold them;
+  use unambiguous revision paths and no silent renderer substitution.
+- `hardware/mechanical/assembly-evidence/<assembly>/<revision>/manifest.json`
+  — WIP or APPROVED contract, exact source/artifact hashes and unresolved
+  capability/input statuses (`docs/assembly-evidence.md`).
 - `hardware/mechanical/drawings/README.md` — the methodology/regeneration
-  document from step 7.
+  document from step 8.
 - A `validation/change-log.md` ECO entry (documentation-only generation,
   no `.scad` geometry/dimension/module body changed — mirrors this
-  project's own STL-export ECO precedent).
+  project's own STL-export ECO precedent) when generating real artifacts.
+  Coordinate IDs with the integration owner; a policy-only change does not
+  fabricate an artifact-generation ECO or new safety evidence.
 
 ## Common failure modes to avoid
 
@@ -260,7 +361,7 @@ connected **this session** before promising an output format.
   while visualizing an already-Design-Complete design — report it as a
   potential new Mechanical Reviewer finding instead, per "The core
   distinction" above.
-- Skipping the methodology write-up (step 7/Output) because the concrete
+- Skipping the methodology write-up (step 8/Output) because the concrete
   deliverable already looks done — without it, the next person (or the
   next revision) re-derives the same technique from scratch, including its
   bugs.

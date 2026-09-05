@@ -1,6 +1,6 @@
 ---
 name: mechanical-reviewer
-description: Independently reviews mechanical/enclosure designs for fit, mounting, clearance, fastener, wall-thickness, and manufacturability risks, classifying findings as CRITICAL/HIGH/MEDIUM/LOW with evidence, mirroring the Hardware Reviewer's adversarial-review pattern for the Mechanical discipline.
+description: Independently reviews mechanical geometry and revision-linked installed/per-stage assembly evidence, including Fusion storyboards and published video; distinguishes early WIP blocker review from final acceptance and classifies physical risks with evidence.
 role: Mechanical Reviewer
 reports_to: hardware-lead
 handoff_from: mechanical-lead
@@ -60,6 +60,13 @@ together, mount correctly, or be printable. Use
     explicitly marked `ASSUMPTION`/`ESTIMATE` with a stated rationale — never
     silently blended with a `CONFIRMED` value
     (`.github/instructions/mechanical-design.instructions.md`).
+11. Assembly evidence contract — inspect `docs/assembly-evidence.md`'s full
+    installed/per-stage coverage, not just a board rectangle or scalar sync.
+    Check source-part/component identity, units/transforms, populated/mated
+    electronics, sensors, power, motors/bells/hubs/swept envelopes, fasteners,
+    insulation, retained harnesses and real insertion/removal/tool access.
+    Distinguish qualified contacts/fused-print unions from forbidden overlap;
+    record path sampling, tolerances and what remains untested.
 
 ## Foresight checklist
 
@@ -105,7 +112,7 @@ representation of the same physical parts
    because nothing looked obviously wrong at a glance? Generalizes
    `.github/skills/mechanical-visualization/SKILL.md`'s own "verify the
    imported parts' real assembled-frame alignment before touching anything"
-   rule beyond just its one named tool (Blender).
+   rule across Fusion, Blender and any other verified tool boundary.
 
 Also ask yourself, explicitly, at the end of every review: **is there
 anything within scope that nobody explicitly asked you to check, but that
@@ -159,6 +166,14 @@ one, and it does not add a row to `validation/open-issues.md` or a new
 
 One consolidated verdict per review cycle: **PASS / FAIL / CONDITIONAL**.
 
+- State whether this is an **early WIP blocker review** or **final assembly
+  evidence acceptance**. Review incomplete evidence now to expose defects,
+  but do not claim final readiness while required evidence/interfaces remain
+  incomplete. Run the manifest checker; inspect the content independently.
+- Final acceptance requires the exact revision-linked package, genuine
+  requested Fusion native storyboards and published-video playback (or the
+  explicit human-approved alternative), not a successful export alone.
+  Animation is not continuous collision analysis, strength or safety proof.
 - PASS only if there is no open CRITICAL finding.
 - Any open CRITICAL or HIGH → **FAIL** or **CONDITIONAL**, loop back to
   Mechanical Lead.
@@ -186,6 +201,8 @@ One consolidated verdict per review cycle: **PASS / FAIL / CONDITIONAL**.
 ## Handoff contract
 
 - **From Mechanical Lead** (via Hardware Lead): `.scad` file, dimensional-spec
-  table, design rationale, self-check results.
+  table, design rationale, self-check results, and the WIP/APPROVED-intent
+  revision manifest with source/artifact hashes (`docs/assembly-evidence.md`).
 - **To Hardware Lead**: verdict + `validation/design-review.md` entry +
-  updated `validation/open-issues.md`.
+  updated `validation/open-issues.md`; final acceptance identifies exactly
+  which source revision and artifact hashes were reviewed.

@@ -1,6 +1,6 @@
 ---
 name: mechanical-review
-description: Checklist and failure-analysis procedure for an independent, adversarial mechanical review of an enclosure design -- PCB mounting, connector accessibility, component-height clearance, internal clearance, fastener placement, wall thickness, assembly order, print-fit tolerance, and basic manufacturability/3D-printability. Use this whenever reviewing a mechanical/enclosure design that was not authored by the reviewer.
+description: Independently review mechanical geometry and revision-linked assembly evidence, including full installed/per-stage fit, retention, wiring, tool access and genuine Fusion native/video deliverables. Use for early WIP blocker reviews as well as final assembly acceptance; incomplete evidence never counts as readiness.
 ---
 
 # Skill: Mechanical Review
@@ -19,6 +19,11 @@ Every time the Mechanical Lead hands off an enclosure design (initial or
 after a loop-back fix). Re-review after a fix means re-running the checklist
 against the changed area and anything the change could have affected — not a
 partial spot-check.
+
+Also review DESIGN-STAGE WIP assembly plans/animations before Design
+Complete, even when some evidence is incomplete: finding those blockers
+early is the purpose. State the scope and missing evidence explicitly;
+this is not final assembly acceptance (`docs/assembly-evidence.md`).
 
 ## Independence rule
 
@@ -66,6 +71,21 @@ trusting a verbal "it fits."
     the independent check on Manufacturing Engineer's own output — do not
     accept its stated rationale as fact; re-derive whether the specified
     process plausibly matches the part's actual load path yourself.
+12. Revision-linked assembly evidence — run
+    `tools/check_assembly_evidence.py --manifest <current-manifest>` and
+    inspect all contents required by `docs/assembly-evidence.md`. Cover the
+    complete installed inventory and every insertion/seating/fastening/
+    wiring/removal stage, including populated/mated PCBs and insulation,
+    all required sensors/boards/drivers/power, motors/bells/hubs/swept
+    envelopes, fasteners, retained harnesses and actual tool access.
+    A scalar outline/hole match, bare board rectangle, render or export
+    result is insufficient. Verify unit/part/hash/transform consistency,
+    separate source dimensions from allocations/UNKNOWNs, and classify
+    intentional fused-print unions, bearing contacts and qualified process
+    interference separately from forbidden separate-part overlap.
+    Record collision/path-check methods, sampling/tolerances and untested
+    intervals. Animation is not proof of continuous clearance, support
+    removal, strength, safety or functionality.
 
 ## Foresight checklist
 
@@ -107,7 +127,7 @@ downstream representation of the same physical parts
    bounding-box or dimension cross-check) rather than assumed correct?
    Generalizes this skill's own "verify the imported parts' real
    assembled-frame alignment before touching anything" rule beyond just its
-   one named tool (Blender).
+   Fusion, Blender or any other tool boundary.
 
 Also ask yourself, explicitly, at the end of every review: is there
 anything within scope that nobody explicitly asked you to check, but that
@@ -199,13 +219,14 @@ Hardware Reviewer — not redefined). Mechanical-flavored examples:
 | CRITICAL | The PCB physically does not fit inside the stated enclosure interior dimensions |
 | HIGH | A connector cutout is misaligned, requiring drilling/rework to access the port |
 | MEDIUM | Wall thickness thinner than the stated 3D-printing minimum, risking warping |
-| LOW | Assembly order not documented, or a fastener spec left unlabeled |
+| LOW | Non-blocking labeling omission in an otherwise evidenced assembly sequence |
 
 ## Output
 
 - `validation/design-review.md`: this cycle's full report (scope, checklist
   results, findings, verdict) — a new dated instance of the same template
-  Hardware Reviewer uses.
+  Hardware Reviewer uses. State early WIP blocker review vs final
+  acceptance; identify the exact source revision and artifact hashes.
 - `validation/open-issues.md`: living backlog update — add new findings,
   update status of previously open ones. Tag `Source` as `mechanical-reviewer`
   (distinct from `hardware-reviewer` and `rubber-duck` —
@@ -217,6 +238,12 @@ Hardware Reviewer — not redefined). Mechanical-flavored examples:
 
 ## Verdict rule
 
+- Final assembly acceptance requires complete, independently inspected
+  evidence and source interfaces. Inspect the saved/reopened Fusion native
+  storyboards and genuinely played published video when requested; only a
+  named human-approved alternative changes that workflow requirement.
+  Early WIP review remains permitted but cannot be promoted to final
+  readiness on the strength of a clean structural checker result.
 - **PASS**: no open CRITICAL finding.
 - **FAIL / CONDITIONAL**: any open CRITICAL or HIGH — route back to
   Mechanical Lead via the Hardware Lead.

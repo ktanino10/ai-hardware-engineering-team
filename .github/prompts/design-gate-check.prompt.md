@@ -21,7 +21,12 @@ Do:
    currently pending my explicit approval before work can proceed.
 6. Recommend the next action: proceed to the next phase, loop back to
    Circuit Engineer, or escalate a specific conflict/decision to me.
+7. For a mechanical assembly, inspect the current revision manifest in
+   `docs/assembly-evidence.md` and report WIP versus APPROVED documentation,
+   missing installed/per-stage evidence, Fusion native/video status and
+   source/capability owners. Early blocker review is allowed with gaps;
+   neither it nor a structural check establishes final readiness.
 
-Output: a short structured status report covering points 1-6 — do not
+Output: a short structured status report covering points 1-7 — do not
 declare Design Complete yourself even if everything looks clear; that
 decision is reported to me, not made unilaterally.
