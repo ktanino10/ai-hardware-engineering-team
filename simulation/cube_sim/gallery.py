@@ -15,6 +15,10 @@ from .visualize import plot, plot_startup, render, source_label, verify_current
 STARTUP_CASES = ("startup-reference", "startup-rev5-proxy", "startup-mechanism-fixture")
 
 
+def startup_model_name(case):
+    return case + ("-v2.json" if case == "startup-mechanism-fixture" else ".json")
+
+
 def build_gallery(directory):
     directory = Path(directory)
     cards, navigation, files = [], [], {}
@@ -122,7 +126,7 @@ def suite(directory):
 
 def write_startup_models(directory):
     directory = Path(directory)
-    paths = [directory / f"{name}.json" for name in STARTUP_CASES]
+    paths = [directory / startup_model_name(name) for name in STARTUP_CASES]
     if any(path.exists() for path in paths):
         raise FileExistsError("Do not replace versioned startup inputs; use a new output directory.")
     directory.mkdir(parents=True, exist_ok=True)
@@ -137,7 +141,7 @@ def startup_suite(directory):
     cards = []
     hashes = {}
     for name in STARTUP_CASES:
-        path = ROOT / "models" / f"{name}.json"
+        path = ROOT / "models" / startup_model_name(name)
         config = load_config(path)
         output = directory / name
         scenario = startup_scenario(config)

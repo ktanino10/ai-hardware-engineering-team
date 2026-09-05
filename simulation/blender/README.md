@@ -16,17 +16,17 @@ From the repository root, using the Blender binary found by runtime preflight:
 /Applications/Blender.app/Contents/MacOS/Blender \
   --background --factory-startup --threads 4 --python-exit-code 1 \
   --python simulation/blender/render_replay.py -- \
-  --run simulation/evidence/startup-v3/startup-mechanism-fixture \
+  --run simulation/evidence/startup-v4/startup-mechanism-fixture \
   --output simulation/runs/my-blender-replay --engine workbench --animation
 
 /Applications/Blender.app/Contents/MacOS/Blender \
   --background --factory-startup simulation/runs/my-blender-replay/replay.blend \
   --threads 4 --python-exit-code 1 --python simulation/blender/check_replay.py -- \
-  --run simulation/evidence/startup-v3/startup-mechanism-fixture \
+  --run simulation/evidence/startup-v4/startup-mechanism-fixture \
   --output simulation/runs/my-blender-replay/native-check.json
 
 simulation/.venv/bin/python simulation/blender/encode_replay.py \
-  --run simulation/evidence/startup-v3/startup-mechanism-fixture \
+  --run simulation/evidence/startup-v4/startup-mechanism-fixture \
   --render simulation/runs/my-blender-replay
 ```
 
@@ -35,6 +35,16 @@ Open `replay.blend` in Blender or play `blender-motion.mp4`. `preview.png`,
 records, scripts, native file, frame mapping and output hashes.
 Raw `frames/` images are regenerable render intermediates, not separate
 physics evidence. Keep them local rather than adding them to the PR.
+Schema-2 provenance binds input/scenario/CSV/map bytes. Before encoding,
+every frame hash, source binding and current full native-check receipt is
+validated. The native checker covers body and rotor world transforms,
+centres, parenting, scales, fixed mesh axes and geometry, not merely local
+rotor quaternions. A moved rotor or changed speed annotation is rejected.
+Older receipts are historical and cannot be reused as current acceptance.
+
+`negative_native.py` provides isolated saved-file mutation regressions
+(10 mm rotor displacement, scaling and mesh-axis errors); its output goes
+under `simulation/runs/`, never into the live Blender scene.
 New published clips require at least ten seconds of recorded motion.
 Workbench is a lightweight display renderer, not a different physics engine.
 The earlier three-second Cycles comparison is historical, not the current

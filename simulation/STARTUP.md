@@ -14,7 +14,7 @@ cd simulation
 # http://127.0.0.1:8765/runs/my-startup-suite/index.html
 ```
 
-収録版は `evidence/startup-v3/index.html`。各通常動画は**実時間10秒**で、
+収録版は `evidence/startup-v4/index.html`。各通常動画は**実時間10秒**で、
 10秒間を積分しています。短い動画の繰り返し/静止画追加ではありません。
 `brake-detail.mp4` は**100倍スロー**と明記した別動画で、0.1秒の計算区間を
 10秒で見せます。どちらも同じ状態記録の該当行を描画します。
@@ -38,6 +38,9 @@ cd simulation
 
 `models/startup-*.json` は再現可能なパラメータファイルです。比較はコピーした新しい
 ケース名で行い、凍結済みの入力/証拠や実機のSource of Truthを書き換えません。
+合成モデルの現行入力は `startup-mechanism-fixture-v2.json` です。R2で指摘された
+由来説明の誤記だけを訂正し、物理/制御パラメータは以前と同じです。基準ファイルは
+ソフトウェアの雛形であり、この合成モデルの質量/形状/床摩擦を保持した元データではありません。
 
 - `scenario.startup.target_rad_s`: 各ホイールの符号付きXYZ目標。0の軸は駆動しない。
 - `actuation.torque_limit_nm`: 各軸の理想モーター上限。

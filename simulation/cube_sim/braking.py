@@ -112,6 +112,10 @@ def derive_startup_config(base_path, *, mechanism_fixture=False):
     config["provenance"]["base_model"] = {"path": str(base_path.resolve().relative_to(ROOT.parent)),
                                          "sha256": sha256(base_path)}
     config["provenance"]["actuation_and_contact"] = (
+        "SYNTHETIC fixture: the base file is a software template only. Body size/mass/inertia, wheel "
+        "mass/annular geometry/inertia/centres and floor friction are intentionally different assumptions. "
+        "Startup target/cutoff, step and independent brake are also assumptions; no actual hardware is adopted."
+        if mechanism_fixture else
         "Startup-only ASSUMPTION overrides: X target/cutoff, integration step and independent dry brake. "
         "Base mass moments and floor law are unchanged; no actual-driver capability is claimed."
     )

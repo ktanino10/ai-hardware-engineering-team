@@ -5,7 +5,6 @@ Blender API: https://docs.blender.org/api/5.1/bpy.ops.render.html
 """
 
 import argparse
-import csv
 import hashlib
 import json
 from pathlib import Path
@@ -15,6 +14,8 @@ import bpy
 from mathutils import Quaternion, Vector
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from cube_sim.geometry import annulus_mesh
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from blender_contract import load_source, validate_provenance
 
 
 def sha(path):
@@ -71,16 +72,9 @@ def main():
     parser.add_argument("--engine", choices=("cycles", "workbench"), default="cycles")
     args = parser.parse_args(sys.argv[sys.argv.index("--") + 1:])
     source, output = args.run.resolve(), args.output.resolve()
+    bound = load_source(source)
+    manifest, config, rows, mapping = (bound[key] for key in ("manifest", "config", "rows", "mapping"))
     output.mkdir(parents=True, exist_ok=False)
-    manifest = json.loads((source / "manifest.json").read_text())
-    for name in ("input.json", "scenario.json", "trajectory.csv", "video-frames.csv"):
-        if sha(source / name) != manifest["outputs"][name]:
-            raise ValueError(f"Changed input: {name}")
-    config = json.loads((source / "input.json").read_text())
-    with (source / "trajectory.csv").open(newline="") as stream:
-        rows = list(csv.DictReader(stream))
-    with (source / "video-frames.csv").open(newline="") as stream:
-        mapping = list(csv.DictReader(stream))
 
     bpy.ops.wm.read_factory_settings(use_empty=True)
     scene = bpy.context.scene
@@ -204,6 +198,8 @@ def main():
     scene.frame_start, scene.frame_end = 1, len(mapping)
     scene.frame_set(1)
     provenance = {
+        "schema_version": 2, "source_files_sha256": bound["source_files_sha256"],
+        "contract_sha256": sha(Path(__file__).with_name("blender_contract.py")),
         "status": "WIP_MUJOCO_STATE_REPLAY_NOT_BLENDER_PHYSICS",
         "blender": bpy.app.version_string, "engine": "Cycles CPU, 16 samples" if args.engine == "cycles" else "Blender Workbench",
         "source_manifest_sha256": sha(source / "manifest.json"),
@@ -221,6 +217,7 @@ def main():
         "frames": len(mapping), "fps": scene.render.fps,
         "scope": "Display-only cube edges/cylinders, not canonical CAD. Integer-frame poses copied from computed records. Between-frame interpolation is not physics evidence.",
     }
+    validate_provenance(bound, provenance)
     bpy.data.texts.new("PROVENANCE.json").write(json.dumps(provenance, indent=2))
     (output / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")
     (output / "frames").mkdir()
@@ -228,6 +225,15 @@ def main():
     bpy.ops.wm.save_as_mainfile(filepath=str(output / "replay.blend"), compress=True)
     if args.animation:
         bpy.ops.render.render(animation=True)
+        receipt = {
+            "source_manifest_sha256": bound["manifest_sha256"],
+            "blend_sha256": sha(output / "replay.blend"),
+            "provenance_sha256": sha(output / "provenance.json"),
+            "renderer_sha256": sha(__file__),
+            "frame_sha256": {f"frame_{i:04}.png": sha(output / "frames" / f"frame_{i:04}.png")
+                             for i in range(1, len(mapping) + 1)},
+        }
+        (output / "render-receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
     else:
         scene.frame_set(len(mapping) // 2 + 1)
         scene.render.filepath = str(output / "preview-raw.png")

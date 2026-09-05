@@ -1,13 +1,15 @@
 """Label Blender-rendered PNGs using the original computed timestamps."""
 
 import argparse
-import csv
 import hashlib
 import json
 from pathlib import Path
 import subprocess
+import sys
 
 from PIL import Image, ImageDraw, ImageFont
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from blender_contract import load_source, validate_encoding
 
 
 def main():
@@ -15,10 +17,9 @@ def main():
     parser.add_argument("--run", type=Path, required=True)
     parser.add_argument("--render", type=Path, required=True)
     args = parser.parse_args()
-    provenance = json.loads((args.render / "provenance.json").read_text())
-    with (args.run / "trajectory.csv").open(newline="") as stream:
-        rows = list(csv.DictReader(stream))
-    scenario = json.loads((args.run / "scenario.json").read_text())
+    source = load_source(args.run)
+    provenance, _ = validate_encoding(args.render, source)
+    rows, scenario = source["rows"], source["scenario"]
     font, small = ImageFont.load_default(size=19), ImageFont.load_default(size=15)
     output = args.render / "blender-motion.mp4"
     command = ["ffmpeg", "-v", "error", "-n", "-f", "rawvideo", "-pix_fmt", "rgb24",
@@ -63,6 +64,8 @@ def main():
               "duration_s": provenance["frames"] / provenance["fps"],
               "source_manifest_sha256": provenance["source_manifest_sha256"],
               "encoder_script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+              "contract_sha256": hashlib.sha256(Path(__file__).with_name("blender_contract.py").read_bytes()).hexdigest(),
+              "source_files_sha256": source["source_files_sha256"],
               "raw_frame_sha256": frame_hashes,
               "files": {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(args.render.iterdir())
                         if p.is_file() and p.name != "manifest.json"}}
