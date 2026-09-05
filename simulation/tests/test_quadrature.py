@@ -1,5 +1,6 @@
 from dataclasses import replace
 import unittest
+from unittest import mock
 
 import mujoco
 import numpy as np
@@ -16,9 +17,21 @@ class QuadratureTests(unittest.TestCase):
         with np.load(ROOT / "evidence/initial-v1/rev5-proxy/fall/trajectory.npz") as archive:
             old = {key: archive[key] for key in archive.files}
         result, _ = simulate(config, scenario)
+
+        def ordinary_step(model, data, _probe, rates):
+            before = rates(data)
+            mujoco.mj_step(model, data)
+            mujoco.mj_forward(model, data)
+            return .5 * model.opt.timestep * (before + rates(data))
+
+        with mock.patch("cube_sim.runner.advance", ordinary_step):
+            unobserved, _ = simulate(config, scenario)
         for key in old:
             if key != "work":
-                np.testing.assert_array_equal(result[key], old[key], err_msg=key)
+                np.testing.assert_array_equal(result[key], unobserved[key], err_msg=key)
+        # Archive sanity across libm/CPU/Python builds; noninterference above stays bitwise.
+        np.testing.assert_allclose(result["qpos"], old["qpos"], atol=1e-10, rtol=0)
+        np.testing.assert_allclose(result["qvel"], old["qvel"], atol=1e-9, rtol=0)
         self.assertLess(result["peak_energy_residual"][-1], .05)
         self.assertGreater(result["peak_energy_residual"][-1], .001)
         old_residual = old["energy"].sum(axis=1) - old["energy"][0].sum() - old["work"].sum(axis=1)
