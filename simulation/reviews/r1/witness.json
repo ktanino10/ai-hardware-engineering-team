@@ -1,0 +1,1868 @@
+{
+  "archived_artifacts": {
+    "reference/edge-balance": {
+      "csv_columns": 62,
+      "csv_npz_exact_all_columns": true,
+      "exact_frame_rows_hashes": true,
+      "final_attitude_error_deg": 45.000673480857316,
+      "final_energy_work_residual_j": -0.17970493988358954,
+      "frames": 75,
+      "independent_lowest_corner_initial_world_z_m": 0.0,
+      "initial_attitude_error_deg": 1.9999999999999944,
+      "initial_height_m": 0.16960224740180027,
+      "initial_penetration_m": 0.0,
+      "initial_qvel_max_abs": 0.0,
+      "last_normal_force_n": 12.752999999922018,
+      "manifest_sha256": "6931ad1abd91bc944c3011178518fb8b8c75a5f288fc91b2bc84f2de9fabf78c",
+      "max_independent_H_error_nms": 1.5959455978986625e-16,
+      "max_independent_P_error_kg_m_s": 2.220446049250313e-16,
+      "max_independent_energy_error_j": 1.0547118733938987e-15,
+      "max_loaded_point_slip_m_s": 0.020923027822502074,
+      "max_sampled_energy_work_residual_j": 0.18040054094552738,
+      "max_sampled_penetration_m": 0.00408496077140795,
+      "max_world_angular_rate_error_rad_s": 5.329070518200751e-15,
+      "outcome": "DEPARTED_TARGET",
+      "outputs": {
+        "input.json": "9119f27fcb6d93bf0e42a9324ea9d0097a70a1664a36172d657c5ac28e284348",
+        "model.xml": "944a6adcd0a97f74af7730870ca29c3f089ffde368610089c12b49b09a798a00",
+        "motion.mp4": "118ffb591a25be8a2e60efe040295a7076a2826c605a1a9aa8838782bf2cf073",
+        "plots.png": "4df89fb8a7448fef06ae3921e42ccd3b00678e577df8be20874872178bfb4261",
+        "preview.png": "ce7b204e1804fda47f49e9b552fe07ade4548e5c5e55ff6db5d7eb378909f911",
+        "scenario.json": "0c262094ab0d94bdf232eb68a2c9733cc1c41a7dfdaecd314ecb898a03520ab6",
+        "summary.json": "5ab30aa49aea19487e88b9c2ad55854a7b4a8e816c0afd0e36de08b3f2ea95ec",
+        "trajectory.csv": "bb1e40aa91d24c6502885586dc16add5801e10cd53df0cce971cbaf4b7cc1e27",
+        "trajectory.npz": "afaff8a2ecd6d68d12fce25c3581815ac63048317741276370e7fead112e5d4c",
+        "video-frames.csv": "64d5caec4453976fade2bab178406775e70bc79201e1c1552c70505fbf3c9889"
+      },
+      "weight_n": 12.753000000000002
+    },
+    "reference/face-to-vertex-attempt": {
+      "csv_columns": 62,
+      "csv_npz_exact_all_columns": true,
+      "exact_frame_rows_hashes": true,
+      "final_attitude_error_deg": 54.73656275017711,
+      "final_energy_work_residual_j": 4.13151152422464e-05,
+      "frames": 75,
+      "independent_lowest_corner_initial_world_z_m": 0.0,
+      "initial_attitude_error_deg": 54.735610317245346,
+      "initial_height_m": 0.12,
+      "initial_penetration_m": 0.0,
+      "initial_qvel_max_abs": 0.0,
+      "last_normal_force_n": 12.753000000021464,
+      "manifest_sha256": "066793f0c2a38df7ac61dcc03ba3296e944a497332e6c1024138249e096b5984",
+      "max_independent_H_error_nms": 2.47198095326695e-17,
+      "max_independent_P_error_kg_m_s": 2.252802548124169e-17,
+      "max_independent_energy_error_j": 1.4988010832439613e-15,
+      "max_loaded_point_slip_m_s": 6.301395657501345e-07,
+      "max_sampled_energy_work_residual_j": 4.141563550401741e-05,
+      "max_sampled_penetration_m": 4.790913957700149e-05,
+      "max_world_angular_rate_error_rad_s": 1.6263032587282567e-19,
+      "outcome": "TARGET_NOT_REACHED",
+      "outputs": {
+        "input.json": "9119f27fcb6d93bf0e42a9324ea9d0097a70a1664a36172d657c5ac28e284348",
+        "model.xml": "944a6adcd0a97f74af7730870ca29c3f089ffde368610089c12b49b09a798a00",
+        "motion.mp4": "5bae61cb04898561804def78fdd7ab61d0bc8c736d78fe63c2bf6bff8ecd1385",
+        "plots.png": "eed80ca212ff4069f24caca19c11af85e1cebb9f38023d56597fce4a79efb74d",
+        "preview.png": "a5a1a9cd3a9babc5821fc025b4a2424c3e9dfb8d8bb535237232701f542663b3",
+        "scenario.json": "095a465cc900fc55a30766afb1490ea0e35b6c3fc848b1bbecc8d325eb41d5c2",
+        "summary.json": "285bc6c61bd1110d13d5d17f7303461ce2960cd0dd80f89a06dd225396a11aa1",
+        "trajectory.csv": "693877ea27e866665b9bb2e6a3da9cfcc1d571f527686fbe94ac483ea6f45efd",
+        "trajectory.npz": "eaf3b2c2a0d8f89f47e7de286f928256e60fe80733b9a1e23a14fcc6d98a371a",
+        "video-frames.csv": "5ae093c8c8247726bfb53097e56e8a7947adcb9c6e0f1fd269bf12730a900501"
+      },
+      "weight_n": 12.753000000000002
+    },
+    "reference/fall": {
+      "csv_columns": 62,
+      "csv_npz_exact_all_columns": true,
+      "exact_frame_rows_hashes": true,
+      "final_attitude_error_deg": 0.0027065305282714214,
+      "final_energy_work_residual_j": -0.44215290913185545,
+      "frames": 50,
+      "independent_lowest_corner_initial_world_z_m": 0.12000000000000002,
+      "initial_attitude_error_deg": 10.313240312354814,
+      "initial_height_m": 0.2595447919456735,
+      "initial_penetration_m": 0.0,
+      "initial_qvel_max_abs": 0.0,
+      "last_normal_force_n": 12.752999999957543,
+      "manifest_sha256": "858adb7c37eb9e06fc2240fb44109a3b9f4eb6538b406ffe7045749d85c3c9ea",
+      "max_independent_H_error_nms": 9.020562075079397e-17,
+      "max_independent_P_error_kg_m_s": 2.220446049250313e-16,
+      "max_independent_energy_error_j": 4.440892098500626e-16,
+      "max_loaded_point_slip_m_s": 0.061582803869986505,
+      "max_sampled_energy_work_residual_j": 0.47241513316152184,
+      "max_sampled_penetration_m": 0.0050483976641476636,
+      "max_world_angular_rate_error_rad_s": 2.6645352591003757e-15,
+      "outcome": "NO_CONTROL_GOAL",
+      "outputs": {
+        "input.json": "9119f27fcb6d93bf0e42a9324ea9d0097a70a1664a36172d657c5ac28e284348",
+        "model.xml": "944a6adcd0a97f74af7730870ca29c3f089ffde368610089c12b49b09a798a00",
+        "motion.mp4": "b7eca230d97042ff92d3af09a03114e463e687e817b354e22a9435638234dcc2",
+        "plots.png": "eafe2b42b887d708ec8c5dc37f70fbe2b8db1cc658c85810fcd386da2c1cbe3d",
+        "preview.png": "101295658a6d7776782805f454c76492e13814d3b83d7e25b7a90510715bcab1",
+        "scenario.json": "08c938d1e9af87f406a355caf2db198d560c3629fb6199697fd2f101b9aea853",
+        "summary.json": "fcacfe08cab499a5628783fbb04d287bbf7b7ae532b5c5c3fc531de38b9d74f6",
+        "trajectory.csv": "3514738f6cdff4b7161f012efd8246e730c79f21c8980f8f76b2ab7212769b34",
+        "trajectory.npz": "c101c027d2418261aaa127865241d80b5ffa5720e229a5cddf9e5209f91d0cea",
+        "video-frames.csv": "56520604e7f79cf5a09b8b0fc25b5484ae370c6f1c99840fdd9b3dedb48beae8"
+      },
+      "weight_n": 12.753000000000002
+    },
+    "reference/one-wheel": {
+      "csv_columns": 62,
+      "csv_npz_exact_all_columns": true,
+      "exact_frame_rows_hashes": true,
+      "final_attitude_error_deg": 7.93829027864959,
+      "final_energy_work_residual_j": 6.874307641679095e-17,
+      "frames": 50,
+      "independent_lowest_corner_initial_world_z_m": 0.18,
+      "initial_attitude_error_deg": 0.0,
+      "initial_height_m": 0.3,
+      "initial_penetration_m": 0.0,
+      "initial_qvel_max_abs": 0.0,
+      "last_normal_force_n": 0.0,
+      "manifest_sha256": "20fd38eaf8f122c26a81a24ca590c9a9dc9c9944e0a7ba145d0567cabe3d82fb",
+      "max_independent_H_error_nms": 5.058480761002682e-18,
+      "max_independent_P_error_kg_m_s": 1.2563192673675783e-17,
+      "max_independent_energy_error_j": 3.191891195797325e-16,
+      "max_loaded_point_slip_m_s": 0.0,
+      "max_sampled_energy_work_residual_j": 5.134781488891349e-16,
+      "max_sampled_penetration_m": 0.0,
+      "max_world_angular_rate_error_rad_s": 4.718447854656915e-16,
+      "outcome": "NO_CONTROL_GOAL",
+      "outputs": {
+        "input.json": "9119f27fcb6d93bf0e42a9324ea9d0097a70a1664a36172d657c5ac28e284348",
+        "model.xml": "38bb581e52a8a0b0673c72791261feeff4d000546c251b76c4479c08be0979dd",
+        "motion.mp4": "57af59796d102c5e9eae5055ef684f648acb71c7f55530df99af08303d20abd9",
+        "plots.png": "aa664507406202e511b84db3413d18b418955a2e58d5c049342495181034639c",
+        "preview.png": "6f197dcc2554be6360caa6784f1ad85422836ee317634d6ae7f23db02743adbd",
+        "scenario.json": "7d78c6e7a0c32c21eb993597090aeac9df44f69bb0a5c914606ea8915c3bfe05",
+        "summary.json": "0341aebf1a7d67810f4db28a642c636711348e0e3a7216bf43e67c0f596f706d",
+        "trajectory.csv": "7fd23cd27fe2d837666d65041550cd6951e5b0569d00d6c232aaeb14ad435e04",
+        "trajectory.npz": "0faa0c88670a54d00965218b9ff963f7e3b22be68de65fd16d5e9c89f7290d56",
+        "video-frames.csv": "d3da2ba777e2ba9a4ba95fcbd5b1eead80d2c86d8bb8e3016d197c90a200d41c"
+      },
+      "weight_n": 0.0
+    },
+    "reference/rest": {
+      "csv_columns": 62,
+      "csv_npz_exact_all_columns": true,
+      "exact_frame_rows_hashes": true,
+      "final_attitude_error_deg": 0.0009524329317747911,
+      "final_energy_work_residual_j": 4.131503419754811e-05,
+      "frames": 50,
+      "independent_lowest_corner_initial_world_z_m": 0.0,
+      "initial_attitude_error_deg": 0.0,
+      "initial_height_m": 0.12,
+      "initial_penetration_m": 0.0,
+      "initial_qvel_max_abs": 0.0,
+      "last_normal_force_n": 12.752999999986413,
+      "manifest_sha256": "fe499bdda1e000e34771937e637989f552787f9ef70454ed65cbfa84c6b92657",
+      "max_independent_H_error_nms": 5.082197683525802e-21,
+      "max_independent_P_error_kg_m_s": 1.0842021724855044e-19,
+      "max_independent_energy_error_j": 6.661338147750939e-16,
+      "max_loaded_point_slip_m_s": 6.301395657501345e-07,
+      "max_sampled_energy_work_residual_j": 4.1413907306643355e-05,
+      "max_sampled_penetration_m": 4.790913957700149e-05,
+      "max_world_angular_rate_error_rad_s": 1.6263032587282567e-19,
+      "outcome": "NO_CONTROL_GOAL",
+      "outputs": {
+        "input.json": "9119f27fcb6d93bf0e42a9324ea9d0097a70a1664a36172d657c5ac28e284348",
+        "model.xml": "944a6adcd0a97f74af7730870ca29c3f089ffde368610089c12b49b09a798a00",
+        "motion.mp4": "0f4ede23bfebec4c09b3e9f131ceae67b3e5ef12996ffef562c93d718c2480db",
+        "plots.png": "4b3e4bbbb6becf23d166f7ace8e2f983ad19f7e2a6349cc750b0d76ffa81f452",
+        "preview.png": "466acfe3e676b44defee073a2e73b9f4b26a4e8b58564feeebaadce2f2e1b9bc",
+        "scenario.json": "be38922235e2c054472c96eb23d3f6fbd783d4faeeaa811442b2b51b3ff122fe",
+        "summary.json": "d761d226acb312bdaa2f6dfda43fce42c27f5228526bb01736ca4dda07795cbf",
+        "trajectory.csv": "970fca3e41fbbaf1b7f5f177df485ebf3d87dac3b5972764ddec0b89fcfbc44c",
+        "trajectory.npz": "b53af98b0cb768b2e814305e51a3e0299f8884dd65a6e79c90ed8999c73e2990",
+        "video-frames.csv": "2314f492d87c97d14071fb2ad2e23d06af58a07ac5e5daae75d6b321c2b6dd88"
+      },
+      "weight_n": 12.753000000000002
+    },
+    "reference/three-wheel": {
+      "csv_columns": 62,
+      "csv_npz_exact_all_columns": true,
+      "exact_frame_rows_hashes": true,
+      "final_attitude_error_deg": 11.628751894862773,
+      "final_energy_work_residual_j": 5.895455192008363e-16,
+      "frames": 75,
+      "independent_lowest_corner_initial_world_z_m": 0.18,
+      "initial_attitude_error_deg": 0.0,
+      "initial_height_m": 0.3,
+      "initial_penetration_m": 0.0,
+      "initial_qvel_max_abs": 0.0,
+      "last_normal_force_n": 0.0,
+      "manifest_sha256": "9b7f7be610d70f262a8baa870282a273cae1d5ce5833bd80619148db7cc7e9af",
+      "max_independent_H_error_nms": 1.8577126599181315e-17,
+      "max_independent_P_error_kg_m_s": 2.358139725155972e-17,
+      "max_independent_energy_error_j": 3.608224830031759e-16,
+      "max_loaded_point_slip_m_s": 0.0,
+      "max_sampled_energy_work_residual_j": 6.800116025829084e-16,
+      "max_sampled_penetration_m": 0.0,
+      "max_world_angular_rate_error_rad_s": 4.440892098500626e-16,
+      "outcome": "NO_CONTROL_GOAL",
+      "outputs": {
+        "input.json": "9119f27fcb6d93bf0e42a9324ea9d0097a70a1664a36172d657c5ac28e284348",
+        "model.xml": "38bb581e52a8a0b0673c72791261feeff4d000546c251b76c4479c08be0979dd",
+        "motion.mp4": "e746a3ee0b520feaa31121e17bbfd36db0ecda8b7c86364e9e62c17011bf963b",
+        "plots.png": "70789b15cf9ce52da8662c53f9a83c860fd2e976ff7b221460cb659ad029839f",
+        "preview.png": "38bd6f93f081b1d94d013678cd29a6026b416300e0e873802721cdd6536f0db6",
+        "scenario.json": "de03b57c690aa54fdbfd36282a98029f9e23a260ac518d59a6746dd6ecc57897",
+        "summary.json": "0bb97a5e0ea1cf680b0315ffffe40ca118d979054132b864ee1fc7a9db53cb32",
+        "trajectory.csv": "6eaebf6a4450f35efd6d3f1a9a45f768b33dbc449656c9d8b74e8aa324b5d378",
+        "trajectory.npz": "c716cea550638c32f5b59c2b1b89fa30923e97e0c63c781b47c3f690bc1157d9",
+        "video-frames.csv": "585e3eda5bed4e14e2cccfcecc5b0526009692a840970e484d13e97506108776"
+      },
+      "weight_n": 0.0
+    },
+    "reference/vertex-balance": {
+      "csv_columns": 62,
+      "csv_npz_exact_all_columns": true,
+      "exact_frame_rows_hashes": true,
+      "final_attitude_error_deg": 54.865894122264294,
+      "final_energy_work_residual_j": 0.13377274949107454,
+      "frames": 75,
+      "independent_lowest_corner_initial_world_z_m": 0.0,
+      "initial_attitude_error_deg": 1.999999999999998,
+      "initial_height_m": 0.2077616874239833,
+      "initial_penetration_m": 0.0,
+      "initial_qvel_max_abs": 0.0,
+      "last_normal_force_n": 12.753000000023558,
+      "manifest_sha256": "ae15ce204a9f769d13aaf15efa1c0727fa639dc8c4050cfddb549e551726db66",
+      "max_independent_H_error_nms": 1.3530843112619095e-16,
+      "max_independent_P_error_kg_m_s": 2.220446049250313e-16,
+      "max_independent_energy_error_j": 4.052314039881821e-15,
+      "max_loaded_point_slip_m_s": 0.3662948383574611,
+      "max_sampled_energy_work_residual_j": 0.2218591716235654,
+      "max_sampled_penetration_m": 0.003207565637435128,
+      "max_world_angular_rate_error_rad_s": 7.049916206369744e-15,
+      "outcome": "DEPARTED_TARGET",
+      "outputs": {
+        "input.json": "9119f27fcb6d93bf0e42a9324ea9d0097a70a1664a36172d657c5ac28e284348",
+        "model.xml": "944a6adcd0a97f74af7730870ca29c3f089ffde368610089c12b49b09a798a00",
+        "motion.mp4": "ce4af65fe48ba23de4d29c6aee2e0eb6b7b497dbfbb010be564dde824ac91aa8",
+        "plots.png": "b3fbe50b7e151eb6e5e3b7685c0561bd24155d28eca36ddaf851e1e4a28b04ee",
+        "preview.png": "4d7705e3c3591dd1050c89f1fe9c7687b6e8ca087003a8348a2bc9f4a71dd640",
+        "scenario.json": "7fd3196b41abdd55d3eeb7f73019a6fbfd1e31cd684e4947107dbe98d8efd2a6",
+        "summary.json": "cc99f3920ed3fc0033baa0f0489e956c4f784b6f54f90b7c028bdcb821f053a7",
+        "trajectory.csv": "e8aa3361186e6f1f435b6595fe134cbf22981d9c45c309281d7e07ece2f3dcd2",
+        "trajectory.npz": "19f3a11e9752f4b9a3714ab7c86a96da5bd9ef6933a79ecab11556c755e0e46f",
+        "video-frames.csv": "9f8468704b757a2bef9fe1122fa470193fcb23c06449f0c5b509bd7f62b05401"
+      },
+      "weight_n": 12.753000000000002
+    },
+    "rev5-proxy/edge-balance": {
+      "csv_columns": 62,
+      "csv_npz_exact_all_columns": true,
+      "exact_frame_rows_hashes": true,
+      "final_attitude_error_deg": 45.00090036078978,
+      "final_energy_work_residual_j": 0.3225449957147266,
+      "frames": 75,
+      "independent_lowest_corner_initial_world_z_m": 0.0,
+      "initial_attitude_error_deg": 1.9999999999999944,
+      "initial_height_m": 0.16960224740180027,
+      "initial_penetration_m": 0.0,
+      "initial_qvel_max_abs": 0.0,
+      "last_normal_force_n": 30.05029986596584,
+      "manifest_sha256": "36d83cbedd21275c04027c8d2d4c51a2f74a8fc90aebd5e1b2ba4988126ceec7",
+      "max_independent_H_error_nms": 1.0140221995413867e-12,
+      "max_independent_P_error_kg_m_s": 4.440892098500626e-16,
+      "max_independent_energy_error_j": 2.255973186038318e-12,
+      "max_loaded_point_slip_m_s": 0.013871561468976794,
+      "max_sampled_energy_work_residual_j": 0.3704278356511026,
+      "max_sampled_penetration_m": 0.00389150327778133,
+      "max_world_angular_rate_error_rad_s": 5.773159728050814e-15,
+      "outcome": "DEPARTED_TARGET",
+      "outputs": {
+        "input.json": "7c08f26532fc2365e935f1fd1761b6cc5eb1662ad3a17dafbe7ad2439e363b6a",
+        "model.xml": "94eea7a86fb836b28a89ee36be39a94791cf698241c2bb708e5ead422a634e0f",
+        "motion.mp4": "5f9a452ac0c2a9c8e2ab73f5c3d818fee756a883e0dee967158a0879148e3705",
+        "plots.png": "14bc0f1650b7b44917e6d6519cd024d0f275e0945d24f245a0bbf0e57c39008a",
+        "preview.png": "ec1c7134f1fb251868eb7202a20e02655e3efdcf42ccc1ba2d480dcb74303890",
+        "scenario.json": "0c262094ab0d94bdf232eb68a2c9733cc1c41a7dfdaecd314ecb898a03520ab6",
+        "summary.json": "130545a271f10d591960790bc074e6b62b8ccf1e8dccb678a0e3c1c183843abc",
+        "trajectory.csv": "59dc1877a1191c939af79fcdbd1c7099f51c52d7213188b13ed6b3a53a9f2f28",
+        "trajectory.npz": "b8db119aa5ab4b270d3ebe640d88ef7442a23a46e54b9c9a1287f0003af71e4f",
+        "video-frames.csv": "8e01b258c8e995e63d4dabc461c762ad49aee4ba3c71bccb350234c7555810a0"
+      },
+      "weight_n": 30.05029986618762
+    },
+    "rev5-proxy/face-to-vertex-attempt": {
+      "csv_columns": 62,
+      "csv_npz_exact_all_columns": true,
+      "exact_frame_rows_hashes": true,
+      "final_attitude_error_deg": 54.73723242556474,
+      "final_energy_work_residual_j": 9.731529854184462e-05,
+      "frames": 75,
+      "independent_lowest_corner_initial_world_z_m": 0.0,
+      "initial_attitude_error_deg": 54.735610317245346,
+      "initial_height_m": 0.12,
+      "initial_penetration_m": 0.0,
+      "initial_qvel_max_abs": 0.0,
+      "last_normal_force_n": 30.05029986618016,
+      "manifest_sha256": "0d6594bc4c7e0acaecf70b3f748a423fd69dff1a17e566c2b08b5111b9af3adf",
+      "max_independent_H_error_nms": 2.0418237413333262e-16,
+      "max_independent_P_error_kg_m_s": 5.961835075552258e-17,
+      "max_independent_energy_error_j": 1.6653345369377348e-15,
+      "max_loaded_point_slip_m_s": 1.0859647219828186e-06,
+      "max_sampled_energy_work_residual_j": 9.75505915969269e-05,
+      "max_sampled_penetration_m": 4.8907390017310926e-05,
+      "max_world_angular_rate_error_rad_s": 1.0842021724855044e-19,
+      "outcome": "TARGET_NOT_REACHED",
+      "outputs": {
+        "input.json": "7c08f26532fc2365e935f1fd1761b6cc5eb1662ad3a17dafbe7ad2439e363b6a",
+        "model.xml": "94eea7a86fb836b28a89ee36be39a94791cf698241c2bb708e5ead422a634e0f",
+        "motion.mp4": "442fbecafc15ffbc551902ca44b498d1b0ca442652316414a215f68a071e66d3",
+        "plots.png": "09fa2f4e30c81c3d230ea4fa6189950b6ce8d8c97461b6d46d7f8291de3c3f75",
+        "preview.png": "98b4a1cdaad7b91474b793403205436ef82905fe7be5e66e36e493d2b4b985d8",
+        "scenario.json": "095a465cc900fc55a30766afb1490ea0e35b6c3fc848b1bbecc8d325eb41d5c2",
+        "summary.json": "b153b2170a2b6dc74adc709aaaa29cda19eab5b97a53986e4802ad1b160186c8",
+        "trajectory.csv": "818c4887c3e3b7dbc73e5925d706a10e54286141bfeac85160660da20b85d44b",
+        "trajectory.npz": "9d2e331d759b758cd99135d8654d154c019b5164aa779f5e905778b739143ec4",
+        "video-frames.csv": "bfac42014792367530e86e265806a034d11df26404bd4fc29fcca2965b5c03fe"
+      },
+      "weight_n": 30.05029986618762
+    },
+    "rev5-proxy/fall": {
+      "csv_columns": 62,
+      "csv_npz_exact_all_columns": true,
+      "exact_frame_rows_hashes": true,
+      "final_attitude_error_deg": 0.00393370068804343,
+      "final_energy_work_residual_j": -0.31608584967335895,
+      "frames": 50,
+      "independent_lowest_corner_initial_world_z_m": 0.12000000000000002,
+      "initial_attitude_error_deg": 10.313240312354814,
+      "initial_height_m": 0.2595447919456735,
+      "initial_penetration_m": 0.0,
+      "initial_qvel_max_abs": 0.0,
+      "last_normal_force_n": 30.050299866628755,
+      "manifest_sha256": "5966e5ebcca6c9532773c497565cfe106c38a77b4ce98eb4c658cf71b0bd4269",
+      "max_independent_H_error_nms": 1.051547737773717e-12,
+      "max_independent_P_error_kg_m_s": 4.440892098500626e-16,
+      "max_independent_energy_error_j": 2.426503442620742e-12,
+      "max_loaded_point_slip_m_s": 0.03540146935425253,
+      "max_sampled_energy_work_residual_j": 0.7920504600422205,
+      "max_sampled_penetration_m": 0.00504061274853318,
+      "max_world_angular_rate_error_rad_s": 1.1102230246251565e-15,
+      "outcome": "NO_CONTROL_GOAL",
+      "outputs": {
+        "input.json": "7c08f26532fc2365e935f1fd1761b6cc5eb1662ad3a17dafbe7ad2439e363b6a",
+        "model.xml": "94eea7a86fb836b28a89ee36be39a94791cf698241c2bb708e5ead422a634e0f",
+        "motion.mp4": "538938af556b6e109b533302b936d4ddf0700ff58ab1c513843a25d66e0d98a4",
+        "plots.png": "9f715a47747ddb0a29f66c141c1031f619faa7a5afdf0325d1211af95eb8d5d8",
+        "preview.png": "40bf4411170a112dcb4fc485bfca950bd5d8b51359b155b8c6d5dc72640c1d53",
+        "scenario.json": "08c938d1e9af87f406a355caf2db198d560c3629fb6199697fd2f101b9aea853",
+        "summary.json": "e94f3d7d2830bab52a5d9ad0da2f5ed89fd6ed02381d8edce0ba3fdf1b119d36",
+        "trajectory.csv": "1b45efd0a8cdf6308cc8b6b0cd36de62e51ac09fe8416365bd6870ce29c7580d",
+        "trajectory.npz": "c6fc99ea063818ced4240a7a9e7356fcb5d476fcc2ffb301cafe327a1a26cfda",
+        "video-frames.csv": "024ba757458d3d1441818c5ac16ae1ed1eb4b9a8371336f7a2fc445b99fb287a"
+      },
+      "weight_n": 30.05029986618762
+    },
+    "rev5-proxy/one-wheel": {
+      "csv_columns": 62,
+      "csv_npz_exact_all_columns": true,
+      "exact_frame_rows_hashes": true,
+      "final_attitude_error_deg": 2.1115386698616243,
+      "final_energy_work_residual_j": 1.2354822568651225e-17,
+      "frames": 50,
+      "independent_lowest_corner_initial_world_z_m": 0.18,
+      "initial_attitude_error_deg": 0.0,
+      "initial_height_m": 0.3,
+      "initial_penetration_m": 0.0,
+      "initial_qvel_max_abs": 0.0,
+      "last_normal_force_n": 0.0,
+      "manifest_sha256": "5389287e7d20e9991af5348cd92710a75f13eb3d6c1862f1247a305bcb25afae",
+      "max_independent_H_error_nms": 1.6693305842729964e-14,
+      "max_independent_P_error_kg_m_s": 1.7293024651143796e-17,
+      "max_independent_energy_error_j": 6.522560269672795e-16,
+      "max_loaded_point_slip_m_s": 0.0,
+      "max_sampled_energy_work_residual_j": 7.077671781985373e-16,
+      "max_sampled_penetration_m": 0.0,
+      "max_world_angular_rate_error_rad_s": 1.3877787807814457e-16,
+      "outcome": "NO_CONTROL_GOAL",
+      "outputs": {
+        "input.json": "7c08f26532fc2365e935f1fd1761b6cc5eb1662ad3a17dafbe7ad2439e363b6a",
+        "model.xml": "bf5da5e73e413919ca2548748542c18f3754aa351d7340b3e34ddb2223b9b0c9",
+        "motion.mp4": "4893cd831c05843b35ba656584cf4adbc68b1afd571c09cfe82b4e52f6dfccf4",
+        "plots.png": "095a3a12291c4b601d56ec770d3b3b5d717bdc958d6acebef8ecb32489819d0e",
+        "preview.png": "8c4ad9d79eca162f20739a1c483d17fd55949f3370ee1f292283ebb8ee6da8ea",
+        "scenario.json": "7d78c6e7a0c32c21eb993597090aeac9df44f69bb0a5c914606ea8915c3bfe05",
+        "summary.json": "c259b62e7310f83b3f738ebab4bcc5116a192e9288fd8c4ceab1adfe96c0e05f",
+        "trajectory.csv": "4b8b553484efac8f1ceb8417efa86e5fb85dd759a948ba96f0bc544ba4f0d81b",
+        "trajectory.npz": "c4b3d4a9d74f8796a9f2f2e1c0006e6bedc5bc56a6ed03047e74babd0a6545ee",
+        "video-frames.csv": "8c2f211e72b84c5550806a041a0bcffbca78560bc84504315457e324b7fee772"
+      },
+      "weight_n": 0.0
+    },
+    "rev5-proxy/rest": {
+      "csv_columns": 62,
+      "csv_npz_exact_all_columns": true,
+      "exact_frame_rows_hashes": true,
+      "final_attitude_error_deg": 0.0016221519166865163,
+      "final_energy_work_residual_j": 9.731517859896781e-05,
+      "frames": 50,
+      "independent_lowest_corner_initial_world_z_m": 0.0,
+      "initial_attitude_error_deg": 0.0,
+      "initial_height_m": 0.12,
+      "initial_penetration_m": 0.0,
+      "initial_qvel_max_abs": 0.0,
+      "last_normal_force_n": 30.050299866143376,
+      "manifest_sha256": "7ff4991eb47f9448c76918926ef1a4fadcfa0d3cda1c1e885fcf34efdbe5ee14",
+      "max_independent_H_error_nms": 2.0418237413333262e-16,
+      "max_independent_P_error_kg_m_s": 8.673617379884035e-19,
+      "max_independent_energy_error_j": 1.3322676295501878e-15,
+      "max_loaded_point_slip_m_s": 1.0859647219828186e-06,
+      "max_sampled_energy_work_residual_j": 9.754767249294124e-05,
+      "max_sampled_penetration_m": 4.8907390017310926e-05,
+      "max_world_angular_rate_error_rad_s": 1.6263032587282567e-19,
+      "outcome": "NO_CONTROL_GOAL",
+      "outputs": {
+        "input.json": "7c08f26532fc2365e935f1fd1761b6cc5eb1662ad3a17dafbe7ad2439e363b6a",
+        "model.xml": "94eea7a86fb836b28a89ee36be39a94791cf698241c2bb708e5ead422a634e0f",
+        "motion.mp4": "4bd61833d781c555a3433ba1bd87380220e4a4b505f312a59e5f83c3ed040a0d",
+        "plots.png": "dc8afad25f28d57c1e7dcfd3d34aa9b431decbfbdfb4cf44647d255d2b2e784d",
+        "preview.png": "6389cb1693cb3a6f11255e54b74cc03e9311706df068e075fafcbf839a36053d",
+        "scenario.json": "be38922235e2c054472c96eb23d3f6fbd783d4faeeaa811442b2b51b3ff122fe",
+        "summary.json": "b047a231b6f596ab7c8613984143af7494c312d2dbd128e2f0d564f1c2353c54",
+        "trajectory.csv": "854f7683f8de1e63b819c92972423c539f2e692496f09460f4562dce786be810",
+        "trajectory.npz": "7cae22aea2732c9ecd3a0047c5104e79f95b4f19301a914bc60bb7ba0b5f2015",
+        "video-frames.csv": "aac966dbf6157f1d9ba35fbe7de5ddc5d24b80babd423ed594ea9f3f81fb1733"
+      },
+      "weight_n": 30.05029986618762
+    },
+    "rev5-proxy/three-wheel": {
+      "csv_columns": 62,
+      "csv_npz_exact_all_columns": true,
+      "exact_frame_rows_hashes": true,
+      "final_attitude_error_deg": 3.1178754813085976,
+      "final_energy_work_residual_j": -3.53115330216109e-17,
+      "frames": 75,
+      "independent_lowest_corner_initial_world_z_m": 0.18,
+      "initial_attitude_error_deg": 0.0,
+      "initial_height_m": 0.3,
+      "initial_penetration_m": 0.0,
+      "initial_qvel_max_abs": 0.0,
+      "last_normal_force_n": 0.0,
+      "manifest_sha256": "93edb17ba8b7f6f198ebc68856fd616b489428aa7dd3ff3041bbed0fca43176e",
+      "max_independent_H_error_nms": 1.9346359146713834e-14,
+      "max_independent_P_error_kg_m_s": 1.9068405708588803e-17,
+      "max_independent_energy_error_j": 1.4710455076283324e-15,
+      "max_loaded_point_slip_m_s": 0.0,
+      "max_sampled_energy_work_residual_j": 9.43689570931383e-16,
+      "max_sampled_penetration_m": 0.0,
+      "max_world_angular_rate_error_rad_s": 1.1102230246251565e-16,
+      "outcome": "NO_CONTROL_GOAL",
+      "outputs": {
+        "input.json": "7c08f26532fc2365e935f1fd1761b6cc5eb1662ad3a17dafbe7ad2439e363b6a",
+        "model.xml": "bf5da5e73e413919ca2548748542c18f3754aa351d7340b3e34ddb2223b9b0c9",
+        "motion.mp4": "2fa03901097b4388bbed0546a8661c9170cb8bff0cdda7d684f56e071111a7d1",
+        "plots.png": "96dba7d9db08a1896450119dd8c5a008e33364e6c9e6a89a3e8f0ea75674c990",
+        "preview.png": "b05e05adda867460c4f00f0ff81a16ea86182b4da51d4108c207bdf1836fd71e",
+        "scenario.json": "de03b57c690aa54fdbfd36282a98029f9e23a260ac518d59a6746dd6ecc57897",
+        "summary.json": "1a7607311f5e8c7e7b5b5d5cd9cdeb8b893eadfa598c11ad34091a1240cf78af",
+        "trajectory.csv": "604ea0691c5bb85e79a5dbe9e62f850b92a8cffe3ceac651059f5d5214ab3c70",
+        "trajectory.npz": "29e4c89b47ed24e00f6f277d56932fd95311d52d171026ef91a97e36dcd97378",
+        "video-frames.csv": "15e7a423781f0337f816f23c1420666e3e10018d6d9e05f46829b1059eea2986"
+      },
+      "weight_n": 0.0
+    },
+    "rev5-proxy/vertex-balance": {
+      "csv_columns": 62,
+      "csv_npz_exact_all_columns": true,
+      "exact_frame_rows_hashes": true,
+      "final_attitude_error_deg": 55.43058716876842,
+      "final_energy_work_residual_j": 0.5179573733453027,
+      "frames": 75,
+      "independent_lowest_corner_initial_world_z_m": 0.0,
+      "initial_attitude_error_deg": 1.999999999999998,
+      "initial_height_m": 0.2077616874239833,
+      "initial_penetration_m": 0.0,
+      "initial_qvel_max_abs": 0.0,
+      "last_normal_force_n": 30.050299865817998,
+      "manifest_sha256": "33d9281a1e613099c39035cfbaa63fbcd7dc55f1ad02bf48f81743dfee4a8b55",
+      "max_independent_H_error_nms": 6.687319968612382e-13,
+      "max_independent_P_error_kg_m_s": 6.661338147750939e-16,
+      "max_independent_energy_error_j": 7.123190925995004e-13,
+      "max_loaded_point_slip_m_s": 0.09816366451079651,
+      "max_sampled_energy_work_residual_j": 0.5179599670305559,
+      "max_sampled_penetration_m": 0.0033349206821373933,
+      "max_world_angular_rate_error_rad_s": 3.552713678800501e-15,
+      "outcome": "DEPARTED_TARGET",
+      "outputs": {
+        "input.json": "7c08f26532fc2365e935f1fd1761b6cc5eb1662ad3a17dafbe7ad2439e363b6a",
+        "model.xml": "94eea7a86fb836b28a89ee36be39a94791cf698241c2bb708e5ead422a634e0f",
+        "motion.mp4": "fa8cc5a2eeb48b884b35c2d57c80b47a6631f609e7e3e6533ed2e6a2b381aad9",
+        "plots.png": "7495c12d591dbe6c28527da3923d2625334782edfe23d958197d9a8429e95e96",
+        "preview.png": "f4c94d452706ffda5c65bf2b48d0f2daa2c0dc45b3efdacefb5cd0b3b553b7bb",
+        "scenario.json": "7fd3196b41abdd55d3eeb7f73019a6fbfd1e31cd684e4947107dbe98d8efd2a6",
+        "summary.json": "78cafa107c7c663344c45ed73eeca1810c5da04f0685e89420e972edbbe6ec8d",
+        "trajectory.csv": "72d86ccafc75b9f654e95d55c2569ba2c4c7fd1904742bd670623630701c87cc",
+        "trajectory.npz": "c0c7f20e11ae23efe1c0ab1baa46eeee5a0db4360787bac3d604e87d5ce25f64",
+        "video-frames.csv": "590082e52c7488f2912b0387249823c38e8fa4d78d0c4ab803d480f1a987d640"
+      },
+      "weight_n": 30.05029986618762
+    }
+  },
+  "bindings": {
+    "actual_head_at_execution": "848005a0a63ebc2d9931bea60251e98d40c0296d",
+    "base_commit": "dd7e4b4a7f4ccd838edeb93b9cc9aac86dc1375d",
+    "branch": "ktanino10-cube-physics-simulation",
+    "implementation_source_commit": "6636b95b78bb14b94acda53a413d39f6baa8688a",
+    "installed_environment": {
+      "matplotlib": "3.11.1",
+      "mujoco": "3.12.0",
+      "numpy": "2.5.2",
+      "pillow": "12.3.0",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "python": "3.14.3"
+    },
+    "primary_sources_retrieved_2026_09_05_sha256": {
+      "https://raw.githubusercontent.com/google-deepmind/mujoco/3.12.0/doc/XMLreference.rst": "2652a8b2567a673b14e51a72713465af02be30a972c63c5eaf77253edf6861d2",
+      "https://raw.githubusercontent.com/google-deepmind/mujoco/3.12.0/doc/computation/index.rst": "0c184816976bae1ce7d598263d1422bf5f489dbd3f46b8395618a59173797656",
+      "https://raw.githubusercontent.com/google-deepmind/mujoco/3.12.0/doc/python.rst": "9a1ed229cab8f85d9aec0ace16d9b7fa9b48970d26383caa1b00c77cdac3d4c2",
+      "https://raw.githubusercontent.com/google-deepmind/mujoco/3.12.0/src/engine/engine_forward.c": "c81f57dfa0249b07bfd92ac14ac145e43581a1695be607c5ae80fab2417c6d52"
+    },
+    "reviewed_head": "848005a0a63ebc2d9931bea60251e98d40c0296d",
+    "reviewer": "Fresh independent Simulation Reviewer, general-purpose invocation; not implementation author",
+    "reviewer_witness_sha256": "6e69d4417836304c456271987dc4a689eb60b7f92dae468481b1d49042a31bc8",
+    "tracked_change_set_file_sha256": {
+      ".github/agents/firmware-engineer.agent.md": "cdd086517a039737c9a013056ad575dea333dd14c9c57cc81f5984540fda5eff",
+      ".github/agents/hardware-lead.agent.md": "fe21addeafd60b885eba87590c05f4cc8467dd3706148eef15eb1d00e70ae1ca",
+      ".github/agents/simulation-engineer.agent.md": "0468f78c744545d7810c3f8c52b7f14ba157c2cb36616a353527817ab53cb468",
+      ".github/agents/simulation-reviewer.agent.md": "280322692f94ffb7f44fe2cd83e33e00b8b28fcb59414d41fefa81c96fba9aba",
+      ".github/copilot-instructions.md": "3c5dde5a310cbec9c76e7ded29397e90514084689c737961288ff3824eb07665",
+      ".github/instructions/firmware.instructions.md": "533f025452b409517708a370f990edd6ac6e9801c03f53f2a50fe35ee7b132ce",
+      ".github/instructions/simulation.instructions.md": "e9b86f195afaab4b9f93ee10b981ece26bda3f84fe4dc61270e5fdabbf78525a",
+      ".github/skills/firmware-bringup/SKILL.md": "b0a235b971968793ce0b1c233f8d94261abaf1087f83d6f22a4ae96b11498396",
+      ".github/skills/rigid-body-simulation/SKILL.md": "ff870e311083349c8242b0ee3920a1057129a39a7446899b6dee3696ea8f8d0c",
+      ".github/skills/simulation-review/SKILL.md": "c0e6a99e90b9d232527853831d6cd4a7ce73e80c17bcd626ebb5ad7aa1f11de6",
+      ".github/workflows/simulation-check.yml": "093f3c9ba468944a50855554634e0cd2cf107d300a7734e0ca0011336bc5aedd",
+      ".gitignore": "62cca38873395ae061aef6e4592e43614e6a3e0680366e0b640cdaacd89c76f3",
+      "README.md": "ec1cc2255989821a866afc2c7aef5411724b3e48f2f9aad76f5d5cd75e6839b0",
+      "docs/architecture-evolution.md": "3367d998214372ca1b64413445cc4f455249aa51b997c9fde9b9ef707b8336ff",
+      "docs/architecture.md": "e268f88b5f45944342a7c1b4e05ea343e68cece543ea2f559228d23acd92f5d7",
+      "docs/assembly-evidence.md": "8a6182762cf200d4065f7db3d637b42d2a17976cbfac6888868072552b522aae",
+      "docs/commands/make-circuit.md": "1d70801b33139cf8471d8154404f901e477f1420c8870474305b73e842c88cca",
+      "docs/simulation.md": "5ed241a14f5adfde06663f5a77e911ce27df3d383a19b819e2f4c7a16e812b50",
+      "docs/workflow.md": "7ca51655113f70fa714e12087581aaec18774e660e01ceaec25454cc8186724b",
+      "simulation/README.md": "e72e056be1da3d549adcf60764cbeb53e587c7ac8d9414e7be4118ea377812e7",
+      "simulation/cube_sim/__init__.py": "5d04a6e81f6e7fce1f8c806db80b19f051d9663cd92befaede24645bddb60be2",
+      "simulation/cube_sim/__main__.py": "bd5e33b531a4b4553cd189fe7db2439e08129ba1d9096f8f17ca526dc3cd6980",
+      "simulation/cube_sim/gallery.py": "a0092a5714556813b4d8d1997feb4284f38ccfba43e4fe0aa11013b9a02eaa68",
+      "simulation/cube_sim/intake.py": "6f300726750bf15a6a184c34dcc623674860bf9ad92ca9b4410b75d33c4c91d3",
+      "simulation/cube_sim/model.py": "cfee7d6fc94a1396342c3c27cc02992061373e93cad7d50d45c89d86c7200675",
+      "simulation/cube_sim/numerics.py": "6e5613e483de52dbdaa0180009f86850093ebbefd63fd040cf2b48c6ebd60bbc",
+      "simulation/cube_sim/runner.py": "80780cd219aebe313753d36dbe4f5c777e57b2b8962b3a279dee327e7a439172",
+      "simulation/cube_sim/scenarios.py": "1153a9ab9f32e994995534e70bacb0816a16148ee73edd16200e36e37c650436",
+      "simulation/cube_sim/visualize.py": "c95bbc72b0b249ae04ea9dd14c33128b25db19408f40f49281fe88744dad22fc",
+      "simulation/evidence/initial-v1/index-manifest.json": "291f5d8d9b73d9f04573b02f4b9d2bce36360b169d501173e764aed72a7e1446",
+      "simulation/evidence/initial-v1/index.html": "29c2ea44ddbd0a19f01a684e1850f2b4c8bae54a5106dc4598bac0814d60d381",
+      "simulation/evidence/initial-v1/numerics.json": "5ed7535bb79709b632e62ffc251e07834a411c0e4a00378a622ba41e3c4a2d03",
+      "simulation/evidence/initial-v1/reference/edge-balance/input.json": "9119f27fcb6d93bf0e42a9324ea9d0097a70a1664a36172d657c5ac28e284348",
+      "simulation/evidence/initial-v1/reference/edge-balance/manifest.json": "6931ad1abd91bc944c3011178518fb8b8c75a5f288fc91b2bc84f2de9fabf78c",
+      "simulation/evidence/initial-v1/reference/edge-balance/model.xml": "944a6adcd0a97f74af7730870ca29c3f089ffde368610089c12b49b09a798a00",
+      "simulation/evidence/initial-v1/reference/edge-balance/motion.mp4": "118ffb591a25be8a2e60efe040295a7076a2826c605a1a9aa8838782bf2cf073",
+      "simulation/evidence/initial-v1/reference/edge-balance/plots.png": "4df89fb8a7448fef06ae3921e42ccd3b00678e577df8be20874872178bfb4261",
+      "simulation/evidence/initial-v1/reference/edge-balance/preview.png": "ce7b204e1804fda47f49e9b552fe07ade4548e5c5e55ff6db5d7eb378909f911",
+      "simulation/evidence/initial-v1/reference/edge-balance/scenario.json": "0c262094ab0d94bdf232eb68a2c9733cc1c41a7dfdaecd314ecb898a03520ab6",
+      "simulation/evidence/initial-v1/reference/edge-balance/summary.json": "5ab30aa49aea19487e88b9c2ad55854a7b4a8e816c0afd0e36de08b3f2ea95ec",
+      "simulation/evidence/initial-v1/reference/edge-balance/trajectory.csv": "bb1e40aa91d24c6502885586dc16add5801e10cd53df0cce971cbaf4b7cc1e27",
+      "simulation/evidence/initial-v1/reference/edge-balance/trajectory.npz": "afaff8a2ecd6d68d12fce25c3581815ac63048317741276370e7fead112e5d4c",
+      "simulation/evidence/initial-v1/reference/edge-balance/video-frames.csv": "64d5caec4453976fade2bab178406775e70bc79201e1c1552c70505fbf3c9889",
+      "simulation/evidence/initial-v1/reference/face-to-vertex-attempt/input.json": "9119f27fcb6d93bf0e42a9324ea9d0097a70a1664a36172d657c5ac28e284348",
+      "simulation/evidence/initial-v1/reference/face-to-vertex-attempt/manifest.json": "066793f0c2a38df7ac61dcc03ba3296e944a497332e6c1024138249e096b5984",
+      "simulation/evidence/initial-v1/reference/face-to-vertex-attempt/model.xml": "944a6adcd0a97f74af7730870ca29c3f089ffde368610089c12b49b09a798a00",
+      "simulation/evidence/initial-v1/reference/face-to-vertex-attempt/motion.mp4": "5bae61cb04898561804def78fdd7ab61d0bc8c736d78fe63c2bf6bff8ecd1385",
+      "simulation/evidence/initial-v1/reference/face-to-vertex-attempt/plots.png": "eed80ca212ff4069f24caca19c11af85e1cebb9f38023d56597fce4a79efb74d",
+      "simulation/evidence/initial-v1/reference/face-to-vertex-attempt/preview.png": "a5a1a9cd3a9babc5821fc025b4a2424c3e9dfb8d8bb535237232701f542663b3",
+      "simulation/evidence/initial-v1/reference/face-to-vertex-attempt/scenario.json": "095a465cc900fc55a30766afb1490ea0e35b6c3fc848b1bbecc8d325eb41d5c2",
+      "simulation/evidence/initial-v1/reference/face-to-vertex-attempt/summary.json": "285bc6c61bd1110d13d5d17f7303461ce2960cd0dd80f89a06dd225396a11aa1",
+      "simulation/evidence/initial-v1/reference/face-to-vertex-attempt/trajectory.csv": "693877ea27e866665b9bb2e6a3da9cfcc1d571f527686fbe94ac483ea6f45efd",
+      "simulation/evidence/initial-v1/reference/face-to-vertex-attempt/trajectory.npz": "eaf3b2c2a0d8f89f47e7de286f928256e60fe80733b9a1e23a14fcc6d98a371a",
+      "simulation/evidence/initial-v1/reference/face-to-vertex-attempt/video-frames.csv": "5ae093c8c8247726bfb53097e56e8a7947adcb9c6e0f1fd269bf12730a900501",
+      "simulation/evidence/initial-v1/reference/fall/input.json": "9119f27fcb6d93bf0e42a9324ea9d0097a70a1664a36172d657c5ac28e284348",
+      "simulation/evidence/initial-v1/reference/fall/manifest.json": "858adb7c37eb9e06fc2240fb44109a3b9f4eb6538b406ffe7045749d85c3c9ea",
+      "simulation/evidence/initial-v1/reference/fall/model.xml": "944a6adcd0a97f74af7730870ca29c3f089ffde368610089c12b49b09a798a00",
+      "simulation/evidence/initial-v1/reference/fall/motion.mp4": "b7eca230d97042ff92d3af09a03114e463e687e817b354e22a9435638234dcc2",
+      "simulation/evidence/initial-v1/reference/fall/plots.png": "eafe2b42b887d708ec8c5dc37f70fbe2b8db1cc658c85810fcd386da2c1cbe3d",
+      "simulation/evidence/initial-v1/reference/fall/preview.png": "101295658a6d7776782805f454c76492e13814d3b83d7e25b7a90510715bcab1",
+      "simulation/evidence/initial-v1/reference/fall/scenario.json": "08c938d1e9af87f406a355caf2db198d560c3629fb6199697fd2f101b9aea853",
+      "simulation/evidence/initial-v1/reference/fall/summary.json": "fcacfe08cab499a5628783fbb04d287bbf7b7ae532b5c5c3fc531de38b9d74f6",
+      "simulation/evidence/initial-v1/reference/fall/trajectory.csv": "3514738f6cdff4b7161f012efd8246e730c79f21c8980f8f76b2ab7212769b34",
+      "simulation/evidence/initial-v1/reference/fall/trajectory.npz": "c101c027d2418261aaa127865241d80b5ffa5720e229a5cddf9e5209f91d0cea",
+      "simulation/evidence/initial-v1/reference/fall/video-frames.csv": "56520604e7f79cf5a09b8b0fc25b5484ae370c6f1c99840fdd9b3dedb48beae8",
+      "simulation/evidence/initial-v1/reference/one-wheel/input.json": "9119f27fcb6d93bf0e42a9324ea9d0097a70a1664a36172d657c5ac28e284348",
+      "simulation/evidence/initial-v1/reference/one-wheel/manifest.json": "20fd38eaf8f122c26a81a24ca590c9a9dc9c9944e0a7ba145d0567cabe3d82fb",
+      "simulation/evidence/initial-v1/reference/one-wheel/model.xml": "38bb581e52a8a0b0673c72791261feeff4d000546c251b76c4479c08be0979dd",
+      "simulation/evidence/initial-v1/reference/one-wheel/motion.mp4": "57af59796d102c5e9eae5055ef684f648acb71c7f55530df99af08303d20abd9",
+      "simulation/evidence/initial-v1/reference/one-wheel/plots.png": "aa664507406202e511b84db3413d18b418955a2e58d5c049342495181034639c",
+      "simulation/evidence/initial-v1/reference/one-wheel/preview.png": "6f197dcc2554be6360caa6784f1ad85422836ee317634d6ae7f23db02743adbd",
+      "simulation/evidence/initial-v1/reference/one-wheel/scenario.json": "7d78c6e7a0c32c21eb993597090aeac9df44f69bb0a5c914606ea8915c3bfe05",
+      "simulation/evidence/initial-v1/reference/one-wheel/summary.json": "0341aebf1a7d67810f4db28a642c636711348e0e3a7216bf43e67c0f596f706d",
+      "simulation/evidence/initial-v1/reference/one-wheel/trajectory.csv": "7fd23cd27fe2d837666d65041550cd6951e5b0569d00d6c232aaeb14ad435e04",
+      "simulation/evidence/initial-v1/reference/one-wheel/trajectory.npz": "0faa0c88670a54d00965218b9ff963f7e3b22be68de65fd16d5e9c89f7290d56",
+      "simulation/evidence/initial-v1/reference/one-wheel/video-frames.csv": "d3da2ba777e2ba9a4ba95fcbd5b1eead80d2c86d8bb8e3016d197c90a200d41c",
+      "simulation/evidence/initial-v1/reference/rest/input.json": "9119f27fcb6d93bf0e42a9324ea9d0097a70a1664a36172d657c5ac28e284348",
+      "simulation/evidence/initial-v1/reference/rest/manifest.json": "fe499bdda1e000e34771937e637989f552787f9ef70454ed65cbfa84c6b92657",
+      "simulation/evidence/initial-v1/reference/rest/model.xml": "944a6adcd0a97f74af7730870ca29c3f089ffde368610089c12b49b09a798a00",
+      "simulation/evidence/initial-v1/reference/rest/motion.mp4": "0f4ede23bfebec4c09b3e9f131ceae67b3e5ef12996ffef562c93d718c2480db",
+      "simulation/evidence/initial-v1/reference/rest/plots.png": "4b3e4bbbb6becf23d166f7ace8e2f983ad19f7e2a6349cc750b0d76ffa81f452",
+      "simulation/evidence/initial-v1/reference/rest/preview.png": "466acfe3e676b44defee073a2e73b9f4b26a4e8b58564feeebaadce2f2e1b9bc",
+      "simulation/evidence/initial-v1/reference/rest/scenario.json": "be38922235e2c054472c96eb23d3f6fbd783d4faeeaa811442b2b51b3ff122fe",
+      "simulation/evidence/initial-v1/reference/rest/summary.json": "d761d226acb312bdaa2f6dfda43fce42c27f5228526bb01736ca4dda07795cbf",
+      "simulation/evidence/initial-v1/reference/rest/trajectory.csv": "970fca3e41fbbaf1b7f5f177df485ebf3d87dac3b5972764ddec0b89fcfbc44c",
+      "simulation/evidence/initial-v1/reference/rest/trajectory.npz": "b53af98b0cb768b2e814305e51a3e0299f8884dd65a6e79c90ed8999c73e2990",
+      "simulation/evidence/initial-v1/reference/rest/video-frames.csv": "2314f492d87c97d14071fb2ad2e23d06af58a07ac5e5daae75d6b321c2b6dd88",
+      "simulation/evidence/initial-v1/reference/three-wheel/input.json": "9119f27fcb6d93bf0e42a9324ea9d0097a70a1664a36172d657c5ac28e284348",
+      "simulation/evidence/initial-v1/reference/three-wheel/manifest.json": "9b7f7be610d70f262a8baa870282a273cae1d5ce5833bd80619148db7cc7e9af",
+      "simulation/evidence/initial-v1/reference/three-wheel/model.xml": "38bb581e52a8a0b0673c72791261feeff4d000546c251b76c4479c08be0979dd",
+      "simulation/evidence/initial-v1/reference/three-wheel/motion.mp4": "e746a3ee0b520feaa31121e17bbfd36db0ecda8b7c86364e9e62c17011bf963b",
+      "simulation/evidence/initial-v1/reference/three-wheel/plots.png": "70789b15cf9ce52da8662c53f9a83c860fd2e976ff7b221460cb659ad029839f",
+      "simulation/evidence/initial-v1/reference/three-wheel/preview.png": "38bd6f93f081b1d94d013678cd29a6026b416300e0e873802721cdd6536f0db6",
+      "simulation/evidence/initial-v1/reference/three-wheel/scenario.json": "de03b57c690aa54fdbfd36282a98029f9e23a260ac518d59a6746dd6ecc57897",
+      "simulation/evidence/initial-v1/reference/three-wheel/summary.json": "0bb97a5e0ea1cf680b0315ffffe40ca118d979054132b864ee1fc7a9db53cb32",
+      "simulation/evidence/initial-v1/reference/three-wheel/trajectory.csv": "6eaebf6a4450f35efd6d3f1a9a45f768b33dbc449656c9d8b74e8aa324b5d378",
+      "simulation/evidence/initial-v1/reference/three-wheel/trajectory.npz": "c716cea550638c32f5b59c2b1b89fa30923e97e0c63c781b47c3f690bc1157d9",
+      "simulation/evidence/initial-v1/reference/three-wheel/video-frames.csv": "585e3eda5bed4e14e2cccfcecc5b0526009692a840970e484d13e97506108776",
+      "simulation/evidence/initial-v1/reference/vertex-balance/input.json": "9119f27fcb6d93bf0e42a9324ea9d0097a70a1664a36172d657c5ac28e284348",
+      "simulation/evidence/initial-v1/reference/vertex-balance/manifest.json": "ae15ce204a9f769d13aaf15efa1c0727fa639dc8c4050cfddb549e551726db66",
+      "simulation/evidence/initial-v1/reference/vertex-balance/model.xml": "944a6adcd0a97f74af7730870ca29c3f089ffde368610089c12b49b09a798a00",
+      "simulation/evidence/initial-v1/reference/vertex-balance/motion.mp4": "ce4af65fe48ba23de4d29c6aee2e0eb6b7b497dbfbb010be564dde824ac91aa8",
+      "simulation/evidence/initial-v1/reference/vertex-balance/plots.png": "b3fbe50b7e151eb6e5e3b7685c0561bd24155d28eca36ddaf851e1e4a28b04ee",
+      "simulation/evidence/initial-v1/reference/vertex-balance/preview.png": "4d7705e3c3591dd1050c89f1fe9c7687b6e8ca087003a8348a2bc9f4a71dd640",
+      "simulation/evidence/initial-v1/reference/vertex-balance/scenario.json": "7fd3196b41abdd55d3eeb7f73019a6fbfd1e31cd684e4947107dbe98d8efd2a6",
+      "simulation/evidence/initial-v1/reference/vertex-balance/summary.json": "cc99f3920ed3fc0033baa0f0489e956c4f784b6f54f90b7c028bdcb821f053a7",
+      "simulation/evidence/initial-v1/reference/vertex-balance/trajectory.csv": "e8aa3361186e6f1f435b6595fe134cbf22981d9c45c309281d7e07ece2f3dcd2",
+      "simulation/evidence/initial-v1/reference/vertex-balance/trajectory.npz": "19f3a11e9752f4b9a3714ab7c86a96da5bd9ef6933a79ecab11556c755e0e46f",
+      "simulation/evidence/initial-v1/reference/vertex-balance/video-frames.csv": "9f8468704b757a2bef9fe1122fa470193fcb23c06449f0c5b509bd7f62b05401",
+      "simulation/evidence/initial-v1/rev5-proxy/edge-balance/input.json": "7c08f26532fc2365e935f1fd1761b6cc5eb1662ad3a17dafbe7ad2439e363b6a",
+      "simulation/evidence/initial-v1/rev5-proxy/edge-balance/manifest.json": "36d83cbedd21275c04027c8d2d4c51a2f74a8fc90aebd5e1b2ba4988126ceec7",
+      "simulation/evidence/initial-v1/rev5-proxy/edge-balance/model.xml": "94eea7a86fb836b28a89ee36be39a94791cf698241c2bb708e5ead422a634e0f",
+      "simulation/evidence/initial-v1/rev5-proxy/edge-balance/motion.mp4": "5f9a452ac0c2a9c8e2ab73f5c3d818fee756a883e0dee967158a0879148e3705",
+      "simulation/evidence/initial-v1/rev5-proxy/edge-balance/plots.png": "14bc0f1650b7b44917e6d6519cd024d0f275e0945d24f245a0bbf0e57c39008a",
+      "simulation/evidence/initial-v1/rev5-proxy/edge-balance/preview.png": "ec1c7134f1fb251868eb7202a20e02655e3efdcf42ccc1ba2d480dcb74303890",
+      "simulation/evidence/initial-v1/rev5-proxy/edge-balance/scenario.json": "0c262094ab0d94bdf232eb68a2c9733cc1c41a7dfdaecd314ecb898a03520ab6",
+      "simulation/evidence/initial-v1/rev5-proxy/edge-balance/summary.json": "130545a271f10d591960790bc074e6b62b8ccf1e8dccb678a0e3c1c183843abc",
+      "simulation/evidence/initial-v1/rev5-proxy/edge-balance/trajectory.csv": "59dc1877a1191c939af79fcdbd1c7099f51c52d7213188b13ed6b3a53a9f2f28",
+      "simulation/evidence/initial-v1/rev5-proxy/edge-balance/trajectory.npz": "b8db119aa5ab4b270d3ebe640d88ef7442a23a46e54b9c9a1287f0003af71e4f",
+      "simulation/evidence/initial-v1/rev5-proxy/edge-balance/video-frames.csv": "8e01b258c8e995e63d4dabc461c762ad49aee4ba3c71bccb350234c7555810a0",
+      "simulation/evidence/initial-v1/rev5-proxy/face-to-vertex-attempt/input.json": "7c08f26532fc2365e935f1fd1761b6cc5eb1662ad3a17dafbe7ad2439e363b6a",
+      "simulation/evidence/initial-v1/rev5-proxy/face-to-vertex-attempt/manifest.json": "0d6594bc4c7e0acaecf70b3f748a423fd69dff1a17e566c2b08b5111b9af3adf",
+      "simulation/evidence/initial-v1/rev5-proxy/face-to-vertex-attempt/model.xml": "94eea7a86fb836b28a89ee36be39a94791cf698241c2bb708e5ead422a634e0f",
+      "simulation/evidence/initial-v1/rev5-proxy/face-to-vertex-attempt/motion.mp4": "442fbecafc15ffbc551902ca44b498d1b0ca442652316414a215f68a071e66d3",
+      "simulation/evidence/initial-v1/rev5-proxy/face-to-vertex-attempt/plots.png": "09fa2f4e30c81c3d230ea4fa6189950b6ce8d8c97461b6d46d7f8291de3c3f75",
+      "simulation/evidence/initial-v1/rev5-proxy/face-to-vertex-attempt/preview.png": "98b4a1cdaad7b91474b793403205436ef82905fe7be5e66e36e493d2b4b985d8",
+      "simulation/evidence/initial-v1/rev5-proxy/face-to-vertex-attempt/scenario.json": "095a465cc900fc55a30766afb1490ea0e35b6c3fc848b1bbecc8d325eb41d5c2",
+      "simulation/evidence/initial-v1/rev5-proxy/face-to-vertex-attempt/summary.json": "b153b2170a2b6dc74adc709aaaa29cda19eab5b97a53986e4802ad1b160186c8",
+      "simulation/evidence/initial-v1/rev5-proxy/face-to-vertex-attempt/trajectory.csv": "818c4887c3e3b7dbc73e5925d706a10e54286141bfeac85160660da20b85d44b",
+      "simulation/evidence/initial-v1/rev5-proxy/face-to-vertex-attempt/trajectory.npz": "9d2e331d759b758cd99135d8654d154c019b5164aa779f5e905778b739143ec4",
+      "simulation/evidence/initial-v1/rev5-proxy/face-to-vertex-attempt/video-frames.csv": "bfac42014792367530e86e265806a034d11df26404bd4fc29fcca2965b5c03fe",
+      "simulation/evidence/initial-v1/rev5-proxy/fall/input.json": "7c08f26532fc2365e935f1fd1761b6cc5eb1662ad3a17dafbe7ad2439e363b6a",
+      "simulation/evidence/initial-v1/rev5-proxy/fall/manifest.json": "5966e5ebcca6c9532773c497565cfe106c38a77b4ce98eb4c658cf71b0bd4269",
+      "simulation/evidence/initial-v1/rev5-proxy/fall/model.xml": "94eea7a86fb836b28a89ee36be39a94791cf698241c2bb708e5ead422a634e0f",
+      "simulation/evidence/initial-v1/rev5-proxy/fall/motion.mp4": "538938af556b6e109b533302b936d4ddf0700ff58ab1c513843a25d66e0d98a4",
+      "simulation/evidence/initial-v1/rev5-proxy/fall/plots.png": "9f715a47747ddb0a29f66c141c1031f619faa7a5afdf0325d1211af95eb8d5d8",
+      "simulation/evidence/initial-v1/rev5-proxy/fall/preview.png": "40bf4411170a112dcb4fc485bfca950bd5d8b51359b155b8c6d5dc72640c1d53",
+      "simulation/evidence/initial-v1/rev5-proxy/fall/scenario.json": "08c938d1e9af87f406a355caf2db198d560c3629fb6199697fd2f101b9aea853",
+      "simulation/evidence/initial-v1/rev5-proxy/fall/summary.json": "e94f3d7d2830bab52a5d9ad0da2f5ed89fd6ed02381d8edce0ba3fdf1b119d36",
+      "simulation/evidence/initial-v1/rev5-proxy/fall/trajectory.csv": "1b45efd0a8cdf6308cc8b6b0cd36de62e51ac09fe8416365bd6870ce29c7580d",
+      "simulation/evidence/initial-v1/rev5-proxy/fall/trajectory.npz": "c6fc99ea063818ced4240a7a9e7356fcb5d476fcc2ffb301cafe327a1a26cfda",
+      "simulation/evidence/initial-v1/rev5-proxy/fall/video-frames.csv": "024ba757458d3d1441818c5ac16ae1ed1eb4b9a8371336f7a2fc445b99fb287a",
+      "simulation/evidence/initial-v1/rev5-proxy/one-wheel/input.json": "7c08f26532fc2365e935f1fd1761b6cc5eb1662ad3a17dafbe7ad2439e363b6a",
+      "simulation/evidence/initial-v1/rev5-proxy/one-wheel/manifest.json": "5389287e7d20e9991af5348cd92710a75f13eb3d6c1862f1247a305bcb25afae",
+      "simulation/evidence/initial-v1/rev5-proxy/one-wheel/model.xml": "bf5da5e73e413919ca2548748542c18f3754aa351d7340b3e34ddb2223b9b0c9",
+      "simulation/evidence/initial-v1/rev5-proxy/one-wheel/motion.mp4": "4893cd831c05843b35ba656584cf4adbc68b1afd571c09cfe82b4e52f6dfccf4",
+      "simulation/evidence/initial-v1/rev5-proxy/one-wheel/plots.png": "095a3a12291c4b601d56ec770d3b3b5d717bdc958d6acebef8ecb32489819d0e",
+      "simulation/evidence/initial-v1/rev5-proxy/one-wheel/preview.png": "8c4ad9d79eca162f20739a1c483d17fd55949f3370ee1f292283ebb8ee6da8ea",
+      "simulation/evidence/initial-v1/rev5-proxy/one-wheel/scenario.json": "7d78c6e7a0c32c21eb993597090aeac9df44f69bb0a5c914606ea8915c3bfe05",
+      "simulation/evidence/initial-v1/rev5-proxy/one-wheel/summary.json": "c259b62e7310f83b3f738ebab4bcc5116a192e9288fd8c4ceab1adfe96c0e05f",
+      "simulation/evidence/initial-v1/rev5-proxy/one-wheel/trajectory.csv": "4b8b553484efac8f1ceb8417efa86e5fb85dd759a948ba96f0bc544ba4f0d81b",
+      "simulation/evidence/initial-v1/rev5-proxy/one-wheel/trajectory.npz": "c4b3d4a9d74f8796a9f2f2e1c0006e6bedc5bc56a6ed03047e74babd0a6545ee",
+      "simulation/evidence/initial-v1/rev5-proxy/one-wheel/video-frames.csv": "8c2f211e72b84c5550806a041a0bcffbca78560bc84504315457e324b7fee772",
+      "simulation/evidence/initial-v1/rev5-proxy/rest/input.json": "7c08f26532fc2365e935f1fd1761b6cc5eb1662ad3a17dafbe7ad2439e363b6a",
+      "simulation/evidence/initial-v1/rev5-proxy/rest/manifest.json": "7ff4991eb47f9448c76918926ef1a4fadcfa0d3cda1c1e885fcf34efdbe5ee14",
+      "simulation/evidence/initial-v1/rev5-proxy/rest/model.xml": "94eea7a86fb836b28a89ee36be39a94791cf698241c2bb708e5ead422a634e0f",
+      "simulation/evidence/initial-v1/rev5-proxy/rest/motion.mp4": "4bd61833d781c555a3433ba1bd87380220e4a4b505f312a59e5f83c3ed040a0d",
+      "simulation/evidence/initial-v1/rev5-proxy/rest/plots.png": "dc8afad25f28d57c1e7dcfd3d34aa9b431decbfbdfb4cf44647d255d2b2e784d",
+      "simulation/evidence/initial-v1/rev5-proxy/rest/preview.png": "6389cb1693cb3a6f11255e54b74cc03e9311706df068e075fafcbf839a36053d",
+      "simulation/evidence/initial-v1/rev5-proxy/rest/scenario.json": "be38922235e2c054472c96eb23d3f6fbd783d4faeeaa811442b2b51b3ff122fe",
+      "simulation/evidence/initial-v1/rev5-proxy/rest/summary.json": "b047a231b6f596ab7c8613984143af7494c312d2dbd128e2f0d564f1c2353c54",
+      "simulation/evidence/initial-v1/rev5-proxy/rest/trajectory.csv": "854f7683f8de1e63b819c92972423c539f2e692496f09460f4562dce786be810",
+      "simulation/evidence/initial-v1/rev5-proxy/rest/trajectory.npz": "7cae22aea2732c9ecd3a0047c5104e79f95b4f19301a914bc60bb7ba0b5f2015",
+      "simulation/evidence/initial-v1/rev5-proxy/rest/video-frames.csv": "aac966dbf6157f1d9ba35fbe7de5ddc5d24b80babd423ed594ea9f3f81fb1733",
+      "simulation/evidence/initial-v1/rev5-proxy/three-wheel/input.json": "7c08f26532fc2365e935f1fd1761b6cc5eb1662ad3a17dafbe7ad2439e363b6a",
+      "simulation/evidence/initial-v1/rev5-proxy/three-wheel/manifest.json": "93edb17ba8b7f6f198ebc68856fd616b489428aa7dd3ff3041bbed0fca43176e",
+      "simulation/evidence/initial-v1/rev5-proxy/three-wheel/model.xml": "bf5da5e73e413919ca2548748542c18f3754aa351d7340b3e34ddb2223b9b0c9",
+      "simulation/evidence/initial-v1/rev5-proxy/three-wheel/motion.mp4": "2fa03901097b4388bbed0546a8661c9170cb8bff0cdda7d684f56e071111a7d1",
+      "simulation/evidence/initial-v1/rev5-proxy/three-wheel/plots.png": "96dba7d9db08a1896450119dd8c5a008e33364e6c9e6a89a3e8f0ea75674c990",
+      "simulation/evidence/initial-v1/rev5-proxy/three-wheel/preview.png": "b05e05adda867460c4f00f0ff81a16ea86182b4da51d4108c207bdf1836fd71e",
+      "simulation/evidence/initial-v1/rev5-proxy/three-wheel/scenario.json": "de03b57c690aa54fdbfd36282a98029f9e23a260ac518d59a6746dd6ecc57897",
+      "simulation/evidence/initial-v1/rev5-proxy/three-wheel/summary.json": "1a7607311f5e8c7e7b5b5d5cd9cdeb8b893eadfa598c11ad34091a1240cf78af",
+      "simulation/evidence/initial-v1/rev5-proxy/three-wheel/trajectory.csv": "604ea0691c5bb85e79a5dbe9e62f850b92a8cffe3ceac651059f5d5214ab3c70",
+      "simulation/evidence/initial-v1/rev5-proxy/three-wheel/trajectory.npz": "29e4c89b47ed24e00f6f277d56932fd95311d52d171026ef91a97e36dcd97378",
+      "simulation/evidence/initial-v1/rev5-proxy/three-wheel/video-frames.csv": "15e7a423781f0337f816f23c1420666e3e10018d6d9e05f46829b1059eea2986",
+      "simulation/evidence/initial-v1/rev5-proxy/vertex-balance/input.json": "7c08f26532fc2365e935f1fd1761b6cc5eb1662ad3a17dafbe7ad2439e363b6a",
+      "simulation/evidence/initial-v1/rev5-proxy/vertex-balance/manifest.json": "33d9281a1e613099c39035cfbaa63fbcd7dc55f1ad02bf48f81743dfee4a8b55",
+      "simulation/evidence/initial-v1/rev5-proxy/vertex-balance/model.xml": "94eea7a86fb836b28a89ee36be39a94791cf698241c2bb708e5ead422a634e0f",
+      "simulation/evidence/initial-v1/rev5-proxy/vertex-balance/motion.mp4": "fa8cc5a2eeb48b884b35c2d57c80b47a6631f609e7e3e6533ed2e6a2b381aad9",
+      "simulation/evidence/initial-v1/rev5-proxy/vertex-balance/plots.png": "7495c12d591dbe6c28527da3923d2625334782edfe23d958197d9a8429e95e96",
+      "simulation/evidence/initial-v1/rev5-proxy/vertex-balance/preview.png": "f4c94d452706ffda5c65bf2b48d0f2daa2c0dc45b3efdacefb5cd0b3b553b7bb",
+      "simulation/evidence/initial-v1/rev5-proxy/vertex-balance/scenario.json": "7fd3196b41abdd55d3eeb7f73019a6fbfd1e31cd684e4947107dbe98d8efd2a6",
+      "simulation/evidence/initial-v1/rev5-proxy/vertex-balance/summary.json": "78cafa107c7c663344c45ed73eeca1810c5da04f0685e89420e972edbbe6ec8d",
+      "simulation/evidence/initial-v1/rev5-proxy/vertex-balance/trajectory.csv": "72d86ccafc75b9f654e95d55c2569ba2c4c7fd1904742bd670623630701c87cc",
+      "simulation/evidence/initial-v1/rev5-proxy/vertex-balance/trajectory.npz": "c0c7f20e11ae23efe1c0ab1baa46eeee5a0db4360787bac3d604e87d5ce25f64",
+      "simulation/evidence/initial-v1/rev5-proxy/vertex-balance/video-frames.csv": "590082e52c7488f2912b0387249823c38e8fa4d78d0c4ab803d480f1a987d640",
+      "simulation/intake/rev5-v1.json": "dd14031121c6f40fcbcb974a82231e49eaf6d4e9c79d0d3fc0f41ad2887bcc76",
+      "simulation/models/reference.json": "b34b181117b7a12cf8e8356bcf1a57321deab20726d12249f39badaaba889c1f",
+      "simulation/models/rev5-proxy.json": "7c08f26532fc2365e935f1fd1761b6cc5eb1662ad3a17dafbe7ad2439e363b6a",
+      "simulation/requirements-lock.txt": "46a9c69d790ca27c38135aefa26e08d683a1e7536080b93840a90b61cbd89cb7",
+      "simulation/requirements.txt": "dd547e9b45f870a7b37e7b242d8ef08d4b03c8bfd3a923ffc94d5ebdec5fb952",
+      "simulation/tests/test_evidence.py": "c62c072abd8ad14e46cadd157dd57df677cfcfbc364d1055da25d004636f755d",
+      "simulation/tests/test_intake.py": "449cf05946fc66feecac20301f885e9dd791bae643759ff1443985bbd07be8d3",
+      "simulation/tests/test_physics.py": "5eed4cb48d89195f1293a485ccd79ffb0a4a4cc46a86dbc35faf67bec4a099fb",
+      "simulation/tests/test_scenarios.py": "dfef00667093a90e31ac83f85952cfca5b4650fadc7aeff34c882d062fd3fad1"
+    }
+  },
+  "closed_form_mechanics": {
+    "reference": {
+      "axial_rotor_inertias_kg_m2": [
+        4.5e-05,
+        4.5e-05,
+        4.5e-05
+      ],
+      "compiled_chassis_tensor_error_kg_m2": 0.0,
+      "joint_effort_nm": [
+        0.009,
+        -0.007,
+        0.011
+      ],
+      "locked_tensor_about_whole_com_kg_m2": [
+        [
+          0.01087213846153846,
+          4.9230769230769246e-05,
+          4.9230769230769246e-05
+        ],
+        [
+          4.9230769230769246e-05,
+          0.01087213846153846,
+          4.9230769230769246e-05
+        ],
+        [
+          4.9230769230769246e-05,
+          4.9230769230769246e-05,
+          0.01087213846153846
+        ]
+      ],
+      "mass_kg": 1.3,
+      "predicted_body_alpha_rad_s2": [
+        -0.8296064724865911,
+        0.6549117157160572,
+        -1.015171246011922
+      ],
+      "predicted_rotor_relative_alpha_rad_s2": [
+        200.82960647248657,
+        -156.2104672712716,
+        245.45961569045636
+      ],
+      "principal_moments_each_part_kg_m2": [
+        [
+          0.0096,
+          0.0096,
+          0.0096
+        ],
+        [
+          2.28e-05,
+          2.28e-05,
+          4.5e-05
+        ],
+        [
+          2.28e-05,
+          2.28e-05,
+          4.5e-05
+        ],
+        [
+          2.28e-05,
+          2.28e-05,
+          4.5e-05
+        ]
+      ],
+      "rotation_trials": [
+        {
+          "angular_acceleration_error_rad_s2": 2.220446049250313e-16,
+          "angular_acceleration_world_rad_s2": [
+            -0.829606472486591,
+            0.654911715716057,
+            -1.0151712460119222
+          ],
+          "origin_acceleration_error_m_s2": 1.3877787807814457e-17,
+          "predicted_origin_acceleration_world_m_s2": [
+            -0.010277433610633718,
+            0.0011419370678481897,
+            0.009135496542785528
+          ],
+          "q_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "wheel_relative_acceleration_error_rad_s2": 1.3073986337985843e-12
+        },
+        {
+          "angular_acceleration_error_rad_s2": 2.220446049250313e-16,
+          "angular_acceleration_world_rad_s2": [
+            -0.6549117157160574,
+            -0.8296064724865909,
+            -1.0151712460119218
+          ],
+          "origin_acceleration_error_m_s2": 1.1058862159352145e-17,
+          "predicted_origin_acceleration_world_m_s2": [
+            -0.0011419370678481921,
+            -0.010277433610633718,
+            0.009135496542785528
+          ],
+          "q_wxyz": [
+            0.7071067811865476,
+            0.0,
+            0.0,
+            0.7071067811865475
+          ],
+          "wheel_relative_acceleration_error_rad_s2": 1.3642420526593924e-12
+        },
+        {
+          "angular_acceleration_error_rad_s2": 1.5543122344752192e-15,
+          "angular_acceleration_world_rad_s2": [
+            -0.9291497874186383,
+            1.1172822716132733,
+            -0.18997344914953607
+          ],
+          "origin_acceleration_error_m_s2": 5.204170427930421e-17,
+          "predicted_origin_acceleration_world_m_s2": [
+            -0.003100828488530747,
+            -0.0002931411805097142,
+            0.013441945168172693
+          ],
+          "q_wxyz": [
+            0.9341237611646731,
+            0.14572393925248112,
+            0.29144787850496223,
+            -0.14572393925248112
+          ],
+          "wheel_relative_acceleration_error_rad_s2": 1.2221335055073723e-12
+        }
+      ],
+      "whole_com_body_m": [
+        0.006153846153846154,
+        0.006153846153846154,
+        0.006153846153846154
+      ]
+    },
+    "rev5-proxy": {
+      "axial_rotor_inertias_kg_m2": [
+        4.5e-05,
+        4.5e-05,
+        4.5e-05
+      ],
+      "compiled_chassis_tensor_error_kg_m2": 2.3387541903119313e-13,
+      "joint_effort_nm": [
+        0.009,
+        -0.007,
+        0.011
+      ],
+      "locked_tensor_about_whole_com_kg_m2": [
+        [
+          0.04076584750469973,
+          0.0005643714389665639,
+          0.0004490935549383528
+        ],
+        [
+          0.0005643714389665639,
+          0.040926147096290305,
+          0.0004911540606653771
+        ],
+        [
+          0.0004490935549383528,
+          0.0004911540606653771,
+          0.040226737821352394
+        ]
+      ],
+      "mass_kg": 3.064277797839998,
+      "predicted_body_alpha_rad_s2": [
+        -0.2204619599073491,
+        0.17755702035443494,
+        -0.2734625330317142
+      ],
+      "predicted_rotor_relative_alpha_rad_s2": [
+        200.2204619599073,
+        -155.73311257590998,
+        244.71790697747613
+      ],
+      "principal_moments_each_part_kg_m2": [
+        [
+          0.0379472990749615,
+          0.03830266028774663,
+          0.03926982334102956
+        ],
+        [
+          2.2668750000000002e-05,
+          2.2668750000000002e-05,
+          4.5e-05
+        ],
+        [
+          2.2668750000000002e-05,
+          2.2668750000000002e-05,
+          4.5e-05
+        ],
+        [
+          2.2668750000000002e-05,
+          2.2668750000000002e-05,
+          4.5e-05
+        ]
+      ],
+      "rotation_trials": [
+        {
+          "angular_acceleration_error_rad_s2": 1.5062395775089499e-12,
+          "angular_acceleration_world_rad_s2": [
+            -0.22046195990584286,
+            0.17755702035531776,
+            -0.2734625330311063
+          ],
+          "origin_acceleration_error_m_s2": 6.774095173689432e-15,
+          "predicted_origin_acceleration_world_m_s2": [
+            -0.0043833249598632116,
+            0.0010399081861614129,
+            0.0042089839429877846
+          ],
+          "q_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "wheel_relative_acceleration_error_rad_s2": 1.9610979506978765e-12
+        },
+        {
+          "angular_acceleration_error_rad_s2": 1.5061840663577186e-12,
+          "angular_acceleration_world_rad_s2": [
+            -0.17755702035531787,
+            -0.22046195990584289,
+            -0.2734625330311062
+          ],
+          "origin_acceleration_error_m_s2": 6.7714930884754665e-15,
+          "predicted_origin_acceleration_world_m_s2": [
+            -0.0010399081861614137,
+            -0.0043833249598632116,
+            0.0042089839429877846
+          ],
+          "q_wxyz": [
+            0.7071067811865476,
+            0.0,
+            0.0,
+            0.7071067811865475
+          ],
+          "wheel_relative_acceleration_error_rad_s2": 1.9895196601282805e-12
+        },
+        {
+          "angular_acceleration_error_rad_s2": 1.506822444596878e-12,
+          "angular_acceleration_world_rad_s2": [
+            -0.24750945600508584,
+            0.30144711053889767,
+            -0.052729848763190534
+          ],
+          "origin_acceleration_error_m_s2": 8.174938590649328e-15,
+          "predicted_origin_acceleration_world_m_s2": [
+            -0.0009680416719792125,
+            0.000269193754896408,
+            0.006082838368341774
+          ],
+          "q_wxyz": [
+            0.9341237611646731,
+            0.14572393925248112,
+            0.29144787850496223,
+            -0.14572393925248112
+          ],
+          "wheel_relative_acceleration_error_rad_s2": 2.0747847884194925e-12
+        }
+      ],
+      "whole_com_body_m": [
+        0.010489011664218902,
+        0.010643950940163712,
+        0.00829369163416447
+      ]
+    }
+  },
+  "completed_utc": "2026-09-05T14:32:44.748197+00:00",
+  "contact_energy_diagnostics": [
+    {
+      "all_step_max_rk4_stage_residual_j": 0.0412767854920828,
+      "all_step_max_trapezoid_residual_j": 0.8313792012487139,
+      "dt_s": 0.002,
+      "final_attitude_error_deg": 0.00393370068804343,
+      "final_energy_work_residual_j": -0.31608584967335895,
+      "final_height_m": 0.11997267527312915,
+      "final_rk4_stage_residual_j": 0.04127678549207481,
+      "independent_controller_and_stage_probe_qpos_match_max_tolerance": 1e-10,
+      "iterations": 50,
+      "max_100Hz_energy_work_residual_j": 0.7920504600422205,
+      "max_100Hz_penetration_m": 0.00504061274853318,
+      "max_contact_power_vs_generalized_constraint_power_w": 2.2737367544323206e-13,
+      "max_generalized_force_equation_residual_norm": 0.0001996573319864016,
+      "max_independent_energy_error_j": 2.453370839816671e-12,
+      "max_instantaneous_dE_dt_minus_force_power_w": 1.9659153520645845e-06,
+      "max_point_velocity_vs_engine_jacobian_m_s": 4.562322741819003e-16,
+      "max_positive_tangential_contact_power_w": 0.04664209454063917,
+      "max_virtual_power_difference_after_solver_residual_w": 6.385757492475563e-10,
+      "outcome": "NO_CONTROL_GOAL",
+      "peak_trapezoid_step": {
+        "four_constraint_powers_w": [
+          0.0,
+          -1201.540486945367,
+          -747.6822510864492,
+          -559.6589702435012
+        ],
+        "rk4_stage_residual_j": 0.03162168553368372,
+        "time_s": 0.1580000000000001,
+        "trapezoid_residual_j": -0.8313792012487139
+      },
+      "peak_virtual_power_difference": {
+        "independent_dE_dt_minus_force_power_w": -1.9659153520645845e-06,
+        "solver_force_equation_v_dot_residual_w": -1.9659072449184955e-06,
+        "time_s": 0.18000000000000013,
+        "unexplained_difference_w": -8.10714608891078e-12
+      },
+      "scenario": "fall",
+      "solver": "Newton",
+      "stage_recorder_changes_integrated_state": false
+    },
+    {
+      "all_step_max_rk4_stage_residual_j": 0.008584363641517712,
+      "all_step_max_trapezoid_residual_j": 0.5707825889671283,
+      "dt_s": 0.001,
+      "final_attitude_error_deg": 0.0035806894551364482,
+      "final_energy_work_residual_j": -0.5705258460964493,
+      "final_height_m": 0.11997267527312885,
+      "final_rk4_stage_residual_j": 0.008584363641511494,
+      "independent_controller_and_stage_probe_qpos_match_max_tolerance": 1e-10,
+      "iterations": 50,
+      "max_100Hz_energy_work_residual_j": 0.5706066149634159,
+      "max_100Hz_penetration_m": 0.004878685896183982,
+      "max_contact_power_vs_generalized_constraint_power_w": 2.2737367544323206e-13,
+      "max_generalized_force_equation_residual_norm": 0.00032327567102183227,
+      "max_independent_energy_error_j": 2.44626541245907e-12,
+      "max_instantaneous_dE_dt_minus_force_power_w": 5.445280096894045e-05,
+      "max_point_velocity_vs_engine_jacobian_m_s": 1.186550857568136e-15,
+      "max_positive_tangential_contact_power_w": 0.0446768076044716,
+      "max_virtual_power_difference_after_solver_residual_w": 6.212317765441015e-10,
+      "outcome": "NO_CONTROL_GOAL",
+      "peak_trapezoid_step": {
+        "four_constraint_powers_w": [
+          0.22277751468742624,
+          -13.164975359686009,
+          -10.48525204302901,
+          -9.133045097306589
+        ],
+        "rk4_stage_residual_j": 0.008583967092103073,
+        "time_s": 0.4160000000000003,
+        "trapezoid_residual_j": -0.5707825889671283
+      },
+      "peak_virtual_power_difference": {
+        "independent_dE_dt_minus_force_power_w": -5.445280096894045e-05,
+        "solver_force_equation_v_dot_residual_w": -5.4452792018503895e-05,
+        "time_s": 0.18000000000000013,
+        "unexplained_difference_w": -8.950436556189392e-12
+      },
+      "scenario": "fall",
+      "solver": "Newton",
+      "stage_recorder_changes_integrated_state": false
+    },
+    {
+      "all_step_max_rk4_stage_residual_j": 0.0014457997308365833,
+      "all_step_max_trapezoid_residual_j": 0.1890617824393357,
+      "dt_s": 0.0005,
+      "final_attitude_error_deg": 0.004153356746650051,
+      "final_energy_work_residual_j": 0.08500768746760556,
+      "final_height_m": 0.11997267527312891,
+      "final_rk4_stage_residual_j": 0.0014457997308339188,
+      "independent_controller_and_stage_probe_qpos_match_max_tolerance": 1e-10,
+      "iterations": 100,
+      "max_100Hz_energy_work_residual_j": 0.1890440777126421,
+      "max_100Hz_penetration_m": 0.005144975472084923,
+      "max_contact_power_vs_generalized_constraint_power_w": 3.410605131648481e-13,
+      "max_generalized_force_equation_residual_norm": 0.0002061283385103106,
+      "max_independent_energy_error_j": 2.439159985101469e-12,
+      "max_instantaneous_dE_dt_minus_force_power_w": 1.4048364310959016e-05,
+      "max_point_velocity_vs_engine_jacobian_m_s": 1.384309333829492e-15,
+      "max_positive_tangential_contact_power_w": 0.04556902608938299,
+      "max_virtual_power_difference_after_solver_residual_w": 6.033264998380436e-10,
+      "outcome": "NO_CONTROL_GOAL",
+      "peak_trapezoid_step": {
+        "four_constraint_powers_w": [
+          8.263307856627108,
+          7.89815413630677,
+          7.909056010855364,
+          7.53876189149698
+        ],
+        "rk4_stage_residual_j": 0.000822271234701244,
+        "time_s": 0.17250000000000013,
+        "trapezoid_residual_j": 0.1890617824393357
+      },
+      "peak_virtual_power_difference": {
+        "independent_dE_dt_minus_force_power_w": -1.4048364310959016e-05,
+        "solver_force_equation_v_dot_residual_w": -1.4048356452223056e-05,
+        "time_s": 0.18000000000000013,
+        "unexplained_difference_w": -7.858735960163815e-12
+      },
+      "scenario": "fall",
+      "solver": "Newton",
+      "stage_recorder_changes_integrated_state": false
+    },
+    {
+      "dt_s": 0.002,
+      "final_attitude_error_deg": 0.003934301422392037,
+      "final_energy_work_residual_j": -0.3160852525609683,
+      "final_height_m": 0.11997267527201493,
+      "iterations": 100,
+      "max_100Hz_energy_work_residual_j": 0.7920507482703096,
+      "max_100Hz_penetration_m": 0.005040612719615811,
+      "outcome": "NO_CONTROL_GOAL",
+      "scenario": "fall",
+      "solver": "CG"
+    },
+    {
+      "all_step_max_rk4_stage_residual_j": 0.016437492270961584,
+      "all_step_max_trapezoid_residual_j": 0.5179868589516401,
+      "dt_s": 0.002,
+      "final_attitude_error_deg": 55.43058716876842,
+      "final_energy_work_residual_j": 0.5179573733453027,
+      "final_height_m": 0.11997267505228419,
+      "final_rk4_stage_residual_j": 0.016437492270959808,
+      "independent_controller_and_stage_probe_qpos_match_max_tolerance": 1e-10,
+      "iterations": 50,
+      "max_100Hz_energy_work_residual_j": 0.5179599670305559,
+      "max_100Hz_penetration_m": 0.0033349206821373933,
+      "max_contact_power_vs_generalized_constraint_power_w": 8.526512829121202e-14,
+      "max_generalized_force_equation_residual_norm": 0.0002632817011932467,
+      "max_independent_energy_error_j": 7.709388682997087e-13,
+      "max_instantaneous_dE_dt_minus_force_power_w": 1.4823974463284983e-05,
+      "max_point_velocity_vs_engine_jacobian_m_s": 1.1830814106161824e-15,
+      "max_positive_tangential_contact_power_w": 2.4085793211841002,
+      "max_virtual_power_difference_after_solver_residual_w": 2.2183678831392436e-10,
+      "outcome": "DEPARTED_TARGET",
+      "peak_trapezoid_step": {
+        "four_constraint_powers_w": [
+          0.533570385724371,
+          0.5342996179876036,
+          0.5279859727576319,
+          -0.2432700501440163
+        ],
+        "rk4_stage_residual_j": 0.01643673472548457,
+        "time_s": 1.1020000000000008,
+        "trapezoid_residual_j": 0.5179868589516401
+      },
+      "peak_virtual_power_difference": {
+        "independent_dE_dt_minus_force_power_w": -1.4823974463284983e-05,
+        "solver_force_equation_v_dot_residual_w": -1.4823972290670541e-05,
+        "time_s": 0.8420000000000006,
+        "unexplained_difference_w": -2.1726144426142393e-12
+      },
+      "scenario": "vertex-balance",
+      "solver": "Newton",
+      "stage_recorder_changes_integrated_state": false
+    },
+    {
+      "all_step_max_rk4_stage_residual_j": 0.00467277227692664,
+      "all_step_max_trapezoid_residual_j": 0.10615047537520889,
+      "dt_s": 0.001,
+      "final_attitude_error_deg": 55.439000210101824,
+      "final_energy_work_residual_j": -0.04584830059019174,
+      "final_height_m": 0.11997267505228466,
+      "final_rk4_stage_residual_j": 0.004672772276923087,
+      "independent_controller_and_stage_probe_qpos_match_max_tolerance": 1e-10,
+      "iterations": 50,
+      "max_100Hz_energy_work_residual_j": 0.10611516165111462,
+      "max_100Hz_penetration_m": 0.003692790278957775,
+      "max_contact_power_vs_generalized_constraint_power_w": 2.2737367544323206e-13,
+      "max_generalized_force_equation_residual_norm": 0.0003023961288546784,
+      "max_independent_energy_error_j": 7.586153927263695e-13,
+      "max_instantaneous_dE_dt_minus_force_power_w": 2.0095795891350576e-05,
+      "max_point_velocity_vs_engine_jacobian_m_s": 1.2628786905111156e-15,
+      "max_positive_tangential_contact_power_w": 2.312148291028553,
+      "max_virtual_power_difference_after_solver_residual_w": 2.105142307522194e-10,
+      "outcome": "DEPARTED_TARGET",
+      "peak_trapezoid_step": {
+        "four_constraint_powers_w": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rk4_stage_residual_j": 0.0009872488874776986,
+        "time_s": 0.8140000000000006,
+        "trapezoid_residual_j": 0.10615047537520889
+      },
+      "peak_virtual_power_difference": {
+        "independent_dE_dt_minus_force_power_w": -2.0095795891350576e-05,
+        "solver_force_equation_v_dot_residual_w": -2.0095775564540256e-05,
+        "time_s": 0.8265000000000006,
+        "unexplained_difference_w": -2.032681032025055e-11
+      },
+      "scenario": "vertex-balance",
+      "solver": "Newton",
+      "stage_recorder_changes_integrated_state": false
+    },
+    {
+      "all_step_max_rk4_stage_residual_j": 0.0010598735245510582,
+      "all_step_max_trapezoid_residual_j": 0.15855673037280837,
+      "dt_s": 0.0005,
+      "final_attitude_error_deg": 55.4331715270936,
+      "final_energy_work_residual_j": -0.12938856256371878,
+      "final_height_m": 0.11997267505228455,
+      "final_rk4_stage_residual_j": 0.00105987352455017,
+      "independent_controller_and_stage_probe_qpos_match_max_tolerance": 1e-10,
+      "iterations": 100,
+      "max_100Hz_energy_work_residual_j": 0.15853925722921103,
+      "max_100Hz_penetration_m": 0.003612740899413408,
+      "max_contact_power_vs_generalized_constraint_power_w": 1.1368683772161603e-13,
+      "max_generalized_force_equation_residual_norm": 0.00030536341789102344,
+      "max_independent_energy_error_j": 7.525091660909311e-13,
+      "max_instantaneous_dE_dt_minus_force_power_w": 1.664922286703785e-05,
+      "max_point_velocity_vs_engine_jacobian_m_s": 1.6132928326584306e-15,
+      "max_positive_tangential_contact_power_w": 1.5087340931749726,
+      "max_virtual_power_difference_after_solver_residual_w": 2.053624042400287e-10,
+      "outcome": "DEPARTED_TARGET",
+      "peak_trapezoid_step": {
+        "four_constraint_powers_w": [
+          0.0,
+          -21.743862233710306,
+          -19.469080090465503,
+          -18.054524057124453
+        ],
+        "rk4_stage_residual_j": 0.0009326429267002556,
+        "time_s": 0.9794999999999475,
+        "trapezoid_residual_j": -0.15855673037280837
+      },
+      "peak_virtual_power_difference": {
+        "independent_dE_dt_minus_force_power_w": -1.664922286703785e-05,
+        "solver_force_equation_v_dot_residual_w": -1.6649202645170093e-05,
+        "time_s": 0.8264999999999644,
+        "unexplained_difference_w": -2.0221867756009147e-11
+      },
+      "scenario": "vertex-balance",
+      "solver": "Newton",
+      "stage_recorder_changes_integrated_state": false
+    },
+    {
+      "dt_s": 0.002,
+      "final_attitude_error_deg": 55.43058605028435,
+      "final_energy_work_residual_j": 0.5179576148621723,
+      "final_height_m": 0.11997267505044648,
+      "iterations": 100,
+      "max_100Hz_energy_work_residual_j": 0.5179602085209836,
+      "max_100Hz_penetration_m": 0.003334924881274376,
+      "outcome": "DEPARTED_TARGET",
+      "scenario": "vertex-balance",
+      "solver": "CG"
+    }
+  ],
+  "controller": {
+    "reference/face-to-vertex-attempt": {
+      "20ms_fifo_exact_on_100Hz_rows": true,
+      "clip_and_outward_cutoff_exact": true,
+      "cutoff_samples": [
+        280,
+        280,
+        0
+      ],
+      "max_relative_speed_rad_s": [
+        80.8888888888891,
+        80.88888888888886,
+        3.885591932444623e-15
+      ],
+      "overspeed_samples": [
+        280,
+        280,
+        0
+      ],
+      "pd_or_pulse_equation_max_error_nm": 2.0816681711721685e-17,
+      "reversing_torque_while_overspeed_samples": 0,
+      "saturated_samples": [
+        299,
+        299,
+        0
+      ]
+    },
+    "reference/three-wheel": {
+      "20ms_fifo_exact_on_100Hz_rows": true,
+      "clip_and_outward_cutoff_exact": true,
+      "cutoff_samples": [
+        0,
+        0,
+        0
+      ],
+      "max_relative_speed_rad_s": [
+        66.94355055546828,
+        44.63147248945616,
+        55.7860482509759
+      ],
+      "overspeed_samples": [
+        0,
+        0,
+        0
+      ],
+      "pd_or_pulse_equation_max_error_nm": 0.0,
+      "reversing_torque_while_overspeed_samples": 0,
+      "saturated_samples": [
+        0,
+        0,
+        0
+      ]
+    },
+    "reference/vertex-balance": {
+      "20ms_fifo_exact_on_100Hz_rows": true,
+      "clip_and_outward_cutoff_exact": true,
+      "cutoff_samples": [
+        252,
+        220,
+        245
+      ],
+      "max_relative_speed_rad_s": [
+        88.18176095605239,
+        83.18692926640736,
+        86.73054363606266
+      ],
+      "overspeed_samples": [
+        254,
+        223,
+        245
+      ],
+      "pd_or_pulse_equation_max_error_nm": 2.7755575615628914e-17,
+      "reversing_torque_while_overspeed_samples": 5,
+      "saturated_samples": [
+        261,
+        29,
+        249
+      ]
+    },
+    "rev5-proxy/face-to-vertex-attempt": {
+      "20ms_fifo_exact_on_100Hz_rows": true,
+      "clip_and_outward_cutoff_exact": true,
+      "cutoff_samples": [
+        280,
+        280,
+        0
+      ],
+      "max_relative_speed_rad_s": [
+        80.88888888888962,
+        80.88888888888918,
+        0.0005212758704580445
+      ],
+      "overspeed_samples": [
+        280,
+        280,
+        0
+      ],
+      "pd_or_pulse_equation_max_error_nm": 2.0816681711721685e-17,
+      "reversing_torque_while_overspeed_samples": 0,
+      "saturated_samples": [
+        299,
+        299,
+        0
+      ]
+    },
+    "rev5-proxy/three-wheel": {
+      "20ms_fifo_exact_on_100Hz_rows": true,
+      "clip_and_outward_cutoff_exact": true,
+      "cutoff_samples": [
+        0,
+        0,
+        0
+      ],
+      "max_relative_speed_rad_s": [
+        66.74035755011295,
+        44.49512910554825,
+        55.61756879867013
+      ],
+      "overspeed_samples": [
+        0,
+        0,
+        0
+      ],
+      "pd_or_pulse_equation_max_error_nm": 0.0,
+      "reversing_torque_while_overspeed_samples": 0,
+      "saturated_samples": [
+        0,
+        0,
+        0
+      ]
+    },
+    "rev5-proxy/vertex-balance": {
+      "20ms_fifo_exact_on_100Hz_rows": true,
+      "clip_and_outward_cutoff_exact": true,
+      "cutoff_samples": [
+        255,
+        235,
+        243
+      ],
+      "max_relative_speed_rad_s": [
+        86.1147784662064,
+        81.84481650227008,
+        86.89208628316261
+      ],
+      "overspeed_samples": [
+        255,
+        235,
+        243
+      ],
+      "pd_or_pulse_equation_max_error_nm": 2.7755575615628914e-17,
+      "reversing_torque_while_overspeed_samples": 0,
+      "saturated_samples": [
+        254,
+        21,
+        245
+      ]
+    },
+    "rotated_free_PD": {
+      "final_error_rad": 0.013920524815695794,
+      "initial_error_rad": 0.035,
+      "initial_world_body_y_velocity_after_effort_rad_s": -0.002586200657464851,
+      "positive_initial_wheel_x_effort_nm": 0.0028000000000000004
+    }
+  },
+  "free_space_invariants": {
+    "reference": {
+      "dt_s": 0.002,
+      "duration_s": 0.6,
+      "initial_H_com_world_nms": [
+        0.0035951797969423684,
+        -0.004998649940624028,
+        -0.0006191450073826113
+      ],
+      "initial_P_world_kg_m_s": [
+        0.22008796243796447,
+        -0.15784653058582834,
+        0.34363490126630775
+      ],
+      "initial_qpos": [
+        0.1,
+        -0.2,
+        0.6,
+        0.9341237611646731,
+        0.14572393925248112,
+        0.29144787850496223,
+        -0.14572393925248112,
+        0.3,
+        -0.7,
+        1.1
+      ],
+      "initial_qvel": [
+        0.17,
+        -0.12,
+        0.26,
+        0.31,
+        -0.27,
+        0.19,
+        17.0,
+        -11.0,
+        23.0
+      ],
+      "max_H_sensor_error": 3.903127820947816e-17,
+      "max_P_sensor_error": 1.6653345369377348e-16,
+      "max_angular_momentum_drift_nms": 2.2216266924432055e-11,
+      "max_com_affine_motion_error_m": 2.8434554739716736e-11,
+      "max_energy_minus_motor_work_j": 2.2311180680745224e-12,
+      "max_independent_energy_vs_engine_j": 4.996003610813204e-16,
+      "max_linear_momentum_drift_kg_m_s": 1.3909378619633298e-11,
+      "max_quaternion_norm_error": 1.1102230246251565e-15,
+      "pulse_nm": [
+        0.003,
+        -0.002,
+        0.0025
+      ],
+      "reverse_at_s": 0.3,
+      "stationary_zero_input_100ms_exact": true
+    },
+    "rev5-proxy": {
+      "dt_s": 0.002,
+      "duration_s": 0.6,
+      "initial_H_com_world_nms": [
+        0.010835514075376572,
+        -0.015918799832438178,
+        -0.0030991876143812184
+      ],
+      "initial_P_world_kg_m_s": [
+        0.5194412986709953,
+        -0.3735996867259824,
+        0.8188446886394805
+      ],
+      "initial_qpos": [
+        0.1,
+        -0.2,
+        0.6,
+        0.9341237611646731,
+        0.14572393925248112,
+        0.29144787850496223,
+        -0.14572393925248112,
+        0.3,
+        -0.7,
+        1.1
+      ],
+      "initial_qvel": [
+        0.17,
+        -0.12,
+        0.26,
+        0.31,
+        -0.27,
+        0.19,
+        17.0,
+        -11.0,
+        23.0
+      ],
+      "max_H_sensor_error": 9.913250775817062e-14,
+      "max_P_sensor_error": 4.440892098500626e-16,
+      "max_angular_momentum_drift_nms": 2.0054183096002946e-11,
+      "max_com_affine_motion_error_m": 1.1112615327774237e-11,
+      "max_energy_minus_motor_work_j": 2.7148977510549344e-12,
+      "max_independent_energy_vs_engine_j": 6.328271240363392e-15,
+      "max_linear_momentum_drift_kg_m_s": 1.9145552460002067e-11,
+      "max_quaternion_norm_error": 1.1102230246251565e-15,
+      "pulse_nm": [
+        0.003,
+        -0.002,
+        0.0025
+      ],
+      "reverse_at_s": 0.3,
+      "stationary_zero_input_100ms_exact": true
+    }
+  },
+  "frozen_source_and_mass": {
+    "bundle_path": "/Users/kyosuketanino/.copilot/session-state/cc8c11df-9cc9-4b20-9f05-5680d77250ab/files/rev5-simulation-intake-v1",
+    "independent_mesh_plus_motors_plus_laminate": {
+      "com_m": [
+        0.007693237481619371,
+        0.007864991920938645,
+        0.005259664983042538
+      ],
+      "inertia_error_vs_proxy_kg_m2": 6.314393452555578e-16,
+      "inertia_kg_m2": [
+        [
+          0.038620674023240605,
+          0.00038952044757728033,
+          0.0002943773026064942
+        ],
+        [
+          0.00038952044757728044,
+          0.038778326859819454,
+          0.00033499732231286007
+        ],
+        [
+          0.0002943773026064954,
+          0.000334997322312859,
+          0.038120781820678774
+        ]
+      ],
+      "mass_kg": 2.764277797839991
+    },
+    "mesh_tetrahedral_integral": {
+      "absolute_errors_vs_frozen_mass_com_inertia": [
+        7.993605777301127e-15,
+        2.0036056147532122e-16,
+        6.245004513516506e-16
+      ],
+      "centroidal_inertia_kg_m2": [
+        [
+          0.03787070566457955,
+          0.00036038377811405543,
+          0.0003261209301248215
+        ],
+        [
+          0.00036038377811405554,
+          0.03797015672220548,
+          0.0003311438074318526
+        ],
+        [
+          0.0003261209301248227,
+          0.0003311438074318515,
+          0.037589644763376936
+        ]
+      ],
+      "com_m": [
+        0.007233981039601316,
+        0.007254108324892235,
+        0.005787144820075161
+      ],
+      "mass_kg": 2.632097797839991,
+      "triangles": 51230
+    },
+    "old_script_imported_or_executed": false,
+    "recomposed_locked": {
+      "com_m": [
+        0.010489011664218902,
+        0.010643950940163712,
+        0.00829369163416447
+      ],
+      "inertia_error_kg_m2": 6.938893903907228e-18,
+      "inertia_kg_m2": [
+        [
+          0.04076584750469973,
+          0.0005643714389665639,
+          0.0004490935549383528
+        ],
+        [
+          0.0005643714389665639,
+          0.040926147096290305,
+          0.0004911540606653771
+        ],
+        [
+          0.0004490935549383528,
+          0.0004911540606653771,
+          0.040226737821352394
+        ]
+      ],
+      "mass_kg": 3.064277797839998
+    },
+    "source_is_main_or_release": false,
+    "source_owner_revision": "3633eb5d03d6db7c90b582e53180414087b33519",
+    "unadopted_candidate_L_read_or_executed": false,
+    "verified_files": {
+      "INTAKE.txt": "bef4cfd724089d818b6083070dd2853c40b23100bdac6826157f3742a47233a2",
+      "baseline/assembly.stl": "c4dbca1e250308fe2190c71e200bdef84d7b844376e79a2be02b0945667d8ea2",
+      "baseline/results.json": "a181bc328b61ecdad52a0b8acdcc6e7cc5c0e5c4748b680ec8fcad0aa5e44c36",
+      "baseline/screen.py": "fc8b4dd6e013afc834b37649414e6230b5689e5c28a9b67a0ec2b6fec7d3bd88",
+      "manifest.json": "1f94e5fdf89d8e1df234e9dec4db7ea32568e30671ba9a841293cf9d79d55999",
+      "source/hardware/mechanical-interface.md": "326a26832a538d86e39fdbd7f07fc653305afd385eb28399f8fa5c73c5090f8c",
+      "source/hardware/mechanical/bench-imu-01-dimensional-spec.md": "7c7439385e5011cb876463c8dad56d9acff52fbf6b2f95ce363b0a53d8b24f2b",
+      "source/hardware/mechanical/bench-imu-01-enclosure.scad": "550371ba2e0d549cf232d918b18cb15eec2bac826d7073d0c653d7a3a8f7a680"
+    }
+  },
+  "invalidation": {
+    "code_changed": {
+      "error": "Simulation code changed: simulation/cube_sim/scenarios.py. Historical output is not current evidence.",
+      "historical_readable": true,
+      "rejected_as_current": true
+    },
+    "dependency_lock_changed": {
+      "error": "Dependency lock changed; archived run is not current numerical evidence.",
+      "historical_readable": true,
+      "rejected_as_current": true
+    },
+    "existing_run_directory": {
+      "overwrite_refused": true
+    },
+    "frozen_intake_changed": {
+      "error": "Frozen intake changed; derive a new proxy and regenerate affected runs.",
+      "historical_readable": true,
+      "rejected_as_current": true
+    },
+    "input_model_changed": {
+      "error": "Model input changed; archived conclusion is not current evidence.",
+      "historical_readable": true,
+      "rejected_as_current": true
+    },
+    "missing_xml": {
+      "exception": "FileNotFoundError",
+      "rejected": true
+    },
+    "trajectory_csv_changed": {
+      "error": "Changed/missing evidence: trajectory.csv; regenerate as a new run.",
+      "historical_readable": false,
+      "rejected_as_current": true
+    },
+    "video_changed": {
+      "error": "Changed/missing evidence: motion.mp4; regenerate as a new run.",
+      "historical_readable": false,
+      "rejected_as_current": true
+    }
+  },
+  "media": {
+    "contact_sheet": {
+      "path": "simulation/runs/reviewer-r1/decoded-contact-sheet.png",
+      "sha256": "01739b180e0fea046002192078f29f3a9344595f61df766f06d9e5a83da58ee7"
+    },
+    "native_GUI_playback_exercised": false,
+    "reference/three-wheel": {
+      "direct_scene_rerenders": [
+        {
+          "scene_mean_absolute_rgb_error": 0.6016326121794872,
+          "scene_rgb_rmse": 1.1383247573540374,
+          "time_s": 0.0,
+          "trajectory_sample": 0,
+          "video_frame": 0
+        },
+        {
+          "scene_mean_absolute_rgb_error": 0.5659648771367521,
+          "scene_rgb_rmse": 1.03743789073696,
+          "time_s": 1.480000000000001,
+          "trajectory_sample": 148,
+          "video_frame": 37
+        },
+        {
+          "scene_mean_absolute_rgb_error": 0.5655462072649573,
+          "scene_rgb_rmse": 1.0370654789801403,
+          "time_s": 2.9599999999998956,
+          "trajectory_sample": 296,
+          "video_frame": 74
+        }
+      ],
+      "ffprobe": {
+        "avg_frame_rate": "25/1",
+        "codec_name": "h264",
+        "duration": "3.000000",
+        "height": 720,
+        "nb_read_frames": "75",
+        "r_frame_rate": "25/1",
+        "width": 960
+      },
+      "full_decode_error_free": true,
+      "middle_frame_vs_preview_mean_rgb_error": 0.869450713734568,
+      "movie_sha256": "e746a3ee0b520feaa31121e17bbfd36db0ecda8b7c86364e9e62c17011bf963b",
+      "plot_regeneration_pixel_file_exact": true,
+      "plot_sha256": "70789b15cf9ce52da8662c53f9a83c860fd2e976ff7b221460cb659ad029839f"
+    },
+    "rev5-proxy/face-to-vertex-attempt": {
+      "direct_scene_rerenders": [
+        {
+          "scene_mean_absolute_rgb_error": 0.5881663995726496,
+          "scene_rgb_rmse": 1.012912757483834,
+          "time_s": 0.0,
+          "trajectory_sample": 0,
+          "video_frame": 0
+        },
+        {
+          "scene_mean_absolute_rgb_error": 0.5846728098290598,
+          "scene_rgb_rmse": 1.0155041430392662,
+          "time_s": 1.480000000000001,
+          "trajectory_sample": 148,
+          "video_frame": 37
+        },
+        {
+          "scene_mean_absolute_rgb_error": 0.5845706463675213,
+          "scene_rgb_rmse": 1.0141687867369282,
+          "time_s": 2.9599999999998956,
+          "trajectory_sample": 296,
+          "video_frame": 74
+        }
+      ],
+      "ffprobe": {
+        "avg_frame_rate": "25/1",
+        "codec_name": "h264",
+        "duration": "3.000000",
+        "height": 720,
+        "nb_read_frames": "75",
+        "r_frame_rate": "25/1",
+        "width": 960
+      },
+      "full_decode_error_free": true,
+      "middle_frame_vs_preview_mean_rgb_error": 0.9832648533950618,
+      "movie_sha256": "442fbecafc15ffbc551902ca44b498d1b0ca442652316414a215f68a071e66d3",
+      "plot_regeneration_pixel_file_exact": true,
+      "plot_sha256": "09fa2f4e30c81c3d230ea4fa6189950b6ce8d8c97461b6d46d7f8291de3c3f75"
+    },
+    "rev5-proxy/fall": {
+      "direct_scene_rerenders": [
+        {
+          "scene_mean_absolute_rgb_error": 0.7042487980769231,
+          "scene_rgb_rmse": 1.3497222431104143,
+          "time_s": 0.0,
+          "trajectory_sample": 0,
+          "video_frame": 0
+        },
+        {
+          "scene_mean_absolute_rgb_error": 0.6167247596153846,
+          "scene_rgb_rmse": 1.0564486423742325,
+          "time_s": 1.0000000000000007,
+          "trajectory_sample": 100,
+          "video_frame": 25
+        },
+        {
+          "scene_mean_absolute_rgb_error": 0.6168289262820513,
+          "scene_rgb_rmse": 1.0564751884062156,
+          "time_s": 1.9600000000000015,
+          "trajectory_sample": 196,
+          "video_frame": 49
+        }
+      ],
+      "ffprobe": {
+        "avg_frame_rate": "25/1",
+        "codec_name": "h264",
+        "duration": "2.000000",
+        "height": 720,
+        "nb_read_frames": "50",
+        "r_frame_rate": "25/1",
+        "width": 960
+      },
+      "full_decode_error_free": true,
+      "middle_frame_vs_preview_mean_rgb_error": 0.8891068672839506,
+      "movie_sha256": "538938af556b6e109b533302b936d4ddf0700ff58ab1c513843a25d66e0d98a4",
+      "plot_regeneration_pixel_file_exact": true,
+      "plot_sha256": "9f715a47747ddb0a29f66c141c1031f619faa7a5afdf0325d1211af95eb8d5d8"
+    },
+    "rev5-proxy/vertex-balance": {
+      "direct_scene_rerenders": [
+        {
+          "scene_mean_absolute_rgb_error": 0.6650046741452992,
+          "scene_rgb_rmse": 1.2676080868123778,
+          "time_s": 0.0,
+          "trajectory_sample": 0,
+          "video_frame": 0
+        },
+        {
+          "scene_mean_absolute_rgb_error": 0.5943042200854701,
+          "scene_rgb_rmse": 1.0864796519898725,
+          "time_s": 1.480000000000001,
+          "trajectory_sample": 148,
+          "video_frame": 37
+        },
+        {
+          "scene_mean_absolute_rgb_error": 0.5952210202991453,
+          "scene_rgb_rmse": 1.0901906369988692,
+          "time_s": 2.9599999999998956,
+          "trajectory_sample": 296,
+          "video_frame": 74
+        }
+      ],
+      "ffprobe": {
+        "avg_frame_rate": "25/1",
+        "codec_name": "h264",
+        "duration": "3.000000",
+        "height": 720,
+        "nb_read_frames": "75",
+        "r_frame_rate": "25/1",
+        "width": 960
+      },
+      "full_decode_error_free": true,
+      "middle_frame_vs_preview_mean_rgb_error": 0.9786492091049382,
+      "movie_sha256": "fa8cc5a2eeb48b884b35c2d57c80b47a6631f609e7e3e6533ed2e6a2b381aad9",
+      "plot_regeneration_pixel_file_exact": true,
+      "plot_sha256": "7495c12d591dbe6c28527da3923d2625334782edfe23d958197d9a8429e95e96"
+    }
+  },
+  "representative_repeats": {
+    "reference/three-wheel": {
+      "all_npz_arrays_exact": true,
+      "trajectory_npz_sha256": "c716cea550638c32f5b59c2b1b89fa30923e97e0c63c781b47c3f690bc1157d9",
+      "xml_exact": true
+    },
+    "rev5-proxy/face-to-vertex-attempt": {
+      "all_npz_arrays_exact": true,
+      "trajectory_npz_sha256": "9d2e331d759b758cd99135d8654d154c019b5164aa779f5e905778b739143ec4",
+      "xml_exact": true
+    },
+    "rev5-proxy/fall": {
+      "all_npz_arrays_exact": true,
+      "trajectory_npz_sha256": "c6fc99ea063818ced4240a7a9e7356fcb5d476fcc2ffb301cafe327a1a26cfda",
+      "xml_exact": true
+    },
+    "rev5-proxy/vertex-balance": {
+      "all_npz_arrays_exact": true,
+      "trajectory_npz_sha256": "c0c7f20e11ae23efe1c0ab1baa46eeee5a0db4360787bac3d604e87d5ce25f64",
+      "xml_exact": true
+    }
+  },
+  "schema": "independent-simulation-review-witness-r1-v1",
+  "started_utc": "2026-09-05T14:31:46.106402+00:00",
+  "tolerances_are_numerical_not_physical": true,
+  "tracked_reviewed_inputs_and_outputs_unchanged": true,
+  "witness_assertions_completed": true
+}

@@ -1,0 +1,131 @@
+{
+  "base_model": {
+    "path": "simulation/models/reference.json",
+    "sha256": "b34b181117b7a12cf8e8356bcf1a57321deab20726d12249f39badaaba889c1f"
+  },
+  "brake_detail_rendering": {
+    "camera": "XY tracking with fixed initial height, size-aware distance",
+    "duration_s": 10.0,
+    "ffmpeg": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+    "fps": 25,
+    "frames": 250,
+    "playback_rate": 0.01,
+    "poster_sample_index": 836,
+    "producer": "MuJoCo Renderer + Pillow labels + ffmpeg/libx264",
+    "state_source": "trajectory.npz; exact rows in brake-detail-frames.csv",
+    "status": "OFFSCREEN_RENDERED_AND_DECODED"
+  },
+  "classification": "SYNTHETIC_REFERENCE",
+  "code": {
+    "simulation/cube_sim/__init__.py": "ceb4c3ee2e2d5c5316c6802c820308a6d622880b8808f0a28a1a052a3cdee09b",
+    "simulation/cube_sim/__main__.py": "339d1b8e0b5818cf4d991782ae0b354c229c77d513853a569bfeb9e462a587a6",
+    "simulation/cube_sim/braking.py": "af606817834b41ab1315aa7c70396525e6be7d6a27766265163d1d114fa57beb",
+    "simulation/cube_sim/gallery.py": "6a76b213adf55040dd1d94130200c4b29f207ebd7f64d7543a421f664f9cd38e",
+    "simulation/cube_sim/geometry.py": "fd4389ef3fa09b30daa133b28e33701b22f0fbb28ea0050ecd6d2de3e4917807",
+    "simulation/cube_sim/intake.py": "6f300726750bf15a6a184c34dcc623674860bf9ad92ca9b4410b75d33c4c91d3",
+    "simulation/cube_sim/integration.py": "e3f0eb6bf57cdac69807b034ac431c6953fd29a393f79b26dbe5f369562203cf",
+    "simulation/cube_sim/model.py": "e6bcc50f56611646907f84780d00cec6fb27e8aa9741d1a4a6c7fd95764e4a73",
+    "simulation/cube_sim/numerics.py": "6e5613e483de52dbdaa0180009f86850093ebbefd63fd040cf2b48c6ebd60bbc",
+    "simulation/cube_sim/runner.py": "efdda2a60715d491e0e9cb3b3f26efaf9aa219d1b9f6a947aa31f05e77047eb5",
+    "simulation/cube_sim/scenarios.py": "18070e1e48126b6123ea1ff396f4fc09dbc52acb705758f758be9bf8dcb621a4",
+    "simulation/cube_sim/visualize.py": "b7e01561b79f2b008ac4663e7fad196f85cb0f20733125c1a489d2280e3c7bdc"
+  },
+  "dense_sampling": {
+    "end_s": 3.6,
+    "period_s": 0.0001,
+    "start_s": 3.48
+  },
+  "dependency_lock_sha256": "46a9c69d790ca27c38135aefa26e08d683a1e7536080b93840a90b61cbd89cb7",
+  "diagnostic_quadrature": "RK4_STAGE_REEVALUATION_1_2_2_1",
+  "environment": {
+    "matplotlib": "3.11.1",
+    "mujoco": "3.12.0",
+    "numpy": "2.5.2",
+    "pillow": "12.3.0",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "python": "3.14.3"
+  },
+  "input_model": {
+    "kind": "repository_file",
+    "path": "simulation/models/startup-reference.json",
+    "sha256": "ddddd2be49d8217a654acf6524c1f9fd124f46509c87bcf97e8e5dd20e7861c9"
+  },
+  "mechanism_source": {
+    "path": "simulation/intake/mechanism-v1.json",
+    "repository": "ktanino10/attitude-control-study",
+    "revision": "a927d1ae3409ba143631077824cdf3c904ea27b9",
+    "sha256": "a9c3a3224a602b4d9e2cef10bcf90cab2e0649ef1e78cc067ff8acdc8672538b",
+    "source_files": [
+      {
+        "path": "ja/session-2-modeling/06-standup-energy.md",
+        "sha256": "8b08823681a0446d1d52610cd9a5ae6d21a848342bae8aad31d8b69a538ecd89",
+        "url": "https://github.com/ktanino10/attitude-control-study/blob/a927d1ae3409ba143631077824cdf3c904ea27b9/ja/session-2-modeling/06-standup-energy.md"
+      },
+      {
+        "path": "ja/reference/mechanical.md",
+        "sha256": "d0e27254bdfe563f7fe419f244ff132026dfd4c307024f7e0cf19c40b8ba29c4",
+        "url": "https://github.com/ktanino10/attitude-control-study/blob/a927d1ae3409ba143631077824cdf3c904ea27b9/ja/reference/mechanical.md"
+      },
+      {
+        "path": "ja/reference/interfaces.md",
+        "sha256": "df20ec89c3a2bb3d98d014df08dd88897fbd629a5313a6ad0270590f8e204fde",
+        "url": "https://github.com/ktanino10/attitude-control-study/blob/a927d1ae3409ba143631077824cdf3c904ea27b9/ja/reference/interfaces.md"
+      }
+    ]
+  },
+  "omissions": [
+    "No CAD-derived or measured complete mass, CG or inertia.",
+    "No battery, populated electronics, harness or motor internals modeled individually.",
+    "Ideal bidirectional joint torque is NOT DRV10983 runtime braking or a motor torque-speed curve.",
+    "No compliance, fracture, thermal/FEA, rotor containment, noise or real-time firmware.",
+    "Box-plane soft contact is uncalibrated; no strength or continuous collision clearance claim.",
+    "Dedicated ideal dry brake is NOT the selected hardware, motor reverse effort or a DRV10983 command.",
+    "3000 rpm is a prior target-only analysis point, not a qualified or safe speed.",
+    "Brake delay/ramp/capacity/constraint response are numerical assumptions, not a manufacturer waveform.",
+    "Only the first face-to-edge kick is attempted; no forced edge capture or second vertex jump."
+  ],
+  "outputs": {
+    "brake-detail-frames.csv": "615cfc6ba1e3a4975fd57a1f4d719692a8706d60fc7bc95390ef5373ff4fb8e2",
+    "brake-detail-preview.png": "71efe2465d98845df56620cac2e13ef088249624c24b223cbed105fe1bc1e29a",
+    "brake-detail.mp4": "4bf24551ce35ebe59eec40294ff7ecca8f8730b892764e092a3508792a295bee",
+    "input.json": "ddddd2be49d8217a654acf6524c1f9fd124f46509c87bcf97e8e5dd20e7861c9",
+    "model.xml": "398e9574033ccdbfb9eaae9daef1cf11cb14d59cddee2191418d24318cd06bee",
+    "motion.mp4": "36f7421b1068ce56ebbb2e0207257b688c54cd25c88edfa19b59924c21dd0692",
+    "plots.png": "b2d706cdb594207d8d91deb28e1c37739d6b42da833ff418826cdf237696cab0",
+    "preview.png": "cb733ac9ec83b10fc2f35e29b4d73d2f1a77dabcabfa0a5b69425b200186d766",
+    "scenario.json": "b6c4ad8508764cae090b11b8e72b94e9a5372463721f036c2928a726ea598fa2",
+    "startup-plots.png": "ba40660ad8bd21e98e3812a5e8ddee82cddfaef87e5b40cefa0ec055ae1ada81",
+    "summary.json": "08302cc1888bca84e2d742e4dfd1bc206ea549300dfc4aed8f20e01f4b295ae4",
+    "trajectory.csv": "eb1fc90da2c759db935b4e4e1492305ee57b2c558885994b30641c7dfc13f1d8",
+    "trajectory.npz": "e6b5f685dcd6ca4846bd8133610ef3b7112d69035c2acbd7d974ba28f39e60ae",
+    "video-frames.csv": "423db1f3e9b43c039cf545e3e44ecea5d033191c57afa0d2dd64ba0b45f89b41"
+  },
+  "phase_codes": {
+    "0": "ordinary trial",
+    "1": "spin-up command",
+    "2": "coast command",
+    "3": "brake command delay",
+    "4": "brake torque ramp",
+    "5": "braking",
+    "6": "wheel near rest; no capture"
+  },
+  "rendering": {
+    "camera": "XY tracking with fixed initial height, size-aware distance",
+    "duration_s": 10.0,
+    "ffmpeg": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+    "fps": 25,
+    "frames": 250,
+    "playback_rate": 1,
+    "poster_sample_index": 0,
+    "producer": "MuJoCo Renderer + Pillow labels + ffmpeg/libx264",
+    "state_source": "trajectory.npz; exact rows in video-frames.csv",
+    "status": "OFFSCREEN_RENDERED_AND_DECODED"
+  },
+  "sample_period_s": 0.01,
+  "schema_version": 1,
+  "source_revision": "a9109f376e70b28788a4b99348cf3d39b2af2da3",
+  "source_snapshot": null,
+  "state": "WIP_SIMULATION_NOT_HARDWARE_OR_ASSEMBLY_APPROVAL",
+  "stochasticity": "NONE",
+  "uncommitted_model_code": false
+}

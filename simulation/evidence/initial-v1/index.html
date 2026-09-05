@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cube dynamics — WIP 計算結果</title>
+<style>
+:root{color-scheme:light;--ink:#173148;--paper:#eaf0f4;--line:#c4d3de;--teal:#12606c;--warn:#996100;--bad:#b13926}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 system-ui,"Hiragino Kaku Gothic ProN",sans-serif}
+main{max-width:1440px;margin:auto;padding:32px 24px}h1,h2{font-family:"Avenir Next",system-ui,sans-serif;line-height:1.15}
+h1{font-size:clamp(2rem,4vw,3.5rem);margin:14px 0}h2{font-size:1.6rem;margin:8px 0}
+a{color:var(--teal);text-underline-offset:3px}a:focus-visible,summary:focus-visible,video:focus-visible{outline:3px solid var(--warn);outline-offset:4px}
+.eyebrow,.model,.caption,.result span{font-family:ui-monospace,"SFMono-Regular",monospace}.eyebrow{letter-spacing:.1em;font-size:.8rem}
+.intro{max-width:1000px}.warning{padding:16px 20px;border-left:5px solid var(--warn);background:#fff8e9}
+.axes{display:flex;gap:24px;margin:18px 0;font-weight:650}.axes span{padding-left:10px;border-left:4px solid}.x{border-color:#d64735!important}.y{border-color:#209756!important}.z{border-color:#357bcc!important}
+nav{display:flex;flex-wrap:wrap;gap:8px 18px;margin:24px 0;font-size:.85rem}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+article{background:white;border:1px solid var(--line);border-radius:8px;overflow:hidden;scroll-margin-top:16px}
+article header{padding:20px 24px}.model{font-size:.78rem;color:var(--teal)}header p{margin-bottom:0;font-size:.9rem}
+video,img{display:block;width:100%;height:auto}video{background:#142636;aspect-ratio:4/3}
+.result{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:16px 24px;border-bottom:1px solid var(--line)}
+.result span{font-size:.8rem}.failed{color:var(--bad);background:#fff0eb}.caption{font-size:.75rem;overflow-wrap:anywhere;padding:0 24px}
+.links{display:flex;gap:18px;flex-wrap:wrap;padding:0 24px}details{border-top:1px solid var(--line);padding:16px 24px}summary{cursor:pointer;font-weight:650}
+pre{overflow:auto;font-size:.8rem;padding:12px;background:var(--paper)}footer{margin:32px 0;color:var(--ink);font-size:.85rem}
+@media(max-width:800px){main{padding:24px 12px}.grid{grid-template-columns:1fr}.result,article header{padding:16px}}
+</style></head><body><main>
+<header class="intro"><div class="eyebrow">RIGID-BODY LAB / WIP / 計算された運動</div>
+<h1>Cube dynamics</h1><p>剛体キューブと3つのリアクションホイール。姿勢・接触・トルクを、同じ記録時刻の動画とグラフで追います。</p>
+<div class="axes"><span class="x">+X wheel</span><span class="y">+Y wheel</span><span class="z">+Z wheel</span></div>
+<p class="warning"><strong>実機の成立性・安全性を承認する結果ではありません。</strong>
+基準モデルとRev5の部分的な固体CAD質量プロキシを分離しています。実ドライバー・完全な質量/CG・床特性は未確定です。
+辺・頂点バランスは事前配置した試験です。失敗や飽和を隠していません。Fusionの組立工程動画とは別物です。</p>
+<p><a href="numerics.json">刻み・ソルバー感度の数値記録</a> /
+<a href="index-manifest.json">この一覧の証拠ハッシュ</a></p></header>
+<nav aria-label="計算ケース"><a href="#reference-rest">reference / rest</a>
+<a href="#reference-fall">reference / fall</a>
+<a href="#reference-one-wheel">reference / one-wheel</a>
+<a href="#reference-three-wheel">reference / three-wheel</a>
+<a href="#reference-edge-balance">reference / edge-balance</a>
+<a href="#reference-vertex-balance">reference / vertex-balance</a>
+<a href="#reference-face-to-vertex-attempt">reference / face-to-vertex-attempt</a>
+<a href="#rev5-proxy-rest">rev5-proxy / rest</a>
+<a href="#rev5-proxy-fall">rev5-proxy / fall</a>
+<a href="#rev5-proxy-one-wheel">rev5-proxy / one-wheel</a>
+<a href="#rev5-proxy-three-wheel">rev5-proxy / three-wheel</a>
+<a href="#rev5-proxy-edge-balance">rev5-proxy / edge-balance</a>
+<a href="#rev5-proxy-vertex-balance">rev5-proxy / vertex-balance</a>
+<a href="#rev5-proxy-face-to-vertex-attempt">rev5-proxy / face-to-vertex-attempt</a></nav><section class="grid">
+<article id="reference-rest">
+  <header><span class="model">SYNTHETIC_REFERENCE</span>
+  <h2>rest</h2><p>Passive face rest; uncalibrated soft contact.</p></header>
+  <video controls playsinline preload="metadata" poster="reference/rest/preview.png"
+         aria-label="reference rest 計算軌道の動画">
+    <source src="reference/rest/motion.mp4" type="video/mp4">
+    <a href="reference/rest/motion.mp4">MP4を開く</a>
+  </video>
+  <div class="result ">
+    <strong>応答を観測（制御目標なし）</strong>
+    <span>最終姿勢誤差 0.00° / 2.0 s</span>
+  </div>
+  <p class="caption">code 6636b95b78bb | synthetic input</p>
+  <p class="links"><a href="reference/rest/motion.mp4">動画</a>
+    <a href="reference/rest/trajectory.csv">CSV</a><a href="reference/rest/trajectory.npz">全状態</a>
+    <a href="reference/rest/model.xml">MJCF</a><a href="reference/rest/manifest.json">版・ハッシュ</a></p>
+  <details><summary>グラフ・入力条件を見る</summary>
+    <a href="reference/rest/plots.png"><img loading="lazy" src="reference/rest/plots.png" alt="姿勢・速度・トルク・接触・エネルギー・運動量の時系列"></a>
+    <p><a href="reference/rest/input.json">全モデル入力・未モデル化事項</a> /
+       <a href="reference/rest/scenario.json">初期条件・制御ゲイン</a> /
+       <a href="reference/rest/video-frames.csv">動画フレームと状態の対応</a></p>
+    <pre>{
+  &quot;command_delay_s&quot;: 0.02,
+  &quot;contact&quot;: true,
+  &quot;controller&quot;: &quot;off&quot;,
+  &quot;description&quot;: &quot;Passive face rest; uncalibrated soft contact.&quot;,
+  &quot;duration_s&quot;: 2.0,
+  &quot;gravity&quot;: true,
+  &quot;initial_clearance_m&quot;: 0.0,
+  &quot;initial_quat&quot;: null,
+  &quot;kd_nm_s_rad&quot;: 0.018,
+  &quot;kp_nm_rad&quot;: 0.08,
+  &quot;name&quot;: &quot;rest&quot;,
+  &quot;perturbation_rad&quot;: 0.0,
+  &quot;pulse_half_period_s&quot;: 0.5,
+  &quot;pulse_nm&quot;: [
+    0.0,
+    0.0,
+    0.0
+  ],
+  &quot;target&quot;: [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+  ]
+}</pre>
+  </details>
+</article>
+
+<article id="reference-fall">
+  <header><span class="model">SYNTHETIC_REFERENCE</span>
+  <h2>fall</h2><p>Passive drop; no recovery controller.</p></header>
+  <video controls playsinline preload="metadata" poster="reference/fall/preview.png"
+         aria-label="reference fall 計算軌道の動画">
+    <source src="reference/fall/motion.mp4" type="video/mp4">
+    <a href="reference/fall/motion.mp4">MP4を開く</a>
+  </video>
+  <div class="result ">
+    <strong>応答を観測（制御目標なし）</strong>
+    <span>最終姿勢誤差 0.00° / 2.0 s</span>
+  </div>
+  <p class="caption">code 6636b95b78bb | synthetic input</p>
+  <p class="links"><a href="reference/fall/motion.mp4">動画</a>
+    <a href="reference/fall/trajectory.csv">CSV</a><a href="reference/fall/trajectory.npz">全状態</a>
+    <a href="reference/fall/model.xml">MJCF</a><a href="reference/fall/manifest.json">版・ハッシュ</a></p>
+  <details><summary>グラフ・入力条件を見る</summary>
+    <a href="reference/fall/plots.png"><img loading="lazy" src="reference/fall/plots.png" alt="姿勢・速度・トルク・接触・エネルギー・運動量の時系列"></a>
+    <p><a href="reference/fall/input.json">全モデル入力・未モデル化事項</a> /
+       <a href="reference/fall/scenario.json">初期条件・制御ゲイン</a> /
+       <a href="reference/fall/video-frames.csv">動画フレームと状態の対応</a></p>
+    <pre>{
+  &quot;command_delay_s&quot;: 0.02,
+  &quot;contact&quot;: true,
+  &quot;controller&quot;: &quot;off&quot;,
+  &quot;description&quot;: &quot;Passive drop; no recovery controller.&quot;,
+  &quot;duration_s&quot;: 2.0,
+  &quot;gravity&quot;: true,
+  &quot;initial_clearance_m&quot;: 0.12,
+  &quot;initial_quat&quot;: null,
+  &quot;kd_nm_s_rad&quot;: 0.018,
+  &quot;kp_nm_rad&quot;: 0.08,
+  &quot;name&quot;: &quot;fall&quot;,
+  &quot;perturbation_rad&quot;: 0.18,
+  &quot;pulse_half_period_s&quot;: 0.5,
+  &quot;pulse_nm&quot;: [
+    0.0,
+    0.0,
+    0.0
+  ],
+  &quot;target&quot;: [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+  ]
+}</pre>
+  </details>
+</article>
+
+<article id="reference-one-wheel">
+  <header><span class="model">SYNTHETIC_REFERENCE</span>
+  <h2>one-wheel</h2><p>Free space X-wheel torque then ideal reverse torque; NOT driver brake.</p></header>
+  <video controls playsinline preload="metadata" poster="reference/one-wheel/preview.png"
+         aria-label="reference one-wheel 計算軌道の動画">
+    <source src="reference/one-wheel/motion.mp4" type="video/mp4">
+    <a href="reference/one-wheel/motion.mp4">MP4を開く</a>
+  </video>
+  <div class="result ">
+    <strong>応答を観測（制御目標なし）</strong>
+    <span>最終姿勢誤差 7.94° / 2.0 s</span>
+  </div>
+  <p class="caption">code 6636b95b78bb | synthetic input</p>
+  <p class="links"><a href="reference/one-wheel/motion.mp4">動画</a>
+    <a href="reference/one-wheel/trajectory.csv">CSV</a><a href="reference/one-wheel/trajectory.npz">全状態</a>
+    <a href="reference/one-wheel/model.xml">MJCF</a><a href="reference/one-wheel/manifest.json">版・ハッシュ</a></p>
+  <details><summary>グラフ・入力条件を見る</summary>
+    <a href="reference/one-wheel/plots.png"><img loading="lazy" src="reference/one-wheel/plots.png" alt="姿勢・速度・トルク・接触・エネルギー・運動量の時系列"></a>
+    <p><a href="reference/one-wheel/input.json">全モデル入力・未モデル化事項</a> /
+       <a href="reference/one-wheel/scenario.json">初期条件・制御ゲイン</a> /
+       <a href="reference/one-wheel/video-frames.csv">動画フレームと状態の対応</a></p>
+    <pre>{
+  &quot;command_delay_s&quot;: 0.02,
+  &quot;contact&quot;: false,
+  &quot;controller&quot;: &quot;pulse&quot;,
+  &quot;description&quot;: &quot;Free space X-wheel torque then ideal reverse torque; NOT driver brake.&quot;,
+  &quot;duration_s&quot;: 2.0,
+  &quot;gravity&quot;: false,
+  &quot;initial_clearance_m&quot;: 0.18,
+  &quot;initial_quat&quot;: null,
+  &quot;kd_nm_s_rad&quot;: 0.018,
+  &quot;kp_nm_rad&quot;: 0.08,
+  &quot;name&quot;: &quot;one-wheel&quot;,
+  &quot;perturbation_rad&quot;: 0.0,
+  &quot;pulse_half_period_s&quot;: 0.5,
+  &quot;pulse_nm&quot;: [
+    0.006,
+    0,
+    0
+  ],
+  &quot;target&quot;: [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+  ]
+}</pre>
+  </details>
+</article>
+
+<article id="reference-three-wheel">
+  <header><span class="model">SYNTHETIC_REFERENCE</span>
+  <h2>three-wheel</h2><p>Free space three orthogonal internal torques then reverse.</p></header>
+  <video controls playsinline preload="metadata" poster="reference/three-wheel/preview.png"
+         aria-label="reference three-wheel 計算軌道の動画">
+    <source src="reference/three-wheel/motion.mp4" type="video/mp4">
+    <a href="reference/three-wheel/motion.mp4">MP4を開く</a>
+  </video>
+  <div class="result ">
+    <strong>応答を観測（制御目標なし）</strong>
+    <span>最終姿勢誤差 11.63° / 3.0 s</span>
+  </div>
+  <p class="caption">code 6636b95b78bb | synthetic input</p>
+  <p class="links"><a href="reference/three-wheel/motion.mp4">動画</a>
+    <a href="reference/three-wheel/trajectory.csv">CSV</a><a href="reference/three-wheel/trajectory.npz">全状態</a>
+    <a href="reference/three-wheel/model.xml">MJCF</a><a href="reference/three-wheel/manifest.json">版・ハッシュ</a></p>
+  <details><summary>グラフ・入力条件を見る</summary>
+    <a href="reference/three-wheel/plots.png"><img loading="lazy" src="reference/three-wheel/plots.png" alt="姿勢・速度・トルク・接触・エネルギー・運動量の時系列"></a>
+    <p><a href="reference/three-wheel/input.json">全モデル入力・未モデル化事項</a> /
+       <a href="reference/three-wheel/scenario.json">初期条件・制御ゲイン</a> /
+       <a href="reference/three-wheel/video-frames.csv">動画フレームと状態の対応</a></p>
+    <pre>{
+  &quot;command_delay_s&quot;: 0.02,
+  &quot;contact&quot;: false,
+  &quot;controller&quot;: &quot;pulse&quot;,
+  &quot;description&quot;: &quot;Free space three orthogonal internal torques then reverse.&quot;,
+  &quot;duration_s&quot;: 3.0,
+  &quot;gravity&quot;: false,
+  &quot;initial_clearance_m&quot;: 0.18,
+  &quot;initial_quat&quot;: null,
+  &quot;kd_nm_s_rad&quot;: 0.018,
+  &quot;kp_nm_rad&quot;: 0.08,
+  &quot;name&quot;: &quot;three-wheel&quot;,
+  &quot;perturbation_rad&quot;: 0.0,
+  &quot;pulse_half_period_s&quot;: 0.5,
+  &quot;pulse_nm&quot;: [
+    0.006,
+    -0.004,
+    0.005
+  ],
+  &quot;target&quot;: [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+  ]
+}</pre>
+  </details>
+</article>
+
+<article id="reference-edge-balance">
+  <header><span class="model">SYNTHETIC_REFERENCE</span>
+  <h2>edge-balance</h2><p>Pre-positioned edge, perturbed 2 deg; NOT face-to-edge transition.</p></header>
+  <video controls playsinline preload="metadata" poster="reference/edge-balance/preview.png"
+         aria-label="reference edge-balance 計算軌道の動画">
+    <source src="reference/edge-balance/motion.mp4" type="video/mp4">
+    <a href="reference/edge-balance/motion.mp4">MP4を開く</a>
+  </video>
+  <div class="result failed">
+    <strong>目標姿勢を維持できず</strong>
+    <span>最終姿勢誤差 45.00° / 3.0 s</span>
+  </div>
+  <p class="caption">code 6636b95b78bb | synthetic input</p>
+  <p class="links"><a href="reference/edge-balance/motion.mp4">動画</a>
+    <a href="reference/edge-balance/trajectory.csv">CSV</a><a href="reference/edge-balance/trajectory.npz">全状態</a>
+    <a href="reference/edge-balance/model.xml">MJCF</a><a href="reference/edge-balance/manifest.json">版・ハッシュ</a></p>
+  <details><summary>グラフ・入力条件を見る</summary>
+    <a href="reference/edge-balance/plots.png"><img loading="lazy" src="reference/edge-balance/plots.png" alt="姿勢・速度・トルク・接触・エネルギー・運動量の時系列"></a>
+    <p><a href="reference/edge-balance/input.json">全モデル入力・未モデル化事項</a> /
+       <a href="reference/edge-balance/scenario.json">初期条件・制御ゲイン</a> /
+       <a href="reference/edge-balance/video-frames.csv">動画フレームと状態の対応</a></p>
+    <pre>{
+  &quot;command_delay_s&quot;: 0.02,
+  &quot;contact&quot;: true,
+  &quot;controller&quot;: &quot;pd&quot;,
+  &quot;description&quot;: &quot;Pre-positioned edge, perturbed 2 deg; NOT face-to-edge transition.&quot;,
+  &quot;duration_s&quot;: 3.0,
+  &quot;gravity&quot;: true,
+  &quot;initial_clearance_m&quot;: 0.0,
+  &quot;initial_quat&quot;: null,
+  &quot;kd_nm_s_rad&quot;: 0.018,
+  &quot;kp_nm_rad&quot;: 0.08,
+  &quot;name&quot;: &quot;edge-balance&quot;,
+  &quot;perturbation_rad&quot;: 0.03490658503988659,
+  &quot;pulse_half_period_s&quot;: 0.5,
+  &quot;pulse_nm&quot;: [
+    0.0,
+    0.0,
+    0.0
+  ],
+  &quot;target&quot;: [
+    0.9238795325112867,
+    0.3826834323650898,
+    0.0,
+    0.0
+  ]
+}</pre>
+  </details>
+</article>
+
+<article id="reference-vertex-balance">
+  <header><span class="model">SYNTHETIC_REFERENCE</span>
+  <h2>vertex-balance</h2><p>Pre-positioned vertex, perturbed 2 deg; NOT a jump/transition.</p></header>
+  <video controls playsinline preload="metadata" poster="reference/vertex-balance/preview.png"
+         aria-label="reference vertex-balance 計算軌道の動画">
+    <source src="reference/vertex-balance/motion.mp4" type="video/mp4">
+    <a href="reference/vertex-balance/motion.mp4">MP4を開く</a>
+  </video>
+  <div class="result failed">
+    <strong>目標姿勢を維持できず</strong>
+    <span>最終姿勢誤差 54.87° / 3.0 s</span>
+  </div>
+  <p class="caption">code 6636b95b78bb | synthetic input</p>
+  <p class="links"><a href="reference/vertex-balance/motion.mp4">動画</a>
+    <a href="reference/vertex-balance/trajectory.csv">CSV</a><a href="reference/vertex-balance/trajectory.npz">全状態</a>
+    <a href="reference/vertex-balance/model.xml">MJCF</a><a href="reference/vertex-balance/manifest.json">版・ハッシュ</a></p>
+  <details><summary>グラフ・入力条件を見る</summary>
+    <a href="reference/vertex-balance/plots.png"><img loading="lazy" src="reference/vertex-balance/plots.png" alt="姿勢・速度・トルク・接触・エネルギー・運動量の時系列"></a>
+    <p><a href="reference/vertex-balance/input.json">全モデル入力・未モデル化事項</a> /
+       <a href="reference/vertex-balance/scenario.json">初期条件・制御ゲイン</a> /
+       <a href="reference/vertex-balance/video-frames.csv">動画フレームと状態の対応</a></p>
+    <pre>{
+  &quot;command_delay_s&quot;: 0.02,
+  &quot;contact&quot;: true,
+  &quot;controller&quot;: &quot;pd&quot;,
+  &quot;description&quot;: &quot;Pre-positioned vertex, perturbed 2 deg; NOT a jump/transition.&quot;,
+  &quot;duration_s&quot;: 3.0,
+  &quot;gravity&quot;: true,
+  &quot;initial_clearance_m&quot;: 0.0,
+  &quot;initial_quat&quot;: null,
+  &quot;kd_nm_s_rad&quot;: 0.018,
+  &quot;kp_nm_rad&quot;: 0.08,
+  &quot;name&quot;: &quot;vertex-balance&quot;,
+  &quot;perturbation_rad&quot;: 0.03490658503988659,
+  &quot;pulse_half_period_s&quot;: 0.5,
+  &quot;pulse_nm&quot;: [
+    0.0,
+    0.0,
+    0.0
+  ],
+  &quot;target&quot;: [
+    0.8880738339771153,
+    0.3250575836718681,
+    -0.3250575836718681,
+    0.0
+  ]
+}</pre>
+  </details>
+</article>
+
+<article id="reference-face-to-vertex-attempt">
+  <header><span class="model">SYNTHETIC_REFERENCE</span>
+  <h2>face-to-vertex-attempt</h2><p>Start on a face; ask for vertex attitude. Falling/saturation is valid.</p></header>
+  <video controls playsinline preload="metadata" poster="reference/face-to-vertex-attempt/preview.png"
+         aria-label="reference face-to-vertex-attempt 計算軌道の動画">
+    <source src="reference/face-to-vertex-attempt/motion.mp4" type="video/mp4">
+    <a href="reference/face-to-vertex-attempt/motion.mp4">MP4を開く</a>
+  </video>
+  <div class="result failed">
+    <strong>目標姿勢に到達せず</strong>
+    <span>最終姿勢誤差 54.74° / 3.0 s</span>
+  </div>
+  <p class="caption">code 6636b95b78bb | synthetic input</p>
+  <p class="links"><a href="reference/face-to-vertex-attempt/motion.mp4">動画</a>
+    <a href="reference/face-to-vertex-attempt/trajectory.csv">CSV</a><a href="reference/face-to-vertex-attempt/trajectory.npz">全状態</a>
+    <a href="reference/face-to-vertex-attempt/model.xml">MJCF</a><a href="reference/face-to-vertex-attempt/manifest.json">版・ハッシュ</a></p>
+  <details><summary>グラフ・入力条件を見る</summary>
+    <a href="reference/face-to-vertex-attempt/plots.png"><img loading="lazy" src="reference/face-to-vertex-attempt/plots.png" alt="姿勢・速度・トルク・接触・エネルギー・運動量の時系列"></a>
+    <p><a href="reference/face-to-vertex-attempt/input.json">全モデル入力・未モデル化事項</a> /
+       <a href="reference/face-to-vertex-attempt/scenario.json">初期条件・制御ゲイン</a> /
+       <a href="reference/face-to-vertex-attempt/video-frames.csv">動画フレームと状態の対応</a></p>
+    <pre>{
+  &quot;command_delay_s&quot;: 0.02,
+  &quot;contact&quot;: true,
+  &quot;controller&quot;: &quot;pd&quot;,
+  &quot;description&quot;: &quot;Start on a face; ask for vertex attitude. Falling/saturation is valid.&quot;,
+  &quot;duration_s&quot;: 3.0,
+  &quot;gravity&quot;: true,
+  &quot;initial_clearance_m&quot;: 0.0,
+  &quot;initial_quat&quot;: [
+    1,
+    0,
+    0,
+    0
+  ],
+  &quot;kd_nm_s_rad&quot;: 0.018,
+  &quot;kp_nm_rad&quot;: 0.08,
+  &quot;name&quot;: &quot;face-to-vertex-attempt&quot;,
+  &quot;perturbation_rad&quot;: 0.0,
+  &quot;pulse_half_period_s&quot;: 0.5,
+  &quot;pulse_nm&quot;: [
+    0.0,
+    0.0,
+    0.0
+  ],
+  &quot;target&quot;: [
+    0.8880738339771153,
+    0.3250575836718681,
+    -0.3250575836718681,
+    0.0
+  ]
+}</pre>
+  </details>
+</article>
+
+<article id="rev5-proxy-rest">
+  <header><span class="model">WIP_DESIGN_PROXY</span>
+  <h2>rest</h2><p>Passive face rest; uncalibrated soft contact.</p></header>
+  <video controls playsinline preload="metadata" poster="rev5-proxy/rest/preview.png"
+         aria-label="rev5-proxy rest 計算軌道の動画">
+    <source src="rev5-proxy/rest/motion.mp4" type="video/mp4">
+    <a href="rev5-proxy/rest/motion.mp4">MP4を開く</a>
+  </video>
+  <div class="result ">
+    <strong>応答を観測（制御目標なし）</strong>
+    <span>最終姿勢誤差 0.00° / 2.0 s</span>
+  </div>
+  <p class="caption">code 6636b95b78bb | WIP intake 3633eb5d03d6</p>
+  <p class="links"><a href="rev5-proxy/rest/motion.mp4">動画</a>
+    <a href="rev5-proxy/rest/trajectory.csv">CSV</a><a href="rev5-proxy/rest/trajectory.npz">全状態</a>
+    <a href="rev5-proxy/rest/model.xml">MJCF</a><a href="rev5-proxy/rest/manifest.json">版・ハッシュ</a></p>
+  <details><summary>グラフ・入力条件を見る</summary>
+    <a href="rev5-proxy/rest/plots.png"><img loading="lazy" src="rev5-proxy/rest/plots.png" alt="姿勢・速度・トルク・接触・エネルギー・運動量の時系列"></a>
+    <p><a href="rev5-proxy/rest/input.json">全モデル入力・未モデル化事項</a> /
+       <a href="rev5-proxy/rest/scenario.json">初期条件・制御ゲイン</a> /
+       <a href="rev5-proxy/rest/video-frames.csv">動画フレームと状態の対応</a></p>
+    <pre>{
+  &quot;command_delay_s&quot;: 0.02,
+  &quot;contact&quot;: true,
+  &quot;controller&quot;: &quot;off&quot;,
+  &quot;description&quot;: &quot;Passive face rest; uncalibrated soft contact.&quot;,
+  &quot;duration_s&quot;: 2.0,
+  &quot;gravity&quot;: true,
+  &quot;initial_clearance_m&quot;: 0.0,
+  &quot;initial_quat&quot;: null,
+  &quot;kd_nm_s_rad&quot;: 0.018,
+  &quot;kp_nm_rad&quot;: 0.08,
+  &quot;name&quot;: &quot;rest&quot;,
+  &quot;perturbation_rad&quot;: 0.0,
+  &quot;pulse_half_period_s&quot;: 0.5,
+  &quot;pulse_nm&quot;: [
+    0.0,
+    0.0,
+    0.0
+  ],
+  &quot;target&quot;: [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+  ]
+}</pre>
+  </details>
+</article>
+
+<article id="rev5-proxy-fall">
+  <header><span class="model">WIP_DESIGN_PROXY</span>
+  <h2>fall</h2><p>Passive drop; no recovery controller.</p></header>
+  <video controls playsinline preload="metadata" poster="rev5-proxy/fall/preview.png"
+         aria-label="rev5-proxy fall 計算軌道の動画">
+    <source src="rev5-proxy/fall/motion.mp4" type="video/mp4">
+    <a href="rev5-proxy/fall/motion.mp4">MP4を開く</a>
+  </video>
+  <div class="result ">
+    <strong>応答を観測（制御目標なし）</strong>
+    <span>最終姿勢誤差 0.00° / 2.0 s</span>
+  </div>
+  <p class="caption">code 6636b95b78bb | WIP intake 3633eb5d03d6</p>
+  <p class="links"><a href="rev5-proxy/fall/motion.mp4">動画</a>
+    <a href="rev5-proxy/fall/trajectory.csv">CSV</a><a href="rev5-proxy/fall/trajectory.npz">全状態</a>
+    <a href="rev5-proxy/fall/model.xml">MJCF</a><a href="rev5-proxy/fall/manifest.json">版・ハッシュ</a></p>
+  <details><summary>グラフ・入力条件を見る</summary>
+    <a href="rev5-proxy/fall/plots.png"><img loading="lazy" src="rev5-proxy/fall/plots.png" alt="姿勢・速度・トルク・接触・エネルギー・運動量の時系列"></a>
+    <p><a href="rev5-proxy/fall/input.json">全モデル入力・未モデル化事項</a> /
+       <a href="rev5-proxy/fall/scenario.json">初期条件・制御ゲイン</a> /
+       <a href="rev5-proxy/fall/video-frames.csv">動画フレームと状態の対応</a></p>
+    <pre>{
+  &quot;command_delay_s&quot;: 0.02,
+  &quot;contact&quot;: true,
+  &quot;controller&quot;: &quot;off&quot;,
+  &quot;description&quot;: &quot;Passive drop; no recovery controller.&quot;,
+  &quot;duration_s&quot;: 2.0,
+  &quot;gravity&quot;: true,
+  &quot;initial_clearance_m&quot;: 0.12,
+  &quot;initial_quat&quot;: null,
+  &quot;kd_nm_s_rad&quot;: 0.018,
+  &quot;kp_nm_rad&quot;: 0.08,
+  &quot;name&quot;: &quot;fall&quot;,
+  &quot;perturbation_rad&quot;: 0.18,
+  &quot;pulse_half_period_s&quot;: 0.5,
+  &quot;pulse_nm&quot;: [
+    0.0,
+    0.0,
+    0.0
+  ],
+  &quot;target&quot;: [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+  ]
+}</pre>
+  </details>
+</article>
+
+<article id="rev5-proxy-one-wheel">
+  <header><span class="model">WIP_DESIGN_PROXY</span>
+  <h2>one-wheel</h2><p>Free space X-wheel torque then ideal reverse torque; NOT driver brake.</p></header>
+  <video controls playsinline preload="metadata" poster="rev5-proxy/one-wheel/preview.png"
+         aria-label="rev5-proxy one-wheel 計算軌道の動画">
+    <source src="rev5-proxy/one-wheel/motion.mp4" type="video/mp4">
+    <a href="rev5-proxy/one-wheel/motion.mp4">MP4を開く</a>
+  </video>
+  <div class="result ">
+    <strong>応答を観測（制御目標なし）</strong>
+    <span>最終姿勢誤差 2.11° / 2.0 s</span>
+  </div>
+  <p class="caption">code 6636b95b78bb | WIP intake 3633eb5d03d6</p>
+  <p class="links"><a href="rev5-proxy/one-wheel/motion.mp4">動画</a>
+    <a href="rev5-proxy/one-wheel/trajectory.csv">CSV</a><a href="rev5-proxy/one-wheel/trajectory.npz">全状態</a>
+    <a href="rev5-proxy/one-wheel/model.xml">MJCF</a><a href="rev5-proxy/one-wheel/manifest.json">版・ハッシュ</a></p>
+  <details><summary>グラフ・入力条件を見る</summary>
+    <a href="rev5-proxy/one-wheel/plots.png"><img loading="lazy" src="rev5-proxy/one-wheel/plots.png" alt="姿勢・速度・トルク・接触・エネルギー・運動量の時系列"></a>
+    <p><a href="rev5-proxy/one-wheel/input.json">全モデル入力・未モデル化事項</a> /
+       <a href="rev5-proxy/one-wheel/scenario.json">初期条件・制御ゲイン</a> /
+       <a href="rev5-proxy/one-wheel/video-frames.csv">動画フレームと状態の対応</a></p>
+    <pre>{
+  &quot;command_delay_s&quot;: 0.02,
+  &quot;contact&quot;: false,
+  &quot;controller&quot;: &quot;pulse&quot;,
+  &quot;description&quot;: &quot;Free space X-wheel torque then ideal reverse torque; NOT driver brake.&quot;,
+  &quot;duration_s&quot;: 2.0,
+  &quot;gravity&quot;: false,
+  &quot;initial_clearance_m&quot;: 0.18,
+  &quot;initial_quat&quot;: null,
+  &quot;kd_nm_s_rad&quot;: 0.018,
+  &quot;kp_nm_rad&quot;: 0.08,
+  &quot;name&quot;: &quot;one-wheel&quot;,
+  &quot;perturbation_rad&quot;: 0.0,
+  &quot;pulse_half_period_s&quot;: 0.5,
+  &quot;pulse_nm&quot;: [
+    0.006,
+    0,
+    0
+  ],
+  &quot;target&quot;: [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+  ]
+}</pre>
+  </details>
+</article>
+
+<article id="rev5-proxy-three-wheel">
+  <header><span class="model">WIP_DESIGN_PROXY</span>
+  <h2>three-wheel</h2><p>Free space three orthogonal internal torques then reverse.</p></header>
+  <video controls playsinline preload="metadata" poster="rev5-proxy/three-wheel/preview.png"
+         aria-label="rev5-proxy three-wheel 計算軌道の動画">
+    <source src="rev5-proxy/three-wheel/motion.mp4" type="video/mp4">
+    <a href="rev5-proxy/three-wheel/motion.mp4">MP4を開く</a>
+  </video>
+  <div class="result ">
+    <strong>応答を観測（制御目標なし）</strong>
+    <span>最終姿勢誤差 3.12° / 3.0 s</span>
+  </div>
+  <p class="caption">code 6636b95b78bb | WIP intake 3633eb5d03d6</p>
+  <p class="links"><a href="rev5-proxy/three-wheel/motion.mp4">動画</a>
+    <a href="rev5-proxy/three-wheel/trajectory.csv">CSV</a><a href="rev5-proxy/three-wheel/trajectory.npz">全状態</a>
+    <a href="rev5-proxy/three-wheel/model.xml">MJCF</a><a href="rev5-proxy/three-wheel/manifest.json">版・ハッシュ</a></p>
+  <details><summary>グラフ・入力条件を見る</summary>
+    <a href="rev5-proxy/three-wheel/plots.png"><img loading="lazy" src="rev5-proxy/three-wheel/plots.png" alt="姿勢・速度・トルク・接触・エネルギー・運動量の時系列"></a>
+    <p><a href="rev5-proxy/three-wheel/input.json">全モデル入力・未モデル化事項</a> /
+       <a href="rev5-proxy/three-wheel/scenario.json">初期条件・制御ゲイン</a> /
+       <a href="rev5-proxy/three-wheel/video-frames.csv">動画フレームと状態の対応</a></p>
+    <pre>{
+  &quot;command_delay_s&quot;: 0.02,
+  &quot;contact&quot;: false,
+  &quot;controller&quot;: &quot;pulse&quot;,
+  &quot;description&quot;: &quot;Free space three orthogonal internal torques then reverse.&quot;,
+  &quot;duration_s&quot;: 3.0,
+  &quot;gravity&quot;: false,
+  &quot;initial_clearance_m&quot;: 0.18,
+  &quot;initial_quat&quot;: null,
+  &quot;kd_nm_s_rad&quot;: 0.018,
+  &quot;kp_nm_rad&quot;: 0.08,
+  &quot;name&quot;: &quot;three-wheel&quot;,
+  &quot;perturbation_rad&quot;: 0.0,
+  &quot;pulse_half_period_s&quot;: 0.5,
+  &quot;pulse_nm&quot;: [
+    0.006,
+    -0.004,
+    0.005
+  ],
+  &quot;target&quot;: [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+  ]
+}</pre>
+  </details>
+</article>
+
+<article id="rev5-proxy-edge-balance">
+  <header><span class="model">WIP_DESIGN_PROXY</span>
+  <h2>edge-balance</h2><p>Pre-positioned edge, perturbed 2 deg; NOT face-to-edge transition.</p></header>
+  <video controls playsinline preload="metadata" poster="rev5-proxy/edge-balance/preview.png"
+         aria-label="rev5-proxy edge-balance 計算軌道の動画">
+    <source src="rev5-proxy/edge-balance/motion.mp4" type="video/mp4">
+    <a href="rev5-proxy/edge-balance/motion.mp4">MP4を開く</a>
+  </video>
+  <div class="result failed">
+    <strong>目標姿勢を維持できず</strong>
+    <span>最終姿勢誤差 45.00° / 3.0 s</span>
+  </div>
+  <p class="caption">code 6636b95b78bb | WIP intake 3633eb5d03d6</p>
+  <p class="links"><a href="rev5-proxy/edge-balance/motion.mp4">動画</a>
+    <a href="rev5-proxy/edge-balance/trajectory.csv">CSV</a><a href="rev5-proxy/edge-balance/trajectory.npz">全状態</a>
+    <a href="rev5-proxy/edge-balance/model.xml">MJCF</a><a href="rev5-proxy/edge-balance/manifest.json">版・ハッシュ</a></p>
+  <details><summary>グラフ・入力条件を見る</summary>
+    <a href="rev5-proxy/edge-balance/plots.png"><img loading="lazy" src="rev5-proxy/edge-balance/plots.png" alt="姿勢・速度・トルク・接触・エネルギー・運動量の時系列"></a>
+    <p><a href="rev5-proxy/edge-balance/input.json">全モデル入力・未モデル化事項</a> /
+       <a href="rev5-proxy/edge-balance/scenario.json">初期条件・制御ゲイン</a> /
+       <a href="rev5-proxy/edge-balance/video-frames.csv">動画フレームと状態の対応</a></p>
+    <pre>{
+  &quot;command_delay_s&quot;: 0.02,
+  &quot;contact&quot;: true,
+  &quot;controller&quot;: &quot;pd&quot;,
+  &quot;description&quot;: &quot;Pre-positioned edge, perturbed 2 deg; NOT face-to-edge transition.&quot;,
+  &quot;duration_s&quot;: 3.0,
+  &quot;gravity&quot;: true,
+  &quot;initial_clearance_m&quot;: 0.0,
+  &quot;initial_quat&quot;: null,
+  &quot;kd_nm_s_rad&quot;: 0.018,
+  &quot;kp_nm_rad&quot;: 0.08,
+  &quot;name&quot;: &quot;edge-balance&quot;,
+  &quot;perturbation_rad&quot;: 0.03490658503988659,
+  &quot;pulse_half_period_s&quot;: 0.5,
+  &quot;pulse_nm&quot;: [
+    0.0,
+    0.0,
+    0.0
+  ],
+  &quot;target&quot;: [
+    0.9238795325112867,
+    0.3826834323650898,
+    0.0,
+    0.0
+  ]
+}</pre>
+  </details>
+</article>
+
+<article id="rev5-proxy-vertex-balance">
+  <header><span class="model">WIP_DESIGN_PROXY</span>
+  <h2>vertex-balance</h2><p>Pre-positioned vertex, perturbed 2 deg; NOT a jump/transition.</p></header>
+  <video controls playsinline preload="metadata" poster="rev5-proxy/vertex-balance/preview.png"
+         aria-label="rev5-proxy vertex-balance 計算軌道の動画">
+    <source src="rev5-proxy/vertex-balance/motion.mp4" type="video/mp4">
+    <a href="rev5-proxy/vertex-balance/motion.mp4">MP4を開く</a>
+  </video>
+  <div class="result failed">
+    <strong>目標姿勢を維持できず</strong>
+    <span>最終姿勢誤差 55.43° / 3.0 s</span>
+  </div>
+  <p class="caption">code 6636b95b78bb | WIP intake 3633eb5d03d6</p>
+  <p class="links"><a href="rev5-proxy/vertex-balance/motion.mp4">動画</a>
+    <a href="rev5-proxy/vertex-balance/trajectory.csv">CSV</a><a href="rev5-proxy/vertex-balance/trajectory.npz">全状態</a>
+    <a href="rev5-proxy/vertex-balance/model.xml">MJCF</a><a href="rev5-proxy/vertex-balance/manifest.json">版・ハッシュ</a></p>
+  <details><summary>グラフ・入力条件を見る</summary>
+    <a href="rev5-proxy/vertex-balance/plots.png"><img loading="lazy" src="rev5-proxy/vertex-balance/plots.png" alt="姿勢・速度・トルク・接触・エネルギー・運動量の時系列"></a>
+    <p><a href="rev5-proxy/vertex-balance/input.json">全モデル入力・未モデル化事項</a> /
+       <a href="rev5-proxy/vertex-balance/scenario.json">初期条件・制御ゲイン</a> /
+       <a href="rev5-proxy/vertex-balance/video-frames.csv">動画フレームと状態の対応</a></p>
+    <pre>{
+  &quot;command_delay_s&quot;: 0.02,
+  &quot;contact&quot;: true,
+  &quot;controller&quot;: &quot;pd&quot;,
+  &quot;description&quot;: &quot;Pre-positioned vertex, perturbed 2 deg; NOT a jump/transition.&quot;,
+  &quot;duration_s&quot;: 3.0,
+  &quot;gravity&quot;: true,
+  &quot;initial_clearance_m&quot;: 0.0,
+  &quot;initial_quat&quot;: null,
+  &quot;kd_nm_s_rad&quot;: 0.018,
+  &quot;kp_nm_rad&quot;: 0.08,
+  &quot;name&quot;: &quot;vertex-balance&quot;,
+  &quot;perturbation_rad&quot;: 0.03490658503988659,
+  &quot;pulse_half_period_s&quot;: 0.5,
+  &quot;pulse_nm&quot;: [
+    0.0,
+    0.0,
+    0.0
+  ],
+  &quot;target&quot;: [
+    0.8880738339771153,
+    0.3250575836718681,
+    -0.3250575836718681,
+    0.0
+  ]
+}</pre>
+  </details>
+</article>
+
+<article id="rev5-proxy-face-to-vertex-attempt">
+  <header><span class="model">WIP_DESIGN_PROXY</span>
+  <h2>face-to-vertex-attempt</h2><p>Start on a face; ask for vertex attitude. Falling/saturation is valid.</p></header>
+  <video controls playsinline preload="metadata" poster="rev5-proxy/face-to-vertex-attempt/preview.png"
+         aria-label="rev5-proxy face-to-vertex-attempt 計算軌道の動画">
+    <source src="rev5-proxy/face-to-vertex-attempt/motion.mp4" type="video/mp4">
+    <a href="rev5-proxy/face-to-vertex-attempt/motion.mp4">MP4を開く</a>
+  </video>
+  <div class="result failed">
+    <strong>目標姿勢に到達せず</strong>
+    <span>最終姿勢誤差 54.74° / 3.0 s</span>
+  </div>
+  <p class="caption">code 6636b95b78bb | WIP intake 3633eb5d03d6</p>
+  <p class="links"><a href="rev5-proxy/face-to-vertex-attempt/motion.mp4">動画</a>
+    <a href="rev5-proxy/face-to-vertex-attempt/trajectory.csv">CSV</a><a href="rev5-proxy/face-to-vertex-attempt/trajectory.npz">全状態</a>
+    <a href="rev5-proxy/face-to-vertex-attempt/model.xml">MJCF</a><a href="rev5-proxy/face-to-vertex-attempt/manifest.json">版・ハッシュ</a></p>
+  <details><summary>グラフ・入力条件を見る</summary>
+    <a href="rev5-proxy/face-to-vertex-attempt/plots.png"><img loading="lazy" src="rev5-proxy/face-to-vertex-attempt/plots.png" alt="姿勢・速度・トルク・接触・エネルギー・運動量の時系列"></a>
+    <p><a href="rev5-proxy/face-to-vertex-attempt/input.json">全モデル入力・未モデル化事項</a> /
+       <a href="rev5-proxy/face-to-vertex-attempt/scenario.json">初期条件・制御ゲイン</a> /
+       <a href="rev5-proxy/face-to-vertex-attempt/video-frames.csv">動画フレームと状態の対応</a></p>
+    <pre>{
+  &quot;command_delay_s&quot;: 0.02,
+  &quot;contact&quot;: true,
+  &quot;controller&quot;: &quot;pd&quot;,
+  &quot;description&quot;: &quot;Start on a face; ask for vertex attitude. Falling/saturation is valid.&quot;,
+  &quot;duration_s&quot;: 3.0,
+  &quot;gravity&quot;: true,
+  &quot;initial_clearance_m&quot;: 0.0,
+  &quot;initial_quat&quot;: [
+    1,
+    0,
+    0,
+    0
+  ],
+  &quot;kd_nm_s_rad&quot;: 0.018,
+  &quot;kp_nm_rad&quot;: 0.08,
+  &quot;name&quot;: &quot;face-to-vertex-attempt&quot;,
+  &quot;perturbation_rad&quot;: 0.0,
+  &quot;pulse_half_period_s&quot;: 0.5,
+  &quot;pulse_nm&quot;: [
+    0.0,
+    0.0,
+    0.0
+  ],
+  &quot;target&quot;: [
+    0.8880738339771153,
+    0.3250575836718681,
+    -0.3250575836718681,
+    0.0
+  ]
+}</pre>
+  </details>
+</article>
+</section><footer>動画は25 fpsで、100 Hz記録の該当行をそのまま再描画しています。ホイールマーカーには標本化による見かけの逆回転があります。
+値の根拠はCSV/入力JSONです。5°帯は表示上の基準であり、実機の合否判定ではありません。</footer></main></body></html>

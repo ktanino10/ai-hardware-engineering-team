@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "status": "FROZEN_WIP_PARTIAL_SOLID_CAD_EQUIVALENT",
+  "owner": "hardware-lead:cc8c11df-9cc9-4b20-9f05-5680d77250ab",
+  "received_date": "2026-09-05",
+  "source_revision": "3633eb5d03d6db7c90b582e53180414087b33519",
+  "source_branch": "ktanino10-rev5-mechanical-cube-frame",
+  "source_is_main_or_release": false,
+  "upstream_bundle": {
+    "name": "rev5-simulation-intake-v1",
+    "manifest_sha256": "1f94e5fdf89d8e1df234e9dec4db7ea32568e30671ba9a841293cf9d79d55999",
+    "intake_txt_sha256": "bef4cfd724089d818b6083070dd2853c40b23100bdac6826157f3742a47233a2",
+    "baseline_results_sha256": "a181bc328b61ecdad52a0b8acdcc6e7cc5c0e5c4748b680ec8fcad0aa5e44c36",
+    "baseline_screen_sha256": "fc8b4dd6e013afc834b37649414e6230b5689e5c28a9b67a0ec2b6fec7d3bd88",
+    "extraction": "Exact numerical fields /scenarios/0 and /mesh_printed_assembly from baseline/results.json; wheel/motor/laminate definitions from INTAKE.txt and baseline/screen.py. No old script was executed or imported."
+  },
+  "upstream_sources": [
+    {
+      "path": "hardware/mechanical-interface.md",
+      "sha256": "326a26832a538d86e39fdbd7f07fc653305afd385eb28399f8fa5c73c5090f8c"
+    },
+    {
+      "path": "hardware/mechanical/bench-imu-01-dimensional-spec.md",
+      "sha256": "7c7439385e5011cb876463c8dad56d9acff52fbf6b2f95ce363b0a53d8b24f2b"
+    },
+    {
+      "path": "hardware/mechanical/bench-imu-01-enclosure.scad",
+      "sha256": "550371ba2e0d549cf232d918b18cb15eec2bac826d7073d0c653d7a3a8f7a680"
+    }
+  ],
+  "frame": "SI, cube-centred XYZ; Part D / section 19, not historical bench Part C. STL sources were mm.",
+  "cube_side_m": 0.24,
+  "locked_partial": {
+    "mass_kg": 3.0642777978399987,
+    "com_m": [0.010489011664218902, 0.01064395094016371, 0.008293691634164468],
+    "inertia_kg_m2": [
+      [0.040765847504699734, 0.0005643714389665639, 0.0004490935549383528],
+      [0.0005643714389665639, 0.04092614709629031, 0.0004911540606653771],
+      [0.0004490935549383528, 0.0004911540606653771, 0.0402267378213524]
+    ],
+    "confidence": "Partial locked analytical assembly, includes ALL THREE WHEELS; neither actual complete mass nor lower bound."
+  },
+  "printed_aggregate": {
+    "mesh_sha256": "c4dbca1e250308fe2190c71e200bdef84d7b844376e79a2be02b0945667d8ea2",
+    "density_kg_m3_assumption": 1270.0,
+    "mass_kg": 2.632097797839999,
+    "com_m": [0.00723398103960125, 0.0072541083248923045, 0.005787144820075361],
+    "inertia_kg_m2": [
+      [0.0378707056645794, 0.00036038377811406394, 0.0003261209301248151],
+      [0.00036038377811406394, 0.037970156722204856, 0.0003311438074318605],
+      [0.0003261209301248151, 0.0003311438074318605, 0.037589644763376576]
+    ],
+    "confidence": "Solid-density mesh calculation for one monolith plus six panels; not slicer, measured mass, strength or installed hardware evidence."
+  },
+  "wheel_definition": {
+    "count": 3, "mass_kg": 0.1, "radius_m": 0.03, "thickness_m": 0.0045,
+    "axial_center_m": 0.10875, "axes": ["+X", "+Y", "+Z"],
+    "confidence": "ASSUMPTION target uniform solid cylinders, not qualified available rotors."
+  },
+  "motor_surrogate": {
+    "count": 3, "mass_kg": 0.03, "radius_m": 0.0135, "thickness_m": 0.0185,
+    "axial_center_m": 0.08825,
+    "confidence": "Source nominal whole-motor envelope/mass DS-MTR-021; uniform distribution ASSUMPTION. Actual rotor/stator split UNKNOWN."
+  },
+  "bare_laminate": {
+    "mass_kg": 0.04218, "com_m": [-0.01, 0, -0.0792], "dimensions_m": [0.15, 0.095, 0.0016],
+    "confidence": "ESTIMATE uniform 1850 kg/m3; no holes, copper, populated electronics or battery."
+  },
+  "unknowns": {
+    "complete_physical_mass_kg": null,
+    "complete_physical_com_m": null,
+    "complete_physical_inertia_kg_m2": null,
+    "actual_torque_speed_current_curve": null,
+    "actual_driver_brake_latency_stop_hold_restart": null,
+    "motor_rotor_inertia": null,
+    "contact_friction_compliance_restitution": null
+  },
+  "omissions": [
+    "Actual PCB population/copper, battery, hubs/adapters, fasteners/retention, connectors/mates, harness, insulation and completed integration.",
+    "Whole motor surrogate is locked to the chassis; unknown rotating bell mass/inertia is NOT invented or double-counted.",
+    "Printed geometry reduced to its reported mass moments, collision to an outer box. No installed fit, retention, deformation, impact damage, strength or containment assessment.",
+    "Actual MN2206/DRV10983 actuation remains UNKNOWN: no generic runtime BRAKE bit, rated RPM, qualified latency or source/regeneration model.",
+    "Fixed-edge angular-momentum deficit applies only to its stated model; candidate-L is unadopted and NOT included here.",
+    "Legacy ISS-058 CRITICAL and ISS-059 HIGH, seven Mechanical HIGHs and physical-action holds are unchanged.",
+    "This snapshot is not main, a complete physical replica, an assembly manifest, or Fusion native/video evidence."
+  ]
+}

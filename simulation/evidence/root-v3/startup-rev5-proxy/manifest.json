@@ -1,0 +1,34 @@
+{
+  "adapter_sha256": "dd0d0038b1fe0b5f65d6ef1f644b04555e24529155b0cc493b0f118e4d9e90ef",
+  "classification": "WIP_DESIGN_PROXY",
+  "cpp_sha256": "f766aadaaf0a76d6c2080be44201eabfeff990be95b55553fc1926338e5576de",
+  "files": {
+    "native-runtime.log": "73fb5d51a65b609a03c9a5bf7d1e5c8540216e4419690928783706f8db5ce076",
+    "summary.json": "5682fe265e972dcf3ca289a2db823cbde3134fe1bc7def16176e547d17400a79",
+    "trajectory.root": "4f924b71865d822bbc58ac7c7e68dbc6b4d848bf72c0744a8381bc7295084558"
+  },
+  "interpreter_health": "ERROR_DIAGNOSTICS_PRESENT",
+  "model_case_id": "rev5-partial-solid-cad-proxy-v1-spin-brake-v2",
+  "native_tree_status": "NATIVE_TTREE_ROUNDTRIP_VALIDATED",
+  "runtime_diagnostics_present": true,
+  "scope": "Native compiled TTree export/readback and time-weighted descriptive bins. No native graphics, Cling, PyROOT or RDataFrame execution is claimed.",
+  "source_code_dirty": false,
+  "source_code_sha256": {
+    "simulation/cube_sim/__init__.py": "ceb4c3ee2e2d5c5316c6802c820308a6d622880b8808f0a28a1a052a3cdee09b",
+    "simulation/cube_sim/__main__.py": "339d1b8e0b5818cf4d991782ae0b354c229c77d513853a569bfeb9e462a587a6",
+    "simulation/cube_sim/braking.py": "1575a454ef849369eb78814dda5a86f83618770f2f2b8816b3989d144bff4a9e",
+    "simulation/cube_sim/gallery.py": "b09670695517207f3a2b0b2fefebb435d1e9666dcbe09b786987455a191c7a76",
+    "simulation/cube_sim/geometry.py": "fd4389ef3fa09b30daa133b28e33701b22f0fbb28ea0050ecd6d2de3e4917807",
+    "simulation/cube_sim/intake.py": "6f300726750bf15a6a184c34dcc623674860bf9ad92ca9b4410b75d33c4c91d3",
+    "simulation/cube_sim/integration.py": "e3f0eb6bf57cdac69807b034ac431c6953fd29a393f79b26dbe5f369562203cf",
+    "simulation/cube_sim/model.py": "e6bcc50f56611646907f84780d00cec6fb27e8aa9741d1a4a6c7fd95764e4a73",
+    "simulation/cube_sim/numerics.py": "6e5613e483de52dbdaa0180009f86850093ebbefd63fd040cf2b48c6ebd60bbc",
+    "simulation/cube_sim/runner.py": "efdda2a60715d491e0e9cb3b3f26efaf9aa219d1b9f6a947aa31f05e77047eb5",
+    "simulation/cube_sim/scenarios.py": "18070e1e48126b6123ea1ff396f4fc09dbc52acb705758f758be9bf8dcb621a4",
+    "simulation/cube_sim/visualize.py": "b7e01561b79f2b008ac4663e7fad196f85cb0f20733125c1a489d2280e3c7bdc"
+  },
+  "source_csv_sha256": "2c46817f33af2c44057add15f5ef9d7cddf82821d3886070976a2a5075ae0e9d",
+  "source_manifest_sha256": "01a8f8ba32e74155e7901198ab57239caff6533371198ddc7b30269712dca4ea",
+  "source_revision": "560c70279c0916068abd9a54b76db4f0f920c990",
+  "state": "WIP_ANALYSIS_INTEROPERABILITY_NOT_A_PHYSICS_ENGINE"
+}

@@ -1,0 +1,39 @@
+{
+  "classification": "TEST_PORTABILITY_NOT_PHYSICS_OR_CONTACT_THRESHOLD",
+  "failed_array": "qpos",
+  "failed_test": "test_stage_work_corrects_contact_diagnostic_without_changing_trajectory",
+  "failure_excerpt": "2026-09-05T16:07:31.1211368Z FAIL: test_stage_work_corrects_contact_diagnostic_without_changing_trajectory (test_quadrature.QuadratureTests.test_stage_work_corrects_contact_diagnostic_without_changing_trajectory)\n2026-09-05T16:07:31.1213839Z ----------------------------------------------------------------------\n2026-09-05T16:07:31.1214629Z Traceback (most recent call last):\n2026-09-05T16:07:31.1221064Z   File \"/home/runner/work/ai-hardware-engineering-team/ai-hardware-engineering-team/simulation/tests/test_quadrature.py\", line 21, in test_stage_work_corrects_contact_diagnostic_without_changing_trajectory\n2026-09-05T16:07:31.1222503Z     np.testing.assert_array_equal(result[key], old[key], err_msg=key)\n2026-09-05T16:07:31.1222967Z     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n2026-09-05T16:07:31.1223767Z   File \"/opt/hostedtoolcache/Python/3.14.7/x64/lib/python3.14/site-packages/numpy/testing/_private/utils.py\", line 1128, in assert_array_equal\n2026-09-05T16:07:31.1224583Z     assert_array_compare(operator.__eq__, actual, desired, err_msg=err_msg,\n2026-09-05T16:07:31.1225064Z     ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n2026-09-05T16:07:31.1225469Z                          verbose=verbose, header='Arrays are not equal',\n2026-09-05T16:07:31.1225813Z                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n2026-09-05T16:07:31.1226104Z                          strict=strict)\n2026-09-05T16:07:31.1226350Z                          ^^^^^^^^^^^^^^\n2026-09-05T16:07:31.1226984Z   File \"/opt/hostedtoolcache/Python/3.14.7/x64/lib/python3.14/site-packages/numpy/testing/_private/utils.py\", line 988, in assert_array_compare\n2026-09-05T16:07:31.1228019Z     raise AssertionError(msg)\n2026-09-05T16:07:31.1228278Z AssertionError: \n2026-09-05T16:07:31.1228485Z Arrays are not equal\n2026-09-05T16:07:31.1228681Z qpos\n2026-09-05T16:07:31.1228879Z Mismatched elements: 1922 / 2010 (95.6%)\n2026-09-05T16:07:31.1229153Z First 5 mismatches are at indices:\n2026-09-05T16:07:31.1229504Z  [1, 0]: -2.731113064940722e-22 (ACTUAL), -1.0884370551279179e-21 (DESIRED)\n2026-09-05T16:07:31.1229936Z  [1, 1]: -3.355194168023846e-22 (ACTUAL), 1.1149451973650352e-21 (DESIRED)\n2026-09-05T16:07:31.1230364Z  [1, 7]: -1.9274705288631187e-18 (ACTUAL), -2.984505813543329e-19 (DESIRED)\n2026-09-05T16:07:31.1230774Z  [1, 8]: -4.440892098500625e-20 (ACTUAL), -2.848693007986542e-19 (DESIRED)\n2026-09-05T16:07:31.1231176Z  [1, 9]: -1.1102230246251616e-20 (ACTUAL), -4.553526945361953e-21 (DESIRED)\n2026-09-05T16:07:31.1231815Z Max absolute difference among violations: 2.2565283e-14\n2026-09-05T16:07:31.1232169Z Max relative difference among violations: 5.45825691\n2026-09-05T16:07:31.1232583Z  ACTUAL: array([[ 0.000000e+00,  0.000000e+00,  2.595448e-01, ...,  0.000000e+00,\n2026-09-05T16:07:31.1232953Z          0.000000e+00,  0.000000e+00],\n2026-09-05T16:07:31.1233276Z        [-2.731113e-22, -3.355194e-22,  2.590545e-01, ..., -1.927471e-18,...\n2026-09-05T16:07:31.1233883Z  DESIRED: array([[ 0.000000e+00,  0.000000e+00,  2.595448e-01, ...,  0.000000e+00,\n2026-09-05T16:07:31.1234250Z          0.000000e+00,  0.000000e+00],\n2026-09-05T16:07:31.1234554Z        [-1.088437e-21,  1.114945e-21,  2.590545e-01, ..., -2.984506e-19,...\n2026-09-05T16:07:31.1234797Z \n2026-09-05T16:07:31.1234939Z ----------------------------------------------------------------------\n2026-09-05T16:07:31.1235267Z Ran 30 tests in 591.521s\n2026-09-05T16:07:31.1235408Z \n2026-09-05T16:07:31.1235489Z FAILED (failures=1)",
+  "finding": "SIM-R2-004",
+  "implementation_changed_by_reviewer": false,
+  "job_id": 101333623262,
+  "job_log_bytes": 32413,
+  "job_log_sha256": "74d13d926c62fce4eac1560045c37bd6d45a0563680ae457236ad5395bb0ede2",
+  "maximum_absolute_difference": 2.2565283e-14,
+  "retrieval_command_argv": [
+    "gh",
+    "api",
+    "repos/ktanino10/ai-hardware-engineering-team/actions/jobs/101333623262/logs",
+    "--allow-escape-sequences"
+  ],
+  "run": {
+    "conclusion": "failure",
+    "headSha": "08adc390a391acb5ad654be7cd279a14f1e780a4",
+    "status": "completed",
+    "url": "https://github.com/ktanino10/ai-hardware-engineering-team/actions/runs/33976353506",
+    "workflowName": "Rigid-body Simulation Checks"
+  },
+  "runtime_excerpt": [
+    "2026-09-05T15:57:21.1258470Z ##[group]Operating System",
+    "2026-09-05T15:57:21.1259127Z Ubuntu",
+    "2026-09-05T15:57:21.1264640Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260831.293/images/ubuntu/Ubuntu2404-Readme.md",
+    "2026-09-05T15:57:23.9767502Z [command]/opt/hostedtoolcache/Python/3.14.7/x64/bin/pip cache dir",
+    "2026-09-05T15:57:25.6130956Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.7/x64",
+    "2026-09-05T15:57:25.6131806Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.7/x64/lib/pkgconfig",
+    "2026-09-05T15:57:25.6132319Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.7/x64",
+    "2026-09-05T15:57:25.6132771Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.7/x64"
+  ],
+  "terminal_control_sequences_removed_from_excerpts": true,
+  "tests_failed": 1,
+  "tests_passed": 29,
+  "tests_run": 30
+}

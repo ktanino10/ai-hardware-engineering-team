@@ -1,0 +1,4911 @@
+{
+  "code": {
+    "simulation/cube_sim/__init__.py": "ceb4c3ee2e2d5c5316c6802c820308a6d622880b8808f0a28a1a052a3cdee09b",
+    "simulation/cube_sim/__main__.py": "339d1b8e0b5818cf4d991782ae0b354c229c77d513853a569bfeb9e462a587a6",
+    "simulation/cube_sim/braking.py": "1575a454ef849369eb78814dda5a86f83618770f2f2b8816b3989d144bff4a9e",
+    "simulation/cube_sim/gallery.py": "b09670695517207f3a2b0b2fefebb435d1e9666dcbe09b786987455a191c7a76",
+    "simulation/cube_sim/geometry.py": "fd4389ef3fa09b30daa133b28e33701b22f0fbb28ea0050ecd6d2de3e4917807",
+    "simulation/cube_sim/intake.py": "6f300726750bf15a6a184c34dcc623674860bf9ad92ca9b4410b75d33c4c91d3",
+    "simulation/cube_sim/integration.py": "e3f0eb6bf57cdac69807b034ac431c6953fd29a393f79b26dbe5f369562203cf",
+    "simulation/cube_sim/model.py": "e6bcc50f56611646907f84780d00cec6fb27e8aa9741d1a4a6c7fd95764e4a73",
+    "simulation/cube_sim/numerics.py": "6e5613e483de52dbdaa0180009f86850093ebbefd63fd040cf2b48c6ebd60bbc",
+    "simulation/cube_sim/runner.py": "efdda2a60715d491e0e9cb3b3f26efaf9aa219d1b9f6a947aa31f05e77047eb5",
+    "simulation/cube_sim/scenarios.py": "18070e1e48126b6123ea1ff396f4fc09dbc52acb705758f758be9bf8dcb621a4",
+    "simulation/cube_sim/visualize.py": "b7e01561b79f2b008ac4663e7fad196f85cb0f20733125c1a489d2280e3c7bdc"
+  },
+  "intake_sha256": "dd14031121c6f40fcbcb974a82231e49eaf6d4e9c79d0d3fc0f41ad2887bcc76",
+  "mujoco": "3.12.0",
+  "reference_input_sha256": "b34b181117b7a12cf8e8356bcf1a57321deab20726d12249f39badaaba889c1f",
+  "rows": [
+    {
+      "case": "reference",
+      "dt_s": 0.002,
+      "final_normal_force_n": 12.752999999986413,
+      "final_qpos": [
+        1.4102851736494612e-06,
+        1.4102851736495845e-06,
+        0.11997245063326913,
+        0.9999999999654599,
+        -5.877150030934556e-06,
+        5.877150030936703e-06,
+        -2.097621447466443e-21,
+        1.175430007541867e-05,
+        -1.175430007525282e-05,
+        5.317807724846888e-20
+      ],
+      "initial_rigid_energy_j": 1.60884,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 1.5405563963134458e-05,
+      "max_angular_momentum_nms": 6.722813123693385e-06,
+      "max_linear_momentum_kg_m_s": 0.0017241604597400626,
+      "max_sampled_rigid_energy_j": 1.60884,
+      "scenario": "rest",
+      "solver": "Newton",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          4.3319935688951355e-16,
+          -4.332077392687519e-16,
+          5.505900284431255e-23
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": -1.5403897939454442e-05,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 1.542069639759733e-05,
+          "max_abs_residual_recorded_grid_j": 1.5405563963134458e-05,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 0.0009524329317747911,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 3.196058491957246e-12,
+        "max_attitude_error_deg": 0.0009524329318074131,
+        "max_loaded_point_slip_m_s": 6.301395657501345e-07,
+        "max_penetration_m": 4.790913957700149e-05,
+        "max_wheel_relative_rad_s": [
+          0.0004410639693831457,
+          0.0004410639693830605,
+          2.4890864489204423e-19
+        ],
+        "min_height_m": 0.11995371715771337,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": -1.5403897939454442e-05,
+        "samples": 201,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "off",
+          "description": "Passive face rest; uncalibrated soft contact.",
+          "duration_s": 2.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "rest",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.002,
+      "final_normal_force_n": 12.752999999957543,
+      "final_qpos": [
+        -2.2107218643743468e-05,
+        0.023057073773047995,
+        0.11997245063326893,
+        0.9999999997210731,
+        -5.87727996253291e-06,
+        5.877020096397602e-06,
+        2.210819491520725e-05,
+        0.180011757282082,
+        -7.005277568162535e-06,
+        -3.5025313372734396e-05
+      ],
+      "initial_rigid_energy_j": 3.4012370256156443,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 0.02030243870548243,
+      "max_angular_momentum_nms": 0.05508582753124921,
+      "max_linear_momentum_kg_m_s": 1.912949999999998,
+      "max_sampled_rigid_energy_j": 3.4012370256156457,
+      "scenario": "fall",
+      "solver": "Newton",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          -3.157743707689955e-17,
+          9.514583248700578e-16,
+          -6.3706746047217386e-18
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.02029350646090755,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.02030243870548243,
+          "max_abs_residual_recorded_grid_j": 0.02030243870548243,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 0.0027065305282714214,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 5.140592721710149e-08,
+        "max_attitude_error_deg": 10.313240312354816,
+        "max_loaded_point_slip_m_s": 0.061582803869986505,
+        "max_penetration_m": 0.0050483976641476636,
+        "max_wheel_relative_rad_s": [
+          5.087626961508342,
+          0.006275848280641489,
+          0.011195512219838819
+        ],
+        "min_height_m": 0.11874685677965267,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": 0.02029350646090755,
+        "samples": 201,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "off",
+          "description": "Passive drop; no recovery controller.",
+          "duration_s": 2.0,
+          "gravity": true,
+          "initial_clearance_m": 0.12,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "fall",
+          "perturbation_rad": 0.18,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.002,
+      "final_normal_force_n": 0.0,
+      "final_qpos": [
+        -0.0012175613304139525,
+        3.0478144924688886e-05,
+        0.30148735031821844,
+        0.994855321718295,
+        -0.0691022248925885,
+        0.046676800457906745,
+        -0.05752432235753928,
+        33.471775277734196,
+        -22.315736244728107,
+        27.89302412548795
+      ],
+      "initial_rigid_energy_j": 0.0,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 6.869504964868156e-16,
+      "max_angular_momentum_nms": 8.079114454798204e-18,
+      "max_linear_momentum_kg_m_s": 5.576468636724367e-16,
+      "max_sampled_rigid_energy_j": 0.21477935863637818,
+      "scenario": "three-wheel",
+      "solver": "Newton",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          3.4542915212644738e-18,
+          -3.1109553322619246e-18,
+          -2.1235067003904282e-18
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "FREE_SPACE_NUMERICAL_DIAGNOSTIC",
+          "final_residual_j": 5.926448127548398e-16,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 6.869504964868156e-16,
+          "max_abs_residual_recorded_grid_j": 6.869504964868156e-16,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 11.628751894862773,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 8.079114454798204e-18,
+        "max_attitude_error_deg": 11.628751894862773,
+        "max_loaded_point_slip_m_s": 0.0,
+        "max_penetration_m": 0.0,
+        "max_wheel_relative_rad_s": [
+          66.94355055546828,
+          44.63147248945616,
+          55.7860482509759
+        ],
+        "min_height_m": 0.3,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": 5.926448127548398e-16,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": false,
+          "controller": "pulse",
+          "description": "Free space three orthogonal internal torques then reverse.",
+          "duration_s": 3.0,
+          "gravity": false,
+          "initial_clearance_m": 0.18,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "three-wheel",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.006,
+            -0.004,
+            0.005
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.002,
+      "final_normal_force_n": 12.752999999922018,
+      "final_qpos": [
+        -3.900517750100237e-05,
+        -0.11434937877737211,
+        0.11997245063326331,
+        0.7071026253696272,
+        0.7071109369452175,
+        1.5772938666635882e-06,
+        -6.734102428956027e-06,
+        233.92691216870995,
+        0.10295724771760684,
+        -0.04058063063508121
+      ],
+      "initial_rigid_energy_j": 2.273857330915936,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 0.007822481963667083,
+      "max_angular_momentum_nms": 0.05774383074856637,
+      "max_linear_momentum_kg_m_s": 1.1686004927102975,
+      "max_sampled_rigid_energy_j": 2.436446839764431,
+      "scenario": "edge-balance",
+      "solver": "Newton",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          0.003840202409977339,
+          2.0288380495374566e-06,
+          1.362681414818461e-06
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.007822481963647654,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.00782448177674755,
+          "max_abs_residual_recorded_grid_j": 0.007822481963667083,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 45.00067348085732,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 2.964337537846983e-08,
+        "max_attitude_error_deg": 47.0055417929724,
+        "max_loaded_point_slip_m_s": 0.020923027822502074,
+        "max_penetration_m": 0.00408496077140795,
+        "max_wheel_relative_rad_s": [
+          86.54883908735412,
+          0.07285470073081726,
+          0.046384927625010945
+        ],
+        "min_height_m": 0.11877491474795648,
+        "outcome": "DEPARTED_TARGET",
+        "rigid_energy_minus_logged_work_j": 0.007822481963647654,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Pre-positioned edge, perturbed 2 deg; NOT face-to-edge transition.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "edge-balance",
+          "perturbation_rad": 0.03490658503988659,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.9238795325112867,
+            0.3826834323650898,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          264,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          264,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          271,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.002,
+      "final_normal_force_n": 12.753000000023558,
+      "final_qpos": [
+        0.04686872400921326,
+        -0.18211239665132656,
+        0.11997245063326907,
+        0.6763496536679291,
+        0.6763600282144355,
+        -0.20625951949861368,
+        -0.2062650451076051,
+        223.45246779835324,
+        -205.35244752109472,
+        -217.48921679195914
+      ],
+      "initial_rigid_energy_j": 2.785460943293344,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 0.008127633022409708,
+      "max_angular_momentum_nms": 0.05281742538910528,
+      "max_linear_momentum_kg_m_s": 1.1247618833237423,
+      "max_sampled_rigid_energy_j": 3.242275000766777,
+      "scenario": "vertex-balance",
+      "solver": "Newton",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          0.005201367812523876,
+          0.0010910987660196273,
+          -0.0036013802001389358
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.008127633022407266,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.00812763302240993,
+          "max_abs_residual_recorded_grid_j": 0.008127633022409708,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 54.8658941222643,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 3.5849844030890846e-07,
+        "max_attitude_error_deg": 59.710359199926366,
+        "max_loaded_point_slip_m_s": 0.3662948383574611,
+        "max_penetration_m": 0.003207565637435128,
+        "max_wheel_relative_rad_s": [
+          88.18176095605239,
+          83.18692926640736,
+          86.73054363606266
+        ],
+        "min_height_m": 0.11957521142508076,
+        "outcome": "DEPARTED_TARGET",
+        "rigid_energy_minus_logged_work_j": 0.008127633022407155,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Pre-positioned vertex, perturbed 2 deg; NOT a jump/transition.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "vertex-balance",
+          "perturbation_rad": 0.03490658503988659,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.8880738339771153,
+            0.3250575836718681,
+            -0.3250575836718681,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          252,
+          220,
+          245
+        ],
+        "speed_exceeded_samples": [
+          254,
+          223,
+          245
+        ],
+        "torque_saturated_samples": [
+          261,
+          29,
+          249
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.002,
+      "final_normal_force_n": 12.753000000021464,
+      "final_qpos": [
+        1.4102980372455574e-06,
+        1.410298037246111e-06,
+        0.11997245063326895,
+        0.9999999999654591,
+        -5.877150030785881e-06,
+        5.877150030783631e-06,
+        1.0475729554846287e-19,
+        -233.6879882457032,
+        233.68798824570308,
+        3.278766865194717e-15
+      ],
+      "initial_rigid_energy_j": 1.60884,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 1.5405563963134458e-05,
+      "max_angular_momentum_nms": 0.005149305757301203,
+      "max_linear_momentum_kg_m_s": 0.0017241604597400626,
+      "max_sampled_rigid_energy_j": 1.9029227571417202,
+      "scenario": "face-to-vertex-attempt",
+      "solver": "Newton",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          -0.0036399999999992896,
+          0.0036399999999992853,
+          -7.323641087204581e-20
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": -1.5403896578336518e-05,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 1.542069639759733e-05,
+          "max_abs_residual_recorded_grid_j": 1.5405563963134458e-05,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 54.73656275017711,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 4.025175198173396e-12,
+        "max_attitude_error_deg": 54.736562750177264,
+        "max_loaded_point_slip_m_s": 6.301395657501345e-07,
+        "max_penetration_m": 4.790913957700149e-05,
+        "max_wheel_relative_rad_s": [
+          80.8888888888891,
+          80.88888888888886,
+          3.885591932444623e-15
+        ],
+        "min_height_m": 0.11995371715771337,
+        "outcome": "TARGET_NOT_REACHED",
+        "rigid_energy_minus_logged_work_j": -1.540389657844754e-05,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Start on a face; ask for vertex attitude. Falling/saturation is valid.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "face-to-vertex-attempt",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.8880738339771153,
+            0.3250575836718681,
+            -0.3250575836718681,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          280,
+          280,
+          0
+        ],
+        "speed_exceeded_samples": [
+          280,
+          280,
+          0
+        ],
+        "torque_saturated_samples": [
+          299,
+          299,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.001,
+      "final_normal_force_n": 12.753000000014426,
+      "final_qpos": [
+        1.4103733899061614e-06,
+        1.4103733899226819e-06,
+        0.11997245063326907,
+        0.9999999999654596,
+        -5.877150030795512e-06,
+        5.877150030793093e-06,
+        7.235854716740213e-19,
+        1.1754300067963134e-05,
+        -1.1754300070380496e-05,
+        -1.4609441038225607e-18
+      ],
+      "initial_rigid_energy_j": 1.60884,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 4.726787605040684e-06,
+      "max_angular_momentum_nms": 6.499972569723114e-06,
+      "max_linear_momentum_kg_m_s": 0.0013699755030630975,
+      "max_sampled_rigid_energy_j": 1.60884,
+      "scenario": "rest",
+      "solver": "Newton",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          -6.820219443016872e-16,
+          6.732495280552449e-16,
+          2.026647663131879e-19
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": -4.7267745304239365e-06,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 4.726932367666849e-06,
+          "max_abs_residual_recorded_grid_j": 4.726787605040684e-06,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 0.0009524329317518881,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 9.460555233578647e-13,
+        "max_attitude_error_deg": 0.0009524329318034329,
+        "max_loaded_point_slip_m_s": 5.730826286741637e-07,
+        "max_penetration_m": 3.1735696293958005e-05,
+        "max_wheel_relative_rad_s": [
+          0.00042644405693490715,
+          0.00042644405693489256,
+          2.9208864377467895e-17
+        ],
+        "min_height_m": 0.11997013805898803,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": -4.7267745304239365e-06,
+        "samples": 201,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "off",
+          "description": "Passive face rest; uncalibrated soft contact.",
+          "duration_s": 2.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "rest",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.001,
+      "final_normal_force_n": 12.753000000006514,
+      "final_qpos": [
+        -1.1479365209979556e-05,
+        0.023061556274271443,
+        0.11997245063326904,
+        0.9999999988600398,
+        -5.87742636529907e-06,
+        5.876873683499146e-06,
+        4.7019561772041285e-05,
+        0.1800117617971295,
+        -4.264656629847144e-06,
+        -8.52997423254249e-05
+      ],
+      "initial_rigid_energy_j": 3.4012370256156443,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 0.003140272004990896,
+      "max_angular_momentum_nms": 0.05500095645316754,
+      "max_linear_momentum_kg_m_s": 1.9129500000000041,
+      "max_sampled_rigid_energy_j": 3.4012370256156528,
+      "scenario": "fall",
+      "solver": "Newton",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          2.1617843601155466e-17,
+          2.526999062202349e-16,
+          -1.2696894047890852e-18
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.0031402720049888977,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.003140272004990896,
+          "max_abs_residual_recorded_grid_j": 0.003140272004990896,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 0.005471577124499617,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 4.655009296391986e-09,
+        "max_attitude_error_deg": 10.313240312354816,
+        "max_loaded_point_slip_m_s": 0.04528256921530018,
+        "max_penetration_m": 0.00488540116104863,
+        "max_wheel_relative_rad_s": [
+          5.079787647635326,
+          0.005561761470707393,
+          0.007873909621922469
+        ],
+        "min_height_m": 0.11856204795723112,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": 0.0031402720049888977,
+        "samples": 201,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "off",
+          "description": "Passive drop; no recovery controller.",
+          "duration_s": 2.0,
+          "gravity": true,
+          "initial_clearance_m": 0.12,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "fall",
+          "perturbation_rad": 0.18,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.001,
+      "final_normal_force_n": 0.0,
+      "final_qpos": [
+        -0.0012175613304138146,
+        3.04781449247872e-05,
+        0.3014873503182175,
+        0.994855321718295,
+        -0.06910222489258867,
+        0.046676800457906835,
+        -0.05752432235753931,
+        33.471775277734075,
+        -22.315736244728058,
+        27.893024125487933
+      ],
+      "initial_rigid_energy_j": 0.0,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 4.718447854656915e-16,
+      "max_angular_momentum_nms": 1.4750812991004993e-17,
+      "max_linear_momentum_kg_m_s": 5.443429176543731e-17,
+      "max_sampled_rigid_energy_j": 0.2147793586363786,
+      "scenario": "three-wheel",
+      "solver": "Newton",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          1.1071330446910982e-17,
+          -3.660224970606687e-18,
+          -1.7698791762828037e-18
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "FREE_SPACE_NUMERICAL_DIAGNOSTIC",
+          "final_residual_j": 2.6257068452817742e-17,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 5.273559366969494e-16,
+          "max_abs_residual_recorded_grid_j": 4.718447854656915e-16,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 11.628751894862795,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 1.4750812991004993e-17,
+        "max_attitude_error_deg": 11.628751894862795,
+        "max_loaded_point_slip_m_s": 0.0,
+        "max_penetration_m": 0.0,
+        "max_wheel_relative_rad_s": [
+          66.94355055546828,
+          44.63147248945618,
+          55.786048250975924
+        ],
+        "min_height_m": 0.3,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": 2.6257068452817742e-17,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": false,
+          "controller": "pulse",
+          "description": "Free space three orthogonal internal torques then reverse.",
+          "duration_s": 3.0,
+          "gravity": false,
+          "initial_clearance_m": 0.18,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "three-wheel",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.006,
+            -0.004,
+            0.005
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.001,
+      "final_normal_force_n": 12.753000000154257,
+      "final_qpos": [
+        -5.5640107255502835e-05,
+        -0.11425536778966894,
+        0.11997245063325067,
+        0.7071026244549788,
+        0.7071109363814926,
+        -2.8279452967899793e-05,
+        -3.659021733615233e-05,
+        233.27821168657863,
+        -0.3707792193383483,
+        -0.22362743456255169
+      ],
+      "initial_rigid_energy_j": 2.273857330915936,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 0.0008896038776564641,
+      "max_angular_momentum_nms": 0.05781580460052849,
+      "max_linear_momentum_kg_m_s": 1.1681458697363476,
+      "max_sampled_rigid_energy_j": 2.43543850341082,
+      "scenario": "edge-balance",
+      "solver": "Newton",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          0.003828465426208508,
+          8.301801690381283e-06,
+          -1.5224022345466801e-05
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.0008885413517436547,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.0008901498991659151,
+          "max_abs_residual_recorded_grid_j": 0.0008896038776564641,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 45.000673798487405,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 7.702454715043321e-09,
+        "max_attitude_error_deg": 47.05843607425206,
+        "max_loaded_point_slip_m_s": 0.03671876536772044,
+        "max_penetration_m": 0.004534189352691273,
+        "max_wheel_relative_rad_s": [
+          86.27144495845474,
+          0.33731955149660836,
+          0.19228546404552885
+        ],
+        "min_height_m": 0.11849902445491015,
+        "outcome": "DEPARTED_TARGET",
+        "rigid_energy_minus_logged_work_j": 0.0008885413517436547,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Pre-positioned edge, perturbed 2 deg; NOT face-to-edge transition.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "edge-balance",
+          "perturbation_rad": 0.03490658503988659,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.9238795325112867,
+            0.3826834323650898,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          265,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          265,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          271,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.001,
+      "final_normal_force_n": 12.753000000006843,
+      "final_qpos": [
+        0.04651273149835171,
+        -0.18297796410267675,
+        0.11997245063326885,
+        0.6759477186977579,
+        0.675958103957897,
+        -0.20757292415841452,
+        -0.20757842960497047,
+        222.27432817856592,
+        -205.6563870234872,
+        -217.88398460427769
+      ],
+      "initial_rigid_energy_j": 2.785460943293344,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 0.0018005023442213552,
+      "max_angular_momentum_nms": 0.05283806001313773,
+      "max_linear_momentum_kg_m_s": 1.1108074290815342,
+      "max_sampled_rigid_energy_j": 3.2378421382310965,
+      "scenario": "vertex-balance",
+      "solver": "Newton",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          0.005191041455353004,
+          0.0010907324040727523,
+          -0.003601012301545001
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.0018005023442171364,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.0018005023442213552,
+          "max_abs_residual_recorded_grid_j": 0.0018005023442213552,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 54.88098112528306,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 1.1485365438967565e-07,
+        "max_attitude_error_deg": 59.83573693359592,
+        "max_loaded_point_slip_m_s": 0.3685526819269944,
+        "max_penetration_m": 0.0032415213107099827,
+        "max_wheel_relative_rad_s": [
+          87.82697584016576,
+          82.73070121197824,
+          86.92546583570876
+        ],
+        "min_height_m": 0.11974855270206602,
+        "outcome": "DEPARTED_TARGET",
+        "rigid_energy_minus_logged_work_j": 0.0018005023442171364,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Pre-positioned vertex, perturbed 2 deg; NOT a jump/transition.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "vertex-balance",
+          "perturbation_rad": 0.03490658503988659,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.8880738339771153,
+            0.3250575836718681,
+            -0.3250575836718681,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          253,
+          222,
+          245
+        ],
+        "speed_exceeded_samples": [
+          255,
+          225,
+          245
+        ],
+        "torque_saturated_samples": [
+          261,
+          29,
+          248
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.001,
+      "final_normal_force_n": 12.753000000012472,
+      "final_qpos": [
+        1.4103755906787015e-06,
+        1.4103755909118831e-06,
+        0.11997245063326903,
+        0.9999999999654594,
+        -5.877150030860362e-06,
+        5.877150030825876e-06,
+        -1.4819898787280467e-18,
+        -232.4442104679391,
+        232.4442104679366,
+        -1.585592124966606e-14
+      ],
+      "initial_rigid_energy_j": 1.60884,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 4.726787605040684e-06,
+      "max_angular_momentum_nms": 0.005121051383260278,
+      "max_linear_momentum_kg_m_s": 0.0013699755030630975,
+      "max_sampled_rigid_energy_j": 1.8996960745346043,
+      "scenario": "face-to-vertex-attempt",
+      "solver": "Newton",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          -0.003620000000000289,
+          0.003620000000000265,
+          -9.59671015711202e-19
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": -4.726774432251002e-06,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 4.726932367666849e-06,
+          "max_abs_residual_recorded_grid_j": 4.726787605040684e-06,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 54.7365627501771,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 8.840615928265762e-12,
+        "max_attitude_error_deg": 54.73656275017733,
+        "max_loaded_point_slip_m_s": 5.730826286741637e-07,
+        "max_penetration_m": 3.1554452510296205e-05,
+        "max_wheel_relative_rad_s": [
+          80.44444444444746,
+          80.44444444444747,
+          2.5771342987188187e-14
+        ],
+        "min_height_m": 0.11997013805898803,
+        "outcome": "TARGET_NOT_REACHED",
+        "rigid_energy_minus_logged_work_j": -4.726774432362024e-06,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Start on a face; ask for vertex attitude. Falling/saturation is valid.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "face-to-vertex-attempt",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.8880738339771153,
+            0.3250575836718681,
+            -0.3250575836718681,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          280,
+          280,
+          0
+        ],
+        "speed_exceeded_samples": [
+          280,
+          280,
+          0
+        ],
+        "torque_saturated_samples": [
+          299,
+          299,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.0005,
+      "final_normal_force_n": 12.75300000001798,
+      "final_qpos": [
+        1.4104130072858579e-06,
+        1.410413006888751e-06,
+        0.11997245063326911,
+        0.9999999999654597,
+        -5.877150031073946e-06,
+        5.87715003085967e-06,
+        2.7569319163100433e-17,
+        1.1754300072505866e-05,
+        -1.1754300074979724e-05,
+        -5.592096491632873e-17
+      ],
+      "initial_rigid_energy_j": 1.60884,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 1.2246112002350636e-06,
+      "max_angular_momentum_nms": 6.392798393400163e-06,
+      "max_linear_momentum_kg_m_s": 0.001298147863418766,
+      "max_sampled_rigid_energy_j": 1.60884,
+      "scenario": "rest",
+      "solver": "Newton",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          2.348631579524714e-16,
+          -5.410030825710367e-17,
+          1.705758657632114e-19
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": -1.2246111288068758e-06,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 1.2246117038923694e-06,
+          "max_abs_residual_recorded_grid_j": 1.2246112002350636e-06,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 0.0009524329317798438,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 1.2119325455856745e-12,
+        "max_attitude_error_deg": 0.0009524329317810272,
+        "max_loaded_point_slip_m_s": 5.484487704884765e-07,
+        "max_penetration_m": 3.0370382166203247e-05,
+        "max_wheel_relative_rad_s": [
+          0.0004194126748698998,
+          0.000419412674869906,
+          9.162824853294517e-16
+        ],
+        "min_height_m": 0.11997245063326896,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": -1.2246111288068758e-06,
+        "samples": 201,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "off",
+          "description": "Passive face rest; uncalibrated soft contact.",
+          "duration_s": 2.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "rest",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.0005,
+      "final_normal_force_n": 12.75299999998091,
+      "final_qpos": [
+        -1.9358631595580185e-05,
+        0.02310015498464936,
+        0.11997245063326908,
+        0.9999999996717845,
+        -5.877292463414166e-06,
+        5.877007594410554e-06,
+        2.423531497093578e-05,
+        0.1800117580248345,
+        -6.0777492889133534e-06,
+        -3.915597918120696e-05
+      ],
+      "initial_rigid_energy_j": 3.4012370256156443,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 0.0006007711750681821,
+      "max_angular_momentum_nms": 0.05518097784164168,
+      "max_linear_momentum_kg_m_s": 1.912949999999998,
+      "max_sampled_rigid_energy_j": 3.4012370256156514,
+      "scenario": "fall",
+      "solver": "Newton",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          -1.979619923974503e-16,
+          5.976410245277711e-17,
+          3.604677073216551e-19
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.0006007711750668498,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.0006007711750681821,
+          "max_abs_residual_recorded_grid_j": 0.0006007711750681821,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 0.0029359428106104195,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 1.145701183011188e-08,
+        "max_attitude_error_deg": 10.313240312354816,
+        "max_loaded_point_slip_m_s": 0.060904747868335635,
+        "max_penetration_m": 0.005152446457100945,
+        "max_wheel_relative_rad_s": [
+          5.096415150839334,
+          0.0058854463327753055,
+          0.010942642078830733
+        ],
+        "min_height_m": 0.11865244209119354,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": 0.0006007711750668498,
+        "samples": 201,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "off",
+          "description": "Passive drop; no recovery controller.",
+          "duration_s": 2.0,
+          "gravity": true,
+          "initial_clearance_m": 0.12,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "fall",
+          "perturbation_rad": 0.18,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.0005,
+      "final_normal_force_n": 0.0,
+      "final_qpos": [
+        -0.0012175613304138137,
+        3.0478144924759007e-05,
+        0.3014873503182188,
+        0.9948553217182948,
+        -0.06910222489258806,
+        0.046676800457906856,
+        -0.0575243223575394,
+        33.47177527773455,
+        -22.315736244728072,
+        27.893024125487603
+      ],
+      "initial_rigid_energy_j": 0.0,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 1.4432899320127035e-15,
+      "max_angular_momentum_nms": 1.072249002602769e-16,
+      "max_linear_momentum_kg_m_s": 6.126003724797306e-17,
+      "max_sampled_rigid_energy_j": 0.21477935863637884,
+      "scenario": "three-wheel",
+      "solver": "Newton",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          6.096389642326416e-18,
+          -6.111837065329066e-19,
+          -6.073832680669015e-19
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "FREE_SPACE_NUMERICAL_DIAGNOSTIC",
+          "final_residual_j": 4.9046384019576324e-18,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 1.4710455076283324e-15,
+          "max_abs_residual_recorded_grid_j": 1.4432899320127035e-15,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 11.628751894862754,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 1.072249002602769e-16,
+        "max_attitude_error_deg": 11.628751894862754,
+        "max_loaded_point_slip_m_s": 0.0,
+        "max_penetration_m": 0.0,
+        "max_wheel_relative_rad_s": [
+          66.94355055546967,
+          44.63147248945622,
+          55.78604825097446
+        ],
+        "min_height_m": 0.3,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": 4.9046384019576324e-18,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": false,
+          "controller": "pulse",
+          "description": "Free space three orthogonal internal torques then reverse.",
+          "duration_s": 3.0,
+          "gravity": false,
+          "initial_clearance_m": 0.18,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "three-wheel",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.006,
+            -0.004,
+            0.005
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.0005,
+      "final_normal_force_n": 12.752999999949566,
+      "final_qpos": [
+        -5.807924481557389e-05,
+        -0.11424833604552492,
+        0.11997245063325182,
+        0.7071026245955264,
+        0.707110936488839,
+        -2.5454221248731782e-05,
+        -3.3765045414564605e-05,
+        233.48773728682838,
+        -0.33041845975607687,
+        -0.20041853407703483
+      ],
+      "initial_rigid_energy_j": 2.273857330915936,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 0.00028632294070929376,
+      "max_angular_momentum_nms": 0.05774368871565974,
+      "max_linear_momentum_kg_m_s": 1.1685971890555407,
+      "max_sampled_rigid_energy_j": 2.435675396926348,
+      "scenario": "edge-balance",
+      "solver": "Newton",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          0.0038325994788418988,
+          7.603962093586517e-06,
+          -1.3732595418277406e-05
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.00028632294070929376,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.00028632294070929376,
+          "max_abs_residual_recorded_grid_j": 0.00028632294070929376,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 45.000673747304724,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 1.4307237882899912e-08,
+        "max_attitude_error_deg": 47.03681299221952,
+        "max_loaded_point_slip_m_s": 0.033102403598457446,
+        "max_penetration_m": 0.004321071064118956,
+        "max_wheel_relative_rad_s": [
+          86.36972487925568,
+          0.30417493741212975,
+          0.17610615871663682
+        ],
+        "min_height_m": 0.11863014421654365,
+        "outcome": "DEPARTED_TARGET",
+        "rigid_energy_minus_logged_work_j": 0.00028632294070929376,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Pre-positioned edge, perturbed 2 deg; NOT face-to-edge transition.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "edge-balance",
+          "perturbation_rad": 0.03490658503988659,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.9238795325112867,
+            0.3826834323650898,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          265,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          265,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          271,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.0005,
+      "final_normal_force_n": 12.752999999993056,
+      "final_qpos": [
+        0.04645788856349641,
+        -0.18286323244058056,
+        0.11997245063326871,
+        0.6759688805073325,
+        0.6759792652060682,
+        -0.2075040003505862,
+        -0.20750950685602554,
+        221.64894174853768,
+        -205.60241864787764,
+        -217.58191630811476
+      ],
+      "initial_rigid_energy_j": 2.785460943293344,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 0.0004373432997348825,
+      "max_angular_momentum_nms": 0.052855597418200256,
+      "max_linear_momentum_kg_m_s": 1.1111467394579895,
+      "max_sampled_rigid_energy_j": 3.2372403647538093,
+      "scenario": "vertex-balance",
+      "solver": "Newton",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          0.005177182672665643,
+          0.0010938728078913192,
+          -0.0036012762893850854
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.0004373432997348825,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.0004373432997353266,
+          "max_abs_residual_recorded_grid_j": 0.0004373432997348825,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 54.880168565342004,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 3.907855355078166e-08,
+        "max_attitude_error_deg": 59.799157415404444,
+        "max_loaded_point_slip_m_s": 0.36982401279277716,
+        "max_penetration_m": 0.0030771757661599564,
+        "max_wheel_relative_rad_s": [
+          87.69648878706322,
+          82.65503852459719,
+          86.76846725119032
+        ],
+        "min_height_m": 0.11973975384216756,
+        "outcome": "DEPARTED_TARGET",
+        "rigid_energy_minus_logged_work_j": 0.00043734329973510455,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Pre-positioned vertex, perturbed 2 deg; NOT a jump/transition.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "vertex-balance",
+          "perturbation_rad": 0.03490658503988659,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.8880738339771153,
+            0.3250575836718681,
+            -0.3250575836718681,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          253,
+          222,
+          246
+        ],
+        "speed_exceeded_samples": [
+          255,
+          225,
+          246
+        ],
+        "torque_saturated_samples": [
+          261,
+          29,
+          249
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.0005,
+      "final_normal_force_n": 12.75299999997184,
+      "final_qpos": [
+        1.4104102451269362e-06,
+        1.4104102451270758e-06,
+        0.11997245063326903,
+        0.9999999999654597,
+        -5.877150030722198e-06,
+        5.877150030728694e-06,
+        1.2772772651725936e-19,
+        -231.82204380127578,
+        231.82204380127567,
+        -6.846963311143383e-15
+      ],
+      "initial_rigid_energy_j": 1.60884,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 1.2246112138791787e-06,
+      "max_angular_momentum_nms": 0.0051069123555952224,
+      "max_linear_momentum_kg_m_s": 0.001298147863418766,
+      "max_sampled_rigid_energy_j": 1.8980893997430528,
+      "scenario": "face-to-vertex-attempt",
+      "solver": "Newton",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          -0.003610000000000813,
+          0.003610000000000812,
+          -1.1206298089888061e-18
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": -1.2246112138791787e-06,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 1.2246117038923694e-06,
+          "max_abs_residual_recorded_grid_j": 1.2246112138791787e-06,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 54.736562750177086,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 9.639904948369459e-12,
+        "max_attitude_error_deg": 54.73656275017711,
+        "max_loaded_point_slip_m_s": 5.484487704884765e-07,
+        "max_penetration_m": 3.0370382166217125e-05,
+        "max_wheel_relative_rad_s": [
+          80.22222222222359,
+          80.22222222222338,
+          8.595052565555698e-15
+        ],
+        "min_height_m": 0.11997245046825387,
+        "outcome": "TARGET_NOT_REACHED",
+        "rigid_energy_minus_logged_work_j": -1.2246112138791787e-06,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Start on a face; ask for vertex attitude. Falling/saturation is valid.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "face-to-vertex-attempt",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.8880738339771153,
+            0.3250575836718681,
+            -0.3250575836718681,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          281,
+          281,
+          0
+        ],
+        "speed_exceeded_samples": [
+          281,
+          281,
+          0
+        ],
+        "torque_saturated_samples": [
+          299,
+          299,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.002,
+      "final_normal_force_n": 12.75299963230395,
+      "final_qpos": [
+        1.4102957298393198e-06,
+        1.4102552107414548e-06,
+        0.11997245063486717,
+        0.9999999999654591,
+        -5.87707197905483e-06,
+        5.8771707287542125e-06,
+        1.3444803197708127e-10,
+        1.1754143968252712e-05,
+        -1.1754341459748497e-05,
+        -2.688972228417508e-10
+      ],
+      "initial_rigid_energy_j": 1.60884,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 1.5405958105245117e-05,
+      "max_angular_momentum_nms": 6.722851421686121e-06,
+      "max_linear_momentum_kg_m_s": 0.0017241604993310422,
+      "max_sampled_rigid_energy_j": 1.60884,
+      "scenario": "rest",
+      "solver": "CG",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          6.270335260224036e-11,
+          -1.5059611580693843e-10,
+          -8.820089933834639e-13
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": -1.540429000774639e-05,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 1.5421017014018057e-05,
+          "max_abs_residual_recorded_grid_j": 1.5405958105245117e-05,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 0.000952428284621192,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 2.0258234832829493e-07,
+        "max_attitude_error_deg": 0.0009524448267331159,
+        "max_loaded_point_slip_m_s": 6.290751258032532e-07,
+        "max_penetration_m": 4.790915266277007e-05,
+        "max_wheel_relative_rad_s": [
+          0.00044106648200155455,
+          0.0004410664820015353,
+          1.2106041634959584e-08
+        ],
+        "min_height_m": 0.11995371716057583,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": -1.540429000773864e-05,
+        "samples": 201,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "off",
+          "description": "Passive face rest; uncalibrated soft contact.",
+          "duration_s": 2.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "rest",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.002,
+      "final_normal_force_n": 12.753000153865983,
+      "final_qpos": [
+        -2.210697295355048e-05,
+        0.0230570765478536,
+        0.1199724506340289,
+        0.9999999997210778,
+        -5.877236347012034e-06,
+        5.876932258811717e-06,
+        2.2107996015243576e-05,
+        0.18001175719490523,
+        -7.004886861310065e-06,
+        -3.502491060951923e-05
+      ],
+      "initial_rigid_energy_j": 3.4012370256156443,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 0.02030294331238247,
+      "max_angular_momentum_nms": 0.05508585439538027,
+      "max_linear_momentum_kg_m_s": 1.912949999999998,
+      "max_sampled_rigid_energy_j": 3.4012370256156457,
+      "scenario": "fall",
+      "solver": "CG",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          -1.4597370522540077e-10,
+          -1.0031135344746784e-10,
+          4.0079876222306446e-12
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.02029401088057936,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.02030294331238247,
+          "max_abs_residual_recorded_grid_j": 0.02030294331238247,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 0.0027065054456460406,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 2.153581028895721e-07,
+        "max_attitude_error_deg": 10.313240312354816,
+        "max_loaded_point_slip_m_s": 0.061582652910267766,
+        "max_penetration_m": 0.00504839761225051,
+        "max_wheel_relative_rad_s": [
+          5.0876294422348005,
+          0.0062758815031560096,
+          0.011195388317832856
+        ],
+        "min_height_m": 0.11874684791992544,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": 0.02029401088057936,
+        "samples": 201,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "off",
+          "description": "Passive drop; no recovery controller.",
+          "duration_s": 2.0,
+          "gravity": true,
+          "initial_clearance_m": 0.12,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "fall",
+          "perturbation_rad": 0.18,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.002,
+      "final_normal_force_n": 0.0,
+      "final_qpos": [
+        -0.0012175613304139525,
+        3.0478144924688886e-05,
+        0.30148735031821844,
+        0.994855321718295,
+        -0.0691022248925885,
+        0.046676800457906745,
+        -0.05752432235753928,
+        33.471775277734196,
+        -22.315736244728107,
+        27.89302412548795
+      ],
+      "initial_rigid_energy_j": 0.0,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 6.869504964868156e-16,
+      "max_angular_momentum_nms": 8.079114454798204e-18,
+      "max_linear_momentum_kg_m_s": 5.576468636724367e-16,
+      "max_sampled_rigid_energy_j": 0.21477935863637818,
+      "scenario": "three-wheel",
+      "solver": "CG",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          3.4542915212644738e-18,
+          -3.1109553322619246e-18,
+          -2.1235067003904282e-18
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "FREE_SPACE_NUMERICAL_DIAGNOSTIC",
+          "final_residual_j": 5.926448127548398e-16,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 6.869504964868156e-16,
+          "max_abs_residual_recorded_grid_j": 6.869504964868156e-16,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 11.628751894862773,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 8.079114454798204e-18,
+        "max_attitude_error_deg": 11.628751894862773,
+        "max_loaded_point_slip_m_s": 0.0,
+        "max_penetration_m": 0.0,
+        "max_wheel_relative_rad_s": [
+          66.94355055546828,
+          44.63147248945616,
+          55.7860482509759
+        ],
+        "min_height_m": 0.3,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": 5.926448127548398e-16,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": false,
+          "controller": "pulse",
+          "description": "Free space three orthogonal internal torques then reverse.",
+          "duration_s": 3.0,
+          "gravity": false,
+          "initial_clearance_m": 0.18,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "three-wheel",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.006,
+            -0.004,
+            0.005
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.002,
+      "final_normal_force_n": 12.752999404032678,
+      "final_qpos": [
+        -3.900630842382919e-05,
+        -0.11434937826159854,
+        0.11997245063305367,
+        0.707102625306623,
+        0.7071109370082033,
+        1.5746516772090336e-06,
+        -6.736704834825641e-06,
+        233.9267423536044,
+        0.10290313449727512,
+        -0.0406951429621141
+      ],
+      "initial_rigid_energy_j": 2.273857330915936,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 0.007822361007751466,
+      "max_angular_momentum_nms": 0.05774377749468846,
+      "max_linear_momentum_kg_m_s": 1.168599373943417,
+      "max_sampled_rigid_energy_j": 2.4364466787848365,
+      "scenario": "edge-balance",
+      "solver": "CG",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          0.0038401996860819255,
+          2.0309694828621594e-06,
+          1.3609459120036163e-06
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.00782236099492406,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.007824364156351682,
+          "max_abs_residual_recorded_grid_j": 0.007822361007751466,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 45.00067349106978,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 3.458196736590143e-07,
+        "max_attitude_error_deg": 47.00552082859667,
+        "max_loaded_point_slip_m_s": 0.020923352681669238,
+        "max_penetration_m": 0.004084815802695971,
+        "max_wheel_relative_rad_s": [
+          86.54878141039063,
+          0.07284195211952862,
+          0.046372259796752725
+        ],
+        "min_height_m": 0.11877497816300489,
+        "outcome": "DEPARTED_TARGET",
+        "rigid_energy_minus_logged_work_j": 0.00782236099492406,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Pre-positioned edge, perturbed 2 deg; NOT face-to-edge transition.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "edge-balance",
+          "perturbation_rad": 0.03490658503988659,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.9238795325112867,
+            0.3826834323650898,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          264,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          264,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          271,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.002,
+      "final_normal_force_n": 12.753001031279808,
+      "final_qpos": [
+        0.04686868309457652,
+        -0.1821123932533099,
+        0.11997245063273566,
+        0.6763496839234915,
+        0.6763600584307013,
+        -0.2062594202809017,
+        -0.20626494603203394,
+        223.45248357765257,
+        -205.35211953039806,
+        -217.4892808454492
+      ],
+      "initial_rigid_energy_j": 2.785460943293344,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 0.008127370175629034,
+      "max_angular_momentum_nms": 0.052817425913428175,
+      "max_linear_momentum_kg_m_s": 1.1247615938502646,
+      "max_sampled_rigid_energy_j": 3.2422750601284065,
+      "scenario": "vertex-balance",
+      "solver": "CG",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          0.00520136864077614,
+          0.0010911011347937822,
+          -0.003601372998754554
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.008127370175629034,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.008127370175629034,
+          "max_abs_residual_recorded_grid_j": 0.008127370175629034,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 54.8658930179788,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 3.890744326490128e-07,
+        "max_attitude_error_deg": 59.71034866419091,
+        "max_loaded_point_slip_m_s": 0.36629482108287076,
+        "max_penetration_m": 0.0032075437979952326,
+        "max_wheel_relative_rad_s": [
+          88.18175521442059,
+          83.18693847209998,
+          86.73057458968168
+        ],
+        "min_height_m": 0.11957522642321385,
+        "outcome": "DEPARTED_TARGET",
+        "rigid_energy_minus_logged_work_j": 0.008127370175628812,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Pre-positioned vertex, perturbed 2 deg; NOT a jump/transition.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "vertex-balance",
+          "perturbation_rad": 0.03490658503988659,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.8880738339771153,
+            0.3250575836718681,
+            -0.3250575836718681,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          252,
+          220,
+          245
+        ],
+        "speed_exceeded_samples": [
+          254,
+          223,
+          245
+        ],
+        "torque_saturated_samples": [
+          261,
+          29,
+          249
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "reference",
+      "dt_s": 0.002,
+      "final_normal_force_n": 12.752999086377779,
+      "final_qpos": [
+        1.41018407904531e-06,
+        1.410203953545723e-06,
+        0.11997245063386874,
+        0.9999999999654592,
+        -5.877208926229466e-06,
+        5.877072567027114e-06,
+        -3.162814219039731e-11,
+        -233.6879898981834,
+        233.6879898984542,
+        -8.221565336743993e-07
+      ],
+      "initial_rigid_energy_j": 1.60884,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 1.5405958105245117e-05,
+      "max_angular_momentum_nms": 0.005149305723420435,
+      "max_linear_momentum_kg_m_s": 0.0017241604993310422,
+      "max_sampled_rigid_energy_j": 1.9029227566882443,
+      "scenario": "face-to-vertex-attempt",
+      "solver": "CG",
+      "summary": {
+        "classification": "SYNTHETIC_REFERENCE",
+        "delta_angular_momentum_world_nms": [
+          -0.0036399999072435616,
+          0.0036399999388060165,
+          -1.998715881023215e-11
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": -1.5397273313844106e-05,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 1.5421017014018057e-05,
+          "max_abs_residual_recorded_grid_j": 1.5405958105245117e-05,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 54.73656274867252,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 1.2463795972304878e-07,
+        "max_attitude_error_deg": 54.736562766841786,
+        "max_loaded_point_slip_m_s": 6.290751258032532e-07,
+        "max_penetration_m": 4.790915266277007e-05,
+        "max_wheel_relative_rad_s": [
+          80.88888963846547,
+          80.88888964014826,
+          5.025949668614325e-07
+        ],
+        "min_height_m": 0.11995371716057583,
+        "outcome": "TARGET_NOT_REACHED",
+        "rigid_energy_minus_logged_work_j": -1.5397273313733084e-05,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Start on a face; ask for vertex attitude. Falling/saturation is valid.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "face-to-vertex-attempt",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.8880738339771153,
+            0.3250575836718681,
+            -0.3250575836718681,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          280,
+          280,
+          0
+        ],
+        "speed_exceeded_samples": [
+          280,
+          280,
+          0
+        ],
+        "torque_saturated_samples": [
+          299,
+          299,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.002,
+      "final_normal_force_n": 30.050299866143376,
+      "final_qpos": [
+        2.384276350787291e-06,
+        2.4194968870125718e-06,
+        0.11997267527312908,
+        0.999999999899805,
+        -1.0082884453911584e-05,
+        9.93610824262566e-06,
+        -2.1888108759976118e-14,
+        2.0165768887528076e-05,
+        -1.987221650681706e-05,
+        4.166120097578521e-14
+      ],
+      "initial_rigid_energy_j": 3.855263904546848,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 3.6286324338626877e-05,
+      "max_angular_momentum_nms": 4.2653384614904066e-05,
+      "max_linear_momentum_kg_m_s": 0.004083578821401643,
+      "max_sampled_rigid_energy_j": 3.855263904546848,
+      "scenario": "rest",
+      "solver": "Newton",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          2.715263176795112e-15,
+          -1.2469943336455248e-15,
+          -2.438439897697532e-17
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": -3.628240050861705e-05,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 3.6321992847453333e-05,
+          "max_abs_residual_recorded_grid_j": 3.6286324338626877e-05,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 0.0016221519166865163,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 4.047303678282908e-12,
+        "max_attitude_error_deg": 0.0016221519167082719,
+        "max_loaded_point_slip_m_s": 1.0859647219828186e-06,
+        "max_penetration_m": 4.8907390017310926e-05,
+        "max_wheel_relative_rad_s": [
+          0.0007550802586273795,
+          0.0007440746457629434,
+          2.3860301662467904e-09
+        ],
+        "min_height_m": 0.11995381730591383,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": -3.628240050861705e-05,
+        "samples": 201,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "off",
+          "description": "Passive face rest; uncalibrated soft contact.",
+          "duration_s": 2.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "rest",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.002,
+      "final_normal_force_n": 30.050299866628755,
+      "final_qpos": [
+        2.214849899977222e-05,
+        0.02381268822506546,
+        0.11997267527312915,
+        0.9999999994107942,
+        -1.0082573713643397e-05,
+        9.936423563449357e-06,
+        -3.127333954130194e-05,
+        0.1800201610854557,
+        -3.2875111533240773e-06,
+        7.54457521340771e-05
+      ],
+      "initial_rigid_energy_j": 8.101863454838952,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 0.04127678549208369,
+      "max_angular_momentum_nms": 0.187917315280119,
+      "max_linear_momentum_kg_m_s": 4.507544979928142,
+      "max_sampled_rigid_energy_j": 8.101863454838956,
+      "scenario": "fall",
+      "solver": "Newton",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          2.984767540547234e-16,
+          -2.769108596243892e-15,
+          4.3223818385760295e-17
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.041276785492075696,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.04127678549208369,
+          "max_abs_residual_recorded_grid_j": 0.04127678549208369,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 0.00393370068804343,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 1.5119779932170167e-07,
+        "max_attitude_error_deg": 10.313240312354816,
+        "max_loaded_point_slip_m_s": 0.03540146935425253,
+        "max_penetration_m": 0.00504061274853318,
+        "max_wheel_relative_rad_s": [
+          4.6139414875130305,
+          0.008072913670212121,
+          0.004803586120749692
+        ],
+        "min_height_m": 0.11889720597607316,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": 0.041276785492075696,
+        "samples": 201,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "off",
+          "description": "Passive drop; no recovery controller.",
+          "duration_s": 2.0,
+          "gravity": true,
+          "initial_clearance_m": 0.12,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "fall",
+          "perturbation_rad": 0.18,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.002,
+      "final_normal_force_n": 0.0,
+      "final_qpos": [
+        -0.0005313078508163226,
+        4.012654083904363e-05,
+        0.3006641540252284,
+        0.9996298689758363,
+        -0.018420447865270684,
+        0.012669601906921953,
+        -0.015501397979415257,
+        33.37017877505638,
+        -22.247564552774048,
+        27.808784399335043
+      ],
+      "initial_rigid_energy_j": 0.0,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 9.71445146547012e-16,
+      "max_angular_momentum_nms": 1.7454484579967808e-17,
+      "max_linear_momentum_kg_m_s": 5.164670372876682e-17,
+      "max_sampled_rigid_energy_j": 0.21412762642905564,
+      "scenario": "three-wheel",
+      "solver": "Newton",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          9.135079336628545e-21,
+          9.403009260959337e-20,
+          -9.883434775837128e-19
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "FREE_SPACE_NUMERICAL_DIAGNOSTIC",
+          "final_residual_j": -8.672346830463152e-18,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 1.0547118733938987e-15,
+          "max_abs_residual_recorded_grid_j": 9.71445146547012e-16,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 3.1178754813085976,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 1.7454484579967808e-17,
+        "max_attitude_error_deg": 3.1178754813085976,
+        "max_loaded_point_slip_m_s": 0.0,
+        "max_penetration_m": 0.0,
+        "max_wheel_relative_rad_s": [
+          66.74035755011295,
+          44.49512910554825,
+          55.61756879867013
+        ],
+        "min_height_m": 0.3,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": -8.672346830463152e-18,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": false,
+          "controller": "pulse",
+          "description": "Free space three orthogonal internal torques then reverse.",
+          "duration_s": 3.0,
+          "gravity": false,
+          "initial_clearance_m": 0.18,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "three-wheel",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.006,
+            -0.004,
+            0.005
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.002,
+      "final_normal_force_n": 30.05029986596584,
+      "final_qpos": [
+        2.8913032740614205e-05,
+        -0.1147170004973949,
+        0.11997267505228443,
+        0.7071012256644514,
+        0.7071123361986993,
+        2.377000304753583e-05,
+        9.717780733815715e-06,
+        230.76694648840112,
+        0.45724245338988284,
+        -0.0058905929692347845
+      ],
+      "initial_rigid_energy_j": 5.50049777208784,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 0.010089642312332003,
+      "max_angular_momentum_nms": 0.1850620645867602,
+      "max_linear_momentum_kg_m_s": 2.4963214590212157,
+      "max_sampled_rigid_energy_j": 5.66406618351779,
+      "scenario": "edge-balance",
+      "solver": "Newton",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          0.003830941575385112,
+          1.6106723404782644e-07,
+          1.3155262802750472e-05
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.010089642312332003,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.010089642312332003,
+          "max_abs_residual_recorded_grid_j": 0.010089642312332003,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 45.00090036078977,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 7.978263002448329e-08,
+        "max_attitude_error_deg": 48.87187733597726,
+        "max_loaded_point_slip_m_s": 0.013871561468976794,
+        "max_penetration_m": 0.00389150327778133,
+        "max_wheel_relative_rad_s": [
+          86.95054778995481,
+          0.2940366996480972,
+          0.046392867377012106
+        ],
+        "min_height_m": 0.11932498280727756,
+        "outcome": "DEPARTED_TARGET",
+        "rigid_energy_minus_logged_work_j": 0.010089642312332003,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Pre-positioned edge, perturbed 2 deg; NOT face-to-edge transition.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "edge-balance",
+          "perturbation_rad": 0.03490658503988659,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.9238795325112867,
+            0.3826834323650898,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          260,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          260,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          265,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.002,
+      "final_normal_force_n": 30.050299865817998,
+      "final_qpos": [
+        0.04262956166605997,
+        -0.16867905073215578,
+        0.11997267505228419,
+        0.6663353083573867,
+        0.6663504808413755,
+        -0.23661127033990423,
+        -0.2366207942402133,
+        224.55363475488048,
+        -202.74172254000732,
+        -215.31416426539343
+      ],
+      "initial_rigid_energy_j": 6.75506308920824,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 0.016437492270957144,
+      "max_angular_momentum_nms": 0.19357720848405394,
+      "max_linear_momentum_kg_m_s": 2.8149958988788812,
+      "max_sampled_rigid_energy_j": 7.215040067993919,
+      "scenario": "vertex-balance",
+      "solver": "Newton",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          0.005331242773485624,
+          0.0005719373811479281,
+          -0.0036788675938415395
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.016437492270957144,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.016437492270957144,
+          "max_abs_residual_recorded_grid_j": 0.016437492270957144,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 55.43058716876842,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 1.0857491244742672e-06,
+        "max_attitude_error_deg": 61.84735624340924,
+        "max_loaded_point_slip_m_s": 0.09816366451079651,
+        "max_penetration_m": 0.0033349206821373933,
+        "max_wheel_relative_rad_s": [
+          86.1147784662064,
+          81.84481650227008,
+          86.89208628316261
+        ],
+        "min_height_m": 0.1192527264492537,
+        "outcome": "DEPARTED_TARGET",
+        "rigid_energy_minus_logged_work_j": 0.0164374922709567,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Pre-positioned vertex, perturbed 2 deg; NOT a jump/transition.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "vertex-balance",
+          "perturbation_rad": 0.03490658503988659,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.8880738339771153,
+            0.3250575836718681,
+            -0.3250575836718681,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          255,
+          235,
+          243
+        ],
+        "speed_exceeded_samples": [
+          255,
+          235,
+          243
+        ],
+        "torque_saturated_samples": [
+          254,
+          21,
+          245
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.002,
+      "final_normal_force_n": 30.05029986618016,
+      "final_qpos": [
+        2.384281780852669e-06,
+        2.419502318837375e-06,
+        0.11997267527312894,
+        0.9999999998998046,
+        -1.0082884453504312e-05,
+        9.93610824262086e-06,
+        -1.6722204171105758e-11,
+        -233.6879798342343,
+        233.6879801277866,
+        0.000770989416760993
+      ],
+      "initial_rigid_energy_j": 3.855263904546848,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 3.6286324338626877e-05,
+      "max_angular_momentum_nms": 0.005150194534678996,
+      "max_linear_momentum_kg_m_s": 0.004083578821401643,
+      "max_sampled_rigid_energy_j": 4.148866283206434,
+      "scenario": "face-to-vertex-attempt",
+      "solver": "Newton",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          -0.003639999999424216,
+          0.0036400000005751723,
+          2.2388406225932068e-08
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": -3.628239916686482e-05,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 3.6321992847453333e-05,
+          "max_abs_residual_recorded_grid_j": 3.6286324338626877e-05,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 54.73723242556475,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 7.445683586677355e-12,
+        "max_attitude_error_deg": 54.737232425564855,
+        "max_loaded_point_slip_m_s": 1.0859647219828186e-06,
+        "max_penetration_m": 4.8907390017310926e-05,
+        "max_wheel_relative_rad_s": [
+          80.88888888888962,
+          80.88888888888918,
+          0.0005212758704580445
+        ],
+        "min_height_m": 0.11995381730591383,
+        "outcome": "TARGET_NOT_REACHED",
+        "rigid_energy_minus_logged_work_j": -3.628239916647624e-05,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Start on a face; ask for vertex attitude. Falling/saturation is valid.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "face-to-vertex-attempt",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.8880738339771153,
+            0.3250575836718681,
+            -0.3250575836718681,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          280,
+          280,
+          0
+        ],
+        "speed_exceeded_samples": [
+          280,
+          280,
+          0
+        ],
+        "torque_saturated_samples": [
+          299,
+          299,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.001,
+      "final_normal_force_n": 30.05029986645049,
+      "final_qpos": [
+        2.384425495422933e-06,
+        2.419648235265368e-06,
+        0.119972675273129,
+        0.9999999998998047,
+        -1.0082884453984434e-05,
+        9.936108242628505e-06,
+        -1.3880912455850385e-14,
+        2.0165768890007325e-05,
+        -1.987221650662968e-05,
+        2.570809273728306e-14
+      ],
+      "initial_rigid_energy_j": 3.855263904546848,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 1.1133293775259954e-05,
+      "max_angular_momentum_nms": 4.124846447709573e-05,
+      "max_linear_momentum_kg_m_s": 0.0032512770762222376,
+      "max_sampled_rigid_energy_j": 3.855263904546848,
+      "scenario": "rest",
+      "solver": "Newton",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          2.903346998528232e-16,
+          -1.2598392170282752e-16,
+          -2.1876267475375463e-18
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": -1.1133262942709791e-05,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 1.1133636441719615e-05,
+          "max_abs_residual_recorded_grid_j": 1.1133293775259954e-05,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 0.0016221519166926919,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 4.993024784648335e-12,
+        "max_attitude_error_deg": 0.001622151916753123,
+        "max_loaded_point_slip_m_s": 9.882472700676414e-07,
+        "max_penetration_m": 3.310622862806589e-05,
+        "max_wheel_relative_rad_s": [
+          0.0007302086632391251,
+          0.0007195669780630544,
+          2.164557808908901e-09
+        ],
+        "min_height_m": 0.11997027232146754,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": -1.1133262942709791e-05,
+        "samples": 201,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "off",
+          "description": "Passive face rest; uncalibrated soft contact.",
+          "duration_s": 2.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "rest",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.001,
+      "final_normal_force_n": 30.050299865730917,
+      "final_qpos": [
+        2.2911475666288958e-05,
+        0.023763530921463313,
+        0.11997267527312885,
+        0.9999999995117993,
+        -1.0082607660219997e-05,
+        9.936389117154537e-06,
+        -2.785695318198451e-05,
+        0.18002016109139646,
+        -2.7258059266438305e-06,
+        6.934305167502159e-05
+      ],
+      "initial_rigid_energy_j": 8.101863454838952,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 0.008584363641515935,
+      "max_angular_momentum_nms": 0.18797031699314878,
+      "max_linear_momentum_kg_m_s": 4.50754497992815,
+      "max_sampled_rigid_energy_j": 8.101863454838952,
+      "scenario": "fall",
+      "solver": "Newton",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          1.223499717957787e-15,
+          2.3688470033129424e-15,
+          -1.4039932749121657e-16
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.008584363641509718,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.008584363641516823,
+          "max_abs_residual_recorded_grid_j": 0.008584363641515935,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 0.0035806894551364482,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 4.20835888099283e-08,
+        "max_attitude_error_deg": 10.313240312354816,
+        "max_loaded_point_slip_m_s": 0.032444005131441925,
+        "max_penetration_m": 0.004878685896183982,
+        "max_wheel_relative_rad_s": [
+          4.615247265208025,
+          0.009219674861314527,
+          0.005483796168078846
+        ],
+        "min_height_m": 0.11914501073177622,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": 0.008584363641509718,
+        "samples": 201,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "off",
+          "description": "Passive drop; no recovery controller.",
+          "duration_s": 2.0,
+          "gravity": true,
+          "initial_clearance_m": 0.12,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "fall",
+          "perturbation_rad": 0.18,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.001,
+      "final_normal_force_n": 0.0,
+      "final_qpos": [
+        -0.0005313078508163196,
+        4.012654083904052e-05,
+        0.30066415402522806,
+        0.9996298689758363,
+        -0.01842044786527089,
+        0.01266960190692213,
+        -0.015501397979415278,
+        33.37017877505653,
+        -22.2475645527742,
+        27.808784399335092
+      ],
+      "initial_rigid_energy_j": 0.0,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 1.3600232051658168e-15,
+      "max_angular_momentum_nms": 3.3805704151587145e-17,
+      "max_linear_momentum_kg_m_s": 3.948163791447122e-17,
+      "max_sampled_rigid_energy_j": 0.21412762642905686,
+      "scenario": "three-wheel",
+      "solver": "Newton",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          -2.1045137718675908e-17,
+          2.444410354394431e-17,
+          -3.447837170092357e-19
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "FREE_SPACE_NUMERICAL_DIAGNOSTIC",
+          "final_residual_j": 2.344534258440702e-17,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 1.5543122344752192e-15,
+          "max_abs_residual_recorded_grid_j": 1.3600232051658168e-15,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 3.117875481308624,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 3.3805704151587145e-17,
+        "max_attitude_error_deg": 3.117875481308624,
+        "max_loaded_point_slip_m_s": 0.0,
+        "max_penetration_m": 0.0,
+        "max_wheel_relative_rad_s": [
+          66.74035755011302,
+          44.49512910554858,
+          55.61756879867019
+        ],
+        "min_height_m": 0.3,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": 2.344534258440702e-17,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": false,
+          "controller": "pulse",
+          "description": "Free space three orthogonal internal torques then reverse.",
+          "duration_s": 3.0,
+          "gravity": false,
+          "initial_clearance_m": 0.18,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "three-wheel",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.006,
+            -0.004,
+            0.005
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.001,
+      "final_normal_force_n": 30.050299866129272,
+      "final_qpos": [
+        1.86042719350748e-05,
+        -0.11470924147439945,
+        0.11997267505227965,
+        0.7071012257129766,
+        0.7071123365413053,
+        8.97170004222782e-06,
+        -5.080231127807916e-06,
+        230.1398243793351,
+        0.23094331682207853,
+        -0.07783690022434771
+      ],
+      "initial_rigid_energy_j": 5.50049777208784,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 0.002283181039669957,
+      "max_angular_momentum_nms": 0.18825999076033026,
+      "max_linear_momentum_kg_m_s": 2.557067351907779,
+      "max_sampled_rigid_energy_j": 5.661462076973741,
+      "scenario": "edge-balance",
+      "solver": "Newton",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          0.0038194247497630334,
+          2.916778554147536e-06,
+          5.095350452716032e-06
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.002283181039669957,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.002283181039670179,
+          "max_abs_residual_recorded_grid_j": 0.002283181039669957,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 45.00090030810636,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 3.674619443200786e-08,
+        "max_attitude_error_deg": 48.79299320978611,
+        "max_loaded_point_slip_m_s": 0.016188521363940667,
+        "max_penetration_m": 0.004047285436810502,
+        "max_wheel_relative_rad_s": [
+          86.4678899607335,
+          0.11491710687963617,
+          0.06435197224042777
+        ],
+        "min_height_m": 0.11919775622076699,
+        "outcome": "DEPARTED_TARGET",
+        "rigid_energy_minus_logged_work_j": 0.002283181039669735,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Pre-positioned edge, perturbed 2 deg; NOT face-to-edge transition.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "edge-balance",
+          "perturbation_rad": 0.03490658503988659,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.9238795325112867,
+            0.3826834323650898,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          260,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          260,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          265,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.001,
+      "final_normal_force_n": 30.05029986578458,
+      "final_qpos": [
+        0.04255067238076425,
+        -0.1682658051638118,
+        0.11997267505228466,
+        0.6662208816129997,
+        0.6662360586977198,
+        -0.2369332620387559,
+        -0.23694277860572588,
+        223.94368835715792,
+        -202.21655907974386,
+        -215.76105525355564
+      ],
+      "initial_rigid_energy_j": 6.75506308920824,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 0.004672772276931081,
+      "max_angular_momentum_nms": 0.1929569975073116,
+      "max_linear_momentum_kg_m_s": 2.816012860383148,
+      "max_sampled_rigid_energy_j": 7.210843043402984,
+      "scenario": "vertex-balance",
+      "solver": "Newton",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          0.005328941265218026,
+          0.0005814860872671027,
+          -0.0036682385410241347
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.004672772276928416,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.004672772276931969,
+          "max_abs_residual_recorded_grid_j": 0.004672772276931081,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 55.439000210101824,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 2.6470907125615723e-07,
+        "max_attitude_error_deg": 61.896651338191745,
+        "max_loaded_point_slip_m_s": 0.09481513213865748,
+        "max_penetration_m": 0.003692790278957775,
+        "max_wheel_relative_rad_s": [
+          85.85161313215526,
+          81.60183299654598,
+          87.2057180950523
+        ],
+        "min_height_m": 0.11914161266516136,
+        "outcome": "DEPARTED_TARGET",
+        "rigid_energy_minus_logged_work_j": 0.004672772276928416,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Pre-positioned vertex, perturbed 2 deg; NOT a jump/transition.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "vertex-balance",
+          "perturbation_rad": 0.03490658503988659,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.8880738339771153,
+            0.3250575836718681,
+            -0.3250575836718681,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          255,
+          235,
+          244
+        ],
+        "speed_exceeded_samples": [
+          255,
+          235,
+          244
+        ],
+        "torque_saturated_samples": [
+          254,
+          21,
+          245
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.001,
+      "final_normal_force_n": 30.050299866260453,
+      "final_qpos": [
+        2.3844264511888946e-06,
+        2.4196491917651358e-06,
+        0.11997267527312903,
+        0.9999999998998049,
+        -1.0082884453681488e-05,
+        9.936108242767345e-06,
+        -1.6723220149773182e-11,
+        -232.44420205645994,
+        232.4442023500123,
+        0.0007712840669881172
+      ],
+      "initial_rigid_energy_j": 3.855263904546848,
+      "iterations": 50,
+      "max_abs_energy_work_residual_j": 1.1133293775259954e-05,
+      "max_angular_momentum_nms": 0.005121958800459844,
+      "max_linear_momentum_kg_m_s": 0.0032512770762222376,
+      "max_sampled_rigid_energy_j": 4.145639589600891,
+      "scenario": "face-to-vertex-attempt",
+      "solver": "Newton",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          -0.003619999999427483,
+          0.0036200000005746046,
+          2.2398763580909954e-08
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": -1.113326288737504e-05,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 1.1133636441719615e-05,
+          "max_abs_residual_recorded_grid_j": 1.1133293775259954e-05,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 54.73723242556477,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 1.07812454059131e-11,
+        "max_attitude_error_deg": 54.73723242556504,
+        "max_loaded_point_slip_m_s": 9.882472700676414e-07,
+        "max_penetration_m": 3.303032320790822e-05,
+        "max_wheel_relative_rad_s": [
+          80.44444444444515,
+          80.4444444444452,
+          0.0005213755638728729
+        ],
+        "min_height_m": 0.11997027232146754,
+        "outcome": "TARGET_NOT_REACHED",
+        "rigid_energy_minus_logged_work_j": -1.1133262887264017e-05,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Start on a face; ask for vertex attitude. Falling/saturation is valid.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "face-to-vertex-attempt",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.8880738339771153,
+            0.3250575836718681,
+            -0.3250575836718681,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          280,
+          280,
+          0
+        ],
+        "speed_exceeded_samples": [
+          280,
+          280,
+          0
+        ],
+        "torque_saturated_samples": [
+          299,
+          299,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.0005,
+      "final_normal_force_n": 30.050299865994365,
+      "final_qpos": [
+        2.3844924963114922e-06,
+        2.419716225726322e-06,
+        0.11997267527312917,
+        0.9999999998998054,
+        -1.0082884453842966e-05,
+        9.936108242599213e-06,
+        -1.0824936386727699e-14,
+        2.0165768923999543e-05,
+        -1.987221653004569e-05,
+        1.9629757088355476e-14
+      ],
+      "initial_rigid_energy_j": 3.855263904546848,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 2.8843874876771257e-06,
+      "max_angular_momentum_nms": 4.057213365682024e-05,
+      "max_linear_momentum_kg_m_s": 0.0030822828063413184,
+      "max_sampled_rigid_energy_j": 3.855263904546848,
+      "scenario": "rest",
+      "solver": "Newton",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          -3.652909918539399e-16,
+          7.322067830191421e-16,
+          -3.1806125952672e-17
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": -2.8843873170419183e-06,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 2.884388781226925e-06,
+          "max_abs_residual_recorded_grid_j": 2.8843874876771257e-06,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 0.001622151916678788,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 4.4202711894375256e-12,
+        "max_attitude_error_deg": 0.0016221519167061407,
+        "max_loaded_point_slip_m_s": 9.460093969066196e-07,
+        "max_penetration_m": 3.212923702397563e-05,
+        "max_wheel_relative_rad_s": [
+          0.0007182354880619146,
+          0.0007077688959884551,
+          2.0691455570607863e-09
+        ],
+        "min_height_m": 0.11997267527312905,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": -2.8843873170419183e-06,
+        "samples": 201,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "off",
+          "description": "Passive face rest; uncalibrated soft contact.",
+          "duration_s": 2.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "rest",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.0005,
+      "final_normal_force_n": 30.050299866629658,
+      "final_qpos": [
+        2.2340238281415906e-05,
+        0.023827707081114983,
+        0.11997267527312891,
+        0.9999999993431543,
+        -1.0082552918550684e-05,
+        9.936444664143808e-06,
+        -3.3366152998699036e-05,
+        0.18002016055758674,
+        -2.5749358450402968e-06,
+        8.046433264614539e-05
+      ],
+      "initial_rigid_energy_j": 8.101863454838952,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 0.0014457997308365833,
+      "max_angular_momentum_nms": 0.18791555750693942,
+      "max_linear_momentum_kg_m_s": 4.507544979928118,
+      "max_sampled_rigid_energy_j": 8.10186345483896,
+      "scenario": "fall",
+      "solver": "Newton",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          2.2044527283983805e-15,
+          -1.6064136578878107e-15,
+          4.163509594230918e-17
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.0014457997308339188,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.0014457997308365833,
+          "max_abs_residual_recorded_grid_j": 0.0014457997308365833,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 0.004153356746650051,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 9.601445929913414e-09,
+        "max_attitude_error_deg": 10.313240312354816,
+        "max_loaded_point_slip_m_s": 0.03719502125110244,
+        "max_penetration_m": 0.005144975472084923,
+        "max_wheel_relative_rad_s": [
+          4.613892683562181,
+          0.008597110427701265,
+          0.005102111909305259
+        ],
+        "min_height_m": 0.11922296317245681,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": 0.0014457997308339188,
+        "samples": 201,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "off",
+          "description": "Passive drop; no recovery controller.",
+          "duration_s": 2.0,
+          "gravity": true,
+          "initial_clearance_m": 0.12,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "fall",
+          "perturbation_rad": 0.18,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.0005,
+      "final_normal_force_n": 0.0,
+      "final_qpos": [
+        -0.0005313078508163172,
+        4.012654083904337e-05,
+        0.30066415402522867,
+        0.9996298689758358,
+        -0.018420447865270542,
+        0.012669601906922212,
+        -0.015501397979415457,
+        33.370178775056104,
+        -22.247564552774303,
+        27.808784399335224
+      ],
+      "initial_rigid_energy_j": 0.0,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 3.2751579226442118e-15,
+      "max_angular_momentum_nms": 4.1186754185454e-17,
+      "max_linear_momentum_kg_m_s": 8.045774123514969e-17,
+      "max_sampled_rigid_energy_j": 0.21412762642905137,
+      "scenario": "three-wheel",
+      "solver": "Newton",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          1.2751946779013937e-18,
+          7.820893921474355e-18,
+          7.338667316951122e-19
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "FREE_SPACE_NUMERICAL_DIAGNOSTIC",
+          "final_residual_j": 1.010020826909993e-15,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 3.3584246494910985e-15,
+          "max_abs_residual_recorded_grid_j": 3.2751579226442118e-15,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 3.1178754813086154,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 4.1186754185454e-17,
+        "max_attitude_error_deg": 3.1178754813086154,
+        "max_loaded_point_slip_m_s": 0.0,
+        "max_penetration_m": 0.0,
+        "max_wheel_relative_rad_s": [
+          66.74035755011168,
+          44.49512910554872,
+          55.61756879866964
+        ],
+        "min_height_m": 0.3,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": 1.010020826909993e-15,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": false,
+          "controller": "pulse",
+          "description": "Free space three orthogonal internal torques then reverse.",
+          "duration_s": 3.0,
+          "gravity": false,
+          "initial_clearance_m": 0.18,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "three-wheel",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.006,
+            -0.004,
+            0.005
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.0005,
+      "final_normal_force_n": 30.05029986625344,
+      "final_qpos": [
+        2.2005294032746854e-05,
+        -0.11469452964986346,
+        0.11997267505228151,
+        0.7071012257305572,
+        0.7071123364385723,
+        1.5025865606773404e-05,
+        9.738153255208153e-07,
+        229.82401995088387,
+        0.31854189878585604,
+        -0.040226615202697415
+      ],
+      "initial_rigid_energy_j": 5.50049777208784,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 0.0005145163681921083,
+      "max_angular_momentum_nms": 0.19129556219778054,
+      "max_linear_momentum_kg_m_s": 2.597027257117334,
+      "max_sampled_rigid_energy_j": 5.661795916779734,
+      "scenario": "edge-balance",
+      "solver": "Newton",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          0.0038136569754739073,
+          1.6404593007904522e-06,
+          8.303158415780985e-06
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.0005145163681921083,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.0005145163681923304,
+          "max_abs_residual_recorded_grid_j": 0.0005145163681921083,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 45.00090031501488,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 2.336977862663728e-08,
+        "max_attitude_error_deg": 48.866447566459286,
+        "max_loaded_point_slip_m_s": 0.01380851119098704,
+        "max_penetration_m": 0.004109314493662114,
+        "max_wheel_relative_rad_s": [
+          86.54425054658809,
+          0.18620141914889204,
+          0.034539936930991506
+        ],
+        "min_height_m": 0.1191725347724887,
+        "outcome": "DEPARTED_TARGET",
+        "rigid_energy_minus_logged_work_j": 0.0005145163681916642,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Pre-positioned edge, perturbed 2 deg; NOT face-to-edge transition.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "edge-balance",
+          "perturbation_rad": 0.03490658503988659,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.9238795325112867,
+            0.3826834323650898,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          260,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          260,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          265,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.0005,
+      "final_normal_force_n": 30.05029986620561,
+      "final_qpos": [
+        0.04223371059437677,
+        -0.16840171775396126,
+        0.11997267505228455,
+        0.666300102676466,
+        0.6663152765770027,
+        -0.23671039007510075,
+        -0.23671991171833598,
+        223.63690977285816,
+        -201.9616415484221,
+        -215.50628528446998
+      ],
+      "initial_rigid_energy_j": 6.75506308920824,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 0.0010598735245395119,
+      "max_angular_momentum_nms": 0.19264928010023186,
+      "max_linear_momentum_kg_m_s": 2.8142841541927566,
+      "max_sampled_rigid_energy_j": 7.2088286745177665,
+      "scenario": "vertex-balance",
+      "solver": "Newton",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          0.005320802239082653,
+          0.0005846639515172304,
+          -0.0036629307382605057
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.0010598735245368474,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.0010598735245404,
+          "max_abs_residual_recorded_grid_j": 0.0010598735245395119,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 55.4331715270936,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 6.832041492617947e-08,
+        "max_attitude_error_deg": 61.87640908019815,
+        "max_loaded_point_slip_m_s": 0.10563647498051189,
+        "max_penetration_m": 0.003612740899413408,
+        "max_wheel_relative_rad_s": [
+          85.72932006102288,
+          81.4816647142556,
+          87.11902754125937
+        ],
+        "min_height_m": 0.11927099587345581,
+        "outcome": "DEPARTED_TARGET",
+        "rigid_energy_minus_logged_work_j": 0.0010598735245368474,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Pre-positioned vertex, perturbed 2 deg; NOT a jump/transition.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "vertex-balance",
+          "perturbation_rad": 0.03490658503988659,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.8880738339771153,
+            0.3250575836718681,
+            -0.3250575836718681,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          253,
+          235,
+          243
+        ],
+        "speed_exceeded_samples": [
+          253,
+          235,
+          243
+        ],
+        "torque_saturated_samples": [
+          254,
+          21,
+          245
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.0005,
+      "final_normal_force_n": 30.05029986625047,
+      "final_qpos": [
+        2.384491365726298e-06,
+        2.419715095928925e-06,
+        0.11997267527312908,
+        0.9999999998998053,
+        -1.0082884453767723e-05,
+        9.936108242809506e-06,
+        -1.672442319695091e-11,
+        -231.82214650091794,
+        231.82214679447029,
+        0.0007714269994774157
+      ],
+      "initial_rigid_energy_j": 3.855263904546848,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 2.8843874876771257e-06,
+      "max_angular_momentum_nms": 0.005107829192520066,
+      "max_linear_momentum_kg_m_s": 0.0030822828063413184,
+      "max_sampled_rigid_energy_j": 4.1440329092514085,
+      "scenario": "face-to-vertex-attempt",
+      "solver": "Newton",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          -0.003609999999429402,
+          0.003610000000578043,
+          2.2403874364421526e-08
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": -2.884387445056813e-06,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 2.884388781226925e-06,
+          "max_abs_residual_recorded_grid_j": 2.8843874876771257e-06,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 54.737232425564784,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 1.7413800236686085e-11,
+        "max_attitude_error_deg": 54.737232425564855,
+        "max_loaded_point_slip_m_s": 9.460093969066196e-07,
+        "max_penetration_m": 3.2129237024211554e-05,
+        "max_wheel_relative_rad_s": [
+          80.22222222222226,
+          80.22222222222626,
+          0.0005214239046012059
+        ],
+        "min_height_m": 0.11997267514403387,
+        "outcome": "TARGET_NOT_REACHED",
+        "rigid_energy_minus_logged_work_j": -2.8843874447792572e-06,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Start on a face; ask for vertex attitude. Falling/saturation is valid.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "face-to-vertex-attempt",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.8880738339771153,
+            0.3250575836718681,
+            -0.3250575836718681,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          280,
+          280,
+          0
+        ],
+        "speed_exceeded_samples": [
+          280,
+          280,
+          0
+        ],
+        "torque_saturated_samples": [
+          299,
+          299,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.002,
+      "final_normal_force_n": 30.050301882193487,
+      "final_qpos": [
+        2.383878082057799e-06,
+        2.4191662143923487e-06,
+        0.11997267526937642,
+        0.9999999998998066,
+        -1.0082783146080848e-05,
+        9.936012770036486e-06,
+        -3.455079228111278e-10,
+        2.0165566276542843e-05,
+        -1.9872025531735382e-05,
+        6.910129342737456e-10
+      ],
+      "initial_rigid_energy_j": 3.855263904546848,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 3.628676738069367e-05,
+      "max_angular_momentum_nms": 4.26534337645292e-05,
+      "max_linear_momentum_kg_m_s": 0.00408357762164901,
+      "max_sampled_rigid_energy_j": 3.855263904546848,
+      "scenario": "rest",
+      "solver": "CG",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          2.1050249666251774e-11,
+          -1.1787496389405178e-11,
+          -1.2333924581527354e-11
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": -3.628284514034042e-05,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 3.6322045401732025e-05,
+          "max_abs_residual_recorded_grid_j": 3.628676738069367e-05,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 0.0016221359693156731,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 2.279503288769608e-06,
+        "max_attitude_error_deg": 0.0016221629461143883,
+        "max_loaded_point_slip_m_s": 1.0859948733846408e-06,
+        "max_penetration_m": 4.890739044599579e-05,
+        "max_wheel_relative_rad_s": [
+          0.0007550816587189441,
+          0.0007440749698108257,
+          1.617327223199701e-08
+        ],
+        "min_height_m": 0.11995381730674748,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": -3.628284514034009e-05,
+        "samples": 201,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "off",
+          "description": "Passive face rest; uncalibrated soft contact.",
+          "duration_s": 2.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "rest",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.002,
+      "final_normal_force_n": 30.050296469758344,
+      "final_qpos": [
+        2.2146454862114928e-05,
+        0.023812688204540383,
+        0.11997267527201493,
+        0.9999999994106133,
+        -1.0082654578205025e-05,
+        9.93644636023865e-06,
+        -3.127906059905717e-05,
+        0.18002016124660425,
+        -3.2874232475252555e-06,
+        7.545747883687008e-05
+      ],
+      "initial_rigid_energy_j": 8.101863454838952,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 0.04127723564144592,
+      "max_angular_momentum_nms": 0.1879173743083031,
+      "max_linear_momentum_kg_m_s": 4.507544979928142,
+      "max_sampled_rigid_energy_j": 8.101863454838956,
+      "scenario": "fall",
+      "solver": "CG",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          -2.3521387083905916e-10,
+          -4.86629239092147e-10,
+          1.268397452962787e-11
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.04127723564039254,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.04127723564146102,
+          "max_abs_residual_recorded_grid_j": 0.04127723564144592,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 0.003934301422392037,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 4.801570072818715e-07,
+        "max_attitude_error_deg": 10.313240312354816,
+        "max_loaded_point_slip_m_s": 0.03540160743779468,
+        "max_penetration_m": 0.005040612719615811,
+        "max_wheel_relative_rad_s": [
+          4.6139429282796165,
+          0.008072904079228413,
+          0.004803576912724486
+        ],
+        "min_height_m": 0.11889720092576596,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": 0.04127723564039254,
+        "samples": 201,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "off",
+          "description": "Passive drop; no recovery controller.",
+          "duration_s": 2.0,
+          "gravity": true,
+          "initial_clearance_m": 0.12,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "fall",
+          "perturbation_rad": 0.18,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.002,
+      "final_normal_force_n": 0.0,
+      "final_qpos": [
+        -0.0005313078508163226,
+        4.012654083904363e-05,
+        0.3006641540252284,
+        0.9996298689758363,
+        -0.018420447865270684,
+        0.012669601906921953,
+        -0.015501397979415257,
+        33.37017877505638,
+        -22.247564552774048,
+        27.808784399335043
+      ],
+      "initial_rigid_energy_j": 0.0,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 9.71445146547012e-16,
+      "max_angular_momentum_nms": 1.7454484579967808e-17,
+      "max_linear_momentum_kg_m_s": 5.164670372876682e-17,
+      "max_sampled_rigid_energy_j": 0.21412762642905564,
+      "scenario": "three-wheel",
+      "solver": "CG",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          9.135079336628545e-21,
+          9.403009260959337e-20,
+          -9.883434775837128e-19
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "FREE_SPACE_NUMERICAL_DIAGNOSTIC",
+          "final_residual_j": -8.672346830463152e-18,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 1.0547118733938987e-15,
+          "max_abs_residual_recorded_grid_j": 9.71445146547012e-16,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 3.1178754813085976,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 1.7454484579967808e-17,
+        "max_attitude_error_deg": 3.1178754813085976,
+        "max_loaded_point_slip_m_s": 0.0,
+        "max_penetration_m": 0.0,
+        "max_wheel_relative_rad_s": [
+          66.74035755011295,
+          44.49512910554825,
+          55.61756879867013
+        ],
+        "min_height_m": 0.3,
+        "outcome": "NO_CONTROL_GOAL",
+        "rigid_energy_minus_logged_work_j": -8.672346830463152e-18,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": false,
+          "controller": "pulse",
+          "description": "Free space three orthogonal internal torques then reverse.",
+          "duration_s": 3.0,
+          "gravity": false,
+          "initial_clearance_m": 0.18,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "three-wheel",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.006,
+            -0.004,
+            0.005
+          ],
+          "startup": null,
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          0,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          0,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          0,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.002,
+      "final_normal_force_n": 30.0503042772933,
+      "final_qpos": [
+        2.8912889919216528e-05,
+        -0.11471700204032423,
+        0.11997267505349414,
+        0.7071012256661957,
+        0.7071123361969791,
+        2.37694763901921e-05,
+        9.717367349484782e-06,
+        230.76693430664525,
+        0.4571592763510147,
+        -0.008156436033305457
+      ],
+      "initial_rigid_energy_j": 5.50049777208784,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 0.010089859096191311,
+      "max_angular_momentum_nms": 0.18506206545547035,
+      "max_linear_momentum_kg_m_s": 2.4963212246069304,
+      "max_sampled_rigid_energy_j": 5.664066395473959,
+      "scenario": "edge-balance",
+      "solver": "CG",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          0.0038309420831484265,
+          2.2220153694379646e-07,
+          1.3153553777901522e-05
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.01008985888968228,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.010089859132564882,
+          "max_abs_residual_recorded_grid_j": 0.010089859096191311,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 45.00090036050448,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 7.285577199924003e-07,
+        "max_attitude_error_deg": 48.87187316338408,
+        "max_loaded_point_slip_m_s": 0.013871652452549276,
+        "max_penetration_m": 0.003891479809208828,
+        "max_wheel_relative_rad_s": [
+          86.95054549301538,
+          0.2939989895031411,
+          0.0463752149628735
+        ],
+        "min_height_m": 0.11932499299887794,
+        "outcome": "DEPARTED_TARGET",
+        "rigid_energy_minus_logged_work_j": 0.010089858889682057,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Pre-positioned edge, perturbed 2 deg; NOT face-to-edge transition.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "edge-balance",
+          "perturbation_rad": 0.03490658503988659,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.9238795325112867,
+            0.3826834323650898,
+            0.0,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          260,
+          0,
+          0
+        ],
+        "speed_exceeded_samples": [
+          260,
+          0,
+          0
+        ],
+        "torque_saturated_samples": [
+          265,
+          0,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.002,
+      "final_normal_force_n": 30.05030365354184,
+      "final_qpos": [
+        0.04262954767546313,
+        -0.16867904271565665,
+        0.11997267505044648,
+        0.6663353236398193,
+        0.666350496256956,
+        -0.23661122713701127,
+        -0.2366207509933237,
+        224.55365191609323,
+        -202.7417384083186,
+        -215.31414038694732
+      ],
+      "initial_rigid_energy_j": 6.75506308920824,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 0.016437086238234144,
+      "max_angular_momentum_nms": 0.19357719672671564,
+      "max_linear_momentum_kg_m_s": 2.814996325190566,
+      "max_sampled_rigid_energy_j": 7.215040488710664,
+      "scenario": "vertex-balance",
+      "solver": "CG",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          0.005331242981237964,
+          0.0005719379273724381,
+          -0.0036788678974308945
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": 0.016437086237668375,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 0.016437086238271892,
+          "max_abs_residual_recorded_grid_j": 0.016437086238234144,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 55.43058605028435,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 1.0542013682041463e-06,
+        "max_attitude_error_deg": 61.84735780697164,
+        "max_loaded_point_slip_m_s": 0.09816362863113177,
+        "max_penetration_m": 0.003334924881274376,
+        "max_wheel_relative_rad_s": [
+          86.11478545741518,
+          81.8448232908503,
+          86.89207600811487
+        ],
+        "min_height_m": 0.11925272359878876,
+        "outcome": "DEPARTED_TARGET",
+        "rigid_energy_minus_logged_work_j": 0.016437086237668375,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Pre-positioned vertex, perturbed 2 deg; NOT a jump/transition.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": null,
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "vertex-balance",
+          "perturbation_rad": 0.03490658503988659,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.8880738339771153,
+            0.3250575836718681,
+            -0.3250575836718681,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          255,
+          235,
+          243
+        ],
+        "speed_exceeded_samples": [
+          255,
+          235,
+          243
+        ],
+        "torque_saturated_samples": [
+          254,
+          21,
+          245
+        ],
+        "trial_band_deg": 5
+      }
+    },
+    {
+      "case": "rev5-partial-proxy",
+      "dt_s": 0.002,
+      "final_normal_force_n": 30.050297100654706,
+      "final_qpos": [
+        2.3843083713302083e-06,
+        2.419391952493267e-06,
+        0.11997267527342521,
+        0.9999999998998045,
+        -1.0082938362347639e-05,
+        9.936048013193198e-06,
+        -1.6934414216077727e-10,
+        -233.687969640389,
+        233.68796993416953,
+        0.0007581855012983508
+      ],
+      "initial_rigid_energy_j": 3.855263904546848,
+      "iterations": 100,
+      "max_abs_energy_work_residual_j": 3.630937101900544e-05,
+      "max_angular_momentum_nms": 0.005150194041426609,
+      "max_linear_momentum_kg_m_s": 0.00408357762164901,
+      "max_sampled_rigid_energy_j": 4.148866256019305,
+      "scenario": "face-to-vertex-attempt",
+      "solver": "CG",
+      "summary": {
+        "classification": "WIP_DESIGN_PROXY",
+        "delta_angular_momentum_world_nms": [
+          -0.00363999923993195,
+          0.003639999484328162,
+          2.212315163845925e-08
+        ],
+        "energy_accounting": {
+          "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+          "final_residual_j": -3.630936888893155e-05,
+          "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+          "max_abs_residual_all_steps_j": 3.6322045401732025e-05,
+          "max_abs_residual_recorded_grid_j": 3.630937101900544e-05,
+          "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+          "physical_energy_heat_impact_qualified": false
+        },
+        "final_attitude_error_deg": 54.7372324250526,
+        "hardware_approval": false,
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+        "max_angular_momentum_balance_residual_nms": 9.840247915440421e-07,
+        "max_attitude_error_deg": 54.737232437370174,
+        "max_loaded_point_slip_m_s": 1.0859948733846408e-06,
+        "max_penetration_m": 4.890739044599579e-05,
+        "max_wheel_relative_rad_s": [
+          80.88888526287087,
+          80.8888852678219,
+          0.0005159207795697822
+        ],
+        "min_height_m": 0.11995381730674748,
+        "outcome": "TARGET_NOT_REACHED",
+        "rigid_energy_minus_logged_work_j": -3.630936888854297e-05,
+        "samples": 301,
+        "scenario": {
+          "command_delay_s": 0.02,
+          "contact": true,
+          "controller": "pd",
+          "description": "Start on a face; ask for vertex attitude. Falling/saturation is valid.",
+          "duration_s": 3.0,
+          "gravity": true,
+          "initial_clearance_m": 0.0,
+          "initial_quat": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "kd_nm_s_rad": 0.018,
+          "kp_nm_rad": 0.08,
+          "name": "face-to-vertex-attempt",
+          "perturbation_rad": 0.0,
+          "pulse_half_period_s": 0.5,
+          "pulse_nm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "startup": null,
+          "target": [
+            0.8880738339771153,
+            0.3250575836718681,
+            -0.3250575836718681,
+            0.0
+          ]
+        },
+        "speed_cutoff_samples": [
+          280,
+          280,
+          0
+        ],
+        "speed_exceeded_samples": [
+          280,
+          280,
+          0
+        ],
+        "torque_saturated_samples": [
+          299,
+          299,
+          0
+        ],
+        "trial_band_deg": 5
+      }
+    }
+  ],
+  "sampling": "Metrics at 100 Hz; unobserved inter-sample impact maxima are not bounded.",
+  "state": "NUMERICAL_WITNESSES_NOT_PHYSICAL_QUALIFICATION"
+}

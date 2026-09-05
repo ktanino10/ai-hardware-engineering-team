@@ -49,9 +49,10 @@ Section 14: "when firmware work starts in earnest") was met by
 
 - **Control loops, PID, attitude-control logic, sensor fusion, or
   calibration/physical-unit conversion.** This is Control Engineer's future
-  territory (`docs/architecture.md` Section 14: "at 1-axis/3-axis attitude
-  control roadmap stage") and that trigger is **not** met by a bench
-  sensor-readout board. Raw register counts are a complete, legitimate
+  production territory (`docs/architecture.md` Section 14), not authorized
+  by a bring-up task. The approved simulated attitude controller lives
+  separately under `simulation/`, owned by Simulation Engineer; it does
+  not expand this role or qualify deployable control. Raw register counts are a complete, legitimate
   "driver-level bring-up" deliverable on their own -- they prove the
   sensor/bus/initialization sequence actually works. Do not quietly grow this
   role into Control Engineer's scope one "just a little math" step at a

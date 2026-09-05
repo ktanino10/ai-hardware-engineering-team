@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "case_id": "synthetic-reference-v1",
+  "classification": "SYNTHETIC_REFERENCE",
+  "description": "WIP synthetic engine fixture, NOT the populated Rev5 cube.",
+  "provenance": {
+    "status": "ASSUMPTION",
+    "rationale": "Simple positive inertias and modest ideal torque for independently calculable engine tests. No component rating or physical design decision.",
+    "body_inertia": "Uniform 1 kg, 0.24 m cube: I = m*s*s/6. Body mass excludes all three rotors.",
+    "wheel_inertia": "Uniform 0.1 kg cylinders: I_axis=m*r*r/2; I_transverse=m*(3*r*r+h*h)/12.",
+    "source_snapshot": null
+  },
+  "body": {
+    "side_m": 0.24,
+    "mass_kg": 1.0,
+    "com_m": [0.0, 0.0, 0.0],
+    "inertia_kg_m2": [0.0096, 0.0096, 0.0096]
+  },
+  "wheels": [
+    {
+      "name": "x", "axis": [1, 0, 0], "center_m": [0.08, 0, 0],
+      "mass_kg": 0.1, "radius_m": 0.03, "thickness_m": 0.006,
+      "inertia_kg_m2": [0.000045, 0.0000228, 0.0000228]
+    },
+    {
+      "name": "y", "axis": [0, 1, 0], "center_m": [0, 0.08, 0],
+      "mass_kg": 0.1, "radius_m": 0.03, "thickness_m": 0.006,
+      "inertia_kg_m2": [0.0000228, 0.000045, 0.0000228]
+    },
+    {
+      "name": "z", "axis": [0, 0, 1], "center_m": [0, 0, 0.08],
+      "mass_kg": 0.1, "radius_m": 0.03, "thickness_m": 0.006,
+      "inertia_kg_m2": [0.0000228, 0.0000228, 0.000045]
+    }
+  ],
+  "actuation": {
+    "model": "IDEAL_JOINT_TORQUE_NOT_ACTUAL_DRIVER",
+    "torque_limit_nm": [0.02, 0.02, 0.02],
+    "speed_cutoff_rad_s": [80.0, 80.0, 80.0]
+  },
+  "contact": {
+    "sliding_friction": 0.6,
+    "solref": [0.01, 1.0],
+    "solimp": [0.9, 0.95, 0.001],
+    "condim": 3
+  },
+  "integration": {
+    "timestep_s": 0.002,
+    "integrator": "RK4",
+    "solver": "Newton",
+    "iterations": 50,
+    "tolerance": 1e-10
+  },
+  "gravity_m_s2": [0, 0, -9.81],
+  "omissions": [
+    "No CAD-derived or measured complete mass, CG or inertia.",
+    "No battery, populated electronics, harness or motor internals modeled individually.",
+    "Ideal bidirectional joint torque is NOT DRV10983 runtime braking or a motor torque-speed curve.",
+    "No compliance, fracture, thermal/FEA, rotor containment, noise or real-time firmware.",
+    "Box-plane soft contact is uncalibrated; no strength or continuous collision clearance claim."
+  ]
+}

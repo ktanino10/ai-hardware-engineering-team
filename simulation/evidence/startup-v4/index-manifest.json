@@ -1,0 +1,10 @@
+{
+  "files": {
+    "index.html": "148626face09a43de7c42dde431f8c236b7c6c158d78a3ec420beb3438d3fcea",
+    "numerics.json": "9ce51be8a8b17649894a2f31eb3050feb29e4897b8de5568f6a533c5b84c9a2f",
+    "startup-mechanism-fixture/manifest.json": "019b72f308fab29d9848da202d0feb395eefa60fe09c75357a6a463a215ceb09",
+    "startup-reference/manifest.json": "bc3709e2e7e7331a903eb14a796fed4308c8f6b961c8a6b52c843d246ce1a1c6",
+    "startup-rev5-proxy/manifest.json": "66c91135fa539140c985c084e2231f8ab3d9fcd4614433d453ff441b0d8c4049"
+  },
+  "state": "WIP_NOT_HARDWARE_APPROVAL"
+}

@@ -1,0 +1,70 @@
+{
+  "classification": "SYNTHETIC_REFERENCE",
+  "delta_angular_momentum_world_nms": [
+    -0.0036399999999992896,
+    0.0036399999999992853,
+    -7.323641087204581e-20
+  ],
+  "final_attitude_error_deg": 54.73656275017711,
+  "hardware_approval": false,
+  "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+  "max_attitude_error_deg": 54.736562750177264,
+  "max_loaded_point_slip_m_s": 6.301395657501345e-07,
+  "max_penetration_m": 4.790913957700149e-05,
+  "max_wheel_relative_rad_s": [
+    80.8888888888891,
+    80.88888888888886,
+    3.885591932444623e-15
+  ],
+  "min_height_m": 0.11995371715771337,
+  "outcome": "TARGET_NOT_REACHED",
+  "rigid_energy_minus_logged_work_j": 4.131511524213538e-05,
+  "samples": 301,
+  "scenario": {
+    "command_delay_s": 0.02,
+    "contact": true,
+    "controller": "pd",
+    "description": "Start on a face; ask for vertex attitude. Falling/saturation is valid.",
+    "duration_s": 3.0,
+    "gravity": true,
+    "initial_clearance_m": 0.0,
+    "initial_quat": [
+      1,
+      0,
+      0,
+      0
+    ],
+    "kd_nm_s_rad": 0.018,
+    "kp_nm_rad": 0.08,
+    "name": "face-to-vertex-attempt",
+    "perturbation_rad": 0.0,
+    "pulse_half_period_s": 0.5,
+    "pulse_nm": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "target": [
+      0.8880738339771153,
+      0.3250575836718681,
+      -0.3250575836718681,
+      0.0
+    ]
+  },
+  "speed_cutoff_samples": [
+    280,
+    280,
+    0
+  ],
+  "speed_exceeded_samples": [
+    280,
+    280,
+    0
+  ],
+  "torque_saturated_samples": [
+    299,
+    299,
+    0
+  ],
+  "trial_band_deg": 5
+}

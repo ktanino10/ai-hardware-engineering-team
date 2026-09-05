@@ -1,0 +1,150 @@
+{
+  "classification": "SYNTHETIC_REFERENCE",
+  "delta_angular_momentum_world_nms": [
+    4.0638939845666783e-16,
+    -4.0875173968630974e-17,
+    2.8065070161939357e-17
+  ],
+  "energy_accounting": {
+    "contact_energy_status": "UNCALIBRATED_CONTACT_NUMERICAL_RESIDUAL_REPORTED",
+    "final_residual_j": 1.07941515575527e-05,
+    "limits": "Stage-consistent quadrature does not remove integrator/solver error or qualify real contact, heat or impact.",
+    "max_abs_residual_all_steps_j": 1.079417259380877e-05,
+    "max_abs_residual_recorded_grid_j": 1.0794171617201087e-05,
+    "method": "RK4_STAGE_REEVALUATION_1_2_2_1",
+    "physical_energy_heat_impact_qualified": false
+  },
+  "final_attitude_error_deg": 45.1968365751739,
+  "hardware_approval": false,
+  "interpretation": "Real simulated spin-up from rest, not a pre-spun initialization. Motor and independent finite brake are assumptions. Dense brake-window rows resolve stopping; they are not continuous physical bounds. Brake work is a SUBSET of constraint work, not an additional energy term.",
+  "max_angular_momentum_balance_residual_nms": 1.7481893080961733e-09,
+  "max_attitude_error_deg": 68.86649122400283,
+  "max_loaded_point_slip_m_s": 0.1539140510751733,
+  "max_penetration_m": 0.0033792507495333246,
+  "max_wheel_relative_rad_s": [
+    314.1254326585872,
+    0.6513971626581013,
+    0.5841297631309794
+  ],
+  "min_height_m": 0.04911684669640481,
+  "outcome": "TARGET_ATTITUDE_VISITED_NO_CAPTURE",
+  "rigid_energy_minus_logged_work_j": 1.07941515575527e-05,
+  "samples": 2189,
+  "scenario": {
+    "command_delay_s": 0.02,
+    "contact": true,
+    "controller": "spin-brake",
+    "description": "Rest -> wheel spin -> coast -> independent finite brake; first edge attempt only.",
+    "duration_s": 10.0,
+    "gravity": true,
+    "initial_clearance_m": 0.0,
+    "initial_quat": [
+      1,
+      0,
+      0,
+      0
+    ],
+    "kd_nm_s_rad": 0.018,
+    "kp_nm_rad": 0.08,
+    "name": "spin-brake",
+    "perturbation_rad": 0.0,
+    "pulse_half_period_s": 0.5,
+    "pulse_nm": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "startup": {
+      "brake_command_s": 3.5,
+      "dense_end_s": 3.6,
+      "dense_period_s": 0.0001,
+      "dense_start_s": 3.48,
+      "engagement_delay_s": 0.02,
+      "ramp_s": 0.001,
+      "speed_gain_nm_per_rad_s": 0.0005,
+      "spin_until_s": 3.0,
+      "stop_relative_rad_s": 1,
+      "target_rad_s": [
+        314.1592653589793,
+        0.0,
+        0.0
+      ]
+    },
+    "target": [
+      0.9238795325112867,
+      0.3826834323650898,
+      0.0,
+      0.0
+    ]
+  },
+  "speed_cutoff_samples": [
+    0,
+    0,
+    0
+  ],
+  "speed_exceeded_samples": [
+    0,
+    0,
+    0
+  ],
+  "startup": {
+    "brake_command_s": 3.5,
+    "brake_peak_sampled_torque_nm_xyz": [
+      7.099999397112932,
+      0.0,
+      0.0
+    ],
+    "brake_ramp_start_s": 3.52,
+    "capture_and_second_jump": "NOT_IMPLEMENTED_OR_CLAIMED; first face-to-edge kick only.",
+    "contact_gap_candidate_observed": true,
+    "dense_period_s": 0.0001,
+    "flight_assessment": {
+      "actual_contact_envelope_uncertainty_m": null,
+      "criterion": "No geometric contacts; total normal force <=1e-8 N; every cube corner >0.1 mm above plane.",
+      "interpretation": "A tiny box-proxy gap is not resolved physical flight. Compare step/solver/contact-envelope sensitivity; display edges themselves are approximate. Edge crossing/tumbling is separate from capture.",
+      "intervals_are_continuous_clearance_proof": false,
+      "max_recorded_contact_penetration_m": 0.0033792507495333246,
+      "observed_intervals": [
+        {
+          "consecutive_samples": 183,
+          "first_observed_s": 3.539100000003044,
+          "last_observed_s": 3.5573000000030826,
+          "observed_span_s": 0.018200000000038408
+        }
+      ],
+      "status": "NUMERICALLY_UNRESOLVED_CONTACT_ENVELOPE",
+      "visual_edge_radius_m": 0.002
+    },
+    "floor_contact_work_on_assembly_j": -0.20395418263496357,
+    "hardware_speed_or_brake_qualified": false,
+    "initial_condition": "All bodies and wheels start at rest; no pre-spun state or velocity reset.",
+    "max_body_centre_height_m": 0.07106231514364343,
+    "max_body_rotation_from_initial_deg": 113.80323946993336,
+    "max_minimum_corner_height_m": 0.0001822989159957697,
+    "max_positive_brake_power_stage_w": 1.605352497542874e-05,
+    "modeled_brake_dissipation_j": 5.371297838971426,
+    "observed_stop_delay_from_ramp_start_s": 0.00590000000301627,
+    "pre_brake_relative_rpm_xyz": [
+      2999.6769215096415,
+      1.7466780973411925e-13,
+      -6.015869882422443e-14
+    ],
+    "pre_brake_relative_wheel_momentum_nms_xyz": [
+      0.03549617389042005,
+      2.066902239678805e-18,
+      -7.118778756384867e-19
+    ],
+    "stop_criterion_relative_rad_s": 1,
+    "target_only_rpm_xyz": [
+      3000.0,
+      0.0,
+      0.0
+    ]
+  },
+  "torque_saturated_samples": [
+    157,
+    0,
+    0
+  ],
+  "trial_band_deg": 5
+}

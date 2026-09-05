@@ -1,0 +1,26 @@
+{
+  "command_delay_s": 0.02,
+  "contact": true,
+  "controller": "off",
+  "description": "Passive face rest; uncalibrated soft contact.",
+  "duration_s": 2.0,
+  "gravity": true,
+  "initial_clearance_m": 0.0,
+  "initial_quat": null,
+  "kd_nm_s_rad": 0.018,
+  "kp_nm_rad": 0.08,
+  "name": "rest",
+  "perturbation_rad": 0.0,
+  "pulse_half_period_s": 0.5,
+  "pulse_nm": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "target": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+  ]
+}

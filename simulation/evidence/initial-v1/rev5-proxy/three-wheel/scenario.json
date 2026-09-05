@@ -1,0 +1,26 @@
+{
+  "command_delay_s": 0.02,
+  "contact": false,
+  "controller": "pulse",
+  "description": "Free space three orthogonal internal torques then reverse.",
+  "duration_s": 3.0,
+  "gravity": false,
+  "initial_clearance_m": 0.18,
+  "initial_quat": null,
+  "kd_nm_s_rad": 0.018,
+  "kp_nm_rad": 0.08,
+  "name": "three-wheel",
+  "perturbation_rad": 0.0,
+  "pulse_half_period_s": 0.5,
+  "pulse_nm": [
+    0.006,
+    -0.004,
+    0.005
+  ],
+  "target": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+  ]
+}

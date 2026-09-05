@@ -1,0 +1,51 @@
+<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>Spin-up and finite braking — 10 second WIP trials</title><style>
+body{font:16px/1.6 system-ui,sans-serif;color:#163247;background:#eaf0f4;margin:0}main{max-width:1200px;margin:auto;padding:28px}
+h1{font-size:2.4rem}article{background:white;padding:24px;margin:28px 0;border:1px solid #bfd0dc;border-radius:8px}
+video,img{display:block;width:100%;height:auto;max-width:960px}video{background:#142636}a{color:#12606c}
+.warning{border-left:5px solid #a06b13;background:#fff4dd;padding:18px}summary{cursor:pointer;padding:16px 0}
+a:focus-visible,summary:focus-visible{outline:3px solid #a06b13}p{max-width:1050px}</style><main>
+<h1>高速回転 → 有限制動：10秒の計算</h1>
+<p>すべて静止状態から10秒間を実際に積分しています。XYZの外力で持ち上げず、内部ホイールトルクと床反力から運動を計算します。</p>
+<p class="warning"><strong>WIP / 実機の成立性・安全性・制動性能の証明ではありません。</strong>
+3000 rpmは既存の解析用目標で、定格ではありません。独立した仮想ブレーキの遅延・立ち上がり・トルク容量も仮定です。
+100 mmの合成機構モデルは240 mmのRev5部分質量モデルと別物です。辺付近の通過や微小離床を倒立維持・頂点捕捉と呼びません。
+ROOTはデータ解析、Blenderは計算軌道の再描画に使い、Fusion組立工程とは区別します。</p>
+<p>通常動画は実時間10秒。拡大動画は<strong>100倍スロー</strong>で、0.1秒の計算区間を10秒で表示します。
+<a href="numerics.json">刻み・ソルバーと補正済み仕事積分の数値記録</a></p>
+<article><h2>startup-reference</h2><p><strong>Original mathematical reference</strong></p>
+<p>Result: TARGET_NOT_REACHED / max body rotation 0.029 deg /
+max lowest-corner clearance 0.0000 mm. NO captured balance.</p>
+<p>Flight assessment: <strong>NO_GAP_CANDIDATE_ABOVE_THRESHOLD</strong>.
+Tiny contact gaps are not a resolved jump; compare contact/geometry uncertainty and convergence.</p>
+<video controls playsinline preload="metadata" poster="startup-reference/preview.png" src="startup-reference/motion.mp4"></video>
+<details><summary>100x slow brake detail (10-second video, only 0.1 simulated seconds)</summary>
+<video controls playsinline preload="metadata" poster="startup-reference/brake-detail-preview.png" src="startup-reference/brake-detail.mp4"></video></details>
+<p><a href="startup-reference/startup-plots.png">Spin / brake / XYZ floor reaction / momentum / clearance plots</a> |
+<a href="startup-reference/trajectory.csv">CSV</a> | <a href="startup-reference/input.json">Parameters and assumptions</a> |
+<a href="startup-reference/manifest.json">Hashes</a></p>
+<a href="startup-reference/startup-plots.png"><img loading="lazy" src="startup-reference/startup-plots.png" alt="Actual time histories"></a></article>
+<article><h2>startup-rev5-proxy</h2><p><strong>Partial WIP design proxy</strong></p>
+<p>Result: TARGET_NOT_REACHED / max body rotation 0.002 deg /
+max lowest-corner clearance 0.0000 mm. NO captured balance.</p>
+<p>Flight assessment: <strong>NO_GAP_CANDIDATE_ABOVE_THRESHOLD</strong>.
+Tiny contact gaps are not a resolved jump; compare contact/geometry uncertainty and convergence.</p>
+<video controls playsinline preload="metadata" poster="startup-rev5-proxy/preview.png" src="startup-rev5-proxy/motion.mp4"></video>
+<details><summary>100x slow brake detail (10-second video, only 0.1 simulated seconds)</summary>
+<video controls playsinline preload="metadata" poster="startup-rev5-proxy/brake-detail-preview.png" src="startup-rev5-proxy/brake-detail.mp4"></video></details>
+<p><a href="startup-rev5-proxy/startup-plots.png">Spin / brake / XYZ floor reaction / momentum / clearance plots</a> |
+<a href="startup-rev5-proxy/trajectory.csv">CSV</a> | <a href="startup-rev5-proxy/input.json">Parameters and assumptions</a> |
+<a href="startup-rev5-proxy/manifest.json">Hashes</a></p>
+<a href="startup-rev5-proxy/startup-plots.png"><img loading="lazy" src="startup-rev5-proxy/startup-plots.png" alt="Actual time histories"></a></article>
+<article><h2>startup-mechanism-fixture</h2><p><strong>Synthetic small annular-wheel fixture; NOT Rev5</strong></p>
+<p>Result: TARGET_ATTITUDE_VISITED_NO_CAPTURE / max body rotation 113.803 deg /
+max lowest-corner clearance 0.1823 mm. NO captured balance.</p>
+<p>Flight assessment: <strong>NUMERICALLY_UNRESOLVED_CONTACT_ENVELOPE</strong>.
+Tiny contact gaps are not a resolved jump; compare contact/geometry uncertainty and convergence.</p>
+<video controls playsinline preload="metadata" poster="startup-mechanism-fixture/preview.png" src="startup-mechanism-fixture/motion.mp4"></video>
+<details><summary>100x slow brake detail (10-second video, only 0.1 simulated seconds)</summary>
+<video controls playsinline preload="metadata" poster="startup-mechanism-fixture/brake-detail-preview.png" src="startup-mechanism-fixture/brake-detail.mp4"></video></details>
+<p><a href="startup-mechanism-fixture/startup-plots.png">Spin / brake / XYZ floor reaction / momentum / clearance plots</a> |
+<a href="startup-mechanism-fixture/trajectory.csv">CSV</a> | <a href="startup-mechanism-fixture/input.json">Parameters and assumptions</a> |
+<a href="startup-mechanism-fixture/manifest.json">Hashes</a></p>
+<a href="startup-mechanism-fixture/startup-plots.png"><img loading="lazy" src="startup-mechanism-fixture/startup-plots.png" alt="Actual time histories"></a></article></main></html>

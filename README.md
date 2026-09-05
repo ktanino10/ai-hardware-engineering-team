@@ -23,8 +23,12 @@ leaves an evidence trail a human can audit later.
 - **For assemblies**: [`docs/assembly-evidence.md`](docs/assembly-evidence.md)
   defines early WIP assembly evidence, requested Fusion native/video
   deliverables and separately gated approved documentation.
+- **For cube physics**: [`simulation/README.md`](simulation/README.md) has
+  Japanese run/view instructions for the working three-wheel MuJoCo
+  simulator; [`docs/simulation.md`](docs/simulation.md) defines its WIP
+  source/evidence and independent-review boundaries.
 
-## The agents
+## The agents (14)
 
 | Discipline | Agent | Spec |
 |---|---|---|
@@ -39,6 +43,9 @@ leaves an evidence trail a human can audit later.
 | Mechanical *(Phase 4)* | Manufacturing Engineer | [`.github/agents/manufacturing-engineer.agent.md`](.github/agents/manufacturing-engineer.agent.md) |
 | Firmware *(Phase 2)* | Firmware Engineer | [`.github/agents/firmware-engineer.agent.md`](.github/agents/firmware-engineer.agent.md) |
 | Firmware *(Phase 5)* | Firmware Reviewer (independent) | [`.github/agents/firmware-reviewer.agent.md`](.github/agents/firmware-reviewer.agent.md) |
+| Cross-discipline *(Phase 7)* | Systems Engineer | [`.github/agents/systems-engineer.agent.md`](.github/agents/systems-engineer.agent.md) |
+| Simulation *(initial rigid-body scope)* | Simulation Engineer | [`.github/agents/simulation-engineer.agent.md`](.github/agents/simulation-engineer.agent.md) |
+| Simulation *(initial rigid-body scope)* | Simulation Reviewer (independent) | [`.github/agents/simulation-reviewer.agent.md`](.github/agents/simulation-reviewer.agent.md) |
 
 Electronics is the original 4-agent MVP, extended to 6 with the Power
 Engineer (Phase 3, engaged only when a project's power complexity warrants
@@ -50,6 +57,9 @@ speculatively), and each has since grown its own second agent (Manufacturing
 Engineer extending Mechanical Reviewer's checklist; Firmware Reviewer as a
 genuinely new independent reviewer) — see `docs/architecture.md` §3/§14 and
 `docs/architecture-evolution.md` §31/§32/§33/§35/§36/§37.
+Systems Engineering owns boundary judgment (§44). The Simulation pair (§45)
+adds early rigid-body calculations and visualization, including a
+simulation-only controller, without adding a production Control Engineer.
 
 ## Repository layout
 
@@ -66,6 +76,8 @@ hardware/            Schematic / PCB artifacts + system power budget +
 bom/                 Component selection / comparison records
 firmware/            Driver-level bring-up firmware, one subdirectory per
                      board (Phase 2)
+simulation/          Rigid-body model/runner, frozen WIP intake, numerical
+                     tests, plotted/video evidence and independent reviews
 validation/          Reviews, open issues, FMEA, change log (ECO), change
                      impact matrix, bring-up procedure
 docs/                Architecture, workflow, evaluation methodology,
@@ -89,8 +101,10 @@ tools/               CI gate parser scripts
 
 ## Benchmark project
 
-First benchmark: **MCU + IMU + Power Supply**. Long-term roadmap (not built
-yet): MCU + IMU → Motor Driver → Reaction Wheel → 1-axis → 3-axis attitude
-control → a standing "Cube" — see `docs/architecture.md` §11. The framework
+First benchmark: **MCU + IMU + Power Supply**. The roadmap progresses through
+motor drivers, reaction wheels and 1-axis/3-axis attitude control toward a
+standing "Cube" — see `docs/architecture.md` §11. Current WIP work includes
+a three-axis cube design and a runnable, separately labeled simulator;
+neither is a claim of built/qualified hardware. The framework
 itself stays reusable for any embedded/robotics/IoT hardware project, not
 just this one.

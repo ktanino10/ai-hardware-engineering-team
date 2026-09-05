@@ -8,6 +8,12 @@ checks. This contract makes their early evidence inspectable instead of
 leaving animation until after approval or treating a scalar PCB check as
 an integrated assembly review.
 
+Rigid-body dynamics has a separate [simulation contract](simulation.md).
+Its hashed model/trajectory/video evidence follows the same revision and
+invalidation principles, but is not this assembly manifest and cannot
+replace Fusion native storyboards or a published assembly-process video.
+Numerical simulation acceptance grants no physical or assembly approval.
+
 ## Two states, one geometry owner
 
 | State | Required behavior | What it does not authorize |

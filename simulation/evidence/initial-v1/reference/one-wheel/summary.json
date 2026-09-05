@@ -1,0 +1,65 @@
+{
+  "classification": "SYNTHETIC_REFERENCE",
+  "delta_angular_momentum_world_nms": [
+    1.797051837461134e-18,
+    1.853700336056352e-19,
+    -7.252337027940682e-19
+  ],
+  "final_attitude_error_deg": 7.93829027864959,
+  "hardware_approval": false,
+  "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+  "max_attitude_error_deg": 7.93829027864959,
+  "max_loaded_point_slip_m_s": 0.0,
+  "max_penetration_m": 0.0,
+  "max_wheel_relative_rad_s": [
+    66.94375959425241,
+    0.0012542327024765995,
+    0.0012542327024765588
+  ],
+  "min_height_m": 0.3,
+  "outcome": "NO_CONTROL_GOAL",
+  "rigid_energy_minus_logged_work_j": 6.874307641679095e-17,
+  "samples": 201,
+  "scenario": {
+    "command_delay_s": 0.02,
+    "contact": false,
+    "controller": "pulse",
+    "description": "Free space X-wheel torque then ideal reverse torque; NOT driver brake.",
+    "duration_s": 2.0,
+    "gravity": false,
+    "initial_clearance_m": 0.18,
+    "initial_quat": null,
+    "kd_nm_s_rad": 0.018,
+    "kp_nm_rad": 0.08,
+    "name": "one-wheel",
+    "perturbation_rad": 0.0,
+    "pulse_half_period_s": 0.5,
+    "pulse_nm": [
+      0.006,
+      0,
+      0
+    ],
+    "target": [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "speed_cutoff_samples": [
+    0,
+    0,
+    0
+  ],
+  "speed_exceeded_samples": [
+    0,
+    0,
+    0
+  ],
+  "torque_saturated_samples": [
+    0,
+    0,
+    0
+  ],
+  "trial_band_deg": 5
+}

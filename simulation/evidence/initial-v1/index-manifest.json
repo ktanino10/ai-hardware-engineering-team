@@ -1,0 +1,22 @@
+{
+  "files": {
+    "index.html": "29c2ea44ddbd0a19f01a684e1850f2b4c8bae54a5106dc4598bac0814d60d381",
+    "numerics.json": "5ed7535bb79709b632e62ffc251e07834a411c0e4a00378a622ba41e3c4a2d03",
+    "reference/edge-balance/manifest.json": "6931ad1abd91bc944c3011178518fb8b8c75a5f288fc91b2bc84f2de9fabf78c",
+    "reference/face-to-vertex-attempt/manifest.json": "066793f0c2a38df7ac61dcc03ba3296e944a497332e6c1024138249e096b5984",
+    "reference/fall/manifest.json": "858adb7c37eb9e06fc2240fb44109a3b9f4eb6538b406ffe7045749d85c3c9ea",
+    "reference/one-wheel/manifest.json": "20fd38eaf8f122c26a81a24ca590c9a9dc9c9944e0a7ba145d0567cabe3d82fb",
+    "reference/rest/manifest.json": "fe499bdda1e000e34771937e637989f552787f9ef70454ed65cbfa84c6b92657",
+    "reference/three-wheel/manifest.json": "9b7f7be610d70f262a8baa870282a273cae1d5ce5833bd80619148db7cc7e9af",
+    "reference/vertex-balance/manifest.json": "ae15ce204a9f769d13aaf15efa1c0727fa639dc8c4050cfddb549e551726db66",
+    "rev5-proxy/edge-balance/manifest.json": "36d83cbedd21275c04027c8d2d4c51a2f74a8fc90aebd5e1b2ba4988126ceec7",
+    "rev5-proxy/face-to-vertex-attempt/manifest.json": "0d6594bc4c7e0acaecf70b3f748a423fd69dff1a17e566c2b08b5111b9af3adf",
+    "rev5-proxy/fall/manifest.json": "5966e5ebcca6c9532773c497565cfe106c38a77b4ce98eb4c658cf71b0bd4269",
+    "rev5-proxy/one-wheel/manifest.json": "5389287e7d20e9991af5348cd92710a75f13eb3d6c1862f1247a305bcb25afae",
+    "rev5-proxy/rest/manifest.json": "7ff4991eb47f9448c76918926ef1a4fadcfa0d3cda1c1e885fcf34efdbe5ee14",
+    "rev5-proxy/three-wheel/manifest.json": "93edb17ba8b7f6f198ebc68856fd616b489428aa7dd3ff3041bbed0fca43176e",
+    "rev5-proxy/vertex-balance/manifest.json": "33d9281a1e613099c39035cfbaa63fbcd7dc55f1ad02bf48f81743dfee4a8b55"
+  },
+  "interpretation": "Nested run manifests bind actual outputs; no physical/Fusion approval.",
+  "state": "WIP_SIMULATION_NOT_ASSEMBLY_EVIDENCE"
+}

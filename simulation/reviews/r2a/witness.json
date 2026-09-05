@@ -1,0 +1,535 @@
+{
+  "ROOT_record_identity": {
+    "startup-mechanism-fixture": {
+      "bins": 80,
+      "both_native_trees_identical": true,
+      "columns": 88,
+      "new_manifest_sha256": "b8a38889b94370a38337dc95d1bcce1f59caa43bede0ed922c58c225584f83d8",
+      "rows": 2189
+    },
+    "startup-reference": {
+      "bins": 80,
+      "both_native_trees_identical": true,
+      "columns": 88,
+      "new_manifest_sha256": "131d19c50a089c64570c266ebb747a918a8762f6d98804503ec3ab78b992e488",
+      "rows": 2189
+    },
+    "startup-rev5-proxy": {
+      "bins": 80,
+      "both_native_trees_identical": true,
+      "columns": 88,
+      "new_manifest_sha256": "2c355138592e3a0fd043ed23c10d2050611b54bfd38e4a5035a928ed8d13289d",
+      "rows": 2189
+    }
+  },
+  "bindings": {
+    "R1_R2_sha256": {
+      "simulation/reviews/r1/review.md": "504a82410d4baa814e6bfe56088b7caaaf5368535873d1b7b777e1b10097f4a0",
+      "simulation/reviews/r1/witness.json": "e5156dae55109b05cfa8a1f2280bb542bdc93beae6e8d3165686a0f4d7f5d087",
+      "simulation/reviews/r1/witness.py": "6e69d4417836304c456271987dc4a689eb60b7f92dae468481b1d49042a31bc8",
+      "simulation/reviews/r2/ci-portability.json": "64abe6b25283ff5569fe0d843b4213b3a0000819ddf12d9e3ff231f6fca85ab8",
+      "simulation/reviews/r2/inspect_blend.py": "e720edac7e5d46df1779f684d47cba464d17ec6ea9bc68def120886d05d3cd31",
+      "simulation/reviews/r2/inspect_root.cxx": "02538325154e2c56ffbc0483935e294218434d6c881c66d06d514133505b611d",
+      "simulation/reviews/r2/review.md": "76759c1cf3f7952ddaed6cd6bc04a206dca1912a7ac1963ed1431e2a18ec7e1a",
+      "simulation/reviews/r2/witness.json": "064b99535ee77556e35ebf6228823b759597416c9066d74bc7ec67232bdf2d75",
+      "simulation/reviews/r2/witness.py": "cb25c988948b4f75bfd6fe27ac549f68b173a31c415c23ca0745d876a0770877"
+    },
+    "fix_source": "a9109f376e70b28788a4b99348cf3d39b2af2da3",
+    "head": "8c626ecb55983005b157da48a4a7a7f3982a23a9",
+    "reviewed_sha256": {
+      "simulation/blender/README.md": "a511ef75c83eea64ddd162cfb8e21bc1e29a33b7f43a3689c6152681ec34f78d",
+      "simulation/blender/blender_contract.py": "0615e3fbb4d51d915dc3728496ec50a9dac9e2c8ea9961204d46735da49f844d",
+      "simulation/blender/check_replay.py": "bd029b279bce5ecbd3866e5cba7a9d93904c53ac3266d582c3f2c0d9cfdd0631",
+      "simulation/blender/encode_replay.py": "1aca51bfd97a53fa4ecb8aed0335c1d1d0b4b54efe111e4f5d6de59bbe04a607",
+      "simulation/blender/negative_native.py": "ef8d41ec7736c85e9e8918f4543020716b556866d0832406a6cbbe3720ca6f55",
+      "simulation/blender/render_replay.py": "48cbbe4dd9d6389eabadc9820e12dd08eebaf034103e03dfab7c9865dac746db",
+      "simulation/cube_sim/__init__.py": "ceb4c3ee2e2d5c5316c6802c820308a6d622880b8808f0a28a1a052a3cdee09b",
+      "simulation/cube_sim/__main__.py": "339d1b8e0b5818cf4d991782ae0b354c229c77d513853a569bfeb9e462a587a6",
+      "simulation/cube_sim/braking.py": "af606817834b41ab1315aa7c70396525e6be7d6a27766265163d1d114fa57beb",
+      "simulation/cube_sim/gallery.py": "6a76b213adf55040dd1d94130200c4b29f207ebd7f64d7543a421f664f9cd38e",
+      "simulation/cube_sim/geometry.py": "fd4389ef3fa09b30daa133b28e33701b22f0fbb28ea0050ecd6d2de3e4917807",
+      "simulation/cube_sim/intake.py": "6f300726750bf15a6a184c34dcc623674860bf9ad92ca9b4410b75d33c4c91d3",
+      "simulation/cube_sim/integration.py": "e3f0eb6bf57cdac69807b034ac431c6953fd29a393f79b26dbe5f369562203cf",
+      "simulation/cube_sim/model.py": "e6bcc50f56611646907f84780d00cec6fb27e8aa9741d1a4a6c7fd95764e4a73",
+      "simulation/cube_sim/numerics.py": "6e5613e483de52dbdaa0180009f86850093ebbefd63fd040cf2b48c6ebd60bbc",
+      "simulation/cube_sim/runner.py": "efdda2a60715d491e0e9cb3b3f26efaf9aa219d1b9f6a947aa31f05e77047eb5",
+      "simulation/cube_sim/scenarios.py": "18070e1e48126b6123ea1ff396f4fc09dbc52acb705758f758be9bf8dcb621a4",
+      "simulation/cube_sim/visualize.py": "b7e01561b79f2b008ac4663e7fad196f85cb0f20733125c1a489d2280e3c7bdc",
+      "simulation/evidence/blender-replay-v5/startup-mechanism-fixture/blender-motion.mp4": "183b8cf349dddd528758ac8635274125b324a605d13b84cae7ba664bc587b9e8",
+      "simulation/evidence/blender-replay-v5/startup-mechanism-fixture/manifest.json": "617b7f2a3c422b1f605350a70908107442cf3ca74f88a3e1f366fa09d97878b7",
+      "simulation/evidence/blender-replay-v5/startup-mechanism-fixture/native-check.json": "dca627dfbf4afc72b04e35f43953d84639ee95229ecff9c865420956d2cde6db",
+      "simulation/evidence/blender-replay-v5/startup-mechanism-fixture/preview.png": "cc77becc9621bab67bac546396f91b9888782a6c40820cedb7331b245e8fb604",
+      "simulation/evidence/blender-replay-v5/startup-mechanism-fixture/provenance.json": "5a00397939243b8a7a74157c494ac29f103bf9be027eeecf6ac56d3c4929fbe4",
+      "simulation/evidence/blender-replay-v5/startup-mechanism-fixture/render-receipt.json": "9343c57d75cda1d5e5d6b311fe74af549d4286971a5a7a928c4c87c70d1a87b8",
+      "simulation/evidence/blender-replay-v5/startup-mechanism-fixture/replay.blend": "b8f10b344627ebeb214caac4a2b816e5cd71d8be9d42b157199366f635e5838f",
+      "simulation/evidence/index.html": "2f61e86b2c4509b8ace870aeb7eac416bb1f6cef3797573f099d68cd44d7b022",
+      "simulation/evidence/root-v4/startup-mechanism-fixture/manifest.json": "b8a38889b94370a38337dc95d1bcce1f59caa43bede0ed922c58c225584f83d8",
+      "simulation/evidence/root-v4/startup-mechanism-fixture/native-runtime.log": "73fb5d51a65b609a03c9a5bf7d1e5c8540216e4419690928783706f8db5ce076",
+      "simulation/evidence/root-v4/startup-mechanism-fixture/summary.json": "f91b3982d790a84e0daf82881e2dd24051314ff016e24c225904be7297585a28",
+      "simulation/evidence/root-v4/startup-mechanism-fixture/trajectory.root": "06fdc3a91466e52d9a1b29730f2eee878b7cac81e2c45d4fabb26d189b5f5db0",
+      "simulation/evidence/root-v4/startup-reference/manifest.json": "131d19c50a089c64570c266ebb747a918a8762f6d98804503ec3ab78b992e488",
+      "simulation/evidence/root-v4/startup-reference/native-runtime.log": "73fb5d51a65b609a03c9a5bf7d1e5c8540216e4419690928783706f8db5ce076",
+      "simulation/evidence/root-v4/startup-reference/summary.json": "8bda1a915c9e5ccd7f28fcba88cc897a2bde4156df628cebc2c58caba52a5f17",
+      "simulation/evidence/root-v4/startup-reference/trajectory.root": "08a1a0fe8f45bae8334e26ac1edc98bd0499cedd6a0b4d2c872d8b334df41bf5",
+      "simulation/evidence/root-v4/startup-rev5-proxy/manifest.json": "2c355138592e3a0fd043ed23c10d2050611b54bfd38e4a5035a928ed8d13289d",
+      "simulation/evidence/root-v4/startup-rev5-proxy/native-runtime.log": "73fb5d51a65b609a03c9a5bf7d1e5c8540216e4419690928783706f8db5ce076",
+      "simulation/evidence/root-v4/startup-rev5-proxy/summary.json": "5682fe265e972dcf3ca289a2db823cbde3134fe1bc7def16176e547d17400a79",
+      "simulation/evidence/root-v4/startup-rev5-proxy/trajectory.root": "bb725dfd2aa16cb531fb7a2b7744412db662293eeabec55c785ec7247f415fcd",
+      "simulation/evidence/startup-v4/index-manifest.json": "0439c6e36559fe6cb6ca6de574f7a75c278ae395960719063a265ffc5f9a0a95",
+      "simulation/evidence/startup-v4/index.html": "148626face09a43de7c42dde431f8c236b7c6c158d78a3ec420beb3438d3fcea",
+      "simulation/evidence/startup-v4/numerics.json": "9ce51be8a8b17649894a2f31eb3050feb29e4897b8de5568f6a533c5b84c9a2f",
+      "simulation/evidence/startup-v4/startup-mechanism-fixture/brake-detail-frames.csv": "01b1a5cad80ebe1692a010894e1adc1d2c37b18aeb9f1587771a62b3e6ca3e5d",
+      "simulation/evidence/startup-v4/startup-mechanism-fixture/brake-detail-preview.png": "5c99a02c4b9c737a3efe0756a6bfb0d045034dea4f753073d44f11c140a9eff9",
+      "simulation/evidence/startup-v4/startup-mechanism-fixture/brake-detail.mp4": "0dd63e969b70bae977560f16cac23f777218188a91be246184f036e5f14e3994",
+      "simulation/evidence/startup-v4/startup-mechanism-fixture/input.json": "a0ed897bb8503530d528208c2f9c11fe37a85804ff008be42df8a8e6a79bfb10",
+      "simulation/evidence/startup-v4/startup-mechanism-fixture/manifest.json": "019b72f308fab29d9848da202d0feb395eefa60fe09c75357a6a463a215ceb09",
+      "simulation/evidence/startup-v4/startup-mechanism-fixture/model.xml": "8c4e8828f9f9188d5b05f18bb6f558f62079d366a9716466842aafb001087ef2",
+      "simulation/evidence/startup-v4/startup-mechanism-fixture/motion.mp4": "9ec53946ec2c2d0f22c6256f95aff8c29b6e5e0a9e6d71163f7cbcb967770dca",
+      "simulation/evidence/startup-v4/startup-mechanism-fixture/plots.png": "9e5d698f734ac6bbd92d37f6c3e1da92c54863048acbfe2ba7d64bf88b178681",
+      "simulation/evidence/startup-v4/startup-mechanism-fixture/preview.png": "4cd68dbe4c6c945dcab7574811a32d139271c91fae8f0fe5a6791de45f030210",
+      "simulation/evidence/startup-v4/startup-mechanism-fixture/scenario.json": "b6c4ad8508764cae090b11b8e72b94e9a5372463721f036c2928a726ea598fa2",
+      "simulation/evidence/startup-v4/startup-mechanism-fixture/startup-plots.png": "be1af576223f960fd953eea0a2446d02ec14a0a5a8c8dbc00d693cd2bffec3fb",
+      "simulation/evidence/startup-v4/startup-mechanism-fixture/summary.json": "4f5701decc1bbaf608b17d3b11c0ccabe7ff04c86309244cebd7a9ce142cc973",
+      "simulation/evidence/startup-v4/startup-mechanism-fixture/trajectory.csv": "8dfd08796a46a2a3a9429447c11523c7e05239f362e2cdd0fa4dee816814d59c",
+      "simulation/evidence/startup-v4/startup-mechanism-fixture/trajectory.npz": "b3fd025e650168e8e94ec52d866a4c278ebbcb2ce8c088f11809f91aba4d627a",
+      "simulation/evidence/startup-v4/startup-mechanism-fixture/video-frames.csv": "46c37f9040b3accd295ced0c53e2cab30f17c1f52850963e2b7f63420ebed0ed",
+      "simulation/evidence/startup-v4/startup-reference/brake-detail-frames.csv": "615cfc6ba1e3a4975fd57a1f4d719692a8706d60fc7bc95390ef5373ff4fb8e2",
+      "simulation/evidence/startup-v4/startup-reference/brake-detail-preview.png": "71efe2465d98845df56620cac2e13ef088249624c24b223cbed105fe1bc1e29a",
+      "simulation/evidence/startup-v4/startup-reference/brake-detail.mp4": "4bf24551ce35ebe59eec40294ff7ecca8f8730b892764e092a3508792a295bee",
+      "simulation/evidence/startup-v4/startup-reference/input.json": "ddddd2be49d8217a654acf6524c1f9fd124f46509c87bcf97e8e5dd20e7861c9",
+      "simulation/evidence/startup-v4/startup-reference/manifest.json": "bc3709e2e7e7331a903eb14a796fed4308c8f6b961c8a6b52c843d246ce1a1c6",
+      "simulation/evidence/startup-v4/startup-reference/model.xml": "398e9574033ccdbfb9eaae9daef1cf11cb14d59cddee2191418d24318cd06bee",
+      "simulation/evidence/startup-v4/startup-reference/motion.mp4": "36f7421b1068ce56ebbb2e0207257b688c54cd25c88edfa19b59924c21dd0692",
+      "simulation/evidence/startup-v4/startup-reference/plots.png": "b2d706cdb594207d8d91deb28e1c37739d6b42da833ff418826cdf237696cab0",
+      "simulation/evidence/startup-v4/startup-reference/preview.png": "cb733ac9ec83b10fc2f35e29b4d73d2f1a77dabcabfa0a5b69425b200186d766",
+      "simulation/evidence/startup-v4/startup-reference/scenario.json": "b6c4ad8508764cae090b11b8e72b94e9a5372463721f036c2928a726ea598fa2",
+      "simulation/evidence/startup-v4/startup-reference/startup-plots.png": "ba40660ad8bd21e98e3812a5e8ddee82cddfaef87e5b40cefa0ec055ae1ada81",
+      "simulation/evidence/startup-v4/startup-reference/summary.json": "08302cc1888bca84e2d742e4dfd1bc206ea549300dfc4aed8f20e01f4b295ae4",
+      "simulation/evidence/startup-v4/startup-reference/trajectory.csv": "eb1fc90da2c759db935b4e4e1492305ee57b2c558885994b30641c7dfc13f1d8",
+      "simulation/evidence/startup-v4/startup-reference/trajectory.npz": "e6b5f685dcd6ca4846bd8133610ef3b7112d69035c2acbd7d974ba28f39e60ae",
+      "simulation/evidence/startup-v4/startup-reference/video-frames.csv": "423db1f3e9b43c039cf545e3e44ecea5d033191c57afa0d2dd64ba0b45f89b41",
+      "simulation/evidence/startup-v4/startup-rev5-proxy/brake-detail-frames.csv": "d43be68045112f5a6e8b18f7df4eaf7b51019c7cbd04a0916818b8cbfb1dda74",
+      "simulation/evidence/startup-v4/startup-rev5-proxy/brake-detail-preview.png": "9707e2f904cc01aa05a12e239d8fbadb4f3998ee5971b717777c3a3542729364",
+      "simulation/evidence/startup-v4/startup-rev5-proxy/brake-detail.mp4": "3ade12568780a2f518396ce545653184b315c889dd6028f1a8638c30bbcba220",
+      "simulation/evidence/startup-v4/startup-rev5-proxy/input.json": "9d88abdfc21ee8f65e895d397595baa30e3b1dc8ba3cf6dfcaadb0fbd6d36866",
+      "simulation/evidence/startup-v4/startup-rev5-proxy/manifest.json": "66c91135fa539140c985c084e2231f8ab3d9fcd4614433d453ff441b0d8c4049",
+      "simulation/evidence/startup-v4/startup-rev5-proxy/model.xml": "377ee6ec8167d354b48d06dd28ecec3b5499f51a4e674e531de34920bd85ba40",
+      "simulation/evidence/startup-v4/startup-rev5-proxy/motion.mp4": "0708893fe423c02d26234870e316469f7a053c50afeec5112f5e1c249c4519ed",
+      "simulation/evidence/startup-v4/startup-rev5-proxy/plots.png": "ca5262cc5f663af01383fd7044ab65251fc628604a57df00c0b51ce0c990a791",
+      "simulation/evidence/startup-v4/startup-rev5-proxy/preview.png": "2ec373586ee4957f6e126d1586fcb76ba474a02e57738b5adc436bf442f60b0e",
+      "simulation/evidence/startup-v4/startup-rev5-proxy/scenario.json": "b6c4ad8508764cae090b11b8e72b94e9a5372463721f036c2928a726ea598fa2",
+      "simulation/evidence/startup-v4/startup-rev5-proxy/startup-plots.png": "0a47d1dee7e69b6b2a2c812bbee830e2334d34dbfb87f081276c67cb0e3cd21c",
+      "simulation/evidence/startup-v4/startup-rev5-proxy/summary.json": "4a5b117b5828dafc4290a5123bfe82bf89c52a2e105a76e8e23e3109a56c701b",
+      "simulation/evidence/startup-v4/startup-rev5-proxy/trajectory.csv": "2c46817f33af2c44057add15f5ef9d7cddf82821d3886070976a2a5075ae0e9d",
+      "simulation/evidence/startup-v4/startup-rev5-proxy/trajectory.npz": "f4d1e5995c322b632872c3c45e459eae8b6e5b551a5cf6e1f74420379e6ec261",
+      "simulation/evidence/startup-v4/startup-rev5-proxy/video-frames.csv": "4772d49979c5ec19374c6ecee27eea3936f74a0f65b4077dc2604d0f5fc8a405",
+      "simulation/models/reference.json": "b34b181117b7a12cf8e8356bcf1a57321deab20726d12249f39badaaba889c1f",
+      "simulation/models/rev5-proxy.json": "7c08f26532fc2365e935f1fd1761b6cc5eb1662ad3a17dafbe7ad2439e363b6a",
+      "simulation/models/startup-mechanism-fixture-v2.json": "a0ed897bb8503530d528208c2f9c11fe37a85804ff008be42df8a8e6a79bfb10",
+      "simulation/models/startup-mechanism-fixture.json": "7acfaa067df31f99750f768ba7205b041a23f9bba39de6dc69e343f3ed52d087",
+      "simulation/models/startup-reference.json": "ddddd2be49d8217a654acf6524c1f9fd124f46509c87bcf97e8e5dd20e7861c9",
+      "simulation/models/startup-rev5-proxy.json": "9d88abdfc21ee8f65e895d397595baa30e3b1dc8ba3cf6dfcaadb0fbd6d36866",
+      "simulation/root/README.md": "f21e0e4c19ca239bea09045dbd644a88333a8f097d8c61ecc9d1495fc7ad3663",
+      "simulation/root/export.cxx": "f766aadaaf0a76d6c2080be44201eabfeff990be95b55553fc1926338e5576de",
+      "simulation/root/export.py": "dd0d0038b1fe0b5f65d6ef1f644b04555e24529155b0cc493b0f118e4d9e90ef",
+      "simulation/tests/test_blender_contract.py": "e025f632a7ea3ced833b041e3c4960f12179204a1e6e8bffe566022e812bbf11",
+      "simulation/tests/test_quadrature.py": "b499b69c924935d13ca1282a56f26755da7ebf32996af7885ef70e5cf54cbac2"
+    },
+    "reviewer_code_sha256": {
+      "native_witness.py": "c9860d9679a649654d92b45cc57455c89417933a77a28f8025a7d2f5428ae3d3",
+      "witness.py": "5e5177842b172fbf55f77878c8da596d3349ae8287dc9a51307a3c454387fe59"
+    }
+  },
+  "complete": true,
+  "encoding_boundary": {
+    "all_250_PNGs_bound_by_receipt": true,
+    "delivered_movie_sha256": "183b8cf349dddd528758ac8635274125b324a605d13b84cae7ba664bc587b9e8",
+    "fresh_positive_receipt_used": true,
+    "negative_cases": [
+      {
+        "case": "changed-CSV-12345",
+        "error": "ValueError: Changed source trajectory.csv; refusing a stale replay/annotation.",
+        "no_movie_preview_or_manifest_written": true,
+        "returncode": 1
+      },
+      {
+        "case": "wrong-valid-run",
+        "error": "ValueError: Replay provenance mismatch: source_manifest_sha256",
+        "no_movie_preview_or_manifest_written": true,
+        "returncode": 1
+      },
+      {
+        "case": "stale-provenance",
+        "error": "ValueError: Replay provenance mismatch: schema_version",
+        "no_movie_preview_or_manifest_written": true,
+        "returncode": 1
+      },
+      {
+        "case": "changed-native",
+        "error": "ValueError: Native file/checker/source receipt changed; recheck before encoding.",
+        "no_movie_preview_or_manifest_written": true,
+        "returncode": 1
+      },
+      {
+        "case": "changed-PNG",
+        "error": "ValueError: Changed rendered image: frame_0001.png",
+        "no_movie_preview_or_manifest_written": true,
+        "returncode": 1
+      }
+    ],
+    "positive_movie_sha256": "183b8cf349dddd528758ac8635274125b324a605d13b84cae7ba664bc587b9e8",
+    "positive_reencoded_and_decoded": true
+  },
+  "frozen_scope_and_R1_R2_unchanged": true,
+  "native_recheck": {
+    "blender": "5.1.1",
+    "independently_checked_frames": 250,
+    "live_scene_accessed": false,
+    "max_world_matrix_error": 6.556510925292969e-07,
+    "positive_checker_status": "NATIVE_REOPEN_TRANSFORMS_GEOMETRY_AND_SOURCES_MATCH",
+    "saved_mutations": [
+      {
+        "mutation": "rotor-centre-10mm",
+        "reason": "rotor local centre differs from the model: 0.010000001692678636",
+        "rejected": true,
+        "saved_blend_sha256": "3eb46c5e7a353bf374a1024179c3d29e822efe9dbacc1556ebd535b9e607888e",
+        "success_receipt_written": false
+      },
+      {
+        "mutation": "rotor-scale",
+        "reason": "rotor scale differs from the model: 0.10000002216547482",
+        "rejected": true,
+        "saved_blend_sha256": "533cf2145a28cd20689e2743655bafe7cba16322e0a5b25870f045eb9d20dd2d",
+        "success_receipt_written": false
+      },
+      {
+        "mutation": "fixed-mesh-axis",
+        "reason": "fixed rotor mesh axis orientation mismatch: 0.7653668353711225",
+        "rejected": true,
+        "saved_blend_sha256": "a2fa47a3ee53e7df82ed6ed7a8569d72d8f0e779222c6a2158fce6070baf2e63",
+        "success_receipt_written": false
+      },
+      {
+        "mutation": "display-edge-parent-inverse",
+        "object": "Visual_cube_edge",
+        "rejected": false,
+        "saved_blend_sha256": "ebaee81f29791d6f4942e0346d53b5ce47fe525c20c7a1832051666994c9aa17",
+        "success_receipt_written": true,
+        "world_edge_displacement_m": 0.009999999873689375
+      }
+    ],
+    "source_blend_sha256": "b8f10b344627ebeb214caac4a2b816e5cd71d8be9d42b157199366f635e5838f"
+  },
+  "parameter_record_identity": {
+    "no_dynamics_rerun": true,
+    "startup-mechanism-fixture": {
+      "CSV_identical": true,
+      "NPZ_arrays_identical": 30,
+      "new_input_sha256": "a0ed897bb8503530d528208c2f9c11fe37a85804ff008be42df8a8e6a79bfb10",
+      "new_manifest_sha256": "019b72f308fab29d9848da202d0feb395eefa60fe09c75357a6a463a215ceb09",
+      "physical_JSON_fields_identical": [
+        "body",
+        "wheels",
+        "contact",
+        "integration",
+        "gravity_m_s2",
+        "actuation",
+        "scenario"
+      ]
+    },
+    "startup-reference": {
+      "CSV_identical": true,
+      "NPZ_arrays_identical": 30,
+      "new_input_sha256": "ddddd2be49d8217a654acf6524c1f9fd124f46509c87bcf97e8e5dd20e7861c9",
+      "new_manifest_sha256": "bc3709e2e7e7331a903eb14a796fed4308c8f6b961c8a6b52c843d246ce1a1c6",
+      "physical_JSON_fields_identical": [
+        "body",
+        "wheels",
+        "contact",
+        "integration",
+        "gravity_m_s2",
+        "actuation",
+        "scenario"
+      ]
+    },
+    "startup-rev5-proxy": {
+      "CSV_identical": true,
+      "NPZ_arrays_identical": 30,
+      "new_input_sha256": "9d88abdfc21ee8f65e895d397595baa30e3b1dc8ba3cf6dfcaadb0fbd6d36866",
+      "new_manifest_sha256": "66c91135fa539140c985c084e2231f8ab3d9fcd4614433d453ff441b0d8c4049",
+      "physical_JSON_fields_identical": [
+        "body",
+        "wheels",
+        "contact",
+        "integration",
+        "gravity_m_s2",
+        "actuation",
+        "scenario"
+      ]
+    },
+    "synthetic_provenance": "SYNTHETIC fixture: the base file is a software template only. Body size/mass/inertia, wheel mass/annular geometry/inertia/centres and floor friction are intentionally different assumptions. Startup target/cutoff, step and independent brake are also assumptions; no actual hardware is adopted."
+  },
+  "scope": "BOUNDED_R2_CLOSURE_NO_NEW_DYNAMICS",
+  "test_portability": {
+    "ci_runs": [
+      {
+        "conclusion": "success",
+        "headSha": "21a5344db9c19a9b54abaf23509662af4a7dbc71",
+        "jobs": [
+          {
+            "completedAt": "2026-09-05T16:39:30Z",
+            "conclusion": "success",
+            "databaseId": 101338105054,
+            "name": "Simulation numerical and evidence regressions (not hardware approval)",
+            "startedAt": "2026-09-05T16:29:46Z",
+            "status": "completed",
+            "steps": [
+              {
+                "completedAt": "2026-09-05T16:29:47Z",
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "startedAt": "2026-09-05T16:29:47Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-05T16:29:49Z",
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "startedAt": "2026-09-05T16:29:47Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-05T16:29:50Z",
+                "conclusion": "success",
+                "name": "Run actions/setup-python@v5",
+                "number": 3,
+                "startedAt": "2026-09-05T16:29:49Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-05T16:30:04Z",
+                "conclusion": "success",
+                "name": "Install declared dependencies",
+                "number": 4,
+                "startedAt": "2026-09-05T16:29:50Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-05T16:39:26Z",
+                "conclusion": "success",
+                "name": "Run CPU numerical and provenance cases",
+                "number": 5,
+                "startedAt": "2026-09-05T16:30:04Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-05T16:39:28Z",
+                "conclusion": "success",
+                "name": "Post Run actions/setup-python@v5",
+                "number": 9,
+                "startedAt": "2026-09-05T16:39:26Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-05T16:39:28Z",
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 10,
+                "startedAt": "2026-09-05T16:39:28Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-05T16:39:28Z",
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 11,
+                "startedAt": "2026-09-05T16:39:28Z",
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/ktanino10/ai-hardware-engineering-team/actions/runs/33978039216/job/101338105054"
+          }
+        ],
+        "status": "completed",
+        "url": "https://github.com/ktanino10/ai-hardware-engineering-team/actions/runs/33978039216"
+      },
+      {
+        "conclusion": "success",
+        "headSha": "a9109f376e70b28788a4b99348cf3d39b2af2da3",
+        "jobs": [
+          {
+            "completedAt": "2026-09-05T16:48:00Z",
+            "conclusion": "success",
+            "databaseId": 101339850852,
+            "name": "Simulation numerical and evidence regressions (not hardware approval)",
+            "startedAt": "2026-09-05T16:42:23Z",
+            "status": "completed",
+            "steps": [
+              {
+                "completedAt": "2026-09-05T16:42:25Z",
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "startedAt": "2026-09-05T16:42:24Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-05T16:42:28Z",
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "startedAt": "2026-09-05T16:42:25Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-05T16:42:29Z",
+                "conclusion": "success",
+                "name": "Run actions/setup-python@v5",
+                "number": 3,
+                "startedAt": "2026-09-05T16:42:28Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-05T16:42:38Z",
+                "conclusion": "success",
+                "name": "Install declared dependencies",
+                "number": 4,
+                "startedAt": "2026-09-05T16:42:29Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-05T16:47:57Z",
+                "conclusion": "success",
+                "name": "Run CPU numerical and provenance cases",
+                "number": 5,
+                "startedAt": "2026-09-05T16:42:38Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-05T16:47:58Z",
+                "conclusion": "success",
+                "name": "Post Run actions/setup-python@v5",
+                "number": 9,
+                "startedAt": "2026-09-05T16:47:57Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-05T16:47:58Z",
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 10,
+                "startedAt": "2026-09-05T16:47:58Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-05T16:47:58Z",
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 11,
+                "startedAt": "2026-09-05T16:47:58Z",
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/ktanino10/ai-hardware-engineering-team/actions/runs/33978690760/job/101339850852"
+          }
+        ],
+        "status": "completed",
+        "url": "https://github.com/ktanino10/ai-hardware-engineering-team/actions/runs/33978690760"
+      },
+      {
+        "conclusion": "success",
+        "headSha": "8c626ecb55983005b157da48a4a7a7f3982a23a9",
+        "jobs": [
+          {
+            "completedAt": "2026-09-05T16:56:37Z",
+            "conclusion": "success",
+            "databaseId": 101340504346,
+            "name": "Simulation numerical and evidence regressions (not hardware approval)",
+            "startedAt": "2026-09-05T16:47:15Z",
+            "status": "completed",
+            "steps": [
+              {
+                "completedAt": "2026-09-05T16:47:16Z",
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "startedAt": "2026-09-05T16:47:16Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-05T16:47:19Z",
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "startedAt": "2026-09-05T16:47:16Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-05T16:47:20Z",
+                "conclusion": "success",
+                "name": "Run actions/setup-python@v5",
+                "number": 3,
+                "startedAt": "2026-09-05T16:47:19Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-05T16:47:32Z",
+                "conclusion": "success",
+                "name": "Install declared dependencies",
+                "number": 4,
+                "startedAt": "2026-09-05T16:47:20Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-05T16:56:35Z",
+                "conclusion": "success",
+                "name": "Run CPU numerical and provenance cases",
+                "number": 5,
+                "startedAt": "2026-09-05T16:47:32Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-05T16:56:35Z",
+                "conclusion": "success",
+                "name": "Post Run actions/setup-python@v5",
+                "number": 9,
+                "startedAt": "2026-09-05T16:56:35Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-05T16:56:36Z",
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 10,
+                "startedAt": "2026-09-05T16:56:35Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-05T16:56:36Z",
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 11,
+                "startedAt": "2026-09-05T16:56:36Z",
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/ktanino10/ai-hardware-engineering-team/actions/runs/33978933402/job/101340504346"
+          }
+        ],
+        "status": "completed",
+        "url": "https://github.com/ktanino10/ai-hardware-engineering-team/actions/runs/33978933402"
+      }
+    ],
+    "energy_criteria_unchanged": true,
+    "historical_atol_qpos_qvel": [
+      1e-10,
+      1e-09
+    ],
+    "same_runtime_bitwise_physical_comparison": true,
+    "targeted_local_test_log_sha256": "be37a44276af1274c5f6487e7de0dfbca90932f7a17fc910604b40ace455441c",
+    "targeted_local_tests_passed": 7,
+    "unchanged_self_assertion_AST": true
+  }
+}

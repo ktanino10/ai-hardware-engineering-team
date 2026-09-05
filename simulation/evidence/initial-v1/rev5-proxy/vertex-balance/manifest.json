@@ -1,0 +1,97 @@
+{
+  "classification": "WIP_DESIGN_PROXY",
+  "code": {
+    "simulation/cube_sim/__init__.py": "5d04a6e81f6e7fce1f8c806db80b19f051d9663cd92befaede24645bddb60be2",
+    "simulation/cube_sim/__main__.py": "bd5e33b531a4b4553cd189fe7db2439e08129ba1d9096f8f17ca526dc3cd6980",
+    "simulation/cube_sim/gallery.py": "a0092a5714556813b4d8d1997feb4284f38ccfba43e4fe0aa11013b9a02eaa68",
+    "simulation/cube_sim/intake.py": "6f300726750bf15a6a184c34dcc623674860bf9ad92ca9b4410b75d33c4c91d3",
+    "simulation/cube_sim/model.py": "cfee7d6fc94a1396342c3c27cc02992061373e93cad7d50d45c89d86c7200675",
+    "simulation/cube_sim/numerics.py": "6e5613e483de52dbdaa0180009f86850093ebbefd63fd040cf2b48c6ebd60bbc",
+    "simulation/cube_sim/runner.py": "80780cd219aebe313753d36dbe4f5c777e57b2b8962b3a279dee327e7a439172",
+    "simulation/cube_sim/scenarios.py": "1153a9ab9f32e994995534e70bacb0816a16148ee73edd16200e36e37c650436",
+    "simulation/cube_sim/visualize.py": "c95bbc72b0b249ae04ea9dd14c33128b25db19408f40f49281fe88744dad22fc"
+  },
+  "dependency_lock_sha256": "46a9c69d790ca27c38135aefa26e08d683a1e7536080b93840a90b61cbd89cb7",
+  "environment": {
+    "matplotlib": "3.11.1",
+    "mujoco": "3.12.0",
+    "numpy": "2.5.2",
+    "pillow": "12.3.0",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "python": "3.14.3"
+  },
+  "input_model": {
+    "kind": "repository_file",
+    "path": "simulation/models/rev5-proxy.json",
+    "sha256": "7c08f26532fc2365e935f1fd1761b6cc5eb1662ad3a17dafbe7ad2439e363b6a"
+  },
+  "omissions": [
+    "Actual PCB population/copper, battery, hubs/adapters, fasteners/retention, connectors/mates, harness, insulation and completed integration.",
+    "Whole motor surrogate is locked to the chassis; unknown rotating bell mass/inertia is NOT invented or double-counted.",
+    "Printed geometry reduced to its reported mass moments, collision to an outer box. No installed fit, retention, deformation, impact damage, strength or containment assessment.",
+    "Actual MN2206/DRV10983 actuation remains UNKNOWN: no generic runtime BRAKE bit, rated RPM, qualified latency or source/regeneration model.",
+    "Fixed-edge angular-momentum deficit applies only to its stated model; candidate-L is unadopted and NOT included here.",
+    "Legacy ISS-058 CRITICAL and ISS-059 HIGH, seven Mechanical HIGHs and physical-action holds are unchanged.",
+    "This snapshot is not main, a complete physical replica, an assembly manifest, or Fusion native/video evidence.",
+    "No CAD-derived or measured complete mass, CG or inertia.",
+    "No battery, populated electronics, harness or motor internals modeled individually.",
+    "Ideal bidirectional joint torque is NOT DRV10983 runtime braking or a motor torque-speed curve.",
+    "No compliance, fracture, thermal/FEA, rotor containment, noise or real-time firmware.",
+    "Box-plane soft contact is uncalibrated; no strength or continuous collision clearance claim."
+  ],
+  "outputs": {
+    "input.json": "7c08f26532fc2365e935f1fd1761b6cc5eb1662ad3a17dafbe7ad2439e363b6a",
+    "model.xml": "94eea7a86fb836b28a89ee36be39a94791cf698241c2bb708e5ead422a634e0f",
+    "motion.mp4": "fa8cc5a2eeb48b884b35c2d57c80b47a6631f609e7e3e6533ed2e6a2b381aad9",
+    "plots.png": "7495c12d591dbe6c28527da3923d2625334782edfe23d958197d9a8429e95e96",
+    "preview.png": "f4c94d452706ffda5c65bf2b48d0f2daa2c0dc45b3efdacefb5cd0b3b553b7bb",
+    "scenario.json": "7fd3196b41abdd55d3eeb7f73019a6fbfd1e31cd684e4947107dbe98d8efd2a6",
+    "summary.json": "78cafa107c7c663344c45ed73eeca1810c5da04f0685e89420e972edbbe6ec8d",
+    "trajectory.csv": "72d86ccafc75b9f654e95d55c2569ba2c4c7fd1904742bd670623630701c87cc",
+    "trajectory.npz": "c0c7f20e11ae23efe1c0ab1baa46eeee5a0db4360787bac3d604e87d5ce25f64",
+    "video-frames.csv": "590082e52c7488f2912b0387249823c38e8fa4d78d0c4ab803d480f1a987d640"
+  },
+  "rendering": {
+    "camera": "body-centre tracking, azimuth 135 deg, elevation -24 deg",
+    "duration_s": 3.0,
+    "ffmpeg": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+    "fps": 25,
+    "frames": 75,
+    "producer": "MuJoCo Renderer + Pillow labels + ffmpeg/libx264",
+    "state_source": "trajectory.npz; exact rows in video-frames.csv",
+    "status": "OFFSCREEN_RENDERED_AND_DECODED"
+  },
+  "sample_period_s": 0.01,
+  "schema_version": 1,
+  "source_revision": "6636b95b78bb14b94acda53a413d39f6baa8688a",
+  "source_snapshot": {
+    "path": "simulation/intake/rev5-v1.json",
+    "sha256": "dd14031121c6f40fcbcb974a82231e49eaf6d4e9c79d0d3fc0f41ad2887bcc76",
+    "upstream_bundle": {
+      "baseline_results_sha256": "a181bc328b61ecdad52a0b8acdcc6e7cc5c0e5c4748b680ec8fcad0aa5e44c36",
+      "baseline_screen_sha256": "fc8b4dd6e013afc834b37649414e6230b5689e5c28a9b67a0ec2b6fec7d3bd88",
+      "extraction": "Exact numerical fields /scenarios/0 and /mesh_printed_assembly from baseline/results.json; wheel/motor/laminate definitions from INTAKE.txt and baseline/screen.py. No old script was executed or imported.",
+      "intake_txt_sha256": "bef4cfd724089d818b6083070dd2853c40b23100bdac6826157f3742a47233a2",
+      "manifest_sha256": "1f94e5fdf89d8e1df234e9dec4db7ea32568e30671ba9a841293cf9d79d55999",
+      "name": "rev5-simulation-intake-v1"
+    },
+    "upstream_revision": "3633eb5d03d6db7c90b582e53180414087b33519",
+    "upstream_sources": [
+      {
+        "path": "hardware/mechanical-interface.md",
+        "sha256": "326a26832a538d86e39fdbd7f07fc653305afd385eb28399f8fa5c73c5090f8c"
+      },
+      {
+        "path": "hardware/mechanical/bench-imu-01-dimensional-spec.md",
+        "sha256": "7c7439385e5011cb876463c8dad56d9acff52fbf6b2f95ce363b0a53d8b24f2b"
+      },
+      {
+        "path": "hardware/mechanical/bench-imu-01-enclosure.scad",
+        "sha256": "550371ba2e0d549cf232d918b18cb15eec2bac826d7073d0c653d7a3a8f7a680"
+      }
+    ]
+  },
+  "state": "WIP_SIMULATION_NOT_HARDWARE_OR_ASSEMBLY_APPROVAL",
+  "stochasticity": "NONE",
+  "uncommitted_model_code": false
+}

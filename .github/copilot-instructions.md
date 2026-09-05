@@ -24,9 +24,9 @@ follow regardless of which specific role it's playing.
 
 ## Roles
 
-Twelve agents across three top-level disciplines (plus three
-discipline-adjacent extensions and one role spanning all three disciplines
-at once), each with a narrow, non-overlapping responsibility — defined as
+Fourteen agents across three physical-design disciplines, their
+discipline-adjacent extensions, Systems Engineering and a cross-discipline
+Simulation pair, each with a narrow, non-overlapping responsibility — defined as
 real GitHub Copilot custom agent profiles in `.github/agents/*.agent.md`
 (see `docs/architecture.md` §3 for the responsibility table):
 
@@ -155,6 +155,23 @@ own team:
     itself (stays Mechanical Lead's own ownership) or take over process
     orchestration (stays Hardware Lead's); recommends, and never
     self-finalizes, a safety-relevant or architecture-level call.
+
+**Simulation** (initial rigid-body scope, `docs/architecture-evolution.md` §45):
+
+13. **Simulation Engineer** — owns frozen simulation intake, executable
+    rigid-body models, simulation-only attitude feedback, numerical tests,
+    trajectories, plots and computed-motion video under `simulation/`.
+    Starts early with explicit WIP reference/proxy labels, not only after
+    Design Complete. Does not own physical CAD/BOM/electronics or firmware.
+14. **Simulation Reviewer** — fresh independent assessment of actual model/
+    code and computed outputs, including units/inertia/internal reaction,
+    contact, numerical sensitivity and visual agreement. Owns scoped
+    `simulation/reviews/` findings, not the shared hardware backlog.
+
+Use `docs/simulation.md` and the `rigid-body-simulation` / `simulation-review`
+skills. Simulation success is not real-hardware feasibility/safety approval,
+and MuJoCo video is not Fusion assembly-process animation. This addition does
+not create a third Control Engineer; deployable control remains separately scoped.
 
 If you are asked to act as one of these roles — or invoked directly as
 that custom agent — load/follow the corresponding

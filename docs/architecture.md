@@ -46,6 +46,11 @@ flowchart TD
     GATE -- "not met" --> L
     GATE -- "met" --> H
     GATE -- "met + independent package acceptance" --> DOC["APPROVED assembly documentation\nphysical-action gates still held"]
+    L -- "approved early WIP physics question" --> SIM["Simulation Engineer\nrigid body + computed trajectories"]
+    ML -- "frozen source facts / explicit gaps" --> SIM
+    SIM --> SREV["Simulation Reviewer\nindependent model + actual results"]
+    SREV -- "model/code CRITICAL or HIGH" --> SIM
+    SREV -- "scoped findings, no hardware approval" --> L
 ```
 
 Loop-back rule: any **CRITICAL** or **HIGH** finding from the Hardware Reviewer
@@ -68,7 +73,7 @@ release. Full layout retains the Design-Complete schematic prerequisite,
 independent Hardware Reviewer review and named human pre-fabrication approval.
 WIP evidence and an early blocker verdict cannot bypass the shared gate.
 
-## 3. Agents (MVP)
+## 3. Agents (14 implemented)
 
 | Agent | Owns | Does NOT own |
 |---|---|---|
@@ -83,13 +88,16 @@ WIP evidence and an early blocker verdict cannot bypass the shared gate.
 | **Manufacturing Engineer** *(Phase 4)* | Manufacturing PROCESS parameters (infill %/pattern, wall/perimeter count, print orientation vs. load direction, material) for safety-critical/structural mechanical parts, once engaged (a Mechanical Lead / Hardware Lead judgment call per part, `.github/agents/manufacturing-engineer.agent.md`) | The part's CAD geometry itself (Mechanical Lead); declaring its own process specification independently reviewed (Mechanical Reviewer performs that independent cross-check, `.github/skills/mechanical-review/SKILL.md` item 11); certifying FDM plastic as adequate for a hazardous-energy containment purpose without real physical testing |
 | **Firmware Reviewer** *(Phase 5)* | Independent, adversarial review of Firmware Engineer's driver-level bring-up code: register/peripheral correctness, pin/interface fidelity against the actual schematic, safety-critical logic correctness where present, premise review; severity-classified findings (own firmware-scoped record, `firmware/<board>/<board>-firmware-review.md` — deliberately does not share `validation/open-issues.md` with Hardware/Mechanical Reviewer, §14, `.github/agents/firmware-reviewer.agent.md`) | Fixing the firmware itself; control-loop/sensor-fusion design (Control Engineer's future territory, §14 — not yet triggered); editing hardware/mechanical artifacts; claiming any real hardware-in-the-loop test or flashing |
 | **PCB Engineer** *(Phase 6)* | Bounded WIP physical-interface preparation before Design Complete; then full schematic-to-PCB layout, routing, DRC closure and fabrication-package inputs from the approved schematic (`.github/agents/pcb-engineer.agent.md`) | General routing/release under the WIP exception; re-litigating component selection or schematic topology; self-declaring review/fabrication readiness (independent Hardware Reviewer and named human gates still apply); enclosure design; firmware |
+| **Systems Engineer** *(Phase 7)* | Cross-discipline interface/trade-off judgment and drift methodology, routed through Hardware Lead | Populating Mechanical Lead's interface/CAD file; process orchestration; self-approving architecture/safety |
+| **Simulation Engineer** *(initial rigid-body scope)* | Frozen intake, rigid-body model/code, simulation-only feedback, numerical witnesses, trajectories/plots/video (`simulation/`) | Physical CAD/PCB/BOM, deployable firmware, FEA/SPICE, self-review, hardware or Fusion approval |
+| **Simulation Reviewer** *(initial rigid-body scope)* | Independent model/code and actual-result assessment, simulation-local findings and fidelity gaps (`simulation/reviews/`) | Fixing its own reviewed model; shared hardware backlog changes; physical qualification or approval |
 
 The Mechanical Lead / Mechanical Reviewer pair was added in Phase 1 of the
 multidisciplinary evolution (`docs/architecture-evolution.md` §7, §10, §27);
 the original 4 agents above are unchanged. The Firmware Engineer was added
 in Phase 2 (`docs/architecture-evolution.md` §32) once its own trigger
 (§14: "when firmware work starts in earnest") was met — no Firmware
-Reviewer agent exists yet (Phase 2 deliberately introduced only one new
+Reviewer agent existed at that stage (Phase 2 deliberately introduced only one new
 agent, not the usual design+independent-review pair, per §32's own
 scope-proportionality reasoning). The Power Engineer was added in Phase 3
 (`docs/architecture-evolution.md` §33) once its own trigger (§14: "when
@@ -197,7 +205,10 @@ Full role specs: `.github/agents/hardware-lead.agent.md`,
 `.github/agents/power-engineer.agent.md`,
 `.github/agents/manufacturing-engineer.agent.md`,
 `.github/agents/firmware-reviewer.agent.md`,
-`.github/agents/pcb-engineer.agent.md`. These are real GitHub Copilot
+`.github/agents/pcb-engineer.agent.md`,
+`.github/agents/systems-engineer.agent.md`,
+`.github/agents/simulation-engineer.agent.md` and
+`.github/agents/simulation-reviewer.agent.md`. These are real GitHub Copilot
 custom agent profiles (per
 [docs.github.com/en/copilot/reference/custom-agents-configuration](https://docs.github.com/en/copilot/reference/custom-agents-configuration)),
 each with a required `description` field, so they are selectable directly
@@ -417,6 +428,18 @@ PlatformIO and STM32CubeIDE/CubeMX were checked and are not installed.
   both actually used that session. Flashing tooling (e.g. `st-flash`,
   OpenOCD) remains Future Integration (§13) until verified connected.
 
+### 5.5 Rigid-body simulation tooling
+
+The user-approved initial Simulation pair uses MuJoCo as its first engine
+(`docs/simulation.md`, `simulation/README.md`). Verify engine/Python,
+local dependencies, offscreen rendering, encoding and native replay
+separately each session. The initial implementation exercised MuJoCo 3.12.0
+and macOS `mjpython` replay; this is a dated observation, not a promise about
+another host. No Fusion tool, remote asset service, device access, GPU fleet
+or unverified API is required. Synthetic/reference and WIP design-proxy
+evidence can be produced before Design Complete without pretending unknown
+actual masses or actuator/contact behavior are established.
+
 ## 6. Evidence Model
 
 ### 6.1 Source of Truth rule
@@ -591,6 +614,9 @@ required:
   Wheel → 1-axis attitude control → 3-axis attitude control → a standing
   "Cube". The framework must stay reusable for other robotics/IoT/embedded
   hardware, not hard-coded to this one product.
+- Current WIP includes a three-axis cube design and the initial runnable
+  rigid-body simulator. This is no longer only a static sensor-board
+  project; physical construction, feasibility and safety remain unapproved.
 - System-level power/thermal/mechanical concerns that only matter once the
   system grows beyond the benchmark are tracked from day one in
   `hardware/power-budget.md` (see §12) so the framework doesn't need a
@@ -643,15 +669,17 @@ framework can add them without restructuring)
 | ~~**Power Engineer**~~ **[IMPLEMENTED — Phase 3, see `docs/architecture-evolution.md` §33]** | System power-tree proposal (`hardware/power-architecture.md`), power budget, sequencing across subsystems (§12) | Met: judged met at the Motor Driver / Reaction Wheel stage — the trigger this row already named as its own example. See §3, `.github/agents/power-engineer.agent.md`, `.github/skills/power-architecture/SKILL.md`. Engaged per-project by Hardware Lead judgment (not automatic for every future design, per that file's "When this role is engaged") |
 | ~~**PCB Engineer**~~ **[IMPLEMENTED — Phase 6, see `docs/architecture-evolution.md` §37]** | Layout, stackup, DRC closure, signal/power integrity at layout level | Met: an explicit human request to bring Bench-IMU-01 Rev 3 to an orderable-PCB stage — the trigger this row already named as its own example ("when schematic-to-layout handoff becomes a distinct phase"). See §3, `.github/agents/pcb-engineer.agent.md`, `.github/skills/pcb-layout/SKILL.md`. No new independent-reviewer agent was added alongside it — Hardware Reviewer's own checklist was extended instead (`.github/skills/hardware-review/SKILL.md`) |
 | ~~**Firmware Engineer**~~ **[IMPLEMENTED — Phase 2, see `docs/architecture-evolution.md` §32]** | Driver-level bring-up code, register-level configuration matching the schematic's actual pin/interface decisions | Met: `hardware/schematic/bench-imu-01-design.md` reached Design Complete. See §3, §5.4, `.github/agents/firmware-engineer.agent.md`, `.github/skills/firmware-bringup/SKILL.md` |
-| **Control Engineer** | Control-loop design (e.g., attitude control loops) | At 1-axis / 3-axis attitude control roadmap stage — **not met** by Bench-IMU-01 (a static bench sensor-readout board, no reaction wheel/motor/attitude-control project exists). Deliberately kept separate from Firmware Engineer above, even though both were once grouped loosely as "Control/Embedded" (`docs/architecture-evolution.md` §7/§11) — Firmware Engineer's own scope explicitly excludes control loops/sensor fusion/unit conversion (`.github/agents/firmware-engineer.agent.md` "Out of scope") precisely so this row's introduction stays gated on its own, later trigger |
+| **Control Engineer** | Deployable control/estimation, real-time implementation and control qualification | Revisit when the human explicitly scopes a production-control discipline. The three-axis cube and simulated attitude-control work now exist; the old "static bench only, no reaction wheel project" rationale is superseded. The approved initial Simulation Engineer owns only simulated feedback (`docs/simulation.md`); this addition does not create a third role, expand bring-up firmware, or qualify a physical controller |
 | ~~**Firmware Reviewer**~~ **[IMPLEMENTED — Phase 5, see `docs/architecture-evolution.md` §36]** | Independent, adversarial review of Firmware Engineer's driver-level bring-up code (mirroring Hardware Reviewer / Mechanical Reviewer) | Met: a real bring-up failure was traced to a class of defect an independent pass would likely have caught — the pre-existing (Rev ≤2) `main.c` infinite-loop-on-`bmi270_init()`-failure coupling bug, self-caught and fixed during Rev 3 firmware bring-up (`firmware/bench-imu-01/src/main.c`, design rationale §4.9) — the trigger this row already named as its own example (the *other* named condition, a second board's firmware, was not what was met). See §3, `.github/agents/firmware-reviewer.agent.md`, `.github/skills/firmware-review/SKILL.md` |
 | **Test Engineer** | Owns `validation/bring-up-procedure.md` formally, designs bench test plans, HIL/environmental test plans | When bring-up moves beyond a one-off MVP bench test |
 | **Datasheet Specialist** | Advanced/high-volume operator of `.github/skills/datasheet-analysis/SKILL.md`; owns `datasheets/evidence-log.md` quality and consistency | When datasheet volume/complexity outgrows ad hoc extraction by whichever agent needs a number |
 | **Safety/Compliance Reviewer** | Regulatory/standards review (e.g. UL/CE/FCC/EMC compliance where applicable) | When the project needs to target a regulated market or a safety-relevant certification |
 | ~~**Systems Engineer**~~ **[IMPLEMENTED — Phase 7 of the multidisciplinary evolution, see `docs/architecture-evolution.md` §44]** | Interface Control for cross-discipline boundary contracts (Electronics ⇔ Mechanical ⇔ Firmware, e.g. `hardware/mechanical-interface.md`); technical trade-off criteria for "which discipline yields" when Hardware Lead's mediation (`docs/workflow.md` §3) surfaces a genuine engineering trade-off, not a process disagreement; methodology ownership for proactive interface-drift detection (e.g. `tools/check_mechanical_pcb_sync.py`) | Met: **MISS-034** (CRITICAL, `validation/open-issues.md`) — a cross-discipline board-geometry interface contract drifted silently for 2+ days across 3 merged PRs because no role owned the *boundary itself* (only each side's own internal self-consistency), caught only by an unrelated scheduled audit. Combined with the human Chief Engineer's own repeated, increasingly specific request across one session for exactly this kind of judgment role. See `.github/agents/systems-engineer.agent.md`, `.github/skills/systems-integration/SKILL.md` |
+| **Simulation Engineer + Simulation Reviewer** **[IMPLEMENTED — initial rigid-body scope, `docs/architecture-evolution.md` §45]** | Reproducible rigid-body dynamics, simulation-only feedback, plots/computed video and independent model/result assessment | Met: explicit human approval for the cube/floor/three-wheel simulator and these two roles. Early WIP entry; no hardware/Fusion acceptance, production control role, FEA/SPICE or digital-twin certification |
 
 These are **not** created as `.github/agents/*.agent.md` files yet (except
-Firmware Engineer, Power Engineer, Firmware Reviewer, and Systems Engineer,
+Firmware Engineer, Power Engineer, PCB Engineer, Firmware Reviewer, Systems Engineer
+and the Simulation pair,
 now implemented above) — introduce the rest only when their trigger
 condition is met, to avoid role/file proliferation ahead of actual need.
 
@@ -687,12 +715,10 @@ consulted by the Mechanical Reviewer's own Foundational Change Cascade
 Checklist (`.github/skills/mechanical-review/SKILL.md`) — Systems Engineer's
 role is judgment and methodology ownership across these existing artifacts/
 mechanisms, not a new competing owner of any one of them. This addition's own
-§3 "Agents (MVP)" table row and §16 Directory Map entry are deliberately left
-for a follow-up change, not silently added here, since this addition's own
-scope was explicitly bounded to this table, `docs/architecture-evolution.md`,
-and `docs/workflow.md` §3 — see `docs/architecture-evolution.md` §44 for the
-full, dated trigger record (MISS-034) and the repeated human request that led
-to it.
+§3 roster and §16 Directory Map entries were deferred by its original
+bounded change; they are synchronized with the implemented roster alongside
+the Simulation pair. The original scope/trigger record remains in
+`docs/architecture-evolution.md` §44; simulation scope is in §45.
 
 ## 15. Evaluation
 
@@ -707,6 +733,7 @@ methodology and metrics.
                                               4 Electronics MVP agents + 2 Mechanical agents (Phase 1)
                                               + 1 Firmware agent (Phase 2) + 1 Power agent (Phase 3)
                                               + 1 Manufacturing agent (Phase 4) + 1 Firmware Reviewer (Phase 5)
+                                              + 1 PCB Engineer + 1 Systems Engineer + 2 Simulation agents = 14
 .github/skills/*/SKILL.md                  Agent skill profiles (name+description frontmatter):
   requirements-engineering/SKILL.md
   component-selection/SKILL.md
@@ -719,12 +746,14 @@ methodology and metrics.
   power-architecture/SKILL.md                Power Engineer's procedure (Phase 3)
   manufacturing-process-specification/SKILL.md  Manufacturing Engineer's procedure (Phase 4)
   firmware-review/SKILL.md                  Firmware Reviewer's procedure (Phase 5)
+  rigid-body-simulation/SKILL.md            Early WIP model/computation/trajectory visualization
+  simulation-review/SKILL.md               Independent numerical and actual-result assessment
   mechanical-visualization/SKILL.md         Mechanical Lead's assembly-instructions/2D-drawing/
                                               WIP assembly evidence + Fusion Animation procedure;
                                               separately gated APPROVED documentation
 .github/instructions/*.instructions.md     Path-scoped rules (datasheets/, hardware+bom/, validation/,
                                               hardware/mechanical/+mechanical-interface.md — Phase 1,
-                                              firmware/ — Phase 2)
+                                              firmware/ — Phase 2; simulation/ — initial rigid-body lane)
 .github/prompts/*.prompt.md                Reusable slash-command-style prompts
 .github/workflows/hardware-gate.yml        CI gate: blocks unresolved CRITICAL/HIGH
 .github/workflows/agent-frontmatter-lint.yml  CI lint: agent/skill required frontmatter (Phase 1)
@@ -765,6 +794,14 @@ firmware/                                  Driver-level bring-up firmware (Phase
   <board>/                                 One subdirectory per board (e.g. bench-imu-01/)
     README.md, <board>-firmware-design.md, Makefile, linker/, src/
 
+simulation/
+  README.md                                Japanese run/view instructions
+  cube_sim/                                Model/runner, simulation-only control, visualization and provenance
+  models/, intake/                         Explicit fixtures and frozen partial design-proxy inputs
+  evidence/<version>/                      Hashed state/plot/video/numerical evidence, always WIP
+  reviews/<review-id>/                      Independent simulation-local verdicts/witnesses
+  tests/                                   Std-lib numerical and evidence regressions
+
 validation/
   design-review.md                         Per-cycle review report template (Hardware or Mechanical Reviewer)
   open-issues.md                           Living finding backlog (CI-checked; shared across disciplines)
@@ -777,6 +814,7 @@ docs/
   architecture.md                          This document
   workflow.md                              End-to-end workflow + gates
   assembly-evidence.md                     Assembly evidence contents, states and structural contract
+  simulation.md                            Early WIP rigid-body scope, ownership and evidence contract
   templates/assembly-manifest.json         Incomplete template, not historical design evidence
   templates/assembly-current.json          Current-revision pointer template
   architecture-evolution.md                Multidisciplinary evolution proposal + Phase 1/2 status
