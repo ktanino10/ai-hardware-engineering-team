@@ -1,0 +1,65 @@
+{
+  "classification": "WIP_DESIGN_PROXY",
+  "delta_angular_momentum_world_nms": [
+    0.003830941575385112,
+    1.6106723404782644e-07,
+    1.3155262802750472e-05
+  ],
+  "final_attitude_error_deg": 45.00090036078977,
+  "hardware_approval": false,
+  "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
+  "max_attitude_error_deg": 48.87187733597726,
+  "max_loaded_point_slip_m_s": 0.013871561468976794,
+  "max_penetration_m": 0.00389150327778133,
+  "max_wheel_relative_rad_s": [
+    86.95054778995481,
+    0.2940366996480972,
+    0.046392867377012106
+  ],
+  "min_height_m": 0.11932498280727756,
+  "outcome": "DEPARTED_TARGET",
+  "rigid_energy_minus_logged_work_j": 0.3225449957147266,
+  "samples": 301,
+  "scenario": {
+    "command_delay_s": 0.02,
+    "contact": true,
+    "controller": "pd",
+    "description": "Pre-positioned edge, perturbed 2 deg; NOT face-to-edge transition.",
+    "duration_s": 3.0,
+    "gravity": true,
+    "initial_clearance_m": 0.0,
+    "initial_quat": null,
+    "kd_nm_s_rad": 0.018,
+    "kp_nm_rad": 0.08,
+    "name": "edge-balance",
+    "perturbation_rad": 0.03490658503988659,
+    "pulse_half_period_s": 0.5,
+    "pulse_nm": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "target": [
+      0.9238795325112867,
+      0.3826834323650898,
+      0.0,
+      0.0
+    ]
+  },
+  "speed_cutoff_samples": [
+    260,
+    0,
+    0
+  ],
+  "speed_exceeded_samples": [
+    260,
+    0,
+    0
+  ],
+  "torque_saturated_samples": [
+    265,
+    0,
+    0
+  ],
+  "trial_band_deg": 5
+}

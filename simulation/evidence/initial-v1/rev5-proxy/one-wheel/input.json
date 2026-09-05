@@ -1,0 +1,209 @@
+{
+  "actuation": {
+    "model": "IDEAL_JOINT_TORQUE_NOT_ACTUAL_DRIVER",
+    "speed_cutoff_rad_s": [
+      80.0,
+      80.0,
+      80.0
+    ],
+    "torque_limit_nm": [
+      0.02,
+      0.02,
+      0.02
+    ]
+  },
+  "body": {
+    "com_m": [
+      0.007693237481619306,
+      0.007864991920938709,
+      0.005259664983042731
+    ],
+    "inertia_kg_m2": [
+      [
+        0.03862067402324046,
+        0.0003895204475772889,
+        0.00029437730260648817
+      ],
+      [
+        0.0003895204475772889,
+        0.03877832685981882,
+        0.00033499732231286815
+      ],
+      [
+        0.00029437730260648817,
+        0.00033499732231286815,
+        0.03812078182067841
+      ]
+    ],
+    "mass_kg": 2.7642777978399984,
+    "side_m": 0.24
+  },
+  "case_id": "rev5-partial-solid-cad-proxy-v1",
+  "classification": "WIP_DESIGN_PROXY",
+  "contact": {
+    "condim": 3,
+    "sliding_friction": 0.6,
+    "solimp": [
+      0.9,
+      0.95,
+      0.001
+    ],
+    "solref": [
+      0.01,
+      1.0
+    ]
+  },
+  "description": "Partial solid-CAD moment proxy + assumed actuator/contact, NOT the complete Rev5 cube.",
+  "gravity_m_s2": [
+    0,
+    0,
+    -9.80665
+  ],
+  "integration": {
+    "integrator": "RK4",
+    "iterations": 50,
+    "solver": "Newton",
+    "timestep_s": 0.002,
+    "tolerance": 1e-10
+  },
+  "omissions": [
+    "Actual PCB population/copper, battery, hubs/adapters, fasteners/retention, connectors/mates, harness, insulation and completed integration.",
+    "Whole motor surrogate is locked to the chassis; unknown rotating bell mass/inertia is NOT invented or double-counted.",
+    "Printed geometry reduced to its reported mass moments, collision to an outer box. No installed fit, retention, deformation, impact damage, strength or containment assessment.",
+    "Actual MN2206/DRV10983 actuation remains UNKNOWN: no generic runtime BRAKE bit, rated RPM, qualified latency or source/regeneration model.",
+    "Fixed-edge angular-momentum deficit applies only to its stated model; candidate-L is unadopted and NOT included here.",
+    "Legacy ISS-058 CRITICAL and ISS-059 HIGH, seven Mechanical HIGHs and physical-action holds are unchanged.",
+    "This snapshot is not main, a complete physical replica, an assembly manifest, or Fusion native/video evidence.",
+    "No CAD-derived or measured complete mass, CG or inertia.",
+    "No battery, populated electronics, harness or motor internals modeled individually.",
+    "Ideal bidirectional joint torque is NOT DRV10983 runtime braking or a motor torque-speed curve.",
+    "No compliance, fracture, thermal/FEA, rotor containment, noise or real-time firmware.",
+    "Box-plane soft contact is uncalibrated; no strength or continuous collision clearance claim."
+  ],
+  "provenance": {
+    "actual_driver_case_status": "BLOCKED_UNKNOWN_TORQUE_SPEED_LATENCY_CURRENT_SOURCE_PARAMETERS",
+    "actuation_and_contact": "ASSUMPTION: copy synthetic reference ideal torque limits, cutoff, contact and integrator unchanged; NOT a claimed actual-driver case or outcome fit.",
+    "decomposition": "Subtract each wheel's mass, first moment and tensor about cube origin; then recenter residual chassis. Motor whole-body surrogates remain locked.",
+    "locked_recomposition": {
+      "com_m": [
+        0.010489011664218902,
+        0.01064395094016371,
+        0.008293691634164468
+      ],
+      "confidence": "Partial locked analytical assembly, includes ALL THREE WHEELS; neither actual complete mass nor lower bound.",
+      "inertia_kg_m2": [
+        [
+          0.040765847504699734,
+          0.0005643714389665639,
+          0.0004490935549383528
+        ],
+        [
+          0.0005643714389665639,
+          0.04092614709629031,
+          0.0004911540606653771
+        ],
+        [
+          0.0004490935549383528,
+          0.0004911540606653771,
+          0.0402267378213524
+        ]
+      ],
+      "mass_kg": 3.0642777978399987
+    },
+    "reference_model_sha256": "b34b181117b7a12cf8e8356bcf1a57321deab20726d12249f39badaaba889c1f",
+    "source_snapshot": {
+      "path": "simulation/intake/rev5-v1.json",
+      "sha256": "dd14031121c6f40fcbcb974a82231e49eaf6d4e9c79d0d3fc0f41ad2887bcc76",
+      "upstream_bundle": {
+        "baseline_results_sha256": "a181bc328b61ecdad52a0b8acdcc6e7cc5c0e5c4748b680ec8fcad0aa5e44c36",
+        "baseline_screen_sha256": "fc8b4dd6e013afc834b37649414e6230b5689e5c28a9b67a0ec2b6fec7d3bd88",
+        "extraction": "Exact numerical fields /scenarios/0 and /mesh_printed_assembly from baseline/results.json; wheel/motor/laminate definitions from INTAKE.txt and baseline/screen.py. No old script was executed or imported.",
+        "intake_txt_sha256": "bef4cfd724089d818b6083070dd2853c40b23100bdac6826157f3742a47233a2",
+        "manifest_sha256": "1f94e5fdf89d8e1df234e9dec4db7ea32568e30671ba9a841293cf9d79d55999",
+        "name": "rev5-simulation-intake-v1"
+      },
+      "upstream_revision": "3633eb5d03d6db7c90b582e53180414087b33519",
+      "upstream_sources": [
+        {
+          "path": "hardware/mechanical-interface.md",
+          "sha256": "326a26832a538d86e39fdbd7f07fc653305afd385eb28399f8fa5c73c5090f8c"
+        },
+        {
+          "path": "hardware/mechanical/bench-imu-01-dimensional-spec.md",
+          "sha256": "7c7439385e5011cb876463c8dad56d9acff52fbf6b2f95ce363b0a53d8b24f2b"
+        },
+        {
+          "path": "hardware/mechanical/bench-imu-01-enclosure.scad",
+          "sha256": "550371ba2e0d549cf232d918b18cb15eec2bac826d7073d0c653d7a3a8f7a680"
+        }
+      ]
+    },
+    "status": "DERIVED_FROM_FROZEN_WIP_PLUS_EXPLICIT_ASSUMPTIONS"
+  },
+  "schema_version": 1,
+  "wheels": [
+    {
+      "axis": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "center_m": [
+        0.10875,
+        0.0,
+        0.0
+      ],
+      "inertia_kg_m2": [
+        4.5e-05,
+        2.2668750000000002e-05,
+        2.2668750000000002e-05
+      ],
+      "mass_kg": 0.1,
+      "name": "x",
+      "radius_m": 0.03,
+      "thickness_m": 0.0045
+    },
+    {
+      "axis": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "center_m": [
+        0.0,
+        0.10875,
+        0.0
+      ],
+      "inertia_kg_m2": [
+        2.2668750000000002e-05,
+        4.5e-05,
+        2.2668750000000002e-05
+      ],
+      "mass_kg": 0.1,
+      "name": "y",
+      "radius_m": 0.03,
+      "thickness_m": 0.0045
+    },
+    {
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "center_m": [
+        0.0,
+        0.0,
+        0.10875
+      ],
+      "inertia_kg_m2": [
+        2.2668750000000002e-05,
+        2.2668750000000002e-05,
+        4.5e-05
+      ],
+      "mass_kg": 0.1,
+      "name": "z",
+      "radius_m": 0.03,
+      "thickness_m": 0.0045
+    }
+  ]
+}

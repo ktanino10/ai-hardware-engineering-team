@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cube dynamics — 10秒の始動・制動</title>
+<style>
+body{margin:0;background:#eaf0f4;color:#173148;font:16px/1.65 system-ui,sans-serif}
+main{max-width:1160px;margin:auto;padding:32px 24px}h1{font-size:clamp(2rem,4vw,3rem)}
+section{background:white;padding:24px;margin:24px 0;border:1px solid #c4d3de;border-radius:8px}
+a{color:#12606c;text-underline-offset:3px}a:focus-visible{outline:3px solid #996100;outline-offset:3px}
+.warning{border-left:5px solid #996100;padding:16px 20px;background:#fff4dd}
+video{width:100%;max-width:960px;background:#142636;display:block}
+.label{font:12px ui-monospace,monospace;letter-spacing:.08em;color:#12606c}
+.links{display:flex;gap:20px;flex-wrap:wrap}
+</style>
+<main>
+<div class="label">WIP / COMPUTED TRAJECTORIES / NO HARDWARE APPROVAL</div>
+<h1>高速回転からの有限制動を、10秒で見る</h1>
+<p>任意の上向き力で持ち上げず、ホイールの内部トルクと床反力から運動を計算します。
+通常動画は10秒間を実際に積分した実時間再生です。別の制動拡大動画は100倍スローと明記しています。</p>
+<p class="warning"><strong>現在の実機の成立性・安全性・倒立維持を証明するものではありません。</strong>
+100 mm / 0.34 kgの合成環状輪モデルは、240 mmのRev5部分質量プロキシと別物です。
+合成モデルの辺付近通過・転倒と、約0.18 mmの微小な接触ギャップ候補を区別します。
+その微小ギャップは接触包絡・幾何・数値感度に対して未解決で、確立した空中跳躍とは呼びません。</p>
+<section>
+<div class="label">MUJOCO / DYNAMICS</div>
+<h2>3つの条件を比較</h2>
+<p>元の数学的基準、凍結したRev5部分モデル、別の合成機構モデルを分離し、
+回転数・有限制動・XYZ床反力・角力積・仕事残差を表示します。捕捉/倒立維持は未達・未実装です。</p>
+<p class="links"><a href="startup-v4/index.html">10秒の動画・スロー拡大・グラフを開く</a>
+<a href="../STARTUP.md">日本語の条件と実行手順</a></p>
+</section>
+<section>
+<div class="label">BLENDER WORKBENCH / MUJOCO STATE REPLAY</div>
+<h2>Blenderでも同じ計算軌道を再生</h2>
+<p>Blender自身で物理計算した結果ではありません。保存した状態の再描画です。
+元の未保存シーンとは別のネイティブファイルを作っています。Fusion組立工程動画とも別です。</p>
+<video controls playsinline preload="metadata"
+  poster="blender-replay-v6/startup-mechanism-fixture/preview.png"
+  src="blender-replay-v6/startup-mechanism-fixture/blender-motion.mp4"></video>
+<p class="links"><a href="blender-replay-v6/startup-mechanism-fixture/replay.blend">Blenderファイル</a>
+<a href="blender-replay-v6/startup-mechanism-fixture/native-check.json">保存・再読込の対応記録</a></p>
+</section>
+<section>
+<div class="label">CERN ROOT / COLUMNAR ANALYSIS</div>
+<h2>ROOT形式の数値データ</h2>
+<p>コンパイル済みTTreeで書き込みと数値の読戻を実行します。制動窓の高密度サンプルを
+過大評価しないよう、ヒストグラムは行数ではなくシミュレーション時間で重み付けします。
+このMacのCling/画像出力はSDK不整合で使えず、ROOT描画やPyROOTの成功は主張しません。</p>
+<p class="links"><a href="root-v4/startup-mechanism-fixture/trajectory.root">合成機構モデルのROOTデータ</a>
+<a href="root-v4/startup-rev5-proxy/trajectory.root">Rev5部分モデルのROOTデータ</a>
+<a href="../root/README.md">ROOTの実行方法・制限</a></p>
+</section>
+<footer>
+<p><a href="../reviews/r2b/review.md">独立R2b確認：報告済みの実装指摘はすべて解消</a>。
+<a href="../reviews/r2/review.md">R2の数値モデル・成果物評価</a>と
+<a href="../reviews/r2a/review.md">修正確認</a>に基づく限定的な完了です。
+微小ギャップ、捕捉/倒立維持、実機の制動/安全性、Fusionに関する制限は変わりません。
+<a href="../reviews/r1/review.md">R1</a>と
+<a href="initial-v1/index.html">初回の短時間14ケース</a>は履歴として保存しています。</p>
+</footer>
+</main>
+</html>

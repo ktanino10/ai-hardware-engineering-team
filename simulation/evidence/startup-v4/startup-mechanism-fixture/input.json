@@ -1,0 +1,238 @@
+{
+  "actuation": {
+    "independent_brake": {
+      "capacity_nm": [
+        7.099999397112932,
+        0,
+        0
+      ],
+      "model": "IDEAL_DRY_HINGE_BRAKE_NOT_ACTUAL_DRIVER",
+      "rationale": "ASSUMPTION capacity = I_axis*target_omega/5 ms; finite torque, not an imposed stop duration.",
+      "solimp": [
+        0.99,
+        0.99,
+        0.001,
+        0.5,
+        2
+      ],
+      "solref": [
+        0.0005,
+        1
+      ]
+    },
+    "model": "IDEAL_JOINT_TORQUE_NOT_ACTUAL_DRIVER",
+    "speed_cutoff_rad_s": [
+      314.1592653589793,
+      80.0,
+      80.0
+    ],
+    "torque_limit_nm": [
+      0.02,
+      0.02,
+      0.02
+    ]
+  },
+  "body": {
+    "com_m": [
+      0,
+      0,
+      0
+    ],
+    "inertia_kg_m2": [
+      0.00016666666666666672,
+      0.00016666666666666672,
+      0.00016666666666666672
+    ],
+    "mass_kg": 0.1,
+    "side_m": 0.1
+  },
+  "case_id": "synthetic-annular-mechanism-fixture-spin-brake-v2",
+  "classification": "SYNTHETIC_REFERENCE",
+  "contact": {
+    "condim": 3,
+    "sliding_friction": 1.2,
+    "solimp": [
+      0.9,
+      0.95,
+      0.001
+    ],
+    "solref": [
+      0.01,
+      1.0
+    ]
+  },
+  "description": "Synthetic 100 mm / 0.34 kg annular-wheel mechanism fixture. NOT Rev5 or a JAXA replica. Spin from rest, coast, finite independent dry brake; no capture controller.",
+  "gravity_m_s2": [
+    0,
+    0,
+    -9.81
+  ],
+  "integration": {
+    "integrator": "RK4",
+    "iterations": 50,
+    "solver": "Newton",
+    "timestep_s": 0.0001,
+    "tolerance": 1e-10
+  },
+  "omissions": [
+    "No CAD-derived or measured complete mass, CG or inertia.",
+    "No battery, populated electronics, harness or motor internals modeled individually.",
+    "Ideal bidirectional joint torque is NOT DRV10983 runtime braking or a motor torque-speed curve.",
+    "No compliance, fracture, thermal/FEA, rotor containment, noise or real-time firmware.",
+    "Box-plane soft contact is uncalibrated; no strength or continuous collision clearance claim.",
+    "Dedicated ideal dry brake is NOT the selected hardware, motor reverse effort or a DRV10983 command.",
+    "3000 rpm is a prior target-only analysis point, not a qualified or safe speed.",
+    "Brake delay/ramp/capacity/constraint response are numerical assumptions, not a manufacturer waveform.",
+    "Only the first face-to-edge kick is attempted; no forced edge capture or second vertex jump."
+  ],
+  "provenance": {
+    "actuation_and_contact": "SYNTHETIC fixture: the base file is a software template only. Body size/mass/inertia, wheel mass/annular geometry/inertia/centres and floor friction are intentionally different assumptions. Startup target/cutoff, step and independent brake are also assumptions; no actual hardware is adopted.",
+    "base_model": {
+      "path": "simulation/models/reference.json",
+      "sha256": "b34b181117b7a12cf8e8356bcf1a57321deab20726d12249f39badaaba889c1f"
+    },
+    "inertia_formula": "Annulus axial I=m*(Ro^2+Ri^2)/2; transverse I=Iax/2+m*h^2/12.",
+    "mechanism_source": {
+      "path": "simulation/intake/mechanism-v1.json",
+      "repository": "ktanino10/attitude-control-study",
+      "revision": "a927d1ae3409ba143631077824cdf3c904ea27b9",
+      "sha256": "a9c3a3224a602b4d9e2cef10bcf90cab2e0649ef1e78cc067ff8acdc8672538b",
+      "source_files": [
+        {
+          "path": "ja/session-2-modeling/06-standup-energy.md",
+          "sha256": "8b08823681a0446d1d52610cd9a5ae6d21a848342bae8aad31d8b69a538ecd89",
+          "url": "https://github.com/ktanino10/attitude-control-study/blob/a927d1ae3409ba143631077824cdf3c904ea27b9/ja/session-2-modeling/06-standup-energy.md"
+        },
+        {
+          "path": "ja/reference/mechanical.md",
+          "sha256": "d0e27254bdfe563f7fe419f244ff132026dfd4c307024f7e0cf19c40b8ba29c4",
+          "url": "https://github.com/ktanino10/attitude-control-study/blob/a927d1ae3409ba143631077824cdf3c904ea27b9/ja/reference/mechanical.md"
+        },
+        {
+          "path": "ja/reference/interfaces.md",
+          "sha256": "df20ec89c3a2bb3d98d014df08dd88897fbd629a5313a6ad0270590f8e204fde",
+          "url": "https://github.com/ktanino10/attitude-control-study/blob/a927d1ae3409ba143631077824cdf3c904ea27b9/ja/reference/interfaces.md"
+        }
+      ]
+    },
+    "rationale": "Explicit momentum-sufficient demonstration: 0.1 kg uniform cube plus three 0.08 kg uniform annuli (40/35 mm radii, 4 mm thick). Geometry/mass/friction are mathematical fixture assumptions, not selected hardware.",
+    "source_snapshot": null,
+    "status": "SYNTHETIC_ASSUMPTION"
+  },
+  "scenario": {
+    "command_delay_s": 0.02,
+    "contact": true,
+    "controller": "spin-brake",
+    "description": "Rest -> wheel spin -> coast -> independent finite brake; first edge attempt only.",
+    "duration_s": 10.0,
+    "gravity": true,
+    "initial_clearance_m": 0.0,
+    "initial_quat": [
+      1,
+      0,
+      0,
+      0
+    ],
+    "kd_nm_s_rad": 0.018,
+    "kp_nm_rad": 0.08,
+    "name": "spin-brake",
+    "perturbation_rad": 0.0,
+    "pulse_half_period_s": 0.5,
+    "pulse_nm": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "startup": {
+      "brake_command_s": 3.5,
+      "dense_end_s": 3.6,
+      "dense_period_s": 0.0001,
+      "dense_start_s": 3.48,
+      "engagement_delay_s": 0.02,
+      "ramp_s": 0.001,
+      "speed_gain_nm_per_rad_s": 0.0005,
+      "spin_until_s": 3.0,
+      "stop_relative_rad_s": 1,
+      "target_rad_s": [
+        314.1592653589793,
+        0.0,
+        0.0
+      ]
+    },
+    "target": [
+      0.9238795325112867,
+      0.3826834323650898,
+      0.0,
+      0.0
+    ]
+  },
+  "schema_version": 1,
+  "wheels": [
+    {
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "center_m": [
+        0.044,
+        0.0,
+        0.0
+      ],
+      "inertia_kg_m2": [
+        0.00011300000000000001,
+        5.660666666666667e-05,
+        5.660666666666667e-05
+      ],
+      "inner_radius_m": 0.035,
+      "mass_kg": 0.08,
+      "name": "x",
+      "radius_m": 0.04,
+      "thickness_m": 0.004
+    },
+    {
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "center_m": [
+        0.0,
+        0.044,
+        0.0
+      ],
+      "inertia_kg_m2": [
+        5.660666666666667e-05,
+        0.00011300000000000001,
+        5.660666666666667e-05
+      ],
+      "inner_radius_m": 0.035,
+      "mass_kg": 0.08,
+      "name": "y",
+      "radius_m": 0.04,
+      "thickness_m": 0.004
+    },
+    {
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "center_m": [
+        0.0,
+        0.0,
+        0.044
+      ],
+      "inertia_kg_m2": [
+        5.660666666666667e-05,
+        5.660666666666667e-05,
+        0.00011300000000000001
+      ],
+      "inner_radius_m": 0.035,
+      "mass_kg": 0.08,
+      "name": "z",
+      "radius_m": 0.04,
+      "thickness_m": 0.004
+    }
+  ]
+}

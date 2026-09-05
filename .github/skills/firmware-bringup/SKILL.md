@@ -94,6 +94,9 @@ discipline, re-derived for firmware.
    (`docs/architecture.md` Section 14) whose trigger is almost certainly
    not met by a bring-up task -- do not creep into that scope "just to be
    more useful."
+   The separately approved Simulation Engineer may implement simulated
+   attitude feedback under `simulation/`; this does not authorize adding
+   that controller to bring-up firmware or claiming control qualification.
 9. **Self-check against the checklist below** before considering the work
    handed off -- until a Firmware Reviewer role exists
    (`docs/architecture-evolution.md` Section 32), this self-check stands in

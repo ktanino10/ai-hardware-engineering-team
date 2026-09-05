@@ -1,0 +1,137 @@
+{
+  "actuation": {
+    "model": "IDEAL_JOINT_TORQUE_NOT_ACTUAL_DRIVER",
+    "speed_cutoff_rad_s": [
+      80.0,
+      80.0,
+      80.0
+    ],
+    "torque_limit_nm": [
+      0.02,
+      0.02,
+      0.02
+    ]
+  },
+  "body": {
+    "com_m": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "inertia_kg_m2": [
+      0.0096,
+      0.0096,
+      0.0096
+    ],
+    "mass_kg": 1.0,
+    "side_m": 0.24
+  },
+  "case_id": "synthetic-reference-v1",
+  "classification": "SYNTHETIC_REFERENCE",
+  "contact": {
+    "condim": 3,
+    "sliding_friction": 0.6,
+    "solimp": [
+      0.9,
+      0.95,
+      0.001
+    ],
+    "solref": [
+      0.01,
+      1.0
+    ]
+  },
+  "description": "WIP synthetic engine fixture, NOT the populated Rev5 cube.",
+  "gravity_m_s2": [
+    0,
+    0,
+    -9.81
+  ],
+  "integration": {
+    "integrator": "RK4",
+    "iterations": 50,
+    "solver": "Newton",
+    "timestep_s": 0.002,
+    "tolerance": 1e-10
+  },
+  "omissions": [
+    "No CAD-derived or measured complete mass, CG or inertia.",
+    "No battery, populated electronics, harness or motor internals modeled individually.",
+    "Ideal bidirectional joint torque is NOT DRV10983 runtime braking or a motor torque-speed curve.",
+    "No compliance, fracture, thermal/FEA, rotor containment, noise or real-time firmware.",
+    "Box-plane soft contact is uncalibrated; no strength or continuous collision clearance claim."
+  ],
+  "provenance": {
+    "body_inertia": "Uniform 1 kg, 0.24 m cube: I = m*s*s/6. Body mass excludes all three rotors.",
+    "rationale": "Simple positive inertias and modest ideal torque for independently calculable engine tests. No component rating or physical design decision.",
+    "source_snapshot": null,
+    "status": "ASSUMPTION",
+    "wheel_inertia": "Uniform 0.1 kg cylinders: I_axis=m*r*r/2; I_transverse=m*(3*r*r+h*h)/12."
+  },
+  "schema_version": 1,
+  "wheels": [
+    {
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "center_m": [
+        0.08,
+        0,
+        0
+      ],
+      "inertia_kg_m2": [
+        4.5e-05,
+        2.28e-05,
+        2.28e-05
+      ],
+      "mass_kg": 0.1,
+      "name": "x",
+      "radius_m": 0.03,
+      "thickness_m": 0.006
+    },
+    {
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "center_m": [
+        0,
+        0.08,
+        0
+      ],
+      "inertia_kg_m2": [
+        2.28e-05,
+        4.5e-05,
+        2.28e-05
+      ],
+      "mass_kg": 0.1,
+      "name": "y",
+      "radius_m": 0.03,
+      "thickness_m": 0.006
+    },
+    {
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "center_m": [
+        0,
+        0,
+        0.08
+      ],
+      "inertia_kg_m2": [
+        2.28e-05,
+        2.28e-05,
+        4.5e-05
+      ],
+      "mass_kg": 0.1,
+      "name": "z",
+      "radius_m": 0.03,
+      "thickness_m": 0.006
+    }
+  ]
+}
