@@ -84,9 +84,12 @@ def local_path(root: pathlib.Path, name: str) -> pathlib.Path:
         and not set(path.parts).intersection({".", "..", ".git"}),
         f"not a canonical repository-relative path: {name}",
     )
-    target = root / name
+    target = root
+    for part in path.parts:
+        target = target / part
+        require(not target.is_symlink(),
+                f"symlink in evidence path: {name} ({target.relative_to(root).as_posix()})")
     require(target.resolve().is_relative_to(root.resolve()), f"path escapes repository: {name}")
-    require(not target.is_symlink(), f"symlink is not an evidence file: {name}")
     return target
 
 
@@ -325,7 +328,16 @@ def check_changed_files(changed: list[str], root: pathlib.Path = REPO_ROOT,
     # physical path prefixes. Their changes still invalidate the current
     # package; inactive historical revisions deliberately do not participate.
     for name in current.values():
-        if reference_paths(load_record(root / name)) & changed_set:
+        references = reference_paths(load_record(root / name))
+        dependencies = set(references)
+        # Validate path identity before comparing literal Git paths; otherwise
+        # an ancestor alias can hide target edits or link retargeting as N/A.
+        for reference in references:
+            local_path(root, reference)
+            # Deleted ancestors no longer exist for the symlink preflight.
+            dependencies.update(parent.as_posix() for parent in
+                                pathlib.PurePosixPath(reference).parents if parent.parts)
+        if dependencies & changed_set:
             manifests.add(name)
     if not physical and not manifests:
         return []

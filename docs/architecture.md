@@ -36,13 +36,16 @@ flowchart TD
     REV -- "CRITICAL / HIGH finding" --> CIR
     REV -- "no open CRITICAL" --> VAL["Validation"]
     VAL -- "issue found" --> CIR
-    VAL --> GATE{"Design Complete\nGate (see §6)"}
-    CIR -- "stable board outline\n(hardware/mechanical-interface.md)" --> ML["Mechanical Lead"]
+    VAL --> GATE{"Design Complete\nGate (see §8)"}
+    CIR -- "known/provisional physical interfaces" --> ML["Mechanical Lead\nWIP design + assembly evidence"]
+    CIR -- "bounded source snapshot" --> PCBWIP["PCB Engineer\nWIP physical preparation only"]
+    PCBWIP -- "source-linked envelopes/mounts" --> ML
     ML --> MREV["Mechanical Reviewer\n(independent)"]
     MREV -- "CRITICAL / HIGH finding" --> ML
     MREV -- "no open CRITICAL" --> GATE
     GATE -- "not met" --> L
     GATE -- "met" --> H
+    GATE -- "met + independent package acceptance" --> DOC["APPROVED assembly documentation\nphysical-action gates still held"]
 ```
 
 Loop-back rule: any **CRITICAL** or **HIGH** finding from the Hardware Reviewer
@@ -58,6 +61,13 @@ source inputs, while unknowns remain visible during early evidence generation
 and both disciplines' findings feed the **same** Design Complete Gate because
 both write to the same `validation/open-issues.md` (§8).
 
+The PCB WIP branch supplies bounded package/populated-board/mated-connector,
+outline, mount and placement evidence needed to close those interfaces
+(`docs/workflow.md` Phase 4a). It is not general routing or fabrication
+release. Full layout retains the Design-Complete schematic prerequisite,
+independent Hardware Reviewer review and named human pre-fabrication approval.
+WIP evidence and an early blocker verdict cannot bypass the shared gate.
+
 ## 3. Agents (MVP)
 
 | Agent | Owns | Does NOT own |
@@ -72,7 +82,7 @@ both write to the same `validation/open-issues.md` (§8).
 | **Power Engineer** *(Phase 3)* | System power-tree/rail-topology proposal (`hardware/power-architecture.md`), multi-rail `hardware/power-budget.md` bookkeeping, once engaged (a Hardware Lead judgment call per project/revision, `.github/agents/power-engineer.agent.md`) | Implementing the actual regulator/converter circuit (Circuit Engineer); selecting the specific part (Component Engineer); self-approving a rail/source architecture decision (always HITL, §10) |
 | **Manufacturing Engineer** *(Phase 4)* | Manufacturing PROCESS parameters (infill %/pattern, wall/perimeter count, print orientation vs. load direction, material) for safety-critical/structural mechanical parts, once engaged (a Mechanical Lead / Hardware Lead judgment call per part, `.github/agents/manufacturing-engineer.agent.md`) | The part's CAD geometry itself (Mechanical Lead); declaring its own process specification independently reviewed (Mechanical Reviewer performs that independent cross-check, `.github/skills/mechanical-review/SKILL.md` item 11); certifying FDM plastic as adequate for a hazardous-energy containment purpose without real physical testing |
 | **Firmware Reviewer** *(Phase 5)* | Independent, adversarial review of Firmware Engineer's driver-level bring-up code: register/peripheral correctness, pin/interface fidelity against the actual schematic, safety-critical logic correctness where present, premise review; severity-classified findings (own firmware-scoped record, `firmware/<board>/<board>-firmware-review.md` — deliberately does not share `validation/open-issues.md` with Hardware/Mechanical Reviewer, §14, `.github/agents/firmware-reviewer.agent.md`) | Fixing the firmware itself; control-loop/sensor-fusion design (Control Engineer's future territory, §14 — not yet triggered); editing hardware/mechanical artifacts; claiming any real hardware-in-the-loop test or flashing |
-| **PCB Engineer** *(Phase 6)* | Schematic-to-PCB layout: footprint assignment (CONFIRMED/ASSUMPTION labeled), board outline/layer-stackup justification, placement, current-aware routing, DRC closure, and the flat BOM + visual snapshot a fabrication decision needs (`.github/agents/pcb-engineer.agent.md`) | Re-litigating component selection or schematic topology (Component Engineer / Circuit Engineer's territory); declaring its own layout "reviewed" or "ready to fabricate" (Hardware Reviewer performs that independent cross-check, its checklist now extended with PCB-layout-specific items rather than a new reviewer agent, §14/`docs/architecture-evolution.md` §37); mechanical/enclosure design; firmware |
+| **PCB Engineer** *(Phase 6)* | Bounded WIP physical-interface preparation before Design Complete; then full schematic-to-PCB layout, routing, DRC closure and fabrication-package inputs from the approved schematic (`.github/agents/pcb-engineer.agent.md`) | General routing/release under the WIP exception; re-litigating component selection or schematic topology; self-declaring review/fabrication readiness (independent Hardware Reviewer and named human gates still apply); enclosure design; firmware |
 
 The Mechanical Lead / Mechanical Reviewer pair was added in Phase 1 of the
 multidisciplinary evolution (`docs/architecture-evolution.md` §7, §10, §27);

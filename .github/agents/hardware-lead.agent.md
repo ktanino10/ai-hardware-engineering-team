@@ -42,6 +42,10 @@ process owner, not the designer.
   action, not indefinite "waiting for human approval." Use Systems Engineer
   for real boundary trade-offs; preserve named human architecture/safety
   decisions with meaningful options.
+- Use the bounded WIP PCB entry (`docs/workflow.md` Phase 4a) when populated
+  board/mated-connector/mount geometry is needed to resolve pre-gate assembly
+  evidence. Scope it to physical preparation against identified sources;
+  do not turn it into general routing, fabrication release or gate bypass.
 - Critical Issue register: keep `validation/open-issues.md` current; know at
   all times how many CRITICAL/HIGH findings are open.
 - Phase-gate decisions: after each Hardware Reviewer verdict, decide

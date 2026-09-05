@@ -18,6 +18,8 @@ flowchart LR
     F -- "issue found" --> D
     F --> G["7. Design Complete\nGate"]
     D -- "known/provisional physical interfaces" --> H8["8. Electronics->Mechanical\nHandoff"]
+    D -- "bounded source snapshot" --> P4A["4a. PCB WIP\nphysical preparation only"]
+    P4A -- "populated/mated envelopes + provisional mounts" --> H8
     H8 --> H9["9. Mechanical Design\n+ WIP assembly evidence"]
     H9 --> H10["10. Independent\nMechanical Review"]
     H10 -- "CRITICAL/HIGH" --> H9
@@ -42,6 +44,12 @@ needs Component Selection's real per-subsystem current/voltage numbers
 before an architecture proposal is possible, and feeds forward *into*
 Phase 4 rather than running alongside it — see Phase 12's entry/exit
 criteria below.
+
+Phase 4a is scoped PCB physical-interface preparation, not a new discipline
+or permission for full layout/routing. It provides the board evidence Phases
+8-10 need before their shared gate can close; `.github/skills/pcb-layout/SKILL.md`
+keeps general routing, completed layout and fabrication release on the
+existing Design Complete / independent review / named human approval path.
 
 ## 2. Phase Detail
 
@@ -106,6 +114,34 @@ criteria below.
   against the Hardware Reviewer's checklist completed, handed off.
 - **Parallel-safe?** Sub-blocks: yes, after interfaces are fixed. Integration:
   no.
+
+### Phase 4a — WIP PCB physical-interface preparation
+- **Owner**: PCB Engineer, scoped by Hardware Lead; Circuit Engineer retains
+  schematic/connectivity ownership, Mechanical Lead retains enclosure geometry.
+- **Entry criteria**: An identified Circuit Engineer-owned source revision
+  and approved part choices support a bounded physical-interface question.
+  Missing facts are explicit UNKNOWNs with source-investigation owners.
+  Design Complete and a finalized outline are **not** entry conditions for
+  this preparation, because the resulting geometry helps resolve Phases 8-10.
+- **Activities**: source packages/footprints, populate board-face and mated
+  connector envelopes, and prepare provisional outline, mounts and placement
+  geometry needed for assembly planning. State source dimensions versus
+  allocations/UNKNOWNs, insertion/tool-access allowances and actual routing/
+  DRC status. Route schematic gaps to Circuit Engineer; do not invent parts,
+  connectivity or safety decisions to make an envelope look complete.
+- **Exit criteria**: source-revision-linked **WIP - NOT ASSEMBLY READY**
+  physical evidence and gap owners handed to Mechanical Lead via Hardware
+  Lead (`docs/assembly-evidence.md`). Early blocker review is permitted; an
+  incomplete or unrouted board remains incomplete.
+- **Boundary**: no general routing, fabrication-ready release, self-approval
+  or physical action under this entry. Full layout still needs the
+  Design-Complete schematic; independent Hardware Reviewer review and all
+  named architecture/component/BOM/safety/fabrication/power-on gates remain.
+- **Loop-back**: changed schematic/PCB source facts invalidate affected
+  WIP geometry and downstream evidence; refresh the handoff, not just a label.
+- **Parallel-safe?** Yes, bounded physical preparation can accompany
+  schematic review and mechanical planning, with one PCB geometry owner
+  and explicit source-version handoffs; no competing layouts.
 
 ### Phase 5 — Independent Review
 - **Owner**: Hardware Reviewer (checklist) + `rubber-duck` (premise check),
@@ -175,7 +211,9 @@ multidisciplinary evolution — `docs/architecture-evolution.md` §13, §27)*
   Include populated/mated electronics, all required boards/sensors/drivers/
   power interfaces, mounting/insulation and retained connector/harness
   envelopes. Hardware Lead assigns source investigations or concrete
-  alternatives; missing facts are not indefinitely parked on human approval.
+  alternatives, including Phase 4a preparation when board facts are needed
+  before Design Complete; missing facts are not indefinitely parked on
+  human approval.
 - **Exit criteria**: `hardware/mechanical-interface.md`'s required fields
   (board outline, mounting holes, max component height, connector locations)
   are at least `ASSUMPTION`/`ESTIMATE`-populated, or an `UNKNOWN` has been
@@ -383,14 +421,17 @@ Two layers, used together — see architecture.md §3 for the invocation model:
   `design-complete-gate`. This layer is **not** a durable record — it resets
   per session and is not the place evidence or decisions live.
 
-Once a stable board outline exists, the same chain extends (Phase 1,
+Once physical interfaces are identified, the same chain extends (Phase 1,
 Mechanical — §2 Phase 8-10 above): `circuit-integrate` → (fork)
 `mechanical-interface-extract` → `mechanical-design` →
 `wip-assembly-evidence` → `independent-mechanical-review` →
 conditional `mechanical-rework` or
 `design-complete-gate` — the *same* `design-complete-gate` todo both chains
 converge on, matching the single shared `validation/open-issues.md` backlog
-(architecture.md §8). Once pin/interface allocation is fixed, a third fork
+(architecture.md §8). When board facts are missing, insert the bounded
+`wip-pcb-physical-preparation` handoff (Phase 4a) before interface extraction,
+not a dependency on Design Complete or on general routing. Once pin/interface
+allocation is fixed, a third fork
 (Phase 2, Firmware — §2 Phase 11 above) can run independently:
 `circuit-integrate` → (fork) `firmware-bringup` — this branch does **not**
 converge on `design-complete-gate` (§2 Phase 11's own note on why), so it

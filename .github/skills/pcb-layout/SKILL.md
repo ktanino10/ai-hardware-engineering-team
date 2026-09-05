@@ -1,32 +1,34 @@
 ---
 name: pcb-layout
-description: Standard procedure for taking a Design-Complete schematic to a real, DRC-clean PCB layout -- footprint assignment (CONFIRMED/ASSUMPTION labeled), board outline and layer-stackup justification, placement, current-aware routing, and DRC closure -- producing a flat order-ready BOM and a visual snapshot for independent review. Use this whenever a schematic-to-layout handoff is starting or a KiCad project needs its footprints/PCB completed.
+description: Prepare bounded WIP PCB physical interfaces before Design Complete when assembly evidence needs them, then perform full layout, routing and DRC closure from the approved schematic. Use for source-grounded board-envelope/mount/connector planning or schematic-to-layout handoff; keep WIP preparation separate from independently reviewed fabrication release.
 ---
 
 # Skill: PCB Layout
 
 ## Purpose
 
-Turn an already Design-Complete schematic into a physically buildable,
+Provide PCB physical facts early enough to resolve assembly interfaces, then
+turn a Design-Complete schematic into a physically buildable,
 DRC-clean PCB: every symbol has a real footprint, every net is routed with
 current-appropriate copper, the stack-up/outline is a justified decision
 (not a default), and the fabrication-package inputs (flat BOM, visual
-snapshot) are ready for independent review. This runs **after** the
+snapshot) are ready for independent review. **Full layout/routing** runs after the
 Circuit Engineer's schematic has reached Design Complete
 (`docs/architecture.md` §8) and **before** the Hardware Reviewer's
 independent PCB-layout review (`docs/architecture.md` §10: "before PCB
-fabrication").
+fabrication"). The bounded WIP path below runs before that gate without
+waiving schematic ownership, source requirements or physical-action holds.
 
 ## When to use
 
 Whenever a project's schematic-to-layout handoff becomes a distinct phase
 — either because a human explicitly requests an orderable-PCB stage, or
 because a Design-Complete schematic is otherwise ready to leave the
-Markdown/schematic-only stage. Not needed while a design is still iterating
-at the schematic level (Circuit Engineer + Hardware Reviewer's normal
-loop-back cycle, `docs/architecture.md` §2) — layout work on a design that
-hasn't reached Design Complete risks being redone every time the schematic
-changes.
+Markdown/schematic-only stage. Also use the **scoped WIP preparation** path
+when Hardware Lead needs actual populated-board, mounting or connector
+geometry for assembly evidence before Design Complete. Do not expand that
+exception into general routing or a fabrication-ready claim while the
+schematic is still iterating.
 
 ## Inputs
 
@@ -40,19 +42,40 @@ changes.
   KiCad-authoring session's own "Symbol/footprint decisions" table) — reuse
   and extend rather than re-deciding parts already confirmed.
 
-## Procedure
+## Scoped WIP physical-interface preparation
+
+1. Identify the Circuit Engineer-owned source revision, approved part
+   choices, relevant interfaces and the bounded facts Hardware Lead needs
+   (`docs/workflow.md` Phase 4a). Check that the real KiCad snapshot reflects
+   the facts being used; send schematic/connectivity corrections back to
+   Circuit Engineer. Do not fill missing facts with guessed dimensions.
+2. Source package/footprint dimensions and populate physical envelopes on
+   both board faces, including fully mated connectors, mounting/insulation
+   and insertion/tool-access allowances. Prepare provisional outline,
+   hole/mount and placement geometry only as needed for assembly planning;
+   distinguish sourced dimensions, engineering allocations and UNKNOWNs.
+3. Hand off revision-linked **WIP - NOT ASSEMBLY READY** geometry and
+   measurements to Mechanical Lead via Hardware Lead, including owners/
+   next actions for missing interfaces and the actual routing/DRC state.
+   Use `docs/assembly-evidence.md`; do not present a bare board rectangle
+   or an unrouted mock-up as a verified complete PCB.
+4. Request early independent blocker review as useful and regenerate affected
+   evidence after source changes. Stop this scoped path before general
+   routing or fabrication release. Architecture, part/topology, major BOM and
+   safety decisions still require their existing named human approvals.
+
+## Full-layout procedure
 
 1. **Confirm the KiCad schematic actually reflects the Design-Complete
-   design before touching layout.** A schematic design document can reach
+   design before general routing/full layout.** This condition does not block
+   the scoped WIP preparation above. A schematic design document can reach
    Design Complete (Markdown/net-list level) before every circuit block in
    it is transcribed into the real KiCad project — check both against each
    other (symbol count, net list) rather than assuming the KiCad file is
    current just because the document is Design Complete. If a gap exists,
-   extend the KiCad schematic first (reusing whatever programmatic
-   authoring method the project already established, e.g. a
-   `generate_schematic.py`-style script — re-run it, don't hand-edit the
-   generated file), and re-verify with `kicad-cli sch erc` +
-   `sch export netlist` before proceeding to layout.
+   route it to Circuit Engineer to update its owned schematic using the
+   established authoring method and re-verify with available ERC/netlist
+   tooling before proceeding. Do not silently edit connectivity in PCB work.
 2. **Assign every missing footprint.** For each symbol without one: find
    the part's real package from its own datasheet/mechanical drawing or a
    real distributor listing. Label CONFIRMED (matches a part-specific
@@ -104,7 +127,12 @@ changes.
 
 ## Output
 
-The completed `.kicad_pcb` (footprints placed, nets routed, stack-up
+For scoped WIP: revision-linked populated/mated envelopes, provisional
+outline/mount/placement geometry, confidence labels, explicit missing
+interfaces/owners and routing/DRC limitations for early assembly/blocker review.
+This is not a completed layout or permission to fabricate.
+
+For full layout: the completed `.kicad_pcb` (footprints placed, nets routed, stack-up
 defined), a DRC report/history entry, a flat order-ready BOM, a visual
 snapshot attached to `validation/design-review.md` per this project's
 existing convention, and a handoff to the Hardware Reviewer for independent
@@ -139,7 +167,7 @@ consumers. Work through every category below before handoff:
    facts when the PCB itself is what moved.
 3. **Treat board-outline/mounting changes as invalidating prior mechanical
    assumptions until re-confirmed.** A previously "stable board outline"
-   handoff (the Phase 8 trigger in `docs/workflow.md`) does not remain valid
+   handoff (a finalized Phase 8 input, not a WIP entry prerequisite) does not remain valid
    automatically after a later layout growth/resize. If you changed the
    geometry, state plainly that Mechanical must re-run its own review cycle
    against the new snapshot rather than silently inheriting the old one.
