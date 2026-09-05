@@ -43,6 +43,7 @@ class Scenario:
     contact: bool = True
     gravity: bool = True
     target: tuple = (1.0, 0.0, 0.0, 0.0)
+    initial_quat: tuple | None = None
     perturbation_rad: float = 0.0
     initial_clearance_m: float = 0.0
     controller: str = "off"
@@ -51,6 +52,23 @@ class Scenario:
     kp_nm_rad: float = 0.08
     kd_nm_s_rad: float = 0.018
     command_delay_s: float = 0.02
+
+    def __post_init__(self):
+        for quat in (self.target, self.initial_quat):
+            if quat is not None and (np.asarray(quat).shape != (4,) or
+                                    not np.all(np.isfinite(quat)) or
+                                    not np.isclose(np.linalg.norm(quat), 1, atol=1e-12, rtol=0)):
+                raise ValueError("Scenario quaternions must be finite unit wxyz values.")
+        for value in (self.duration_s, self.pulse_half_period_s):
+            if not np.isfinite(value) or value <= 0:
+                raise ValueError("Scenario duration and pulse period must be positive.")
+        for value in (self.initial_clearance_m, self.command_delay_s, self.kp_nm_rad, self.kd_nm_s_rad):
+            if not np.isfinite(value) or value < 0:
+                raise ValueError("Scenario clearance, delay and gains must be nonnegative.")
+        if not np.isfinite(self.perturbation_rad) or np.asarray(self.pulse_nm).shape != (3,) or not np.all(np.isfinite(self.pulse_nm)):
+            raise ValueError("Invalid perturbation/pulse parameters.")
+        if self.controller not in {"off", "pulse", "pd"}:
+            raise ValueError("Unknown controller.")
 
     def record(self):
         return asdict(self)
@@ -75,15 +93,13 @@ def scenarios():
             Scenario("vertex-balance", "Pre-positioned vertex, perturbed 2 deg; NOT a jump/transition.",
                      target=vertex, perturbation_rad=math.radians(2), controller="pd", duration_s=3.0),
             Scenario("face-to-vertex-attempt", "Start on a face; ask for vertex attitude. Falling/saturation is valid.",
-                     target=vertex, controller="pd", duration_s=3.0),
+                     target=vertex, initial_quat=(1, 0, 0, 0), controller="pd", duration_s=3.0),
         ]
     }
 
 
 def initialize(model, data, config, scenario):
-    quat = np.asarray(scenario.target)
-    if scenario.name == "face-to-vertex-attempt":
-        quat = np.array([1.0, 0.0, 0.0, 0.0])
+    quat = np.asarray(scenario.target if scenario.initial_quat is None else scenario.initial_quat)
     quat = multiply(quat, axis_angle([1, 0, 0], scenario.perturbation_rad))
     data.qpos[3:7] = quat
     half = config["body"]["side_m"] / 2

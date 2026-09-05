@@ -12,7 +12,7 @@ import subprocess
 import mujoco
 import numpy as np
 
-from .model import ROOT, build
+from .model import ROOT, build, load_config
 from .scenarios import command, error_vector, initialize, rotation
 
 REPO = ROOT.parent
@@ -39,6 +39,8 @@ def contacts(model, data):
     normal = 0.0
     active = 0
     minimum = 0.0
+    slip_speed = 0.0
+    omega = rotation(data.qpos[3:7]) @ data.qvel[3:6]
     for i in range(data.ncon):
         contact = data.contact[i]
         minimum = min(minimum, float(contact.dist))
@@ -47,7 +49,10 @@ def contacts(model, data):
             mujoco.mj_contactForce(model, data, i, wrench)
             normal += wrench[0]
             active += int(wrench[0] > 1e-8)
-    return active, normal, minimum
+            if wrench[0] > 1e-8:
+                velocity = data.qvel[:3] + np.cross(omega, contact.pos - data.qpos[:3])
+                slip_speed = max(slip_speed, float(np.linalg.norm(velocity[:2])))
+    return active, normal, minimum, slip_speed
 
 
 def simulate(config, scenario):
@@ -64,8 +69,8 @@ def simulate(config, scenario):
     speed_limit = np.asarray(config["actuation"]["speed_cutoff_rad_s"])
     total_mass = float(sum(model.body_mass))
     arrays = {k: [] for k in ("time", "qpos", "qvel", "command", "delayed", "applied",
-                              "saturated", "speed_cutoff", "angular_momentum", "linear_momentum",
-                              "energy", "work", "contact", "omega_world", "attitude_error")}
+                              "saturated", "speed_cutoff", "speed_exceeded", "angular_momentum", "linear_momentum",
+                              "energy", "work", "contact", "omega_world", "wheel_absolute_axial", "attitude_error")}
     work = np.zeros(3)
 
     def powers():
@@ -92,10 +97,12 @@ def simulate(config, scenario):
                 "time": float(data.time), "qpos": data.qpos.copy(), "qvel": data.qvel.copy(),
                 "command": requested, "delayed": delayed, "applied": data.actuator_force.copy(),
                 "saturated": np.abs(delayed) > torque_limit, "speed_cutoff": cutoff,
+                "speed_exceeded": np.abs(data.qvel[6:]) > speed_limit,
                 "angular_momentum": data.sensor("angular_momentum_world").data.copy(),
                 "linear_momentum": total_mass * data.sensor("com_velocity_world").data.copy(),
                 "energy": data.energy.copy(), "work": work.copy(), "contact": contacts(model, data),
                 "omega_world": rotation(data.qpos[3:7]) @ data.qvel[3:6],
+                "wheel_absolute_axial": data.qvel[6:].copy() + data.qvel[3:6],
                 "attitude_error": error_vector(data.qpos[3:7], scenario.target),
             }
             for key, value in values.items():
@@ -114,12 +121,12 @@ def write_csv(path, values):
               "qvel": ["vx_world_m_s", "vy_world_m_s", "vz_world_m_s",
                        "wx_body_rad_s", "wy_body_rad_s", "wz_body_rad_s",
                        "wheel_x_relative_rad_s", "wheel_y_relative_rad_s", "wheel_z_relative_rad_s"],
-              "contact": ["active_contacts", "normal_force_n", "minimum_contact_distance_m"],
+              "contact": ["active_contacts", "normal_force_n", "minimum_contact_distance_m", "max_loaded_point_slip_m_s"],
               "energy": ["potential_j", "kinetic_j"], "work": ["motor_work_j", "passive_work_j", "constraint_work_j"]}
     for key, unit in (("command", "nm"), ("delayed", "nm"), ("applied", "nm"),
-                      ("saturated", "bool"), ("speed_cutoff", "bool"),
+                      ("saturated", "bool"), ("speed_cutoff", "bool"), ("speed_exceeded", "bool"),
                       ("angular_momentum", "world_nms"), ("linear_momentum", "world_kg_m_s"),
-                      ("omega_world", "rad_s"), ("attitude_error", "body_rad")):
+                      ("omega_world", "rad_s"), ("wheel_absolute_axial", "rad_s"), ("attitude_error", "body_rad")):
         fields[key] = [f"{key}_{axis}_{unit}" for axis in "xyz"]
     matrix = np.column_stack([values[key] for key in fields])
     with Path(path).open("w", newline="", encoding="utf-8") as stream:
@@ -130,22 +137,29 @@ def write_csv(path, values):
 
 def summary(values, scenario, config):
     angle = np.rad2deg(np.linalg.norm(values["attitude_error"], axis=1))
+    outcome = "NO_CONTROL_GOAL"
+    if scenario.controller == "pd":
+        if scenario.initial_quat is not None:
+            outcome = "TARGET_ATTITUDE_REACHED_ONLY" if angle[-1] <= 5 else "TARGET_NOT_REACHED"
+        else:
+            outcome = "DEPARTED_TARGET" if np.any(angle > 5) else "WITHIN_TRIAL_BAND"
     return {
         "classification": config["classification"], "hardware_approval": False,
         "scenario": scenario.record(), "samples": len(values["time"]),
         "final_attitude_error_deg": float(angle[-1]), "max_attitude_error_deg": float(max(angle)),
         "trial_band_deg": 5,
-        "outcome": ("DEPARTED_TARGET" if np.any(angle > 5) else "WITHIN_TRIAL_BAND")
-        if scenario.controller == "pd" else "NO_CONTROL_GOAL",
+        "outcome": outcome,
         "max_wheel_relative_rad_s": np.max(np.abs(values["qvel"][:, 6:]), axis=0).tolist(),
         "torque_saturated_samples": np.sum(values["saturated"], axis=0).tolist(),
         "speed_cutoff_samples": np.sum(values["speed_cutoff"], axis=0).tolist(),
+        "speed_exceeded_samples": np.sum(values["speed_exceeded"], axis=0).tolist(),
         "min_height_m": float(np.min(values["qpos"][:, 2])),
-        "max_penetration_m": float(-np.min(values["contact"][:, 2])),
+        "max_penetration_m": float(max(0, -np.min(values["contact"][:, 2]))),
+        "max_loaded_point_slip_m_s": float(np.max(values["contact"][:, 3])),
         "delta_angular_momentum_world_nms": (values["angular_momentum"][-1] - values["angular_momentum"][0]).tolist(),
         "rigid_energy_minus_logged_work_j": float(np.sum(values["energy"][-1] - values["energy"][0]) -
                                                   np.sum(values["work"][-1])),
-        "interpretation": "5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition.",
+        "interpretation": "Metrics are sampled at 100 Hz, not guaranteed continuous maxima. 5 deg is a reporting band, not qualification. Pre-positioned balance is not a transition; a geometric target is not necessarily the COM-balanced pose of an asymmetric proxy.",
     }
 
 
@@ -155,7 +169,10 @@ def finalize_manifest(directory, manifest):
     write_json(directory / "manifest.json", manifest)
 
 
-def run(config, scenario, directory):
+def run(config, scenario, directory, *, config_path=None):
+    if config_path is not None and load_config(config_path) != config:
+        raise ValueError("Selected model file differs from the supplied model; do not misattribute its provenance.")
+    code_before = {str(p.relative_to(REPO)): sha256(p) for p in sorted((ROOT / "cube_sim").glob("*.py"))}
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=False)
     values, xml = simulate(config, scenario)
@@ -168,18 +185,30 @@ def run(config, scenario, directory):
     revision = subprocess.run(["git", "rev-parse", "HEAD"], cwd=REPO, check=True,
                               capture_output=True, text=True).stdout.strip()
     dirty = subprocess.run(["git", "status", "--porcelain", "--", "simulation/cube_sim",
-                            "simulation/models", "simulation/requirements.txt"], cwd=REPO,
+                            "simulation/models", "simulation/intake", "simulation/requirements.txt",
+                            "simulation/requirements-lock.txt"], cwd=REPO,
                            check=True, capture_output=True, text=True).stdout.strip()
+    source = {"kind": "inline_snapshot", "sha256": sha256(directory / "input.json")}
+    if config_path is not None:
+        path = Path(config_path).resolve()
+        if path.is_relative_to(ROOT / "models"):
+            source = {"kind": "repository_file", "path": str(path.relative_to(REPO)), "sha256": sha256(path)}
     manifest = {
         "schema_version": 1, "state": "WIP_SIMULATION_NOT_HARDWARE_OR_ASSEMBLY_APPROVAL",
         "classification": config["classification"], "source_revision": revision,
         "uncommitted_model_code": bool(dirty),
-        "code": {str(p.relative_to(REPO)): sha256(p) for p in sorted((ROOT / "cube_sim").glob("*.py"))},
+        "code": code_before,
+        "dependency_lock_sha256": sha256(ROOT / "requirements-lock.txt"),
+        "input_model": source,
         "environment": {"python": platform.python_version(), "platform": platform.platform(),
                         **{pkg: importlib.metadata.version(pkg) for pkg in ("mujoco", "numpy", "matplotlib", "pillow")}},
-        "sample_period_s": SAMPLE_PERIOD, "rendering": {"status": "NOT_RUN"},
+        "sample_period_s": SAMPLE_PERIOD, "stochasticity": "NONE", "rendering": {"status": "NOT_RUN"},
         "source_snapshot": config["provenance"]["source_snapshot"],
         "omissions": config["omissions"],
     }
+    if code_before != {str(p.relative_to(REPO)): sha256(p) for p in sorted((ROOT / "cube_sim").glob("*.py"))}:
+        raise RuntimeError("Code changed during integration; discard this partial run and regenerate from a frozen revision.")
+    if config_path is not None and load_config(config_path) != config:
+        raise RuntimeError("Model file changed during integration; this partial run is not accepted.")
     finalize_manifest(directory, manifest)
     return values, manifest
