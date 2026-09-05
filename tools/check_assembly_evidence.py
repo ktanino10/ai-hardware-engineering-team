@@ -329,11 +329,15 @@ def check_changed_files(changed: list[str], root: pathlib.Path = REPO_ROOT,
     # package; inactive historical revisions deliberately do not participate.
     for name in current.values():
         references = reference_paths(load_record(root / name))
+        dependencies = set(references)
         # Validate path identity before comparing literal Git paths; otherwise
         # an ancestor alias can hide target edits or link retargeting as N/A.
         for reference in references:
             local_path(root, reference)
-        if references & changed_set:
+            # Deleted ancestors no longer exist for the symlink preflight.
+            dependencies.update(parent.as_posix() for parent in
+                                pathlib.PurePosixPath(reference).parents if parent.parts)
+        if dependencies & changed_set:
             manifests.add(name)
     if not physical and not manifests:
         return []

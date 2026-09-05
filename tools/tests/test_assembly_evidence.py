@@ -302,6 +302,35 @@ class AssemblyEvidenceTests(unittest.TestCase):
         self.assertIn("symlink", errors)
         self.assertNotIn("NOT APPLICABLE", output)
 
+    def test_real_pr_ancestor_symlink_deletion_cannot_receive_exemption(self):
+        base, _, link = self.symlink_report_fixture()
+        link.unlink()
+        head = self.commit_fixture("Delete only the current report's ancestor symlink")
+        self.assertEqual(self.git("diff", "--name-status", base, head).strip(),
+                         "D\tvalidation/report-link")
+        status, output, errors = self.run_pr(base, head)
+        self.assertEqual(status, 1, output + errors)
+        self.assertIn("independent_review: missing/empty file: validation/report-link/independent-review.md",
+                      errors)
+        self.assertNotIn("NOT APPLICABLE", output)
+
+    def test_real_pr_unrelated_prefix_sibling_does_not_select_current_evidence(self):
+        self.approve()
+        report = self.file("validation/reports/current.md", "Synthetic canonical current report\n")
+        self.data["artifacts"]["independent_review"]["files"] = [report]
+        self.data["approval"]["record"] = dict(report, section="Synthetic report")
+        self.assertEqual(self.validate(require_approved=True).state, "APPROVED")
+        base = self.commit_fixture("Canonical current evidence baseline")
+        self.file("validation/report", "This path is a string prefix, not a path ancestor\n")
+        head = self.commit_fixture("Add unrelated neighboring report path")
+        with mock.patch.object(checker, "validate_manifest",
+                               side_effect=AssertionError("Unrelated current evidence was selected")), \
+                mock.patch.object(checker, "digest_file",
+                                  side_effect=AssertionError("Unrelated current evidence was hashed")):
+            status, output, errors = self.run_pr(base, head)
+        self.assertEqual(status, 0, output + errors)
+        self.assertIn("NOT APPLICABLE", output)
+
     def test_current_reference_paths_are_validated_before_unrelated_diff_exemption(self):
         self.approve()
         original = copy.deepcopy(self.data)
