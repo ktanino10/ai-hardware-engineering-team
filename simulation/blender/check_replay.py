@@ -39,7 +39,14 @@ def world_transform(obj, position, quaternion):
     require(math.isfinite(error) and error < 1e-6, f"{obj.name} full world transform mismatch: {error}")
 
 
+def parent_inverse_identity(obj):
+    error = max(abs(obj.matrix_parent_inverse[i][j] - (1 if i == j else 0))
+                for i in range(4) for j in range(4))
+    require(math.isfinite(error) and error < 1e-12, f"{obj.name} unsupported parent inverse")
+
+
 def cylinder_bounds(obj, radius, depth, inner=None):
+    parent_inverse_identity(obj)
     require(not obj.modifiers and not obj.constraints and obj.data.shape_keys is None,
             f"{obj.name} has an unsupported geometry modifier/constraint")
     require(obj.animation_data is None, f"{obj.name} must have a fixed local geometry transform")
@@ -86,17 +93,21 @@ def main():
             expected_edges.append((Vector(location), Vector([int(i == axis) for i in range(3)])))
     edges = [obj for obj in root.children if obj.name.startswith("Visual_cube_edge")]
     require(len(edges) == 12, "Expected all twelve display edges")
+    edge_transforms = []
     for obj in edges:
         index = min(range(len(expected_edges)), key=lambda i: (obj.location - expected_edges[i][0]).length)
         location, axis = expected_edges.pop(index)
         vector_error(obj.location, location, "body edge centre")
         vector_error(obj.scale, (1, 1, 1), "body edge scale")
-        quaternion_error(obj.rotation_quaternion, Vector((0, 0, 1)).rotation_difference(axis), "body edge")
+        alignment = Vector((0, 0, 1)).rotation_difference(axis)
+        quaternion_error(obj.rotation_quaternion, alignment, "body edge")
         cylinder_bounds(obj, .002, 2 * half)
+        edge_transforms.append((obj, location, alignment))
     for i, item in enumerate(config["wheels"]):
         pivot = bpy.data.objects["WHEEL_" + item["name"].upper() + "_REPLAY"]
         mesh = bpy.data.objects["Wheel_" + item["name"]]
         require(pivot.parent == root and mesh.parent == pivot, "Rotor parenting mismatch")
+        parent_inverse_identity(pivot)
         require(not pivot.constraints, "Unexpected rotor constraint")
         vector_error(pivot.location, item["center_m"], "rotor local centre")
         vector_error(pivot.scale, (1, 1, 1), "rotor scale")
@@ -107,6 +118,7 @@ def main():
         cylinder_bounds(mesh, item["radius_m"], item["thickness_m"], item.get("inner_radius_m"))
         markers = [obj for obj in pivot.children if obj.name.startswith("Physical_angle_sample_marker")]
         require(len(markers) == 1, "Expected one source-angle marker per rotor")
+        parent_inverse_identity(markers[0])
         require(markers[0].animation_data is None and not markers[0].constraints and not markers[0].modifiers,
                 "Unexpected animated/modified rotation marker")
         marker = Vector(item["axis"]) * item["thickness_m"] / 2
@@ -124,6 +136,8 @@ def main():
         actual = root.matrix_world.to_quaternion()
         body_error = quaternion_error(actual, expected, "body world")
         world_transform(root, position, expected)
+        for obj, location, alignment in edge_transforms:
+            world_transform(obj, position + expected @ location, expected @ alignment)
         wheel_errors = []
         centre_errors = []
         for item in config["wheels"]:

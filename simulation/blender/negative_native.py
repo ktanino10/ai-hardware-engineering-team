@@ -21,14 +21,17 @@ def main():
     args.blend, args.run, args.output = args.blend.resolve(), args.run.resolve(), args.output.resolve()
     args.output.mkdir(parents=True, exist_ok=False)
     results = []
-    for name in ("wheel-centre-10mm", "wheel-scale", "mesh-axis"):
+    for name in ("wheel-centre-10mm", "wheel-scale", "mesh-axis", "edge-parent-inverse-10mm"):
         bpy.ops.wm.open_mainfile(filepath=str(args.blend.resolve()))
         if name == "wheel-centre-10mm":
             bpy.data.objects["WHEEL_X_REPLAY"].location.x += .01
         elif name == "wheel-scale":
             bpy.data.objects["WHEEL_X_REPLAY"].scale.x = 1.1
-        else:
+        elif name == "mesh-axis":
             bpy.data.objects["Wheel_x"].rotation_quaternion = (1, 0, 0, 0)
+        else:
+            edge = next(obj for obj in bpy.data.objects if obj.name.startswith("Visual_cube_edge"))
+            edge.matrix_parent_inverse[0][3] += .01
         directory = args.output / name
         directory.mkdir()
         path = directory / "replay.blend"
