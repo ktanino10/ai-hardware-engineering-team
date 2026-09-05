@@ -1,0 +1,31 @@
+name: Assembly Evidence
+
+# Run on every PR: unrelated docs/policy-only changes receive an explicit N/A,
+# not a missing check. Do not change the existing hardware gate's exemption.
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  assembly-evidence:
+    name: Check revision-linked assembly evidence
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Exercise evidence contract regressions
+        run: python3 -m unittest discover -s tools/tests -p 'test_assembly_evidence.py'
+        env:
+          PYTHONPATH: tools
+      - name: Check changed assembly evidence
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python3 tools/check_assembly_evidence.py

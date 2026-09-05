@@ -51,9 +51,10 @@ sends the design back to the Circuit Engineer for a fix, followed by a
 against the changed area and any area the change could have affected). The
 same loop-back rule applies to the Mechanical Lead / Mechanical Reviewer pair,
 added in Phase 1 (§3, §5.3, `docs/architecture-evolution.md` §27) — Mechanical
-Design can start once Circuit Design has produced a stable board outline (it
-does not need to wait for the Electronics-side Design Complete Gate to pass
-first, since board geometry is independent of later electrical-only fixes),
+Design/WIP assembly planning starts from identified physical interfaces,
+without waiting for Design Complete; finalized dimensions require stable
+source inputs, while unknowns remain visible during early evidence generation
+(`docs/workflow.md` Phases 8-10),
 and both disciplines' findings feed the **same** Design Complete Gate because
 both write to the same `validation/open-issues.md` (§8).
 
@@ -61,12 +62,12 @@ both write to the same `validation/open-issues.md` (§8).
 
 | Agent | Owns | Does NOT own |
 |---|---|---|
-| **Hardware Engineering Lead / Orchestrator** | Requirements intake, task delegation, artifact handoff, phase-gate decisions, Critical Issue register, conflict mediation/escalation | Detailed circuit design |
+| **Hardware Engineering Lead / Orchestrator** | Requirements intake, task delegation, integrated interface completion, revision-linked assembly evidence handoff, phase-gate decisions, Critical Issue register, conflict mediation/escalation | Detailed circuit or mechanical geometry design |
 | **Component Engineer** | Candidate sourcing (≥3 when feasible), datasheet-grounded comparison, EOL/availability/ecosystem evaluation, recommendation | Final schematic topology |
 | **Circuit Engineer** | Schematic design from approved parts + datasheets, design rationale log | Marking own work reviewed/complete |
 | **Hardware Reviewer** | Independent, adversarial review; severity-classified findings | Fixing the design itself |
-| **Mechanical Lead** *(Phase 1)* | Enclosure/mechanical design from `hardware/mechanical-interface.md`, sole owner of the mechanical geometry state, design rationale log | Marking own work reviewed/complete; editing Electronics artifacts |
-| **Mechanical Reviewer** *(Phase 1)* | Independent, adversarial mechanical review; severity-classified findings (shares `validation/open-issues.md` with Hardware Reviewer) | Fixing the design itself |
+| **Mechanical Lead** *(Phase 1)* | Enclosure/mechanical geometry, design rationale and WIP assembly-process/installed/per-stage evidence from sourced interfaces; requested Fusion native/video package | Marking own work reviewed/complete; editing Electronics artifacts; silently redesigning within visualization |
+| **Mechanical Reviewer** *(Phase 1)* | Independent geometry/evidence acceptance, distinguishing early WIP blocker review from final acceptance; severity-classified findings (shared `validation/open-issues.md`) | Fixing the design itself; treating animation or structural CI as safety certification |
 | **Firmware Engineer** *(Phase 2)* | Driver-level bring-up firmware from a Design-Complete schematic: peripheral initialization, register-level configuration, design rationale log (`firmware/<board>/`) | Control loops/sensor fusion/unit conversion (Control Engineer's future territory, §14 — not yet triggered); editing Electronics artifacts; marking own work reviewed/complete (self-check stood in for independent review until a Firmware Reviewer trigger was met, `docs/architecture-evolution.md` §32 — now superseded: Firmware Reviewer performs independent review, Phase 5, `docs/architecture-evolution.md` §36) |
 | **Power Engineer** *(Phase 3)* | System power-tree/rail-topology proposal (`hardware/power-architecture.md`), multi-rail `hardware/power-budget.md` bookkeeping, once engaged (a Hardware Lead judgment call per project/revision, `.github/agents/power-engineer.agent.md`) | Implementing the actual regulator/converter circuit (Circuit Engineer); selecting the specific part (Component Engineer); self-approving a rail/source architecture decision (always HITL, §10) |
 | **Manufacturing Engineer** *(Phase 4)* | Manufacturing PROCESS parameters (infill %/pattern, wall/perimeter count, print orientation vs. load direction, material) for safety-critical/structural mechanical parts, once engaged (a Mechanical Lead / Hardware Lead judgment call per part, `.github/agents/manufacturing-engineer.agent.md`) | The part's CAD geometry itself (Mechanical Lead); declaring its own process specification independently reviewed (Mechanical Reviewer performs that independent cross-check, `.github/skills/mechanical-review/SKILL.md` item 11); certifying FDM plastic as adequate for a hazardous-energy containment purpose without real physical testing |
@@ -325,26 +326,30 @@ itself has no ERC-equivalent). Both facts are simultaneously true.
 
 ### 5.3 Mechanical tooling (Phase 1)
 
-No CAD/3D modeling MCP tool is connected in this environment — **verified**,
-not assumed: a live connection check against the only 3D-capable tool surface
-present in this session's toolset (`blender-get_addon_status`) returned
-"Could not connect to Blender." No local `openscad`/`freecad` binary or
-`cadquery`/`solid`/`build123d` Python library is installed either. Until a
-working CAD/3D tool is verified connected in a future session:
+Capability is **runtime- and operation-specific**, not permanently "no CAD"
+or universally "connected." Mechanical Lead records the current installed
+version/connection and separately verifies model preparation/import,
+Animation workspace/action authoring, native save/reopen and video
+publish/playback. Follow the official UI/API references and preflight in
+`.github/skills/mechanical-visualization/SKILL.md`. Documented API support,
+SDK symbols, an exposed MCP tool and a successfully executed operation are
+different facts; none implies the others.
 
-- The **Mechanical Lead** produces text/parametric output only: an
-  OpenSCAD-syntax `.scad` file (every dimension a named variable) plus a
-  structured dimensional-spec Markdown table, per
-  `.github/agents/mechanical-lead.agent.md` and
-  `hardware/mechanical/README.md`.
-- Do not claim a rendered preview, an STL export, or an automated fit-check
-  exists — see §13 (Future Integration) for the tracked row.
-- The Mechanical Lead does use the *existing*, already-documented read-only
-  KiCad tools (§5.2: `get_project_structure`, `extract_project_netlist`,
-  `analyze_bom`, `generate_pcb_thumbnail`/`generate_project_thumbnail`) to
-  populate `hardware/mechanical-interface.md` from an existing KiCad project
-  when one exists — this is reuse of an already-verified tool surface, not a
-  new capability claim.
+Autodesk Fusion Animation is the standard requested workflow for applicable
+multi-part assemblies, including genuine native storyboards and playable
+published video. Current AnimationManager/Storyboard API documentation
+exists; do not infer absence of Animation APIs from an old search or missing
+MCP operation. Conversely, storyboard/view-recording support alone does not
+prove component-action authoring or publishing. Experimental/unverified
+`fusion_*` MCP tools cannot produce real deliverables.
+
+Retain canonical parametric source and the always-readable dimensional table.
+If execution is unavailable, prepare source inputs and WIP planning evidence,
+record the precise missing operation and smallest supported handoff, and
+leave its artifact BLOCKED. Do not claim a render/export/fit-check/native
+animation exists unless actually produced and inspected. Read-only KiCad
+extraction (§5.2) still supplies the physical interface facts when available.
+See `docs/assembly-evidence.md` for the two-state evidence/release contract.
 
 **Addendum, 2026-09-02 (this session, re-checked at the user's own
 prompting after sharing screenshots of a locally-running Blender MCP
@@ -368,11 +373,10 @@ server" (i.e., the add-on believes it is listening/connected):
 
 Both calls returned `protocol_version: null`, `blender_version: null`,
 `capabilities: []` — no working capability was ever actually obtained this
-session. **This does not change this section's practical conclusion**: the
-Mechanical Lead still produces text/parametric output only until a working
-CAD/3D tool is actually verified connected in whatever session needs it —
-this addendum is only a precise, dated record of what was tried and what
-specifically failed, not a claim that Blender is now usable. No
+session. **Historical observation, not a present-session instruction**:
+text/parametric-only output was the honest limit of that attempt. This
+addendum records what was tried and failed, not a standing claim that Blender
+or another CAD tool is unavailable (or usable) in later sessions. No
 troubleshooting of the user's local Blender/add-on setup was attempted this
 session (out of scope for this documentation-only update).
 
@@ -512,6 +516,14 @@ following hold:
 5. `validation/change-log.md` (ECO) has an entry for this revision, signed off
    by a human.
 
+For applicable assemblies, generate WIP assembly-process and installed/
+per-stage evidence before this gate, as part of real requirement verification
+and Mechanical Review. Release **APPROVED assembly documentation** only after
+the gate and independent acceptance of the exact revision package
+(`docs/assembly-evidence.md`). An early blocker review or structural CI result
+does not satisfy these five conditions, waive required Fusion native/video
+delivery, or authorize fabrication/power-on/flashing (§10).
+
 Findings carry an SLA target (see `validation/open-issues.md` header) so that
 CRITICAL/HIGH items do not silently age — exact day counts are set by the
 human Chief Engineer per project, not hard-coded by AI.
@@ -607,7 +619,7 @@ tools/servers exist)
 | SPICE (simulation, parameter sweep, stability/power analysis) | Not available for automated/scriptable use — **checked, not assumed, 2026-08-31** | The `ngspice` engine (`libngspice.dylib`) is genuinely bundled with the local KiCad 10.0.1 install, but `kicad-cli --help` has no `sim` subcommand — no scriptable/CLI-invokable simulation path was found. A human could still run a SPICE simulation interactively inside KiCad's own GUI (Simulation Command menu), which is not something an agent session can drive non-interactively. Remains Future Integration for *automated* use specifically |
 | Component database / parts availability MCP | Not available | Evaluate when such a tool is actually connected |
 | Test equipment MCP (bench instruments) | Not available | Relevant once `validation/bring-up-procedure.md` moves to instrumented bench testing |
-| CAD/3D modeling tool (e.g. Blender or a parametric CAD/OpenSCAD engine) | Not available — **verified**, not assumed | A live connection check (`blender-get_addon_status`) failed ("Could not connect to Blender"); no local `openscad`/`freecad` binary or `cadquery`/`solid`/`build123d` Python library is installed either. Mechanical Lead produces text/parametric output only until a working tool is verified connected (§5.3) |
+| CAD/assembly-animation tooling | **MOVED to runtime preflight in §5.3** | Past connection failures are historical observations, not permanent instructions. Verify supported model/animation/save/video operations separately; missing agent execution is a precise capability blocker, not proof that Fusion or its public Animation API does not exist. |
 | Firmware flashing / hardware-in-the-loop test tool (e.g. `st-flash`, OpenOCD, a debugger's own CLI) | Not available today (to this AI session's own tooling) | Relevant once a physical board exists to flash — see §5.4/§10. An ARM embedded *compiler* toolchain is a separate, already-available concern (§5.4), not blocked on this row. **2026-09-02**: the human's own tool-procurement research (which SWD programmer/flashing software/USB-UART adapter to actually buy for Bench-IMU-01) is now written up in `validation/bring-up-procedure.md` §0a.1–§0a.4 — that is a paper guide for a future physical build, not a change to this row's own status; no flashing tool is connected to this AI session itself |
 
 Never implement code/process that assumes any of the above exists. When one
@@ -698,14 +710,16 @@ methodology and metrics.
   manufacturing-process-specification/SKILL.md  Manufacturing Engineer's procedure (Phase 4)
   firmware-review/SKILL.md                  Firmware Reviewer's procedure (Phase 5)
   mechanical-visualization/SKILL.md         Mechanical Lead's assembly-instructions/2D-drawing/
-                                              exploded-view/animation procedure for an already-
-                                              Design-Complete revision (documentation, not design)
+                                              WIP assembly evidence + Fusion Animation procedure;
+                                              separately gated APPROVED documentation
 .github/instructions/*.instructions.md     Path-scoped rules (datasheets/, hardware+bom/, validation/,
                                               hardware/mechanical/+mechanical-interface.md — Phase 1,
                                               firmware/ — Phase 2)
 .github/prompts/*.prompt.md                Reusable slash-command-style prompts
 .github/workflows/hardware-gate.yml        CI gate: blocks unresolved CRITICAL/HIGH
 .github/workflows/agent-frontmatter-lint.yml  CI lint: agent/skill required frontmatter (Phase 1)
+.github/workflows/assembly-evidence-check.yml  Revision-linked evidence/status/provenance check,
+                                              not geometry/safety certification
 .github/CODEOWNERS                         Required human review on safety-critical paths
 
 
@@ -728,7 +742,11 @@ hardware/
   power-budget.md                          System power budget (multi-rail once Power Engineer engaged)
   power-architecture.md                    Power-tree/rail-topology proposal + decision record (Phase 3)
   mechanical-interface.md                  Electronics -> Mechanical interface contract (Phase 1)
-  mechanical/README.md                     Mechanical design artifacts (Phase 1, text/parametric only)
+  mechanical/README.md                     Mechanical design artifacts (runtime-verified tooling)
+  mechanical/assembly-evidence/<assembly>/<revision>/manifest.json
+                                              WIP or APPROVED source/artifact handoff
+  mechanical/assembly-evidence/<assembly>/current.json
+                                              Live revision for dependency checks; older records preserved
 
 bom/component-selection.md                 Candidate comparison template
 
@@ -748,12 +766,17 @@ validation/
 docs/
   architecture.md                          This document
   workflow.md                              End-to-end workflow + gates
+  assembly-evidence.md                     Assembly evidence contents, states and structural contract
+  templates/assembly-manifest.json         Incomplete template, not historical design evidence
+  templates/assembly-current.json          Current-revision pointer template
   architecture-evolution.md                Multidisciplinary evolution proposal + Phase 1/2 status
   evaluation.md                            Single vs multi-agent metrics
   commands/make-circuit.md                 Standard kickoff prompt for a new design cycle
 
 tools/check_open_issues.py                 CI gate parser for open-issues.md
 tools/check_agent_frontmatter.py           CI lint for agent/skill frontmatter (Phase 1)
+tools/check_assembly_evidence.py            Diff-aware current-revision assembly evidence checker
+tools/tests/test_assembly_evidence.py       Synthetic positive/negative contract regression cases
 ```
 
 ## 17. Autonomous Operation & Cross-Session Coordination Policy

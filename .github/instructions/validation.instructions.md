@@ -39,3 +39,14 @@ applyTo: 'validation/**'
   becomes concrete enough to act on.
 - Do not report or imply "Design Complete" unless all five conditions in
   `docs/architecture.md` §8 hold.
+- Assembly reviews follow `docs/assembly-evidence.md`: explicitly distinguish
+  an early WIP blocker review (allowed with incomplete evidence) from final
+  evidence acceptance. Record the source revision and reviewed artifact
+  hashes, full installed/per-stage coverage, unknowns and method limits.
+  A successful structural validator, scalar sync or animation export is not
+  independent geometry/safety acceptance.
+- APPROVED assembly documentation requires the exact package's independent
+  review, Design Complete and named safety-decision references. Preserve
+  physical-action stop gates and existing risk dispositions; the requested
+  Fusion native/video deliverables remain incomplete until genuinely
+  delivered or an explicit human-approved alternative is recorded.

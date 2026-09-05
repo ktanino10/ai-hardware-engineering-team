@@ -20,6 +20,9 @@ leaves an evidence trail a human can audit later.
   process, parallelization rules, conflict resolution.
 - **To start a design cycle**: [`docs/commands/make-circuit.md`](docs/commands/make-circuit.md)
   has a copy-pasteable kickoff prompt.
+- **For assemblies**: [`docs/assembly-evidence.md`](docs/assembly-evidence.md)
+  defines early WIP assembly evidence, requested Fusion native/video
+  deliverables and separately gated approved documentation.
 
 ## The agents
 
@@ -91,4 +94,3 @@ yet): MCU + IMU → Motor Driver → Reaction Wheel → 1-axis → 3-axis attitu
 control → a standing "Cube" — see `docs/architecture.md` §11. The framework
 itself stays reusable for any embedded/robotics/IoT hardware project, not
 just this one.
-

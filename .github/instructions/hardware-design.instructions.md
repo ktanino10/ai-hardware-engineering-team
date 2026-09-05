@@ -21,5 +21,12 @@ applyTo: 'hardware/**,bom/**'
   `validation/change-impact-matrix.md` entry before human approval.
 - Keep `hardware/power-budget.md` current whenever a subsystem's
   current/power draw changes.
+- For integrated assembly changes, provide the actual populated/mated
+  PCB/module envelopes, mounts, connector/power interfaces and source
+  references to Mechanical Lead via Hardware Lead. Sourceable gaps require
+  investigation or a concrete alternative, not indefinite human approval.
+  Link changed inputs/artifacts in the revision manifest described by
+  `docs/assembly-evidence.md`; WIP evidence is allowed before Design
+  Complete but does not authorize final readiness or physical operations.
 - Deviating from a datasheet's Recommended Application Circuit is allowed
   but must be justified and cited, not silent.
