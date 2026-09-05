@@ -16,17 +16,17 @@ From the repository root, using the Blender binary found by runtime preflight:
 /Applications/Blender.app/Contents/MacOS/Blender \
   --background --factory-startup --threads 4 --python-exit-code 1 \
   --python simulation/blender/render_replay.py -- \
-  --run simulation/evidence/startup-v2/startup-mechanism-fixture \
+  --run simulation/evidence/startup-v3/startup-mechanism-fixture \
   --output simulation/runs/my-blender-replay --engine workbench --animation
 
 /Applications/Blender.app/Contents/MacOS/Blender \
   --background --factory-startup simulation/runs/my-blender-replay/replay.blend \
   --threads 4 --python-exit-code 1 --python simulation/blender/check_replay.py -- \
-  --run simulation/evidence/startup-v2/startup-mechanism-fixture \
+  --run simulation/evidence/startup-v3/startup-mechanism-fixture \
   --output simulation/runs/my-blender-replay/native-check.json
 
 simulation/.venv/bin/python simulation/blender/encode_replay.py \
-  --run simulation/evidence/startup-v2/startup-mechanism-fixture \
+  --run simulation/evidence/startup-v3/startup-mechanism-fixture \
   --render simulation/runs/my-blender-replay
 ```
 

@@ -5,7 +5,7 @@ MuJoCoで計算します。**実機の成立性・安全性・Design Completeの
 初期コントローラーはシミュレーション専用です。Fusionの組立工程アニメーションとは別物です。
 
 **最新の10秒始動試験**: [高速回転→有限制動の手順と条件](STARTUP.md)。
-閲覧入口は `evidence/startup-v2/index.html`。合成機構モデルと不完全な実機プロキシを
+閲覧入口は `evidence/startup-v3/index.html`。合成機構モデルと不完全な実機プロキシを
 別ケースにし、XYZ反力を内部制動と床接触から計算します。
 Blenderの10秒再描画とCERN ROOT形式への解析出力も、それぞれ役割を分けています。
 

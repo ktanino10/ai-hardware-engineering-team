@@ -212,7 +212,7 @@ def render(directory, *, detail=False):
                       fill="#ffb1a1", font=small)
             angle = np.rad2deg(np.linalg.norm(values["attitude_error"][sample_index]))
             active = int(values["contact"][sample_index, 0])
-            support = "airborne" if active == 0 else f"{active} loaded contact point(s)"
+            support = "no loaded contacts" if active == 0 else f"{active} loaded contact point(s)"
             phase = PHASES[int(values["phase"][sample_index])] if "phase" in values else "ordinary trial"
             draw.text((20, 625), f"t={data.time:.4f} s | {phase} | {support} | error={angle:.1f} deg"
                       f" | trial: {summary['outcome']}", fill="white", font=small)

@@ -93,7 +93,7 @@ def simulate(config, scenario):
                               "contact", "omega_world", "wheel_absolute_axial", "attitude_error",
                               "brake_limit", "brake_torque", "brake_work", "phase",
                               "ground_angular_impulse", "momentum_residual", "wheel_relative_axial_momentum",
-                              "peak_positive_brake_power", "ground_force", "minimum_corner_height")}
+                              "peak_positive_brake_power", "ground_force", "minimum_corner_height", "geometric_contacts")}
     integrals = np.zeros(7)
     peak_positive_brake_power = 0.0
 
@@ -152,6 +152,7 @@ def simulate(config, scenario):
                 "ground_force": data.qfrc_constraint[:3].copy(),
                 "minimum_corner_height": float(data.qpos[2] - config["body"]["side_m"] / 2
                                                * np.abs(rotation(data.qpos[3:7])[2]).sum()),
+                "geometric_contacts": int(data.ncon),
             }
             for key, value in values.items():
                 arrays[key].append(value)
@@ -175,6 +176,7 @@ def write_csv(path, values):
               "peak_positive_brake_power": ["max_positive_brake_power_stage_w"],
               "phase": ["phase_code"],
               "minimum_corner_height": ["minimum_cube_corner_height_m"],
+              "geometric_contacts": ["geometric_contact_count"],
               "energy": ["potential_j", "kinetic_j"], "work": ["motor_work_j", "passive_work_j", "constraint_work_j"]}
     for key, unit in (("command", "nm"), ("delayed", "nm"), ("applied", "nm"),
                       ("saturated", "bool"), ("speed_cutoff", "bool"), ("speed_exceeded", "bool"),
@@ -240,6 +242,15 @@ def summary(values, scenario, config):
                                  & np.all(np.abs(values["qvel"][:, 6:][:, active]) < program.stop_relative_rad_s, axis=1))
         initial_quat = values["qpos"][0, 3:7]
         maximum_rotation = max(np.linalg.norm(error_vector(q, initial_quat)) for q in values["qpos"][:, 3:7])
+        candidates = np.flatnonzero((values["geometric_contacts"] == 0)
+                                     & (values["contact"][:, 1] <= 1e-8)
+                                     & (values["minimum_corner_height"] > .0001))
+        intervals = []
+        if len(candidates):
+            for group in np.split(candidates, np.flatnonzero(np.diff(candidates) > 1) + 1):
+                start, end = float(values["time"][group[0]]), float(values["time"][group[-1]])
+                intervals.append({"first_observed_s": start, "last_observed_s": end,
+                                  "observed_span_s": end - start, "consecutive_samples": len(group)})
         report["startup"] = {
             "initial_condition": "All bodies and wheels start at rest; no pre-spun state or velocity reset.",
             "target_only_rpm_xyz": (np.asarray(program.target_rad_s) * 60 / (2 * np.pi)).tolist(),
@@ -255,8 +266,17 @@ def summary(values, scenario, config):
             "max_body_rotation_from_initial_deg": float(np.rad2deg(maximum_rotation)),
             "max_body_centre_height_m": float(np.max(values["qpos"][:, 2])),
             "max_minimum_corner_height_m": float(np.max(values["minimum_corner_height"])),
-            "airborne_above_0p1mm_observed": bool(np.any((values["contact"][:, 0] == 0)
-                                                       & (values["minimum_corner_height"] > .0001))),
+            "contact_gap_candidate_observed": bool(len(candidates)),
+            "flight_assessment": {
+                "status": "NUMERICALLY_UNRESOLVED_CONTACT_ENVELOPE" if len(candidates) else "NO_GAP_CANDIDATE_ABOVE_THRESHOLD",
+                "criterion": "No geometric contacts; total normal force <=1e-8 N; every cube corner >0.1 mm above plane.",
+                "observed_intervals": intervals,
+                "intervals_are_continuous_clearance_proof": False,
+                "actual_contact_envelope_uncertainty_m": None,
+                "visual_edge_radius_m": .002,
+                "max_recorded_contact_penetration_m": float(max(0, -values["contact"][:, 2].min())),
+                "interpretation": "A tiny box-proxy gap is not resolved physical flight. Compare step/solver/contact-envelope sensitivity; display edges themselves are approximate. Edge crossing/tumbling is separate from capture."
+            },
             "dense_period_s": program.dense_period_s,
             "capture_and_second_jump": "NOT_IMPLEMENTED_OR_CLAIMED; first face-to-edge kick only.",
             "hardware_speed_or_brake_qualified": False,

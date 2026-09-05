@@ -60,6 +60,9 @@ class StartupTests(unittest.TestCase):
         self.assertGreater(fixture_report["startup"]["max_body_rotation_from_initial_deg"], 90)
         self.assertGreater(fixture_report["startup"]["max_body_centre_height_m"], .065)
         self.assertGreater(fixture_report["startup"]["max_minimum_corner_height_m"], .0001)
+        self.assertEqual(fixture_report["startup"]["flight_assessment"]["status"],
+                         "NUMERICALLY_UNRESOLVED_CONTACT_ENVELOPE")
+        self.assertTrue(fixture_report["startup"]["flight_assessment"]["observed_intervals"])
         self.assertEqual(fixture[0]["classification"], "SYNTHETIC_REFERENCE")
         self.assertEqual(fixture[0]["body"]["side_m"], .1)
 

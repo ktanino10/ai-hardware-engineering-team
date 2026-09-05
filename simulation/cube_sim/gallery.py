@@ -156,6 +156,8 @@ def startup_suite(directory):
         cards.append(f"""<article><h2>{html.escape(name)}</h2><p><strong>{text}</strong></p>
 <p>Result: {report['outcome']} / max body rotation {study['max_body_rotation_from_initial_deg']:.3f} deg /
 max lowest-corner clearance {study['max_minimum_corner_height_m'] * 1000:.4f} mm. NO captured balance.</p>
+<p>Flight assessment: <strong>{study['flight_assessment']['status']}</strong>.
+Tiny contact gaps are not a resolved jump; compare contact/geometry uncertainty and convergence.</p>
 <video controls playsinline preload="metadata" poster="{name}/preview.png" src="{name}/motion.mp4"></video>
 <details><summary>100x slow brake detail (10-second video, only 0.1 simulated seconds)</summary>
 <video controls playsinline preload="metadata" poster="{name}/brake-detail-preview.png" src="{name}/brake-detail.mp4"></video></details>

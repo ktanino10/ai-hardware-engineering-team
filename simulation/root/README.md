@@ -20,7 +20,7 @@ or claim to have exercised RDataFrame, PyROOT or ROOT graphics.
 ```sh
 # Repository root; requires existing root-config and c++.
 simulation/.venv/bin/python simulation/root/export.py \
-  simulation/evidence/startup-v2/startup-mechanism-fixture \
+  simulation/evidence/startup-v3/startup-mechanism-fixture \
   --output simulation/runs/my-root-analysis
 ```
 
