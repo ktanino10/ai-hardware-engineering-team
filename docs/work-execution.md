@@ -40,6 +40,15 @@ repository-relative files/directories, not globs; all deliverables must be
 within it. A report-only worker can use `.agent-work/<task>/`. This scratch
 handoff is not a published engineering record.
 
+For `depends_on`, each producer's declared deliverables must also appear at
+the same repository-relative paths in the consumer's `inputs`. Commit those
+deliverables before choosing the consumer's `source_revision`; a worktree at
+that snapshot must contain the recorded bytes. The guard checks both the
+producer's saved files and the consumer's frozen copies. A dependency name
+alone does not authorize reading some other worktree or a stale local copy.
+Use durable repository paths for deliverables intended as dependency inputs;
+ignored scratch reports remain coordinator handoffs, not dependency sources.
+
 From the worker's intended worktree, the coordinator runs:
 
 ```sh
@@ -101,7 +110,9 @@ python3 tools/agent_workflow.py finish RUN_ID --session coordinator-id --state D
 Use `--state BLOCKED` instead when a declared stop condition applies, preserving
 any partial outputs and stating the **specific changed input/decision needed**.
 `DONE` requires every declared deliverable to exist; both terminal states
-record hashes of saved outputs. Hardware Lead must still assess `done_when`:
+record hashes of readable regular outputs. `BLOCKED` records explicit errors
+for missing, invalid or unreadable outputs and releases the attempt without
+repairing or following those paths; `DONE` still rejects them. Hardware Lead must still assess `done_when`:
 file existence alone cannot establish that engineering acceptance was met.
 `BLOCKED` closes this attempt; it is not an instruction to keep asking or retry.
 After all commissioned tasks are terminal, report and end the run. Do not

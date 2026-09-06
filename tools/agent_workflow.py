@@ -169,15 +169,20 @@ def database(root: pathlib.Path):
 def artifacts(root: pathlib.Path, names: list[str], required: bool) -> list[dict]:
     result = []
     for name in sorted(names):
-        path = repo_path(root, name)
-        if not path.exists() and not required:
-            continue
-        require(path.is_file() and not path.is_symlink(), f"missing deliverable: {name}")
-        digest = hashlib.sha256()
-        with path.open("rb") as stream:
-            for block in iter(lambda: stream.read(1024 * 1024), b""):
-                digest.update(block)
-        result.append({"path": name, "sha256": digest.hexdigest()})
+        try:
+            path = repo_path(root, name)
+            require(path.is_file() and not path.is_symlink(),
+                    f"missing deliverable (requires a regular file): {name}")
+            digest = hashlib.sha256()
+            with path.open("rb") as stream:
+                for block in iter(lambda: stream.read(1024 * 1024), b""):
+                    digest.update(block)
+        except (WorkflowError, OSError) as exc:
+            if required:
+                raise
+            result.append({"path": name, "error": str(exc)})
+        else:
+            result.append({"path": name, "sha256": digest.hexdigest()})
     return result
 
 
@@ -204,8 +209,13 @@ def start(root: pathlib.Path, data: dict, session: str) -> dict:
             ).fetchone()
             require(row is not None and row["state"] == "DONE", f"dependency not DONE: {task}")
             recorded = json.loads(row["artifacts_json"])
-            actual = artifacts(pathlib.Path(row["worktree"]), [a["path"] for a in recorded], True)
+            names = [a["path"] for a in recorded]
+            actual = artifacts(pathlib.Path(row["worktree"]), names, True)
             require(actual == recorded, f"dependency artifacts changed: {task}")
+            require(all(name in inputs for name in names),
+                    f"dependency artifacts must be declared in consumer inputs: {task}")
+            require(artifacts(root, names, True) == recorded,
+                    f"consumer dependency snapshot differs from the recorded handoff: {task}")
             dependencies[task] = {"fingerprint": row["fingerprint"], "artifacts": actual}
         fingerprint = hashlib.sha256(json.dumps(
             {"inputs": inputs, "dependencies": dependencies}, sort_keys=True

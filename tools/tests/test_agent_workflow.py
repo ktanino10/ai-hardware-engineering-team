@@ -183,12 +183,78 @@ class AgentWorkflowTests(unittest.TestCase):
             workflow.start(self.root, downstream, "review-session")
         self.file("output/handoff.txt", "Saved result\n")
         self.close(parent, "DONE")
+        downstream["source_revision"] = self.commit()
+        downstream["inputs"].append("output/handoff.txt")
+        consumer = self.root / "consumer"
+        self.git("worktree", "add", "--detach", str(consumer), downstream["source_revision"])
         self.file("output/handoff.txt", "Changed result without a new handoff\n")
         with self.assertRaisesRegex(workflow.WorkflowError, "dependency artifacts changed"):
-            workflow.start(self.root, downstream, "review-session")
+            workflow.start(consumer, downstream, "review-session")
         self.file("output/handoff.txt", "Saved result\n")
-        self.assertEqual(workflow.start(self.root, downstream, "review-session")["state"],
+        self.assertEqual(workflow.start(consumer, downstream, "review-session")["state"],
                          "RUNNING")
+
+    def test_dependency_cannot_admit_a_stale_consumer_snapshot(self):
+        self.file("output/handoff.txt", "OLD result\n")
+        old = self.commit()
+        parent = workflow.start(self.root, self.contract, "parent-session")
+        self.file("output/handoff.txt", "NEW result\n")
+        self.close(parent, "DONE")
+        new = self.commit()
+        downstream = copy.deepcopy(self.contract)
+        downstream.update(id="downstream-review", owner="hardware-reviewer",
+                          source_revision=old, writes=["review"],
+                          deliverables=["review/handoff.txt"],
+                          inputs=["requirements/input.txt", "output/handoff.txt"],
+                          depends_on=[self.contract["id"]])
+        stale = self.root / "stale-consumer"
+        self.git("worktree", "add", "--detach", str(stale), old)
+        with self.assertRaisesRegex(workflow.WorkflowError, "consumer dependency"):
+            workflow.start(stale, downstream, "review-session")
+        current = self.root / "current-consumer"
+        self.git("worktree", "add", "--detach", str(current), new)
+        downstream["source_revision"] = new
+        self.assertEqual(workflow.start(current, downstream, "review-session")["state"],
+                         "RUNNING")
+
+    def test_dependency_requires_explicit_consumer_inputs(self):
+        parent = workflow.start(self.root, self.contract, "parent-session")
+        self.file("output/handoff.txt", "Saved result\n")
+        self.close(parent, "DONE")
+        downstream = copy.deepcopy(self.contract)
+        downstream.update(id="downstream-review", writes=["review"],
+                          deliverables=["review/handoff.txt"],
+                          depends_on=[self.contract["id"]])
+        with self.assertRaisesRegex(workflow.WorkflowError, "consumer inputs"):
+            workflow.start(self.root, downstream, "review-session")
+
+    def test_blocked_finish_records_invalid_output_and_releases_writes(self):
+        self.contract["deliverables"].append("output/partial.txt")
+        run = workflow.start(self.root, self.contract, "parent-session")
+        (self.root / "output/handoff.txt").mkdir(parents=True)
+        self.file("output/partial.txt", "Saved partial result\n")
+        result = self.close(run, "BLOCKED")
+        self.assertEqual(result["state"], "BLOCKED")
+        saved = {item["path"]: item for item in result["artifacts"]}
+        self.assertIn("error", saved["output/handoff.txt"])
+        self.assertIn("sha256", saved["output/partial.txt"])
+        self.assertEqual(workflow.status(self.root)[0]["state"], "BLOCKED")
+        other = copy.deepcopy(self.contract)
+        other.update(id="inspect-output-error", objective="Inspect the saved failure",
+                     deliverables=["output/error-analysis.txt"])
+        self.assertEqual(workflow.start(self.root, other, "another-session")["state"],
+                         "RUNNING")
+
+    def test_blocked_finish_does_not_follow_a_symlinked_output(self):
+        run = workflow.start(self.root, self.contract, "parent-session")
+        (self.root / "output").mkdir()
+        (self.root / "output/handoff.txt").symlink_to(self.root / "requirements/input.txt")
+        with self.assertRaisesRegex(workflow.WorkflowError, "symlink"):
+            self.close(run, "DONE")
+        result = self.close(run, "BLOCKED")
+        self.assertEqual(result["state"], "BLOCKED")
+        self.assertIn("symlink", result["artifacts"][0]["error"])
+        self.assertNotIn("sha256", result["artifacts"][0])
 
     def test_work_status_cannot_be_used_as_physical_approval(self):
         run = workflow.start(self.root, self.contract, "parent-session")
