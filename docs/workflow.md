@@ -303,7 +303,9 @@ multidisciplinary evolution — `docs/architecture-evolution.md` §13, §27)*
 
 ### Phase 11 — Firmware Bring-up *(Phase 2 of the multidisciplinary
 evolution — `docs/architecture-evolution.md` §32)*
-- **Owner**: Firmware Engineer. Uses `.github/skills/firmware-bringup/SKILL.md`.
+- **Owner**: Firmware Engineer for implementation; Firmware Reviewer for
+  independent assessment. Uses `.github/skills/firmware-bringup/SKILL.md`
+  and `.github/skills/firmware-review/SKILL.md`, respectively.
 - **Entry criteria**: Circuit Design (Phase 4) has fixed the pin/interface
   allocation (pin assignments, peripheral instances, mode-select straps) for
   the peripherals firmware needs — deliberately **data-driven, not
@@ -322,10 +324,15 @@ evolution — `docs/architecture-evolution.md` §32)*
   (`.github/agents/firmware-engineer.agent.md`'s full checklist); attempt a
   real compile if a toolchain is available or installable, disclosing the
   actual outcome honestly either way (architecture.md §5.4).
-- **Exit criteria**: firmware source tree + design rationale document
+- **Implementation handoff**: firmware source tree + design rationale document
   (Evidence-ID-cited, mirroring the schematic's own style) + self-check
   results + tooling/compile-status disclosure handed off to the Hardware
-  Lead.
+  Lead. This completes the implementation task, not independent acceptance.
+- **Review exit criteria**: Hardware Lead obtains a separate Firmware
+  Reviewer verdict against the frozen source/build handoff. Findings stay
+  in `firmware/<board>/<board>-firmware-review.md`; CRITICAL/HIGH corrections
+  return to Firmware Engineer and then to affected-scope independent review.
+  A blocked review is reported as blocked, not replaced with self-review.
 - **Loop-back rule**: if the schematic's pin/interface facts change after
   this phase starts (e.g. Circuit Engineer reassigns a pin during Phase 5
   rework), re-enter this phase for the affected peripheral driver(s).
@@ -337,11 +344,10 @@ evolution — `docs/architecture-evolution.md` §32)*
   future physical bring-up. See `docs/architecture-evolution.md` §32 for
   why this also avoids a real coupling problem in the shared
   `validation/open-issues.md` CI gate.
-- **Parallel-safe?** No independent Firmware Reviewer exists yet
-  (architecture.md §14, architecture-evolution.md §32) — self-check stands
-  in for review this round, so there is no separate review pass to
-  parallelize against. Safe to run in parallel with Phases 5/6/7/8-10 for
-  the same data-driven reasons Phase 8 is.
+- **Parallel-safe?** Implementation may accompany Phases 5/6/7/8-10 once
+  its inputs are fixed. Independent firmware review follows the frozen
+  implementation handoff, not a moving source tree. Its verdict and the
+  first-flash human decision remain separate serial steps.
 
 ### Phase 12 — Power Architecture *(Phase 3 of the multidisciplinary
 evolution — `docs/architecture-evolution.md` §33)*

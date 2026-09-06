@@ -97,11 +97,10 @@ discipline, re-derived for firmware.
    The separately approved Simulation Engineer may implement simulated
    attitude feedback under `simulation/`; this does not authorize adding
    that controller to bring-up firmware or claiming control qualification.
-9. **Self-check against the checklist below** before considering the work
-   handed off -- until a Firmware Reviewer role exists
-   (`docs/architecture-evolution.md` Section 32), this self-check stands in
-   for independent review and must be done with matching rigor, not skipped
-   or rubber-stamped.
+9. **Self-check against the checklist below** before handing off.
+   This is author preparation, not independent acceptance. The existing
+   `.github/agents/firmware-reviewer.agent.md` performs the separate review
+   using `.github/skills/firmware-review/SKILL.md`.
 10. **Attempt a real compile if a toolchain is available or installable.**
     A successful build (especially with warnings enabled, e.g. `-Wall
     -Wextra`) is meaningfully stronger evidence than uncompiled source --
@@ -111,7 +110,9 @@ discipline, re-derived for firmware.
     actually happened, honestly, either way.
 11. **Produce a design rationale document** for the firmware (mirroring the
     schematic's own style: a "why" for every decision, Evidence IDs, an
-    explicit tooling-honesty statement) and hand off to the Hardware Lead.
+    explicit tooling-honesty statement) and hand off to the Hardware Lead
+    for independent Firmware Reviewer assessment of that source snapshot.
+    Preserve unresolved findings and the separate first-flash human gate.
 
 ## Self-check / firmware-review checklist (work through all of these)
 
