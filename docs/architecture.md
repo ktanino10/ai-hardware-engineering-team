@@ -83,7 +83,7 @@ WIP evidence and an early blocker verdict cannot bypass the shared gate.
 | **Hardware Reviewer** | Independent, adversarial review; severity-classified findings | Fixing the design itself |
 | **Mechanical Lead** *(Phase 1)* | Enclosure/mechanical geometry, design rationale and WIP assembly-process/installed/per-stage evidence from sourced interfaces; requested Fusion native/video package | Marking own work reviewed/complete; editing Electronics artifacts; silently redesigning within visualization |
 | **Mechanical Reviewer** *(Phase 1)* | Independent geometry/evidence acceptance, distinguishing early WIP blocker review from final acceptance; severity-classified findings (shared `validation/open-issues.md`) | Fixing the design itself; treating animation or structural CI as safety certification |
-| **Firmware Engineer** *(Phase 2)* | Driver-level bring-up firmware from a Design-Complete schematic: peripheral initialization, register-level configuration, design rationale log (`firmware/<board>/`) | Control loops/sensor fusion/unit conversion (Control Engineer's future territory, §14 — not yet triggered); editing Electronics artifacts; marking own work reviewed/complete (self-check stood in for independent review until a Firmware Reviewer trigger was met, `docs/architecture-evolution.md` §32 — now superseded: Firmware Reviewer performs independent review, Phase 5, `docs/architecture-evolution.md` §36) |
+| **Firmware Engineer** *(Phase 2)* | Driver-level bring-up firmware from the stable actual pin/interface contract (workflow Phase 11): peripheral initialization, register-level configuration, design rationale log (`firmware/<board>/`) | Control loops/sensor fusion/unit conversion (Control Engineer's future territory, §14 — not yet triggered); editing Electronics artifacts; self-declaring independent acceptance or permission to flash. Mandatory self-check is followed by Firmware Reviewer assessment (`docs/architecture-evolution.md` §36); bounded task completion is separate. |
 | **Power Engineer** *(Phase 3)* | System power-tree/rail-topology proposal (`hardware/power-architecture.md`), multi-rail `hardware/power-budget.md` bookkeeping, once engaged (a Hardware Lead judgment call per project/revision, `.github/agents/power-engineer.agent.md`) | Implementing the actual regulator/converter circuit (Circuit Engineer); selecting the specific part (Component Engineer); self-approving a rail/source architecture decision (always HITL, §10) |
 | **Manufacturing Engineer** *(Phase 4)* | Manufacturing PROCESS parameters (infill %/pattern, wall/perimeter count, print orientation vs. load direction, material) for safety-critical/structural mechanical parts, once engaged (a Mechanical Lead / Hardware Lead judgment call per part, `.github/agents/manufacturing-engineer.agent.md`) | The part's CAD geometry itself (Mechanical Lead); declaring its own process specification independently reviewed (Mechanical Reviewer performs that independent cross-check, `.github/skills/mechanical-review/SKILL.md` item 11); certifying FDM plastic as adequate for a hazardous-energy containment purpose without real physical testing |
 | **Firmware Reviewer** *(Phase 5)* | Independent, adversarial review of Firmware Engineer's driver-level bring-up code: register/peripheral correctness, pin/interface fidelity against the actual schematic, safety-critical logic correctness where present, premise review; severity-classified findings (own firmware-scoped record, `firmware/<board>/<board>-firmware-review.md` — deliberately does not share `validation/open-issues.md` with Hardware/Mechanical Reviewer, §14, `.github/agents/firmware-reviewer.agent.md`) | Fixing the firmware itself; control-loop/sensor-fusion design (Control Engineer's future territory, §14 — not yet triggered); editing hardware/mechanical artifacts; claiming any real hardware-in-the-loop test or flashing |
@@ -227,11 +227,25 @@ Lead role defaults to being played by the primary Copilot session itself,
 guided by `.github/copilot-instructions.md` +
 `.github/agents/hardware-lead.agent.md`.
 
+All work-starting invocations use the reservation and terminal-handoff
+contract in [`work-execution.md`](work-execution.md). The local
+`tools/agent_workflow.py` guard is executable; descriptive frontmatter such
+as `role`, `handoff_to` and `delegates_to` is not a scheduler or permission
+boundary. Load only the assigned profiles/skills and necessary source scope.
+Adopt and pin configuration revisions at a safe handoff, not during an
+active writer's run.
+
 ## 4. Parallel Execution ("Fleet") Policy
 
 Some phases parallelize well; others must stay serial to preserve a single
 coherent judgment. Do not parallelize a phase not listed as parallel-safe below
 without Hardware Lead sign-off.
+
+Parallel-safe does not mean parallel-required. Use a separate worker only
+for genuinely independent work that benefits from its own context; keep a
+small review or one continuous investigation with one owner. Shared-ledger
+publication is serial even when source research is parallel. Agree runtime
+ceilings separately; never infer a need to launch every role.
 
 | Phase / Activity | Parallel-safe? | Notes |
 |---|---|---|

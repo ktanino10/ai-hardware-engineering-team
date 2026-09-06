@@ -3,6 +3,7 @@ import pathlib
 import re
 import unittest
 
+import agent_workflow
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 
@@ -33,6 +34,32 @@ class WorkflowInstructionTests(unittest.TestCase):
         self.assertIn("firmware-review", text)
         self.assertIn("firmware/<board>/<board>-firmware-review.md", text)
         self.assertIn("first", text.lower())
+
+    def test_dispatch_entrypoints_use_the_same_execution_contract(self):
+        paths = (
+            ".github/copilot-instructions.md",
+            ".github/agents/hardware-lead.agent.md",
+            ".github/prompts/independent-review.prompt.md",
+            "docs/architecture.md",
+            "docs/workflow.md",
+            "docs/commands/make-circuit.md",
+        )
+        for name in paths:
+            with self.subTest(path=name):
+                self.assertIn("work-execution.md", (ROOT / name).read_text(encoding="utf-8"))
+
+    def test_documented_publisher_scopes_match_the_guard(self):
+        text = (ROOT / "docs/work-execution.md").read_text(encoding="utf-8")
+        for name in agent_workflow.SHARED_LEDGERS:
+            with self.subTest(path=name):
+                self.assertIn(f"`{name}`", text)
+
+    def test_common_role_index_preserves_every_existing_specialist(self):
+        text = (ROOT / ".github/copilot-instructions.md").read_text(encoding="utf-8")
+        for path in (ROOT / ".github/agents").glob("*.agent.md"):
+            role = path.name.removesuffix(".agent.md")
+            with self.subTest(role=role):
+                self.assertIn(f"| `{role}` |", text)
 
 
 if __name__ == "__main__":

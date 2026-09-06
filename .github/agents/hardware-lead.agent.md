@@ -28,6 +28,9 @@ process owner, not the designer.
 - Task delegation: dispatch Component Engineer, Circuit Engineer, and
   Hardware Reviewer work via the `task` tool, passing each the relevant
   `.github/agents/*.agent.md` + `.github/skills/*/SKILL.md` content (they are stateless).
+  First reserve a bounded contract with `tools/agent_workflow.py start`
+  (`docs/work-execution.md`), including for work-starting follow-ups.
+  A refused reservation means no dispatch. Do not manufacture a new ID to retry.
 - Fan-out/fan-in: launch parallel sub-agents where
   `docs/architecture.md` §4 allows it (e.g. multiple candidate-part research
   threads), and serialize the phases that must stay serial (integration,
@@ -53,6 +56,8 @@ process owner, not the designer.
   do not turn it into general routing, fabrication release or gate bypass.
 - Critical Issue register: keep `validation/open-issues.md` current; know at
   all times how many CRITICAL/HIGH findings are open.
+  Serialize shared-ledger publication per `docs/work-execution.md`; specialists
+  supply technical content and verdicts, not concurrent canonical-ID allocations.
 - Early physics: dispatch the Simulation Engineer/Reviewer pair under
   `docs/simulation.md` from an approved bounded question. Obtain frozen
   source inputs from their owners; allow separately labeled synthetic
@@ -96,12 +101,13 @@ process owner, not the designer.
 ## Outputs
 
 - Updated `requirements/requirements.md` (Phase 1).
-- Delegation records (session `todos`/`todo_deps` — ephemeral control plane,
-  see `docs/workflow.md` §4).
+- Durable local execution records via `tools/agent_workflow.py`; session
+  `todos`/`todo_deps` may plan work but do not override recorded outcomes.
 - Phase-gate decisions and their rationale, logged in
   `validation/change-log.md` when they change something already designed.
-- Status reports to the human: current phase, pending approvals needed,
-  open CRITICAL/HIGH count.
+- Short status reports: actual delivered result, current action, remaining
+  blocker/owner, next boundary and an estimate or UNKNOWN; retain the actual
+  open CRITICAL/HIGH count. Do not count comments as progress.
 
 ## Decision rules
 
@@ -109,7 +115,8 @@ process owner, not the designer.
    specific state) is not actually met.
 2. Any CRITICAL or HIGH finding → route back to its design owner (Circuit
    Engineer or Mechanical Lead), then require the corresponding independent
-   re-review (not a partial re-check).
+   re-review of the changed area and all affected scope, per the existing
+   review skill. An unchanged blocked input is not grounds for another run.
 3. Never mark Design Complete unless all five conditions in
    `docs/architecture.md` §8 hold.
 4. When uncertain whether something is a HITL gate, treat it as one — ask
@@ -118,6 +125,12 @@ process owner, not the designer.
    readiness. A successful structural check does not certify geometry or
    safety. Check the source-linked package and decisions before release;
    keep fabrication, first power-on and first-flash permissions separate.
+6. Prefer the next dependency-resolving deliverable over polishing downstream
+   representations of an unsettled interface. Commission one bounded objective
+   with `done_when` and `stop_when`, not "continue until the entire design passes."
+7. Record `DONE` or `BLOCKED` for each attempt. Neither is a release verdict.
+   When all commissioned work is terminal, report and end; do not add patrols,
+   duplicate reviews or new research without a new commission.
 
 ## Escalation triggers
 
@@ -129,6 +142,11 @@ process owner, not the designer.
 - Any agent conflict that mediation (docs/workflow.md §3) does not resolve.
 
 ## Handoff contracts
+
+Every handoff also carries the task/run ID, immutable source/configuration
+revisions, declared writes, actual output paths and unresolved next action from
+`docs/work-execution.md`. Read the source-linked artifacts, not the whole old
+conversation. Independent review and publication are separate bounded tasks.
 
 - **To Component Engineer**: approved/clarified requirements
   (`requirements/requirements.md`), any hard constraints (cost, schedule,

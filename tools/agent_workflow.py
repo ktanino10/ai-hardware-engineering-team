@@ -12,6 +12,7 @@ import re
 import sqlite3
 import subprocess
 import sys
+import unicodedata
 import uuid
 
 
@@ -54,17 +55,22 @@ def repo_path(root: pathlib.Path, value: str) -> pathlib.Path:
     path = pathlib.PurePosixPath(value)
     require(
         bool(path.parts) and not path.is_absolute() and path.as_posix() == value
-        and not any(part in {".", "..", ".git"} for part in path.parts)
+        and not any(part.casefold() in {".", "..", ".git"} for part in path.parts)
         and not any(c in value for c in "\\*?[]")
         and not any(ord(c) < 32 for c in value),
         f"invalid repository-relative path: {value!r}",
     )
     target = root / path
+    require(not any((root.joinpath(*path.parts[:i])).is_symlink()
+                    for i in range(1, len(path.parts) + 1)), f"symlink in path: {value}")
     require(target.resolve().is_relative_to(root.resolve()), f"path escapes worktree: {value}")
     return target
 
 
 def covers(parent: str, child: str) -> bool:
+    # Conservatively treat case/Unicode aliases as one resource on every OS.
+    parent = unicodedata.normalize("NFC", parent).casefold()
+    child = unicodedata.normalize("NFC", child).casefold()
     return pathlib.PurePosixPath(child).is_relative_to(parent)
 
 
@@ -99,6 +105,10 @@ def validate_contract(root: pathlib.Path, data: dict) -> dict[str, str]:
     for key in ("source_revision", "config_revision"):
         require(COMMIT.fullmatch(data[key]), f"{key}: use a full immutable commit ID")
         git(root, "rev-parse", "--verify", data[key] + "^{commit}")
+    for name in (".github/copilot-instructions.md", "docs/work-execution.md",
+                 "tools/agent_workflow.py"):
+        require(repo_path(root, name).is_file(), f"missing adopted configuration: {name}")
+        git(root, "rev-parse", "--verify", f"{data['config_revision']}:{name}")
     for name in (*data["inputs"], *data["writes"], *data["deliverables"]):
         repo_path(root, name)
     for name in data["deliverables"]:
@@ -183,9 +193,10 @@ def start(root: pathlib.Path, data: dict, session: str) -> dict:
                     f"shared ledger publisher is busy: {row['task_id']}")
             require(not any(overlaps(a, b) for a in data["writes"] for b in active["writes"]),
                     f"write conflict with {row['task_id']}")
-            require(not any(overlaps(a, b) for a in data["writes"] for b in active["inputs"])
-                    and not any(overlaps(a, b) for a in active["writes"] for b in data["inputs"]),
-                    f"input/write conflict with {row['task_id']}")
+            if pathlib.Path(row["worktree"]) == root.resolve():
+                require(not any(overlaps(a, b) for a in data["writes"] for b in active["inputs"])
+                        and not any(overlaps(a, b) for a in active["writes"] for b in data["inputs"]),
+                        f"input/write conflict with {row['task_id']}")
         dependencies = {}
         for task in data["depends_on"]:
             row = db.execute(

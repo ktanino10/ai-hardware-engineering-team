@@ -25,7 +25,17 @@ on:
     paths:
       - ".github/agents/**"
       - ".github/skills/**"
+      - ".github/instructions/**"
+      - ".github/copilot-instructions.md"
+      - ".github/prompts/**"
+      - ".github/workflows/agent-frontmatter-lint.yml"
+      - "docs/architecture.md"
+      - "docs/workflow.md"
+      - "docs/work-execution.md"
+      - "docs/commands/make-circuit.md"
       - "tools/check_agent_frontmatter.py"
+      - "tools/agent_workflow.py"
+      - "tools/tests/test_*workflow*.py"
   workflow_dispatch: {}
 
 jobs:
@@ -41,3 +51,7 @@ jobs:
         run: pip install pyyaml
       - name: Run frontmatter lint
         run: python3 tools/check_agent_frontmatter.py
+      - name: Exercise workflow execution and instruction regressions
+        run: python3 -m unittest discover -s tools/tests -p 'test_*workflow*.py'
+        env:
+          PYTHONPATH: tools

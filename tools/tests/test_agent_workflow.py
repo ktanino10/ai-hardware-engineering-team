@@ -5,6 +5,7 @@ import contextlib
 import io
 import json
 import pathlib
+import re
 import subprocess
 import tempfile
 import threading
@@ -20,6 +21,8 @@ class AgentWorkflowTests(unittest.TestCase):
         self.root = pathlib.Path(self.temp.name)
         self.git("init", "-q")
         self.file(".github/copilot-instructions.md", "Synthetic instructions\n")
+        self.file("docs/work-execution.md", "Synthetic execution contract\n")
+        self.file("tools/agent_workflow.py", "# Synthetic adopted guard\n")
         for role in ("hardware-lead", "circuit-engineer", "hardware-reviewer"):
             self.file(f".github/agents/{role}.agent.md", "Synthetic role\n")
         self.file("requirements/input.txt", "Synthetic input A\n")
@@ -71,6 +74,12 @@ class AgentWorkflowTests(unittest.TestCase):
         self.file(".github/copilot-instructions.md", "Changed instructions\n")
         with self.assertRaisesRegex(workflow.WorkflowError, "configuration differs"):
             workflow.validate_contract(self.root, self.contract)
+
+    def test_legacy_checkout_without_execution_contract_cannot_be_reserved(self):
+        self.git("rm", "-q", "docs/work-execution.md", "tools/agent_workflow.py")
+        self.contract["config_revision"] = self.contract["source_revision"] = self.commit()
+        with self.assertRaisesRegex(workflow.WorkflowError, "missing adopted configuration"):
+            workflow.start(self.root, self.contract, "parent-session")
 
     def test_contract_rejects_missing_fields_and_unsafe_paths(self):
         for key in ("done_when", "stop_when", "config_revision"):
@@ -277,6 +286,16 @@ class AgentWorkflowTests(unittest.TestCase):
         with self.assertRaisesRegex(workflow.WorkflowError, "input/write conflict"):
             workflow.start(self.root, other, "another-session")
 
+    def test_reader_in_another_frozen_worktree_can_continue(self):
+        workflow.start(self.root, self.contract, "parent-session")
+        other_root = self.root / "frozen-worktree"
+        self.git("worktree", "add", "--detach", str(other_root), self.sha)
+        other = copy.deepcopy(self.contract)
+        other.update(id="input-edit", writes=["requirements/input.txt"],
+                     deliverables=["requirements/input.txt"])
+        self.assertEqual(workflow.start(other_root, other, "another-session")["state"],
+                         "RUNNING")
+
     def test_corrupt_state_is_reported_not_reset(self):
         path = workflow.state_path(self.root)
         path.parent.mkdir(parents=True)
@@ -285,6 +304,29 @@ class AgentWorkflowTests(unittest.TestCase):
         self.assertEqual((code, output), (2, ""))
         self.assertIn("Workflow refused:", errors)
         self.assertEqual(path.read_bytes(), b"not a sqlite database")
+
+    def test_case_aliases_do_not_bypass_write_scope_conflicts(self):
+        workflow.start(self.root, self.contract, "parent-session")
+        other = copy.deepcopy(self.contract)
+        other.update(id="case-alias", writes=["OUTPUT"], deliverables=["OUTPUT/other.txt"])
+        with self.assertRaisesRegex(workflow.WorkflowError, "write conflict"):
+            workflow.start(self.root, other, "another-session")
+
+    def test_symlinked_scope_cannot_alias_another_owner_path(self):
+        (self.root / "output").mkdir()
+        (self.root / "alias").symlink_to(self.root / "output", target_is_directory=True)
+        self.contract.update(writes=["alias"], deliverables=["alias/handoff.txt"])
+        with self.assertRaisesRegex(workflow.WorkflowError, "symlink"):
+            workflow.start(self.root, self.contract, "parent-session")
+
+    def test_documented_contract_is_usable_with_real_snapshot_ids(self):
+        doc = pathlib.Path(__file__).resolve().parents[2] / "docs/work-execution.md"
+        block = re.search(r"```json\n(.*?)\n```", doc.read_text(encoding="utf-8"), re.DOTALL)
+        self.assertIsNotNone(block)
+        data = json.loads(block.group(1))
+        self.file("requirements/requirements.md", "Synthetic scoped requirements\n")
+        data["source_revision"] = data["config_revision"] = self.commit()
+        self.assertEqual(workflow.start(self.root, data, "example-session")["state"], "RUNNING")
 
 
 if __name__ == "__main__":

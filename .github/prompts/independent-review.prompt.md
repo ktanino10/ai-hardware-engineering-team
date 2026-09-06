@@ -11,6 +11,12 @@ value.
 
 Design/handoff to review: ${input:target:path to the schematic/KiCad project or design rationale log}
 
+Hardware Lead must first reserve this review under `docs/work-execution.md`.
+Use the frozen input/configuration revisions, task ID and declared scope;
+if the same input was already reviewed or blocked, do not start another pass.
+For a correction, review the changed area and everything it could affect,
+not an unrelated replay or a partial spot-check.
+
 Do:
 1. Work through the full checklist (voltage violation, Absolute Maximum
    Rating violation, current limit, thermal risk, missing decoupling,
@@ -24,10 +30,13 @@ Do:
 3. For every finding, record: Issue, Rationale, Datasheet Source (Evidence
    ID), Failure Mechanism, Affected Component, Recommended Fix, Severity
    (CRITICAL/HIGH/MEDIUM/LOW).
-4. Write a full cycle report into `validation/design-review.md` and roll
-   findings into `validation/open-issues.md` (tag `Source: hardware-reviewer`).
+4. Save the cycle report and proposed backlog changes in the declared handoff
+   files (tag `Source: hardware-reviewer`). Hardware Lead serially publishes
+   them to `validation/design-review.md` and `validation/open-issues.md`
+   without changing the independent verdict or allocating conflicting IDs.
 5. Give one consolidated verdict: PASS (no open CRITICAL) / FAIL /
    CONDITIONAL.
 
 Output: the verdict, the count of open CRITICAL/HIGH findings, and the
-updated `validation/open-issues.md` diff.
+proposed `validation/open-issues.md` diff. A delivered FAIL review can be a
+DONE review task; it is not a passing design or physical permission.
