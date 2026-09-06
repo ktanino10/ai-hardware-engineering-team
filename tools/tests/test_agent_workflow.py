@@ -75,6 +75,13 @@ class AgentWorkflowTests(unittest.TestCase):
         with self.assertRaisesRegex(workflow.WorkflowError, "configuration differs"):
             workflow.validate_contract(self.root, self.contract)
 
+    def test_root_agent_guide_is_part_of_pinned_configuration(self):
+        self.file("AGENTS.md", "Synthetic contributor entry point\n")
+        self.contract["config_revision"] = self.contract["source_revision"] = self.commit()
+        self.file("AGENTS.md", "Changed contributor instructions\n")
+        with self.assertRaisesRegex(workflow.WorkflowError, "configuration differs"):
+            workflow.validate_contract(self.root, self.contract)
+
     def test_legacy_checkout_without_execution_contract_cannot_be_reserved(self):
         self.git("rm", "-q", "docs/work-execution.md", "tools/agent_workflow.py")
         self.contract["config_revision"] = self.contract["source_revision"] = self.commit()

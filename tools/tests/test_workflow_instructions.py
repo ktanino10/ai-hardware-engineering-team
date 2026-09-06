@@ -4,6 +4,7 @@ import re
 import unittest
 
 import agent_workflow
+import yaml
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 
@@ -37,6 +38,8 @@ class WorkflowInstructionTests(unittest.TestCase):
 
     def test_dispatch_entrypoints_use_the_same_execution_contract(self):
         paths = (
+            "AGENTS.md",
+            "README.md",
             ".github/copilot-instructions.md",
             ".github/agents/hardware-lead.agent.md",
             ".github/prompts/independent-review.prompt.md",
@@ -60,6 +63,34 @@ class WorkflowInstructionTests(unittest.TestCase):
             role = path.name.removesuffix(".agent.md")
             with self.subTest(role=role):
                 self.assertIn(f"| `{role}` |", text)
+
+    def test_onboarding_links_resolve_without_duplicate_policy_files(self):
+        paths = ("AGENTS.md", "README.md", ".github/copilot-instructions.md")
+        for name in paths:
+            path = ROOT / name
+            for target in re.findall(r"\[[^\]]+\]\(([^)]+)\)", path.read_text(encoding="utf-8")):
+                if target.startswith(("http://", "https://", "#")):
+                    continue
+                with self.subTest(page=name, target=target):
+                    self.assertTrue((path.parent / target.split("#", 1)[0]).exists())
+        policy = (ROOT / ".github/copilot-instructions.md").read_text(encoding="utf-8")
+        self.assertIn("## Maintenance matrix", policy)
+
+    def test_documented_workflow_commands_match_the_existing_ci(self):
+        workflow = yaml.safe_load(
+            (ROOT / ".github/workflows/agent-frontmatter-lint.yml").read_text(encoding="utf-8")
+        )
+        job = workflow["jobs"]["frontmatter-lint"]
+        guide = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        runs = {step["run"] for step in job["steps"] if "run" in step}
+        for command in (
+            "python3 tools/check_agent_frontmatter.py",
+            "python3 -m unittest discover -s tools/tests -p 'test_*workflow*.py'",
+        ):
+            self.assertIn(command, runs)
+            self.assertIn(command, guide)
+        self.assertEqual(job["name"], "Check agent/skill frontmatter")
+        self.assertEqual(workflow["permissions"], {"contents": "read"})
 
 
 if __name__ == "__main__":

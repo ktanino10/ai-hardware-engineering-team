@@ -64,7 +64,7 @@ The guard refuses:
   and dependency handoffs. A new timestamp, session, configuration revision
   or unrelated commit does not make those inputs new.
 - Missing/dirty input snapshots or configuration differing from
-  `config_revision`. `.github/`, architecture/workflow/execution instructions,
+  `config_revision`. `AGENTS.md`, `.github/`, architecture/workflow/execution instructions,
   the kickoff and the guard itself are checked.
 
 Do not rename the task, delete state, or add irrelevant inputs to bypass a

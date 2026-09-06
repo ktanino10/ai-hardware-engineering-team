@@ -13,11 +13,14 @@ leaves an evidence trail a human can audit later.
 
 ## Start here
 
-- **Read first**: [`docs/architecture.md`](docs/architecture.md) — the
-  full architecture: agent roles, evidence model, severity taxonomies,
-  Design Complete gate, Human-in-the-loop gates, future roles/integrations.
-- **Then**: [`docs/workflow.md`](docs/workflow.md) — phase-by-phase
-  process, parallelization rules, conflict resolution.
+- **Read first**: [`AGENTS.md`](AGENTS.md) — concise navigation, existing
+  commands and the source of truth for each kind of work.
+- **For this run**: [`docs/work-execution.md`](docs/work-execution.md) —
+  bounded tasks, frozen inputs, progress, shared publication and stop conditions.
+- **As needed**: [`docs/architecture.md`](docs/architecture.md) and
+  [`docs/workflow.md`](docs/workflow.md) — roles, evidence, gates,
+  phase-specific prerequisites and conflict resolution. Read the applicable
+  sections rather than loading all historical guidance for every task.
 - **To start a design cycle**: [`docs/commands/make-circuit.md`](docs/commands/make-circuit.md)
   has a copy-pasteable kickoff prompt.
 - **For assemblies**: [`docs/assembly-evidence.md`](docs/assembly-evidence.md)
@@ -108,3 +111,15 @@ a three-axis cube design and a runnable, separately labeled simulator;
 neither is a claim of built/qualified hardware. The framework
 itself stays reusable for any embedded/robotics/IoT hardware project, not
 just this one.
+
+## Contributing
+
+Work on a focused branch without interrupting another session's worktree.
+Follow [AGENTS.md](AGENTS.md) for the existing scope-appropriate commands and
+the [maintenance matrix](.github/copilot-instructions.md#maintenance-matrix)
+for affected documentation/consumers. Open a PR using
+[the contribution template](.github/PULL_REQUEST_TEMPLATE.md), recording
+actual results, unperformed work and remaining blockers separately.
+Do not install a generic tool stack or rewrite existing configuration just
+to complete an asset checklist. Engineering changes retain independent
+review, source provenance and all named human/physical gates.

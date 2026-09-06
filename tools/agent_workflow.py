@@ -17,7 +17,7 @@ import uuid
 
 
 CONFIG_PATHS = (
-    ".github", "docs/architecture.md", "docs/workflow.md",
+    "AGENTS.md", ".github", "docs/architecture.md", "docs/workflow.md",
     "docs/commands/make-circuit.md", "docs/work-execution.md",
     "tools/agent_workflow.py",
 )

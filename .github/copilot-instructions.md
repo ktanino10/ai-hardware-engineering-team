@@ -51,6 +51,25 @@ Simulation uses `docs/simulation.md`. Simulated balance is not hardware
 feasibility, deployable firmware or safety acceptance; computed-motion video
 is not Fusion assembly-process animation. No new Control Engineer is implied.
 
+## Maintenance matrix
+
+Use [AGENTS.md](../AGENTS.md) for commands and navigation. Audit existing
+guidance before adding another file. Update only affected consumers below;
+do not duplicate role definitions, change logs, CI or local MCP configuration.
+
+| When this changes | Reconcile these consumers |
+|---|---|
+| A role/skill is added or its responsibility changes | Relevant `.github/agents/`, `.github/skills/` and scoped instructions; role indexes here, in `README.md` and `docs/architecture.md`; frontmatter and workflow-instruction checks. |
+| `tools/agent_workflow.py` or the task contract | `tools/tests/test_agent_workflow.py`, `docs/work-execution.md`, Hardware Lead and kickoff/review prompts; include newly authoritative instruction paths in the configuration snapshot. |
+| Check commands or CI behavior | `AGENTS.md`, the owning `.github/workflows/` file and affected `tools/tests/`; preserve existing required-check names and hardware gate semantics. |
+| A load-bearing source/interface/design value | Existing `docs/workflow.md` §4.2 cascade; affected PCB/mechanical/firmware/power consumers, evidence bindings and traceability/ECO through their owners, not wholesale historical rewrites. |
+| Repeated review feedback reveals a real convention gap | Correct the narrowest applicable instruction and add a regression where executable; link the actual feedback, distinguish one-off exceptions, and avoid another always-loaded checklist. |
+
+PR publication claims need their own current evidence: local commit, pushed
+branch and merged PR are not interchangeable. The project-specific adaptation
+and limits of the ai-ready reference are recorded in
+[this candidate case](../docs/reference-cases/ai-ready-workflow.md).
+
 ## Bounded execution and shared publication
 
 Follow `docs/work-execution.md` for every specialist dispatch, follow-up
