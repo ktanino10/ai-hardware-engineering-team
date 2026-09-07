@@ -47,11 +47,13 @@ applyTo: 'firmware/**'
   requirement that turns out to be wired to a hardware reset pin rather
   than a GPIO). Implement against the real schematic and document the
   discrepancy.
-- No independent Firmware Reviewer agent exists yet
-  (`docs/architecture-evolution.md` Section 32) -- self-check against
-  `.github/skills/firmware-bringup/SKILL.md`'s checklist is mandatory and
-  stands in for independent review; do not skip it or treat it as a
-  formality.
+- Self-check against `.github/skills/firmware-bringup/SKILL.md` is mandatory,
+  but does not replace independent review. Hardware Lead hands the frozen
+  firmware and actual build results to
+  `.github/agents/firmware-reviewer.agent.md`, following
+  `.github/skills/firmware-review/SKILL.md`. Findings stay in the
+  firmware-scoped review record; they do not silently change the hardware
+  Design Complete gate or authorize first flashing.
 - Any non-cosmetic change under `firmware/**` needs a
   `validation/change-log.md` (ECO) entry if it changes something already
   reviewed/handed off, same rule as `hardware/**`/`bom/**`

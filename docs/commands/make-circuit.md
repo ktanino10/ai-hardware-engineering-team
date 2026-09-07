@@ -19,13 +19,16 @@ repository (see .github/agents/hardware-lead.agent.md and .github/copilot-instru
 
 Requirements are in requirements/requirements.md[, updated for: <what changed>].
 
-Orchestrate the full design cycle end to end:
-  Requirements Engineering -> Component Selection -> Datasheet Verification
-  -> Circuit Design -> Independent Review -> Validation
-per docs/workflow.md, looping Circuit Design <-> Independent Review whenever
-a CRITICAL or HIGH finding is open (docs/architecture.md sections 7-8).
+Use docs/workflow.md to identify the next dependency-resolving deliverable.
+For this run, commission only: <one bounded objective or an explicitly agreed set>.
+Do not interpret the full design lifecycle as permission to run indefinitely.
 
 Rules:
+- Follow docs/work-execution.md. Before each specialist invocation or
+  work-starting follow-up, create its contract and successfully reserve it
+  with tools/agent_workflow.py start. Include source/configuration commits,
+  relevant inputs, write scopes, deliverables, dependencies, done_when and
+  stop_when. A refusal means no dispatch; do not rename the task to bypass it.
 - Do not perform detailed circuit design yourself; delegate to the
   Component Engineer, Circuit Engineer, and Hardware Reviewer custom agents
   (.github/agents/*.agent.md) — invoke them natively where supported, or via
@@ -36,7 +39,12 @@ Rules:
   and escalate to me rather than guessing.
 - Parallelize candidate research and independent sub-blocks per
   docs/architecture.md section 4; keep integration, requirements sign-off,
-  and the review verdict serial.
+  and the review verdict serial. Activate only roles needed now, not every role.
+- Resolve upstream interface/source decisions before polishing affected
+  downstream evidence. Re-review changed and affected scope after an actual
+  fix; an unchanged open finding is not a reason to replay the same review.
+- Specialists return shared-ledger proposals; Hardware Lead alone serializes
+  canonical publication, without altering independent verdicts.
 - Stop and ask me for explicit approval at every Human-in-the-loop gate in
   docs/architecture.md section 10 (architecture decisions, key component
   decisions, missing datasheet, safety-critical changes, major BOM changes,
@@ -46,24 +54,29 @@ Rules:
   docs/architecture.md section 8 holds (no open CRITICAL, HIGH resolved or
   accepted-risk with my sign-off, traceability matrix fully verified/waived,
   FMEA reviewed, ECO logged).
+- Save each bounded outcome as DONE or BLOCKED using tools/agent_workflow.py.
+  Neither state supplies design/safety acceptance. Once the commissioned work
+  is terminal, report and end; do not create new research or patrol work.
 
 Report back to me:
-  - what phase you're in and why,
-  - anything you need my approval on right now,
-  - and a running summary of validation/open-issues.md status
-    (open CRITICAL/HIGH count) whenever it changes.
+  - the delivered result and current action,
+  - remaining blockers, their owners and any specific decision needed,
+  - the next stopping boundary and estimated time, or UNKNOWN,
+  - and the actual open CRITICAL/HIGH count when it changes.
+Use the recorded task status and source-linked results, not comment volume.
 ```
 
 ## 3. Using this with `save_workflow` (scheduled/recurring kickoff)
 
-If you want this kickoff to run automatically on a schedule or on demand
-without retyping it (e.g. "every time I add a new requirements revision,
-re-run the design cycle check"), use this app's workflow feature
-(`save_workflow` / the workflow editor in the UI) and paste the prompt from
-§2 above as the workflow's `prompt`. This document only prepares the prompt
-text — actually registering a saved workflow (name, schedule, project) is
-something you do yourself through the app's UI/tools; nothing here creates
-or manages a workflow automatically.
+If the current Copilot surface actually exposes a saved-workflow/scheduling
+feature, paste the bounded prompt above into it. Verify that capability at
+runtime; a historical `save_workflow` tool name is not a guarantee that it is
+available now. This document creates no schedule.
+
+Every scheduled invocation must consult the same repository-local guard.
+When inputs and decisions have not changed, report no new dispatch and end
+without waking workers. Disable recurring work when its agreed objective is
+met; do not use scheduled prompts as an unlimited retry loop.
 
 ## 4. Variants
 
@@ -80,8 +93,9 @@ or manages a workflow automatically.
 - **Resuming after a Reviewer loop-back**: replace the kickoff paragraph
   with "Resume the design cycle for `requirements/requirements.md`. The last
   Hardware Reviewer verdict was <PASS/FAIL/CONDITIONAL>; open findings are in
-  validation/open-issues.md. Address open CRITICAL/HIGH findings via the
-  Circuit Engineer, then re-review." — keep the same Rules and Report-back
+  validation/open-issues.md. The changed input/decision is <source-linked delta>.
+  Commission <bounded correction>, then independent review of its changed and
+  affected scope." — keep the same Rules and Report-back
   sections from §2.
 - **Adding a new subsystem to an existing design** (e.g. Motor Driver on top
   of the MCU+IMU+Power benchmark): note explicitly that

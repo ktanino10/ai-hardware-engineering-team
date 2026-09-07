@@ -27,6 +27,7 @@ datasheets/local-cache/
 datasheets/**/local-cache/
 
 # Local scratch / working files
+.agent-work/
 *.local.md
 .DS_Store
 Thumbs.db

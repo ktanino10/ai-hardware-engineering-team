@@ -1,9 +1,24 @@
 # Engineering Workflow
 
 This is the operational, step-by-step companion to `docs/architecture.md`.
-Read architecture.md first for the vocabulary (severity taxonomies, Evidence
-ID scheme, gates); this document is "what happens, in what order, with what
-entry/exit criteria."
+Use the referenced sections of architecture.md for severity taxonomies,
+Evidence IDs and gates; this document is "what happens, in what order, with
+what entry/exit criteria." Do not reload the entire evolution history for
+every bounded task.
+
+## 0. Execution boundary
+
+Apply [the bounded work contract](work-execution.md) before every specialist
+dispatch and work-starting follow-up. `tools/agent_workflow.py start` must
+succeed first. It checks immutable inputs/configuration, prior terminal
+attempts, completed dependencies and conflicting write scopes across linked
+worktrees. It does not launch agents or approve engineering work.
+
+Choose the next deliverable that removes a dependency or answers a concrete
+question. Preserve partial results and stop at `done_when` or `stop_when`.
+The phase loop-backs below describe engineering dependencies, not permission
+to rerun unchanged blocked inputs indefinitely. Task `DONE`/`BLOCKED` is
+separate from Design Complete, independent acceptance and physical permission.
 
 ## 1. Phase Sequence
 
@@ -303,7 +318,9 @@ multidisciplinary evolution — `docs/architecture-evolution.md` §13, §27)*
 
 ### Phase 11 — Firmware Bring-up *(Phase 2 of the multidisciplinary
 evolution — `docs/architecture-evolution.md` §32)*
-- **Owner**: Firmware Engineer. Uses `.github/skills/firmware-bringup/SKILL.md`.
+- **Owner**: Firmware Engineer for implementation; Firmware Reviewer for
+  independent assessment. Uses `.github/skills/firmware-bringup/SKILL.md`
+  and `.github/skills/firmware-review/SKILL.md`, respectively.
 - **Entry criteria**: Circuit Design (Phase 4) has fixed the pin/interface
   allocation (pin assignments, peripheral instances, mode-select straps) for
   the peripherals firmware needs — deliberately **data-driven, not
@@ -322,10 +339,15 @@ evolution — `docs/architecture-evolution.md` §32)*
   (`.github/agents/firmware-engineer.agent.md`'s full checklist); attempt a
   real compile if a toolchain is available or installable, disclosing the
   actual outcome honestly either way (architecture.md §5.4).
-- **Exit criteria**: firmware source tree + design rationale document
+- **Implementation handoff**: firmware source tree + design rationale document
   (Evidence-ID-cited, mirroring the schematic's own style) + self-check
   results + tooling/compile-status disclosure handed off to the Hardware
-  Lead.
+  Lead. This completes the implementation task, not independent acceptance.
+- **Review exit criteria**: Hardware Lead obtains a separate Firmware
+  Reviewer verdict against the frozen source/build handoff. Findings stay
+  in `firmware/<board>/<board>-firmware-review.md`; CRITICAL/HIGH corrections
+  return to Firmware Engineer and then to affected-scope independent review.
+  A blocked review is reported as blocked, not replaced with self-review.
 - **Loop-back rule**: if the schematic's pin/interface facts change after
   this phase starts (e.g. Circuit Engineer reassigns a pin during Phase 5
   rework), re-enter this phase for the affected peripheral driver(s).
@@ -337,11 +359,10 @@ evolution — `docs/architecture-evolution.md` §32)*
   future physical bring-up. See `docs/architecture-evolution.md` §32 for
   why this also avoids a real coupling problem in the shared
   `validation/open-issues.md` CI gate.
-- **Parallel-safe?** No independent Firmware Reviewer exists yet
-  (architecture.md §14, architecture-evolution.md §32) — self-check stands
-  in for review this round, so there is no separate review pass to
-  parallelize against. Safe to run in parallel with Phases 5/6/7/8-10 for
-  the same data-driven reasons Phase 8 is.
+- **Parallel-safe?** Implementation may accompany Phases 5/6/7/8-10 once
+  its inputs are fixed. Independent firmware review follows the frozen
+  implementation handoff, not a moving source tree. Its verdict and the
+  first-flash human decision remain separate serial steps.
 
 ### Phase 12 — Power Architecture *(Phase 3 of the multidisciplinary
 evolution — `docs/architecture-evolution.md` §33)*
@@ -435,13 +456,19 @@ severity.
 
 ## 4. Handoff Mechanism
 
-Two layers, used together — see architecture.md §3 for the invocation model:
+Three layers, used together — see architecture.md §3 for the invocation model:
 
 - **File-based (durable, git-tracked, the actual Source of Truth)**:
   `requirements/`, `bom/`, `hardware/`, `validation/`, `simulation/`, `docs/`. This is what
   survives across sessions and is what a human audits. Every phase's real
   exit criteria is a file being in a specific state, not a chat message.
-- **SQL `todos` / `todo_deps` (ephemeral, session-local control plane)**: used
+- **Repository-local execution state**: `tools/agent_workflow.py` records
+  attempts, source/configuration revisions, outcomes and output hashes in
+  the Git common directory, shared by linked worktrees. `status` is the
+  current execution report; it is not live process telemetry or a design
+  approval. See [work-execution.md](work-execution.md) for reservation,
+  short progress reports, termination, recovery and single-writer publication.
+- **SQL `todos` / `todo_deps` (session-local planning)**: used
   by whichever session is playing Hardware Lead to sequence and parallelize
   sub-agent dispatch within one working session — e.g. `component-search-mcu`
   / `component-search-imu` / `component-search-power` (no deps → parallel) →
@@ -450,8 +477,10 @@ Two layers, used together — see architecture.md §3 for the invocation model:
   `circuit-design-sensor-if` (parallel, after interfaces fixed) →
   `circuit-integrate` (depends on all three) → `independent-review`
   (review + rubber-duck, parallel) → conditional `circuit-rework` or
-  `design-complete-gate`. This layer is **not** a durable record — it resets
-  per session and is not the place evidence or decisions live.
+  `design-complete-gate`. This layer is not the cross-session execution
+  authority and is not where engineering evidence or human decisions live.
+  Check the persistent execution record before starting any planned item;
+  a fresh todo does not authorize replaying completed or blocked work.
 
 Once physical interfaces are identified, the same chain extends (Phase 1,
 Mechanical — §2 Phase 8-10 above): `circuit-integrate` → (fork)
@@ -465,7 +494,8 @@ converge on, matching the single shared `validation/open-issues.md` backlog
 not a dependency on Design Complete or on general routing. Once pin/interface
 allocation is fixed, a third fork
 (Phase 2, Firmware — §2 Phase 11 above) can run independently:
-`circuit-integrate` → (fork) `firmware-bringup` — this branch does **not**
+`circuit-integrate` → (fork) `firmware-bringup` → `independent-firmware-review`
+— this branch does **not**
 converge on `design-complete-gate` (§2 Phase 11's own note on why), so it
 has no todo dependency on the other two chains' gate step. When Power
 Engineer is engaged (Phase 3 — §2 Phase 12 above), a chain precedes
@@ -495,8 +525,17 @@ native/video delivery remains with Mechanical Lead.
 
 ### 4.1 Cross-Branch ID Collision Resolution (Shared-Namespace Files)
 
-Three files hold a flat, monotonically-increasing ID namespace that any
-session/branch can append rows to: `ECO-<NNN>` in
+**Current preventive rule:** Hardware Lead is the serial publisher for
+shared ledgers under [work-execution.md](work-execution.md). Specialists
+return proposed facts/findings; they do not independently allocate canonical
+IDs on sibling branches. Reserve the publication task, reconcile current
+records, allocate once, preserve the author's verdict and publish the new
+source handoff. This changes write coordination, not technical ownership or
+risk authority. The collision recovery below remains necessary for existing
+branches and other clones that predate or bypass the guard.
+
+Historically, any session/branch could append to the shared namespaces:
+`ECO-<NNN>` in
 `validation/change-log.md`, `ISS-<NNN>`/`MISS-<NNN>` in
 `validation/open-issues.md`, and `DS-<CATEGORY>-<NNN>` in
 `datasheets/evidence-log.md` (architecture.md §6.3). When two branches

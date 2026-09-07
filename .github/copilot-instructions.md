@@ -24,159 +24,72 @@ follow regardless of which specific role it's playing.
 
 ## Roles
 
-Fourteen agents across three physical-design disciplines, their
-discipline-adjacent extensions, Systems Engineering and a cross-discipline
-Simulation pair, each with a narrow, non-overlapping responsibility — defined as
-real GitHub Copilot custom agent profiles in `.github/agents/*.agent.md`
-(see `docs/architecture.md` §3 for the responsibility table):
+Fourteen existing roles are available on demand, not fourteen workers to
+launch for every task. Load the assigned `.github/agents/<role>.agent.md`,
+its relevant skills and the actual bounded inputs. Do not preload every
+profile, old review or evolution record. Full scope/history remains in
+`docs/architecture.md` §3 and the individual profiles.
 
-**Electronics** (original 4, unchanged):
+| Role | Responsibility and boundary |
+|---|---|
+| `hardware-lead` | Orchestration, handoffs and gate decisions; not detailed design or self-review. |
+| `component-engineer` | Compare at least three source-grounded candidates when feasible; recommend, do not self-approve key parts. |
+| `circuit-engineer` | Actual circuit from approved parts/sources, with rationale for each decision. |
+| `hardware-reviewer` | Independent electrical and PCB review, including current/thermal/layout and foresight checks. |
+| `mechanical-lead` | Sole mechanical geometry owner; interface contract and early WIP assembly-process evidence. |
+| `mechanical-reviewer` | Independent geometry, assembly and manufacturing-process assessment, including foresight. |
+| `firmware-engineer` | Driver bring-up from the stable actual pin/interface contract; not deployable attitude control. |
+| `firmware-reviewer` | Independent firmware and premise review; findings in `firmware/<board>/<board>-firmware-review.md`. |
+| `power-engineer` | When commissioned, source-grounded system power options/budgets; Circuit implements human-approved topology. |
+| `manufacturing-engineer` | When commissioned, material/process conditions needed by structural assumptions; not self-certification. |
+| `pcb-engineer` | Bounded WIP physical preparation (Phase 4a); full routing follows Design Complete and existing independent/human gates. |
+| `systems-engineer` | Evidence-grounded cross-discipline trade-offs; neither geometry ownership nor architecture/safety approval. |
+| `simulation-engineer` | Frozen WIP rigid-body models, simulation-only control and actual outputs under `simulation/`. |
+| `simulation-reviewer` | Independent model/numerical/output review; findings in `simulation/reviews/`, not hardware approval. |
 
-1. **Hardware Lead / Orchestrator** — delegates, tracks issues, decides
-   gate transitions. Does not do detailed circuit design itself. Now
-   orchestrates across Electronics, Mechanical, and Firmware (`docs/architecture.md`
-   §3, §5.3, §5.4; `docs/workflow.md` Phase 8-11).
-2. **Component Engineer** — compares ≥3 datasheet-grounded candidates,
-   recommends for project-success probability, not peak spec.
-3. **Circuit Engineer** — designs from approved parts + datasheets, with a
-   recorded "why" for every decision.
-4. **Hardware Reviewer** — independent, adversarial review; classifies
-   findings CRITICAL/HIGH/MEDIUM/LOW. Its checklist now also covers
-   PCB-layout-specific concerns (DRC closure, copper current-carrying
-   capacity, clearance/creepage, thermal via/pour integrity), extended
-   when PCB Engineer was introduced (Phase 6) rather than standing up a
-   separate PCB Reviewer agent. Also carries a Foresight checklist
-   (cross-domain interference; re-verifying existing ASSUMPTIONs after a
-   change) for proactively noticing what wasn't explicitly asked about
-   (`docs/architecture-evolution.md` §38).
+Simulation uses `docs/simulation.md`. Simulated balance is not hardware
+feasibility, deployable firmware or safety acceptance; computed-motion video
+is not Fusion assembly-process animation. No new Control Engineer is implied.
 
-**Mechanical** (Phase 1 of the multidisciplinary evolution —
-`docs/architecture-evolution.md` §10/§27/§31):
+## Maintenance matrix
 
-5. **Mechanical Lead** — designs an enclosure from
-   `hardware/mechanical-interface.md`; sole owner of the mechanical geometry
-   state and early WIP assembly-process evidence. Uses runtime-verified
-   tooling, including requested Fusion Animation, not a permanent text-only
-   assumption.
-6. **Mechanical Reviewer** — independent, adversarial mechanical review,
-   mirroring the Hardware Reviewer pattern; shares
-   `validation/open-issues.md` with Hardware Reviewer (`Source:
-   mechanical-reviewer`). Its checklist also cross-checks Manufacturing
-   Engineer's process specification (below), rather than a separate
-   reviewer for that narrow addition. Also carries a Foresight checklist
-   (physical interference across the whole assembly incl. downstream
-   visualizations; simplified-model distortion of real insertion depth/
-   clearance; scale/axis-transform sanity) — the discipline where this
-   practice's motivating gap was found (`docs/architecture-evolution.md`
-   §38).
+Use [AGENTS.md](../AGENTS.md) for commands and navigation. Audit existing
+guidance before adding another file. Update only affected consumers below;
+do not duplicate role definitions, change logs, CI or local MCP configuration.
 
-**Firmware** (Phase 2 of the multidisciplinary evolution —
-`docs/architecture-evolution.md` §32):
+| When this changes | Reconcile these consumers |
+|---|---|
+| A role/skill is added or its responsibility changes | Relevant `.github/agents/`, `.github/skills/` and scoped instructions; role indexes here, in `README.md` and `docs/architecture.md`; frontmatter and workflow-instruction checks. |
+| `tools/agent_workflow.py` or the task contract | `tools/tests/test_agent_workflow.py`, `docs/work-execution.md`, Hardware Lead and kickoff/review prompts; include newly authoritative instruction paths in the configuration snapshot. |
+| Check commands or CI behavior | `AGENTS.md`, the owning `.github/workflows/` file and affected `tools/tests/`; preserve existing required-check names and hardware gate semantics. |
+| A load-bearing source/interface/design value | Existing `docs/workflow.md` §4.2 cascade; affected PCB/mechanical/firmware/power consumers, evidence bindings and traceability/ECO through their owners, not wholesale historical rewrites. |
+| Repeated review feedback reveals a real convention gap | Correct the narrowest applicable instruction and add a regression where executable; link the actual feedback, distinguish one-off exceptions, and avoid another always-loaded checklist. |
 
-7. **Firmware Engineer** — writes driver-level bring-up firmware
-   (`firmware/<board>/`) from a Design-Complete schematic: peripheral
-   initialization and register-level configuration matching the schematic's
-   actual pin/interface decisions, every register-level claim grounded in
-   manufacturer documentation.
+PR publication claims need their own current evidence: local commit, pushed
+branch and merged PR are not interchangeable. The project-specific adaptation
+and limits of the ai-ready reference are recorded in
+[this candidate case](../docs/reference-cases/ai-ready-workflow.md).
 
-**Power** (Phase 3 of the multidisciplinary evolution —
-`docs/architecture-evolution.md` §33), an Electronics-adjacent addition
-(extends the original 4-agent Electronics team, not a new top-level
-discipline the way Mechanical/Firmware are):
+## Bounded execution and shared publication
 
-8. **Power Engineer** — owns system-level power architecture
-   (`hardware/power-architecture.md`) and multi-rail
-   `hardware/power-budget.md` bookkeeping once a project's power complexity
-   exceeds what Circuit Engineer can track ad hoc — engaged only when the
-   Hardware Lead judges it warranted for a given project/revision, not
-   automatically for every design. Proposes rail topology/source options
-   with real numbers; Circuit Engineer implements the human-approved
-   architecture.
+Follow `docs/work-execution.md` for every specialist dispatch, follow-up
+that starts more work, and scheduled kickoff. Hardware Lead must obtain a
+successful `tools/agent_workflow.py start` reservation first. Stable task IDs,
+input/configuration snapshots, write scopes and terminal outcomes survive
+session changes in the repository-local control record.
 
-**Manufacturing** (Phase 4 of the multidisciplinary evolution —
-`docs/architecture-evolution.md` §35), a Mechanical-adjacent addition:
+`DONE` means the assigned work was delivered, not Design Complete. `BLOCKED`
+means preserve the result and wait for a relevant input/decision change,
+not silently repeat the same research or review. Do not rename tasks or add
+irrelevant inputs to evade the guard. Report actual progress and next action,
+not message volume or a guessed completion time.
 
-9. **Manufacturing Engineer** — specifies the additive-manufacturing PROCESS
-   parameters (infill %/pattern, wall/perimeter count, print orientation vs.
-   load direction, material) a safety-critical/structural mechanical part
-   needs to actually achieve the physical properties its CAD design
-   assumes, engaged only when Mechanical Lead/Hardware Lead judges a
-   specific part's function warrants it. Never self-certifies — cross-checked
-   by the Mechanical Reviewer.
-
-**Firmware Reviewer addition to Firmware** (Phase 5 of the multidisciplinary
-evolution — `docs/architecture-evolution.md` §36), a genuinely new
-independent-reviewer agent (unlike Manufacturing Engineer's "extend an
-existing reviewer" pattern, because nothing previously reviewed Firmware
-Engineer's output at all):
-
-10. **Firmware Reviewer** — independent, adversarial review of Firmware
-    Engineer's driver-level bring-up code: register/peripheral correctness,
-    pin/interface fidelity against the actual schematic, safety-critical
-    logic correctness where present, premise review. Findings live in a
-    firmware-scoped file (`firmware/<board>/<board>-firmware-review.md`),
-    deliberately not `validation/open-issues.md`, so a firmware-only
-    finding cannot silently block the Design Complete Gate. Also carries a
-    Foresight checklist (requirement-implied-but-unimplemented
-    functionality; unverified timing/concurrency areas)
-    (`docs/architecture-evolution.md` §38).
-
-**PCB** (Phase 6 of the multidisciplinary evolution —
-`docs/architecture-evolution.md` §37), an Electronics-adjacent addition like
-Power Engineer:
-
-11. **PCB Engineer** — supplies bounded WIP physical-interface preparation
-    before Design Complete when assembly evidence needs populated-board/
-    mated-connector envelopes and provisional mounts/placement
-    (`docs/workflow.md` Phase 4a), then takes the Design-Complete schematic
-    through full layout/routing and DRC closure: footprint assignment (CONFIRMED/ASSUMPTION
-    labeled), board outline/layer-stackup justification, placement,
-    current-aware routing, DRC closure, and the flat BOM + visual snapshot a
-    fabrication decision needs. WIP preparation grants no general routing
-    or fabrication release. Does not self-declare "ready to fabricate" —
-    hands off to Hardware Reviewer's now-extended checklist (above) for
-    independent review, per the "before PCB fabrication" Human-in-the-loop
-    gate.
-
-**Systems Engineer** (Phase 7 of the multidisciplinary evolution —
-`docs/architecture-evolution.md` §44), a cross-discipline addition spanning
-all three top-level disciplines from its own introduction — unlike Power
-Engineer/PCB Engineer (Electronics-adjacent) or Manufacturing Engineer
-(Mechanical-adjacent), it is not tied to extending any single discipline's
-own team:
-
-12. **Systems Engineer** — owns the technical content of cross-discipline
-    boundary contracts (Electronics ⇔ Mechanical ⇔ Firmware, e.g.
-    `hardware/mechanical-interface.md`) and the substantive trade-off
-    criteria for which discipline should yield when two genuinely conflict,
-    once Hardware Lead's own mediation procedure (`docs/workflow.md` §3)
-    identifies a real engineering trade-off rather than a process
-    disagreement. Does not populate `hardware/mechanical-interface.md`
-    itself (stays Mechanical Lead's own ownership) or take over process
-    orchestration (stays Hardware Lead's); recommends, and never
-    self-finalizes, a safety-relevant or architecture-level call.
-
-**Simulation** (initial rigid-body scope, `docs/architecture-evolution.md` §45):
-
-13. **Simulation Engineer** — owns frozen simulation intake, executable
-    rigid-body models, simulation-only attitude feedback, numerical tests,
-    trajectories, plots and computed-motion video under `simulation/`.
-    Starts early with explicit WIP reference/proxy labels, not only after
-    Design Complete. Does not own physical CAD/BOM/electronics or firmware.
-14. **Simulation Reviewer** — fresh independent assessment of actual model/
-    code and computed outputs, including units/inertia/internal reaction,
-    contact, numerical sensitivity and visual agreement. Owns scoped
-    `simulation/reviews/` findings, not the shared hardware backlog.
-
-Use `docs/simulation.md` and the `rigid-body-simulation` / `simulation-review`
-skills. Simulation success is not real-hardware feasibility/safety approval,
-and MuJoCo video is not Fusion assembly-process animation. This addition does
-not create a third Control Engineer; deployable control remains separately scoped.
-
-If you are asked to act as one of these roles — or invoked directly as
-that custom agent — load/follow the corresponding
-`.github/agents/<role>.agent.md` and relevant `.github/skills/*/SKILL.md` file(s)
-as your operating instructions for that task.
+Specialists own technical content and independent verdicts. Hardware Lead
+serializes publication to the shared ledgers listed in `docs/work-execution.md`;
+profile instructions to update those files mean returning a source-linked
+proposal when the specialist is not their designated publisher. Never change
+a reviewer's verdict during publication. Scope-local CAD/code remains with
+its assigned owner.
 
 ## Learning from engineering references
 
