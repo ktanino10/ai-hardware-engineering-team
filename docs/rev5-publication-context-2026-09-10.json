@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "kind": "PUBLIC_SAFE_PUBLICATION_CONTEXT",
+  "scope": "A selected, portable WIP host-control package and source-bound status summaries, not the private engineering history or a hardware release.",
+  "target_repository": "ktanino10/ai-hardware-engineering-team",
+  "default_branch": "main",
+  "public_base_revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+  "public_publication_configuration": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+  "engineering_preparation_configuration": "0d524373af5f0a87e792d8a46a55caa4041987f2",
+  "publication_route": "Separate public branch and draft pull request only; no direct main push, force push or automatic merge.",
+  "executor_launch": {
+    "execution_location": "local",
+    "model": "gpt-6-astra",
+    "binding": "Explicit create_session kickoff.model; do not rely on an existing idle App session inheriting the coordinator's model.",
+    "admission": "A normal reservation precedes the bounded preflight in its assigned public worktree. A later publication contract must name the actual public App worktree and frozen package before any remote action.",
+    "mismatch_action": "Stop before technical work or publication rather than silently use a different model."
+  },
+  "authority_boundary": "The repository owner's public-update request and scoped publication-configuration decision authorize this route. This is a public-safe derived context, not a copy of private instructions, conversations or execution receipts.",
+  "configuration_differences": [
+    {
+      "path": ".github/copilot-instructions.md",
+      "public_baseline_limit": "Does not contain the later manual USER_UPLOAD source-handoff section."
+    },
+    {
+      "path": "docs/workflow.md",
+      "public_baseline_limit": "Does not contain the later required Rev5 mechanical/PCB pairing explanation."
+    },
+    {
+      "path": ".github/workflows/id-uniqueness-check.yml",
+      "public_baseline_limit": "Does not contain the later test/workflow path triggers or registry-table regression step."
+    },
+    {
+      "path": ".github/workflows/mechanical-pcb-sync-check.yml",
+      "public_baseline_limit": "Retains the earlier advisory description and lacks the later test/workflow path triggers and required-pair/parsing regression step."
+    }
+  ],
+  "configuration_sources": {
+    "comparison": "The two immutable configuration revisions above; no configuration file is changed by this publication.",
+    "admission_guard_blob_at_both_revisions": "a72a4853c5992eabd40cf0e5faf8248ffe2dd348",
+    "coverage_equivalence_claimed": false,
+    "private_active_contracts_changed": false
+  },
+  "required_checks_to_preserve": [
+    "Check open-issues.md for unresolved CRITICAL/HIGH findings",
+    "Check ECO/Issue/Evidence IDs for cross-branch duplicates",
+    "Check agent/skill frontmatter"
+  ],
+  "verification_boundary": "Exercise applicable existing commands on the actual public tree. Do not reuse private-tree results as public-tree evidence, suppress failures, transplant unrelated policies/checkers, or imply the older public configuration has later coverage.",
+  "planned_public_artifact_root": "docs/rev5-public-2026-09-10/",
+  "export_rules": [
+    "Select project-owned source and minimal useful context; preserve UNKNOWN, unresolved findings and limited review scopes.",
+    "Map original repository-relative source paths and hashes to public paths and hashes. Archive commit identifiers do not imply those commits are publicly reachable.",
+    "Declare adapted or redacted files as derivatives. Do not rebind original seals, execution results or independent acceptance to changed public bytes.",
+    "Exclude raw manufacturer documents, uploaded files, credentials, personal paths/data, private URLs, conversations, local run logs, caches and environment artifacts.",
+    "Retain USER_UPLOAD provenance when applicable; source receipt does not mean an agent download, latest-version confirmation or technical acceptance.",
+    "If a required dependency cannot be safely included, omit or explicitly limit that artifact rather than claim a successful standalone execution.",
+    "Only a designated publication executor may perform the bounded remote actions after the exported snapshot is fixed."
+  ],
+  "review_routing": "Local coding work owns new packaging/adapters. Independent firmware and hardware reviewers retain their original engineering scopes. A read-only code review covers meaningful publication-specific software differences only.",
+  "physical_or_adoption_permission": false,
+  "unchanged_holds": "No hardware qualification, part/topology/risk adoption, physical operation or relaxation of existing engineering gates follows from publication."
+}

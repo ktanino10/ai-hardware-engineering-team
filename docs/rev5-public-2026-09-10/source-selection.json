@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "kind": "PUBLIC_DERIVATIVE_SOURCE_SELECTION",
+  "original_identifiers": "Paths/commits/hashes are archive identifiers, not promises of public reachability. No private link target is required at runtime.",
+  "selected": [
+    {
+      "public_path": "model.py",
+      "original_path": "docs/rev5-2100-2026-09-09/host-event-model/model.py",
+      "original_revision": "27d1510bb85f32878c977dca33d1249149157364",
+      "original_sha256": "ce496b2806b21966d68cec789ae85ec5dbdd4cf1eb7762a8d0b29fac172af447",
+      "classification": "exact-copy",
+      "transformation": "NONE"
+    },
+    {
+      "public_path": "sequencer.py",
+      "original_path": "docs/rev5-2300-2026-09-09/output-sequencer/sequencer.py",
+      "original_revision": "27d1510bb85f32878c977dca33d1249149157364",
+      "original_sha256": "f15c6017fffa05fc8608d49649c13b918c17b673ba91007d65a75afc34d73585",
+      "classification": "adapter-derived",
+      "transformation": "See manifest adapter delta; core preservation checked separately."
+    },
+    {
+      "public_path": "scenarios.py",
+      "original_path": "docs/rev5-2300-2026-09-09/output-sequencer/scenarios.py",
+      "original_revision": "27d1510bb85f32878c977dca33d1249149157364",
+      "original_sha256": "20386057d9acfbbc0deecf82f53fa7126b8048eb1df44df9de46e058162b7dba",
+      "classification": "adapter-derived",
+      "transformation": "See manifest adapter delta; core preservation checked separately."
+    },
+    {
+      "public_path": "cli.py",
+      "original_path": "docs/rev5-2300-2026-09-09/output-sequencer/cli.py",
+      "original_revision": "27d1510bb85f32878c977dca33d1249149157364",
+      "original_sha256": "1e13cb8972d8ef46f83e573ce54aa752a818d53752e9207bb64415a4440ad172",
+      "classification": "adapter-derived",
+      "transformation": "See manifest adapter delta; core preservation checked separately."
+    },
+    {
+      "public_path": "test_sequencer.py",
+      "original_path": "docs/rev5-2300-2026-09-09/output-sequencer/test_sequencer.py",
+      "original_revision": "27d1510bb85f32878c977dca33d1249149157364",
+      "original_sha256": "1ab281a96216ed17609af7b5b0487aa3add9d85446893a9a1fcb54dedfbb7546",
+      "classification": "adapter-derived",
+      "transformation": "See manifest adapter delta; core preservation checked separately."
+    },
+    {
+      "public_path": "source-context/acceptance-spec.json",
+      "original_path": "docs/rev5-2100-2026-09-09/acceptance-spec/spec.json",
+      "original_revision": "27d1510bb85f32878c977dca33d1249149157364",
+      "original_sha256": "50a7d689125a0355076af1f62ce64ff69baab8bf23851629d9f7f961647881c9",
+      "classification": "redacted",
+      "deleted_json_pointers": [
+        "/task_id",
+        "/run_id",
+        "/owner",
+        "/source/contract_sha256",
+        "/source/input_count",
+        "/source/input_set_sha256",
+        "/source/full_hash_manifest",
+        "/source/aliases/AUTH",
+        "/source/aliases/OPERATOR",
+        "/source/dependency_semantics",
+        "/source/source_access",
+        "/authority_and_delta/user_endpoint_quote",
+        "/authority_and_delta/parent_recorded_endpoint_at",
+        "/authority_and_delta/exact_click_at",
+        "/authority_and_delta/priority_author",
+        "/authority_and_delta/old_history",
+        "/A2_comparison_boundary/next_step",
+        "/self_check_and_non_updates/native_method"
+      ],
+      "replaced_json_pointers": {},
+      "format": "JSON reserialized with UTF-8, indent=2, trailing newline; all other decoded values identical",
+      "purpose": "Hash-bound project-authored technical context; not primary manufacturer documentation or a new source verdict."
+    },
+    {
+      "public_path": "source-context/firmware-authority-map.json",
+      "original_path": "docs/rev5-2100-2026-09-09/firmware-authority/authority-map.json",
+      "original_revision": "27d1510bb85f32878c977dca33d1249149157364",
+      "original_sha256": "213d166f0f3872f2afd44fbc8ba2943d0494fda1f7b4707baa58d95c9361fa52",
+      "classification": "redacted",
+      "deleted_json_pointers": [
+        "/task_id",
+        "/run_id",
+        "/owner",
+        "/source_catalog_and_intake_witness",
+        "/termination_and_final_comparison",
+        "/authority_binding/A1_isolation",
+        "/authority_binding/old_windows",
+        "/authority_binding/refs",
+        "/epoch_separation/current_application/receipt",
+        "/epoch_separation/current_application/current_readme",
+        "/epoch_separation/refs",
+        "/author_self_check/tooling"
+      ],
+      "replaced_json_pointers": {
+        "/authority_binding/normal_first": "Remove delegation/click provenance only; preserve normal-first analysis and no-qualification limits."
+      },
+      "format": "JSON reserialized with UTF-8, indent=2, trailing newline; all other decoded values identical",
+      "purpose": "Hash-bound project-authored technical context; not primary manufacturer documentation or a new source verdict."
+    },
+    {
+      "public_path": "source-context/driver-proposal.json",
+      "original_path": "docs/rev5-2100-2026-09-09-continuation/driver-proposal/proposal.json",
+      "original_revision": "27d1510bb85f32878c977dca33d1249149157364",
+      "original_sha256": "d1f40f27d9179b64a2416f82d252aa38cad93df09e4d726971db49a771c2a127",
+      "classification": "redacted",
+      "deleted_json_pointers": [
+        "/task_id",
+        "/run_id",
+        "/owner",
+        "/source/contract_sha256",
+        "/source/input_count",
+        "/source/first_START",
+        "/source/execution",
+        "/source/workspace",
+        "/source/branch",
+        "/source/component_STOP",
+        "/source/component_saved_ACK",
+        "/source/component_jobs",
+        "/source/aliases/raw_manifest",
+        "/source/integrity_record"
+      ],
+      "replaced_json_pointers": {},
+      "format": "JSON reserialized with UTF-8, indent=2, trailing newline; all other decoded values identical",
+      "purpose": "Hash-bound project-authored technical context; not primary manufacturer documentation or a new source verdict."
+    },
+    {
+      "public_path": "source-context/source-proposals.json",
+      "original_path": "docs/rev5-2100-2026-09-09-continuation/driver-capacitance-correction/source-proposals.json",
+      "original_revision": "27d1510bb85f32878c977dca33d1249149157364",
+      "original_sha256": "9ec617b39ec8ff975f92178312af62aab96fc0f74f03c5a897b5720a92b9a695",
+      "classification": "redacted",
+      "deleted_json_pointers": [
+        "/task_id",
+        "/publisher",
+        "/source_view_revision/run_id",
+        "/source_view_revision/owner",
+        "/source_view_revision/inherited_original/task_id",
+        "/source_view_revision/inherited_original/run_id",
+        "/source_view_revision/current_primary_read/method",
+        "/source_view_revision/details",
+        "/documents/TXU/consumer_copy",
+        "/documents/AXC/consumer_copy",
+        "/history_preserved"
+      ],
+      "replaced_json_pointers": {},
+      "format": "JSON reserialized with UTF-8, indent=2, trailing newline; all other decoded values identical",
+      "purpose": "Hash-bound project-authored technical context; not primary manufacturer documentation or a new source verdict."
+    },
+    {
+      "public_path": "source-context/capacitance-correction.json",
+      "original_path": "docs/rev5-2100-2026-09-09-continuation/driver-capacitance-correction/correction.json",
+      "original_revision": "27d1510bb85f32878c977dca33d1249149157364",
+      "original_sha256": "0dc1825dde6f95daa7250df292fb8cfa44f066d2f49fc352b496f08f4928b1cf",
+      "classification": "redacted",
+      "deleted_json_pointers": [
+        "/task_id",
+        "/run_id",
+        "/owner",
+        "/contract",
+        "/source_basis/publisher_receipt",
+        "/source_basis/publisher_receipt_sha256",
+        "/source_basis/primary_path",
+        "/source_basis/primary_read_scope",
+        "/source_basis/primary_before_observation",
+        "/source_basis/primary_after_observation_record",
+        "/preservation/producer_original_six",
+        "/preservation/independent_review_six",
+        "/preservation/all_other_work",
+        "/verification",
+        "/next_owner"
+      ],
+      "replaced_json_pointers": {},
+      "format": "JSON reserialized with UTF-8, indent=2, trailing newline; all other decoded values identical",
+      "purpose": "Hash-bound project-authored technical context; not primary manufacturer documentation or a new source verdict."
+    },
+    {
+      "public_path": "source-context/driver-schematic.md",
+      "original_path": "docs/rev5-2100-2026-09-09-continuation/driver-proposal/schematic.md",
+      "original_revision": "27d1510bb85f32878c977dca33d1249149157364",
+      "original_sha256": "bb828875aac86ff62469419b7d981275fb3cdcbffb0171d07a3777db60c05fb2",
+      "classification": "exact-copy",
+      "purpose": "Original project-authored proposed connection diagram and conditions; no native CAD or manufacturer image."
+    }
+  ],
+  "exclusions": [
+    {
+      "category": "Private coordination and evidence of execution",
+      "examples": "authority/operator records, run/session identities, contracts, input logs, receipts, stop acknowledgements and closed raw outcomes",
+      "treatment": "Not exported; metadata pointers removed above. New private preparation records are outside this package."
+    },
+    {
+      "category": "Manufacturer originals and acquisition material",
+      "examples": "PDFs, text/image extracts of manufacturer files, uploaded attachments, capture paths",
+      "treatment": "Not exported or accessed. Only already-frozen project-authored analysis/parameter annotations remain, with original conditions and IDs. No new primary verification or IDs."
+    },
+    {
+      "category": "External dependency closure",
+      "examples": "Original evidence ledger, upstream project graphs, SDK source, review files and original Git history",
+      "treatment": "Not included or required for host execution; source identifiers are unresolved archive references, not a complete independent engineering reproduction."
+    },
+    {
+      "category": "Historical results and future reviews",
+      "examples": "old author/test/closed-run outputs; active reviewers work",
+      "treatment": "Not exported, replayed or presumed current. Run the derivative CLI to obtain its own results."
+    },
+    {
+      "category": "Machine/private artifacts",
+      "examples": "absolute personal paths, local URLs, tokens, environment dumps, caches, virtualenvs and native hardware/firmware",
+      "treatment": "Excluded."
+    }
+  ]
+}

@@ -1,0 +1,663 @@
+{
+  "schema_version": 1,
+  "spec_id": "REV5-2100-0909-A1-FIRST",
+  "status": "UNADOPTED_ACCEPTANCE_SPECIFICATION",
+  "independent_review": "NOT_INDEPENDENTLY_REVIEWED",
+  "implemented_enforcement": false,
+  "actual_operation_permission": false,
+  "source": {
+    "revision": "cecf8e3064e238a088db0b44eeea0aeba0ada952",
+    "config": "0d524373af5f0a87e792d8a46a55caa4041987f2",
+    "aliases": {
+      "D01": "docs/rev5-noon-2026-09-09/planned-event-control/proposal.json",
+      "D01_DRAWING": "docs/rev5-noon-2026-09-09/planned-event-control/schematic.md",
+      "P38": "docs/rev5-night-2026-09-09/control-path/proposal/proposal.json",
+      "INV": "docs/rev5-night-2026-09-09/control-path/circuit-inputs/inventory.json",
+      "COMP": "docs/rev5-night-2026-09-09/control-path/components/guarantee-matrix.json",
+      "GRAPH": "hardware/schematic/bench-imu-01-rev5/integrated-contract.json",
+      "NATIVE": "hardware/schematic/bench-imu-01-rev5/bench-imu-01-rev5-integrated.kicad_sch",
+      "PREP": "firmware/bench-imu-01-rev5/preparation/generated/preparation_tables.json",
+      "LEDGER": "datasheets/evidence-log.md",
+      "REVIEW": "validation/reviews/rev5-d01-planned-event-first/review.json"
+    },
+    "committed_dependencies": [
+      [
+        "rev5-control-path-representative-proposal",
+        "38c891cb7dcb9ce39e2cec7601d6898d05803a90"
+      ],
+      [
+        "rev5-control-path-input-state-inventory",
+        "082e467882d45a2ed7040d1470ee4f6662f7f308"
+      ],
+      [
+        "rev5-tmux1511-control-off-guarantee-closure",
+        "2e9f2e5631e32810a83287d35c2ae5fab3538102"
+      ],
+      [
+        "rev5-default-disconnect-switch-source-publication",
+        "ede733776ca222a2964ae48d46cd6c89118a192e"
+      ],
+      [
+        "rev5-rtm-four-requirements-publication",
+        "76897b9b317745ae048743e251f9d9687405d6ad"
+      ],
+      [
+        "rev5-planned-event-control-delta",
+        "41372f947875a055cdef6da31385159099bf09fd"
+      ],
+      [
+        "rev5-d01-planned-event-first-independent-review",
+        "8b9ccbb1ca9ed844d3f25c31dac0290650b3c982"
+      ]
+    ]
+  },
+  "authority_and_delta": {
+    "analysis_priority": "NORMAL_CONDITION_DESIGN_PROOF_FIRST",
+    "changes": [
+      {
+        "old": "D01 completion_proof.required_38c_scope required both host and local cuts open for every target SCL/SDA.",
+        "new": "Require every target end-to-end communication route to be interrupted, in both relevant influence directions. Do not automatically require every serial cut individually open.",
+        "why": "AUTH endpoint_choice; REVIEW completion_and_design_proof.two_distinct_claims. The old two-cut policy was stronger than the newly selected endpoint."
+      },
+      {
+        "old": "Endpoint and proof scope were unselected, so no concrete completion predicate could be evaluated.",
+        "new": "Define a cut-set plus electrical-envelope predicate, and a maintained, event-bound proof obligation. A conditional normal-design proof may be studied without a status pin; actual satisfaction is still UNKNOWN.",
+        "why": "AUTH delegated_analysis_choice; DS-IFACE-070..074; REVIEW qualified_design_proof. A source model implication is not measurement or evidence of actual normal components."
+      },
+      {
+        "old": "Withdrawal demanded all retained host/local cuts OFF and treated all as required completion witnesses.",
+        "new": "The old all-OFF command proposal may be retained without counting every cut as an acceptance witness. Each later mechanism must name its actual blocking cut-set, commands and powered states. Changing that set invalidates the certificate.",
+        "why": "End-to-end proof changes acceptance, not installed topology, actuation wiring, parts, or a fault tolerance rating."
+      }
+    ],
+    "unchanged": "No planned reset/debug/remap initiating action before completion; no bounded-exposure waiver. Unannounced faults/power abnormalities, all physical gates, normal-service qualification, nine non-I2C paths and energy/inhibit requirements remain unresolved."
+  },
+  "endpoint_binding": {
+    "meaning_of_actual": "As drawn in admitted native/contract text, not an as-built observation.",
+    "native_status": "All six host signal nets are singleton stubs. Each local SCL/SDA net has its driver pin and its own pullup. No MCU-driver I2C bridge, TMUX, TCA repeater, proof sensor or event enforcer is installed in this native design.",
+    "domain_map": {
+      "H": "LOGIC_3V3: U202.5 drawn source -> U201.2; 3V3_SYS is an alias, not another supply.",
+      "X": "DRV_3V3_X from U301.9; VM_X at U301.23/.24.",
+      "Y": "DRV_3V3_Y from U302.9; VM_Y at U302.23/.24.",
+      "Z": "DRV_3V3_Z from U303.9; VM_Z at U303.23/.24.",
+      "VM": "Actual VM source implementation absent; P1 direction conditional.",
+      "GND": "Common logical GND: U201.1/.40/.41 and each U301..303.5/.8/.15/.16/.25. Actual offsets/impedances UNKNOWN; not galvanic isolation.",
+      "separation": "Three independent fixed-address0x52 buses; no rail pooling. PREP has two unassigned hardware I2C resources, not an implemented three-bus runtime."
+    },
+    "line_columns": [
+      "id",
+      "host_pin",
+      "gpio",
+      "host_net",
+      "driver_pin",
+      "local_net",
+      "local_pull",
+      "host_TMUX_S_D_SEL",
+      "TCA_B_A",
+      "local_TMUX_S_D_SEL"
+    ],
+    "lines": [
+      [
+        "X-SCL",
+        "U201.12",
+        8,
+        "DRV_X_SCL",
+        "U301.10",
+        "DRV_X_SCL_D",
+        "R302",
+        [
+          "H0",
+          2,
+          3,
+          1
+        ],
+        [
+          "X",
+          7,
+          2
+        ],
+        [
+          "LX",
+          2,
+          3,
+          1
+        ]
+      ],
+      [
+        "X-SDA",
+        "U201.17",
+        9,
+        "DRV_X_SDA",
+        "U301.11",
+        "DRV_X_SDA_D",
+        "R303",
+        [
+          "H0",
+          5,
+          6,
+          4
+        ],
+        [
+          "X",
+          6,
+          3
+        ],
+        [
+          "LX",
+          5,
+          6,
+          4
+        ]
+      ],
+      [
+        "Y-SCL",
+        "U201.31",
+        38,
+        "DRV_Y_SCL",
+        "U302.10",
+        "DRV_Y_SCL_D",
+        "R322",
+        [
+          "H0",
+          9,
+          8,
+          10
+        ],
+        [
+          "Y",
+          7,
+          2
+        ],
+        [
+          "LY",
+          2,
+          3,
+          1
+        ]
+      ],
+      [
+        "Y-SDA",
+        "U201.32",
+        39,
+        "DRV_Y_SDA",
+        "U302.11",
+        "DRV_Y_SDA_D",
+        "R323",
+        [
+          "H0",
+          12,
+          11,
+          13
+        ],
+        [
+          "Y",
+          6,
+          3
+        ],
+        [
+          "LY",
+          5,
+          6,
+          4
+        ]
+      ],
+      [
+        "Z-SCL",
+        "U201.33",
+        40,
+        "DRV_Z_SCL",
+        "U303.10",
+        "DRV_Z_SCL_D",
+        "R342",
+        [
+          "H1",
+          2,
+          3,
+          1
+        ],
+        [
+          "Z",
+          7,
+          2
+        ],
+        [
+          "LZ",
+          2,
+          3,
+          1
+        ]
+      ],
+      [
+        "Z-SDA",
+        "U201.34",
+        41,
+        "DRV_Z_SDA",
+        "U303.11",
+        "DRV_Z_SDA_D",
+        "R343",
+        [
+          "H1",
+          5,
+          6,
+          4
+        ],
+        [
+          "Z",
+          6,
+          3
+        ],
+        [
+          "LZ",
+          5,
+          6,
+          4
+        ]
+      ]
+    ],
+    "pull_definition": "Every listed local resistor has pin1 on its own DRV_3V3_axis, pin2 on local signal; 4.75kohm is existing nominal/reference only [DS-MTR-119], not a timing/current qualification. Native host external bias absent.",
+    "proposed_only": {
+      "path": "H -> host TMUX S/D -> B -> active TCA9517 B/A -> A -> local TMUX S/D -> L. SDA is bidirectional; driver SCL is an input, but reverse electrical influence/backfeed must still be bounded.",
+      "TMUX": "Old TMUX1511PWR shape: H0/H1 VDD14=H rail; LX/LY/LZ VDD14=own local rail; GND7=common GND. Five quad packages,12 used poles,24 used S/D terminals,8 unused slots. No new BOM or footprint adoption [DS-IFACE-070].",
+      "TCA": "Old TCA9517DGKR per axis: VCCA1=local, VCCB8=H, GND4, conditional EN5=H. A/B require own-side pullups; values unselected [DS-IFACE-063/064].",
+      "repeater": "TCA is an active LOW-repeating element, not a passive resistor. Transfer graph includes both logical directions, static-offset state, initial stored charge and output release/tail behavior. An input disconnected now can leave a downstream output/tail needing qualification.",
+      "cut_logic": "For a single intended serial route with no bypass: qualified host cut OR qualified local cut can block that line, with repeater/tail and endpoint obligations also met. For all six lines require a valid blocker on EACH line. Opening only SCL to prevent complete messages does not satisfy disconnection of the target SCL AND SDA lines. No need to prove both serial cuts open merely because they exist.",
+      "nonwitness_cut": "A remaining conductive or non-witness cut does not itself refute end-to-end interruption. Its terminals, loading, supply/ground and effect on the chosen witness remain in scope; it cannot violate ROC or provide an alternate path.",
+      "TCA_EN": "Do not presently count EN LOW as a qualified asynchronous cut or substitute timer. DS-IFACE-064/066/069 provide restricted disable/power statements, not the required disabled current and completion deadline.",
+      "alternate_paths": "Proof graph must include any installed cross-axis remapping/bridge, SCL-SDA coupling, wiring/probe attachment, retained control crossing, rail/ground/protection-mediated influence and all future observation circuits. Current graph shows no intended direct bridge; absence of all physical parasitic/fault paths is not measured. Buses cannot be merged because addresses coincide.",
+      "shared_resources": "H0 shares X/Y; H packages share VH, GND and proposed authority. This neither proves independent redundancy nor automatically requires whole-package opening. Event closure depends on actual shared control/register/power effects; unknown closure denies permission.",
+      "refs": [
+        "GRAPH#/nets",
+        "GRAPH#/driver_host_boundaries",
+        "INV#/six_native_pairs",
+        "D01#/retained_data_shape",
+        "DS-IFACE-063",
+        "DS-IFACE-067",
+        "DS-IFACE-070"
+      ]
+    }
+  },
+  "acceptance": {
+    "variables": {
+      "q": "Fresh event identity: epoch, actual issuer, kind, old/new pin ownership/mapping, affected set S, selected cut-set K, configuration/source revision.",
+      "S": "Both SCL/SDA for every affected axis; reset/global halt/debug -> XYZ. Remap -> old union new union shared-resource affected axes, fixed before mutation.",
+      "A": "Explicit normal-component, specified-power/return/temperature/load and exclusive-control assumptions. Not an actual-board fact.",
+      "X": "Complete admitted operating envelope: initial states, terminal/control histories, impedances, rail/return trajectories, loads, temperatures, uncertainties and event-generated disturbances.",
+      "B": "Approved per-endpoint/per-port continuous, transient, charge, current, receiver-threshold/pulse and validity limits. Numerical values UNKNOWN.",
+      "t_request": "Actual accepted request, not GPIO level retention or a scheduled intention.",
+      "t_withdraw": "Actual new-work inhibition and bus-grant withdrawal begin, before any event.",
+      "t_c": "Earliest time ALL target route/tail/envelope obligations have qualified completion evidence with valid maintained-isolation support.",
+      "t_op": "First irreversible/initiating action of the exact planned operation, not later software notification.",
+      "t_rejoin": "Actual qualified end of held-isolation phase when fresh normal-service rejoin is separately authorized and initiated.",
+      "I_hold": "Closed interval from t_c through the boundary immediately preceding actual authorized rejoin; includes permission delivery, whole event, uncertain event end and post-event recovery."
+    },
+    "C1_route": "For every target line and every possible relevant directed communication/influence route between its H and L endpoints in the actual proposed implementation, K contains at least one source-qualified blocking element or an explicitly qualified non-transferring isolation state. Endpoint silence, protocol masking, clamping a still-connected endpoint or merely preventing complete messages is not disconnection. Include cross-line/axis bypasses and active repeater effects. No complete route may transmit a receiver-significant event during I_hold.",
+    "C2_electrical": "For all histories x in X and all t in I_hold: every involved terminal/control/rail is inside its functional envelope relative to its actual return, AMR is never used as a valid operating allowance, signed port currents remain within B, and induced endpoint excursions/charge remain within B without a receiver-interpreted SCL/SDA edge/START/STOP/data disturbance. No zero-leakage or galvanic-disconnection claim.",
+    "C3_tail": "At t_c, all pre-withdrawal propagation, switch/repeater output release, charge injection and stored-charge/current tails are already within the sustained C1/C2 bounds for every permitted initial state. New transients during I_hold must independently obey those bounds. Merely crossing a datasheet timing marker is not completion.",
+    "precompletion_transition": "Before t_c the still-connected path is not falsely labeled isolated. Withdrawal/opening itself must stay within the source-qualified voltage/current/thermal operating envelopes and an explicit transaction-disposition contract, including switch-induced transients. UNKNOWN transition bounds are not permission for stress, false transactions or bounded exposure. The planned operation remains forbidden throughout this transition.",
+    "C4_maintained": "The control and power conditions that justify K and C1..C3 persist through I_hold, with no uncontrolled reclose path. Proof validity includes transitions caused by the planned event. If proof only covers a finite interval, no event whose completion/recovery may exceed it can be authorized without a qualified extension or indefinite hold argument.",
+    "C5_authority": "An actual enforcer can prevent every initiating action in the scoped event set; q is fresh, frozen and exclusive; withdrawal and transaction disposition are complete; evidence is bound to q/X/B/K and current configuration. No actual enforcer exists here.",
+    "permission_rule": "SPEC_ONLY: PERMIT(q,t_op) implies C1 AND C2 AND C3 AND C4 AND C5, evidence valid at use, t_op >= t_c with real ordering/delivery uncertainty accounted for, and all separately applicable gates. UNKNOWN in any prerequisite yields NOT_AUTHORIZABLE, not a presumed pass.",
+    "design_proof_rule": "A AND source-guarantee premises AND matched X AND actual implementation/control refinement -> C1..C5 is a conditional design theorem. Its validity does not establish A or implementation identity on an actual board. Commissioned first-step analysis may assume A; operational acceptance may not silently do so.",
+    "fault_boundary": "Normal analysis excludes unannounced component/crossing/return failures only from this theorem's hypotheses; it does not waive their system requirements. Retained stale requests and planned reset/remap consequences are modeled, not excluded as faults. A stuck driver HIGH, data-pole short, bypass, unexpected reset or abnormal power requires a separate source-backed coverage case; no invented occurrence rate or fault sensor.",
+    "rationale_refs": [
+      "AUTH",
+      "D01#/completion_proof",
+      "REVIEW#/completion_and_design_proof",
+      "DS-IFACE-070",
+      "DS-IFACE-071",
+      "DS-IFACE-072",
+      "DS-IFACE-073",
+      "DS-IFACE-074"
+    ]
+  },
+  "evidence_obligations": [
+    {
+      "id": "E_TOPOLOGY",
+      "required": "Revision-bound installed-intent path/control/rail graph, explicit K per target line, all alternate routes and active-repeater state dependencies; source identity and implementation conformance evidence.",
+      "acceptance": "Every route is covered; no unknown route dismissed because data were idle. Current native unbridged stubs prove only documentary absence of a bridge and fail service readiness.",
+      "actual_status": "Only frozen as-drawn endpoints and unadopted path proposal available."
+    },
+    {
+      "id": "E_CONTINUOUS",
+      "required": "Worst-case signed current envelopes at both S/D of every used pole, each involved SEL/supply/GND, TCA ports and H/L endpoints, including both-positive and reversed-terminal cases and aggregate rail loading. Partition terminal current from transferred current, rail injection and return current; do not sum unrelated fixture limits.",
+      "acceptance": "For each required port j and all x in X: I_min_allowed_j <= I_j(x,t) <= I_max_allowed_j. For each target boundary: sup(abs(I_cross_total)) + uncertainty <= I_cross_allow. All limits and actual impedance-derived voltage margins remain UNKNOWN.",
+      "actual_status": "DS-IFACE-072 tests are scoped, not a complete current/backfeed matrix. No actual load/return envelope or measured currents."
+    },
+    {
+      "id": "E_TRANSIENT",
+      "required": "Per-endpoint worst-case waveform including initial charge, switch charge injection, capacitive/cross-channel coupling, repeater propagation/release, all six line skews and event power/control edges. Include driving histories on either side and interactions with local pullups; do not assume the disconnected segment stays idle.",
+      "acceptance": "For every relevant transient window W: integral_W(abs(I_induced))dt <= Q_allow(W), peak excursions/current and pulse widths obey B, and no forbidden receiver-state transition occurs. Net signed charge cancellation is insufficient. B, uncertainty and waveform envelope UNKNOWN.",
+      "actual_status": "Typical charge injection/off-isolation/skew and fixture capacitances do not close worst-case actual-waveform proof [DS-IFACE-074]."
+    },
+    {
+      "id": "E_COMPLETION_TIME",
+      "required": "Worst-case request/withdrawal arrival, driver/crossing/SEL transition, each selected cut's accepted electrical state, repeater release and current-tail settling; real clock/order uncertainty and earliest event actuation. Evaluate the last required target completion, not average or same-package data skew.",
+      "acceptance": "t_c >= max over targets and admitted histories of accepted-route-and-tail completion. t_op earliest >= t_c latest. A settling bound must ensure the sustained limit for all later t until rejoin, not one threshold sample. No numerical delay allocated.",
+      "actual_status": "55ns/80ns/4us fixture timings are not t_c; event-to-leakage timing and controller clock/delivery bounds UNKNOWN [DS-IFACE-074; COMP parameter_table]."
+    },
+    {
+      "id": "E_VALIDITY",
+      "required": "Either a qualified observation/diagnostic with coverage, uncertainty, freshness and held-state argument, or qualified source/design proof plus justified implementation/operating-condition conformance and maintained control/power. State exact assumptions, exclusions, duration and invalidators for both routes.",
+      "acceptance": "Evidence object binds q,S,K,X,B, source/configuration and validity interval covering I_hold. Sampling does not fill blind intervals without a bound; design proof does not assert unmeasured actual normality. No status pin is universally mandatory.",
+      "actual_status": "No completion observer, conformance certificate or complete design proof. Software ACK, SEL/GPIO value and idle voltage alone cannot distinguish connected equal-potential nodes from disconnected ones."
+    },
+    {
+      "id": "E_SERVICE",
+      "required": "Actual pre-event transaction disposition, fresh post-event pin/peripheral ownership, qualified sequential rejoin and useful separate-bus service, with direction-specific loaded LOW/HIGH and timing proof.",
+      "acceptance": "Cancellation/reset/data cuts do not roll back accepted writes. No blind replay or automatic bus-clear. Permanent OFF is not successful service. Event permission and BUS permission do not imply CMD permission, motor inhibit, no motion or safe residual energy.",
+      "actual_status": "Three-bus runtime, enforcement and electrical service qualification remain absent."
+    }
+  ],
+  "registered_source_limits": {
+    "reuse_only": "No fresh primary extraction or new source registration. Categories and fixture restrictions below are preserved admitted claims, not newly selected acceptance limits.",
+    "parameter_columns": [
+      "parameter",
+      "min",
+      "typ",
+      "max",
+      "unit",
+      "category",
+      "source_and_scope"
+    ],
+    "rows": [
+      [
+        "TMUX VDD",
+        1.5,
+        null,
+        5.5,
+        "V",
+        "ROC",
+        "DS-IFACE-071; not a supply-ramp guarantee"
+      ],
+      [
+        "TMUX S/D at VDD>=1.5V",
+        0,
+        null,
+        "min(2*VDD,5.5)",
+        "V",
+        "ROC",
+        "DS-IFACE-071; each terminal relative to package GND"
+      ],
+      [
+        "TMUX S/D at 0<=VDD<1.5V",
+        0,
+        null,
+        3.6,
+        "V",
+        "voltage allowance",
+        "DS-IFACE-071; not full subthreshold function/leakage"
+      ],
+      [
+        "TMUX powered OFF I_S or I_D",
+        -100,
+        null,
+        100,
+        "nA",
+        "conditioned electrical",
+        "DS-IFACE-072; VDD1.5..5.5V, TA-40..125C; paired0.2/0.8*VDD terminals or swapped"
+      ],
+      [
+        "TMUX grounded-off SOURCE I_POFF",
+        -2,
+        null,
+        2,
+        "uA",
+        "conditioned electrical",
+        "DS-IFACE-072; VDD=0, S0..3.6V, D=0, TA-40..125C; not reciprocal/all-port/both-positive matrix"
+      ],
+      [
+        "TMUX control transition",
+        null,
+        null,
+        55,
+        "ns",
+        "fixture timing",
+        "DS-IFACE-074; VDD2.5..5.5V, VS=VDD, RL200ohm/CL15pF, SEL edges<5ns, Figure6-5 markers; not time-to-leakage"
+      ],
+      [
+        "TMUX supply OFF",
+        null,
+        null,
+        4,
+        "us",
+        "fixture timing",
+        "DS-IFACE-074; VS3.6V,1us supply fall, SEL=VDD, RL200ohm/CL15pF, Figure6-6 supply1.5V/output90% markers"
+      ],
+      [
+        "TMUX S/D continuous current",
+        -25,
+        null,
+        25,
+        "mA",
+        "AMR stress only",
+        "DS-IFACE-071; not operating allowance"
+      ],
+      [
+        "TCA EN setup/hold",
+        100,
+        null,
+        null,
+        "ns",
+        "minimum protocol timing",
+        "DS-IFACE-069; both buses idle; not EN-to-disconnection maximum"
+      ]
+    ],
+    "ramp_consequence": "A terminal held at3.6V violates powered S/D ROC while1.5<=VDD<1.8V; equality at1.8V provides no positive margin. End-to-end interruption does not remove the applied voltage from a non-witness cut. Any necessary event trajectory through this condition is ineligible under the normal all-in-ROC proof, not cured by SEL LOW [DS-IFACE-071].",
+    "normal_power": "Specified means an actual proposed trajectory envelope, not nominal3.3V or the phrase normal board. MCU reset/hold/debug and rail changes caused by the event must be covered explicitly [DS-MCU-151..154].",
+    "no_substitution": "No TCA9800 rules transferred to TCA9517; no TXU spare channel used as an I2C/proof signal; no fixture or typical value promoted to a numerical acceptance threshold."
+  },
+  "event_protocol": {
+    "state_kind": "Proposed specification only; none is installed enforcement.",
+    "states": [
+      [
+        "SERVICE_CONDITIONAL",
+        "Only separately qualified bus service; no standing event authorization."
+      ],
+      [
+        "REQUEST_CAPTURE",
+        "Capture fresh q and old/new/shared affected closure; reject unknown issuer/target or any event already begun."
+      ],
+      [
+        "WITHDRAW",
+        "Prevent new affected work, invalidate old grants, resolve or explicitly disposition in-flight transaction; maintain required current pin state without premature reset/remux."
+      ],
+      [
+        "EVIDENCE_PENDING",
+        "Demand selected K blocking state through real future control; operation remains denied until E_TOPOLOGY..E_VALIDITY and transaction disposition qualify."
+      ],
+      [
+        "EVENT_PERMITTED",
+        "Issue a one-use authorization for exactly q; bus grants remain withdrawn. Check evidence at actual use, consume authorization atomically with initiation, maintain isolation."
+      ],
+      [
+        "EVENT_ACTIVE",
+        "Hold isolation throughout event and its delayed effects. No extra operation permitted on the consumed token."
+      ],
+      [
+        "RECOVERY_ISOLATED",
+        "Confirm event termination and actual pin/rail/ownership/transaction state. No automatic reconnect, command replay or grant restoration."
+      ],
+      [
+        "REARM_READY",
+        "Require fresh service qualification and independently authorized rejoin; then actual sequential rejoin may return to SERVICE_CONDITIONAL."
+      ],
+      [
+        "REJECTED_OR_PROOF_LOST",
+        "No new event permitted; withdraw/revoke tokens, retain independent OFF demand if realizable. Containment/recovery unresolved until cause disposition."
+      ]
+    ],
+    "request_withdrawal": "Before bus withdrawal, cancellation invalidates q and any token; existing separately valid service need not be falsely declared interrupted. Once withdrawal begins, request cancellation does not restore previous BUS grants or undo a transaction; move to RECOVERY_ISOLATED.",
+    "cancellation_during_event": "Cancel only further initiation/continuation actions that the future actuator can actually prevent. An executed reset, transferred byte or physical change cannot be undone. Retain isolation and classify partial event/transaction outcome; no reset-first recovery shortcut.",
+    "proof_loss": "Any source/configuration/K/mapping/rail/return/ownership change outside the certified envelope, evidence expiry or known invalidity revokes unused permission. During an event prevent additional authorized actions where enforceable, demand continued blocking and enter loss/recovery. Detection latency and prevention of already in-flight effects are UNKNOWN; this is not instantaneous installed fault containment.",
+    "rearm": "No retained GPIO42 HIGH, held SW201 contact, old ACK or old epoch can rearm. Require cause disposition, released/requalified requester as applicable, fresh epoch and fresh evidence. Boot/default state has no granted operation; this spec does not assert a hardware reset in order to obtain that state.",
+    "no_progress": "When proof/transaction/event completion cannot be established, no permission or automatic retry. A future expiry/abort policy needs real bounded timing and actuator semantics; values UNKNOWN. Indefinite denial is a blocked branch, not service success.",
+    "issuer_boundaries": [
+      [
+        "manual reset",
+        "Existing SW201.1 directly on MCU_EN/U201.3 is a bypass. D01 request-only rewire and sink remain proposals, not performed."
+      ],
+      [
+        "internal planned reset",
+        "External EN sink cannot veto privileged internal reset writes; actual exclusive initiation boundary/source call sites required."
+      ],
+      [
+        "pad debug",
+        "GPIO39/40/41 overlap Y-SDA/Z-SCL/Z-SDA. Prevent attachment/drive/halt initiation before permit, not ACK after it. Treat global debug as XYZ."
+      ],
+      [
+        "native USB debug",
+        "U201.13/.14 remain singleton USB_U_DM_MCU/USB_U_DP_MCU; J201 data/SBU NC. No newly connected debug path or transport."
+      ],
+      [
+        "UART/boot",
+        "J202 TX/RX and direct SW202 BOOT_N are real boundaries, not an installed request parser/interlock. No strap/fuse change."
+      ],
+      [
+        "remap/hold",
+        "Freeze old/new and shared resource closure before IO-MUX, GPIO, peripheral or hold mutation; no gpio_reset_pin-as-release assumption [DS-MCU-154]."
+      ],
+      [
+        "planned power removal/direct access",
+        "Cannot use unplugging or EN short as an authorized interlocked substitute. Prevent/exclude through separately approved boundary or reject branch; unexpected loss remains unresolved."
+      ]
+    ]
+  },
+  "A2_comparison_boundary": {
+    "eligible_now": [
+      "Conditional structural comparison against the SAME six endpoints: route coverage with a host-side, local-side or mixed qualified cut-set, without requiring every serial cut open. This authorizes a comparison question, not adopting or deleting either cut.",
+      "Compare source/design-proof versus actual observation obligations, needed conformance facts, control independence, held-isolation capability and bypass coverage under explicit A/X. Lack of a status pin alone cannot eliminate the design-proof route.",
+      "Compare dependency burden and exact guarantee-domain fit, return/rail assumptions, event enforcement/refinement and recovery/service feasibility. A source-domain contradiction can conditionally eliminate only that proposed envelope/placement.",
+      "Compare symbolically parameterized leakage/tail/validity budgets and which minimum inputs each mechanism needs; record conditional feasibility, not an absolute winner."
+    ],
+    "not_yet_comparable_as_accepted_design": [
+      "Numerical delay, thresholds, tolerable current/charge/exposure and positive margins: B and actual X/uncertainty absent.",
+      "Which mechanism guarantees actual per-board completion or fastest rearm: implementation, control timing, load/tail/conformance facts absent.",
+      "Fault-tolerant/safety/redundancy ranking: unannounced fault set, coverage requirement and common-cause assumptions not waived or supplied.",
+      "Global reset/debug/remap permission in practice: actual all-issuer control boundary and event completion semantics absent.",
+      "Normal service, motor-safe operation, rail budget fit or selected part/architecture: independent and human gates remain."
+    ]
+  },
+  "minimum_next_inputs": [
+    [
+      "U_LIMITS",
+      "Lead with Circuit/Component and acceptance authority",
+      "Per-H/L receiver-significance criteria and approved signed DC/current/charge/transient/pulse/validity budgets B, tied to actual allowable disturbance and original no-before-completion intent. UNKNOWN; no number selected here."
+    ],
+    [
+      "U_ENVELOPE",
+      "Power + Circuit via Lead",
+      "Actual intended rail/return/temperature/load/initial-state and event trajectory envelope X for H/B/A/L, all controls and each domain; source capacity and tolerances, including power states through reset/recovery. Actual board conformity remains a separate fact."
+    ],
+    [
+      "U_GUARANTEE",
+      "Component via Lead",
+      "Only missing exact guarantee/qualification cases for selected K: bilateral/both-positive/rail/control currents, loaded transition-to-current-tail, repeater release and coupling. Existing TMUX source is not missing; do not reacquire it or extrapolate its fixtures."
+    ],
+    [
+      "U_ENFORCER",
+      "Firmware + Circuit via Lead",
+      "Frozen actual issuer/write/transport inventory and enforceable request-to-actuator boundary, q binding, withdrawal, veto/reclose ownership and reset/debug/remap completion semantics. Do not read current B output until committed and admitted."
+    ],
+    [
+      "U_PROOF_REFINEMENT",
+      "Circuit/Component then independent Hardware Reviewer via Lead",
+      "Specific candidate implementation, source-bound conditional proof or qualified diagnostic method, implementation identity/conformance, uncertainty/freshness and maintained validity. No new sensor assumed."
+    ],
+    [
+      "U_TRANSACTION",
+      "Firmware via Lead",
+      "In-flight byte/transaction/write outcome, no-progress/cancel policy and fresh three-bus rejoin/service checks without blind replay; do not modify sealed measurement firmware."
+    ],
+    [
+      "U_FAULTS",
+      "Lead/acceptance authority with relevant existing owners",
+      "Explicit unannounced fault requirements/coverage and independent safety argument in later scope. No waiver inferred from NORMAL_CONDITION_DESIGN_PROOF_FIRST."
+    ],
+    [
+      "U_PHYSICAL_SAFETY",
+      "Lead + Power/Mechanical/Circuit existing owners",
+      "Separate nine SPEED/DIR/FG, actual inhibit/no-motion, power/remanent energy and REQ-409 closures. Not a prerequisite to comparing A2 communication mechanisms symbolically, but not released by that comparison."
+    ]
+  ],
+  "self_check_and_non_updates": {
+    "classification": "AUTHOR_DESK_CHECK_ONLY",
+    "mandatory_18": [
+      [
+        "1 supply",
+        "Specified/actual trajectory distinction and U_ENVELOPE; no rail changed."
+      ],
+      [
+        "2 logic",
+        "Per-endpoint/SEL receiver envelopes required; no thresholds invented."
+      ],
+      [
+        "3 AMR",
+        "Stress separated from functional acceptance."
+      ],
+      [
+        "4 ROC",
+        "All involved terminals, including non-witness cut, and ramp counterexample retained."
+      ],
+      [
+        "5 current",
+        "Signed port/aggregate/transfer budgets and source-condition matrix required."
+      ],
+      [
+        "6 thermal",
+        "Temperature envelope/derating and added loss UNKNOWN; no new load."
+      ],
+      [
+        "7 decoupling",
+        "Actual capacitance/initial charge enters tail; no part/value selected."
+      ],
+      [
+        "8 bias",
+        "Local own-rail pulls preserved; actual driving/release not inferred from idle."
+      ],
+      [
+        "9 protection",
+        "Protection/backfeed/bypass behavior in graph/envelope; no new device."
+      ],
+      [
+        "10 sequencing",
+        "Hold interval includes event/reset/recovery; no arbitrary-ramp guarantee."
+      ],
+      [
+        "11 reset",
+        "Existing SW201 bypass and internal reset authority preserved."
+      ],
+      [
+        "12 timing",
+        "Completion/tail/order/expiry symbolic; fixture times not timers."
+      ],
+      [
+        "13 MCU function",
+        "Exact six GPIOs, JTAG/hold/remap and two-resource constraint retained."
+      ],
+      [
+        "14 interface",
+        "Separate0x52 buses, active repeater and both signal-line obligations."
+      ],
+      [
+        "15 grounding",
+        "Common logical return, not galvanic separation or proven zero offset."
+      ],
+      [
+        "16 noise",
+        "Coupling/false edges/charge required; no EMI result claimed."
+      ],
+      [
+        "17 application",
+        "TCA pullups/EN and TMUX conditions retained; no reference circuit changed."
+      ],
+      [
+        "18 mechanical/thermal",
+        "Rotating-body vibration/connectors/IMU heat drift unchanged and unqualified here; no geometry or dissipation change, no mechanical qualification."
+      ]
+    ],
+    "reviewer_checklist": "Items1..16 desk-checked through obligations above; layout17..21 not assessed or changed. No whole-design verdict.",
+    "power_budget": "hardware/power-budget.md unchanged: no subsystem or physical load added. Future added request/state/enforcement/proof/crossing/driver loads and charge/discharge demand must be budgeted separately per host/local rail by owner; no free margin or5mA headroom assumed.",
+    "preservation": "No native/BOM/pin/strap/fuse/PCB/geometry/sealed firmware/RTM/FMEA/ledger/risk/old verdict edits. NO-GO, P1 conditional,3C8H,REQ-409,oldfivechanges,foreign.prostrict and all independent/human/physical gates remain.",
+    "not_claimed": "No actual successful disconnection, installed DENIED enforcement, measured normality, successful service, motor inhibition, no-motion, rollback, zero leakage, fault tolerance, Design Complete or independent acceptance."
+  }
+}
