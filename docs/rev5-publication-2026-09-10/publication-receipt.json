@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "kind": "ACTUAL_PUBLIC_PUBLICATION_RECEIPT",
+  "status": "LOCAL_IMPORT_SAVED_REMOTE_ACTIONS_PENDING",
+  "repository": "ktanino10/ai-hardware-engineering-team",
+  "branch": "ktanino10-glowing-journey",
+  "base_branch": "main",
+  "public_base_and_configuration": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+  "safe_staging_revision": "b812427a62de59b150905e2884e54a6983574c15",
+  "import_readback": "docs/rev5-publication-2026-09-10/import-readback.json",
+  "local_import_commit": null,
+  "first_push": null,
+  "pull_request": null,
+  "actual_technical_STOP": null,
+  "saved_readback_ACK": null,
+  "owned_background_jobs": 0,
+  "main_merge_claimed": false,
+  "physical_or_adoption_permission": false,
+  "holds": ["NO-GO", "P1 conditional", "3C8H", "REQ409", "old five", "foreign.pro", "all physical and human holds"],
+  "actual_C_issuer_normality_B_X_and_physical_proof": "UNKNOWN",
+  "receipt_hash_policy": "A later receipt-only commit may record the observed first push and PR. Its own final tip is reported separately, never embedded as a self-referential hash.",
+  "frozen_export_status_policy": "The 39 export files and publication context retain their original exact bytes and source-epoch statuses."
+}

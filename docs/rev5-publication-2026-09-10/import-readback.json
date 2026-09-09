@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "kind": "ACTUAL_PUBLIC_CANONICAL_IMPORT_READBACK",
+  "status": "APPLIED_AND_READ_BACK",
+  "repository": "ktanino10/ai-hardware-engineering-team",
+  "public_base_and_configuration": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+  "safe_staging_revision": "b812427a62de59b150905e2884e54a6983574c15",
+  "execution": {
+    "location": "LOCAL",
+    "runtime_context_model": "gpt-6-astra",
+    "independent_backend_attestation": false,
+    "actual_START": {
+      "event": "Executor began by reading the commissioned contract and checking the assigned public branch.",
+      "timestamp": null,
+      "timestamp_limit": "No wall-clock sample was taken at the start event; the received commission timestamp is not substituted for actual execution time."
+    },
+    "validation_completed_at": "2026-09-10T03:06:04.583765+09:00",
+    "subdispatch": false,
+    "background_jobs_started": 0
+  },
+  "frozen_export": {
+    "manifest": "docs/rev5-publication-2026-09-10/manifest.json",
+    "manifest_sha256": "55c2877768eddf1e8760ed535ada278f71e32198df9ef684be9b7a824ead393d",
+    "handoff": "docs/rev5-publication-2026-09-10/handoff.json",
+    "handoff_sha256": "ff260148d247936647dc6a843ad84e8c64b50ec0c5c9d7fa131c32e7dd43b5a4",
+    "public_file_count": 39,
+    "all_export_bytes_unchanged": true,
+    "publication_context_sha256": "c406d7aebf06d269305c1dc7af62c523a8906fbb7f4ee00886721ab42210206e",
+    "publication_context_unchanged": true,
+    "all_55_nonledger_inputs_unchanged_from_safe_staging": true,
+    "configuration_unchanged": true,
+    "historical_status_fields_remain_frozen": true
+  },
+  "prevalidation": {
+    "clean_safe_staging_HEAD": true,
+    "single_safe_staging_commit_above_public_base": true,
+    "App_diff_base": "origin/main",
+    "App_merge_base": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+    "actual_remote_main_matched_public_base": true,
+    "dedicated_remote_branch_was_absent": true,
+    "origin_fetch_and_push_target_confirmed": true,
+    "evidence_rows_before": 411,
+    "ECO_rows_before": 69,
+    "all_36_addition_IDs_absent": true,
+    "all_three_old_replacement_rows_exact": true,
+    "ECO_124_absent": true
+  },
+  "import": {
+    "source_operations": "docs/rev5-public-sources-2026-09-10/rows.json",
+    "source_operations_sha256": "4139bc3bb042f1c2dbacd8b3a0f2180fb55af7dd8abed6cf81a89aa65612f25d",
+    "qualified_operations": "docs/rev5-publication-2026-09-10/g031-row-operations.json",
+    "qualified_operations_sha256": "f096f27e721281027a90040cebd479ee25c766d8067a5749e5190e11a5dffac5",
+    "method": "Data-driven import of exact UTF-8 target rows. Additions sorted by ID immediately before the existing Rules heading inside the first eight-column canonical table. Replacements stay in their original positions. Only the provided ECO-124 public row is appended inside the existing ECO table.",
+    "added_evidence_rows": 36,
+    "replaced_evidence_IDs": ["DS-MTR-065", "DS-MCU-072", "DS-MCU-073"],
+    "operation_count": 39,
+    "evidence_rows_after": 447,
+    "ECO_rows_after": 70,
+    "ECO_added": "ECO-124",
+    "ECO_row_sha256_including_LF": "d39b135cf4bf499ac9a848606ab09777c13b705797918c7d8b89fe1b14d0d9f5",
+    "no_new_table": true,
+    "all_target_rows_and_full_row_hashes_exact": true,
+    "all_other_evidence_bytes_preserved": true,
+    "all_other_ECO_bytes_preserved": true,
+    "preservation_method": "Reverse only the declared row operations in memory and compare the complete resulting bytes to safe staging; both original ledgers match exactly."
+  },
+  "actual_public_parser": {
+    "path": "tools/check_id_uniqueness.py",
+    "sha256": "1cb5a1192a33552cd04e711f34447f91621b3674d8d4d6aaa9e6e69da28b06ab",
+    "REPO_ROOT_matches_actual_execution_root": true,
+    "relocated_or_overridden": false,
+    "signature_used": "parse_table_rows(text, header_prefix, id_pattern)",
+    "coverage": "First matching table only; no claim of later private-parser equivalence.",
+    "operation_ID_inventory": "manifest.json#/projected_canonical_import/operation_ids",
+    "required_ID_inventory": "manifest.json#/projected_canonical_import/all_export_reference_closure_ids",
+    "metadata_and_cell_hash_inventory": "manifest.json#/projected_canonical_import/metadata_resolution",
+    "each_of_39_operation_IDs_enumerated_exactly_once": true,
+    "each_of_50_required_IDs_enumerated_exactly_once": true,
+    "all_447_evidence_IDs_unique": true,
+    "all_50_expected_full_cell_hashes_match": true,
+    "cell_hash_encoding": "SHA256 of json.dumps(cells, ensure_ascii=False, separators=(',', ':')).encode('utf-8')",
+    "both_G031_accepted_first_six_cell_hashes_match": true,
+    "all_metadata_paths_match_and_exist": true,
+    "multiple_metadata_paths_preserved_for_DS_MCU_130": true,
+    "parser_warnings": 0
+  },
+  "commands_exercised": [
+    {
+      "command": "python3 -B tools/check_id_uniqueness.py",
+      "exit": 0,
+      "result": "621 IDs across three namespaces; no duplicates."
+    },
+    {
+      "command": "python3 -B -m unittest discover -s docs/rev5-public-2026-09-10 -p 'test_*.py'",
+      "exit": 0,
+      "tests_run": 40,
+      "result": "OK; includes package-local relocation and existing 29 sequencer tests."
+    },
+    {
+      "command": "python3 -B docs/rev5-public-2026-09-10/cli.py all",
+      "exit": 0,
+      "scenario_count": 10,
+      "source_binding_count": 7,
+      "actual_operation_bus_and_physical_flags_checked": 702,
+      "all_such_flags_false": true,
+      "execution_scope": "PUBLIC_DERIVATIVE_CURRENT_EXECUTION"
+    },
+    {
+      "command": "git diff --check",
+      "exit": 0
+    }
+  ],
+  "publication_hygiene": {
+    "scope": "Only the selected 40 new public files and imported ledger rows, not a repository-wide historical scan.",
+    "allowlist_and_text_file_types_confirmed": true,
+    "actual_personal_path_local_URI_worker_UUID_credential_patterns_found": 0,
+    "relative_Markdown_links_resolved": 20,
+    "test_marker_vocabulary": "An initial broad URI matcher included the closing quote after bare file:// vocabulary. The matcher was narrowed to actual URI payloads; the test file was not changed.",
+    "initial_import_attempt": "A newline-boundary assertion stopped the in-memory first attempt before any write. Actual heading boundaries were inspected; the exact bulk import then succeeded.",
+    "test_temporary_directories_and_bytecode_remaining": 0,
+    "raw_documents_private_receipts_and_logs_added": false,
+    "pattern_scan_is_not_security_certification": true,
+    "archive_paths_and_hashes_are_not_public_reachability_claims": true
+  },
+  "unchanged_limits": {
+    "holds": ["NO-GO", "P1 conditional", "3C8H", "REQ409", "old five", "foreign.pro", "all physical and human holds"],
+    "actual_C_issuer_normality_B_X_and_physical_proof": "UNKNOWN",
+    "source_metadata_or_qualification_is_not_part_or_board_adoption": true,
+    "legacy_PA9_U6_ISS_015_and_firmware_consumers": "Pending separately scoped owner reassessment.",
+    "new_independent_review": false,
+    "physical_or_adoption_permission": false,
+    "publication_status": "See publication-receipt.json; this import readback alone does not establish a push, PR, merge or physical acceptance."
+  }
+}
