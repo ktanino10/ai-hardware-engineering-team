@@ -1,0 +1,65 @@
+name: Rev5 Public Host Smoke
+
+on:
+  pull_request:
+    paths:
+      - "docs/rev5-public-2026-09-10/**"
+      - ".github/workflows/rev5-public-host-smoke.yml"
+      - "docs/rev5-public-ci.md"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  public-host-smoke:
+    name: Rev5 public host smoke (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run existing public package tests
+        run: python3 -B -m unittest discover -s docs/rev5-public-2026-09-10 -p 'test_*.py' -v
+      - name: Run all public host scenarios
+        run: python3 -B docs/rev5-public-2026-09-10/cli.py all
+      - name: Exercise complete copy outside checkout from a different cwd
+        shell: bash
+        run: |
+          python3 -B - <<'PY'
+          import os
+          from pathlib import Path
+          import shutil
+          import subprocess
+          import sys
+          import tempfile
+
+          workspace = Path(os.environ["GITHUB_WORKSPACE"]).resolve()
+          with tempfile.TemporaryDirectory(
+              prefix="rev5 public smoke ", dir=os.environ["RUNNER_TEMP"]
+          ) as temporary:
+              scratch = Path(temporary).resolve()
+              if scratch.is_relative_to(workspace):
+                  raise RuntimeError("Relocation scratch must be outside the checkout")
+              package = scratch / "complete public package"
+              foreign = scratch / "different working directory"
+              shutil.copytree(workspace / "docs/rev5-public-2026-09-10", package)
+              foreign.mkdir()
+              subprocess.run(
+                  [sys.executable, "-B", "-m", "unittest", "discover",
+                   "-s", str(package), "-p", "test_*.py", "-v"],
+                  cwd=foreign, check=True,
+              )
+              subprocess.run(
+                  [sys.executable, "-B", str(package / "cli.py"), "all"],
+                  cwd=foreign, check=True,
+              )
+          PY
