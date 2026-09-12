@@ -1,5 +1,7 @@
 # Rigid-body simulation contract
 
+[English](simulation.md) | [日本語の読者向け版](simulation.ja.md) | [Guide index](README.md)
+
 This is the **user-approved initial physics lane**, not a physical design
 release. It adds two roles: Simulation Engineer and independent Simulation
 Reviewer. It covers a free rigid cube, floor contact/friction, three actual

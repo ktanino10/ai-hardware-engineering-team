@@ -1,5 +1,14 @@
 # Project Dashboard (Bench-IMU-01)
 
+[English](README.md) | [日本語の説明・操作ガイド](../../docs/dashboard.ja.md) |
+[Pages guide](../../docs/pages.md)
+
+The landing pages now provide separate EN/JA introductions. A dashboard
+link with `?lang=en` or `?lang=ja` selects that initial UI language before
+the saved preference; otherwise the existing saved-preference/English
+fallback applies. The toggle still re-renders in memory without fetching
+data, and Back follows the currently displayed language.
+
 A bird's-eye status view for the human Chief Engineer: what phase things are
 in, what's waiting on a human decision right now, findings/quality
 snapshot, recent activity, and an electrical/mechanical snapshot. Open
@@ -160,7 +169,7 @@ footnotes, and error-fallback messages. The choice persists via
 `localStorage` across visits. Toggling never re-fetches data — it re-renders
 the already-loaded content from memory in the new language.
 
-This is scoped to this dashboard only, per an explicit request: `circuit-viewer/`
+The viewer UI translation remains scoped to this dashboard: `circuit-viewer/`
 and `assembly-viewer/` are untouched and stay English-only, matching their
 own prior, explicitly-requested simplification.
 
@@ -302,8 +311,9 @@ during development:
   uses `nameEn`/`nameJa` bilingual labels throughout; that turned out to be
   inaccurate for the *other two* viewers (`circuit-viewer/`'s own README
   states it went English-only "per explicit user preference"; neither it
-  nor `assembly-viewer/` nor the landing page has a live Japanese variant,
-  and this page doesn't touch them). This dashboard's *own* chrome, added
+  nor `assembly-viewer/` has a live Japanese UI variant).
+  Separate EN/JA landing introductions and reader guides do not change those
+  viewers' UI or shared data. This dashboard's *own* chrome, added
   in a follow-up request, is bilingual — see "Bilingual UI, English data"
   above for exactly what does/doesn't get translated and why.
 - **The GitHub Feature Map's static block goes stale on purpose, not by

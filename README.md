@@ -1,5 +1,7 @@
 # AI Hardware Engineering Team
 
+[English](README.md) | [日本語](README.ja.md)
+
 A reusable, multi-agent **Hardware Engineering Framework** built on GitHub
 Copilot: specialized AI agents (not one AI doing everything) carry a
 hardware design from requirements through independent review, with every
@@ -13,6 +15,12 @@ leaves an evidence trail a human can audit later.
 
 ## Start here
 
+- **Choose a language**: [English documentation](docs/README.md) /
+  [日本語ドキュメント](docs/README.ja.md). Reader guides are separate from
+  shared engineering records and executable agent instructions.
+- **Explore in a browser**: [English visualizations](https://ktanino10.github.io/ai-hardware-engineering-team/) /
+  [日本語の紹介](https://ktanino10.github.io/ai-hardware-engineering-team/index.ja.html).
+  The dashboard has EN/JA interface text; source records remain unchanged.
 - **Read first**: [`AGENTS.md`](AGENTS.md) — concise navigation, existing
   commands and the source of truth for each kind of work.
 - **For this run**: [`docs/work-execution.md`](docs/work-execution.md) —

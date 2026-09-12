@@ -1,5 +1,7 @@
 # Evaluation: Does This Framework Actually Improve Design Quality?
 
+[English](evaluation.md) | [日本語](evaluation.ja.md) | [Guide index](README.md)
+
 The point of separating agents is worthless if it cannot be shown to reduce
 design mistakes and increase traceability compared to a single AI agent doing
 the same task. This document defines how to measure that, once there is more

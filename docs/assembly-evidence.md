@@ -1,5 +1,7 @@
 # Assembly evidence contract
 
+[English](assembly-evidence.md) | [日本語](assembly-evidence.ja.md) | [Guide index](README.md)
+
 This is the revision-aware handoff for applicable multi-part assemblies, not
 a new design discipline or a replacement for the five Design Complete
 conditions in `docs/architecture.md` section 8. Existing Mechanical Lead and

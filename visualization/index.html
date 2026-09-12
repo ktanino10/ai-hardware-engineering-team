@@ -3,39 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bench-IMU-01 — Interactive Visualizations</title>
-<style>
-  body{margin:0;background:#0a1628;color:#dce8f7;font-family:"Segoe UI",Arial,sans-serif;
-    display:flex;align-items:center;justify-content:center;min-height:100vh;}
-  .wrap{max-width:720px;padding:40px;}
-  h1{font-size:22px;margin-bottom:4px;}
-  p.sub{color:#5c7699;font-size:13px;margin-top:0;}
-  .cards{display:flex;flex-direction:column;gap:14px;margin-top:28px;}
-  a.card{display:block;background:#0d1f3c;border:1px solid #1c3a63;border-radius:10px;padding:18px 20px;
-    color:#dce8f7;text-decoration:none;transition:.15s;}
-  a.card:hover{border-color:#4fd3ff;}
-  a.card .t{font-size:15px;font-weight:600;color:#4fd3ff;}
-  a.card .d{font-size:12.5px;color:#8ea6c9;margin-top:6px;line-height:1.6;}
-</style>
+<title>AI Hardware Engineering Team — Visualizations</title>
+<link rel="alternate" hreflang="ja" href="index.ja.html">
+<link rel="stylesheet" href="landing.css">
 </head>
 <body>
-  <div class="wrap">
-    <h1>Bench-IMU-01 — Interactive Visualizations</h1>
-    <p class="sub">github/ai-hardware-engineering-team — generated from the real KiCad project, OpenSCAD/STL mechanical files, and firmware source, not illustrative.</p>
+  <main class="wrap">
+    <nav aria-label="Language"><a href="index.html" lang="en" aria-current="page">English</a> | <a href="index.ja.html" lang="ja">日本語</a></nav>
+    <h1>AI Hardware Engineering Team</h1>
+    <p class="sub">Interactive explanations of the public Bench-IMU-01 artifacts.</p>
+    <p>Explore the circuit, mechanical parts and project records. These viewers explain recorded artifacts; they are not proof of current physical fit, safe operation or Design Complete.</p>
+    <p><a href="https://github.com/ktanino10/ai-hardware-engineering-team/blob/main/docs/README.md">English documentation</a> · <a href="https://github.com/ktanino10/ai-hardware-engineering-team/blob/main/docs/pages.md">How to read these viewers</a></p>
     <div class="cards">
       <a class="card" href="circuit-viewer/index.html">
         <div class="t">Circuit &amp; Current-Flow Viewer</div>
-        <div class="d">Interactive block diagram of power distribution, real (bench-mode) current behavior, and the future closed-loop attitude-control concept — built from the real schematic, netlist, and firmware source. Click any component or wire for its real role and datasheet.</div>
+        <div class="d">English UI. Switch between power distribution, implemented open-loop bench behavior and the explicitly unimplemented closed-loop concept. Click a component or wire for its explanation and source. Animated pulses are explanatory, not measured current.</div>
       </a>
       <a class="card" href="assembly-viewer/index.html">
         <div class="t">3D Assembly &amp; Part Inspector</div>
-        <div class="d">Real mechanical geometry (KiCad PCB export + OpenSCAD-derived STL parts, converted to OBJ) laid out as an exploded assembly. Orbit freely from any angle and click any part — 3D-printed or purchased — for its real dimensions, role, and source. No plugin required.</div>
+        <div class="d">English UI. Orbit, zoom, switch assembled/exploded views, and inspect each part. Source-derived meshes and simplified purchased-part shapes use a presentation layout, not a full installed-state or collision check. This is not Fusion assembly-process evidence.</div>
       </a>
-      <a class="card" href="dashboard/index.html">
+      <a class="card" href="dashboard/index.html?lang=en">
         <div class="t">Project Dashboard</div>
-        <div class="d">A live status view, not a snapshot — fetched and parsed directly from this repository's own requirements, findings, change-log, component-selection, and mechanical-interface files on every page load. What's pending a human decision right now, phase/progress overview, findings &amp; quality snapshot, recent activity, and a link out to the circuit/mechanical viewers above.</div>
+        <div class="d">EN/JA UI. Fetches public main-branch requirements, findings and other records on load or Refresh. Source prose, IDs and governance terms remain unchanged in either language. Parsing, CDN caching and dated static settings have explicit limits; the dashboard is read-only, not an approval engine.</div>
       </a>
-    </div>
+      <p class="note">The circuit and assembly viewers use checked-in data; the dashboard fetches public records. Repository links leave this Pages site. No language edition changes source values, review verdicts or human gates.</p>
+    </main>
   </div>
 </body>
 </html>
