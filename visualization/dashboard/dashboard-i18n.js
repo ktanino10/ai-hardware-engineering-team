@@ -234,6 +234,8 @@ const STRINGS = {
 const LANG_STORAGE_KEY = 'dashboardLang';
 
 function detectInitialLang() {
+  const requested = new URLSearchParams(window.location.search).get('lang');
+  if (requested === 'en' || requested === 'ja') return requested;
   try {
     const saved = window.localStorage.getItem(LANG_STORAGE_KEY);
     if (saved === 'en' || saved === 'ja') return saved;
@@ -267,6 +269,8 @@ function applyStaticChrome() {
   setText('i18n-subtitle-body-2', t('subtitle_body_2'));
   setText('refresh-btn', t('refresh_btn'));
   setText('i18n-back-link', t('back_link'));
+  const backLink = document.getElementById('i18n-back-link');
+  if (backLink) backLink.href = currentLang === 'ja' ? '../index.ja.html' : '../index.html';
   document.querySelectorAll('.i18n-src-prefix').forEach(el => { el.textContent = t('src_prefix'); });
 
   setText('i18n-pending-title', t('pending_title'));

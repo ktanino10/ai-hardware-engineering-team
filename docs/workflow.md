@@ -1,5 +1,7 @@
 # Engineering Workflow
 
+[English](workflow.md) | [日本語の読者向け版](workflow.ja.md) | [Guide index](README.md)
+
 This is the operational, step-by-step companion to `docs/architecture.md`.
 Use the referenced sections of architecture.md for severity taxonomies,
 Evidence IDs and gates; this document is "what happens, in what order, with

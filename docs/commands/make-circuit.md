@@ -1,5 +1,7 @@
 # Command: `make-circuit` — Start a New Circuit Design Cycle
 
+[English](make-circuit.md) | [日本語](make-circuit.ja.md) | [Guide index](../README.md)
+
 Use this when you (the human Product Owner / Chief Engineer) want to start a
 new hardware design cycle and don't want to write the orchestration
 instructions from scratch each time.

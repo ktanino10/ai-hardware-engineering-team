@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Hardware Engineering Team — 可視化</title>
+<link rel="alternate" hreflang="en" href="index.html">
+<link rel="stylesheet" href="landing.css">
+</head>
+<body>
+  <main class="wrap">
+    <nav aria-label="言語"><a href="index.html" lang="en">English</a> | <a href="index.ja.html" lang="ja" aria-current="page">日本語</a></nav>
+    <h1>AI Hardware Engineering Team</h1>
+    <p class="sub">公開されている Bench-IMU-01 成果物を対話的に理解するためのページです。</p>
+    <p>回路、機械部品、プロジェクト記録を閲覧できます。これらは記録済み成果物の説明であり、現在の実機の嵌合、安全動作、Design Complete の証明ではありません。</p>
+    <p><a href="https://github.com/ktanino10/ai-hardware-engineering-team/blob/main/docs/README.ja.md">日本語ドキュメント</a> · <a href="https://github.com/ktanino10/ai-hardware-engineering-team/blob/main/docs/pages.ja.md">ビューアーの読み方</a></p>
+    <div class="cards">
+      <a class="card" href="circuit-viewer/index.html">
+        <div class="t">回路・電流経路ビューアー</div>
+        <div class="d">UI は英語です。電源配分、実装済みの開ループ動作、明示的に未実装の閉ループ構想を切り替えます。部品や配線をクリックすると説明と出典が開きます。流れる点は説明用で、実測電流ではありません。</div>
+      </a>
+      <a class="card" href="assembly-viewer/index.html">
+        <div class="t">3D 組立・部品ビューアー</div>
+        <div class="d">UI は英語です。回転、拡大、組立・分解表示の切り替え、部品の詳細表示ができます。出典由来のメッシュと簡略化した購入部品を説明用に配置しており、全搭載状態や衝突の検証ではありません。Fusion の組立工程証拠とも異なります。</div>
+      </a>
+      <a class="card" href="dashboard/index.html?lang=ja">
+        <div class="t">プロジェクトダッシュボード</div>
+        <div class="d">UI は EN/JA 対応です。読み込み・更新時に公開 main の要件や指摘などを取得します。どちらの言語でも出典本文、ID、規定の状態語は変えません。解析、CDN キャッシュ、日付付き設定記録には限界があります。読み取り専用で、承認を与える機能ではありません。</div>
+      </a>
+    </div>
+    <p class="note">回路・組立ビューアーはコミット済みデータを使い、ダッシュボードは公開記録を取得します。リポジトリへのリンクは Pages サイトの外へ移動します。言語別説明は設計値、レビュー判定、人間のゲートを変更しません。</p>
+  </main>
+</body>
+</html>

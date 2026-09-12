@@ -1,5 +1,7 @@
 # Contributor and agent entry point
 
+[English](AGENTS.md) | [日本語](AGENTS.ja.md)
+
 This repository contains a hardware-development framework, its design
 artifacts, Python checks, embedded C firmware and a scoped simulator. It is
 not one application with a universal build command.

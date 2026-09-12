@@ -1,5 +1,7 @@
 # AI Hardware Engineering Team — Architecture
 
+[English](architecture.md) | [日本語の読者向け版](architecture.ja.md) | [Guide index](README.md)
+
 This document is the canonical reference for the multi-agent Hardware Engineering
 Framework in this repository. It defines shared vocabulary and rules that every
 agent, skill, and template refers back to. If a template or skill seems to

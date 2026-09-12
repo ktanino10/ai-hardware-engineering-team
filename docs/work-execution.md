@@ -1,5 +1,7 @@
 # Bounded agent work
 
+[English](work-execution.md) | [日本語](work-execution.ja.md) | [Guide index](README.md)
+
 This is the execution contract for `docs/workflow.md`, not another engineering
 discipline or a replacement for independent review. Use one coordinator and
 only specialists needed by the next dependency-resolving deliverable.

@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "source_revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+  "config_revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+  "entry_points": [
+    {"source": "README.md", "en": "README.md", "ja": "README.ja.md", "kind": "translation"},
+    {"source": "AGENTS.md", "en": "AGENTS.md", "ja": "AGENTS.ja.md", "kind": "translation"},
+    {"source": "docs/architecture.md", "en": "docs/architecture.md", "ja": "docs/architecture.ja.md", "kind": "reading-edition"},
+    {"source": "docs/workflow.md", "en": "docs/workflow.md", "ja": "docs/workflow.ja.md", "kind": "reading-edition"},
+    {"source": "docs/work-execution.md", "en": "docs/work-execution.md", "ja": "docs/work-execution.ja.md", "kind": "translation"},
+    {"source": "docs/commands/make-circuit.md", "en": "docs/commands/make-circuit.md", "ja": "docs/commands/make-circuit.ja.md", "kind": "translation"},
+    {"source": "docs/assembly-evidence.md", "en": "docs/assembly-evidence.md", "ja": "docs/assembly-evidence.ja.md", "kind": "translation"},
+    {"source": "docs/simulation.md", "en": "docs/simulation.md", "ja": "docs/simulation.ja.md", "kind": "reading-edition"},
+    {"source": "docs/evaluation.md", "en": "docs/evaluation.md", "ja": "docs/evaluation.ja.md", "kind": "translation"},
+    {"source": "datasheets/README.md", "en": "datasheets/README.md", "ja": "docs/datasheets.ja.md", "kind": "translation"},
+    {"source": "firmware/README.md", "en": "firmware/README.md", "ja": "docs/firmware.ja.md", "kind": "reading-edition"},
+    {"source": "firmware/bench-imu-01/README.md", "en": "firmware/bench-imu-01/README.md", "ja": "docs/bench-imu-01-firmware.ja.md", "kind": "reading-edition"},
+    {"source": "hardware/schematic/README.md", "en": "docs/hardware.md", "ja": "docs/hardware.ja.md", "kind": "reading-edition"},
+    {"source": "hardware/schematic/bench-imu-01/README.md", "en": "docs/hardware.md", "ja": "docs/hardware.ja.md", "kind": "reading-edition"},
+    {"source": "hardware/pcb/README.md", "en": "docs/hardware.md", "ja": "docs/hardware.ja.md", "kind": "reading-edition"},
+    {"source": "hardware/pcb/bench-imu-01/fab/README.md", "en": "docs/hardware.md", "ja": "docs/hardware.ja.md", "kind": "reading-edition"},
+    {"source": "hardware/mechanical/README.md", "en": "docs/hardware.md", "ja": "docs/hardware.ja.md", "kind": "reading-edition"},
+    {"source": "hardware/mechanical/stl/README.md", "en": "hardware/mechanical/stl/README.md", "ja": "docs/mechanical-artifacts.ja.md", "kind": "reading-edition"},
+    {"source": "hardware/mechanical/drawings/README.md", "en": "hardware/mechanical/drawings/README.md", "ja": "docs/mechanical-artifacts.ja.md", "kind": "reading-edition"},
+    {"source": "simulation/README.md", "en": "docs/simulator.md", "ja": "simulation/README.md", "kind": "translation"},
+    {"source": "simulation/STARTUP.md", "en": "docs/startup.md", "ja": "simulation/STARTUP.md", "kind": "translation"},
+    {"source": "simulation/blender/README.md", "en": "simulation/blender/README.md", "ja": "docs/blender-replay.ja.md", "kind": "translation"},
+    {"source": "simulation/root/README.md", "en": "simulation/root/README.md", "ja": "docs/root-analysis.ja.md", "kind": "translation"},
+    {"source": "visualization/circuit-viewer/README.md", "en": "visualization/circuit-viewer/README.md", "ja": "docs/circuit-viewer.ja.md", "kind": "reading-edition"},
+    {"source": "visualization/assembly-viewer/README.md", "en": "visualization/assembly-viewer/README.md", "ja": "docs/assembly-viewer.ja.md", "kind": "reading-edition"},
+    {"source": "visualization/dashboard/README.md", "en": "visualization/dashboard/README.md", "ja": "docs/dashboard.ja.md", "kind": "reading-edition"}
+  ],
+  "new_pairs": [
+    {"en": "docs/README.md", "ja": "docs/README.ja.md"},
+    {"en": "docs/pages.md", "ja": "docs/pages.ja.md"},
+    {"en": "docs/hardware.md", "ja": "docs/hardware.ja.md"},
+    {"en": "docs/language-coverage.md", "ja": "docs/language-coverage.ja.md"},
+    {"en": "visualization/index.html", "ja": "visualization/index.ja.html"}
+  ],
+  "shared_machine_policy_prefixes": [".github/"],
+  "shared_engineering_record_prefixes": [
+    "bom/", "datasheets/", "firmware/", "hardware/", "requirements/", "simulation/", "validation/"
+  ],
+  "shared_reference_paths": [
+    "docs/architecture-evolution.md",
+    "docs/reference-cases/ai-ready-workflow.md",
+    "docs/reference-cases/jaxa-triaxial.md",
+    "docs/reference-cases/template.md"
+  ],
+  "shared_runtime_paths": [
+    "visualization/circuit-viewer/circuit-data.js",
+    "visualization/circuit-viewer/circuit-render.js",
+    "visualization/circuit-viewer/index.html",
+    "visualization/assembly-viewer/assembly-data.js",
+    "visualization/assembly-viewer/assembly-render.js",
+    "visualization/assembly-viewer/index.html",
+    "visualization/dashboard/dashboard-live.js",
+    "visualization/dashboard/dashboard-render.js",
+    "visualization/dashboard/index.html"
+  ]
+}
