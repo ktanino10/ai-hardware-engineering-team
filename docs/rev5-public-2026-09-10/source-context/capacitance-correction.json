@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "status": "OWNER_CORRECTION_NOT_INDEPENDENTLY_REVIEWED",
+  "source_revision": "02057166aa1f28a497cb1dfffac158a0ce21c2de",
+  "config_revision": "0d524373af5f0a87e792d8a46a55caa4041987f2",
+  "finding": {
+    "id": "LOCAL-HR-DRIVER-001",
+    "canonical_id_allocated": false,
+    "Severity": "MEDIUM",
+    "Status": "OPEN",
+    "owner_response": "Corrected the newly commissioned consumer source view only; independent disposition pending. Not self-resolved or risk-accepted.",
+    "independent_review_path": "validation/reviews/rev5-hc1-control-driver/review.json",
+    "independent_review_pointer": "/findings/0",
+    "independent_review_sha256": "4d035f542fa0a6b55c61f1319db7a03a8e8ea895e79fc0d46db480acbbb31bb3",
+    "review_original_commit": "212b1d4983c3b48ed0b37a3fc96e2a518f592d8a",
+    "review_same_byte_intake": "d9c30e5e08bfb39f902e88f89e2fb7db3bca1771",
+    "original_verdict": "CONDITIONAL",
+    "original_verdict_unchanged": true,
+    "next_disposition_owner": "Independent Hardware Reviewer, separately commissioned by Sole Hardware Lead after stopped same-byte commit/intake"
+  },
+  "effective_replacement": {
+    "effective_source_view_path": "docs/rev5-2100-2026-09-09-continuation/driver-capacitance-correction/source-proposals.json",
+    "effective_source_view_sha256": "9ec617b39ec8ff975f92178312af62aab96fc0f74f03c5a897b5720a92b9a695",
+    "use_with_unchanged_graph_proposal": "docs/rev5-2100-2026-09-09-continuation/driver-proposal/proposal.json",
+    "unchanged_graph_proposal_sha256": "d1f40f27d9179b64a2416f82d252aa38cad93df09e4d726971db49a771c2a127",
+    "unchanged_schematic_path": "docs/rev5-2100-2026-09-09-continuation/driver-proposal/schematic.md",
+    "unchanged_schematic_sha256": "bb828875aac86ff62469419b7d981275fb3cdcbffb0171d07a3777db60c05fb2",
+    "consumer_rule": "Resolve current driver source references through the effective_source_view_path above, including the old proposal/schematic's relative source-proposals.json mention. The old driver-proposal/source-proposals.json remains original historical evidence only; its capacitance MAX prose is explicitly superseded and must not be used as current guaranteed source authority. No filesystem redirect, old-file edit or old-seal rebind is performed.",
+    "scope_of_replacement": "One current documentary source-view revision, not a new graph, native circuit, candidate adoption, publication of other source claims or blanket qualification of the original proposal.",
+    "unchanged_proposal_status_provenance": "Original proposal review/status/source/run fields remain original-epoch fields. Neither its historical NOT_INDEPENDENTLY_REVIEWED text nor original review CONDITIONAL is a new verdict on this correction. This correction separately remains NOT_INDEPENDENTLY_REVIEWED."
+  },
+  "exact_change": {
+    "before": {
+      "path": "docs/rev5-2100-2026-09-09-continuation/driver-proposal/source-proposals.json",
+      "producer_commit": "e85be5c445127e0891b69070cc3469b6e54cef69",
+      "file_sha256": "ad4456288c29e532c322f29551c90bbf1bcb9670b2f10329c27396a48e07eb4e",
+      "bytes": 13528,
+      "json_pointer": "/registered_reuse/4/scope",
+      "value": "Data4pF/OE3.5pF maxima at specified3.3V measurement; A-to-B delay0.5..11ns and OE-to-B disable18.5..42ns at both3.3+/-0.3V,-40..125C. CL5pF includes jig/probe; RL10k and measurement switch settings matter; generator<=1ns/V is NOT output slew.",
+      "value_utf8_sha256": "60449a40fa453fe2cd93dd2c72dc36dc010a3478a9ca93a6eb169e6382aec91b",
+      "authority": "HISTORICAL_SUPERSEDED_CAPACITANCE_CLAUSE_NOT_CURRENT_MAX_GUARANTEE"
+    },
+    "after": {
+      "path": "docs/rev5-2100-2026-09-09-continuation/driver-capacitance-correction/source-proposals.json",
+      "file_sha256": "9ec617b39ec8ff975f92178312af62aab96fc0f74f03c5a897b5720a92b9a695",
+      "bytes": 17618,
+      "json_pointer": "/registered_reuse/4/scope",
+      "value": "Data Cio4pF/OE Ci3.5pF are TYP in the -40..125C TYP columns, not maxima; guaranteed MAX=UNKNOWN (source MAX cells blank). SCES935A section7.5 p9 Cio: VCCA=VCCB=3.3V, OE=GND, VO=1.65V DC +1MHz -16dBm sine wave; p8 Ci: VCCA=VCCB=3.3V, VI=3.3V or GND. Temperature-column typicals are not all-temperature guarantees or bounds at other voltage/power/frequency/signal conditions; no selected total load, charging-current, RC or loaded-edge bound follows. A-to-B delay0.5..11ns and OE-to-B disable18.5..42ns at both3.3+/-0.3V,-40..125C. CL5pF includes jig/probe; RL10k and measurement switch settings matter; generator<=1ns/V is NOT output slew.",
+      "value_utf8_sha256": "baec77867f5dc013274b15271c194ecf07f9794d7ffa095415b7f1f9da1fd558"
+    },
+    "hash_convention": "File SHA-256 covers exact saved bytes. Pointer SHA-256 covers the decoded JSON string encoded as UTF-8, with no quotes, escaping or appended newline.",
+    "other_changes_in_new_view": [
+      "/task_id identifies this new commission rather than the inherited original task",
+      "Added /source_view_revision explicitly separates current source/run/provenance and effective path from inherited original fields"
+    ],
+    "unchanged_values": "All other original JSON values, all registered_reuse IDs and the entire timing/fixture suffix beginning A-to-B are exactly unchanged. No source-row additions, threshold/current changes or new guarantees.",
+    "old_files_modified": false
+  },
+  "source_basis": {
+    "Evidence_ID": "DS-IFACE-017",
+    "current_canonical_revision": "02057166aa1f28a497cb1dfffac158a0ce21c2de",
+    "BOM_row": "SCN-P009",
+    "source_only_ECO": "ECO-123",
+    "primary_document": "Texas Instruments TXU0304 SCES935A, May2021 / revised November2021",
+    "primary_sha256": "f6f6178296b8d497d3706ea7766633b62f799cfe830659a2dcfd09c79bfa71dc",
+    "parameter_rows": [
+      {
+        "Parameter": "Data I/O capacitance Cio",
+        "Min": "UNKNOWN",
+        "Typ": 4,
+        "Max": "UNKNOWN",
+        "Unit": "pF",
+        "Category": "TYPICAL_CHARACTERISTIC_NOT_GUARANTEE",
+        "Source": "DS-IFACE-017; SCES935A section7.5 p9",
+        "temperature_column": "-40..125C TYP",
+        "conditions": "VCCA=VCCB=3.3V; OE=GND; VO=1.65V DC +1MHz -16dBm sine wave",
+        "MAX_cell": "BLANK"
+      },
+      {
+        "Parameter": "Control-input/OE capacitance Ci",
+        "Min": "UNKNOWN",
+        "Typ": 3.5,
+        "Max": "UNKNOWN",
+        "Unit": "pF",
+        "Category": "TYPICAL_CHARACTERISTIC_NOT_GUARANTEE",
+        "Source": "DS-IFACE-017; SCES935A section7.5 p8",
+        "temperature_column": "-40..125C TYP",
+        "conditions": "VCCA=VCCB=3.3V; VI=3.3V or GND",
+        "MAX_cell": "BLANK"
+      }
+    ],
+    "classification_limit": "The temperature-range heading does not turn TYP into an all-temperature maximum. No interpolation or safety multiplier; no conversion from the small-signal Cio measurement into active-switching, rail-ramp/off/floating, unequal-rail or arbitrary-frequency capacitance bounds. 25C/-40..85C TYP values are not substituted for the corrected pair.",
+    "why": "Exact primary columns agree with the independent finding and the already corrected canonical source. Retaining the inherited maxima claim would understate possible input loading and derived timing/charging burden.",
+    "shared_records": "No canonical edit, ID allocation or publisher formatting repair; known recoverable ECO123 blank-line warning remains outside this scope."
+  },
+  "downstream_reconciliation": [
+    {
+      "consumer": "driver-proposal/proposal.json#/driver_template and #/request_crossing",
+      "affected_scope": "C-side drive into TDRV_X/Y/Z data/OE and TREQ OE; H request source into TREQ data; data-port capacitance can also matter at connected receiving/output nodes under an applicable model",
+      "decision": "Corrected Cio/Ci are only conditioned typical device values. They cannot cap source charging demand, effective total input load, dynamic current or peak current. Actual source drive, parasitics, protection, wiring and waveform-dependent capacitance remain UNKNOWN.",
+      "graph_change": false
+    },
+    {
+      "consumer": "driver-proposal/proposal.json#/bias_and_edge_obligations/disabled; schematic.md section4",
+      "affected_scope": "High-Z default/discharge, retained charge, settling and bias sizing",
+      "decision": "Do not derive any worst-case RC or LOW-arrival time from4/3.5pF. Missing actual capacitance maxima, initial charge, applicable signed leakage over the trajectory, resistance/tolerance and returns preclude that bound. Existing no_selected_solution=true remains. No R, load, timer or discharge waveform is selected."
+    },
+    {
+      "consumer": "driver-proposal/proposal.json#/bias_and_edge_obligations/ordinary_FF_inputs and #/conditioned_source_point/timing; schematic.md sections4-5",
+      "affected_scope": "TXU-to-FF CLR/CLK load and edge reasoning",
+      "decision": "Keep separate: TXU Cio/Ci are not the FF input-capacitance maximum or the complete output load. Do not equate them or HOLD TYP with the CL5pF timing fixture. Existing FF transition obligations and unknown actual loaded slew/ringing remain. Genuine propagation/enable/disable timing scopes and source fixture conditions are not changed; generator edge is not output slew. No rejoin/cut timer or inter-channel ordering is derived."
+    },
+    {
+      "consumer": "driver-proposal/proposal.json#/local_power_proposal/H, #/C, #/VL_each and #/actual_static_dynamic_peak_power_and_margin",
+      "affected_scope": "Charging and dynamic-load deltas only",
+      "decision": "Actual charging, dynamic/peak supply current, rail allocation/capability and power margin remain UNKNOWN. No new subsystem or selected load is introduced, so no canonical power-budget update is authorized or necessary for this source-only correction. Retain all original per-rail obligations and5mA external-limit scope; no new thermal/physical qualification."
+    },
+    {
+      "consumer": "driver-proposal/proposal.json#/conditioned_source_point/TXU_to_FF_light_load and #/new_driver_traces",
+      "affected_scope": "Unaffected static source-point arithmetic and retained state/failure examples",
+      "decision": "Voltage-source test-point differences were not calculated from4/3.5pF. Do not recalculate or promote them into actual margins. Retained state traces remain conditional; charge/edge/power gaps and stale-HIGH counterexamples still apply. Original helper/results are not executed or regenerated."
+    }
+  ],
+  "separate_static_current": {
+    "review_disposition": "NOT_A_FINDING",
+    "Evidence_ID": "DS-IFACE-002",
+    "source": "SCES935A section7.5 p8 explicit ICCA+ICCB Combined supply current row",
+    "conditions": "VCCA and VCCB each1.1..5.5V; VI=VCCI or GND; IO=0; -40..125C MAX column",
+    "combined_MAX_uA_per_package": 6,
+    "four_matched_packages_MAX_uA": 24,
+    "decision": "Unchanged. The explicit combined row is distinct from individual ICCA/ICCB maxima. No invented doubling, reallocation or current correction.",
+    "limits": "Not actual consumption, each-rail allocation, driven bias, dynamic/controller/startup current, off/floating/ramp behavior or actual5mA margin.",
+    "unchanged_pointers": [
+      "driver-proposal/source-proposals.json#/registered_reuse/0",
+      "driver-proposal/proposal.json#/local_power_proposal/source_point_only"
+    ]
+  },
+  "preservation": {
+    "unchanged_design_scope": "All graph/pins/domains,17 issuer limitations,12 traces,18 design obligations, B/X UNKNOWNs, selected parts/topology, fuse/strap and motor/physical boundaries.",
+    "retained_holds": [
+      "NO-GO",
+      "P1 conditional",
+      "3C8H",
+      "REQ409",
+      "oldfive",
+      "foreign.pro strict",
+      "all physical/human/source gates",
+      "old closeout/history/ACK epochs"
+    ]
+  }
+}

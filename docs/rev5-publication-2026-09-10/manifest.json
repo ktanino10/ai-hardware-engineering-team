@@ -1,0 +1,790 @@
+{
+  "schema_version": 1,
+  "kind": "FROZEN_PUBLIC_ONLY_EXPORT_MANIFEST",
+  "source_snapshot": "942bd898218026400da13e762da960da786068d5",
+  "private_preparation_configuration": "0d524373af5f0a87e792d8a46a55caa4041987f2",
+  "actual_public_baseline_and_configuration": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+  "configuration_equivalence_claim": false,
+  "status": "LOCAL_EXPORT_PUBLIC_IMPORT_AND_REMOTE_ACTIONS_NOT_YET_PERFORMED",
+  "public_allowlist": [
+    "datasheets/public-references-rev5/espressif_esp-idf-v6.1_peripherals_web-2026-09-06.md",
+    "datasheets/public-references-rev5/espressif_esp-idf_v5.5.2_gpio-source.md",
+    "datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md",
+    "datasheets/public-references-rev5/espressif_esp32-s3_datasheet-v2.2.md",
+    "datasheets/public-references-rev5/espressif_esp32-s3_jtag-external_v6.1.md",
+    "datasheets/public-references-rev5/espressif_esp32-s3_trm-v1.8.md",
+    "datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md",
+    "datasheets/public-references-rev5/texasinstruments_sn74axc4t774_sces898c.md",
+    "datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md",
+    "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md",
+    "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md",
+    "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md",
+    "datasheets/stmicroelectronics_stm32g031k8t6_rev4.md",
+    "docs/rev5-public-2026-09-10/README.md",
+    "docs/rev5-public-2026-09-10/_bootstrap.py",
+    "docs/rev5-public-2026-09-10/cli.py",
+    "docs/rev5-public-2026-09-10/manifest.json",
+    "docs/rev5-public-2026-09-10/model.py",
+    "docs/rev5-public-2026-09-10/publication-status.json",
+    "docs/rev5-public-2026-09-10/scenarios.py",
+    "docs/rev5-public-2026-09-10/sequencer.py",
+    "docs/rev5-public-2026-09-10/source-context/README.md",
+    "docs/rev5-public-2026-09-10/source-context/acceptance-spec.json",
+    "docs/rev5-public-2026-09-10/source-context/capacitance-correction.json",
+    "docs/rev5-public-2026-09-10/source-context/driver-proposal.json",
+    "docs/rev5-public-2026-09-10/source-context/driver-schematic.md",
+    "docs/rev5-public-2026-09-10/source-context/firmware-authority-map.json",
+    "docs/rev5-public-2026-09-10/source-context/source-proposals.json",
+    "docs/rev5-public-2026-09-10/source-selection.json",
+    "docs/rev5-public-2026-09-10/test_portability.py",
+    "docs/rev5-public-2026-09-10/test_sequencer.py",
+    "docs/rev5-public-sources-2026-09-10/README.md",
+    "docs/rev5-public-sources-2026-09-10/manifest.json",
+    "docs/rev5-public-sources-2026-09-10/rows.json",
+    "docs/rev5-publication-2026-09-10/README.md",
+    "docs/rev5-publication-2026-09-10/g031-row-operations.json",
+    "docs/rev5-publication-2026-09-10/handoff.json",
+    "docs/rev5-publication-2026-09-10/manifest.json",
+    "docs/rev5-publication-2026-09-10/source-assessments.json"
+  ],
+  "public_file_count": 39,
+  "files": [
+    {
+      "path": "datasheets/public-references-rev5/espressif_esp-idf-v6.1_peripherals_web-2026-09-06.md",
+      "sha256": "d1558f3313a4af7ad2c850973119afbb17f082f6d9e4ec9a0af122d937c13815",
+      "bytes": 2102,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "datasheets/public-references-rev5/espressif_esp-idf-v6.1_peripherals_web-2026-09-06.md",
+      "source_sha256": "d1558f3313a4af7ad2c850973119afbb17f082f6d9e4ec9a0af122d937c13815",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "datasheets/public-references-rev5/espressif_esp-idf_v5.5.2_gpio-source.md",
+      "sha256": "c305b16ba788e0cc26d956fd696e18595a5051c64b2b08628e9d1bc23f171ece",
+      "bytes": 1588,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "datasheets/public-references-rev5/espressif_esp-idf_v5.5.2_gpio-source.md",
+      "source_sha256": "c305b16ba788e0cc26d956fd696e18595a5051c64b2b08628e9d1bc23f171ece",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md",
+      "sha256": "23f1fc06fc36db9fc8672ae459e11ff52419b2709109bfd62248711f7d2e45ea",
+      "bytes": 1444,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md",
+      "source_sha256": "23f1fc06fc36db9fc8672ae459e11ff52419b2709109bfd62248711f7d2e45ea",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "datasheets/public-references-rev5/espressif_esp32-s3_datasheet-v2.2.md",
+      "sha256": "a0deb32bb54ffa3c41fd07e14a2df6e205685475ffcde35778fc8ca6dde6336d",
+      "bytes": 1269,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "datasheets/public-references-rev5/espressif_esp32-s3_datasheet-v2.2.md",
+      "source_sha256": "a0deb32bb54ffa3c41fd07e14a2df6e205685475ffcde35778fc8ca6dde6336d",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "datasheets/public-references-rev5/espressif_esp32-s3_jtag-external_v6.1.md",
+      "sha256": "e39d5f01ce08f649e5f658354baee2210d0afe27275193558d412762c337e9ea",
+      "bytes": 917,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "datasheets/public-references-rev5/espressif_esp32-s3_jtag-external_v6.1.md",
+      "source_sha256": "e39d5f01ce08f649e5f658354baee2210d0afe27275193558d412762c337e9ea",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "datasheets/public-references-rev5/espressif_esp32-s3_trm-v1.8.md",
+      "sha256": "dcdb726e7a6a372b0e311f223aee3d43ac536e25ea990f9987b72439a400f96d",
+      "bytes": 1139,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "datasheets/public-references-rev5/espressif_esp32-s3_trm-v1.8.md",
+      "source_sha256": "dcdb726e7a6a372b0e311f223aee3d43ac536e25ea990f9987b72439a400f96d",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md",
+      "sha256": "61f0f0927b2ccb7d8c59350b971b3684fb81e75269e3b05b1fe20ae108eb1066",
+      "bytes": 2011,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md",
+      "source_sha256": "61f0f0927b2ccb7d8c59350b971b3684fb81e75269e3b05b1fe20ae108eb1066",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "datasheets/public-references-rev5/texasinstruments_sn74axc4t774_sces898c.md",
+      "sha256": "4e7580a698b678a064bf3586da48512e75eb07166f8d9015efac2e431dcb8c17",
+      "bytes": 1044,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "datasheets/public-references-rev5/texasinstruments_sn74axc4t774_sces898c.md",
+      "source_sha256": "4e7580a698b678a064bf3586da48512e75eb07166f8d9015efac2e431dcb8c17",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md",
+      "sha256": "c6071c8791d664583048c86489dbc9a2228e0c2aed2c95145e9962d6777d24dd",
+      "bytes": 1152,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md",
+      "source_sha256": "c6071c8791d664583048c86489dbc9a2228e0c2aed2c95145e9962d6777d24dd",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md",
+      "sha256": "43d353a219ba0a29565dbaa979d35ec7f2c281228d07289d1d7dc0e1f7601b04",
+      "bytes": 1299,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md",
+      "source_sha256": "43d353a219ba0a29565dbaa979d35ec7f2c281228d07289d1d7dc0e1f7601b04",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md",
+      "sha256": "4a59a61afb1dee1757a4518dfa58ada661bf893e69d6b7f6ab9f565c303457e9",
+      "bytes": 1314,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md",
+      "source_sha256": "4a59a61afb1dee1757a4518dfa58ada661bf893e69d6b7f6ab9f565c303457e9",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md",
+      "sha256": "0f5aa60e60ca60e7760bd755c1c70a1c8a0bd670ccd9a330df1aa8e5b5fc7451",
+      "bytes": 1580,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md",
+      "source_sha256": "0f5aa60e60ca60e7760bd755c1c70a1c8a0bd670ccd9a330df1aa8e5b5fc7451",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "datasheets/stmicroelectronics_stm32g031k8t6_rev4.md",
+      "sha256": "c2bac732cf833b5d280c0c8b7f3ea28e5b6ee4763224f3e78aae837ee2aa62b7",
+      "bytes": 2157,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "datasheets/stmicroelectronics_stm32g031k8t6_rev4.md",
+      "source_sha256": "c2bac732cf833b5d280c0c8b7f3ea28e5b6ee4763224f3e78aae837ee2aa62b7",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "docs/rev5-public-2026-09-10/README.md",
+      "sha256": "360079c598837738c0c14b4899ea2d499598464339933adcff749b37a8287890",
+      "bytes": 9436,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "docs/rev5-public-2026-09-10/README.md",
+      "source_sha256": "442de2a414dabbd79eb41bb4bf98507e7192276562307b76c9a066bc3f70efb5",
+      "transform": "CURRENT_STATUS_DOCUMENTATION_ONLY"
+    },
+    {
+      "path": "docs/rev5-public-2026-09-10/_bootstrap.py",
+      "sha256": "08e87f4bb05fcd74d56f6f574f880cf320416a9b0454a896b4e78b57357fa25b",
+      "bytes": 2014,
+      "transform": "NEW_MINIMAL_PUBLIC_PROJECTION_OF_STOPPED_INPUTS"
+    },
+    {
+      "path": "docs/rev5-public-2026-09-10/cli.py",
+      "sha256": "8e576eb934318c395b7b0be828f888e7e067a49c8909dde1bb4de10bfcd2e3e2",
+      "bytes": 1870,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "docs/rev5-public-2026-09-10/cli.py",
+      "source_sha256": "8e576eb934318c395b7b0be828f888e7e067a49c8909dde1bb4de10bfcd2e3e2",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "docs/rev5-public-2026-09-10/manifest.json",
+      "sha256": "cd4856e498be93bae7db2af749b76a864c9820293905ac3426badaf217d63bf8",
+      "bytes": 10889,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "docs/rev5-public-2026-09-10/manifest.json",
+      "source_sha256": "558a368d0f9077a46349a963365bc39f5c98f080e73f0b5e4342f62969877966",
+      "transform": "CURRENT_STATUS_DOCUMENTATION_ONLY"
+    },
+    {
+      "path": "docs/rev5-public-2026-09-10/model.py",
+      "sha256": "ce496b2806b21966d68cec789ae85ec5dbdd4cf1eb7762a8d0b29fac172af447",
+      "bytes": 33962,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "docs/rev5-public-2026-09-10/model.py",
+      "source_sha256": "ce496b2806b21966d68cec789ae85ec5dbdd4cf1eb7762a8d0b29fac172af447",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "docs/rev5-public-2026-09-10/publication-status.json",
+      "sha256": "76005e59ea742ae64c8f2935a383c9c21aa4c21501647758f89ceffdb6ef2a15",
+      "bytes": 3262,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "docs/rev5-public-2026-09-10/publication-status.json",
+      "source_sha256": "ab0df3f32200067f6d6ddbb4e376f3a25793f812dbd15199a7a0461757e138b2",
+      "transform": "CURRENT_STATUS_DOCUMENTATION_ONLY"
+    },
+    {
+      "path": "docs/rev5-public-2026-09-10/scenarios.py",
+      "sha256": "ee8028095f757ca63e1c35e07f197e7556eee0ad7734dfc37dd0afa121f24f86",
+      "bytes": 10685,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "docs/rev5-public-2026-09-10/scenarios.py",
+      "source_sha256": "ee8028095f757ca63e1c35e07f197e7556eee0ad7734dfc37dd0afa121f24f86",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "docs/rev5-public-2026-09-10/sequencer.py",
+      "sha256": "634e1891186e73f46407b5037bfda7ebb84b93211b1055898e5b6be040aea745",
+      "bytes": 18935,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "docs/rev5-public-2026-09-10/sequencer.py",
+      "source_sha256": "634e1891186e73f46407b5037bfda7ebb84b93211b1055898e5b6be040aea745",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "docs/rev5-public-2026-09-10/source-context/README.md",
+      "sha256": "b79ac19da4e8aab7f82a94e75cf41a0aa99757777aa8759d15ceb20310018db6",
+      "bytes": 3345,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "docs/rev5-public-2026-09-10/source-context/README.md",
+      "source_sha256": "b79ac19da4e8aab7f82a94e75cf41a0aa99757777aa8759d15ceb20310018db6",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "docs/rev5-public-2026-09-10/source-context/acceptance-spec.json",
+      "sha256": "07a73624d64cca3463930a878faaefce41eab16f0a1a77d9f6b8de1c1bd1e290",
+      "bytes": 35943,
+      "transform": "NEW_MINIMAL_PUBLIC_PROJECTION_OF_STOPPED_INPUTS"
+    },
+    {
+      "path": "docs/rev5-public-2026-09-10/source-context/capacitance-correction.json",
+      "sha256": "45440084ce0a51fe4cbe12ef45a65ab000564eb21dddb7ea897e7052d0900d71",
+      "bytes": 11771,
+      "transform": "NEW_MINIMAL_PUBLIC_PROJECTION_OF_STOPPED_INPUTS"
+    },
+    {
+      "path": "docs/rev5-public-2026-09-10/source-context/driver-proposal.json",
+      "sha256": "4c26e4bdb00335bae9b1a63366d66f680b41c3fb2ed3ee26067e09bb31e8e582",
+      "bytes": 34576,
+      "transform": "NEW_MINIMAL_PUBLIC_PROJECTION_OF_STOPPED_INPUTS"
+    },
+    {
+      "path": "docs/rev5-public-2026-09-10/source-context/driver-schematic.md",
+      "sha256": "bb828875aac86ff62469419b7d981275fb3cdcbffb0171d07a3777db60c05fb2",
+      "bytes": 19739,
+      "transform": "NEW_MINIMAL_PUBLIC_PROJECTION_OF_STOPPED_INPUTS"
+    },
+    {
+      "path": "docs/rev5-public-2026-09-10/source-context/firmware-authority-map.json",
+      "sha256": "0da8afe95c78da49c547859b3777e3a1ec41805323e8877294a95393d71936d3",
+      "bytes": 50654,
+      "transform": "NEW_MINIMAL_PUBLIC_PROJECTION_OF_STOPPED_INPUTS"
+    },
+    {
+      "path": "docs/rev5-public-2026-09-10/source-context/source-proposals.json",
+      "sha256": "49d613967bb59c8a9f17e76b666549c65eb92ede5cb626bea81c963255c14c85",
+      "bytes": 17090,
+      "transform": "NEW_MINIMAL_PUBLIC_PROJECTION_OF_STOPPED_INPUTS"
+    },
+    {
+      "path": "docs/rev5-public-2026-09-10/source-selection.json",
+      "sha256": "2e157b69f21320d3fc23758810e37c39ec6743cdf662d5fa80c652f64f0dd253",
+      "bytes": 10622,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "docs/rev5-public-2026-09-10/source-selection.json",
+      "source_sha256": "2e157b69f21320d3fc23758810e37c39ec6743cdf662d5fa80c652f64f0dd253",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "docs/rev5-public-2026-09-10/test_portability.py",
+      "sha256": "714a3ad898feb3c0ded193c94601bc3fa728de5adf5bef1b7a2dd2925baaeec3",
+      "bytes": 13535,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "docs/rev5-public-2026-09-10/test_portability.py",
+      "source_sha256": "714a3ad898feb3c0ded193c94601bc3fa728de5adf5bef1b7a2dd2925baaeec3",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "docs/rev5-public-2026-09-10/test_sequencer.py",
+      "sha256": "81307e146d3193edb718b14acea306cfcb16f6f3fee201a033b4da5f41aef0b5",
+      "bytes": 22390,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "docs/rev5-public-2026-09-10/test_sequencer.py",
+      "source_sha256": "81307e146d3193edb718b14acea306cfcb16f6f3fee201a033b4da5f41aef0b5",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "docs/rev5-public-sources-2026-09-10/README.md",
+      "sha256": "c91492bb276d50d67d04de542fedf206496f50d11fd92a90482c7e12689f5102",
+      "bytes": 5851,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "docs/rev5-public-sources-2026-09-10/README.md",
+      "source_sha256": "c91492bb276d50d67d04de542fedf206496f50d11fd92a90482c7e12689f5102",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "docs/rev5-public-sources-2026-09-10/manifest.json",
+      "sha256": "752962139c6133f5a65a66372fd29094f3cb1653d9fcd873cf48931604b85810",
+      "bytes": 158217,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "docs/rev5-public-sources-2026-09-10/manifest.json",
+      "source_sha256": "752962139c6133f5a65a66372fd29094f3cb1653d9fcd873cf48931604b85810",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "docs/rev5-public-sources-2026-09-10/rows.json",
+      "sha256": "4139bc3bb042f1c2dbacd8b3a0f2180fb55af7dd8abed6cf81a89aa65612f25d",
+      "bytes": 144529,
+      "source_revision": "942bd898218026400da13e762da960da786068d5",
+      "source_path": "docs/rev5-public-sources-2026-09-10/rows.json",
+      "source_sha256": "4139bc3bb042f1c2dbacd8b3a0f2180fb55af7dd8abed6cf81a89aa65612f25d",
+      "transform": "SAME_BYTES"
+    },
+    {
+      "path": "docs/rev5-publication-2026-09-10/README.md",
+      "sha256": "004fb483a36316c06b1a00c80a98103b94d2701c221ea982aa50bc9cbbe05228",
+      "bytes": 3771,
+      "transform": "NEW_MINIMAL_PUBLIC_PROJECTION_OF_STOPPED_INPUTS"
+    },
+    {
+      "path": "docs/rev5-publication-2026-09-10/g031-row-operations.json",
+      "sha256": "f096f27e721281027a90040cebd479ee25c766d8067a5749e5190e11a5dffac5",
+      "bytes": 11831,
+      "transform": "NEW_MINIMAL_PUBLIC_PROJECTION_OF_STOPPED_INPUTS"
+    },
+    {
+      "path": "docs/rev5-publication-2026-09-10/source-assessments.json",
+      "sha256": "6e416d8ffaac70d20b67132a622c48d60023fe4708dff14290d736e4ffdf11ae",
+      "bytes": 4830,
+      "transform": "NEW_MINIMAL_PUBLIC_PROJECTION_OF_STOPPED_INPUTS"
+    }
+  ],
+  "self_hash_policy": "Manifest and handoff excluded here; handoff binds the completed manifest and other37 files, and normal dependency handoff records both final files.",
+  "projected_canonical_import": {
+    "baseline_rows": 411,
+    "added_rows": 36,
+    "changed_existing_rows": 3,
+    "expected_rows": 447,
+    "operation_ids": [
+      "DS-IFACE-002",
+      "DS-IFACE-003",
+      "DS-IFACE-007",
+      "DS-IFACE-014",
+      "DS-IFACE-015",
+      "DS-IFACE-016",
+      "DS-IFACE-017",
+      "DS-IFACE-018",
+      "DS-IFACE-039",
+      "DS-IFACE-040",
+      "DS-IFACE-043",
+      "DS-IFACE-055",
+      "DS-IFACE-056",
+      "DS-IFACE-057",
+      "DS-IFACE-058",
+      "DS-IFACE-063",
+      "DS-IFACE-064",
+      "DS-IFACE-067",
+      "DS-IFACE-069",
+      "DS-IFACE-070",
+      "DS-IFACE-071",
+      "DS-IFACE-072",
+      "DS-IFACE-073",
+      "DS-IFACE-074",
+      "DS-IFACE-075",
+      "DS-MCU-072",
+      "DS-MCU-073",
+      "DS-MCU-102",
+      "DS-MCU-120",
+      "DS-MCU-121",
+      "DS-MCU-123",
+      "DS-MCU-130",
+      "DS-MCU-140",
+      "DS-MCU-151",
+      "DS-MCU-153",
+      "DS-MCU-154",
+      "DS-MTR-065",
+      "DS-MTR-116",
+      "DS-MTR-119"
+    ],
+    "all_export_reference_closure_ids": [
+      "DS-IFACE-002",
+      "DS-IFACE-003",
+      "DS-IFACE-007",
+      "DS-IFACE-014",
+      "DS-IFACE-015",
+      "DS-IFACE-016",
+      "DS-IFACE-017",
+      "DS-IFACE-018",
+      "DS-IFACE-039",
+      "DS-IFACE-040",
+      "DS-IFACE-043",
+      "DS-IFACE-055",
+      "DS-IFACE-056",
+      "DS-IFACE-057",
+      "DS-IFACE-058",
+      "DS-IFACE-063",
+      "DS-IFACE-064",
+      "DS-IFACE-067",
+      "DS-IFACE-069",
+      "DS-IFACE-070",
+      "DS-IFACE-071",
+      "DS-IFACE-072",
+      "DS-IFACE-073",
+      "DS-IFACE-074",
+      "DS-IFACE-075",
+      "DS-IMU-079",
+      "DS-IMU-080",
+      "DS-IMU-081",
+      "DS-IMU-082",
+      "DS-IMU-083",
+      "DS-IMU-084",
+      "DS-MCU-044",
+      "DS-MCU-045",
+      "DS-MCU-050",
+      "DS-MCU-052",
+      "DS-MCU-053",
+      "DS-MCU-072",
+      "DS-MCU-073",
+      "DS-MCU-102",
+      "DS-MCU-120",
+      "DS-MCU-121",
+      "DS-MCU-123",
+      "DS-MCU-130",
+      "DS-MCU-140",
+      "DS-MCU-151",
+      "DS-MCU-153",
+      "DS-MCU-154",
+      "DS-MTR-065",
+      "DS-MTR-116",
+      "DS-MTR-119"
+    ],
+    "required_ID_count": 50,
+    "metadata_resolution": {
+      "DS-IFACE-002": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ],
+        "canonical_cells_sha256": "ff094e683303668a598d10a2ecb8eb216d50d89cacc184c5530800c6428e375d"
+      },
+      "DS-IFACE-003": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_sn74axc4t774_sces898c.md"
+        ],
+        "canonical_cells_sha256": "5561fa14a0a9f00f7c84d172b5bb37b395d77657889e3b7fb811cc18b10487e5"
+      },
+      "DS-IFACE-007": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md"
+        ],
+        "canonical_cells_sha256": "03ca8a8d5742728020d29eb259dc9219844c1abd0b96cbf40b623625e9bf8a84"
+      },
+      "DS-IFACE-014": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ],
+        "canonical_cells_sha256": "c2da0f45cdd6e304544e1e5305e081649206a1c51e13befa4aebffb4a10fde4c"
+      },
+      "DS-IFACE-015": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ],
+        "canonical_cells_sha256": "e9e051ac14a880694507146e8815a5f3add4c89166ae7bea344e85e84de96dfa"
+      },
+      "DS-IFACE-016": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ],
+        "canonical_cells_sha256": "7aa3b69208097e96b02dd5f4d92cf3612dbd4a24f274870a909184e34bdd9f69"
+      },
+      "DS-IFACE-017": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ],
+        "canonical_cells_sha256": "b368b0218ded55c125a082b7dd2acc10f979cfb5851ce03be42006e4951d37b9"
+      },
+      "DS-IFACE-018": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ],
+        "canonical_cells_sha256": "99734cb39ff27f0522c8de01402a405b2e31fdcfd9c2380038b51bdcd7bc1937"
+      },
+      "DS-IFACE-039": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md"
+        ],
+        "canonical_cells_sha256": "c4eb05dd5a771f3e2e5fbfecc4bcacc3db31e4a421f0b4d629f84d263a9f8092"
+      },
+      "DS-IFACE-040": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md"
+        ],
+        "canonical_cells_sha256": "8a6bf694739826111f345461ccba32da47b2a37862c7d0bddf4537c5f303148a"
+      },
+      "DS-IFACE-043": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_sn74axc4t774_sces898c.md"
+        ],
+        "canonical_cells_sha256": "01cafdd6d524bb49c05076904430f192226ea86ad83ec4373c760d2795385ec8"
+      },
+      "DS-IFACE-055": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ],
+        "canonical_cells_sha256": "c28ccfff87032605a8ed94a3cc67882a7a9023c9d180eaebb2cd7806226ed69e"
+      },
+      "DS-IFACE-056": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ],
+        "canonical_cells_sha256": "0281eaba1666bee6d50e391578e4c42179834b3f2144d12382a7b4d460e99883"
+      },
+      "DS-IFACE-057": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ],
+        "canonical_cells_sha256": "8606c023511253652090a10e648f8ea6ab6feb8f8c96407fe26bf89c49a651da"
+      },
+      "DS-IFACE-058": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ],
+        "canonical_cells_sha256": "9e9d2e48cb1cc0916e5f9850f19bdc4ab354bbfa487cc0fcb03b0e6de7120f28"
+      },
+      "DS-IFACE-063": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md"
+        ],
+        "canonical_cells_sha256": "dcde62b9faeb0a3a8c1f3ba95b17665cd982f434847bd25ac37619b1a49447f8"
+      },
+      "DS-IFACE-064": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md"
+        ],
+        "canonical_cells_sha256": "7e17045ba9ac53934102a12d4668a9a365ad9b64c7981d4e6b9a28460e8653d7"
+      },
+      "DS-IFACE-067": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md"
+        ],
+        "canonical_cells_sha256": "00a6566e15f4fe86488a90f802ef545565789b20edd28ffc35a3f628d822e0e8"
+      },
+      "DS-IFACE-069": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md"
+        ],
+        "canonical_cells_sha256": "61898f7c309e78e9d3f69304f90f8e89cb5997c8450aa09c84f53198e6724660"
+      },
+      "DS-IFACE-070": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md"
+        ],
+        "canonical_cells_sha256": "aa8b793e8c8203f0ce1880ee3fa2b2fc9cc64ae8425051624e113831c3ee6d52"
+      },
+      "DS-IFACE-071": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md"
+        ],
+        "canonical_cells_sha256": "f1ec5278f770e4ec0081490d7f7d660ea1bad1e3b54ca1fb1d775c2e4a5c253d"
+      },
+      "DS-IFACE-072": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md"
+        ],
+        "canonical_cells_sha256": "969c7675c4ba06be686c711ca69c30ac8486688aa69ac8f1b9c3333b41a98a09"
+      },
+      "DS-IFACE-073": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md"
+        ],
+        "canonical_cells_sha256": "dffe0e40c6f5691078e1dcc65387672325648423e09514e6edccf4aca79ca27f"
+      },
+      "DS-IFACE-074": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md"
+        ],
+        "canonical_cells_sha256": "b9f177d575da8b2a7ab0493e77d97792800332cf1806517329475090e0373b0a"
+      },
+      "DS-IFACE-075": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md"
+        ],
+        "canonical_cells_sha256": "39b48d625b9c9143bb4e2776a94b1915d591316a5fa97a3e41e89eb612175207"
+      },
+      "DS-IMU-079": {
+        "metadata_paths": [
+          "datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md"
+        ],
+        "canonical_cells_sha256": "67a8c6f851e781164791c1d7cb8094ea03464773d0b5409c1b204142757f2e67"
+      },
+      "DS-IMU-080": {
+        "metadata_paths": [
+          "datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md"
+        ],
+        "canonical_cells_sha256": "81f15506eea9da8355f3eae8aedaa86038bcf3c9fcbf0681a1126ce86dbab7db"
+      },
+      "DS-IMU-081": {
+        "metadata_paths": [
+          "datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md"
+        ],
+        "canonical_cells_sha256": "878300a275ec444c3ac2b68f3725e2d5766c8adac6d70692dcf1b384addd3f60"
+      },
+      "DS-IMU-082": {
+        "metadata_paths": [
+          "datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md"
+        ],
+        "canonical_cells_sha256": "fb152dc6977ef2206649a382a138e361a73fe6deb9ef1c6829376cbf7ba95b4b"
+      },
+      "DS-IMU-083": {
+        "metadata_paths": [
+          "datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md"
+        ],
+        "canonical_cells_sha256": "05636f63e10c18d3891e75ad9302ded2a5a3c770326fde85bff5d5844822d1ee"
+      },
+      "DS-IMU-084": {
+        "metadata_paths": [
+          "datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md"
+        ],
+        "canonical_cells_sha256": "ff1cc6ac41807025a12409ee1bda3262c073b41c03e9616b9f8f373920fea8dc"
+      },
+      "DS-MCU-044": {
+        "metadata_paths": [
+          "datasheets/stmicroelectronics_stm32g031k8t6_rev-unknown.md"
+        ],
+        "canonical_cells_sha256": "37ff419e0204873d752aa63d0d68d21882d7e8ed2e05ce82e726a293e07fda38"
+      },
+      "DS-MCU-045": {
+        "metadata_paths": [
+          "datasheets/stmicroelectronics_stm32g031k8t6_rev-unknown.md"
+        ],
+        "canonical_cells_sha256": "b0dda2528d89d626b7367e563f0cb0db1a0120ecb51bd718336fcd040856bb3c"
+      },
+      "DS-MCU-050": {
+        "metadata_paths": [
+          "datasheets/stmicroelectronics_stm32g031k8t6_rev-unknown.md"
+        ],
+        "canonical_cells_sha256": "6bb682a57a161b9acc17f9b339ff9f49cea2c485cc8c7068001763d9dd8a0dbb"
+      },
+      "DS-MCU-052": {
+        "metadata_paths": [
+          "datasheets/stmicroelectronics_stm32g031k8t6_rev-unknown.md"
+        ],
+        "canonical_cells_sha256": "b716e7491bb08f9fc2c83efdcee4d8f916cf4cef2b161aef4999ba3d00d5ea3d"
+      },
+      "DS-MCU-053": {
+        "metadata_paths": [
+          "datasheets/stmicroelectronics_stm32g031k8t6_rev-unknown.md"
+        ],
+        "canonical_cells_sha256": "56faafcd4fb5c1c9667dcd7b023f483bdcb2f2d4b6f8a3ceca709ebf4d313ff1"
+      },
+      "DS-MCU-072": {
+        "metadata_paths": [
+          "datasheets/stmicroelectronics_stm32g031k8t6_rev4.md"
+        ],
+        "canonical_cells_sha256": "df02d697a779b939221319b3d7b7772b25121fc7a63b3eb96e4ed41d8abf9dc1"
+      },
+      "DS-MCU-073": {
+        "metadata_paths": [
+          "datasheets/stmicroelectronics_stm32g031k8t6_rev4.md"
+        ],
+        "canonical_cells_sha256": "80cabb95ce88b17c0ef77375b99535a5c5282e521be81f7ebd918cefedff6efa"
+      },
+      "DS-MCU-102": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md"
+        ],
+        "canonical_cells_sha256": "dabada9e25538fe4b2c62593ed157c5c0ab0d24ef46a40e140a686d193fb9d59"
+      },
+      "DS-MCU-120": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md"
+        ],
+        "canonical_cells_sha256": "08bcda76a88bfca3db8e5ca720b1320b3ca97cb9602aa2ae9bc1bf1f3e229a50"
+      },
+      "DS-MCU-121": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md"
+        ],
+        "canonical_cells_sha256": "a4be8efea9e824eec69e1280d06f257fff6e2f053ca448f3555e95343c5b80ad"
+      },
+      "DS-MCU-123": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp-idf-v6.1_peripherals_web-2026-09-06.md"
+        ],
+        "canonical_cells_sha256": "f4d304602353521b0cf446938671af09112cb4f239a4cfa67ba9befe6b61e9f3"
+      },
+      "DS-MCU-130": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md",
+          "datasheets/public-references-rev5/espressif_esp32-s3_jtag-external_v6.1.md"
+        ],
+        "canonical_cells_sha256": "5c4e0f619259dec64b47474a19443128f9119713ee6a9a94adfc7400e70f9f4b"
+      },
+      "DS-MCU-140": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp32-s3_datasheet-v2.2.md"
+        ],
+        "canonical_cells_sha256": "912a03342e38d415bad17815b13c9dae653bc24fa198939e6f8e74d72024163e"
+      },
+      "DS-MCU-151": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp32-s3_datasheet-v2.2.md"
+        ],
+        "canonical_cells_sha256": "e9d7d86b33db25d08dfa23eb63ed6d0b628232df573d589f6e15cc1896556ebe"
+      },
+      "DS-MCU-153": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp32-s3_trm-v1.8.md"
+        ],
+        "canonical_cells_sha256": "d3df0304acc8f4d3cadbc4cad5b0e4431be6024fc9ecf9723769f2a403c4f245"
+      },
+      "DS-MCU-154": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp-idf_v5.5.2_gpio-source.md"
+        ],
+        "canonical_cells_sha256": "a481b10c7afc560aad3e916b94597fe6eb80ec4e4c1f360cc46b075965657c3e"
+      },
+      "DS-MTR-065": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md"
+        ],
+        "canonical_cells_sha256": "859038214b05edb4521d1730b4d900926f00d2a0a37a863378b9a99e49e334f9"
+      },
+      "DS-MTR-116": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md"
+        ],
+        "canonical_cells_sha256": "b4cc54ab80ed41f16e491fb5faaaa407963c83c09d9b1e9bef3e8226051c7763"
+      },
+      "DS-MTR-119": {
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md"
+        ],
+        "canonical_cells_sha256": "55d1deb280444af23cf2bfb7fb1848c547c272459fa604e399488f89bd179732"
+      }
+    },
+    "projection_method": "Existing private parser/text projection only; not actual public-parser execution or equivalence.",
+    "required_public_method": "Use actual public-root checker and assert each39 operation ID and full closure exactly once, expected cells/hashes, metadata existence and no collisions; no second ignored table."
+  },
+  "lineage": {
+    "portable_code_and_first_adapters": "2fd673060298190ee7289803d4fb5bdb763bc389",
+    "source_supplement": "f22c395a0cf7324eea64f6191fb60a0f9e374f61",
+    "G031_source_application": "256c931ebc4036394152210b8ade84919cb052b9",
+    "nested_manifests": "Package manifest binds current18; source-supplement manifest remains its original finite preparation. Its old Cpackage hashes are historical, not overwritten.",
+    "archive_identifiers": "Original paths/revisions/hashes need not be public links. No private source or receipt is required at runtime."
+  },
+  "excluded": [
+    "Manufacturer PDFs/HTML/images/vendor-code captures and all uploaded/raw attachments",
+    "Private authority/operator/user conversation, worker/session identities, raw review/CLI dumps and receipts",
+    "Personal absolute paths, local URLs, credentials, caches, environments and ignored control records",
+    "Private commit ancestry, native hardware/geometry, sealed embedded images, old simulations and broad historical ledgers"
+  ],
+  "checks_in_this_export": {
+    "existing_targeted_package_tests": 40,
+    "CLI_all_exit": 0,
+    "actual_permission_flags_false": true,
+    "Python_bound_context_source_projection_metadata_unchanged": true,
+    "original_private_administrative_verifier_assumption": "Single-metadata-path assumption corrected for130; no producer edit or technical finding.",
+    "private_path_UUID_credential_pattern_scan": "PASS_SELECTED_TEXT_FILES_NOT_A_SECURITY_GUARANTEE",
+    "scanner_precision": "Bare file:// and github_pat_ vocabulary in the existing forbidden-marker test is not an actual URI or credential; patterns require payload. No test/source byte was changed.",
+    "configuration_files_unchanged": 57
+  },
+  "physical_or_adoption_permission": false,
+  "public_publisher_outputs_not_part_of_this_fixed_export": [
+    "docs/rev5-publication-2026-09-10/import-readback.json",
+    "docs/rev5-publication-2026-09-10/publication-receipt.json"
+  ]
+}

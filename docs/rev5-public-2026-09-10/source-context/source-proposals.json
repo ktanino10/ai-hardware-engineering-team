@@ -1,0 +1,307 @@
+{
+  "schema_version": 1,
+  "source_view_revision": {
+    "revision": "DRIVER-CAPACITANCE-CORRECTION-1",
+    "source_revision": "02057166aa1f28a497cb1dfffac158a0ce21c2de",
+    "config_revision": "0d524373af5f0a87e792d8a46a55caa4041987f2",
+    "effective_source_view": "docs/rev5-2100-2026-09-09-continuation/driver-capacitance-correction/source-proposals.json",
+    "use_with_unchanged_proposal": "docs/rev5-2100-2026-09-09-continuation/driver-proposal/proposal.json",
+    "proposal_sha256": "d1f40f27d9179b64a2416f82d252aa38cad93df09e4d726971db49a771c2a127",
+    "replacement_rule": "For current interpretation of the unchanged driver graph/proposal and its source references, use this file, not the sibling historical driver-proposal/source-proposals.json. The historical MAX capacitance wording is superseded, not current source authority. This replacement does not modify or qualify the graph.",
+    "inherited_original": {
+      "path": "docs/rev5-2100-2026-09-09-continuation/driver-proposal/source-proposals.json",
+      "sha256": "ad4456288c29e532c322f29551c90bbf1bcb9670b2f10329c27396a48e07eb4e",
+      "producer_commit": "e85be5c445127e0891b69070cc3469b6e54cef69",
+      "source_revision": "182d484eeca065202b189200e0902aa2ae457f0e",
+      "field_policy": "All original fields except /task_id and /registered_reuse/4/scope are inherited unchanged JSON values. /documents identity_checked, extraction_pages, load_bearing_content and access statements, /new_rows PROPOSED handles, publication-relative language and /history_preserved describe the original producer epoch, NOT new reads, acquisitions or republication in this run. No AXC/HOLD/ISO primary was read in this correction. Current source publication status must not be inferred anew from inherited PROPOSED fields."
+    },
+    "changed_technical_pointer": "/registered_reuse/4/scope",
+    "current_primary_read": {
+      "document": "TXU0304 SCES935A, section7.5",
+      "printed_PDF_pages": [
+        8,
+        9
+      ],
+      "sha256": "f6f6178296b8d497d3706ea7766633b62f799cfe830659a2dcfd09c79bfa71dc",
+      "scope": "Ci/Cio capacitance category and exact test conditions; separate combined-current row only to preserve NOT_A_FINDING. Other original source scopes are inherited, not freshly verified."
+    },
+    "current_source_authority": "Corrected DS-IFACE-017 and SCN-P009 at source02057166; capacitance-source-correction/receipt.json and ECO-123. No new Evidence IDs or canonical writes.",
+    "finding": {
+      "id": "LOCAL-HR-DRIVER-001",
+      "severity": "MEDIUM",
+      "status": "OPEN",
+      "owner_correction": "DELIVERED_NOT_INDEPENDENTLY_REVIEWED",
+      "disposition_owner": "Independent Hardware Reviewer via Sole Hardware Lead",
+      "original_review_verdict": "CONDITIONAL; original review bytes and verdict remain unchanged"
+    },
+    "capacitance_limits": "Guaranteed Ci/Cio maxima, selected total load, charging-current/RC/settling/loaded-edge bounds and physical qualification remain UNKNOWN. TYP values in temperature-range columns are not all-temperature guarantees and do not extend to other voltage, power, frequency or signal conditions."
+  },
+  "status": "PROVISIONAL_STUDY_CONSTRAINTS_ONLY",
+  "independent_review": "NOT_INDEPENDENTLY_REVIEWED",
+  "canonical_ids_allocated": [],
+  "policy": "Local PROPOSED handles are not registered Evidence IDs. Publication must precede dependent qualified engineering use. Access restored is not specification closure or actual-board qualification. Do not extend an existing ID to the whole PDF.",
+  "documents": {
+    "TXU": {
+      "manufacturer": "Texas Instruments",
+      "part": "TXU0304",
+      "candidate": "TXU0304PWR",
+      "revision": "SCES935A",
+      "publication": "May 2021; revised November 2021",
+      "official_url": "https://www.ti.com/lit/ds/symlink/txu0304.pdf",
+      "metadata": "datasheets/texasinstruments_txu0304_sces935a.md",
+      "sha256": "f6f6178296b8d497d3706ea7766633b62f799cfe830659a2dcfd09c79bfa71dc",
+      "bytes": 2666177,
+      "access": "EXISTING_CAPTURE_READ_ONLY; no download",
+      "identity_checked": "Document header matches SCES935A and date; page4 Figure6-1/Table6-1 is specifically PW14, not RUT/DTR12.",
+      "extraction_pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        14,
+        18,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "load_bearing_content": "PW14 pins p4; AMR/ROC p5-6; electrical p7-9; selected 3.3V table p14; fixture p18; features/default/truth p21-23; necessary bypass/ground application recommendations p24-25. Other extracted identity/contents/layout context does not expand claim scope.",
+      "identity_limit": "No fresh lifecycle, orderability, stock, physical package or footprint acceptance."
+    },
+    "AXC": {
+      "manufacturer": "Texas Instruments",
+      "part": "SN74AXC4T774",
+      "candidate": "SN74AXC4T774PWR",
+      "revision": "SCES898C",
+      "publication": "July 2019; revised May 2022",
+      "official_url": "https://www.ti.com/lit/ds/symlink/sn74axc4t774.pdf",
+      "metadata": "datasheets/texasinstruments_sn74axc4t774_sces898c.md",
+      "sha256": "f45cd62a9675b9f6071519d149a060d4124f49944f3c3af44160a76796f3bf20",
+      "bytes": 2480293,
+      "access": "EXISTING_CAPTURE_READ_ONLY; no download",
+      "identity_checked": "Page1 header SCES898C July2019/revised May2022. Pages20-21 retain that header and have a 2024 copyright footer; footer is not silently treated as a new revision.",
+      "extraction_pages": [
+        1,
+        20,
+        21
+      ],
+      "load_bearing_content": "Only sections7.1/7.4, Table7-1 A-to-B DIR polarity, to repair the unnecessary dynamic-DIR-controller premise. No new whole alternative study.",
+      "identity_limit": "No refreshed electrical load/edge, availability or floating-supply qualification."
+    }
+  },
+  "registered_reuse": [
+    {
+      "ids": [
+        "DS-IFACE-002"
+      ],
+      "scope": "Exact PW14 pin/direction mapping, supply ROC, OE HIGH/LOW, combined static IO=0/rail-input supply test <=6uA. Pins are candidate pins, not installed control authority."
+    },
+    {
+      "ids": [
+        "DS-IFACE-014"
+      ],
+      "scope": "Data VT+ MAX1.92V and VT- MIN0.89V at BOTH rails exactly3V; not a3.0..3.6V or unequal-rail threshold envelope."
+    },
+    {
+      "ids": [
+        "DS-IFACE-015",
+        "DS-IFACE-056"
+      ],
+      "scope": "VOH>=VCCO-0.1V at IOH=-0.1mA; VOL<=0.1V at IOL=+0.1mA, rails1.1..5.5V, input test footnotes3/4. Heavy +/-10mA, both3V gives VOH2.2/VOL0.8V. Not continuous signed load I-V."
+    },
+    {
+      "ids": [
+        "DS-IFACE-016",
+        "DS-IFACE-056"
+      ],
+      "scope": "Data II/IOZ endpoint-only tests; Ioff one rail0, other0..5.5V, VI/VO0..5.5V +/-2.5uA; Ioff-float only VI/VO=GND and externally undriven floating rail leakage<=10nA. No sum across mismatched test conditions."
+    },
+    {
+      "ids": [
+        "DS-IFACE-017",
+        "DS-IFACE-057"
+      ],
+      "scope": "Data Cio4pF/OE Ci3.5pF are TYP in the -40..125C TYP columns, not maxima; guaranteed MAX=UNKNOWN (source MAX cells blank). SCES935A section7.5 p9 Cio: VCCA=VCCB=3.3V, OE=GND, VO=1.65V DC +1MHz -16dBm sine wave; p8 Ci: VCCA=VCCB=3.3V, VI=3.3V or GND. Temperature-column typicals are not all-temperature guarantees or bounds at other voltage/power/frequency/signal conditions; no selected total load, charging-current, RC or loaded-edge bound follows. A-to-B delay0.5..11ns and OE-to-B disable18.5..42ns at both3.3+/-0.3V,-40..125C. CL5pF includes jig/probe; RL10k and measurement switch settings matter; generator<=1ns/V is NOT output slew."
+    },
+    {
+      "ids": [
+        "DS-IFACE-018",
+        "DS-IFACE-055"
+      ],
+      "scope": "5Mohm input pulldown TYP only; either-rail OE reference; slow Schmitt input can increase current; complementary rail in ROC required for <100mV/disconnected isolation claim. Glitch-free sequencing does not reject a correctly followed retained HIGH."
+    },
+    {
+      "ids": [
+        "DS-IFACE-058"
+      ],
+      "scope": "ROC supplies1.08..5.5V, input0..5.5V, active output0..VCCO, tri-state0..5.5V, TA-40..125C; AMR -0.5..6.5V and active-output supply+0.5V remain stress limits."
+    },
+    {
+      "ids": [
+        "DS-IFACE-039",
+        "DS-IFACE-040",
+        "DS-IFACE-075"
+      ],
+      "scope": "Existing DCTR pins, own-rail D/PRE; PRE HIGH/CLR LOW clears, both LOW does not. At3.0..3.6V FF VIH2V/VIL0.8V, input edge<=10ns/V, pulse/setup/hold/recovery source conditions retained. HOLD raw NOT re-read in this task."
+    },
+    {
+      "ids": [
+        "DS-IFACE-003",
+        "DS-IFACE-043"
+      ],
+      "scope": "Existing AXC supply/control/pin and static source conditions retained; new DIR truth below does not refresh other claims."
+    },
+    {
+      "ids": [
+        "DS-IFACE-070",
+        "DS-IFACE-071",
+        "DS-IFACE-072",
+        "DS-IFACE-073",
+        "DS-IFACE-074",
+        "DS-MTR-116"
+      ],
+      "scope": "Retained local TMUX route/terminal/current/tail obligations and5mA per-driver external limit. Raw NOT re-read; no physical conductance/current acceptance."
+    }
+  ],
+  "table_convention": {
+    "UNKNOWN": "No number claimed; never zero.",
+    "Nominal": "Application recommendation, distinct from a guaranteed minimum or typical electrical measurement.",
+    "Category": "AMR / ROC / CONDITIONED_ELECTRICAL / FUNCTION / APPLICATION_RECOMMENDATION; never merge categories."
+  },
+  "new_rows": [
+    {
+      "handle": "PROPOSED-TXU-OE-RISE-3V",
+      "document": "TXU",
+      "Parameter": "OE positive-going input threshold",
+      "Min": 1.48,
+      "Typ": "UNKNOWN",
+      "Max": 1.92,
+      "Unit": "V",
+      "Category": "CONDITIONED_ELECTRICAL",
+      "locator": "Printed/PDF p7, section7.5 Electrical Characteristics, VT+ / OE row, VCCA=3V and VCCB=3V, -40..125C column",
+      "condition": "Both rails exactly3V. OE referenced to VCCA or VCCB. Not an unequal-rail or continuous3.0..3.6V guarantee.",
+      "sha256": "f6f6178296b8d497d3706ea7766633b62f799cfe830659a2dcfd09c79bfa71dc",
+      "minimal_publication": "Only this OE row and condition; data extrema already014. A source point cannot qualify the unknown C supply.",
+      "acceptance_effect": "Closes the exact3V OE source-point threshold gap only."
+    },
+    {
+      "handle": "PROPOSED-TXU-OE-FALL-3V",
+      "document": "TXU",
+      "Parameter": "OE negative-going input threshold",
+      "Min": 0.89,
+      "Typ": "UNKNOWN",
+      "Max": 1.5,
+      "Unit": "V",
+      "Category": "CONDITIONED_ELECTRICAL",
+      "locator": "Printed/PDF p7, section7.5, VT- / OE row, VCCA=3V and VCCB=3V, -40..125C column",
+      "condition": "Both rails exactly3V. To force deassertion regardless of prior Schmitt state, source LOW must be below MIN VT- with actual uncertainty accounted.",
+      "sha256": "f6f6178296b8d497d3706ea7766633b62f799cfe830659a2dcfd09c79bfa71dc",
+      "minimal_publication": "Only OE negative-threshold scope, not full voltage-band extension.",
+      "acceptance_effect": "Allows a conditioned OE-low inequality, not a selected R_OE."
+    },
+    {
+      "handle": "PROPOSED-TXU-OE-II",
+      "document": "TXU",
+      "Parameter": "OE input leakage",
+      "Min": -0.1,
+      "Typ": "UNKNOWN",
+      "Max": 2,
+      "Unit": "uA",
+      "Category": "CONDITIONED_ELECTRICAL",
+      "locator": "Printed/PDF p8, section7.5, II / OE row, -40..125C column",
+      "condition": "Both rails1.1..5.5V; VI=VCC or GND as printed. No intermediate-VI, rail-ramp or source-off OE leakage matrix. The OE negative limit differs from the data-input -2uA row.",
+      "sha256": "f6f6178296b8d497d3706ea7766633b62f799cfe830659a2dcfd09c79bfa71dc",
+      "minimal_publication": "Register OE-specific signed row; do not copy data II to OE.",
+      "acceptance_effect": "Refines OE source loading at endpoints only; cannot solve high-Z bias discharge across voltage."
+    },
+    {
+      "handle": "PROPOSED-TXU-ENABLE-B",
+      "document": "TXU",
+      "Parameter": "OE-to-B enable time",
+      "Min": 6.6,
+      "Typ": "UNKNOWN",
+      "Max": 29,
+      "Unit": "ns",
+      "Category": "CONDITIONED_ELECTRICAL",
+      "locator": "Printed/PDF p14, section7.11, ten FROM OE TO B, VCCB3.3+/-0.3V column, -40..125C; p18 section8.1/Table8-1 and Figure8-1",
+      "condition": "VCCA=VCCB=3.3+/-0.3V; CL5pF including jig/probe, RL10kohm, S1=GND or2VCCO, VTP0.3V; generator1MHz,50ohm,edge<=1ns/V. Enable marker is not FF clock threshold, inter-channel ordering or actual load response.",
+      "sha256": "f6f6178296b8d497d3706ea7766633b62f799cfe830659a2dcfd09c79bfa71dc",
+      "minimal_publication": "B-side ten row only; propagation and disable already057. Do not manufacture a clearance or rejoin timer.",
+      "acceptance_effect": "Confirms enable is a distinct transition to be qualified. Does not order CLR versus CLK."
+    },
+    {
+      "handle": "PROPOSED-TXU-BYPASS",
+      "document": "TXU",
+      "Parameter": "Bypass at each supply pin",
+      "Min": "UNKNOWN",
+      "Typ": "UNKNOWN",
+      "Max": "UNKNOWN",
+      "Nominal": 0.1,
+      "Unit": "uF",
+      "Category": "APPLICATION_RECOMMENDATION",
+      "locator": "Printed/PDF p24 Figure10-1; p25 section12.1 Layout Guidelines first bullet",
+      "condition": "Recommendation, not a guaranteed effective-capacitance minimum. Place as close as possible. Optional additional parallel1uF is not selected in this proposal. Figure12-1 p26 is DTR12 and is NOT a PW14 footprint.",
+      "sha256": "f6f6178296b8d497d3706ea7766633b62f799cfe830659a2dcfd09c79bfa71dc",
+      "minimal_publication": "Supply-bypass recommendation only; no capacitor MPN, tolerance, bias/temperature derating or placement distance inferred.",
+      "acceptance_effect": "Documents eight new candidate bypass locations; effective values and passives approval remain UNKNOWN."
+    },
+    {
+      "handle": "PROPOSED-TXU-GROUND-FIRST",
+      "document": "TXU",
+      "Parameter": "Ground reference before supply",
+      "Min": "UNKNOWN",
+      "Typ": "UNKNOWN",
+      "Max": "UNKNOWN",
+      "Unit": "sequence",
+      "Category": "APPLICATION_RECOMMENDATION",
+      "locator": "Printed/PDF p25 section11 Power Supply Recommendations",
+      "condition": "Apply GND reference first. No supply ramp order/rate restriction stated for the TXU sequencing feature; not a downstream FF/TMUX valid-power, ground-bounce or power-survival guarantee.",
+      "sha256": "f6f6178296b8d497d3706ea7766633b62f799cfe830659a2dcfd09c79bfa71dc",
+      "minimal_publication": "Ground-before-supply recommendation; preserve existing018/055 sequencing scope.",
+      "acceptance_effect": "Adds a return-sequence obligation. Actual returns remain unqualified."
+    },
+    {
+      "handle": "PROPOSED-AXC-DIR",
+      "document": "AXC",
+      "Parameter": "Forward direction condition",
+      "Min": "UNKNOWN",
+      "Typ": "UNKNOWN",
+      "Max": "UNKNOWN",
+      "Unit": "logic",
+      "Category": "FUNCTION",
+      "locator": "Printed/PDF p20 section7.1; p21 section7.4 Table7-1, OE=L/DIR=H row",
+      "condition": "DIRx HIGH and /OE LOW selects A-input to B-output. DIR/OE use VCCA reference. Existing043 supplies PW16 DIR1.1/DIR2.2 and VCCA.16 pin mapping.",
+      "sha256": "f45cd62a9675b9f6071519d149a060d4124f49944f3c3af44160a76796f3bf20",
+      "minimal_publication": "Only DIR truth. For fixed forward paths DIR1/2 could be tied to own VCCA in a future qualified proposal; extra dynamic GPIO/controller is NOT inherently necessary.",
+      "acceptance_effect": "Repairs an overly strong alternative-rejection premise. TXU remains a conditional preference, not proof AXC is impossible or an adopted swap."
+    }
+  ],
+  "unresolved_source_questions": [
+    {
+      "key": "TXU-CONTINUOUS-THRESHOLDS",
+      "category": "SPECIFICATION_NOT_STATED_IN_EXAMINED_TABLE",
+      "locator": "TXU section7.5 p7",
+      "result": "Data/OE threshold rows are discrete equal-rail points1.1/1.4/1.65/2.3/3/4.5/5.5V. No3.3V row or full unequal-rail threshold surface stated there.",
+      "next": "Actual C/H/VL ranges and authoritative applicable threshold coverage are needed; do not interpolate or request a redundant whole-PDF download."
+    },
+    {
+      "key": "TXU-OUTPUT-SLEW",
+      "category": "GUARANTEE_NOT_STATED_IN_EXAMINED_SCOPE",
+      "locator": "TXU section7.11 p14;8.1 p18;9.3.3 p21;12.1 p25",
+      "result": "Selected timing table specifies propagation/enable/disable, not a guaranteed loaded output rise/fall bound. Generator<=1ns/V and qualitative fast edges/monotonicity do not prove FF input<=10ns/V or no ringing.",
+      "next": "Matched output-load/edge qualification with actual FF/bias/wiring/protection and rail/temperature histories. No fictitious extra buffer or supervisor."
+    },
+    {
+      "key": "ACTUAL-IMPLEMENTATION",
+      "category": "ACTUAL_BOARD_AUTHORITY_POWER_LOAD_UNKNOWN",
+      "result": "C source/device/pins, H request pins, rail survival, loaded edges/bias, B/X and all17-issuer enforcement are absent. Source publication cannot create them."
+    }
+  ]
+}
