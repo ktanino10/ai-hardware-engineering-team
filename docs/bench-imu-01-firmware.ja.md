@@ -34,7 +34,7 @@ SHDN は R11 pulldown により既定 OFF と記録されています。
 | ASCII command | 実装上の意味 |
 |---|---|
 | `SPD <0-100>` | PWM duty %。armed でなければ拒否 |
-| `DIR <0|1>` | 0 forward / 1 reverse。armed かつ duty 0 のときのみ |
+| `DIR <0\|1>` | 0 forward / 1 reverse。armed かつ duty 0 のときのみ |
 | `STOP` | 即座に duty 0。常に受理するが disarm はしない |
 | `REARM` | U6 SHDN の power-cycle、I2C1 による U5 再 commissioning、latched fault を clear。最初の SPD と REQ-405/406 trip 後に必要。自動再開しない |
 

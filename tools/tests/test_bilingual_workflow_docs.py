@@ -132,6 +132,16 @@ class BilingualWorkflowDocsTests(unittest.TestCase):
                     self.assertTrue(path.is_relative_to(pages_root), target)
                     self.assertTrue(path.is_file(), target)
 
+    def test_firmware_direction_command_keeps_preconditions_in_table_cell(self):
+        text = (ROOT / "docs/bench-imu-01-firmware.ja.md").read_text(encoding="utf-8")
+        rows = [line for line in text.splitlines() if line.startswith("| `DIR ")]
+        self.assertEqual(len(rows), 1)
+        cells = re.split(r"(?<!\\)\|", rows[0].strip().strip("|"))
+        self.assertEqual(len(cells), 2, "An unescaped pipe hides the DIR preconditions in GFM")
+        self.assertEqual(cells[0].strip().replace(r"\|", "|"), "`DIR <0|1>`")
+        for condition in ("0 forward / 1 reverse", "armed", "duty 0"):
+            self.assertIn(condition, cells[1])
+
     @unittest.skipUnless(shutil.which("node"), "Node unavailable: dashboard VM check not run")
     def test_dashboard_language_behavior(self):
         result = subprocess.run(
