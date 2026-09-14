@@ -57,7 +57,7 @@ Bounded-work reservation: `tools/agent_workflow.py start` succeeded; run_id `542
 
 ## Project state / open PR overlap
 
-- Current public main fetched during this checkpoint equals the requested verified SHA: `a6ebb82d712746087aa1735198f5a3778d799fd7`. No main advancement was observed.
+- Current public main comparison is recorded once in the checkpoint header above; the fetched SHA matched the requested verified SHA at this checkpoint.
 - Open public PRs observed: #78 (this WIP), #77 firmware Linux build documentation, #76 public CLI/workflow-tool verification with no file changes, #74 CI smoke for Rev5 host package, #73 public-safe Rev5 host sequencer/source records.
 - PR #76 is useful bounded prior evidence that public CLI/workflow commands succeeded, but it has no adopted main changes and is not proof of this Harness architecture.
 - PR #77 is useful bounded prior evidence for Linux firmware compilation, but it is unmerged and changes firmware documentation plus a separate docs receipt, not this task's `docs/engineering-harness-research-2026-09-14/` write scope.
