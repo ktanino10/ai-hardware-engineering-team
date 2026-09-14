@@ -48,7 +48,7 @@ Recommended MVP: **Incremental Harness Core + one KiCad CLI adapter**.
 | 25 | Proposed Folder Structure | `architecture-proposal.md` Proposed folder structure |
 | 26 | MVP | `architecture-proposal.md` MVP recommendation |
 | 27 | Harness vs No-Harness Experiment | `experiment-contract.md` |
-| 28 | Implementation Roadmap | below |
+| 28 | Implementation Roadmap | this README, [`Implementation roadmap（later task only）`](#implementation-roadmaplater-task-only) |
 
 ## Implementation roadmap（later task only）
 
