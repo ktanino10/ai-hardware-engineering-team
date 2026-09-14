@@ -1,0 +1,6 @@
+{
+  "scope": "SYNTHETIC_ONLY",
+  "actor": "fictitious-test-actor",
+  "usable_for_real_action": false,
+  "requested_action": "manufacturing-export"
+}

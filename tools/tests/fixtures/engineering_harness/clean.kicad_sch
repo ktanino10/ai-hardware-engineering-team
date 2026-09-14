@@ -1,0 +1,47 @@
+(kicad_sch (version 20250114) (generator "engineering_harness_fixture")
+  (uuid "1d415f75-c229-5116-b508-542b345f1ec8") (paper "A4")
+  (lib_symbols
+  (symbol "Harness:Terminal"
+    (pin_numbers hide)
+    (pin_names (offset 0) hide)
+    (in_bom no)
+    (on_board no)
+    (property "Reference" "J" (at 0 2.54 0) (effects (font (size 1.27 1.27))))
+    (property "Value" "Terminal" (at 0 -2.54 0) (effects (font (size 1.27 1.27))))
+    (property "Footprint" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+    (property "Datasheet" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+    (symbol "Terminal_0_1"
+      (rectangle (start -1.27 1.27) (end 1.27 -1.27)
+        (stroke (width 0) (type default)) (fill (type background))))
+    (symbol "Terminal_1_1"
+      (pin passive line (at -3.81 0 0) (length 2.54)
+        (name "1" (effects (font (size 1.27 1.27))))
+        (number "1" (effects (font (size 1.27 1.27))))))
+  )
+)
+
+  (wire (pts (xy 50.8 50.8) (xy 76.2 50.8)) (stroke (width 0) (type default))
+    (uuid "6f7a0bfe-c0ee-5225-8547-0f149c75aa7b"))
+
+
+  (symbol (lib_id "Harness:Terminal") (at 54.61 50.8 0) (unit 1)
+    (in_bom no) (on_board no) (dnp no) (uuid "e44542ea-6520-5fbc-b0e5-fa233db770f3")
+    (property "Reference" "J1" (at 54.61 48.26 0) (effects (font (size 1.27 1.27))))
+    (property "Value" "Terminal" (at 54.61 53.34 0) (effects (font (size 1.27 1.27))))
+    (property "Footprint" "" (at 54.61 50.8 0) (effects (font (size 1.27 1.27)) hide))
+    (property "Datasheet" "" (at 54.61 50.8 0) (effects (font (size 1.27 1.27)) hide))
+    (pin "1" (uuid "8f1b043c-3c0b-5105-a4d5-59350f4bb427"))
+    (instances (project "clean" (path "/1d415f75-c229-5116-b508-542b345f1ec8" (reference "J1") (unit 1))))
+  )
+
+  (symbol (lib_id "Harness:Terminal") (at 80.01 50.8 0) (unit 1)
+    (in_bom no) (on_board no) (dnp no) (uuid "dfd9ab6e-8635-5327-aea2-4f6105b812fb")
+    (property "Reference" "J2" (at 80.01 48.26 0) (effects (font (size 1.27 1.27))))
+    (property "Value" "Terminal" (at 80.01 53.34 0) (effects (font (size 1.27 1.27))))
+    (property "Footprint" "" (at 80.01 50.8 0) (effects (font (size 1.27 1.27)) hide))
+    (property "Datasheet" "" (at 80.01 50.8 0) (effects (font (size 1.27 1.27)) hide))
+    (pin "1" (uuid "44480c1d-922d-5967-8172-1dec4643934d"))
+    (instances (project "clean" (path "/1d415f75-c229-5116-b508-542b345f1ec8" (reference "J2") (unit 1))))
+  )
+
+)

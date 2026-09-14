@@ -1,0 +1,2 @@
+(sym_lib_table (version 7)
+  (lib (name "Harness") (type "KiCad") (uri "${KIPRJMOD}/Harness.kicad_sym") (options "") (descr "Synthetic test terminals; no real component")))

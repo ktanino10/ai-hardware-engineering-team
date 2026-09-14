@@ -1,0 +1,6 @@
+{
+  "scope": "SYNTHETIC_ONLY",
+  "fixture": "not-a-real-simulation",
+  "model_revision": "fixture-v1",
+  "verification_mode": "CURRENT"
+}

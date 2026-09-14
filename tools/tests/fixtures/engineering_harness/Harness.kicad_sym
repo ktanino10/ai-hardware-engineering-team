@@ -1,0 +1,20 @@
+(kicad_symbol_lib (version 20241209) (generator "engineering_harness_fixture")
+
+  (symbol "Terminal"
+    (pin_numbers hide)
+    (pin_names (offset 0) hide)
+    (in_bom no)
+    (on_board no)
+    (property "Reference" "J" (at 0 2.54 0) (effects (font (size 1.27 1.27))))
+    (property "Value" "Terminal" (at 0 -2.54 0) (effects (font (size 1.27 1.27))))
+    (property "Footprint" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+    (property "Datasheet" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+    (symbol "Terminal_0_1"
+      (rectangle (start -1.27 1.27) (end 1.27 -1.27)
+        (stroke (width 0) (type default)) (fill (type background))))
+    (symbol "Terminal_1_1"
+      (pin passive line (at -3.81 0 0) (length 2.54)
+        (name "1" (effects (font (size 1.27 1.27))))
+        (number "1" (effects (font (size 1.27 1.27))))))
+  )
+)
