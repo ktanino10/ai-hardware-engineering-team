@@ -1,0 +1,107 @@
+{
+  "approval": "No GitHub APPROVE, merge, full-MVP/physical certification or production adoption.",
+  "normal_review_run_id": "0118b4b9-d007-47bd-b537-1c6faaca04dc",
+  "provenance": {
+    "input_snapshot_sha256": "2340e0051da0ca1eaa65d406b85dfc454b253187abd7b806f3cc395daee0d4d1",
+    "original_private_review_unchanged": true,
+    "private_path_normalized_report_sha256": "c844876e255de6ea812c494a5d9c97a74d1d73ba19368b5cd2c4114d507ea4b6",
+    "raw_private_response_sha256": "b7e548a648dd08e4c1ec49f5e79b0304b6209ada1ce8c6121c55a66e3ea18caa",
+    "same_reviewer_one_authorized_followup": true,
+    "sanitization": "Exact worktree prefix removed from technical references; private contract/snapshot inspection paths replaced by private locators. No disposition, severity, confidence, rationale, uncertainty, recommendation or limitation changed.",
+    "serializer_is_implementation_author_not_reviewer": true
+  },
+  "reviewer_agent_id": "bfe592f9-793b-497b-b99a-16fceb0e5920",
+  "reviewer_report": {
+    "continuity": "This is the same independent review context performing the single authorized EH-001/EH-002 delta follow-up. I authored none of the original implementation or corrections and spawned no worker. The original needs_correction recommendation and both original static findings, severities and confidence ratings remain unchanged at their original revision.",
+    "dispositions": [
+      {
+        "confidence": 9,
+        "current_sources": [
+          "tools/tests/test_engineering_harness_experiment.py:43-103",
+          "tools/tests/test_engineering_harness_experiment.py:629-656",
+          "tools/tests/test_engineering_harness_experiment.py:687-765",
+          "tools/tests/test_engineering_harness_experiment.py:774-925",
+          "tools/tests/test_engineering_harness_experiment.py:1128-1147"
+        ],
+        "id": "EH-001",
+        "original_evidence_status": "static_code_supported",
+        "rationale": "The final truncating rewrite is removed. Completed and skipped rows use the same append-only TrialStream, so finalization no longer destroys accumulated records before summary generation. Cancellation checks the stream's identity and readable bytes, reports complete records and any partial tail, and compares the acknowledged byte prefix instead of unconditionally asserting retention. Missing or replaced streams do not receive a successful retention claim. The new regressions exercise real main/_run_experiment orchestration with controlled producers and cover finalization interruption, a partial sixth append, missing-stream reporting and skipped rows. KeyboardInterrupt still unwinds the campaign and reaches exit 130.",
+        "severity": "MEDIUM",
+        "successor_status": "addressed",
+        "uncertainty": "Addressed at the inspected source revision within the documented cooperative, catchable-cancellation model. Regression assertions were inspected, not executed; the author's before/after record counts are not observations made by this reviewer."
+      },
+      {
+        "confidence": 10,
+        "current_sources": [
+          "tools/engineering_harness_adapters/kicad.py:95-162",
+          "tools/tests/test_engineering_harness_experiment.py:263-286",
+          "tools/tests/test_engineering_harness_experiment.py:441-467",
+          "tools/tests/test_engineering_harness_experiment.py:492-570",
+          "tools/tests/test_engineering_harness_experiment.py:759-770",
+          "tools/tests/test_engineering_harness_experiment.py:926-1019"
+        ],
+        "id": "EH-002",
+        "original_evidence_status": "static_code_supported",
+        "rationale": "Timeout coverage now reads the retained process receipt and requires a positive integer PID, an observed timeout, a matching reaped exit, matching TIMEOUT reasons without interruption, verified cleanup with no remaining owned PIDs, and a confirmed receipt. These checks run after either arm, so the original Popen EAGAIN trigger remains safely BLOCKED but cannot receive exercised/correct credit. An unexercised trial stops further dispatch and prevents COMPLETE. Stable transport facts participate in reproducibility, while the separate private receipt hash is excluded from that projection. Regressions cover EAGAIN through the real synthetic transport boundary in both arms, missing prerequisites, a real short-lived timeout positive, and changed timeout/error facts.",
+        "severity": "MEDIUM",
+        "successor_status": "addressed",
+        "uncertainty": "Addressed by the inspected receipt producer, shared assessor and completion paths. The regressions and their assertions were inspected without running the test child or reproducing the author's reported passes."
+      }
+    ],
+    "executions": [],
+    "inspected_files": [
+      {
+        "coverage": "Full",
+        "path": "PRIVATE_REVIEW_CONTRACT"
+      },
+      {
+        "coverage": "Full; recorded hashes read, not recomputed",
+        "path": "PRIVATE_INPUT_SNAPSHOT"
+      },
+      {
+        "coverage": "Current lines 1-205, 263-297, 344-586, 629-1041 and 1128-1153; authorized-delta hunk locations and bounded source searches",
+        "path": "tools/tests/test_engineering_harness_experiment.py"
+      },
+      {
+        "coverage": "Current lines 95-162; unchanged transport receipt semantics only",
+        "path": "tools/engineering_harness_adapters/kicad.py"
+      },
+      {
+        "coverage": "Full, lines 1-76",
+        "path": "docs/engineering-harness-mvp-2026-09-14/experiment-corrections.md"
+      },
+      {
+        "coverage": "Full, lines 1-62; author observations only",
+        "path": "docs/engineering-harness-mvp-2026-09-14/experiment-correction-witness.json"
+      },
+      {
+        "coverage": "Authorized delta hunk covering current lines 166-191",
+        "path": "docs/engineering-harness-mvp-2026-09-14/README.md"
+      },
+      {
+        "coverage": "Authorized delta hunk covering current lines 116-151",
+        "path": "docs/engineering-harness-mvp.ja.md"
+      }
+    ],
+    "limitations": [
+      "Only read-only Git/source inspection was performed. No tests, project imports, witnesses, native operations, edits, installations, workers, GitHub comments, approvals or merges were performed.",
+      "This follow-up covers only the EH-001/EH-002 correction delta and directly necessary callers, receipt semantics and regression design. It does not replace the original review or constitute a new full-MVP review.",
+      "The author's reproduction counts and reported test/check passes remain author evidence, not independently executed results. No post-run consistency check was treated as independent acceptance.",
+      "The separately running campaign's live results were neither read nor awaited. Existing campaign packages, fixture equivalence and the full frozen-input manifest were not re-audited.",
+      "Restricted profile bodies, the primary checkout, other worktrees and unrelated Rev5 outputs were not accessed. Unchanged common policy and relevant prior-review context were reused.",
+      "The disposition is limited to cooperative output ownership, direct declared bindings and catchable cancellation. It does not establish arbitrary same-UID protection, uncatchable-signal handling, parent-death supervision or authenticated authority.",
+      "The strong scripted baseline and no-favorable-delta requirement remain intact. No new campaign outcome, production suitability, electrical/mechanical safety acceptance or human authorization is inferred."
+    ],
+    "new_findings": [],
+    "next_action": "Preserve this successor-specific disposition alongside the unchanged original report and keep the PR experimental. Return the bounded disposition to the coordinator; no additional review loop, execution, worker, adoption or merge is requested or authorized by this response.",
+    "original_review_recommendation": "needs_correction",
+    "original_review_source_revision": "8562b6e7bc383c373c3af3bf8a42929ebba7ddba",
+    "recommendation": "keep_experimental",
+    "review_source_revision": "c7764e126380e94ed7012545a84b68cd5a5de1eb",
+    "reviewer_role": "code-review",
+    "summary": "EH-001 and EH-002 are addressed in this successor by static inspection of the corrections and regression design. No high-confidence directly coupled new defect was found. This is a source-specific delta disposition, not full-MVP acceptance or independent confirmation of the author's executed results.",
+    "witness_requests": []
+  },
+  "schema_version": 1,
+  "scope": "SINGLE_SOURCE_SPECIFIC_EH_001_EH_002_DELTA_REVIEW"
+}
