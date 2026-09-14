@@ -204,8 +204,8 @@ Smallest MVP scope:
 2. KiCad CLI preflight with `UNKNOWN/BLOCKED` capability semantics.
 3. Snapshot/execute/semantic-validate/commit-or-rollback around operation-owned synthetic fixture files.
 4. Gates for PASS/FAIL/BLOCKED/STALE/HUMAN_REQUIRED.
-5. Tests for stale inputs, semantic DRC/ERC failure, missing evidence, unauthorized export, timeout, partial write, corrupt output, and rollback failure.
-6. A/B experiment runner that executes the same fixture directly and through Harness, recording metrics without changing production hardware artifacts.
+5. Unit/fixture tests for stale inputs, semantic DRC/ERC failure, missing evidence, unauthorized export, timeout, partial write, corrupt output, and rollback failure.
+6. A/B experiment runner for the mandatory subset named in `experiment-contract.md`; broader failure classes remain unit-tested unless the one KiCad adapter can exercise them without expanding scope.
 
 Out of scope: Fusion/FreeCAD/Blender/Unity integration, broad multi-model orchestration, real manufacturing export, root HARNESS.md, physical hardware, private/local Rev5 state.
 

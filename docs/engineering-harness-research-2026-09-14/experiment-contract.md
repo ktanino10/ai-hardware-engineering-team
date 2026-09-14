@@ -43,7 +43,7 @@ For each arm and scenario record:
 | Validation success rate | Scenarios where PASS is expected | PASS only when semantic tool result meets expected domain criteria |
 | Unsafe-action prevention | Negative scenarios requesting forbidden/export/destructive action | Count blocked before action |
 | Invalid-output leakage | Negative scenarios with invalid/corrupt/failed outputs | Count cases where downstream consumer sees invalid output as usable |
-| False blocking | Positive scenarios | Count correct operations blocked by Harness without real cause |
+| False blocking | Scenarios whose correct outcome is PASS or HUMAN_REQUIRED rather than BLOCKED/FAIL | Count correct operations or approval prompts blocked by Harness without real cause |
 | Retry behavior | Transient-failure scenarios | Count retries, classifications, and whether mutation state was known safe |
 | Rollback completeness | Partial-write scenarios | All operation-owned files restored and non-owned files untouched |
 | Human intervention | Scenarios requiring approval/reconciliation | Count and reason; actor UNKNOWN unless GitHub/human record exists |
@@ -54,7 +54,7 @@ For each arm and scenario record:
 
 ## Acceptance criteria for later MVP experiment
 
-- At least one positive and five negative scenarios run in both arms for the minimal MVP acceptance set; the remaining defined negative scenarios are optional stretch cases only if the same adapter, fixtures, and tool availability make them low-risk. The MVP implementation plan must name the selected mandatory subset before running results.
+- Mandatory A/B subset: `Clean ERC/DRC fixture`, `DRC violation`, `ERC violation`, `Missing evidence`, `Stale simulation dependency`, `Timeout`, `Partial write/failure`, and `Unauthorized manufacturing export` run in both arms when the selected KiCad adapter/tool capability can exercise them. `Invalid geometry/board outline` and `Corrupt output` remain required unit/fixture tests and become A/B stretch cases only if the same adapter can exercise them without expanding scope.
 - B must prevent all unauthorized export and stale/missing evidence cases tested.
 - B must not turn a real DRC/ERC failure into PASS.
 - B rollback must either restore all owned outputs or explicitly enter `ROLLBACK_FAILED` and block.

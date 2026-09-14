@@ -9,12 +9,12 @@ websites are recorded as retrieval failures rather than inferred facts.
 
 | # | URL | Retrieval result | Inspected revision/source |
 |---:|---|---|---|
-| 1 | https://github.com/ignaciomolini/mcp-fusion360 | OK | README SHA `211d3ec...`; latest commit `3419de8...` 2026-06-24; `mcp-server/src/tools.ts` SHA `adbe04...`; `Fusion360MCP/handlers.py` SHA `1214ea...`; MIT license SHA `e3e36a...` |
-| 2 | https://github.com/blwfish/freecad-mcp | OK | README SHA `251f36...`; latest commit `ff13461...` 2026-09-14; TOOLS SHA `8cedc2...`; SECURITY SHA `903966...`; README states LGPL-2.1-or-later |
+| 1 | https://github.com/ignaciomolini/mcp-fusion360 | OK | README SHA `211d3e...`; latest commit `3419de...` 2026-06-24; `mcp-server/src/tools.ts` SHA `adbe04...`; `Fusion360MCP/handlers.py` SHA `1214ea...`; MIT license SHA `e3e36a...` |
+| 2 | https://github.com/blwfish/freecad-mcp | OK | README SHA `251f36...`; latest commit `ff1346...` 2026-09-14; TOOLS SHA `8cedc2...`; SECURITY SHA `903966...`; README states LGPL-2.1-or-later |
 | 3 | https://github.com/CREATeNG/freecad-mcp-bridge | OK | README SHA `4a98e2...`; latest commit `5a4ecd...` 2026-07-08; MIT license SHA `d74ef4...` |
 | 4 | https://github.com/blwfish/kicad-mcp | OK | README SHA `fd5b1f...`; latest commit `33838c...` 2026-09-14; server.py SHA `349c06...`; pyproject SHA `5f7f96...`; MIT license SHA `4183ef...` |
 | 5 | https://github.com/NiRuLabs/kicad-mcp-server | OK | README SHA `cf2bc3...`; latest commit `2fd14d...` 2026-07-28; server.py SHA `a05a6a...`; tools.py SHA `0cd254...`; pyproject SHA `1a035e...`; MIT license SHA `c13f99...` |
-| 6 | https://github.com/ahujasid/blender-mcp | OK | README SHA `73964d...`; latest commit `5f8ddaf...` 2026-09-07; server dump SHA `d6821d...`; addon dump SHA `884340...`; MIT license SHA `82e98f...` |
+| 6 | https://github.com/ahujasid/blender-mcp | OK | README SHA `73964d...`; latest commit `5f8dda...` 2026-09-07; server dump SHA `d6821d...`; addon dump SHA `884340...`; MIT license SHA `82e98f...` |
 | 7 | https://github.com/PoBruno/mcp-blender-agent | OK | README SHA `6f516c...`; latest commit `a45012...` 2026-07-20; architecture SHA `33288f...`; MIT license SHA `b34b0d...` |
 | 8 | https://www.blender.org/lab/mcp-server/ | BLOCKED/UNAVAILABLE | Direct fetch failed: `No address associated with hostname`. No source/license/maintenance facts verified from this URL. |
 | 9 | https://github.com/CoplayDev/unity-mcp | OK | README SHA `a804bd...`; latest commit `2fcc17...` 2026-09-05; package.json SHA `c7b084...`; MIT license SHA `e7f878...` |
