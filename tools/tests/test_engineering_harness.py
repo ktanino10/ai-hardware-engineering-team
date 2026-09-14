@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -20,6 +21,36 @@ from engineering_harness_adapters import kicad
 
 FIXTURES = Path(__file__).parent / "fixtures" / "engineering_harness"
 TOOL = kicad.ToolIdentity("a" * 64, "10.0.1")
+
+
+@contextlib.contextmanager
+def interrupt_owned_wait(use_sigint=True):
+    real_popen = subprocess.Popen
+    owned = []
+
+    def start(*args, **kwargs):
+        child = real_popen(*args, **kwargs)
+        if args[0][0] == sys.executable and not owned:
+            owned.append(child)
+            real_wait = child.wait
+
+            def interrupt(timeout=None):
+                child.wait = real_wait
+                if use_sigint:
+                    os.kill(os.getpid(), signal.SIGINT)
+                raise KeyboardInterrupt
+            child.wait = interrupt
+        return child
+
+    try:
+        with patch.object(kicad.subprocess, "Popen", side_effect=start):
+            yield owned
+    finally:
+        # Test cleanup is not credited to the transport if an assertion fails.
+        for child in owned:
+            if child.poll() is None:
+                os.killpg(child.pid, signal.SIGKILL)
+                child.wait(timeout=5)
 
 
 def synthetic_report(operation="drc", source="clean.kicad_pcb", violations=None):
@@ -321,6 +352,29 @@ class HarnessTests(unittest.TestCase):
         blocked.assert_not_called()
         self.assertIn("INVALID_REQUEST_FIELDS", stderr.getvalue())
 
+    def test_cli_honors_preflight_cancellation_and_retains_receipt(self):
+        request = {
+            "scope": "SYNTHETIC_ONLY", "operation": "drc", "task_id": "unit-task", "run_id": "unit-run",
+            "source_revision": self.revision, "config_revision": self.revision,
+            "inputs": self.names, "configuration": ["configuration.txt"],
+            "native_inputs": self.names[:2], "input_name": self.names[0],
+            "tool": {"sha256": TOOL.sha256, "version": TOOL.version}, "timeout": 20,
+        }
+        path = self.root / "request.json"
+        path.write_bytes(harness.json_bytes(request))
+        adapter = Mock(expected=TOOL)
+        adapter.preflight.side_effect = kicad.ProcessInterrupted({"cleanup_verified": False})
+        with patch.object(harness, "KiCad", return_value=adapter), contextlib.redirect_stderr(io.StringIO()) as stderr:
+            status = harness.main([str(path), "--root", str(self.root),
+                                   "--workspace", ".agent-work/cancel",
+                                   "--kicad-cli", "/nonexistent/kicad-cli"])
+        self.assertEqual(status, 130)
+        adapter.execute.assert_not_called()
+        result = json.loads(stderr.getvalue())
+        self.assertEqual(result["gate_reasons"], ["OPERATOR_CANCELLED"])
+        self.assertFalse(result["owned_process_cleanup_verified"])
+        self.assertTrue((self.root / ".agent-work/cancel/journal/cancelled.json").is_file())
+
 
 class ReportTests(unittest.TestCase):
     def parse(self, data, operation="drc", exit_code=0, source="clean.kicad_pcb"):
@@ -381,6 +435,50 @@ class ReportTests(unittest.TestCase):
             self.assertTrue(receipt["timed_out"])
             self.assertTrue(receipt["cleanup_verified"])
             self.assertEqual(receipt["remaining_owned_pids"], [])
+
+    def test_keyboard_interrupt_and_sigint_reap_owned_child_and_preserve_receipts(self):
+        for use_sigint in (False, True):
+            with self.subTest(sigint=use_sigint), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory).resolve()
+                with interrupt_owned_wait(use_sigint) as children:
+                    with self.assertRaises(kicad.ProcessInterrupted) as stopped:
+                        kicad.run_process([sys.executable, "-c", "import time; time.sleep(3)"],
+                                          root, {"PATH": "/usr/bin:/bin"}, root, 10)
+                    self.assertIsNotNone(children[0].poll())
+                    self.assertTrue(stopped.exception.receipt["cleanup_verified"])
+                    self.assertTrue(stopped.exception.receipt["interrupted"])
+                    self.assertEqual(stopped.exception.receipt["remaining_owned_pids"], [])
+                    receipt = json.loads((root / "process.json").read_text())
+                    self.assertEqual(receipt["error"], "OPERATOR_CANCELLED")
+                    self.assertTrue((root / "stdout.txt").is_file())
+                    self.assertTrue((root / "stderr.txt").is_file())
+
+    def test_interrupted_cleanup_uncertainty_is_not_reported_as_zero_processes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            with interrupt_owned_wait() as children, patch.object(kicad, "process_group", side_effect=OSError("fixture")):
+                with self.assertRaises(kicad.ProcessInterrupted) as stopped:
+                    kicad.run_process([sys.executable, "-c", "import time; time.sleep(3)"],
+                                      root, {"PATH": "/usr/bin:/bin"}, root, 10)
+                self.assertIsNotNone(children[0].poll())
+            self.assertFalse(stopped.exception.receipt["cleanup_verified"])
+            self.assertIsNone(stopped.exception.receipt["remaining_owned_pids"])
+            self.assertTrue((root / "process.json").is_file())
+
+    def test_adapter_cancellation_keeps_partial_runtime_and_propagates(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            adapter = object.__new__(kicad.KiCad)
+            adapter.executable = Path(sys.executable)
+            adapter.verify_identity = Mock()
+            with interrupt_owned_wait() as children:
+                with self.assertRaises(kicad.ProcessInterrupted):
+                    adapter._invoke(["-c", "import time; time.sleep(3)"], root / "native", {}, 10)
+                self.assertIsNotNone(children[0].poll())
+            receipt = json.loads((root / "native/runtime.json").read_text())
+            self.assertTrue(receipt["retained_for_interruption"])
+            self.assertFalse(receipt["temporary_environment_removed"])
+            self.assertTrue(Path(receipt["runtime"]).exists())
 
 
 if __name__ == "__main__":

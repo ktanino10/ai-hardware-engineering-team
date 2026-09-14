@@ -16,7 +16,8 @@ from enum import StrEnum
 from agent_workflow import WorkflowError, repo_path
 from check_assembly_evidence import EvidenceError, digest_file, git_bytes, unique_keys
 from engineering_harness_adapters.kicad import (
-    AdapterError, IGNORED_CHECKS, Invocation, KiCad, ToolIdentity, bytes_hash, parse_report,
+    AdapterError, IGNORED_CHECKS, Invocation, KiCad, ProcessInterrupted, ToolIdentity,
+    bytes_hash, parse_report,
 )
 
 
@@ -461,6 +462,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--workspace", required=True, help="New owned repository-relative directory")
     parser.add_argument("--kicad-cli", type=Path)
     args = parser.parse_args(argv)
+    outputs = None
     try:
         request = read_json(args.request)
         if request.get("scope") != "SYNTHETIC_ONLY":
@@ -494,6 +496,27 @@ def main(argv: list[str] | None = None) -> int:
         outputs._save("decision.json", decision)
         print(json_bytes({"operation": record.facts(), "decision": decision}).decode(), end="")
         return 0 if decision["gate_decision"] == "ALLOW_TEST_OUTPUT" else 2
+    except KeyboardInterrupt as exc:
+        cancelled = {
+            "operation_lifecycle": "FAILED", "validation_verdict": "NOT_RUN",
+            "evidence_freshness": "UNKNOWN", "gate_decision": "BLOCKED",
+            "gate_reasons": ["OPERATOR_CANCELLED"], "recovery_outcome": "NOT_ATTEMPTED",
+            "owned_process_cleanup_verified": exc.receipt["cleanup_verified"]
+            if isinstance(exc, ProcessInterrupted) else "UNKNOWN",
+            "partial_state_retained": outputs is not None,
+        }
+        if isinstance(exc, ProcessInterrupted):
+            cancelled["transport_receipt_status"] = {
+                key: exc.receipt.get(key, "UNKNOWN")
+                for key in ("receipt_written", "receipt_error", "runtime_receipt_error")
+            }
+        if outputs is not None:
+            try:
+                outputs._save("cancelled.json", cancelled)
+            except (OSError, HarnessError) as error:
+                cancelled["receipt_error"] = type(error).__name__
+        print(json.dumps(cancelled), file=sys.stderr)
+        return 130
     except (OSError, KeyError, TypeError, ValueError, EvidenceError, WorkflowError) as exc:
         print(json.dumps({"state": "BLOCKED", "error_type": type(exc).__name__,
                           "error": str(exc)}), file=sys.stderr)

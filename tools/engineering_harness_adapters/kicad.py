@@ -29,6 +29,14 @@ class AdapterError(ValueError):
     """A capability, input or result cannot be established."""
 
 
+class ProcessInterrupted(KeyboardInterrupt):
+    """Operator cancellation with the best available owned-process receipt."""
+
+    def __init__(self, receipt: dict):
+        super().__init__("OPERATOR_CANCELLED")
+        self.receipt = receipt
+
+
 @dataclass(frozen=True)
 class ToolIdentity:
     sha256: str
@@ -91,55 +99,92 @@ def run_process(command: list[str], cwd: Path, env: dict[str, str],
         raise AdapterError("INVALID_TIMEOUT")
     started = time.monotonic()
     stdout_path, stderr_path = receipts / "stdout.txt", receipts / "stderr.txt"
+    process = None
+    interrupted, timed_out = False, False
+    remaining = None
+    error = None
+    cleanup_error = None
     with stdout_path.open("xb") as stdout, stderr_path.open("xb") as stderr:
         try:
             process = subprocess.Popen(
                 command, cwd=cwd, env=env, stdin=subprocess.DEVNULL,
                 stdout=stdout, stderr=stderr, start_new_session=True,
             )
-        except OSError as exc:
-            result = {
-                "pid": None, "exit_code": None, "timed_out": False,
-                "cleanup_verified": True, "remaining_owned_pids": [],
-                "error": f"START_FAILED_ERRNO_{exc.errno}",
-            }
-        else:
-            timed_out = False
             try:
                 process.wait(timeout=timeout)
             except subprocess.TimeoutExpired:
                 timed_out = True
+                error = "TIMEOUT"
+        except KeyboardInterrupt:
+            interrupted = True
+            error = "OPERATOR_CANCELLED"
+        except OSError as exc:
+            error = f"PROCESS_ERRNO_{exc.errno}"
+        finally:
+            if process is not None:
                 try:
-                    os.killpg(process.pid, signal.SIGTERM)
-                except ProcessLookupError:
-                    pass  # The owned process may have exited at the timeout boundary.
-                try:
-                    process.wait(timeout=5)
-                except subprocess.TimeoutExpired:
-                    os.killpg(process.pid, signal.SIGKILL)
-                    process.wait(timeout=5)
-            remaining = process_group(process.pid)
-            if remaining and timed_out:
-                # This group was created by this Popen; never target names/global jobs.
-                os.killpg(process.pid, signal.SIGKILL)
-                deadline = time.monotonic() + 2
-                while remaining and time.monotonic() < deadline:
-                    time.sleep(0.05)
+                    if timed_out or interrupted or process.poll() is None:
+                        _stop_owned_process(process)
                     remaining = process_group(process.pid)
-            result = {
-                "pid": process.pid, "exit_code": process.returncode,
-                "timed_out": timed_out, "cleanup_verified": not remaining,
-                "remaining_owned_pids": remaining,
-                "error": "TIMEOUT" if timed_out else (
-                    "CLEANUP_UNVERIFIED" if remaining else None
-                ),
-            }
-    result |= {
+                except KeyboardInterrupt:
+                    interrupted = True
+                    error = "OPERATOR_CANCELLED"
+                    cleanup_error = "CLEANUP_INTERRUPTED"
+                except (OSError, subprocess.SubprocessError) as exc:
+                    cleanup_error = "CLEANUP_UNVERIFIED:" + type(exc).__name__
+            elif not interrupted:
+                remaining = []
+    clean = remaining == [] and cleanup_error is None and (
+        process is None or process.returncode is not None
+    )
+    result = {
+        "pid": process.pid if process is not None else None,
+        "exit_code": process.returncode if process is not None else None,
+        "timed_out": timed_out, "interrupted": interrupted,
+        "cleanup_verified": clean, "remaining_owned_pids": remaining,
+        "cleanup_error": cleanup_error,
+        "error": error or (None if clean else "CLEANUP_UNVERIFIED"),
         "elapsed_seconds": time.monotonic() - started,
         "stdout_sha256": digest_file(stdout_path), "stderr_sha256": digest_file(stderr_path),
+        "receipt_written": True,
     }
-    (receipts / "process.json").write_text(json.dumps(result, indent=2) + "\n")
+    try:
+        (receipts / "process.json").write_text(json.dumps(result, indent=2) + "\n")
+    except OSError as exc:
+        if not interrupted:
+            raise
+        result["receipt_written"] = False
+        result["receipt_error"] = f"ERRNO_{exc.errno}"
+        raise ProcessInterrupted(result) from exc
+    if interrupted:
+        raise ProcessInterrupted(result)
     return result
+
+
+def _stop_owned_process(process: subprocess.Popen) -> None:
+    # Only the process group created by this Popen belongs to this operation.
+    try:
+        os.killpg(process.pid, signal.SIGTERM)
+    except ProcessLookupError:
+        pass
+    try:
+        process.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        process.wait(timeout=5)
+    remaining = process_group(process.pid)
+    if remaining:
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        deadline = time.monotonic() + 2
+        while remaining and time.monotonic() < deadline:
+            time.sleep(0.05)
+            remaining = process_group(process.pid)
 
 
 def _remove_owned_runtime(path: Path, identity: tuple[int, int]) -> bool:
@@ -200,7 +245,19 @@ class KiCad:
               for item in arguments),
         ]
         (receipts / "private-command.json").write_text(json.dumps(command) + "\n")
-        observed = run_process(command, inputs, env, receipts, timeout)
+        try:
+            observed = run_process(command, inputs, env, receipts, timeout)
+        except ProcessInterrupted as exc:
+            # Keep the partial runtime and streams, never publish or resume it.
+            try:
+                (receipts / "runtime.json").write_text(json.dumps({
+                    "runtime": str(runtime), "temporary_environment_removed": False,
+                    "retained_for_interruption": True,
+                    "owned_process_cleanup_verified": exc.receipt["cleanup_verified"],
+                }, indent=2) + "\n")
+            except OSError as error:
+                exc.receipt["runtime_receipt_error"] = f"ERRNO_{error.errno}"
+            raise
         report_path = runtime / "report.json"
         report = None
         if report_path.is_symlink():

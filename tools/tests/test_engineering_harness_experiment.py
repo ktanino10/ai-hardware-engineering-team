@@ -2,16 +2,19 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 from dataclasses import asdict
 import datetime
 import json
+import io
 from pathlib import Path
 import platform
 import subprocess
 import sys
 import time
+import tempfile
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import agent_workflow
 import engineering_harness as h
@@ -20,6 +23,10 @@ from test_engineering_harness import TOOL, observation, synthetic_report, violat
 
 
 PLAN_PATH = "docs/engineering-harness-mvp-2026-09-14/experiment-plan.json"
+PUBLIC_DIRECTORIES = {
+    "docs/engineering-harness-mvp-2026-09-14/experiment",
+    "docs/engineering-harness-mvp-2026-09-14/experiment-cancellation-successor",
+}
 ROWS = {
     "clean", "erc-violation", "drc-violation", "invalid-geometry", "missing-evidence",
     "stale-simulation", "timeout", "partial-write", "corrupt-output", "unauthorized-export", "capability",
@@ -524,6 +531,32 @@ def publish_trial(public: Path, trial: dict, obs: kicad.Invocation | None, works
 
 
 def run_experiment(args) -> int:
+    owned = []
+    try:
+        return _run_experiment(args, owned)
+    except KeyboardInterrupt as exc:
+        if owned:
+            public, device, inode, planned = owned[0]
+            try:
+                current = public.lstat()
+                if public.is_symlink() or (current.st_dev, current.st_ino) != (device, inode):
+                    raise h.HarnessError("INTERRUPTED_OUTPUT_OWNERSHIP_CHANGED")
+                with (public / "interruption.json").open("xb") as stream:
+                    cancelled = {
+                        "experiment_status": "PARTIAL", "reason": "OPERATOR_CANCELLED",
+                        "planned": planned, "remaining_trials_not_dispatched": True,
+                        "owned_process_cleanup_verified": exc.receipt["cleanup_verified"]
+                        if isinstance(exc, kicad.ProcessInterrupted) else "UNKNOWN",
+                        "partial_trial_stream_retained": True,
+                        "limits": "Catchable caller interruption only; no SIGKILL/parent-death guarantee.",
+                    }
+                    stream.write(h.json_bytes(cancelled))
+            except (OSError, h.HarnessError) as error:
+                print(json.dumps({"interruption_receipt_error": type(error).__name__}), file=sys.stderr)
+        raise
+
+
+def _run_experiment(args, owned: list) -> int:
     root = Path.cwd()
     plan = h.read_json(root / PLAN_PATH)
     validate_plan(plan)
@@ -544,14 +577,14 @@ def run_experiment(args) -> int:
     names = source_names(plan, manifest)
     tool = kicad.ToolIdentity(**plan["tool"])
     binding = h.bind_inputs(root, args.candidate, plan["config_revision"], names, plan["configuration"], tool)
-    if not args.private_root.startswith(f".agent-work/{args.task_id}/") or args.public_dir != (
-        "docs/engineering-harness-mvp-2026-09-14/experiment"
-    ):
+    if not args.private_root.startswith(f".agent-work/{args.task_id}/") or args.public_dir not in PUBLIC_DIRECTORIES:
         raise h.HarnessError("EXPERIMENT_OUTPUT_SCOPE_MISMATCH")
     private = h.repo_path(root, args.private_root)
     public = h.repo_path(root, args.public_dir)
     private.mkdir(parents=True, exist_ok=False)
     public.mkdir(parents=True, exist_ok=False)
+    identity = public.stat()
+    owned.append((public, identity.st_dev, identity.st_ino, len(plan["scenarios"]) * plan["repetitions"] * 2))
     schedule = [
         (case, arm, repeat)
         for repeat, arms in enumerate(plan["arm_order_by_repetition"], 1)
@@ -630,6 +663,27 @@ def run_experiment(args) -> int:
 
 
 class ExperimentTests(unittest.TestCase):
+    def test_cancellation_stops_campaign_and_keeps_partial_stream(self):
+        with tempfile.TemporaryDirectory() as directory:
+            public = Path(directory)
+
+            def interrupt(args, owned):
+                stat = public.stat()
+                owned.append((public, stat.st_dev, stat.st_ino, 120))
+                (public / "trials.jsonl").write_text('{"completed":"fixture"}\n')
+                raise kicad.ProcessInterrupted({"cleanup_verified": True})
+
+            args = ["--run", "--candidate", "a" * 40, "--task-id", "unit", "--run-id", "unit",
+                    "--private-root", ".agent-work/unit/fixture", "--public-dir", str(public),
+                    "--kicad-cli", "/nonexistent/kicad-cli"]
+            with patch(__name__ + "._run_experiment", side_effect=interrupt) as run, contextlib.redirect_stderr(io.StringIO()):
+                self.assertEqual(main(args), 130)
+            run.assert_called_once()
+            result = h.read_json(public / "interruption.json")
+            self.assertEqual(result["experiment_status"], "PARTIAL")
+            self.assertTrue(result["remaining_trials_not_dispatched"])
+            self.assertEqual((public / "trials.jsonl").read_text(), '{"completed":"fixture"}\n')
+
     def test_all_rows_both_arms_and_positive_variants_are_frozen(self):
         plan = h.read_json(Path(__file__).parents[2] / PLAN_PATH)
         validate_plan(plan)
@@ -730,6 +784,9 @@ def main(argv=None):
         parser.error("--run is required for native trials")
     try:
         return run_experiment(args)
+    except KeyboardInterrupt:
+        print(json.dumps({"experiment_status": "PARTIAL", "reason": "OPERATOR_CANCELLED"}), file=sys.stderr)
+        return 130
     except (OSError, ValueError, subprocess.SubprocessError) as exc:
         print(json.dumps({"experiment_status": "PARTIAL", "error": str(exc)}), file=sys.stderr)
         return 2

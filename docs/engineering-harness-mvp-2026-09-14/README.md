@@ -103,7 +103,12 @@ python3 tools/engineering_harness.py <request.json> \
 ```
 
 Exit 0 means only an allowed current **test output**; exit 2 means blocked
-or human routing. Caller-supplied identities are not human authentication.
+or human routing. Catchable caller cancellation exits **130**, stops further
+dispatch, and retains interruption/partial-state receipts. Known owned
+processes are terminated/reaped or cleanup is explicitly unverified;
+uncatchable SIGKILL, default SIGTERM and general parent-death protection
+are not promised. See [the cancellation follow-up](cancellation-followup.md).
+Caller-supplied identities are not human authentication.
 Requests cannot add native arguments, exports or production input paths.
 There is deliberately no automatic retry in this MVP. Every attempt and
 zero retry count is recorded; successful transient retry recovery is not
@@ -152,6 +157,14 @@ It creates result directories exclusively, never overwrites a previous
 campaign, and returns exit 2/PARTIAL if mandatory native coverage or
 cleanup cannot be established. A new campaign requires a relevant changed
 input/decision and normal admission, not a renamed retry.
+
+The original `experiment/` package belongs to candidate `ca0f276` and stays
+unchanged. The cancellation-fixed successor uses the **same plan, cases,
+rules, oracle and repetition/order**, but a new candidate and normal
+reservation, with `--public-dir` set to
+`docs/engineering-harness-mvp-2026-09-14/experiment-cancellation-successor`.
+Cancellation regression/witness tests are separate from those matched
+measurements; they are not added to the benchmark to create an advantage.
 
 Final evidence belongs in `experiment/`: frozen input/config/tool hashes,
 preflight facts, sanitized actual reports/logs, every trial's coverage and
