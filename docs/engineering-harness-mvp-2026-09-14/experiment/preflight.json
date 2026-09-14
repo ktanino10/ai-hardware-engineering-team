@@ -1,0 +1,61 @@
+{
+  "domain_acceptance": "NOT_RUN",
+  "help": {
+    "drc": {
+      "attempts": 1,
+      "cleanup_verified": true,
+      "command": [
+        "kicad-cli",
+        "pcb",
+        "drc",
+        "--help"
+      ],
+      "elapsed_seconds": 0.1969691250124015,
+      "error": null,
+      "exit_code": 0,
+      "raw_report_sha256": null,
+      "source": "NATIVE_KICAD",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "da7c7fa31fb2f5a2cf44fca62031f1e619fcf8607146c94d030b205b8f326998",
+      "timed_out": false
+    },
+    "erc": {
+      "attempts": 1,
+      "cleanup_verified": true,
+      "command": [
+        "kicad-cli",
+        "sch",
+        "erc",
+        "--help"
+      ],
+      "elapsed_seconds": 0.19841887499205768,
+      "error": null,
+      "exit_code": 0,
+      "raw_report_sha256": null,
+      "source": "NATIVE_KICAD",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "0d56494977d010e708ce1c022f9d40bb53daa8d6a02df44e0c08acd89e1a9321",
+      "timed_out": false
+    },
+    "version": {
+      "attempts": 1,
+      "cleanup_verified": true,
+      "command": [
+        "kicad-cli",
+        "--version"
+      ],
+      "elapsed_seconds": 0.3691322499944363,
+      "error": null,
+      "exit_code": 0,
+      "raw_report_sha256": null,
+      "source": "NATIVE_KICAD",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "54acbfdb31a2a82cd15f8a83956781cc821222b3902828d5a79d8a9a7a59e334",
+      "timed_out": false
+    }
+  },
+  "identity": {
+    "sha256": "04d9e61cad2e80cf7ad6c3da06417a6d7e8e2cdd23efc99957a1184e604d6657",
+    "version": "10.0.1"
+  }
+}

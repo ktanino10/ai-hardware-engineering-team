@@ -1,0 +1,97 @@
+{
+  "arms": {
+    "A": {
+      "actual_human_interventions": 0,
+      "attempted": 60,
+      "correct": 60,
+      "elapsed_seconds": 11.73381262505427,
+      "exercised": 60,
+      "false_blocking": {
+        "denominator": 12,
+        "numerator": 0
+      },
+      "invalid_output_leakage": {
+        "denominator": 30,
+        "numerator": 0
+      },
+      "native_exercised": 15,
+      "planned": 60,
+      "positive_success": {
+        "denominator": 12,
+        "numerator": 12
+      },
+      "process_seconds": 10.122007290017791,
+      "recovery": {
+        "denominator": 6,
+        "exact_restore": 3,
+        "explicit_conflict": 3
+      },
+      "reproducible_scenarios": {
+        "denominator": 20,
+        "numerator": 20
+      },
+      "retries": 0,
+      "synthetic_human_routes": 12,
+      "unexercised": 0,
+      "unsafe_request_rejection": {
+        "denominator": 12,
+        "numerator": 12
+      },
+      "upstream_evidence_completeness": {
+        "denominator": 60,
+        "numerator": 57
+      }
+    },
+    "B": {
+      "actual_human_interventions": 0,
+      "attempted": 60,
+      "correct": 60,
+      "elapsed_seconds": 12.536420702992473,
+      "exercised": 60,
+      "false_blocking": {
+        "denominator": 12,
+        "numerator": 0
+      },
+      "invalid_output_leakage": {
+        "denominator": 30,
+        "numerator": 0
+      },
+      "native_exercised": 15,
+      "planned": 60,
+      "positive_success": {
+        "denominator": 12,
+        "numerator": 12
+      },
+      "process_seconds": 10.317144582048059,
+      "recovery": {
+        "denominator": 6,
+        "exact_restore": 3,
+        "explicit_conflict": 3
+      },
+      "reproducible_scenarios": {
+        "denominator": 20,
+        "numerator": 20
+      },
+      "retries": 0,
+      "synthetic_human_routes": 12,
+      "unexercised": 0,
+      "unsafe_request_rejection": {
+        "denominator": 12,
+        "numerator": 12
+      },
+      "upstream_evidence_completeness": {
+        "denominator": 60,
+        "numerator": 57
+      }
+    }
+  },
+  "backend_model_identity": "UNKNOWN",
+  "benefit_conclusion": "NO_DEMONSTRATED_RELIABILITY_IMPROVEMENT",
+  "billing": "UNKNOWN",
+  "ended_at": "2026-09-14T14:52:56.994896+00:00",
+  "experiment_status": "COMPLETE",
+  "limits": "Scripted policy-following baseline, not live-agent/human performance; controlled test path only. No production adoption or real Rev5 blocker closure.",
+  "reliability_measures_equal": true,
+  "scope": "SYNTHETIC_ONLY",
+  "stop_reason": null
+}
