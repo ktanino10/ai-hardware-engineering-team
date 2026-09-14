@@ -55,8 +55,17 @@ make BUILDDIR=/tmp/rev5-linux-build/build
 No `Makefile`, linker script, or source file was edited to perform this
 build -- same `CFLAGS`/`LDFLAGS`/`LDLIBS` and the same 14 `SRCS` as committed.
 **Exit code: 0. Zero compiler warnings** under `-Wall -Wextra` across all 14
-translation units and the final link. Full transcript:
-[`build.log`](build.log).
+translation units and the final link. Each of the 14 `arm-none-eabi-gcc -c`
+invocations used the exact `CFLAGS` shown in `firmware/bench-imu-01/Makefile`
+(`-mcpu=cortex-m0plus -mthumb -Os -g -Wall -Wextra -std=c11 -ffreestanding
+-fno-common -fno-builtin -Isrc -MMD -MP`), followed by one
+`arm-none-eabi-gcc` link step with the Makefile's own `LDFLAGS`/`LDLIBS`
+(`-T linker/STM32G031K8Tx_FLASH.ld -nostdlib -Wl,--gc-sections
+-Wl,-Map=.../bench-imu-01.map ... -lgcc`) and the three `arm-none-eabi-objcopy`/
+`arm-none-eabi-size` post-processing steps -- the full transcript is not
+committed (build logs stay in ignored, task-owned storage only), and this
+summary plus the reproduce command in "Storage and reproducibility" below is
+sufficient to regenerate it exactly.
 
 ## 3. Output verification
 
@@ -134,13 +143,12 @@ board exists in this environment.
 
 ## 5. Storage and reproducibility
 
-Build outputs and the full log live only in this session's task-owned
+Build outputs and the full build log live only in this session's task-owned
 scratch path (`/tmp/rev5-linux-build/`), never committed and never uploaded
 as a CI/Actions artifact -- consistent with the task's write scope. Only
-this handoff document, its size/hash table, and
-[`build.log`](build.log) (a small compiler-invocation transcript, no
-binaries) are added to the repository. No workflow YAML, `tools/`, or root
-policy file was touched. `firmware/bench-imu-01/Makefile` was **not**
+this handoff document and its size/hash table are added to the repository;
+no build log or binary artifact is committed. No workflow YAML, `tools/`, or
+root policy file was touched. `firmware/bench-imu-01/Makefile` was **not**
 modified -- the fresh-output build via the Makefile's own `BUILDDIR`
 override fully reproduced the existing target with no code defect found, so
 no regression was needed (per the task's own "no code defect -> documentation
@@ -169,13 +177,11 @@ repository remain unqualified.
 
 - **Starting SHA**: `a6ebb82d712746087aa1735198f5a3778d799fd7` (verified `git
   log -1` on this branch before any edit).
-- **Final SHA**: recorded by the PR's own commit history (this document plus
-  `build.log`; `firmware/bench-imu-01/README.md` gains one new section --
-  see below).
+- **Final SHA**: recorded by the PR's own commit history (this document;
+  `firmware/bench-imu-01/README.md` gains one new section -- see below).
 - **Changed files**: `firmware/bench-imu-01/README.md` (new "Linux build"
   section appended); `docs/cloud-linux-firmware-build-2026-09-14/README.md`
-  and `docs/cloud-linux-firmware-build-2026-09-14/build.log` (new).
-  `firmware/bench-imu-01/Makefile` was **not** changed.
+  (new). `firmware/bench-imu-01/Makefile` was **not** changed.
 - **Commands/exits**: `sudo apt-get install -y gcc-arm-none-eabi
   binutils-arm-none-eabi` (exit 0); `make BUILDDIR=/tmp/rev5-linux-build/build`
   (exit 0, zero warnings).
@@ -185,9 +191,9 @@ repository remain unqualified.
 - **Output hashes/sizes**: see the table in section 3 above.
 - **Remaining limitations**: no physical board exists to flash or validate
   against; only static build/section-fit is confirmed, not runtime
-  behavior; build outputs and log retained only in this session's scratch
-  path per the task's storage constraint (a copy of `build.log` is included
-  in this doc folder as the reproducibility receipt, containing only
-  compiler invocation lines, no binary content).
+  behavior; the build log itself is not committed (kept only in this
+  session's own task-owned scratch storage, per the task's storage
+  constraint) -- this document's command transcript and hash table are the
+  retained reproducibility record.
 - **User choice needed**: none -- no compilation defect was found, so no
   code change was required beyond this documentation addition.
