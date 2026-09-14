@@ -166,6 +166,26 @@ reservation, with `--public-dir` set to
 Cancellation regression/witness tests are separate from those matched
 measurements; they are not added to the benchmark to create an advantage.
 
+The limited independent review of `8562b6e` subsequently returned
+**needs_correction**, with EH-001 (MEDIUM, 9/10) and EH-002 (MEDIUM, 10/10).
+The original static findings and both completed campaigns stay unchanged.
+The [experiment correction record](experiment-corrections.md) describes
+new native-independent reproductions and the narrow runner changes.
+Completed and skipped trial rows are now append-only; cancellation reports
+observed stream bytes/hash, complete records, partial tail and whether the
+acknowledged prefix is actually retained. A missing stream is not reported
+as retained.
+
+Timeout coverage now requires the intended child to have started, timed out,
+been reaped, and have a verified owned-cleanup receipt. A safe BLOCKED response
+to failed launch is **unexercised/PARTIAL**, not timeout success. Actual
+timeout/error/start/cleanup facts participate in reproducibility; raw private
+receipt hashes do not. The corrected candidate is measured separately under
+`experiment-review-corrections/`, preserving the original 20 cases,
+three repetitions, fixtures, rule thresholds and fault schedule. The
+corrected assessor/finalization source is explicitly recorded in that
+campaign's frozen inputs; no favorable A/B delta is presumed.
+
 Final evidence belongs in `experiment/`: frozen input/config/tool hashes,
 preflight facts, sanitized actual reports/logs, every trial's coverage and
 measurements, metrics, and a human-readable summary. Raw environment,

@@ -1,0 +1,62 @@
+{
+  "after_fix": {
+    "actual_finalization_interrupt_retained_records": 120,
+    "failed_timeout_injection_campaign_status": "PARTIAL",
+    "failed_timeout_start_A_exercised_flag": false,
+    "failed_timeout_start_B_exercised_flag": false,
+    "focused_command": "PYTHONPATH=tools:tools/tests python3 -m unittest test_engineering_harness test_engineering_harness_experiment -v",
+    "interrupted_sixth_append_acknowledged_records_retained": 5,
+    "interrupted_sixth_append_reported_partial_tail_bytes": 9,
+    "missing_stream_retention_reported": false,
+    "runner_sha256": "fe611118ddbbcbe24ea8464d23c322490bfdfa0d78a6fd7bd2ebce793bf2ff09",
+    "scope": "AUTHOR_REGRESSION_VERIFIED; independent source-specific disposition pending",
+    "tests_passed": 49,
+    "timeout_transport_facts_compared_for_reproducibility": true
+  },
+  "baseline_implementation_revision": "8562b6e7bc383c373c3af3bf8a42929ebba7ddba",
+  "limits": "No KiCad/native/hardware operation in these regressions. Old private review and both prior campaign results remain unchanged. Catchable cancellation only; no uncatchable-signal or general parent-death guarantee.",
+  "original_review": {
+    "findings": [
+      {
+        "confidence": 9,
+        "evidence_status": "static_code_supported",
+        "id": "EH-001",
+        "severity": "MEDIUM"
+      },
+      {
+        "confidence": 10,
+        "evidence_status": "static_code_supported",
+        "id": "EH-002",
+        "severity": "MEDIUM"
+      }
+    ],
+    "recommendation": "needs_correction",
+    "reviewer_report_sha256": "c9df7b5d49a5f82e075bdb7b4beb384c1b476a6d45d465ee98193644525271b3",
+    "source_revision": "8562b6e7bc383c373c3af3bf8a42929ebba7ddba",
+    "unchanged": true
+  },
+  "private_receipt_hashes": {
+    "after-fix-regressions.txt": "0d3044e05525735eb4532a0a71e56649525f2afbd9f8d805c6036e5504dab030",
+    "before-fix-regressions.txt": "1154eef2616e523e653432188a77ee0a929bce19594eb32d8cc16e5950cf35c8",
+    "focused-tests.txt": "c268d67cad44d13f6277d4ca45a731fb5122bc97dbd6aa4b3135176485d887fd"
+  },
+  "recorded_at": "2026-09-14T16:45:28.627432+00:00",
+  "reproductions": {
+    "EH-001": {
+      "accumulated_records_before_finalization": 120,
+      "native_and_trial_production_replaced_with_controlled_test_fixtures": true,
+      "real_orchestration_finalization_exercised": true,
+      "records_after_interrupted_truncating_open": 0,
+      "whole_run_function_mocked": false
+    },
+    "EH-002": {
+      "child_started": false,
+      "injection": "Popen OSError(EAGAIN) at the synthetic timeout boundary",
+      "original_A_exercised_flag": true,
+      "original_B_exercised_flag": true,
+      "safe_gate": "BLOCKED"
+    }
+  },
+  "schema_version": 1,
+  "scope": "SYNTHETIC_NATIVE_INDEPENDENT_AUTHOR_REGRESSIONS"
+}

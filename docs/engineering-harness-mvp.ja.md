@@ -116,6 +116,36 @@ schematic/PCB parity を評価した意味ではありません。
 既存結果を上書きしたり、途中で fixture・ルール・反復順を変えたりしません。
 請求額と backend-model identity は公開情報がなければ `UNKNOWN` のままです。
 
+## 限定独立レビュー後の実験 runner 修正
+
+`8562b6e` に対する限定独立レビューは **needs_correction** でした。
+EH-001（MEDIUM、9/10）は集計直前の trial stream 書き直し中断による
+記録消失と保持報告の不一致、EH-002（MEDIUM、10/10）は子プロセス起動失敗を
+timeout の実施成功と数える問題です。元の静的な指摘、確信度、
+2つの過去キャンペーンと「改善は実証されず」の結論は変更しません。
+
+[修正記録](engineering-harness-mvp-2026-09-14/experiment-corrections.md) では、
+native を使わない新しい回帰テストによる再現と、その後の修正を分けています。
+実際の集積済み stream の最終化経路で中断すると120行が0行になること、
+timeout の `Popen` に `EAGAIN` を注入すると A/B とも実施済みになることを
+確認しました。runner 全体を mock した再現ではありません。
+
+修正版は完了・未実施の行を追記するだけで、最後にファイルを切り詰めません。
+中断 receipt は実際の bytes/hash、完全な行数、未完の末尾と、
+書き込み確認済み prefix が残っているかを記録します。ファイルがない場合は
+保持済みと報告しません。終了コード130と部分証拠の保存を維持します。
+
+Timeout の実施数に入れるには、意図した子の起動、実 timeout、終了の回収、
+所有 cleanup の確認済み receipt が必要です。起動失敗に対して安全に
+`BLOCKED` となっても、注入失敗は未実施・`PARTIAL` です。
+起動・timeout・error・cleanup の事実も再現性比較に含めますが、
+変動する private process receipt のハッシュは比較の値から外します。
+
+修正候補は別の正常予約で、同じ20ケース・3反復・fixture・閾値・故障スケジュールを
+`experiment-review-corrections/` に測定します。修正した assessor/finalization の
+ソースを明示し、有利な比較結果を前提にしません。元と同じ reviewer による
+1回の限定差分確認は別記録であり、自分の修正テストだけで独立指摘を閉じません。
+
 ## 証拠と承認
 
 公開するのは小さい sanitized reports/logs、入力・設定・tool のハッシュ、

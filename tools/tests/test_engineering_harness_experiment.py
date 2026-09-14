@@ -5,8 +5,10 @@ import argparse
 import contextlib
 from dataclasses import asdict
 import datetime
+import errno
 import json
 import io
+import os
 from pathlib import Path
 import platform
 import subprocess
@@ -26,6 +28,7 @@ PLAN_PATH = "docs/engineering-harness-mvp-2026-09-14/experiment-plan.json"
 PUBLIC_DIRECTORIES = {
     "docs/engineering-harness-mvp-2026-09-14/experiment",
     "docs/engineering-harness-mvp-2026-09-14/experiment-cancellation-successor",
+    "docs/engineering-harness-mvp-2026-09-14/experiment-review-corrections",
 }
 ROWS = {
     "clean", "erc-violation", "drc-violation", "invalid-geometry", "missing-evidence",
@@ -35,6 +38,68 @@ OLD_OUTPUT = b"SYNTHETIC_ONLY prior output bytes; not a PASS certificate\n"
 PARTIAL_OUTPUT = b'{"SYNTHETIC_ONLY":'
 CONFLICT_OUTPUT = b"SYNTHETIC_ONLY intervening writer; preserve these bytes\n"
 SENTINEL = b"SYNTHETIC_ONLY outside this operation's outputs\n"
+
+
+class TrialStream:
+    """Append-only record of completed/skipped trials in one owned campaign."""
+
+    def __init__(self, path: Path):
+        self.path = path
+        with path.open("xb") as stream:
+            identity = os.fstat(stream.fileno())
+        self.identity = (identity.st_dev, identity.st_ino)
+        self.acknowledged_bytes = b""
+        self.acknowledged_records = 0
+
+    def append(self, trial: dict) -> None:
+        data = (json.dumps(trial, sort_keys=True, allow_nan=False) + "\n").encode()
+        identity = self.path.lstat()
+        if self.path.is_symlink() or identity.st_nlink != 1 or (
+            identity.st_dev, identity.st_ino
+        ) != self.identity:
+            raise h.HarnessError("TRIAL_STREAM_OWNERSHIP_CHANGED")
+        with self.path.open("ab") as stream:
+            opened = os.fstat(stream.fileno())
+            if (opened.st_dev, opened.st_ino) != self.identity:
+                raise h.HarnessError("TRIAL_STREAM_OWNERSHIP_CHANGED")
+            stream.write(data)
+            stream.flush()
+        self.acknowledged_bytes += data
+        self.acknowledged_records += 1
+
+    def retained(self) -> dict:
+        result = {
+            "acknowledged_records": self.acknowledged_records,
+            "acknowledged_bytes": len(self.acknowledged_bytes),
+            "acknowledged_prefix_retained": False,
+        }
+        try:
+            identity = self.path.lstat()
+            if self.path.is_symlink() or identity.st_nlink != 1 or (
+                identity.st_dev, identity.st_ino
+            ) != self.identity:
+                return result | {"status": "OWNERSHIP_CHANGED"}
+            data = self.path.read_bytes()
+        except OSError as exc:
+            return result | {"status": "UNREADABLE", "error_type": type(exc).__name__}
+        records, valid = 0, True
+        complete, separator, tail = data.rpartition(b"\n")
+        for line in complete.splitlines() if separator else []:
+            try:
+                parsed = json.loads(line, object_pairs_hook=h.unique_keys)
+                if not isinstance(parsed, dict):
+                    valid = False
+                    break
+            except (ValueError, UnicodeDecodeError):
+                valid = False
+                break
+            records += 1
+        return result | {
+            "status": "OBSERVED", "sha256": kicad.bytes_hash(data), "bytes": len(data),
+            "complete_records": records, "complete_lines_valid": valid,
+            "partial_tail_bytes": len(tail),
+            "acknowledged_prefix_retained": data.startswith(self.acknowledged_bytes),
+        }
 
 
 def validate_plan(plan: dict) -> None:
@@ -367,12 +432,39 @@ def run_trial(case: dict, arm: str, repetition: int, files: Path, binding: h.Bin
             path = outputs.journal / "original-report.json"
             evidence_complete &= path.is_file() and h.digest_file(path) == kicad.bytes_hash(obs.report)
     types = record["semantics"].get("violation_types", [])
-    native_exercised = case["kind"] != "native" or (
+    exercised = case["kind"] != "native" or (
         obs is not None and obs.source == "NATIVE_KICAD" and obs.exit_code in (0, 5)
         and record["validation_verdict"] == case["expected_verdict"]
         and set(case["expected_types"]).issubset(types)
         and (not case["positive"] or record["semantics"].get("violation_count") == 0)
     )
+    transport_facts = {
+        "process_started": bool(case["kind"] == "native" and obs is not None and obs.exit_code is not None),
+        "exit_code": obs.exit_code if obs else None,
+        "timed_out": obs.timed_out if obs else False,
+        "error": obs.error if obs else None,
+        "cleanup_verified": obs.cleanup_verified if obs else True,
+    }
+    process_receipt_sha256 = None
+    coverage_reasons = []
+    if case["id"] == "timeout":
+        receipt_path = workspace / "timeout-receipts" / "process.json"
+        receipt = h.read_json(receipt_path)
+        process_receipt_sha256 = h.digest_file(receipt_path)
+        transport_facts["process_started"] = type(receipt.get("pid")) is int and receipt["pid"] > 0
+        prerequisites = {
+            "CHILD_NOT_STARTED": transport_facts["process_started"],
+            "TIMEOUT_NOT_OBSERVED": receipt.get("timed_out") is True and obs is not None and obs.timed_out,
+            "CHILD_NOT_REAPED": type(receipt.get("exit_code")) is int and obs is not None
+            and receipt["exit_code"] == obs.exit_code,
+            "TIMEOUT_REASON_MISMATCH": receipt.get("error") == "TIMEOUT" and obs is not None
+            and obs.error == "TIMEOUT" and receipt.get("interrupted") is False,
+            "CLEANUP_UNVERIFIED": receipt.get("cleanup_verified") is True
+            and receipt.get("remaining_owned_pids") == [] and obs is not None and obs.cleanup_verified,
+            "PROCESS_RECEIPT_UNCONFIRMED": receipt.get("receipt_written") is True,
+        }
+        coverage_reasons = [reason for reason, satisfied in prerequisites.items() if not satisfied]
+        exercised = not coverage_reasons
     expected_gate = case["expected_gate"]
     correct = decision["gate_decision"] == expected_gate
     if "expected_freshness" in case:
@@ -397,7 +489,10 @@ def run_trial(case: dict, arm: str, repetition: int, files: Path, binding: h.Bin
     trial = {
         "case": case["id"], "row": case["row"], "arm": arm, "repetition": repetition,
         "kind": case["kind"], "positive": case["positive"], "attempted": True,
-        "exercised": native_exercised, "expected_gate": expected_gate,
+        "exercised": exercised, "expected_gate": expected_gate,
+        "coverage_reasons": coverage_reasons,
+        "transport_facts": transport_facts,
+        "private_process_receipt_sha256": process_receipt_sha256,
         "gate_decision": decision["gate_decision"], "gate_reasons": decision["reasons"],
         "operation_lifecycle": record["operation_lifecycle"],
         "validation_verdict": record["validation_verdict"],
@@ -407,7 +502,7 @@ def run_trial(case: dict, arm: str, repetition: int, files: Path, binding: h.Bin
         "semantic_result": record["semantics"], "upstream_evidence_complete": evidence_complete,
         "sentinel_unchanged": sentinel_unchanged, "forbidden_recorder_attempted": forbidden_attempt,
         "cleanup_verified": cleanup, "intermediate_gate": intermediate,
-        "correct": bool(correct and sentinel_unchanged and not forbidden_attempt and cleanup and native_exercised),
+        "correct": bool(correct and sentinel_unchanged and not forbidden_attempt and cleanup and exercised),
         "elapsed_seconds": elapsed, "native_or_fault_process_seconds": obs.elapsed_seconds if obs else 0.0,
         "retries": record["retries"], "actual_human_interventions": 0,
         "synthetic_human_routes": int(decision["gate_decision"] == "HUMAN_REQUIRED"),
@@ -442,6 +537,7 @@ def summarize(trials: list[dict], plan: dict) -> dict:
                 "gate_decision", "validation_verdict", "evidence_freshness", "recovery_outcome",
                 "semantic_result", "normalized_report_sha256", "cleanup_verified",
                 "upstream_evidence_complete", "intermediate_gate", "sentinel_unchanged",
+                "transport_facts",
             )
             projections = {h.json_bytes({key: trial[key] for key in fields}) for trial in repeats}
             reproducible.append(len(repeats) == plan["repetitions"] and len(projections) == 1)
@@ -536,18 +632,22 @@ def run_experiment(args) -> int:
         return _run_experiment(args, owned)
     except KeyboardInterrupt as exc:
         if owned:
-            public, device, inode, planned = owned[0]
+            public, device, inode, planned, trial_stream = owned[0]
             try:
                 current = public.lstat()
                 if public.is_symlink() or (current.st_dev, current.st_ino) != (device, inode):
                     raise h.HarnessError("INTERRUPTED_OUTPUT_OWNERSHIP_CHANGED")
+                retention = trial_stream.retained() if trial_stream is not None else {
+                    "status": "NOT_INITIALIZED", "acknowledged_prefix_retained": False,
+                }
                 with (public / "interruption.json").open("xb") as stream:
                     cancelled = {
                         "experiment_status": "PARTIAL", "reason": "OPERATOR_CANCELLED",
                         "planned": planned, "remaining_trials_not_dispatched": True,
                         "owned_process_cleanup_verified": exc.receipt["cleanup_verified"]
                         if isinstance(exc, kicad.ProcessInterrupted) else "UNKNOWN",
-                        "partial_trial_stream_retained": True,
+                        "partial_trial_stream_retained": retention["acknowledged_prefix_retained"],
+                        "trial_stream": retention,
                         "limits": "Catchable caller interruption only; no SIGKILL/parent-death guarantee.",
                     }
                     stream.write(h.json_bytes(cancelled))
@@ -584,7 +684,9 @@ def _run_experiment(args, owned: list) -> int:
     private.mkdir(parents=True, exist_ok=False)
     public.mkdir(parents=True, exist_ok=False)
     identity = public.stat()
-    owned.append((public, identity.st_dev, identity.st_ino, len(plan["scenarios"]) * plan["repetitions"] * 2))
+    owned.append([public, identity.st_dev, identity.st_ino, len(plan["scenarios"]) * plan["repetitions"] * 2, None])
+    trial_stream = TrialStream(public / "trials.jsonl")
+    owned[0][4] = trial_stream
     schedule = [
         (case, arm, repeat)
         for repeat, arms in enumerate(plan["arm_order_by_repetition"], 1)
@@ -597,6 +699,14 @@ def _run_experiment(args, owned: list) -> int:
         "started_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "interpreter": plan["interpreter"], "system": platform.system(), "machine": platform.machine(),
         "native_flags": list(kicad.FLAGS), "policy": h.POLICY,
+        "assessor": {
+            "path": "tools/tests/test_engineering_harness_experiment.py",
+            "source_revision": args.candidate, "corrections": ["EH-001", "EH-002"],
+            "trial_stream": "append-only completed/skipped rows with observed retention",
+            "timeout_coverage": "started child, observed timeout, reaped exit and verified cleanup receipt",
+            "reproducibility_added_fields": ["transport_facts"],
+            "private_process_receipt_hash_in_projection": False,
+        },
     }
     (public / "frozen-inputs.json").write_bytes(h.json_bytes(frozen))
     trials, stop_reason = [], None
@@ -610,11 +720,13 @@ def _run_experiment(args, owned: list) -> int:
     for case, arm, repeat in schedule:
         workspace = private / f"{case['id']}-{repeat}-{arm}"
         if stop_reason:
-            trials.append({
+            skipped = {
                 "case": case["id"], "row": case["row"], "arm": arm, "repetition": repeat,
                 "kind": case["kind"], "positive": case["positive"], "attempted": False,
                 "exercised": False, "correct": False, "stop_reason": stop_reason,
-            })
+            }
+            trial_stream.append(skipped)
+            trials.append(skipped)
             continue
         setup_start = time.monotonic()
         files = private / f"inputs-{case['id']}-{repeat}-{arm}"
@@ -644,16 +756,12 @@ def _run_experiment(args, owned: list) -> int:
                 "kind": case["kind"], "positive": case["positive"], "attempted": True,
                 "exercised": False, "correct": False, "stop_reason": stop_reason,
             }
+        trial_stream.append(trial)
         trials.append(trial)
-        with (public / "trials.jsonl").open("a") as stream:
-            stream.write(json.dumps(trial, sort_keys=True, allow_nan=False) + "\n")
         if not trial.get("cleanup_verified", True):
             stop_reason = "OWNED_PROCESS_OR_CLEANUP_UNVERIFIED"
         if not trial["exercised"]:
             stop_reason = stop_reason or "MANDATORY_CASE_NOT_EXERCISED"
-    (public / "trials.jsonl").write_text("".join(
-        json.dumps(trial, sort_keys=True, allow_nan=False) + "\n" for trial in trials
-    ))
     result = summarize(trials, plan)
     result["ended_at"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
     result["stop_reason"] = stop_reason
@@ -663,14 +771,261 @@ def _run_experiment(args, owned: list) -> int:
 
 
 class ExperimentTests(unittest.TestCase):
+    @contextlib.contextmanager
+    def controlled_campaign(self):
+        """Run the real orchestration/finalization with native work replaced."""
+        from test_engineering_harness import HarnessTests
+        context = HarnessTests()
+        context.setUp()
+        try:
+            root = context.root
+            plan = h.read_json(Path(__file__).parents[2] / PLAN_PATH)
+            plan["tool"] = asdict(TOOL)
+            plan["config_revision"] = context.revision
+            plan["interpreter"] = {
+                "implementation": platform.python_implementation(),
+                "version": platform.python_version(),
+            }
+            path = root / PLAN_PATH
+            path.parent.mkdir(parents=True)
+            path.write_bytes(h.json_bytes(plan))
+            adapter = Mock()
+            adapter.preflight.return_value = {"source": "SYNTHETIC_UNIT_FIXTURE"}
+            args = [
+                "--run", "--candidate", context.revision, "--task-id", "unit-task",
+                "--run-id", "unit-run", "--private-root", ".agent-work/unit-task/campaign",
+                "--public-dir", "docs/engineering-harness-mvp-2026-09-14/experiment",
+                "--kicad-cli", "/nonexistent/kicad-cli",
+            ]
+
+            def completed(case, arm, repetition, *unused):
+                return {
+                    "case": case["id"], "row": case["row"], "arm": arm,
+                    "repetition": repetition, "kind": "SYNTHETIC_UNIT_FIXTURE",
+                    "positive": case["positive"], "attempted": True,
+                    "exercised": True, "correct": True, "cleanup_verified": True,
+                }, None
+
+            with (
+                patch.object(Path, "cwd", return_value=root),
+                patch.object(agent_workflow, "status", return_value=[{
+                    "run_id": "unit-run", "task_id": "unit-task", "state": "RUNNING",
+                    "source_revision": context.revision, "config_revision": context.revision,
+                    "worktree": str(root),
+                }]),
+                patch.object(h, "bind_inputs", return_value=context.binding),
+                patch.object(kicad, "KiCad", return_value=adapter),
+                patch(__name__ + ".source_names", return_value=context.names),
+                patch(__name__ + ".run_trial", side_effect=completed),
+            ):
+                yield root / "docs/engineering-harness-mvp-2026-09-14/experiment", args, plan
+        finally:
+            context.doCleanups()
+
+    def test_finalization_interruption_retains_actual_accumulated_stream(self):
+        original_open = Path.open
+        with self.controlled_campaign() as (public, args, plan):
+            stream_path = public / "trials.jsonl"
+            truncating_attempts = []
+
+            def interrupt_truncating_write(path, mode="r", *values, **options):
+                if path == stream_path and "w" in mode:
+                    with original_open(path, mode, *values, **options):
+                        pass
+                    truncating_attempts.append(True)
+                    raise KeyboardInterrupt
+                return original_open(path, mode, *values, **options)
+
+            with (
+                patch.object(Path, "open", interrupt_truncating_write),
+                patch(__name__ + ".summarize", side_effect=KeyboardInterrupt),
+                contextlib.redirect_stdout(io.StringIO()),
+                contextlib.redirect_stderr(io.StringIO()),
+            ):
+                self.assertEqual(main(args), 130)
+            rows = [json.loads(line) for line in stream_path.read_text().splitlines()]
+            self.assertEqual(len(rows), len(plan["scenarios"]) * plan["repetitions"] * 2)
+            self.assertEqual(truncating_attempts, [])
+            receipt = h.read_json(public / "interruption.json")
+            self.assertTrue(receipt["partial_trial_stream_retained"])
+            self.assertEqual(receipt["trial_stream"]["complete_records"], len(rows))
+            self.assertEqual(receipt["trial_stream"]["sha256"], h.digest_file(stream_path))
+
+    def test_interrupted_append_preserves_acknowledged_prefix_and_reports_partial_tail(self):
+        original_open = Path.open
+        with self.controlled_campaign() as (public, args, _):
+            stream_path = public / "trials.jsonl"
+            appends, prefix = [], []
+
+            @contextlib.contextmanager
+            def partial_write(path, mode, *values, **options):
+                with original_open(path, mode, *values, **options) as stream:
+                    class InterruptedAppend:
+                        def fileno(self):
+                            return stream.fileno()
+
+                        def write(self, data):
+                            stream.write(data[:9])
+                            stream.flush()
+                            raise KeyboardInterrupt
+                    yield InterruptedAppend()
+
+            def interrupt_sixth_append(path, mode="r", *values, **options):
+                if path == stream_path and mode == "ab":
+                    appends.append(True)
+                    if len(appends) == 6:
+                        prefix.append(path.read_bytes())
+                        return partial_write(path, mode, *values, **options)
+                return original_open(path, mode, *values, **options)
+
+            with (
+                patch.object(Path, "open", interrupt_sixth_append),
+                contextlib.redirect_stdout(io.StringIO()),
+                contextlib.redirect_stderr(io.StringIO()),
+            ):
+                self.assertEqual(main(args), 130)
+            current = stream_path.read_bytes()
+            self.assertTrue(current.startswith(prefix[0]))
+            self.assertEqual(len(appends), 6)
+            receipt = h.read_json(public / "interruption.json")
+            self.assertTrue(receipt["partial_trial_stream_retained"])
+            self.assertEqual(receipt["trial_stream"]["acknowledged_records"], 5)
+            self.assertEqual(receipt["trial_stream"]["complete_records"], 5)
+            self.assertEqual(receipt["trial_stream"]["partial_tail_bytes"], 9)
+            self.assertEqual(receipt["trial_stream"]["sha256"], kicad.bytes_hash(current))
+
+    def test_cancellation_does_not_claim_retention_when_stream_is_missing(self):
+        with self.controlled_campaign() as (public, args, _):
+            def missing_stream(*unused):
+                (public / "trials.jsonl").unlink()
+                raise KeyboardInterrupt
+
+            with (
+                patch(__name__ + ".summarize", side_effect=missing_stream),
+                contextlib.redirect_stdout(io.StringIO()),
+                contextlib.redirect_stderr(io.StringIO()),
+            ):
+                self.assertEqual(main(args), 130)
+            receipt = h.read_json(public / "interruption.json")
+            self.assertFalse(receipt["partial_trial_stream_retained"])
+            self.assertEqual(receipt["trial_stream"]["status"], "UNREADABLE")
+            self.assertEqual(receipt["trial_stream"]["acknowledged_records"], 120)
+
+    def test_unexercised_skipped_rows_are_appended_without_rewriting_completed_records(self):
+        with self.controlled_campaign() as (public, args, plan):
+            with (
+                patch.object(kicad, "KiCad", side_effect=FileNotFoundError("unit fixture")),
+                contextlib.redirect_stdout(io.StringIO()),
+            ):
+                self.assertEqual(main(args), 2)
+            rows = [json.loads(line) for line in (public / "trials.jsonl").read_text().splitlines()]
+            self.assertEqual(len(rows), len(plan["scenarios"]) * plan["repetitions"] * 2)
+            self.assertTrue(all(not row["attempted"] and not row["exercised"] for row in rows))
+            self.assertEqual(h.read_json(public / "metrics.json")["experiment_status"], "PARTIAL")
+
+    def test_failed_start_is_not_exercised_timeout_in_either_arm(self):
+        from test_engineering_harness import HarnessTests
+        plan = h.read_json(Path(__file__).parents[2] / PLAN_PATH)
+        case = next(case for case in plan["scenarios"] if case["id"] == "timeout")
+        for arm in ("A", "B"):
+            with self.subTest(arm=arm):
+                context = HarnessTests()
+                context.setUp()
+                try:
+                    with patch.object(kicad.subprocess, "Popen", side_effect=OSError(errno.EAGAIN, "fixture")):
+                        trial, _ = run_trial(
+                            case, arm, 1, context.root, context.binding,
+                            context.root / "failed-start", Mock(expected=TOOL),
+                            plan, "unit-task", "unit-run",
+                        )
+                    self.assertEqual(trial["gate_decision"], "BLOCKED")
+                    self.assertFalse(trial["exercised"])
+                    self.assertFalse(trial["correct"])
+                    self.assertFalse(trial["transport_facts"]["process_started"])
+                    self.assertFalse(trial["transport_facts"]["timed_out"])
+                    self.assertIn("CHILD_NOT_STARTED", trial["coverage_reasons"])
+                    self.assertIn("TIMEOUT_NOT_OBSERVED", trial["coverage_reasons"])
+                    summary = summarize([trial], plan)
+                    self.assertEqual(summary["experiment_status"], "PARTIAL")
+                    self.assertEqual(summary["arms"][arm]["exercised"], 0)
+                    self.assertEqual(summary["arms"][arm]["unexercised"], 60)
+                finally:
+                    context.doCleanups()
+
+    def test_timeout_transport_facts_participate_in_reproducibility(self):
+        from test_engineering_harness import HarnessTests
+        context = HarnessTests()
+        context.setUp()
+        self.addCleanup(context.doCleanups)
+        plan = h.read_json(Path(__file__).parents[2] / PLAN_PATH)
+        case = next(case for case in plan["scenarios"] if case["id"] == "timeout")
+        trial, _ = run_trial(
+            case, "A", 1, context.root, context.binding, context.root / "real-timeout",
+            Mock(expected=TOOL), plan, "unit-task", "unit-run",
+        )
+        self.assertTrue(trial["exercised"])
+        self.assertTrue(trial["transport_facts"]["process_started"])
+        self.assertTrue(trial["transport_facts"]["timed_out"])
+        self.assertTrue(trial["transport_facts"]["cleanup_verified"])
+        plan["scenarios"] = [case]
+        repeated = [
+            json.loads(json.dumps(trial | {"arm": arm, "repetition": repetition}))
+            for arm in ("A", "B") for repetition in range(1, plan["repetitions"] + 1)
+        ]
+        self.assertEqual(summarize(repeated, plan)["experiment_status"], "COMPLETE")
+        for field, different in (("timed_out", False), ("error", "DIFFERENT_TRANSPORT_ERROR")):
+            with self.subTest(field=field):
+                changed = json.loads(json.dumps(repeated))
+                changed[0]["transport_facts"][field] = different
+                summary = summarize(changed, plan)
+                self.assertEqual(summary["arms"]["A"]["reproducible_scenarios"]["numerator"], 0)
+                self.assertEqual(summary["experiment_status"], "PARTIAL")
+
+    def test_timeout_credit_requires_started_timed_out_and_verified_cleanup_receipt(self):
+        from test_engineering_harness import HarnessTests
+        plan = h.read_json(Path(__file__).parents[2] / PLAN_PATH)
+        case = next(case for case in plan["scenarios"] if case["id"] == "timeout")
+        for field, missing in (("pid", None), ("timed_out", False),
+                               ("cleanup_verified", False), ("exit_code", None)):
+            for arm in ("A", "B"):
+                with self.subTest(field=field, arm=arm):
+                    context = HarnessTests()
+                    context.setUp()
+                    try:
+                        def incomplete_receipt(command, cwd, env, receipts, timeout):
+                            actual = {
+                                "pid": 123, "exit_code": -15, "timed_out": True,
+                                "cleanup_verified": True, "remaining_owned_pids": [],
+                                "interrupted": False, "receipt_written": True,
+                                "error": "TIMEOUT", "elapsed_seconds": 0.0,
+                                "stdout_sha256": kicad.bytes_hash(b""),
+                                "stderr_sha256": kicad.bytes_hash(b""),
+                            } | {field: missing}
+                            for name in ("stdout.txt", "stderr.txt"):
+                                (receipts / name).write_bytes(b"")
+                            (receipts / "process.json").write_bytes(h.json_bytes(actual))
+                            return actual
+
+                        with patch.object(kicad, "run_process", side_effect=incomplete_receipt):
+                            trial, _ = run_trial(
+                                case, arm, 1, context.root, context.binding, context.root / "receipt-fixture",
+                                Mock(expected=TOOL), plan, "unit-task", "unit-run",
+                            )
+                        self.assertFalse(trial["exercised"])
+                        self.assertFalse(trial["correct"])
+                        self.assertTrue(trial["coverage_reasons"])
+                    finally:
+                        context.doCleanups()
+
     def test_cancellation_stops_campaign_and_keeps_partial_stream(self):
         with tempfile.TemporaryDirectory() as directory:
             public = Path(directory)
 
             def interrupt(args, owned):
                 stat = public.stat()
-                owned.append((public, stat.st_dev, stat.st_ino, 120))
-                (public / "trials.jsonl").write_text('{"completed":"fixture"}\n')
+                trial_stream = TrialStream(public / "trials.jsonl")
+                trial_stream.append({"completed": "fixture"})
+                owned.append((public, stat.st_dev, stat.st_ino, 120, trial_stream))
                 raise kicad.ProcessInterrupted({"cleanup_verified": True})
 
             args = ["--run", "--candidate", "a" * 40, "--task-id", "unit", "--run-id", "unit",
@@ -682,7 +1037,7 @@ class ExperimentTests(unittest.TestCase):
             result = h.read_json(public / "interruption.json")
             self.assertEqual(result["experiment_status"], "PARTIAL")
             self.assertTrue(result["remaining_trials_not_dispatched"])
-            self.assertEqual((public / "trials.jsonl").read_text(), '{"completed":"fixture"}\n')
+            self.assertEqual(json.loads((public / "trials.jsonl").read_text()), {"completed": "fixture"})
 
     def test_all_rows_both_arms_and_positive_variants_are_frozen(self):
         plan = h.read_json(Path(__file__).parents[2] / PLAN_PATH)
