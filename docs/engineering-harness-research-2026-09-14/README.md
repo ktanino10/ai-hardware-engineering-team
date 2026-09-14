@@ -48,9 +48,9 @@ Recommended MVP: **Incremental Harness Core + one KiCad CLI adapter**.
 | 25 | Proposed Folder Structure | `architecture-proposal.md` Proposed folder structure |
 | 26 | MVP | `architecture-proposal.md` MVP recommendation |
 | 27 | Harness vs No-Harness Experiment | `experiment-contract.md` |
-| 28 | Implementation Roadmap | this README, [`Implementation roadmap（later task only）`](#implementation-roadmaplater-task-only) |
+| 28 | Implementation Roadmap | this README, [`Implementation roadmap (later task only)`](#implementation-roadmap-later-task-only) |
 
-## Implementation roadmap（later task only）
+## Implementation roadmap (later task only)
 
 1. Human Chief Engineer reviews this proposal and chooses MVP/adapter scope.
 2. Create a new bounded implementation task with explicit write scope for `tools/` and tests.

@@ -10,13 +10,13 @@ Bounded-work reservation: `tools/agent_workflow.py start` succeeded; run_id `542
 
 ## Ordering record
 
-この文書は、外部 reference URL を開く前に作成した Primary Repository grounded checkpoint である。ここまでに読んだ primary inputs は `AGENTS.md`, `.github/copilot-instructions.md`, `docs/work-execution.md`, `docs/workflow.md`, `docs/architecture.md`, `docs/assembly-evidence.md`, `docs/simulation.md`, `tools/agent_workflow.py`, `tools/check_assembly_evidence.py`, `tools/check_open_issues.py`, `tools/check_id_uniqueness.py`, `tools/check_mechanical_pcb_sync.py`, 関連 workflow YAML, CODEOWNERS, PR #76/#77 の public metadata/file scope である。`.github/agents/` 本文はこの session の上位境界により直接読まない。role roster と boundaries は `docs/architecture.md` と `.github/copilot-instructions.md` に記録された public summary に基づく。
+この文書は、外部 reference URL を開く前に作成した Primary Repository grounded checkpoint である。Line ranges in this checkpoint are verification aids for the frozen source snapshot; durable anchors are the named files and section topics (roles, evidence IDs, Design Complete gate, HITL, work-execution protocol) rather than mutable line numbers. ここまでに読んだ primary inputs は `AGENTS.md`, `.github/copilot-instructions.md`, `docs/work-execution.md`, `docs/workflow.md`, `docs/architecture.md`, `docs/assembly-evidence.md`, `docs/simulation.md`, `tools/agent_workflow.py`, `tools/check_assembly_evidence.py`, `tools/check_open_issues.py`, `tools/check_id_uniqueness.py`, `tools/check_mechanical_pcb_sync.py`, 関連 workflow YAML, CODEOWNERS, PR #76/#77 の public metadata/file scope である。`.github/agents/` 本文はこの session の上位境界により直接読まない。role roster と boundaries は `docs/architecture.md` と `.github/copilot-instructions.md` に記録された public summary に基づく。
 
 ## Current architecture（現状）
 
-- Repository mission は「単一 AI が plausibly-looking circuit を書く」ことの置換であり、primary-source evidence、narrow role ownership、independent review、human authority を要求する（`docs/architecture.md:10-22`）。
-- Workflow は Requirements → Component → Datasheet → Circuit → Independent Review → Validation → Design Complete Gate を中心に、Mechanical WIP/Review、Firmware Bring-up、Power Architecture、Simulation lane を分岐させる（`docs/workflow.md:25-73`）。
-- 実装済み roles は 14 個で、Hardware Lead が orchestration/gates、domain agents が artifacts、reviewers が independent verdicts を持つ（`docs/architecture.md:78-95`）。
+- Repository mission は「単一 AI が plausibly-looking circuit を書く」ことの置換であり、primary-source evidence、narrow role ownership、independent review、human authority を要求する（`docs/architecture.md` source-of-truth overview; snapshot lines `docs/architecture.md:10-22`）。
+- Workflow は Requirements → Component → Datasheet → Circuit → Independent Review → Validation → Design Complete Gate を中心に、Mechanical WIP/Review、Firmware Bring-up、Power Architecture、Simulation lane を分岐させる（`docs/workflow.md` phase overview; snapshot lines `docs/workflow.md:25-73`）。
+- 実装済み roles は 14 個で、Hardware Lead が orchestration/gates、domain agents が artifacts、reviewers が independent verdicts を持つ（`docs/architecture.md` §3 role roster; snapshot lines `docs/architecture.md:78-95`）。
 - Durable Source of Truth は repository files (`requirements/`, `bom/`, `hardware/`, `validation/`, `simulation/`, `docs/`) であり、chat message ではない（`docs/workflow.md:459-466`）。
 - Repository-local execution state は `tools/agent_workflow.py` が Git common dir の SQLite に保存する。これは live telemetry でも approval でもない（`docs/workflow.md:467-472`, `docs/work-execution.md:155-176`）。
 - Session-local `todos` は planning であり、cross-session execution authority ではない（`docs/workflow.md:473-485`）。
