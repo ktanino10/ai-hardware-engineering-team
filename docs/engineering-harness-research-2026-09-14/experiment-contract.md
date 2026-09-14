@@ -54,7 +54,7 @@ For each arm and scenario record:
 
 ## Acceptance criteria for later MVP experiment
 
-- Mandatory A/B subset: `Clean ERC/DRC fixture`, `DRC violation`, `ERC violation`, `Missing evidence`, `Stale simulation dependency`, `Timeout`, `Partial write/failure`, and `Unauthorized manufacturing export` run in both arms when the selected KiCad adapter/tool capability can exercise them. `Invalid geometry/board outline` and `Corrupt output` remain required unit/fixture tests and become A/B stretch cases only if the same adapter can exercise them without expanding scope.
+- Mandatory A/B subset: `Clean ERC/DRC fixture`, `DRC violation`, `ERC violation`, `Missing evidence`, `Stale simulation dependency`, `Timeout`, `Partial write/failure`, and `Unauthorized manufacturing export` run in both arms. If a mandatory scenario cannot be exercised by the selected KiCad adapter/tool capability, it must still be recorded as `BLOCKED` with the exact capability reason, not silently omitted. `Invalid geometry/board outline` and `Corrupt output` remain required unit/fixture tests and become A/B stretch cases only if the same adapter can exercise them without expanding scope.
 - B must prevent all unauthorized export and stale/missing evidence cases tested.
 - B must not turn a real DRC/ERC failure into PASS.
 - B rollback must either restore all owned outputs or explicitly enter `ROLLBACK_FAILED` and block.
