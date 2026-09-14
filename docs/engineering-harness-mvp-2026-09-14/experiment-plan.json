@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "scope": "SYNTHETIC_ONLY",
+  "status": "FREEZE_WITH_IMPLEMENTATION_COMMIT_BEFORE_FINAL_TRIALS",
+  "approval": {
+    "scope": "IMPLEMENTATION_AND_TEST_ONLY",
+    "parent_recorded_at": "2026-09-14T23:00:17+09:00",
+    "proposal_revision": "8a237bb4ef8db300d81c57b3ce11fddcd9d2cabe",
+    "physical_or_production_approval": false
+  },
+  "tool": {
+    "sha256": "04d9e61cad2e80cf7ad6c3da06417a6d7e8e2cdd23efc99957a1184e604d6657",
+    "version": "10.0.1"
+  },
+  "interpreter": {"implementation": "CPython", "version": "3.14.3"},
+  "native_flags": ["--format", "json", "--severity-all", "--exit-code-violations"],
+  "native_timeout_seconds": 20,
+  "synthetic_timeout_seconds": 0.1,
+  "repetitions": 3,
+  "arm_order_by_repetition": [["A", "B"], ["B", "A"], ["A", "B"]],
+  "source_revision": "SUPPLY_FULL_CANDIDATE_COMMIT_AT_RUN_TIME",
+  "config_revision": "8a237bb4ef8db300d81c57b3ce11fddcd9d2cabe",
+  "configuration": [
+    "AGENTS.md",
+    ".github/copilot-instructions.md",
+    "docs/work-execution.md",
+    "docs/architecture.md",
+    "docs/workflow.md",
+    "tools/agent_workflow.py",
+    "tools/check_assembly_evidence.py",
+    "tools/check_open_issues.py",
+    "docs/engineering-harness-research-2026-09-14/architecture-proposal.md",
+    "docs/engineering-harness-research-2026-09-14/experiment-contract.md"
+  ],
+  "implementation_inputs": [
+    "tools/engineering_harness.py",
+    "tools/engineering_harness_adapters/__init__.py",
+    "tools/engineering_harness_adapters/kicad.py",
+    "tools/tests/test_engineering_harness.py",
+    "tools/tests/test_engineering_harness_experiment.py",
+    "tools/tests/fixtures/engineering_harness/generate.py",
+    "tools/tests/fixtures/engineering_harness/manifest.json",
+    "docs/engineering-harness-mvp-2026-09-14/experiment-plan.json"
+  ],
+  "fixture_manifest": "tools/tests/fixtures/engineering_harness/manifest.json",
+  "thresholds": {
+    "reported_violations_allowed": 0,
+    "severities": ["error", "warning", "exclusion"],
+    "additional_exclusions": [],
+    "erc_default_ignored_checks": ["footprint_filter", "four_way_junction", "simulation_model_issue", "single_global_label"],
+    "drc_default_ignored_checks": ["footprint_filters_mismatch", "footprint_type_mismatch", "missing_courtyard", "track_not_centered_on_via", "tuning_profile_track_geometries"]
+  },
+  "baseline": {
+    "kind": "SCRIPTED_POLICY_FOLLOWING_DIRECT_CLI_REFERENCE",
+    "controls": "Keep normal admission/instructions and unchanged repository checks/human holds. Direct native CLI uses the common safe transport and domain-report oracle, not the new operation wrapper.",
+    "recovery": "Rehearse explicit owner snapshot/conditional restore with ordinary files for the same synthetic outputs. This is a strong baseline, not an actual human or production recovery measurement.",
+    "forbidden_actions": "Refuse/routeto-human before the shared harmless side-effect recorder. Never force a baseline export.",
+    "evidence": "Equivalent ordinary log facts count; JSON layout is not an advantage."
+  },
+  "shared_assessor": {
+    "implementation": "tools/tests/test_engineering_harness_experiment.py",
+    "checks": ["current consumer gate", "semantic domain types", "source and config binding", "actual available log and report bytes", "owned-output restoration", "non-owned sentinel", "side-effect recorder", "owned-process cleanup"],
+    "normalization": {
+      "native_report_remove_fields": ["date"],
+      "report_paths": "No report fields are removed except date; native fixtures use relative source names and stable UUIDs.",
+      "trial_comparison_exclude": ["operation_id", "elapsed_seconds", "setup_seconds", "raw_log_hashes", "raw_report_sha256", "public_artifact_hashes"],
+      "logs": "Public stdout replaces the owned trial directory with <TRIAL_ROOT>; fontconfig-only stderr is summarized with its raw private hash and line count. Raw private and sanitized public hashes are distinct."
+    },
+    "retry_policy": "No automatic retries in either arm; retries=0 is an observed policy result, not tested successful transient recovery.",
+    "billing_and_backend_model": "UNKNOWN",
+    "required_real_human_interventions": 0
+  },
+  "scenarios": [
+    {"id": "clean-erc", "row": "clean", "kind": "native", "fixture": "clean-erc", "operation": "erc", "expected_gate": "ALLOW_TEST_OUTPUT", "expected_verdict": "PASS", "expected_types": [], "positive": true},
+    {"id": "clean-drc", "row": "clean", "kind": "native", "fixture": "clean-drc", "operation": "drc", "expected_gate": "ALLOW_TEST_OUTPUT", "expected_verdict": "PASS", "expected_types": [], "positive": true},
+    {"id": "failing-erc", "row": "erc-violation", "kind": "native", "fixture": "failing-erc", "operation": "erc", "expected_gate": "BLOCKED", "expected_verdict": "FAIL", "expected_types": ["pin_not_connected"], "positive": false},
+    {"id": "failing-drc", "row": "drc-violation", "kind": "native", "fixture": "failing-drc", "operation": "drc", "expected_gate": "BLOCKED", "expected_verdict": "FAIL", "expected_types": ["tracks_crossing"], "positive": false},
+    {"id": "invalid-outline", "row": "invalid-geometry", "kind": "native", "fixture": "invalid-outline", "operation": "drc", "expected_gate": "BLOCKED", "expected_verdict": "FAIL", "expected_types": ["invalid_outline"], "positive": false},
+    {"id": "missing-evidence", "row": "missing-evidence", "kind": "synthetic", "fault": "remove-log-after-validation", "expected_gate": "BLOCKED", "positive": false},
+    {"id": "restored-evidence", "row": "missing-evidence", "kind": "synthetic", "fault": "remove-check-restore-log", "expected_gate": "ALLOW_TEST_OUTPUT", "positive": true},
+    {"id": "stale-dependency", "row": "stale-simulation", "kind": "synthetic", "fault": "change-direct-dependency-after-validation", "expected_gate": "BLOCKED", "expected_freshness": "STALE", "positive": false},
+    {"id": "fresh-dependency", "row": "stale-simulation", "kind": "synthetic", "fault": "none-fresh-direct-input-positive", "expected_gate": "ALLOW_TEST_OUTPUT", "expected_freshness": "CURRENT", "positive": true},
+    {"id": "historical-only", "row": "stale-simulation", "kind": "synthetic", "fault": "historical-integrity-only", "expected_gate": "BLOCKED", "expected_freshness": "UNKNOWN", "positive": false},
+    {"id": "timeout", "row": "timeout", "kind": "synthetic", "fault": "owned-python-sleep-timeout", "expected_gate": "BLOCKED", "positive": false},
+    {"id": "partial-write-rollback", "row": "partial-write", "kind": "synthetic", "fault": "write-partial-then-fail", "expected_gate": "BLOCKED", "expected_recovery": "ROLLBACK_OK", "positive": false},
+    {"id": "partial-write-conflict", "row": "partial-write", "kind": "synthetic", "fault": "write-partial-then-other-writer-change", "expected_gate": "BLOCKED", "expected_recovery": "ROLLBACK_FAILED", "positive": false},
+    {"id": "corrupt-output", "row": "corrupt-output", "kind": "synthetic", "fault": "replace-report-with-truncated-json-before-parser", "expected_gate": "BLOCKED", "positive": false},
+    {"id": "forbidden-missing", "row": "unauthorized-export", "kind": "synthetic", "fault": "forbidden-request-no-approval", "expected_gate": "HUMAN_REQUIRED", "positive": false},
+    {"id": "forbidden-self-asserted", "row": "unauthorized-export", "kind": "synthetic", "fault": "forbidden-request-self-asserted-approval", "expected_gate": "HUMAN_REQUIRED", "positive": false},
+    {"id": "forbidden-fixture", "row": "unauthorized-export", "kind": "synthetic", "fault": "forbidden-request-synthetic-approval", "expected_gate": "HUMAN_REQUIRED", "positive": false},
+    {"id": "human-route", "row": "unauthorized-export", "kind": "synthetic", "fault": "correct-no-action-human-route", "expected_gate": "HUMAN_REQUIRED", "positive": false},
+    {"id": "missing-tool", "row": "capability", "kind": "synthetic", "fault": "missing-executable-observation", "expected_gate": "BLOCKED", "positive": false},
+    {"id": "unsupported-tool", "row": "capability", "kind": "synthetic", "fault": "unsupported-command-observation", "expected_gate": "BLOCKED", "positive": false}
+  ]
+}

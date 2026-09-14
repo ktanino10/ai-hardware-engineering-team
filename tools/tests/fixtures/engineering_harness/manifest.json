@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "scope": "SYNTHETIC_ONLY",
+  "files": {
+    "Harness.kicad_sym": "1775c1d35fa184a1c3c1b5a43ad2a8556b93546c92064100b9e7f3949da73206",
+    "approval.json": "82b561a3dbdb71fcc2ba8762faecd8f77263374b556929d9922affb58824793d",
+    "clean.kicad_pcb": "b5c1dfa0c48e8493594df8eefaf59633e6bda692fe76f32c40c5daf4ae0f1cdc",
+    "clean.kicad_pro": "3351a75042cfef50c94251d2c3c382f2ffa70f69455f2c020e730db9e99580ba",
+    "clean.kicad_sch": "3e1dec957f921497c82111820e20e202e2ad86e27f060caafef0eb500ec922fe",
+    "dependency.json": "59a985784d5ca831fe1e82c33b5c9581d2b7b632afa6ab0b7632efdd92de66b1",
+    "drc_violation.kicad_pcb": "2a86310287ca64e67592166993511a7dbb8944ed593afd3095897d136bc0902f",
+    "drc_violation.kicad_pro": "d8fa1ac3f8232caf0985ede672e7f92d2e7454fe3a0d8b0d15691a74685a9f73",
+    "erc_violation.kicad_pro": "c1b6d2f30bcf6263e27277f661aeb29e1144dbb0b411a172fe58cb5b41d5c0ca",
+    "erc_violation.kicad_sch": "b82d3030f9c28215885b79148475265ea8b5b10ab82eb87bb2d5ae23632f9129",
+    "invalid_outline.kicad_pcb": "a0b686350f5792b81dc324a3152b06ba1ffbc1605da829cfa0aab7b854f0358f",
+    "invalid_outline.kicad_pro": "d2ab1a141b61ed5073394c6868dab10816644c27987d3a3e2985091532e03df2",
+    "sym-lib-table": "7e4506964d074080cf0e6dc4e26c83f317f495e916db923961003f554fb52fe1"
+  },
+  "domain_inputs": {
+    "clean-erc": [
+      "clean.kicad_sch",
+      "clean.kicad_pro",
+      "sym-lib-table",
+      "Harness.kicad_sym"
+    ],
+    "failing-erc": [
+      "erc_violation.kicad_sch",
+      "erc_violation.kicad_pro",
+      "sym-lib-table",
+      "Harness.kicad_sym"
+    ],
+    "clean-drc": [
+      "clean.kicad_pcb",
+      "clean.kicad_pro"
+    ],
+    "failing-drc": [
+      "drc_violation.kicad_pcb",
+      "drc_violation.kicad_pro"
+    ],
+    "invalid-outline": [
+      "invalid_outline.kicad_pcb",
+      "invalid_outline.kicad_pro"
+    ]
+  },
+  "rule_policy": {
+    "reported_violations_allowed": 0,
+    "severity": "all",
+    "exclusions": []
+  },
+  "expected_domain_failure": {
+    "failing-erc": "pin_not_connected",
+    "failing-drc": "tracks_crossing",
+    "invalid-outline": "invalid_outline"
+  },
+  "nonempty": {
+    "erc": "Two custom passive test terminals, connected or disconnected",
+    "drc": "Closed outline, four embedded test pads and two copper tracks on distinct nets, parallel or crossing"
+  },
+  "external_symbol_or_footprint_libraries": [],
+  "limitations": "No production components, parity, hardware feasibility, manufacturing or Rev5 blocker acceptance."
+}

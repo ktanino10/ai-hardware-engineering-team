@@ -1,0 +1,479 @@
+{
+  "all_owned_runtime_directories_absent": true,
+  "candidate": "ca0f276ffd51781e7e88cc44274787fbdd4237e7",
+  "forbidden_recorder_files_present": 0,
+  "known_owned_timeouts": 6,
+  "limits": "Scoped observed process groups only, not global jobs-zero or an OS sandbox. A restoration is an explicit scripted owner-procedure rehearsal; B uses its wrapper. Both restore only test-owned outputs, not production data.",
+  "native_binary_sha256_after_campaign": "04d9e61cad2e80cf7ad6c3da06417a6d7e8e2cdd23efc99957a1184e604d6657",
+  "native_case_counts_both_arms": {
+    "clean-drc": 6,
+    "clean-erc": 6,
+    "failing-drc": 6,
+    "failing-erc": 6,
+    "invalid-outline": 6
+  },
+  "process_receipt_count": 39,
+  "processes": [
+    {
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "567d635382cfd67f96fb8452a6d3791b58925a500ceafc865e35a47136bf81b8",
+      "receipt_label": "clean-drc-1-A/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "1df392bc22d1c82c627a520e2caa93ac51753c674bd87b34ca33b35fb5f9eeb1",
+      "receipt_label": "clean-drc-1-B/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "8e5630b8fee6e2a3edb466329f2246436d8f54f7b5c1808968903d4b72aee52a",
+      "receipt_label": "clean-drc-2-A/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "f66cd5feabc0fc50c6832ff0302db87845eabd92d0019df9c9693bb63c60072a",
+      "receipt_label": "clean-drc-2-B/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "642663ed24293c6bba297ccd7f6ae01d039836118aa2a105b0c4bb54f008fa33",
+      "receipt_label": "clean-drc-3-A/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "a4d69051f08cf21af704cb81048eea26b9bc52663e36d6cf4694ed3b8a45db5e",
+      "receipt_label": "clean-drc-3-B/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "676cac06e611c213bb14718e4815a9ec90625bd9e5c773ca29d376614173dc4c",
+      "receipt_label": "clean-erc-1-A/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "72a255f7c2169707ddecc95a218a1c65f12537970f511ddc6d036fcefd5a2ae6",
+      "receipt_label": "clean-erc-1-B/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "9e0e0197ab432a020484abebed7c1d4fc998f521afae1efe650a48f7e473ed9d",
+      "receipt_label": "clean-erc-2-A/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "eee39d73e473a5cb227bd73fc752e1e82a7a1d6abc0f2f9dd87da89d38506148",
+      "receipt_label": "clean-erc-2-B/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "d0979476112c376b9c481b309567afd8fd40fb06982fc4586dd7e200caea7d46",
+      "receipt_label": "clean-erc-3-A/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "6e1aff601cab43d477bcecbf9975914c3a8120df0a7ac75e6a588b90f4e8d5f0",
+      "receipt_label": "clean-erc-3-B/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 5,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "2f8f5b1f8b89f0a77161cff622e01b7c74d84d1e4667fa3a8aa44d15d250f7c6",
+      "receipt_label": "failing-drc-1-A/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 5,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "331308effbb636ad115080f9a08090a75b22517cae16ff51d725faa097c8fc5b",
+      "receipt_label": "failing-drc-1-B/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 5,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "8f886938b51c94a4e86fcd1cfbc8b8eeb8c6815b66cfe45bc0f1b0d270a73658",
+      "receipt_label": "failing-drc-2-A/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 5,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "ff7e3756db87e4af3e9b6b316d0f3f7f851fedb524a6a8d0a7cb24be654bc792",
+      "receipt_label": "failing-drc-2-B/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 5,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "8d97212db078ca5c90c1de4786d8054398442ce9e395353ea22c6c881eff3d51",
+      "receipt_label": "failing-drc-3-A/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 5,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "7f0b56bb583d4c7ef99af8fbddcf280097f8f158a0780fa3facecbc014c637a1",
+      "receipt_label": "failing-drc-3-B/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 5,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "3102978d507d30fa8ff350cf118970ca851e6ad7885d2dc95ad45139a116a574",
+      "receipt_label": "failing-erc-1-A/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 5,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "ad0617c699a5a12d344f5605feba4df5a53b7257df34ee60d78a44e5792d7226",
+      "receipt_label": "failing-erc-1-B/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 5,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "2e1f7e9ea179a4f67215b8bf282a8f974747ac89414025cd1e0b45d58524cef0",
+      "receipt_label": "failing-erc-2-A/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 5,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "ab8ea200bbdfc362fd76e9bf494d4696b5c856318223e1b3f5e76560507887cf",
+      "receipt_label": "failing-erc-2-B/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 5,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "8460a58db99b88ad33ebfd8696e78130dc393379cffe4be5ef94cc9ef17dc090",
+      "receipt_label": "failing-erc-3-A/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 5,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "45995c8bb1f0353e49db8f4db1a2fbcdf8822bd61e340d42edbbe8ea13d9046f",
+      "receipt_label": "failing-erc-3-B/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 5,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "5de0a82b14983a3d299d363ee28b075b7a22151b4d8e214819d5c20ec8f0d810",
+      "receipt_label": "invalid-outline-1-A/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 5,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "df73196db754592fad94137a3ef87b8a3609696237ffa1670744b0657481be7d",
+      "receipt_label": "invalid-outline-1-B/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 5,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "2eb7f3fd11d99e9b18fd2eea0f8adc704d9d324b306bdaf213112943d7d20e72",
+      "receipt_label": "invalid-outline-2-A/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 5,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "edfc5442743344bafbd04d8c002eeb58a82f9befcffa55adb6f182ebf15ef94f",
+      "receipt_label": "invalid-outline-2-B/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 5,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "c77a7a503e71c2c67afb1847a8a10306aaf94ae02700a31d322a91a7f2361812",
+      "receipt_label": "invalid-outline-3-A/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 5,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "c2e23cd504edc7492d73f6461839d5d8abb8da100b1455ad9f8bc466b30ddabf",
+      "receipt_label": "invalid-outline-3-B/operation/native/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "36dab2d81a7c1fc8836b36d55b43a8292b8bee799a5f9efe860e9060c0a8fa76",
+      "receipt_label": "preflight/drc/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "ca28d6ad62e524aebf4839dc9d9a3ba3622652ab548944b6f17cf4a4b0639723",
+      "receipt_label": "preflight/erc/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": 0,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "c816ccf700ebca783b23d4410c44d127f1425a08bb2ae44e7037f513aabcfbd6",
+      "receipt_label": "preflight/version/process.json",
+      "timed_out": false
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": -15,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "cf0448157fa0ab13e2d2f7bef8b3682e3d0e3f870448b3a5446de1e5eefbf2c7",
+      "receipt_label": "timeout-1-A/timeout-receipts/process.json",
+      "timed_out": true
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": -15,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "ff75eda21c09641381cb4bcca71703656274c8e2f264110ec321d44c1d37de26",
+      "receipt_label": "timeout-1-B/timeout-receipts/process.json",
+      "timed_out": true
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": -15,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "cf582779acb829d95d5e6bdcd115541ea95afb72d9e1d797d41dee64c2b2b34c",
+      "receipt_label": "timeout-2-A/timeout-receipts/process.json",
+      "timed_out": true
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": -15,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "68c87051c681d01ea5c93c37688f468e6a1b680afefda122d6b59d1ca9c26616",
+      "receipt_label": "timeout-2-B/timeout-receipts/process.json",
+      "timed_out": true
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": -15,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "ac13fda31198bb23db44d02f5028e41e0b8cb128b4f2964602e3943e393e6792",
+      "receipt_label": "timeout-3-A/timeout-receipts/process.json",
+      "timed_out": true
+    },
+    {
+      "cleanup_verified": true,
+      "exit_code": -15,
+      "owned_group_remaining_at_observation": 0,
+      "private_receipt_sha256": "aa614109a71ad0ed00ea7795ccbfee353330819847a52ebb7985c21f23bb5872",
+      "receipt_label": "timeout-3-B/timeout-receipts/process.json",
+      "timed_out": true
+    }
+  ],
+  "recovery": [
+    {
+      "after_sha256": "b5c7db5014e5d6b230a3fa7ca536132d58b264cc5f5c6c6183960061cd1cbb3f",
+      "before_sha256": "b5c7db5014e5d6b230a3fa7ca536132d58b264cc5f5c6c6183960061cd1cbb3f",
+      "current_gate": "BLOCKED",
+      "exact_before_bytes_restored": true,
+      "intervening_bytes_preserved": false,
+      "operation_partial_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "operation_still_failed": true,
+      "original_failure_report_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "outcome": "ROLLBACK_OK",
+      "trial": "partial-write-rollback-1-A"
+    },
+    {
+      "after_sha256": "b5c7db5014e5d6b230a3fa7ca536132d58b264cc5f5c6c6183960061cd1cbb3f",
+      "before_sha256": "b5c7db5014e5d6b230a3fa7ca536132d58b264cc5f5c6c6183960061cd1cbb3f",
+      "current_gate": "BLOCKED",
+      "exact_before_bytes_restored": true,
+      "intervening_bytes_preserved": false,
+      "operation_partial_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "operation_still_failed": true,
+      "original_failure_report_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "outcome": "ROLLBACK_OK",
+      "trial": "partial-write-rollback-1-B"
+    },
+    {
+      "after_sha256": "0f9045481d918ce2a624b624df83a90997074e462a5e3d7b56e886fa8ee9abdf",
+      "before_sha256": "b5c7db5014e5d6b230a3fa7ca536132d58b264cc5f5c6c6183960061cd1cbb3f",
+      "current_gate": "BLOCKED",
+      "exact_before_bytes_restored": false,
+      "intervening_bytes_preserved": true,
+      "operation_partial_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "operation_still_failed": true,
+      "original_failure_report_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "outcome": "ROLLBACK_FAILED",
+      "trial": "partial-write-conflict-1-A"
+    },
+    {
+      "after_sha256": "0f9045481d918ce2a624b624df83a90997074e462a5e3d7b56e886fa8ee9abdf",
+      "before_sha256": "b5c7db5014e5d6b230a3fa7ca536132d58b264cc5f5c6c6183960061cd1cbb3f",
+      "current_gate": "BLOCKED",
+      "exact_before_bytes_restored": false,
+      "intervening_bytes_preserved": true,
+      "operation_partial_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "operation_still_failed": true,
+      "original_failure_report_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "outcome": "ROLLBACK_FAILED",
+      "trial": "partial-write-conflict-1-B"
+    },
+    {
+      "after_sha256": "b5c7db5014e5d6b230a3fa7ca536132d58b264cc5f5c6c6183960061cd1cbb3f",
+      "before_sha256": "b5c7db5014e5d6b230a3fa7ca536132d58b264cc5f5c6c6183960061cd1cbb3f",
+      "current_gate": "BLOCKED",
+      "exact_before_bytes_restored": true,
+      "intervening_bytes_preserved": false,
+      "operation_partial_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "operation_still_failed": true,
+      "original_failure_report_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "outcome": "ROLLBACK_OK",
+      "trial": "partial-write-rollback-2-B"
+    },
+    {
+      "after_sha256": "b5c7db5014e5d6b230a3fa7ca536132d58b264cc5f5c6c6183960061cd1cbb3f",
+      "before_sha256": "b5c7db5014e5d6b230a3fa7ca536132d58b264cc5f5c6c6183960061cd1cbb3f",
+      "current_gate": "BLOCKED",
+      "exact_before_bytes_restored": true,
+      "intervening_bytes_preserved": false,
+      "operation_partial_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "operation_still_failed": true,
+      "original_failure_report_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "outcome": "ROLLBACK_OK",
+      "trial": "partial-write-rollback-2-A"
+    },
+    {
+      "after_sha256": "0f9045481d918ce2a624b624df83a90997074e462a5e3d7b56e886fa8ee9abdf",
+      "before_sha256": "b5c7db5014e5d6b230a3fa7ca536132d58b264cc5f5c6c6183960061cd1cbb3f",
+      "current_gate": "BLOCKED",
+      "exact_before_bytes_restored": false,
+      "intervening_bytes_preserved": true,
+      "operation_partial_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "operation_still_failed": true,
+      "original_failure_report_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "outcome": "ROLLBACK_FAILED",
+      "trial": "partial-write-conflict-2-B"
+    },
+    {
+      "after_sha256": "0f9045481d918ce2a624b624df83a90997074e462a5e3d7b56e886fa8ee9abdf",
+      "before_sha256": "b5c7db5014e5d6b230a3fa7ca536132d58b264cc5f5c6c6183960061cd1cbb3f",
+      "current_gate": "BLOCKED",
+      "exact_before_bytes_restored": false,
+      "intervening_bytes_preserved": true,
+      "operation_partial_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "operation_still_failed": true,
+      "original_failure_report_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "outcome": "ROLLBACK_FAILED",
+      "trial": "partial-write-conflict-2-A"
+    },
+    {
+      "after_sha256": "b5c7db5014e5d6b230a3fa7ca536132d58b264cc5f5c6c6183960061cd1cbb3f",
+      "before_sha256": "b5c7db5014e5d6b230a3fa7ca536132d58b264cc5f5c6c6183960061cd1cbb3f",
+      "current_gate": "BLOCKED",
+      "exact_before_bytes_restored": true,
+      "intervening_bytes_preserved": false,
+      "operation_partial_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "operation_still_failed": true,
+      "original_failure_report_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "outcome": "ROLLBACK_OK",
+      "trial": "partial-write-rollback-3-A"
+    },
+    {
+      "after_sha256": "b5c7db5014e5d6b230a3fa7ca536132d58b264cc5f5c6c6183960061cd1cbb3f",
+      "before_sha256": "b5c7db5014e5d6b230a3fa7ca536132d58b264cc5f5c6c6183960061cd1cbb3f",
+      "current_gate": "BLOCKED",
+      "exact_before_bytes_restored": true,
+      "intervening_bytes_preserved": false,
+      "operation_partial_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "operation_still_failed": true,
+      "original_failure_report_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "outcome": "ROLLBACK_OK",
+      "trial": "partial-write-rollback-3-B"
+    },
+    {
+      "after_sha256": "0f9045481d918ce2a624b624df83a90997074e462a5e3d7b56e886fa8ee9abdf",
+      "before_sha256": "b5c7db5014e5d6b230a3fa7ca536132d58b264cc5f5c6c6183960061cd1cbb3f",
+      "current_gate": "BLOCKED",
+      "exact_before_bytes_restored": false,
+      "intervening_bytes_preserved": true,
+      "operation_partial_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "operation_still_failed": true,
+      "original_failure_report_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "outcome": "ROLLBACK_FAILED",
+      "trial": "partial-write-conflict-3-A"
+    },
+    {
+      "after_sha256": "0f9045481d918ce2a624b624df83a90997074e462a5e3d7b56e886fa8ee9abdf",
+      "before_sha256": "b5c7db5014e5d6b230a3fa7ca536132d58b264cc5f5c6c6183960061cd1cbb3f",
+      "current_gate": "BLOCKED",
+      "exact_before_bytes_restored": false,
+      "intervening_bytes_preserved": true,
+      "operation_partial_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "operation_still_failed": true,
+      "original_failure_report_sha256": "07e2570d4af4c51b6a6f9597f8e1b394057f881bdc384aa647163d9d77b229ca",
+      "outcome": "ROLLBACK_FAILED",
+      "trial": "partial-write-conflict-3-B"
+    }
+  ],
+  "scope": "SYNTHETIC_ONLY_OWNED_PROCESS_AND_OUTPUT_WITNESSES",
+  "sentinel_before_after_sha256": "22f65f0bb2a884d048dd08e37ab65e6c18eae4996012a40b54425eb4f28b3f51",
+  "sentinels_checked": 120
+}

@@ -28,7 +28,10 @@
     {"source": "simulation/root/README.md", "en": "simulation/root/README.md", "ja": "docs/root-analysis.ja.md", "kind": "translation"},
     {"source": "visualization/circuit-viewer/README.md", "en": "visualization/circuit-viewer/README.md", "ja": "docs/circuit-viewer.ja.md", "kind": "reading-edition"},
     {"source": "visualization/assembly-viewer/README.md", "en": "visualization/assembly-viewer/README.md", "ja": "docs/assembly-viewer.ja.md", "kind": "reading-edition"},
-    {"source": "visualization/dashboard/README.md", "en": "visualization/dashboard/README.md", "ja": "docs/dashboard.ja.md", "kind": "reading-edition"}
+    {"source": "visualization/dashboard/README.md", "en": "visualization/dashboard/README.md", "ja": "docs/dashboard.ja.md", "kind": "reading-edition"},
+    {"source": "docs/engineering-harness-research-2026-09-14/README.md", "en": "docs/engineering-harness-research-2026-09-14/README.md", "ja": "docs/engineering-harness-research.ja.md", "kind": "reading-edition", "source_revision": "8a19b7578930bb4c0e25c5c11ed070f7c8571ce0"},
+    {"source": "docs/engineering-harness-mvp-2026-09-14/README.md", "en": "docs/engineering-harness-mvp-2026-09-14/README.md", "ja": "docs/engineering-harness-mvp.ja.md", "kind": "reading-edition", "source_revision": "8a19b7578930bb4c0e25c5c11ed070f7c8571ce0"},
+    {"source": "tools/tests/fixtures/engineering_harness/README.md", "en": "tools/tests/fixtures/engineering_harness/README.md", "ja": "docs/engineering-harness-fixtures.ja.md", "kind": "reading-edition", "source_revision": "8a19b7578930bb4c0e25c5c11ed070f7c8571ce0"}
   ],
   "new_pairs": [
     {"en": "docs/README.md", "ja": "docs/README.ja.md"},
@@ -39,7 +42,9 @@
   ],
   "shared_machine_policy_prefixes": [".github/"],
   "shared_engineering_record_prefixes": [
-    "bom/", "datasheets/", "firmware/", "hardware/", "requirements/", "simulation/", "validation/"
+    "bom/", "datasheets/", "firmware/", "hardware/", "requirements/", "simulation/", "validation/",
+    "docs/engineering-harness-research-2026-09-14/",
+    "docs/engineering-harness-mvp-2026-09-14/"
   ],
   "shared_reference_paths": [
     "docs/architecture-evolution.md",

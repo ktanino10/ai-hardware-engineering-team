@@ -1,0 +1,86 @@
+{
+  "binding": {
+    "config_revision": "8a237bb4ef8db300d81c57b3ce11fddcd9d2cabe",
+    "files": {
+      ".github/copilot-instructions.md": "345a70f8cea45283466ae46c23f03de0335cdcf9db46fa7be03d041729430468",
+      "AGENTS.md": "450abb0cf3b5eb317cb2a21caaa494413d3195b2012b2a088158b5fd8dc6ae00",
+      "docs/architecture.md": "7ea8291aed1e78e2bf9dfe9e7762b42c2a3314a133665a4944fa9fc9f5e1f72a",
+      "docs/engineering-harness-mvp-2026-09-14/experiment-plan.json": "9a309c4bc416a17fc97d11f0749359e6ce23cf5477b1635035bb27adea110115",
+      "docs/engineering-harness-research-2026-09-14/architecture-proposal.md": "d5c050f75be0bd56cdad41b6d354b85b51d6d4b533964c9f2f2073a1239bfe4a",
+      "docs/engineering-harness-research-2026-09-14/experiment-contract.md": "4565ae881dd06c9df3110c0a8a6554e2ccc3a50e4b37230695b56dcece43529a",
+      "docs/work-execution.md": "212310bce59154af8e4034984bbe7841d28929201756f6db6639e190d9a6b5de",
+      "docs/workflow.md": "9c72bdf44a067f96c36b11600e2015507aa4057e487f853bec589f34dddd5e45",
+      "tools/agent_workflow.py": "8e5568907b8ea65fe25e5d18bf1c8a7eb429fb17262ea238e2746639c40fdc29",
+      "tools/check_assembly_evidence.py": "44dceb2611949f0faa4543009785b99b7e4b80870d010b3f5274f9f554de523d",
+      "tools/check_open_issues.py": "c8917f83d5c4cee634d425b481d403d8358341e54c38b4b5c047515aa90106ec",
+      "tools/engineering_harness.py": "6b2978f1225fe0ca936f7dd601ae5d359439e087e396fd28d2027255f287c425",
+      "tools/engineering_harness_adapters/__init__.py": "bac32d84bff6aa62e079b3e2f72d9f0f31f374ba6657b9a3a1d41eb67f0f3331",
+      "tools/engineering_harness_adapters/kicad.py": "edb91fa729714254c446f830d2387892df0e70bdc7673957584943845e98a5f7",
+      "tools/tests/fixtures/engineering_harness/Harness.kicad_sym": "1775c1d35fa184a1c3c1b5a43ad2a8556b93546c92064100b9e7f3949da73206",
+      "tools/tests/fixtures/engineering_harness/approval.json": "82b561a3dbdb71fcc2ba8762faecd8f77263374b556929d9922affb58824793d",
+      "tools/tests/fixtures/engineering_harness/clean.kicad_pcb": "b5c1dfa0c48e8493594df8eefaf59633e6bda692fe76f32c40c5daf4ae0f1cdc",
+      "tools/tests/fixtures/engineering_harness/clean.kicad_pro": "3351a75042cfef50c94251d2c3c382f2ffa70f69455f2c020e730db9e99580ba",
+      "tools/tests/fixtures/engineering_harness/clean.kicad_sch": "3e1dec957f921497c82111820e20e202e2ad86e27f060caafef0eb500ec922fe",
+      "tools/tests/fixtures/engineering_harness/dependency.json": "59a985784d5ca831fe1e82c33b5c9581d2b7b632afa6ab0b7632efdd92de66b1",
+      "tools/tests/fixtures/engineering_harness/drc_violation.kicad_pcb": "2a86310287ca64e67592166993511a7dbb8944ed593afd3095897d136bc0902f",
+      "tools/tests/fixtures/engineering_harness/drc_violation.kicad_pro": "d8fa1ac3f8232caf0985ede672e7f92d2e7454fe3a0d8b0d15691a74685a9f73",
+      "tools/tests/fixtures/engineering_harness/erc_violation.kicad_pro": "c1b6d2f30bcf6263e27277f661aeb29e1144dbb0b411a172fe58cb5b41d5c0ca",
+      "tools/tests/fixtures/engineering_harness/erc_violation.kicad_sch": "b82d3030f9c28215885b79148475265ea8b5b10ab82eb87bb2d5ae23632f9129",
+      "tools/tests/fixtures/engineering_harness/generate.py": "ca04190959c39eaf679b2a2137a013a243b9b1572c2f343183eebe13b7ddb984",
+      "tools/tests/fixtures/engineering_harness/invalid_outline.kicad_pcb": "a0b686350f5792b81dc324a3152b06ba1ffbc1605da829cfa0aab7b854f0358f",
+      "tools/tests/fixtures/engineering_harness/invalid_outline.kicad_pro": "d2ab1a141b61ed5073394c6868dab10816644c27987d3a3e2985091532e03df2",
+      "tools/tests/fixtures/engineering_harness/manifest.json": "37acafb8b2f487c154dca63e524b2b14ee06a8a140aeb1fc0ebe14fe3cd1c7d1",
+      "tools/tests/fixtures/engineering_harness/sym-lib-table": "7e4506964d074080cf0e6dc4e26c83f317f495e916db923961003f554fb52fe1",
+      "tools/tests/test_engineering_harness.py": "69d4b5693d7e6cab28684b4d7796c44d754aad35fa8ccd095389769378a90ded",
+      "tools/tests/test_engineering_harness_experiment.py": "1ca8989e09b4ac4bca6ed21fdf322b3b3b94b6291cf3e458333836bab3dd6336"
+    },
+    "policy_sha256": "4ecae2bf94fb1410c2bda4730b931d6b3c7dbbdf6d335add3e0ba66f6259314b",
+    "source_revision": "ca0f276ffd51781e7e88cc44274787fbdd4237e7",
+    "tool": {
+      "sha256": "04d9e61cad2e80cf7ad6c3da06417a6d7e8e2cdd23efc99957a1184e604d6657",
+      "version": "10.0.1"
+    }
+  },
+  "candidate": "ca0f276ffd51781e7e88cc44274787fbdd4237e7",
+  "config_revision": "8a237bb4ef8db300d81c57b3ce11fddcd9d2cabe",
+  "interpreter": {
+    "implementation": "CPython",
+    "version": "3.14.3"
+  },
+  "machine": "arm64",
+  "native_flags": [
+    "--format",
+    "json",
+    "--severity-all",
+    "--exit-code-violations"
+  ],
+  "plan_sha256": "9a309c4bc416a17fc97d11f0749359e6ce23cf5477b1635035bb27adea110115",
+  "policy": {
+    "exclusions": [],
+    "irreversible_actions": "OUT_OF_MVP_SCOPE",
+    "native_default_ignored_checks": {
+      "drc": [
+        "footprint_filters_mismatch",
+        "footprint_type_mismatch",
+        "missing_courtyard",
+        "track_not_centered_on_via",
+        "tuning_profile_track_geometries"
+      ],
+      "erc": [
+        "footprint_filter",
+        "four_way_junction",
+        "simulation_model_issue",
+        "single_global_label"
+      ]
+    },
+    "purpose": "TEST_ONLY_REVIEW_READINESS",
+    "reported_violations_allowed": 0,
+    "retry_limit": 0,
+    "scope": "SYNTHETIC_ONLY",
+    "severity": "all"
+  },
+  "run_id": "0d5ee0a7-e571-41b3-9c7e-d3cdb6502628",
+  "started_at": "2026-09-14T14:51:42.516330+00:00",
+  "system": "Darwin",
+  "task_id": "engineering-harness-mvp-experiment-2026-09-14"
+}

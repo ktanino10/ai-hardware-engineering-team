@@ -1,0 +1,68 @@
+{
+  "$schema": "https://schemas.kicad.org/erc.v1.json",
+  "coordinate_units": "mm",
+  "date": "2026-09-14T23:51:49",
+  "ignored_checks": [
+    {
+      "description": "Global label only appears once in the schematic",
+      "key": "single_global_label"
+    },
+    {
+      "description": "Four connection points are joined together",
+      "key": "four_way_junction"
+    },
+    {
+      "description": "SPICE model issue",
+      "key": "simulation_model_issue"
+    },
+    {
+      "description": "Assigned footprint doesn't match footprint filters",
+      "key": "footprint_filter"
+    }
+  ],
+  "included_severities": [
+    "error",
+    "warning",
+    "exclusion"
+  ],
+  "kicad_version": "10.0.1",
+  "sheets": [
+    {
+      "path": "/",
+      "uuid_path": "/24f72b14-720c-5436-a62f-ab413381eff2",
+      "violations": [
+        {
+          "description": "Pin not connected",
+          "items": [
+            {
+              "description": "Symbol J1 \u30d4\u30f3 1 [1, \u30d1\u30c3\u30b7\u30d6, \u30e9\u30a4\u30f3]",
+              "pos": {
+                "x": 0.508,
+                "y": 0.508
+              },
+              "uuid": "aac851b0-3528-5ec9-8e29-034363dc6f29"
+            }
+          ],
+          "severity": "error",
+          "type": "pin_not_connected"
+        },
+        {
+          "description": "Pin not connected",
+          "items": [
+            {
+              "description": "Symbol J2 \u30d4\u30f3 1 [1, \u30d1\u30c3\u30b7\u30d6, \u30e9\u30a4\u30f3]",
+              "pos": {
+                "x": 0.762,
+                "y": 0.508
+              },
+              "uuid": "82251976-4246-579c-a00b-9a91934cada4"
+            }
+          ],
+          "severity": "error",
+          "type": "pin_not_connected"
+        }
+      ]
+    }
+  ],
+  "source": "erc_violation.kicad_sch"
+}

@@ -1,0 +1,25 @@
+{
+  "source_revision": "7f381cb3f68e7adf8fff34484df3ab1ecafb3f4c",
+  "observed_at": "2026-09-14T15:13:58.087553+00:00",
+  "controlled_caller_sigint": true,
+  "keyboard_interrupt_propagated": true,
+  "owned_child_alive_after_transport_unwind": true,
+  "transport_process_receipt_present": false,
+  "witness_owner_cleanup_exit": -15,
+  "cleanup_credit": "WITNESS_CLEANUP_ONLY_NOT_TRANSPORT_RECOVERY",
+  "witness_owner_cleanup_verified": true,
+  "private_witness_sha256": "8c6e9bca70f40542f4896ca4fafbeb16f2fe62f42bb3c4492a0ccc62bcd466a0",
+  "after_fix": {
+    "stage": "DEVELOPMENT_BEFORE_SUCCESSOR_FREEZE",
+    "observed_at": "2026-09-14T15:19:10.773025+00:00",
+    "adapter_sha256": "301f13ea3e807b8148c8955177ccd7dc29fcbb236ca96359ab1f5d6c45ed286d",
+    "actual_caller_sigint": true,
+    "cancellation_propagated": true,
+    "owned_child_alive_after_transport_unwind": false,
+    "process_receipt_present": true,
+    "owned_cleanup_verified": true,
+    "manual_witness_cleanup_needed": false,
+    "private_process_receipt_sha256": "76904ccce0af97bf8304f35fd588ab3310d36899237fb7e34a332721c61d8793",
+    "limits": "Catchable caller interruption with known Popen ownership only; not SIGKILL or general parent-death supervision."
+  }
+}

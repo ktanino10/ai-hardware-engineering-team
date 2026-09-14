@@ -1,0 +1,20 @@
+{
+  "command": [
+    "kicad-cli",
+    "sch",
+    "erc",
+    "--format",
+    "json",
+    "--severity-all",
+    "--exit-code-violations",
+    "--output",
+    "@report",
+    "@source/clean.kicad_sch"
+  ],
+  "exit_code": 0,
+  "raw_private_stderr_sha256": "ab0c2a8aec9bf3f0b80c9efdeff9eee52c377a6d3a4b37632e89621ce1015cec",
+  "raw_private_stdout_sha256": "8f3648eb3dc4b8a0b99c3c79f354fc9f2601a8bdb80d96aa4660ddef7d85d351",
+  "stderr": "FONTCONFIG_WARNINGS_RETAINED_PRIVATELY",
+  "stderr_line_count": 45,
+  "stdout_sanitized": "0 \u500b\u306e\u9055\u53cd\u3092\u691c\u51fa\u3057\u307e\u3057\u305f\nDRC \u30ec\u30dd\u30fc\u30c8\u3092 <TRIAL_ROOT>/operation/native/runtime-p7y_gl_g/report.json \u306b\u4fdd\u5b58\u3057\u307e\u3057\u305f\n"
+}

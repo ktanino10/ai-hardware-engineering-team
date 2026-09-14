@@ -1,0 +1,61 @@
+{
+  "$schema": "https://schemas.kicad.org/drc.v1.json",
+  "coordinate_units": "mm",
+  "date": "2026-09-15T01:51:07",
+  "ignored_checks": [
+    {
+      "description": "Footprint has no courtyard defined",
+      "key": "missing_courtyard"
+    },
+    {
+      "description": "Track endpoint not centered on via",
+      "key": "track_not_centered_on_via"
+    },
+    {
+      "description": "Tuning profile track geometries",
+      "key": "tuning_profile_track_geometries"
+    },
+    {
+      "description": "Footprint doesn't match symbol's footprint filters",
+      "key": "footprint_filters_mismatch"
+    },
+    {
+      "description": "Footprint component type doesn't match footprint pads",
+      "key": "footprint_type_mismatch"
+    }
+  ],
+  "included_severities": [
+    "error",
+    "warning",
+    "exclusion"
+  ],
+  "kicad_version": "10.0.1",
+  "schematic_parity": [],
+  "source": "invalid_outline.kicad_pcb",
+  "unconnected_items": [],
+  "violations": [
+    {
+      "description": "\u57fa\u677f\u5916\u5f62\u304c\u7570\u5e38\u306a\u5f62\u72b6 (\u9589\u3058\u3066\u3044\u306a\u3044\u5f62\u72b6)",
+      "items": [
+        {
+          "description": "\u30bb\u30b0\u30e1\u30f3\u30c8 (Edge.Cuts \u4e0a)",
+          "pos": {
+            "x": 10.0,
+            "y": 10.0
+          },
+          "uuid": "81f6fca7-de20-52ea-9d65-0bb467c9c68a"
+        },
+        {
+          "description": "\u30bb\u30b0\u30e1\u30f3\u30c8 (Edge.Cuts \u4e0a)",
+          "pos": {
+            "x": 10.0,
+            "y": 10.0
+          },
+          "uuid": "81f6fca7-de20-52ea-9d65-0bb467c9c68a"
+        }
+      ],
+      "severity": "error",
+      "type": "invalid_outline"
+    }
+  ]
+}

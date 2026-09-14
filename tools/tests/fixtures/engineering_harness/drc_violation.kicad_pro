@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "version": 1,
+    "filename": "drc_violation.kicad_pro"
+  },
+  "board": {
+    "design_settings": {
+      "rules": {
+        "min_clearance": 0.2,
+        "min_track_width": 0.2
+      },
+      "drc_exclusions": [],
+      "rule_severities": {}
+    }
+  },
+  "erc": {
+    "erc_exclusions": [],
+    "rule_severities": {}
+  },
+  "libraries": {
+    "pinned_symbol_libs": [
+      "Harness"
+    ]
+  }
+}

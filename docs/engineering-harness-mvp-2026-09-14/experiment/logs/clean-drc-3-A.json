@@ -1,0 +1,20 @@
+{
+  "command": [
+    "kicad-cli",
+    "pcb",
+    "drc",
+    "--format",
+    "json",
+    "--severity-all",
+    "--exit-code-violations",
+    "--output",
+    "@report",
+    "@source/clean.kicad_pcb"
+  ],
+  "exit_code": 0,
+  "raw_private_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "raw_private_stdout_sha256": "e387adc92e12e7405c5e9f809279f0737e04f2bd37fbeb213458aef213eddfbd",
+  "stderr": "EMPTY",
+  "stderr_line_count": 0,
+  "stdout_sanitized": "0 \u500b\u306e\u9055\u53cd\u3092\u691c\u51fa\u3057\u307e\u3057\u305f\n0 \u500b\u306e\u672a\u914d\u7dda\u30a2\u30a4\u30c6\u30e0\u3092\u691c\u51fa\u3057\u307e\u3057\u305f\n<TRIAL_ROOT>/operation/native/runtime-qbmirnp9/report.json \u306bDRC \u30ec\u30dd\u30fc\u30c8\u3092\u4fdd\u5b58\n"
+}

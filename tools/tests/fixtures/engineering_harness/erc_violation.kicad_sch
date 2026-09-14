@@ -1,0 +1,44 @@
+(kicad_sch (version 20250114) (generator "engineering_harness_fixture")
+  (uuid "24f72b14-720c-5436-a62f-ab413381eff2") (paper "A4")
+  (lib_symbols
+  (symbol "Harness:Terminal"
+    (pin_numbers hide)
+    (pin_names (offset 0) hide)
+    (in_bom no)
+    (on_board no)
+    (property "Reference" "J" (at 0 2.54 0) (effects (font (size 1.27 1.27))))
+    (property "Value" "Terminal" (at 0 -2.54 0) (effects (font (size 1.27 1.27))))
+    (property "Footprint" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+    (property "Datasheet" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+    (symbol "Terminal_0_1"
+      (rectangle (start -1.27 1.27) (end 1.27 -1.27)
+        (stroke (width 0) (type default)) (fill (type background))))
+    (symbol "Terminal_1_1"
+      (pin passive line (at -3.81 0 0) (length 2.54)
+        (name "1" (effects (font (size 1.27 1.27))))
+        (number "1" (effects (font (size 1.27 1.27))))))
+  )
+)
+
+
+  (symbol (lib_id "Harness:Terminal") (at 54.61 50.8 0) (unit 1)
+    (in_bom no) (on_board no) (dnp no) (uuid "c18bea42-3fb3-58f1-b5f2-6671139a487f")
+    (property "Reference" "J1" (at 54.61 48.26 0) (effects (font (size 1.27 1.27))))
+    (property "Value" "Terminal" (at 54.61 53.34 0) (effects (font (size 1.27 1.27))))
+    (property "Footprint" "" (at 54.61 50.8 0) (effects (font (size 1.27 1.27)) hide))
+    (property "Datasheet" "" (at 54.61 50.8 0) (effects (font (size 1.27 1.27)) hide))
+    (pin "1" (uuid "aac851b0-3528-5ec9-8e29-034363dc6f29"))
+    (instances (project "erc_violation" (path "/24f72b14-720c-5436-a62f-ab413381eff2" (reference "J1") (unit 1))))
+  )
+
+  (symbol (lib_id "Harness:Terminal") (at 80.01 50.8 0) (unit 1)
+    (in_bom no) (on_board no) (dnp no) (uuid "598e76ce-8811-5f00-b64b-8d8e37fd7ad6")
+    (property "Reference" "J2" (at 80.01 48.26 0) (effects (font (size 1.27 1.27))))
+    (property "Value" "Terminal" (at 80.01 53.34 0) (effects (font (size 1.27 1.27))))
+    (property "Footprint" "" (at 80.01 50.8 0) (effects (font (size 1.27 1.27)) hide))
+    (property "Datasheet" "" (at 80.01 50.8 0) (effects (font (size 1.27 1.27)) hide))
+    (pin "1" (uuid "82251976-4246-579c-a00b-9a91934cada4"))
+    (instances (project "erc_violation" (path "/24f72b14-720c-5436-a62f-ab413381eff2" (reference "J2") (unit 1))))
+  )
+
+)
