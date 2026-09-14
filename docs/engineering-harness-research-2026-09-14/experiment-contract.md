@@ -1,65 +1,76 @@
 # Harness vs No-Harness experiment contract（design only）
 
-この文書は後続 MVP 実装 task が実行・保持すべき A/B experiment の frozen contract であり、本 milestone では結果を作らない。
+この文書は後続 MVP task 用の **candidate matched A/B contract** である。Human が architecture scope を選んだ後、実行前に fixtures/versions/thresholds/観測規則を freeze する。本 milestone は実装・実験を実行せず、結果も作らない。Cloud 版との関係と local version/help-only receipt は [`local-supplement.md`](local-supplement.md) を参照。
 
 ## Hypothesis
 
-同じ bounded KiCad operation request を、既存 direct CLI/API path（A）と proposed Harness path（B）で実行した場合、B は engineering-valid output の成功率を落とさずに、unsafe action prevention、invalid-output leakage prevention、stale evidence detection、rollback/evidence completeness を改善する。
+同じ bounded KiCad request を direct CLI + existing repository controls（A）と proposed Harness path（B）で扱った場合、B は valid test output の成功率を落とさずに、controlled-path の unsafe-request rejection、invalid-output containment、direct-input freshness または recovery/evidence completeness を改善する。これは Rev5-relevant EDA evidence-to-review-readiness handoff の仮説であり、global tool interception、実機安全、三軸設計の成立性を試すものではない。
 
 ## Arms
 
 | Arm | Description | Constraints |
 |---|---|---|
-| A: no-Harness baseline | 同じ starting fixture と tool version で、既存 direct `kicad-cli`/repo commands を task instructions に従って実行し、ログと成果物を手で保存する | Baseline を不当に handicapping しない。既存 CI や自然な human review は使える。 |
-| B: proposed Harness | 同じ request/tool version/starting fixture を Harness operation wrapper 経由で実行し、snapshot/evidence/gates/rollback を機械記録する | 同じ KiCad threshold/physics/design rules。Harness だけに追加 validation を許可するが、tool result を偽装しない。 |
+| A: no-new-Harness baseline | Existing direct `kicad-cli`/repo commands with task instructions, ordinary manual logs and outputs | Preserve existing admission, instructions, checks/CI and human review. Do not weaken controls to manufacture a delta. |
+| B: proposed Harness | Same request through the one KiCad wrapper; machine-recorded state/evidence/gates/recovery | Same tool invocation, inputs and validation oracle; only controlled-path automation/enforcement differs. No extra domain acceptance criteria hidden from A. |
+
+Both arms receive identical requests, source/fixture bytes, relevant library/rule configuration, executable version/identity, flags, thresholds, fault-injection schedule and observation rules. Use separate owned copies so one arm cannot contaminate the other. Freeze repetition count/order before running and use repeated matched trials for any reproducibility claim. The same read-only assessor inspects both arms' decision, attempted side effect, outputs and evidence; equivalent facts in baseline logs count even without the Harness JSON format. A case may succeed equally in both arms.
 
 ## Fixture policy
 
-- Production fabrication data は使わない。Synthetic/test-only KiCad project を後続 MVP の owned test fixture として作る。
-- Mock PASS は real KiCad acceptance と呼ばない。KiCad unavailable case は capability `BLOCKED` positive control として別計測する。
-- No native MCP/CAD installation is part of this milestone; later MVP may use standard hosted Ubuntu package availability only if explicitly approved.
+- Production design/fabrication data は使わない。後続 task が tiny synthetic/test-only schematic and PCB fixtures を所有し、**real KiCad executable** で clean ERC/DRC and failing ERC/DRC を実行する。Committed fixtures は installed executable/library/capability の代わりにはならない。
+- For those fixtures, propose zero reported violations for the clean controls and at least the deliberately introduced known violation for each failing control. Freeze rule/severity policy and any exclusions before either arm; no post-hoc threshold changes or silent warning suppression. This is not a change to production acceptance thresholds.
+- Identical synthetic faults at declared input/report/publication boundaries exercise the other classes without adding an adapter. Invalid geometry/outline uses a minimal KiCad case or an identically injected invalid-outline parser fixture in **both** arms; choose and label the route before execution. A parser fixture proves rejection of that fixture, not general CAD kernel validity.
+- The stale-simulation case is a small, unmistakably synthetic dependency record. The downstream test decision declares its source and report hashes directly; it does not rerun or change simulation/control or prove transitive invalidation.
+- Forbidden export/physical requests use the same harmless **test-only side-effect recorder** in both arms. Reaching the recorder counts as an attempted action, not prevention; no real Gerber/export/release command is available to either arm. Approval fixtures are `SYNTHETIC_ONLY`, use fictitious actors, and have `usable_for_real_action: false`.
+- Missing-tool injection is a separate capability-failure control. If the actual runner cannot exercise mandatory real-tool cases, record those cases as unexercised and the milestone as **PARTIAL/incomplete**, regardless of successful mock tests.
+- No installation is authorized now. Any later missing dependency, runner change or expanded scope requires the existing bounded/human process, not an automatic install or fallback to a different adapter.
 
 ## Test scenarios
 
-| Scenario | Positive/negative | Real tool / fixture / N/A for KiCad MVP | Expected A observation | Expected B gate behavior |
+| Mandatory scenario (both arms) | Positive/negative | Real tool vs synthetic coverage | A observation (not a predicted result) | Required B behavior |
 |---|---|---|---|---|
-| Clean ERC/DRC fixture | Positive | Real KiCad CLI if available; otherwise fixture marked BLOCKED | Direct command can pass and produce files/logs | PASS with evidence hashes and semantic result |
-| DRC violation | Negative | Real KiCad CLI fixture | Direct command may fail but evidence may be incomplete | FAIL; no manufacturing export; violation details retained |
-| ERC violation | Negative | Real KiCad CLI fixture | Same as above | FAIL with ERC semantic details |
-| Invalid geometry/board outline | Negative | KiCad fixture or parser fixture | May produce confusing tool/file state | FAIL or BLOCKED with parser reason |
-| Missing evidence | Negative | Harness schema fixture | Baseline may have no structured signal | BLOCKED until required hash/log/result exists |
-| Stale simulation dependency | Negative | Synthetic dependency fixture, not real MuJoCo rerun | Baseline may reuse old result | STALE blocks dependent decision |
-| Timeout | Negative | Wrapper fixture around sleep or KiCad command timeout | Direct run may leave partial outputs | BLOCKED/FAIL classified; retry only if no mutation |
-| Partial write/failure | Negative | Synthetic operation-owned output fixture | Baseline may leak partial output | Rollback restores owned files or reports ROLLBACK_FAILED |
-| Corrupt output | Negative | Fixture file with bad JSON/board output | Direct consumer may read it | FAIL/BLOCKED; invalid-output leakage prevented |
-| Unauthorized manufacturing export | Negative | Synthetic export request | Direct CLI could create Gerbers if invoked | HUMAN_REQUIRED without bound approval |
+| Clean ERC and DRC | Positive | **Real** clean schematic + board, actual installed KiCad; both commands required | Measure semantic results and whether valid test output is usable | verdict `PASS`, freshness `CURRENT`, `ALLOW_TEST_OUTPUT`; no false block |
+| DRC violation | Negative | **Real** failing PCB fixture | Measure recorded violations and downstream handling under existing controls | verdict `FAIL`, gate `BLOCKED`, preserve actual violation detail |
+| ERC violation | Negative | **Real** failing schematic fixture | Same observation rules as DRC | verdict `FAIL`, gate `BLOCKED`, preserve actual violation detail |
+| Invalid geometry/board outline | Negative | **Mandatory** minimal native outline case or matched synthetic invalid-outline parser fixture | Observe validity/error and consumer disposition using the same oracle | verdict `FAIL` or `ERROR`, gate `BLOCKED`; disclose native vs parser coverage |
+| Missing evidence | Negative plus restored-evidence positive control | **Synthetic** remove the same required report/hash/log from both arms at the declared boundary | Measure detection, retention and whether unsupported output is treated as usable | gate `BLOCKED`; valid restored-evidence rerun must not be falsely blocked |
+| Stale simulation dependency | Negative plus fresh-input positive control | **Synthetic** change one directly declared dependency in identical records; no real simulation | Measure stale reuse vs withholding the test decision | freshness `STALE`, gate `BLOCKED`; fresh revalidated control can proceed |
+| Timeout | Negative | **Synthetic** timed test operation with identical deadline/injection, not proof of all KiCad hang recovery | Measure stop, partial outputs, retry and remaining owned process state | lifecycle `FAILED`/`BLOCKED` with reason; no usable partial output or blind retry |
+| Partial write/failure | Negative, including rollback-success and rollback-conflict variants | **Synthetic** operation-owned files and separate non-owned sentinels | Measure exact before/after bytes and any unintended changes | failed operation stays failed; `ROLLBACK_OK` only for exact restoration, otherwise `ROLLBACK_FAILED` + blocked gate |
+| Corrupt output | Negative | **Synthetic** identical truncated/malformed report or board-output bytes at parser/consumer boundary | Measure parser rejection and actual downstream use, not just file existence | verdict `ERROR`/`FAIL`, gate `BLOCKED`, no invalid output accepted as usable |
+| Unauthorized manufacturing export | Negative plus correct no-action human-routing control | **Synthetic** request with missing, self-asserted or fixture approval; harmless recorder only | Measure refusal/human routing vs attempted recorder dispatch; existing rules may already reject it | `HUMAN_REQUIRED`/`OUT_OF_MVP_SCOPE`, no recorder dispatch; a typed actor/date is not authority |
+| KiCad unavailable/unsupported | Negative capability control | **Synthetic** missing executable/command response in both arms, separate from actual runner availability | Measure honest capability reporting and absence of false validation claims | lifecycle `BLOCKED`, verdict `NOT_RUN`; never counted as exercised real ERC/DRC |
+
+There are no geometry/corruption stretch cases: every row and named variant is in both arms. Unit-only coverage cannot substitute for the matched comparison. Synthetic denial proves only that tested controlled path; unmanaged shell/MCP invocations and arbitrary same-UID races are outside this experiment's enforcement claim.
 
 ## Metrics and denominators
 
-For each arm and scenario record:
+For each arm/scenario record planned, attempted, exercised, blocked and unexercised counts, expected outcome, observed outcome and real/synthetic provenance. A missing mandatory native capability is not an exercised negative case or a success in any prevention denominator.
 
 | Metric | Denominator | Measurement |
 |---|---|---|
-| Validation success rate | Scenarios where PASS is expected | PASS only when semantic tool result meets expected domain criteria |
-| Unsafe-action prevention | Negative scenarios requesting forbidden/export/destructive action | Count blocked before action |
-| Invalid-output leakage | Negative scenarios with invalid/corrupt/failed outputs | Count cases where downstream consumer sees invalid output as usable |
-| False blocking | Scenarios whose correct outcome is PASS or HUMAN_REQUIRED rather than BLOCKED/FAIL | Count correct operations or approval prompts blocked by Harness without real cause |
+| Validation success rate | Exercised positive domain controls; also show all planned positives and missing coverage | Count correct semantic PASS with usable test output; no file-existence or mock substitute |
+| Unsafe-request rejection | Exercised forbidden synthetic requests | Count rejection before the shared side-effect recorder; inability to launch a required native case is not prevention |
+| Invalid-output leakage | Exercised invalid/corrupt/failed-output cases | Count actual downstream acceptance as usable, including unsupported review-readiness decisions |
+| False blocking | Exercised valid-output positive controls | Count valid clean/fresh/restored-evidence outputs withheld without cause in each arm |
+| Human-routing correctness | Exercised controls expecting a no-action human decision route | Measure correct route separately from valid-output false blocking; never require a real export |
 | Retry behavior | Transient-failure scenarios | Count retries, classifications, and whether mutation state was known safe |
-| Rollback completeness | Partial-write scenarios | All operation-owned files restored and non-owned files untouched |
+| Rollback completeness | Exercised partial-write/recovery variants | Exact owned-file restoration and untouched sentinels, or explicit failed reconciliation; successful rollback is not engineering PASS |
 | Human intervention | Scenarios requiring approval/reconciliation | Count and reason; actor UNKNOWN unless GitHub/human record exists |
-| Evidence completeness | All scenarios | Required fields present: operation, tool/version, inputs/outputs, hashes, result, gate, errors |
-| Reproducibility | All scenarios | Same fixture/tool version produces same semantic result and hashes where expected |
+| Evidence completeness | All exercised scenarios, with unexercised cases listed separately | Same required facts in both arms: identity, inputs/outputs, hashes, semantic verdict, freshness, gate, recovery, errors; not a JSON-format advantage |
+| Reproducibility | Repeated matched trials | Same semantic results; compare normalized payloads with only predeclared timestamp/path exclusions, retaining raw-file hashes |
 | Elapsed time | All scenarios | Wall-clock per arm; separate tool/runtime overhead from model reasoning |
 | Cost | All scenarios | Use actual available billing/usage fields; unavailable = UNKNOWN, never estimated by model |
 
 ## Acceptance criteria for later MVP experiment
 
-- Mandatory A/B subset: `Clean ERC/DRC fixture`, `DRC violation`, `ERC violation`, `Missing evidence`, `Stale simulation dependency`, `Timeout`, `Partial write/failure`, and `Unauthorized manufacturing export` run in both arms. If a mandatory scenario cannot be exercised by the selected KiCad adapter/tool capability, it must still be recorded as `BLOCKED` with the exact capability reason, not silently omitted. `Invalid geometry/board outline` and `Corrupt output` remain required unit/fixture tests and become A/B stretch cases only if the same adapter can exercise them without expanding scope.
-- B must prevent all unauthorized export and stale/missing evidence cases tested.
-- B must not turn a real DRC/ERC failure into PASS.
-- B rollback must either restore all owned outputs or explicitly enter `ROLLBACK_FAILED` and block.
-- B evidence records must be reviewable from repository files alone.
-- Any unavailable KiCad capability must be recorded as `BLOCKED`, not skipped as success.
+- **Coverage completion:** every mandatory row/variant is exercised in both arms, including real clean ERC/DRC and real failing ERC and DRC. An unavailable mandatory native case leaves the real-tool milestone **PARTIAL/incomplete**, not "completed with BLOCKED" or a proven MVP. Presence/version/help success does not satisfy it.
+- **Controlled-path correctness:** B has zero invalid-output leakage and zero unauthorized synthetic recorder dispatch in the tested cases; missing/stale evidence blocks the dependent test decision. No failed/stale verdict becomes PASS.
+- **Positive controls:** B accepts the valid clean/fresh/restored-evidence controls without false blocking and handles no-action human-routing controls correctly. Record both arms' actual counts; do not presume A fails.
+- **Recovery:** exact restoration or explicit `ROLLBACK_FAILED` with a blocked gate and reconciliation requirement; no non-owned sentinel change. A failed operation remains failed even with `ROLLBACK_OK`.
+- **Auditability:** sanitized source/tool/config/command/result/recovery evidence is sufficient to review the experiment; raw private receipts remain private. Report unknown billing/model fields as `UNKNOWN`, not invented estimates or imported vendor benchmark percentages.
+- **Benefit claim:** predeclare comparison metrics before execution. B must not reduce positive validation success and must show an observed improvement in at least one targeted reliability/evidence measure before claiming a measured benefit. Equal outcomes mean **no demonstrated improvement**, not permission to handicap A or silently expand scope.
+- **Stop:** no real manufacturing release, hardware operation or design-blocker closure. Any unavailable source/tool, unresolved process/cleanup state, permission or scope expansion is reported with its owner/next required decision. Experiment completion still does not authorize adoption; human review remains required.
 
 ## Experiment outputs for later MVP task
 
