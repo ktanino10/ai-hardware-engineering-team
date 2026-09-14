@@ -10,7 +10,7 @@
 
 | Arm | Description | Constraints |
 |---|---|---|
-| A: no-Harness baseline | 同じ starting fixture と tool version で、既存 direct `kicad-cli`/repo commands を task instructions に従って実行し、ログと成果物を手で保存する | Baseline を不当に handicapping しない。既存 CIや自然な human review は使える。 |
+| A: no-Harness baseline | 同じ starting fixture と tool version で、既存 direct `kicad-cli`/repo commands を task instructions に従って実行し、ログと成果物を手で保存する | Baseline を不当に handicapping しない。既存 CI や自然な human review は使える。 |
 | B: proposed Harness | 同じ request/tool version/starting fixture を Harness operation wrapper 経由で実行し、snapshot/evidence/gates/rollback を機械記録する | 同じ KiCad threshold/physics/design rules。Harness だけに追加 validation を許可するが、tool result を偽装しない。 |
 
 ## Fixture policy
@@ -54,7 +54,7 @@ For each arm and scenario record:
 
 ## Acceptance criteria for later MVP experiment
 
-- At least one positive and five negative scenarios run in both arms.
+- At least one positive and five negative scenarios run in both arms for the minimal MVP acceptance set; the remaining defined negative scenarios are optional stretch cases only if the same adapter, fixtures, and tool availability make them low-risk. The MVP implementation plan must name the selected mandatory subset before running results.
 - B must prevent all unauthorized export and stale/missing evidence cases tested.
 - B must not turn a real DRC/ERC failure into PASS.
 - B rollback must either restore all owned outputs or explicitly enter `ROLLBACK_FAILED` and block.

@@ -76,7 +76,7 @@ Minimum operation state fields:
 
 | Field | Meaning |
 |---|---|
-| `operation_id` | Collision-resistant ID scoped by task/adaptor/artifact |
+| `operation_id` | Collision-resistant ID scoped by task/adapter/artifact |
 | `task_id` / `run_id` | Existing bounded-work link |
 | `state` | `PLANNED`, `RESERVED`, `SNAPSHOTTED`, `EXECUTING`, `VALIDATING`, `PASS`, `FAIL`, `BLOCKED`, `STALE`, `ROLLBACK_OK`, `ROLLBACK_FAILED`, `HUMAN_REQUIRED` |
 | `owner` | Role/session identity; requested model and attested actual model/tool identity separated |
@@ -133,7 +133,7 @@ Each operation evidence record should contain:
 
 ## Retry model
 
-Retry only when all are true: failure is connection/startup/transient, no mutation happened or snapshot proves mutation state is known safe, operation is idempotent, and retry count/backoff are recorded. Never retry blindly for DRC/ ERC failures, unsafe/unknown state, partial writes, inconsistent outputs, rollback failure, export/fabrication side effects, or human-approval-required states.
+Retry only when all are true: failure is connection/startup/transient, no mutation happened or snapshot proves mutation state is known safe, operation is idempotent, and retry count/backoff are recorded. Never retry blindly for DRC/ERC failures, unsafe/unknown state, partial writes, inconsistent outputs, rollback failure, export/fabrication side effects, or human-approval-required states.
 
 ## Rollback model
 
@@ -159,7 +159,7 @@ Interface:
 6. `commit()` -> publish evidence/artifacts.
 7. `rollback()` -> restore operation-owned outputs under revision fences.
 
-MVP adapter: KiCad CLI first. MCP/IPCs may be added later behind the same adapter interface after capability preflight proves they work in the current runtime.
+MVP adapter: KiCad CLI first. MCP/IPC integrations may be added later behind the same adapter interface after capability preflight proves they work in the current runtime.
 
 ## Multi-model strategy
 

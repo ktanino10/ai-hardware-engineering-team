@@ -20,7 +20,7 @@ websites are recorded as retrieval failures rather than inferred facts.
 | 9 | https://github.com/CoplayDev/unity-mcp | OK | README SHA `a804bd...`; latest commit `2fcc17...` 2026-09-05; package.json SHA `c7b084...`; MIT license SHA `e7f878...` |
 | 10 | https://agentcad.dev/ | BLOCKED/UNAVAILABLE | Direct fetch failed: `No address associated with hostname`. Source repo below used for project facts; website-only claims remain NOT_VERIFIED. |
 | 11 | https://github.com/jdilla1277/agentcad | OK | README SHA `d25145...`; latest commit `4e9636...` 2026-09-14; pyproject SHA `d9bb70...`; Apache-2.0 license from README/pyproject |
-| 12 | https://github.com/ai-cad-labs/ai-cad | OK | README SHA `aee3b0...`; latest commit `c7503b...` 2026-08-09; ADR-0006 SHA `2d7b3f...`; ADR-0012 SHA `96584c...`; Apache-2.0 license SHA `56e8a...` |
+| 12 | https://github.com/ai-cad-labs/ai-cad | OK | README SHA `aee3b0...`; latest commit `c7503b...` 2026-08-09; ADR-0006 SHA `2d7b3f...`; ADR-0012 SHA `96584c...`; Apache-2.0 license SHA `56e8aa...` |
 | 13 | https://github.com/writeitai/team-harness | OK | README SHA `ded9ec...`; latest commit `c07e3a...` 2026-07-20; pyproject SHA `aba1f5...`; Apache-2.0 license SHA `ac139a...` |
 | 14 | https://github.com/agentharnesses/agentharnesses | OK | README SHA `7efee3...`; latest commit `0d855c...` 2026-08-19; harnesses-ref README SHA `edce1c...`; LICENSE SHA `52a2d5...` |
 | 15 | https://github.com/harnessworks/harness-starter-kit | OK | README SHA `43059f...`; latest commit `62437b...` 2026-06-18; validation docs SHA `2087ac...`; theory SHA `0ffd2b...`; MIT license SHA `4f4404...` |
