@@ -63,15 +63,15 @@ invocations used the exact `CFLAGS` shown in `firmware/bench-imu-01/Makefile`
 (`-T linker/STM32G031K8Tx_FLASH.ld -nostdlib -Wl,--gc-sections
 -Wl,-Map=.../bench-imu-01.map ... -lgcc`) and the three `arm-none-eabi-objcopy`/
 `arm-none-eabi-size` post-processing steps -- the full transcript is not
-committed (build logs stay in ignored, task-owned storage only), and this
-summary plus the reproduce command in "Storage and reproducibility" below is
-sufficient to regenerate it exactly.
+included in the current PR file set. This summary and the procedure in
+"Storage and reproducibility" below support repeating the unchanged target
+build and static section checks, not byte-for-byte reproduction.
 
 ## 3. Output verification
 
 All three requested artifacts plus the link map were produced as real,
-non-empty files in the task-owned path (not committed -- see "Storage"
-below):
+non-empty files in the Cloud run's task-owned scratch path (not committed --
+see "Storage" below):
 
 | File | Size (bytes) | SHA-256 |
 |---|---|---|
@@ -143,16 +143,17 @@ board exists in this environment.
 
 ## 5. Storage and reproducibility
 
-Build outputs and the full build log live only in this session's task-owned
-scratch path (`/tmp/rev5-linux-build/`), never committed and never uploaded
-as a CI/Actions artifact -- consistent with the task's write scope. Only
-this handoff document and its size/hash table are added to the repository;
-no build log or binary artifact is committed. No workflow YAML, `tools/`, or
+Build outputs and the full build log were produced in the Cloud run's
+task-owned scratch path (`/tmp/rev5-linux-build/`). Post-run retention and
+retrievability are **NOT_VERIFIED**. No build log or binary artifact is
+included in the current PR file set or published as a CI/Actions artifact --
+consistent with the task's write scope. Only this handoff document and its
+size/hash table are added to the repository. No workflow YAML, `tools/`, or
 root policy file was touched. `firmware/bench-imu-01/Makefile` was **not**
 modified -- the fresh-output build via the Makefile's own `BUILDDIR`
-override fully reproduced the existing target with no code defect found, so
+override built the unchanged target with no code defect found, so
 no regression was needed (per the task's own "no code defect -> documentation
-is the deliverable" instruction). Reproduce with:
+is the deliverable" instruction). Repeat the build with:
 
 ```sh
 sudo apt-get update && sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi
@@ -161,6 +162,11 @@ make BUILDDIR=/tmp/rev5-linux-build/build
 arm-none-eabi-size /tmp/rev5-linux-build/build/bench-imu-01.elf
 sha256sum /tmp/rev5-linux-build/build/bench-imu-01.{elf,bin,hex,map}
 ```
+
+The install commands do not pin the full environment, and ELF debug
+information/map output can embed build paths. The recorded hashes identify
+the observed Cloud run; identical hashes are not guaranteed for a later
+build on an unpinned machine.
 
 ## Scope and unchanged holds
 
@@ -191,9 +197,9 @@ repository remain unqualified.
 - **Output hashes/sizes**: see the table in section 3 above.
 - **Remaining limitations**: no physical board exists to flash or validate
   against; only static build/section-fit is confirmed, not runtime
-  behavior; the build log itself is not committed (kept only in this
-  session's own task-owned scratch storage, per the task's storage
-  constraint) -- this document's command transcript and hash table are the
-  retained reproducibility record.
+  behavior; the full build log was produced in the Cloud run's task-owned
+  scratch, with post-run retention/retrievability **NOT_VERIFIED**. This
+  document's compact summary, recorded commands/tool versions and size/hash
+  table are the retained public record, not a full transcript.
 - **User choice needed**: none -- no compilation defect was found, so no
   code change was required beyond this documentation addition.

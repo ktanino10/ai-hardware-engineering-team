@@ -136,5 +136,6 @@ GCC 16.2.0 record above -- an expected GCC 13 vs. 16 code-generation delta,
 not a flag/source/linker change), **108 bytes** `.bss` (identical), 0 bytes
 `.data` (identical) -- comfortably within the 64 KB flash / 8 KB RAM budget.
 No flash/debugger/serial/hardware target exists in this Makefile and none
-was invoked. Full command transcript, hashes, and reproduction steps:
+was invoked. Build summary, recorded commands/tool versions, sizes/hashes,
+and reproduction procedure:
 [`docs/cloud-linux-firmware-build-2026-09-14/`](../../docs/cloud-linux-firmware-build-2026-09-14/README.md).
