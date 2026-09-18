@@ -19,6 +19,20 @@ Ctrl+C で終了します。ビルドは不要です。組立ビューアーの 
 `file://` より HTTP を使ってください。Three.js は既存 CDN、dashboard は公開 GitHub にアクセスするため、
 完全オフライン動作を保証しません。
 
+## 現在の Rev5 WIP 参照図
+
+[全体モデル v2](https://ktanino10.github.io/ai-hardware-engineering-team/rev5-full-assembly-v2/index.html)は、
+2026-09-15時点の名目メッシュ399個を固定した日本語UIです。分解量、再生・停止・リセット、
+透過線画、三角形に基づくホバー、全IDのSVG参考三面図を利用できます。
+このv2単体は依存ファイルを同梱しており、`file://`でもオフライン動作します。
+[操作ガイド](../visualization/rev5-full-assembly-v2/README.md)と
+[公開範囲・保留項目](rev5-public-release/README.md)を参照してください。
+
+**WIP / NOT ASSEMBLY READY、REF / NOT FOR FABRICATION**です。
+寸法は設置軸のメッシュ外接寸法、動きは表示専用です。公差付き製造図、組立経路の成立、
+物理シミュレーション、完成した購入部品BOMを意味しません。後日の形状・電子系は混在させていません。
+以下のベンチ例は過去の成果物であり、ダッシュボードも現在のRev5の完成を認定しません。
+
 ## 回路ビューアー
 
 UI は英語です。電源配分、実装済みの開ループ動作、**NOT IMPLEMENTED** の閉ループ構想を切り替えます。

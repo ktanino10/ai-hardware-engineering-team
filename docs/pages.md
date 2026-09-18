@@ -18,7 +18,23 @@ Open `http://127.0.0.1:8765/` or `http://127.0.0.1:8765/index.ja.html`.
 Stop with Ctrl+C. There is no build step. HTTP is preferable to `file://`
 for the assembly viewer's ES modules and model loading. Three.js is loaded
 from its existing CDN; the dashboard needs access to public GitHub data.
-This is not an offline guarantee.
+This is not an offline guarantee for those historical viewers.
+
+## Current Rev5 WIP reference
+
+[Open whole-assembly v2](https://ktanino10.github.io/ai-hardware-engineering-team/rev5-full-assembly-v2/index.html).
+The Japanese UI shows 399 nominal meshes from the frozen 2026-09-15 snapshot:
+explosion, play/pause/reset, translucent edges, triangle-based hover and
+reference three-view SVGs for every ID. Its self-contained runtime works
+offline, including `file://`, without the historical viewer's CDN dependencies.
+See its [operation guide](../visualization/rev5-full-assembly-v2/README.md)
+and the [curated release scope](rev5-public-release/README.md).
+
+**WIP / NOT ASSEMBLY READY; REF / NOT FOR FABRICATION.** These are installed-axis
+mesh envelopes and presentation motions, not toleranced drawings, assembly-path
+proof, physical simulation, or a complete purchased-parts BOM. Later geometry
+and electronics epochs are not mixed in. The bench examples below remain
+historical; neither they nor the dashboard certify current Rev5 readiness.
 
 ## Circuit viewer
 
