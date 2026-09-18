@@ -1,0 +1,338 @@
+{
+  "schema_version": 1,
+  "record_type": "DERIVED_PUBLIC_INTAKE",
+  "task_id": "rev5-public-software-followup",
+  "repository": "ktanino10/ai-hardware-engineering-team",
+  "public_base": "ca07ba11bf3347ff467671606c00a6e2b5a70c02",
+  "configuration_at_intake": "ca07ba11bf3347ff467671606c00a6e2b5a70c02",
+  "authority": "Owner-authorized remaining software publication by normal PR, required CI, main merge and Pages navigation verification. No new engineering adoption, license, credentials, protection override, hardware action or additional actor.",
+  "scope": {
+    "c1": "Derived aggregate status only. The sealed private production input closure, CLI and production datasets are not exported or reconstructed.",
+    "imu": "Unchanged disagreement wrapper, four estimator/helper modules, original 14-test suite and the exact synthetic one-bias config/samples only.",
+    "n8r8": "Unchanged evaluation/build/source guards and measurement/pin/vendor closure. Only the test's pin-reference locator is ported to an explicitly derived U201 reference: no raw native netlist or hardware design changes.",
+    "publication": "EN/JA reader guides, manifest, scoped checks in the existing simulation workflow and landing links. Existing required checks and v2 assets remain."
+  },
+  "sources": [
+    {
+      "revision": "a7b935d1fc199d4bfcb68c8c2218c7649fd7fc91",
+      "path": "simulation/imu_disagreement/__init__.py",
+      "bytes": 70,
+      "sha256": "c608d78be25dbbf3538c182192455a12247329acc593066c31210d263d07f150",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "a7b935d1fc199d4bfcb68c8c2218c7649fd7fc91",
+      "path": "simulation/imu_disagreement/__main__.py",
+      "bytes": 2637,
+      "sha256": "45ed1be56ad6d51e0fb724bda963bb845c22cb6f3a54016cb9a58d495d2c8710",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "a7b935d1fc199d4bfcb68c8c2218c7649fd7fc91",
+      "path": "simulation/imu_disagreement/report.py",
+      "bytes": 8540,
+      "sha256": "5b0c2d6a86d9cb0de128037fe120364358996794cfdaa3d9b3b2b7e529a6f276",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "a7b935d1fc199d4bfcb68c8c2218c7649fd7fc91",
+      "path": "simulation/imu_disagreement/tests/test_report.py",
+      "bytes": 11607,
+      "sha256": "3df588a2d27d1cb8e37f8ef9985dac88aa3b770178fafef65750afe0e52e8e83",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "a7b935d1fc199d4bfcb68c8c2218c7649fd7fc91",
+      "path": "simulation/imu_estimation/__init__.py",
+      "bytes": 103,
+      "sha256": "b7db592469cc569173310bb8533008a3249a04706f9b3a06b537153cbb8197d3",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "a7b935d1fc199d4bfcb68c8c2218c7649fd7fc91",
+      "path": "simulation/imu_estimation/estimator.py",
+      "bytes": 8695,
+      "sha256": "032810a1e178692cfdc637dccf914d799005473b1f0c87c7c13601b318c7ce3c",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "a7b935d1fc199d4bfcb68c8c2218c7649fd7fc91",
+      "path": "simulation/imu_estimation/schema.py",
+      "bytes": 4424,
+      "sha256": "f63ad25736bf865154f4670a656a6c1193b3c301ac61cf1d952979830c5893ae",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "a7b935d1fc199d4bfcb68c8c2218c7649fd7fc91",
+      "path": "simulation/imu_estimation/math3d.py",
+      "bytes": 1893,
+      "sha256": "bd82d9c399733a3c70f5bb9ea28daf8aa8f83e1baa661620c2706bdf80a068d9",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "a7b935d1fc199d4bfcb68c8c2218c7649fd7fc91",
+      "path": "docs/rev5-six-imu-fault-study-2026-09-13/author/run-001/one-bias/config.json",
+      "bytes": 4270,
+      "sha256": "dfd0d6ec924f7ef51771635ffcddc089e632b0b0f785c966431b89db01b0d8a6",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "a7b935d1fc199d4bfcb68c8c2218c7649fd7fc91",
+      "path": "docs/rev5-six-imu-fault-study-2026-09-13/author/run-001/one-bias/samples.jsonl",
+      "bytes": 1669574,
+      "sha256": "897d197be8f7b531f1b8669ede033304888569eda0810d6c0ea76b21bef301ce",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "a7b935d1fc199d4bfcb68c8c2218c7649fd7fc91",
+      "path": "simulation/imu_disagreement/README.md",
+      "bytes": 4727,
+      "sha256": "c2b37930679583e94ab3fae0367da0775c963690824cf530e9b40a9412c58bee",
+      "disposition": "DERIVED_READER_GUIDE"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "firmware/bench-imu-01-rev5/evaluation/n8r8/CMakeLists.txt",
+      "bytes": 1995,
+      "sha256": "4eb4fc7a9b98fb57445d340b544a94e9e9c53f279318fe3779fc96c0eb1f213f",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "firmware/bench-imu-01-rev5/evaluation/n8r8/source-contract.cmake",
+      "bytes": 1987,
+      "sha256": "7d6c6a65d713a7d2f3a75a3779bb6172bd881ae75506b1c72d50ce9f5f1947a9",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "firmware/bench-imu-01-rev5/evaluation/n8r8/sdkconfig.defaults",
+      "bytes": 876,
+      "sha256": "6507e51cb89bb492a8ef2d78e062a8fabca697e6310d2d9c5cb333d5624c4677",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "firmware/bench-imu-01-rev5/evaluation/n8r8/evaluation-profile.json",
+      "bytes": 4394,
+      "sha256": "6f67c034103dd4246e71a3924bf82db169e678f7c2628dbb2523540f19b59588",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "firmware/bench-imu-01-rev5/measurement/CMakeLists.txt",
+      "bytes": 982,
+      "sha256": "61b774b0065eafb721408bcb51d14f6d79f0915ffea67a962daadd9f0f904fc2",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "firmware/bench-imu-01-rev5/measurement/main/CMakeLists.txt",
+      "bytes": 324,
+      "sha256": "f833373af1fddfa6db33528e0a6fc87014813b61320a27f65afacd649ef390aa",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "firmware/bench-imu-01-rev5/measurement/main/main.c",
+      "bytes": 24924,
+      "sha256": "bc835654d70d8f422f190cd00b135ad2f50f85b61d91a763b9641a2024f20e05",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "firmware/bench-imu-01-rev5/measurement/sdkconfig.defaults",
+      "bytes": 1189,
+      "sha256": "1cf914c26301b81b6dac42afd94994c2abb07934aabfdfc6c042cd31cf84913c",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "firmware/bench-imu-01-rev5/measurement/measurement-profile.json",
+      "bytes": 6045,
+      "sha256": "062afec56ae315cbe3a4bb07a6ecc901bff59d044b06c62585a901c1289a9a99",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "firmware/bench-imu-01-rev5/preparation/generated/pin_definitions.h",
+      "bytes": 15141,
+      "sha256": "00bb53739d3f90278e09c7813cd1ca56c11c0e8e79e5e7bd171ad16a3c29ea2a",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "firmware/bench-imu-01-rev5/measurement/vendor/bosch/bmi2.c",
+      "bytes": 374283,
+      "sha256": "c3f912bc3033b411fa8df67dbdf66f5b3d74cf203b2e8aa4a8c834821116c2b3",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "firmware/bench-imu-01-rev5/measurement/vendor/bosch/bmi2.h",
+      "bytes": 68902,
+      "sha256": "81334388e9467c8dfefa439b0e2888a3fd93a4eb8de6eb6f62840a6e7e12bd50",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "firmware/bench-imu-01-rev5/measurement/vendor/bosch/bmi2_defs.h",
+      "bytes": 118236,
+      "sha256": "2e2474895d636bc46e1f735a24c380ed4e5356746caf928d0b9a50e6d8fbfbf3",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "firmware/bench-imu-01-rev5/measurement/vendor/bosch/bmi270.c",
+      "bytes": 192739,
+      "sha256": "f6446867378bbcc90ea97ef6593555de8767ca20b799355c1b37c2cabb7b7b41",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "firmware/bench-imu-01-rev5/measurement/vendor/bosch/bmi270.h",
+      "bytes": 15676,
+      "sha256": "7979ec4c943e2825351bd9d3d267b63abc6f8314c1f13f1c37e95cabc3fc82c8",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "firmware/bench-imu-01-rev5/measurement/vendor/bosch/LICENSE",
+      "bytes": 1524,
+      "sha256": "56df116398e0b72a12ae353d93002d29175583590283ced2c2510e3d8075546f",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "firmware/bench-imu-01-rev5/measurement/vendor/bosch/provenance.json",
+      "bytes": 2676,
+      "sha256": "114c32ef654b8562abef901d4c61439e0dc7c734e465bb79e00d4b1e862c6814",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "firmware/bench-imu-01-rev5/measurement/licenses/ESP-IDF-LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "firmware/bench-imu-01-rev5/evaluation/n8r8/README.md",
+      "bytes": 7724,
+      "sha256": "0a92feb25e7b7135f4549c11301626298b1cc68764bd9e23691d2721c475cead",
+      "disposition": "DERIVED_READER_GUIDE"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "firmware/bench-imu-01-rev5/measurement/README.md",
+      "bytes": 21082,
+      "sha256": "afb8d23ea7fe6c2e1f1528c562878fe6719f3d7075cad7347702e14f466ee224",
+      "disposition": "DERIVED_READER_GUIDE"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "firmware/bench-imu-01-rev5/measurement/NOTICE.md",
+      "bytes": 1378,
+      "sha256": "d71df7834d94d154a85d23da178e0e69644ea2abcbf53dced7dd71174b8122ff",
+      "disposition": "DERIVED_READER_GUIDE"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "firmware/bench-imu-01-rev5/evaluation/n8r8/tests/test_profile.py",
+      "bytes": 5653,
+      "sha256": "db86193028353c27eccf5f1dacf23893321a019be0d3339032d495b95dd846bc",
+      "disposition": "DERIVED_TEST_PIN_FIXTURE_LOCATOR_ONLY"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "hardware/schematic/bench-imu-01-rev5/checks/rev5-int-wip-3f-u1/native-netlist.xml",
+      "bytes": 184706,
+      "sha256": "aebe15515f997cc3c38f797081c3179889492aa49e80180921fe3f523909789a",
+      "disposition": "DERIVED_U201_PIN_REFERENCE_ONLY"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "docs/rev5-controller-memory-variant-comparison-2026-09-18/source-metadata.json",
+      "bytes": 12873,
+      "sha256": "7f697dc31f2f6dc4aac8afc0363b2402dd4868d44b6471aca4e8d88cf1e81007",
+      "disposition": "DERIVED_MANUFACTURER_METADATA_ONLY"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "datasheets/evidence-log.md",
+      "bytes": 609473,
+      "sha256": "0035a35970110c084f499d7d369f4aab8bfc017c1f5ab0cb0220dbc5b50f2c1a",
+      "disposition": "DERIVED_CITED_SOURCE_ROWS_ONLY"
+    },
+    {
+      "revision": "89808e295bfdce121e897dbec36e366194a43983",
+      "path": "docs/rev5-c1-bom-readiness-2026-09-18/current/readiness.json",
+      "bytes": 221066,
+      "sha256": "35a0284798e88785f99cfc672d46037443fb650d00f13d6533a15bd0018637ea",
+      "disposition": "DERIVED_AGGREGATE_SUMMARY_ONLY"
+    },
+    {
+      "revision": "89808e295bfdce121e897dbec36e366194a43983",
+      "path": "docs/rev5-c1-bom-readiness-2026-09-18/README.md",
+      "bytes": 5791,
+      "sha256": "1f9dac3cbcd69094721e7d334f0204efd2b40a3803bd17b0f9d761832d9a33c8",
+      "disposition": "PROVENANCE_ONLY_NOT_EXPORTED"
+    },
+    {
+      "revision": "5d70e3126a5008904ff3d32ccdcda28cd26f1e29",
+      "path": "docs/rev5-recent-software-review-2026-09-18/reports/review.json",
+      "bytes": 46039,
+      "sha256": "15884333499705c62ddbf614bb5fc9d7ec21dbb285adc9e7b4a63d5c93a4b0b8",
+      "disposition": "DERIVED_REVIEW_SUMMARY_ONLY"
+    },
+    {
+      "revision": "5d70e3126a5008904ff3d32ccdcda28cd26f1e29",
+      "path": "docs/rev5-recent-software-review-2026-09-18/reports/checks.json",
+      "bytes": 7504,
+      "sha256": "654608bfa5f84f7cd6612872d872cdd7e96a14b7bb8610daf7f771dc810142a2",
+      "disposition": "DERIVED_REVIEW_SUMMARY_ONLY"
+    },
+    {
+      "revision": "5d70e3126a5008904ff3d32ccdcda28cd26f1e29",
+      "path": "docs/rev5-recent-software-review-2026-09-18/reports/handoff-ja.md",
+      "bytes": 7142,
+      "sha256": "64303ff76fda5ecf1f3be07759bc7ad44593673cfdbb031ac50543513a27f847",
+      "disposition": "DERIVED_REVIEW_SUMMARY_ONLY"
+    }
+  ],
+  "completed_independent_review": {
+    "commit": "5d70e3126a5008904ff3d32ccdcda28cd26f1e29",
+    "technical_commit": "7b033d9fb7675ac1d2a6847cfc73b40422d52568",
+    "verdict": "PASS_FOR_NAMED_SOFTWARE_SOURCE_SCOPES_WITH_EXPLICIT_NOT_RUN_LIMITS",
+    "new_concrete_defects": 0,
+    "unit_tests_run_pass": {
+      "c1": 18,
+      "imu": 14,
+      "n8r8": 4,
+      "total": 36
+    },
+    "n8r8_dynamic_cmake_test": "NOT_RUN: reviewer host CMake unavailable",
+    "sdk_build_elf_bin_device_checks": "EXCLUDED",
+    "publication_test_changes": "Not retroactively independently reviewed. Any new CMake execution is new publisher/CI evidence, not an amended review.",
+    "handoff_boundary": "Original receipts remain private. The normal publication guard freezes this hash-bound derived intake; it does not claim to import the private producer's complete deliverables as a scheduler dependency."
+  },
+  "rights_basis": "Owner-authorized first-party source/fixtures. Bosch BSD-3-Clause files and notices remain verbatim; ESP-IDF license retained, SDK not distributed. No new repository or downstream license.",
+  "excluded": [
+    "private ancestry and sealed C1 power-return inputs",
+    "raw manufacturer documents and user uploads",
+    "private reviewer/provider/account/actor/host logs",
+    "SDK/tool snapshots, ELF/BIN and device access",
+    "raw native netlist with local paths and full design history",
+    "held sidecar/control, active v3 and Blender media"
+  ],
+  "holds": [
+    "WIP / NOT ASSEMBLY READY",
+    "NO-GO / 3C8H / REQ409 / strict-pro / 39UNKNOWN",
+    "P1/C1/D1; RRT; sidecar/ICD/control and all human/physical gates",
+    "C1 zero adopted; quantity UNKNOWN; not orderable",
+    "N8R8 NOT_FOR_FLASH; full Rev5 FG35/36/37 conflict",
+    "original44=2closed42unfinished"
+  ],
+  "stop_when": "Missing source/rights/auth/required-check/app prerequisite, or finite normal publication and exact remote/Pages read-back delivered; no extra phase."
+}
