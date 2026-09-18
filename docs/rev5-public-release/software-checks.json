@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "record_type": "NEW_PUBLICATION_CHECKS_NOT_INDEPENDENT_REVIEW",
+  "status": "LOCAL_PUBLIC_INPUT_CLOSURE_PASS_CI_PENDING",
+  "independent_review": false,
+  "historical_review": "software-review.json",
+  "historical_review_n8r8_dynamic_cmake": "NOT_RUN; unchanged",
+  "publisher_sdk_build_elf_bin": "NOT_RUN; excluded from this publication",
+  "hardware_device_actions": "NOT_RUN; not authorized",
+  "local_cmake": "UNAVAILABLE on the publication host",
+  "local_checks": [
+    {"check": "public export integrity and boundaries", "tests": 9, "result": "PASS"},
+    {"check": "original IMU disagreement suite", "tests": 14, "result": "PASS"},
+    {"check": "tracked-file workflow and bilingual regressions", "tests": 45, "result": "PASS"},
+    {"check": "agent and skill frontmatter", "agents": 14, "skills": 17, "result": "PASS"},
+    {"check": "canonical namespace uniqueness", "ids": 584, "result": "PASS"},
+    {"check": "unchanged v2 feature tests", "tests": 3, "result": "PASS"},
+    {"check": "Git index versus public manifest", "files": 51, "result": "PASS"}
+  ],
+  "public_only_reproduction": {
+    "python": "3.9.6",
+    "input": "Positive public Git-index archive extracted outside any repository",
+    "public_index_tree": "d65e034a259c3f30ad822aad7dd19bd31aeda44f",
+    "tested_manifest_sha256": "461f8b022df09e2a17c8a6c7a7465e23b8bfbc3972235c0a2bf87a6fbf8c517d",
+    "git_discovery_probe_exit": 128,
+    "private_git_objects_available": false,
+    "public_export_tests": 9,
+    "imu_original_tests": 14,
+    "test_result": "PASS",
+    "cli_exit": 0,
+    "synthetic_records": 1201,
+    "comparable_records": 1201,
+    "unresolved_records": 0,
+    "report_sha256": "000615b717220cc1946e4d890046bf34383b72119458552739e3e2924080b47a",
+    "limit": "This hash binds the tested export before this result record was added. Only publication metadata changes afterward; current-head CI remains required."
+  },
+  "initial_local_attempts_preserved": [
+    {
+      "check": "frontmatter and workflow tests",
+      "result": "MISSING_DEPENDENCY: PyYAML",
+      "resolution": "Installed the existing CI dependency into a task-local import directory, not global Python. Both commands then passed; the earlier failure is not relabeled."
+    },
+    {
+      "check": "git diff --cached --check",
+      "exit": 2,
+      "cause": "Default Git whitespace handling flags original CRLF endings in the five byte-identical Bosch C/header files.",
+      "resolution": "Per-command git -c core.whitespace=cr-at-eol diff --cached --check returned 0. No file bytes or Git configuration were changed; staged SHA-256 values remain identical to upstream."
+    }
+  ],
+  "new_ci_cmake_evidence": "PENDING; existing hosted CI will run the unchanged source guard test",
+  "publication_state": "Local export and checks complete; PR/merge/deploy must be established separately"
+}

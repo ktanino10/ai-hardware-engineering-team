@@ -36,6 +36,12 @@ proof, physical simulation, or a complete purchased-parts BOM. Later geometry
 and electronics epochs are not mixed in. The bench examples below remain
 historical; neither they nor the dashboard certify current Rev5 readiness.
 
+The [software follow-up](rev5-public-release/software.md) publishes an offline
+synthetic IMU CLI and a source-only N8R8 evaluation closure, plus a C1
+summary rather than its private production inputs. The landing page links
+to their GitHub guides; these command-line tools do not run in the viewer.
+The original v2 data, geometry epoch and physical holds remain unchanged.
+
 ## Circuit viewer
 
 The English UI has three modes: power distribution, implemented open-loop

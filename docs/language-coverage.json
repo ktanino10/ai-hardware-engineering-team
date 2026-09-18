@@ -30,14 +30,18 @@
     {"source": "visualization/assembly-viewer/README.md", "en": "visualization/assembly-viewer/README.md", "ja": "docs/assembly-viewer.ja.md", "kind": "reading-edition"},
     {"source": "visualization/dashboard/README.md", "en": "visualization/dashboard/README.md", "ja": "docs/dashboard.ja.md", "kind": "reading-edition"},
     {"source": "visualization/rev5-full-assembly-v2/README.md", "en": "visualization/rev5-full-assembly-v2/README.md", "ja": "docs/pages.ja.md", "kind": "reading-edition"},
-    {"source": "docs/rev5-public-release/README.md", "en": "docs/rev5-public-release/README.md", "ja": "docs/pages.ja.md", "kind": "reading-edition"}
+    {"source": "docs/rev5-public-release/README.md", "en": "docs/rev5-public-release/README.md", "ja": "docs/pages.ja.md", "kind": "reading-edition"},
+    {"source": "simulation/imu_disagreement/README.md", "en": "simulation/imu_disagreement/README.md", "ja": "docs/rev5-public-release/software.ja.md", "kind": "reading-edition"},
+    {"source": "firmware/bench-imu-01-rev5/evaluation/n8r8/README.md", "en": "firmware/bench-imu-01-rev5/evaluation/n8r8/README.md", "ja": "docs/rev5-public-release/software.ja.md", "kind": "reading-edition"},
+    {"source": "firmware/bench-imu-01-rev5/measurement/README.md", "en": "firmware/bench-imu-01-rev5/measurement/README.md", "ja": "docs/rev5-public-release/software.ja.md", "kind": "reading-edition"}
   ],
   "new_pairs": [
     {"en": "docs/README.md", "ja": "docs/README.ja.md"},
     {"en": "docs/pages.md", "ja": "docs/pages.ja.md"},
     {"en": "docs/hardware.md", "ja": "docs/hardware.ja.md"},
     {"en": "docs/language-coverage.md", "ja": "docs/language-coverage.ja.md"},
-    {"en": "visualization/index.html", "ja": "visualization/index.ja.html"}
+    {"en": "visualization/index.html", "ja": "visualization/index.ja.html"},
+    {"en": "docs/rev5-public-release/software.md", "ja": "docs/rev5-public-release/software.ja.md"}
   ],
   "shared_machine_policy_prefixes": [".github/"],
   "shared_engineering_record_prefixes": [

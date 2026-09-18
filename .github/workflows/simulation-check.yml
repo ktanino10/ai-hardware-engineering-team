@@ -4,11 +4,19 @@ on:
   pull_request:
     paths:
       - "simulation/**"
+      - "firmware/bench-imu-01-rev5/**"
+      - "docs/rev5-public-release/software*"
+      - "docs/rev5-six-imu-fault-study-2026-09-13/author/run-001/one-bias/**"
+      - "tools/tests/test_rev5_public_software.py"
       - ".github/workflows/simulation-check.yml"
   push:
     branches: [main]
     paths:
       - "simulation/**"
+      - "firmware/bench-imu-01-rev5/**"
+      - "docs/rev5-public-release/software*"
+      - "docs/rev5-six-imu-fault-study-2026-09-13/author/run-001/one-bias/**"
+      - "tools/tests/test_rev5_public_software.py"
       - ".github/workflows/simulation-check.yml"
   workflow_dispatch: {}
 
@@ -31,3 +39,13 @@ jobs:
       - name: Run CPU numerical and provenance cases
         working-directory: simulation
         run: python -m unittest discover -s tests -v
+      - name: Check curated Rev5 public software (no SDK or hardware)
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          python -B -m unittest discover -s tools/tests -p 'test_rev5_public_software.py' -v
+          python -B -m unittest discover -s simulation/imu_disagreement/tests -v
+          cmake --version
+          export REV5_EVAL_CMAKE="$(command -v cmake)"
+          export REV5_EVAL_TEST_SCRATCH="$(mktemp -d "$RUNNER_TEMP/rev5-n8r8.XXXXXX")"
+          python -B firmware/bench-imu-01-rev5/evaluation/n8r8/tests/test_profile.py -v

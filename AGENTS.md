@@ -43,6 +43,7 @@ generic setup ritual.
 | Agent/skill metadata | `python3 tools/check_agent_frontmatter.py` |
 | Work contracts, instructions and onboarding | `PYTHONPATH=tools python3 -m unittest discover -s tools/tests -p 'test_*workflow*.py'` |
 | Shared Python check/evidence behavior | `PYTHONPATH=tools python3 -m unittest discover -s tools/tests` |
+| Curated Rev5 public software | `python3 -B -m unittest discover -s tools/tests -p 'test_rev5_public_software.py'`; IMU and SDK-free CMake commands in [the public guide](docs/rev5-public-release/software.md) |
 | Canonical Evidence/Issue/ECO namespaces | `python3 tools/check_id_uniqueness.py` |
 | Supported mechanical/PCB dimensional pairing | `python3 tools/check_mechanical_pcb_sync.py` |
 

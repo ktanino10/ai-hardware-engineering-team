@@ -75,6 +75,13 @@ macOSの標準Chrome配置以外は `--browser /path/to/existing/chrome` を追�
 | N8R8評価 | profile/code/buildは保留。独立レビュー、測定・pin・vendor依存と通知が必要。NOT_FOR_FLASH、測定subsetのみ。全Rev5の35/36/37との競合は未解消 |
 | 過去のBlender/FreeCAD | geometry epochを混ぜず保留。native binaryやeditor実行は含めない |
 
+上表は**元PR79公開時点の記録**です。[別のソフトウェア追補](rev5-public-release/software.ja.md)では、
+C1の派生要約、synthetic IMUの実行可能な最小依存一式、N8R8のsource-only評価依存を公開します。
+独立レビュー36件PASSと当時のCMake NOT_RUN、今回の確認は分けて記録します。
+C1の私有生産入力、SDK・ELF/BIN、実機の許可は追加しません。
+Pages入口からGitHub上の手順へ移動するもので、CLIをビューアー内で実行する機能ではありません。
+元v2の形状とmanifestは不変です。
+
 全成果物の公開完了ではありません。必須CI後の通常マージとPages deploy成功は別に確認し、
 実URLでの描画・操作を検査します。戻す場合も通常のreview付きrevertと同じ必須チェック・deployを使います。
 NO-GO / 3C8H / REQ409 / strict-pro / 39UNKNOWN、P1/C1/D1、sidecar/ICD/control、

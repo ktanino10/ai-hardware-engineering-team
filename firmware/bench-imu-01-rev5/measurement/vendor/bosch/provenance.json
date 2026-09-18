@@ -1,0 +1,66 @@
+{
+  "repository": "https://github.com/boschsensortec/BMI270_SensorAPI.git",
+  "tag": "v2.86.1",
+  "commit": "d270cdee303b2ed9ea4c43fb7064da8ded8a48b4",
+  "license": "BSD-3-Clause",
+  "files": [
+    {
+      "path": "vendor/bosch/bmi2.c",
+      "upstream_path": "bmi2.c",
+      "sha256": "c3f912bc3033b411fa8df67dbdf66f5b3d74cf203b2e8aa4a8c834821116c2b3",
+      "bytes": 374283,
+      "url": "https://github.com/boschsensortec/BMI270_SensorAPI/blob/d270cdee303b2ed9ea4c43fb7064da8ded8a48b4/bmi2.c",
+      "modified": false
+    },
+    {
+      "path": "vendor/bosch/bmi2.h",
+      "upstream_path": "bmi2.h",
+      "sha256": "81334388e9467c8dfefa439b0e2888a3fd93a4eb8de6eb6f62840a6e7e12bd50",
+      "bytes": 68902,
+      "url": "https://github.com/boschsensortec/BMI270_SensorAPI/blob/d270cdee303b2ed9ea4c43fb7064da8ded8a48b4/bmi2.h",
+      "modified": false
+    },
+    {
+      "path": "vendor/bosch/bmi2_defs.h",
+      "upstream_path": "bmi2_defs.h",
+      "sha256": "2e2474895d636bc46e1f735a24c380ed4e5356746caf928d0b9a50e6d8fbfbf3",
+      "bytes": 118236,
+      "url": "https://github.com/boschsensortec/BMI270_SensorAPI/blob/d270cdee303b2ed9ea4c43fb7064da8ded8a48b4/bmi2_defs.h",
+      "modified": false
+    },
+    {
+      "path": "vendor/bosch/bmi270.c",
+      "upstream_path": "bmi270.c",
+      "sha256": "f6446867378bbcc90ea97ef6593555de8767ca20b799355c1b37c2cabb7b7b41",
+      "bytes": 192739,
+      "url": "https://github.com/boschsensortec/BMI270_SensorAPI/blob/d270cdee303b2ed9ea4c43fb7064da8ded8a48b4/bmi270.c",
+      "modified": false
+    },
+    {
+      "path": "vendor/bosch/bmi270.h",
+      "upstream_path": "bmi270.h",
+      "sha256": "7979ec4c943e2825351bd9d3d267b63abc6f8314c1f13f1c37e95cabc3fc82c8",
+      "bytes": 15676,
+      "url": "https://github.com/boschsensortec/BMI270_SensorAPI/blob/d270cdee303b2ed9ea4c43fb7064da8ded8a48b4/bmi270.h",
+      "modified": false
+    },
+    {
+      "path": "vendor/bosch/LICENSE",
+      "upstream_path": "LICENSE",
+      "sha256": "56df116398e0b72a12ae353d93002d29175583590283ced2c2510e3d8075546f",
+      "bytes": 1524,
+      "url": "https://github.com/boschsensortec/BMI270_SensorAPI/blob/d270cdee303b2ed9ea4c43fb7064da8ded8a48b4/LICENSE",
+      "modified": false
+    }
+  ],
+  "blob": {
+    "symbol": "bmi270_config_file",
+    "source": "vendor/bosch/bmi270.c",
+    "bytes_independently_counted": 8192,
+    "sha256": "2d75e68e343a13ff99be98261dfbd99d9e8c6f267da9e3c5aeb883276ad178db",
+    "legacy_path": "firmware/bench-imu-01/src/bmi270_config_file.h",
+    "legacy_file_sha256": "0ce12262016ff2fb0211829ba593eb2463116dabb2ebc10456eaea74338d9f8c",
+    "legacy_blob_identical": true,
+    "legacy_file_modified": false
+  }
+}
