@@ -111,3 +111,31 @@ brew install arm-none-eabi-gcc   # or your platform's equivalent package
 cd firmware/bench-imu-01
 make
 ```
+
+## Linux build verification (2026-09-14, hosted Ubuntu, no hardware)
+
+The macOS/Homebrew build above is a prior actual build record, not a
+declared universal toolchain pin. This unchanged target was also verified
+to build cleanly on the standard hosted Ubuntu environment (24.04.5 LTS),
+using the ordinary distribution package instead of Homebrew:
+
+```sh
+sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi
+cd firmware/bench-imu-01
+make BUILDDIR=/tmp/rev5-linux-build/build   # fresh, task-owned output path
+```
+
+`arm-none-eabi-gcc (15:13.2.rel1-2) 13.2.1 20231009` with GNU Binutils
+`2.42` (`objcopy`/`size`) produced `bench-imu-01.elf`/`.bin`/`.hex` and a
+`.map`, **exit 0, zero warnings** under `-Wall -Wextra`. `.elf` is a real
+32-bit little-endian ARM/EABI5 executable; `.isr_vector`/`.text` load at
+FLASH's unchanged `0x08000000` origin and `.data`/`.bss` at RAM's unchanged
+`0x20000000` origin (`linker/STM32G031K8Tx_FLASH.ld`, not modified). Size:
+14,844 bytes combined `.isr_vector`+`.text` (+92 bytes vs. the macOS
+GCC 16.2.0 record above -- an expected GCC 13 vs. 16 code-generation delta,
+not a flag/source/linker change), **108 bytes** `.bss` (identical), 0 bytes
+`.data` (identical) -- comfortably within the 64 KB flash / 8 KB RAM budget.
+No flash/debugger/serial/hardware target exists in this Makefile and none
+was invoked. Build summary, recorded commands/tool versions, sizes/hashes,
+and reproduction procedure:
+[`docs/cloud-linux-firmware-build-2026-09-14/`](../../docs/cloud-linux-firmware-build-2026-09-14/README.md).
