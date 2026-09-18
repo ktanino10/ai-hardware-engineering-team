@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "record_type": "DERIVED_PUBLIC_EXPORT",
+  "task_id": "rev5-public-software-release",
+  "objective": "Publish a curated, self-contained Rev5 WIP viewer and cleared software on the existing public repository and Pages site.",
+  "authority": "The project owner explicitly requested public repository reflection and normal merge to main followed by Pages verification, conditional on required CI and publication checks.",
+  "public_base": "a6ebb82d712746087aa1735198f5a3778d799fd7",
+  "repository": "ktanino10/ai-hardware-engineering-team",
+  "viewer": {
+    "revision": "7a7924645042ae60386c14e38be4770bfcbfecac",
+    "allowlist": "docs/rev5-full-assembly-v2-2026-09-18/release-allowlist.json",
+    "root": "visualization/rev5-full-assembly-v2",
+    "rights": "Candidate only: trace first-party code and geometry provenance before export."
+  },
+  "software_candidates": [
+    {
+      "name": "C1 readiness",
+      "revision": "89808e295bfdce121e897dbec36e366194a43983",
+      "scope": ["tools/rev5_c1_readiness.py", "tools/tests/test_rev5_c1_readiness.py", "docs/rev5-c1-bom-readiness-2026-09-18"],
+      "boundary": "Not an orderable BOM; zero adopted candidates."
+    },
+    {
+      "name": "Synthetic IMU disagreement",
+      "revision": "a7b935d1fc199d4bfcb68c8c2218c7649fd7fc91",
+      "scope": ["simulation/imu_disagreement", "docs/rev5-imu-disagreement-2026-09-18"],
+      "boundary": "Offline synthetic gyro reporting only; no health decisions or control."
+    },
+    {
+      "name": "N8R8 evaluation",
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "scope": ["firmware/bench-imu-01-rev5/evaluation/n8r8", "docs/rev5-n8r8-evaluation-profile-2026-09-18"],
+      "boundary": "NOT_FOR_FLASH; measurement subset, not the full Rev5 configuration."
+    }
+  ],
+  "conditions": [
+    "Export only cleared immutable files; no private ancestry or whole-branch merge.",
+    "No license, permission, branch-protection or engineering-gate changes.",
+    "No manufacturer originals, raw uploads, private receipts, SDK snapshots or host-specific data.",
+    "Other software requires its independent review and a portable public input closure.",
+    "Source-linked limits remain WIP / NOT ASSEMBLY READY, UNKNOWN, NOT_FOR_FLASH and original 44 = 2 closed / 42 unfinished.",
+    "Normal merge requires passing required checks and publication audit; verify deployment and actual live rendering afterward."
+  ],
+  "stop_when": "A specific required rights, source, authorization, check or approval prerequisite is missing, or the finite cleared release has been deployed and verified.",
+  "provenance_note": "Sanitized publication commission derived from the owner's instructions; not a replacement for original private records."
+}
