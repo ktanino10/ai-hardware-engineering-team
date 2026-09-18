@@ -28,7 +28,9 @@
     {"source": "simulation/root/README.md", "en": "simulation/root/README.md", "ja": "docs/root-analysis.ja.md", "kind": "translation"},
     {"source": "visualization/circuit-viewer/README.md", "en": "visualization/circuit-viewer/README.md", "ja": "docs/circuit-viewer.ja.md", "kind": "reading-edition"},
     {"source": "visualization/assembly-viewer/README.md", "en": "visualization/assembly-viewer/README.md", "ja": "docs/assembly-viewer.ja.md", "kind": "reading-edition"},
-    {"source": "visualization/dashboard/README.md", "en": "visualization/dashboard/README.md", "ja": "docs/dashboard.ja.md", "kind": "reading-edition"}
+    {"source": "visualization/dashboard/README.md", "en": "visualization/dashboard/README.md", "ja": "docs/dashboard.ja.md", "kind": "reading-edition"},
+    {"source": "visualization/rev5-full-assembly-v2/README.md", "en": "visualization/rev5-full-assembly-v2/README.md", "ja": "docs/pages.ja.md", "kind": "reading-edition"},
+    {"source": "docs/rev5-public-release/README.md", "en": "docs/rev5-public-release/README.md", "ja": "docs/pages.ja.md", "kind": "reading-edition"}
   ],
   "new_pairs": [
     {"en": "docs/README.md", "ja": "docs/README.ja.md"},

@@ -9,6 +9,12 @@ branch, raw endpoint, source package or private history is imported.
 References already present in the public text remain references; they
 were not followed to obtain additional design material.
 
+The later [curated Rev5 release](rev5-public-release/README.md) separately adds
+two reader sources from its explicitly authorized export. Their Japanese
+reading destination is [the Pages guide](pages.ja.md), with runtime commands,
+provenance/reproduction limits and deferred-package status. The baseline above
+describes the original language work, not this later source intake.
+
 ## What “covered” means
 
 The [machine-readable inventory](language-coverage.json) maps **all 26
@@ -25,6 +31,7 @@ long historical narratives, numerical design tables, per-part decisions
 and original review receipts remain linked in their canonical source.
 **A reading edition is not a line-for-line translation of that source.**
 No missing historical or engineering translation is advertised as complete.
+The inventory now also classifies the two later Rev5 release/viewer READMEs.
 
 The root and [domain index](README.md#artifact-entry-points-and-operating-instructions)
 provide EN/JA navigation even for source-bound files intentionally left
@@ -50,6 +57,7 @@ English editions, not English headings over Japanese instructions.
 | Pages landing | Separate static EN/JA pages, shared CSS; no build/deployment machinery added |
 | Dashboard UI | Existing EN/JA dictionary/data split retained; explicit language links and language-aware Back added |
 | Circuit/assembly UI | Existing English UI and shared data retained; Japanese descriptions do not claim to translate those runtime interfaces |
+| Rev5 v2 and curated release | Japanese runtime UI; Japanese Pages reading edition covers operation, verification, first-party export basis, unavailable historical regeneration and individually deferred software. Detailed provenance/hash records remain canonical, not a second translated source of truth. |
 
 ## Deliberately shared material, not omitted by accident
 

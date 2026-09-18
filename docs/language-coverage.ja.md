@@ -7,12 +7,18 @@
 入力はこの公開 checkout だけです。私有 branch、raw endpoint、素材束、履歴を取り込みません。
 公開文中にすでにある参照は維持しますが、追加の私有設計情報を取得するために辿っていません。
 
+後続の[Rev5限定公開](rev5-public-release/README.md)は別途明示承認された出力から
+2件のREADMEを追加しています。[Pages日本語ガイド](pages.ja.md)に実行方法、
+生成元・再現性の限界、個別の公開保留を記載しました。上の基準は元の言語対応作業を
+指し、後続の公開取込みを同じ入力だったと主張するものではありません。
+
 ## 「対応済み」の意味
 
 [機械可読対応表](language-coverage.json)は**既存26の読者入口**について
 source、English、日本語、版の種類を1行ずつ記録します。
 root README/AGENTS、active framework guides、各分野の README・手順が対象です。
 regression は README の一覧漏れと未分類 Markdown を検出します。
+後続のRev5ビューアー・限定公開のREADME 2件も、現在の対応表に明示登録しています。
 
 `translation` は操作説明を別言語で提供し、command grammar と境界を保持するものです。
 `reading-edition` は現行の説明・手順を読者向けに編集し、
@@ -43,6 +49,7 @@ EN/JA の導線を提供します。日本語の simulator/startup は、
 | Pages landing | 別 EN/JA static page と共通 CSS。新 build/deploy 機構なし |
 | dashboard UI | 既存 EN/JA と data 分離を維持。明示言語 URL と言語に沿う Back を追加 |
 | 回路・組立 UI | 既存英語 UI・data のまま。日本語の紹介が runtime UI 全翻訳だとは主張しない |
+| Rev5 v2・限定公開 | 日本語UI。Pagesの日本語読者向け版に操作・確認コマンド、第一者成果物の公開根拠、履歴からの再生成不可、ソフトウェアの個別保留を記載。詳細な出所・hashは原記録を維持 |
 
 ## 意図的に共通とする資料
 

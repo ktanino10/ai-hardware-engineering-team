@@ -1,5 +1,7 @@
 # Rev5 v2 — public interactive reference
 
+[English/source](README.md) | [日本語読者向け版](https://github.com/ktanino10/ai-hardware-engineering-team/blob/main/docs/pages.ja.md)
+
 **WIP / NOT ASSEMBLY READY · REF / NOT FOR FABRICATION**
 
 Open `index.html` in a current WebGL browser. Keep the entire runtime bundle

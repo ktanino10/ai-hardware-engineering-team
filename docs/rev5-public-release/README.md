@@ -1,5 +1,7 @@
 # Rev5 curated public release
 
+[English/source](README.md) | [日本語読者向け版](../pages.ja.md)
+
 **DERIVED_PUBLIC_EXPORT / WIP / NOT ASSEMBLY READY**
 
 [日本語の公開入口](https://ktanino10.github.io/ai-hardware-engineering-team/index.ja.html) /
@@ -87,6 +89,10 @@ corrected HTTP run passed all19 checks and compared all12 public-layout assets
 against the local files. It is recorded separately from the original failure.
 
 Required PR CI and the exact publication diff must pass before normal merge.
+The initial required CI caught two unclassified new README paths: local tests
+had preceded staging, while CI enumerated tracked files. The language inventory
+and real Japanese reading coverage were corrected; tests and gates were not
+changed. Final tracked-file CI, not that earlier local pass, controls merge.
 Merge and Pages deployment are separate: the existing workflow publishes
 `visualization/` as the site root. The live browser harness compares each
 runtime file's public HTTP bytes with this checkout before testing controls.
