@@ -1,0 +1,267 @@
+{
+  "schema_version": 1,
+  "record_type": "DERIVED_PUBLIC_EXPORT",
+  "public_base": "a6ebb82d712746087aa1735198f5a3778d799fd7",
+  "runtime_source": "7a7924645042ae60386c14e38be4770bfcbfecac",
+  "geometry_source": "a4a6382f0b80802cf3e22aa1f824d679784c6325",
+  "runtime_external_dependencies": [],
+  "runtime_file_count": 12,
+  "optional_test_file_count": 2,
+  "files": [
+    {
+      "path": "visualization/rev5-full-assembly-v2/index.html",
+      "bytes": 8642,
+      "sha256": "e61fe28811dbeda13da3338e10cf83e6fde28e90c18d17382406165f731a907f",
+      "original_sha256": "a91e185ff82fe2555e8807c54324434e54c9d3aec7c4321f098a4c6116dd9c1f",
+      "original_revision": "7a7924645042ae60386c14e38be4770bfcbfecac",
+      "disposition": "DERIVED_PUBLIC_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v2/style.css",
+      "bytes": 5874,
+      "sha256": "73a3e565d8b4144bc412c9d2b35d4837ec2d684638a0a991be70cae0910ac9cd",
+      "original_sha256": "73a3e565d8b4144bc412c9d2b35d4837ec2d684638a0a991be70cae0910ac9cd",
+      "original_revision": "7a7924645042ae60386c14e38be4770bfcbfecac",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v2/interactive-viewer.js",
+      "bytes": 21676,
+      "sha256": "936a6eedfdd8b09fe873beee30f1d11f7f1be111076aafd26b278200a7a01833",
+      "original_sha256": "936a6eedfdd8b09fe873beee30f1d11f7f1be111076aafd26b278200a7a01833",
+      "original_revision": "7a7924645042ae60386c14e38be4770bfcbfecac",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v2/scene-data.js",
+      "bytes": 8995251,
+      "sha256": "8f55ba45dcd688c0253ec7c81628ce0ccedf7cedd79e7752191f2d8978eeedd0",
+      "original_sha256": "8f55ba45dcd688c0253ec7c81628ce0ccedf7cedd79e7752191f2d8978eeedd0",
+      "original_revision": "7a7924645042ae60386c14e38be4770bfcbfecac",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v2/edge-data.js",
+      "bytes": 4458621,
+      "sha256": "ecec1cd659ed4ca66e1d0126acb9c0ec1e638a927a57fc50bb3d8253d4c35e8b",
+      "original_sha256": "ecec1cd659ed4ca66e1d0126acb9c0ec1e638a927a57fc50bb3d8253d4c35e8b",
+      "original_revision": "7a7924645042ae60386c14e38be4770bfcbfecac",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v2/features.js",
+      "bytes": 3751,
+      "sha256": "eb34d5ced089a11287fef46d8c6717d827943e3177a9f9bdcdca21f27946e11e",
+      "original_sha256": "eb34d5ced089a11287fef46d8c6717d827943e3177a9f9bdcdca21f27946e11e",
+      "original_revision": "7a7924645042ae60386c14e38be4770bfcbfecac",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v2/viewer.js",
+      "bytes": 18946,
+      "sha256": "19f1faeef070418714bf7c58c30798f3b179ceb52779b11e05ca56c4761159de",
+      "original_sha256": "19f1faeef070418714bf7c58c30798f3b179ceb52779b11e05ca56c4761159de",
+      "original_revision": "7a7924645042ae60386c14e38be4770bfcbfecac",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v2/drawings.js",
+      "bytes": 5101,
+      "sha256": "7c8719441b48de3c3a8f86c2abb522a6da97ccaeb4afba62cfdb5212817dab95",
+      "original_sha256": "7c8719441b48de3c3a8f86c2abb522a6da97ccaeb4afba62cfdb5212817dab95",
+      "original_revision": "7a7924645042ae60386c14e38be4770bfcbfecac",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v2/app.js",
+      "bytes": 9534,
+      "sha256": "3769bd8abff922f022ada797ceeeb3d03fcb5ddef7b9deed61b21ce0e8dd2f91",
+      "original_sha256": "3769bd8abff922f022ada797ceeeb3d03fcb5ddef7b9deed61b21ce0e8dd2f91",
+      "original_revision": "7a7924645042ae60386c14e38be4770bfcbfecac",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v2/inventory.json",
+      "bytes": 514667,
+      "sha256": "3caf94d95eedaef9f657be31b7e82cfce22a4b96a262d184249790026c2dd9ba",
+      "original_sha256": "3caf94d95eedaef9f657be31b7e82cfce22a4b96a262d184249790026c2dd9ba",
+      "original_revision": "7a7924645042ae60386c14e38be4770bfcbfecac",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v2/runtime-assets.json",
+      "bytes": 872,
+      "sha256": "b605c6fe7547c293ba813b14738fbb2198c1c7fd4fc3dfe2d8387650a6fe0411",
+      "original_sha256": "b605c6fe7547c293ba813b14738fbb2198c1c7fd4fc3dfe2d8387650a6fe0411",
+      "original_revision": "7a7924645042ae60386c14e38be4770bfcbfecac",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v2/README.md",
+      "bytes": 6140,
+      "sha256": "c11adc5054a5e7a46d9922f81bf150db43d085efe3e58c31cac808173985a307",
+      "original_sha256": "4e5979c2c6a222060d36a2c5f04a614836d2bc6bbc02da3d308d2407a9e6c110",
+      "original_revision": "7a7924645042ae60386c14e38be4770bfcbfecac",
+      "disposition": "DERIVED_PUBLIC_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v2/features_test.mjs",
+      "bytes": 2532,
+      "sha256": "0e6913c09434c395b07bbe9106cff2e6621e2ab73cc38c0426653e365799afee",
+      "original_sha256": "0e6913c09434c395b07bbe9106cff2e6621e2ab73cc38c0426653e365799afee",
+      "original_revision": "7a7924645042ae60386c14e38be4770bfcbfecac",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v2/browser_test.mjs",
+      "bytes": 27757,
+      "sha256": "1465bd7e27fdb9002aa39f11389ff089311287525b00f828a6458ac05d002c66",
+      "original_sha256": "27decfbb8b1c3cef7fbe69142d1afdb2cfaecd8bee0073cb8b64b8ef71bc9976",
+      "original_revision": "7a7924645042ae60386c14e38be4770bfcbfecac",
+      "disposition": "DERIVED_PUBLIC_EXPORT"
+    }
+  ],
+  "provenance_only_sources": [
+    {
+      "path": "docs/rev5-phase-hall-service-margin-wip-2026-09-13/candidate/build.py",
+      "revision": "a4a6382f0b80802cf3e22aa1f824d679784c6325",
+      "sha256": "294214c697f026fb94a07d8516fa375a82bec86b133d39a1e208c07b714c9505",
+      "included": false,
+      "purpose": "Read-only first-party generation provenance"
+    },
+    {
+      "path": "docs/rev5-phase-hall-service-margin-wip-2026-09-13/candidate/service-interface.scad",
+      "revision": "a4a6382f0b80802cf3e22aa1f824d679784c6325",
+      "sha256": "efb5aa3f64bf738466a3b2c4f40ce613891be7b844d42e9d478af6e50c4a4501",
+      "included": false,
+      "purpose": "Read-only first-party generation provenance"
+    },
+    {
+      "path": "docs/rev5-phase-hall-larger-cassette-wip-2026-09-13/candidate/build_cases.py",
+      "revision": "a4a6382f0b80802cf3e22aa1f824d679784c6325",
+      "sha256": "eb8914c528c73952d08ba7d1b15678c767708d83b1219d658311173d04b0c73f",
+      "included": false,
+      "purpose": "Read-only first-party generation provenance"
+    },
+    {
+      "path": "docs/rev5-phase-hall-larger-cassette-wip-2026-09-13/candidate/cassette_tools.py",
+      "revision": "a4a6382f0b80802cf3e22aa1f824d679784c6325",
+      "sha256": "964d798de96b21eaf7c82c0b17c17996a0ebebd7ff76b4d886e77995f32875e0",
+      "included": false,
+      "purpose": "Read-only first-party generation provenance"
+    },
+    {
+      "path": "docs/rev5-phase-hall-larger-cassette-wip-2026-09-13/candidate/cassette.scad",
+      "revision": "a4a6382f0b80802cf3e22aa1f824d679784c6325",
+      "sha256": "f8d0d489bb92dd424646fabd50a8d2426967852d03f7acf28aa7186ea6ccf203",
+      "included": false,
+      "purpose": "Read-only first-party generation provenance"
+    },
+    {
+      "path": "docs/rev5-240mm-internal-layout-wip-2026-09-12/correction-002/candidate/build.py",
+      "revision": "a4a6382f0b80802cf3e22aa1f824d679784c6325",
+      "sha256": "fe3a222ee14aadcc3d34cbebfc3efabc114467443abd304f78aa44443608c257",
+      "included": false,
+      "purpose": "Read-only first-party generation provenance"
+    },
+    {
+      "path": "docs/rev5-240mm-internal-layout-wip-2026-09-12/correction-001/candidate/build.py",
+      "revision": "a4a6382f0b80802cf3e22aa1f824d679784c6325",
+      "sha256": "f70c7c01f5ed1fcafd2037af6cf78afcb911089f6f82e2361ef95d5829f86acd",
+      "included": false,
+      "purpose": "Read-only first-party generation provenance"
+    },
+    {
+      "path": "docs/rev5-240mm-internal-layout-wip-2026-09-12/candidate/build.py",
+      "revision": "a4a6382f0b80802cf3e22aa1f824d679784c6325",
+      "sha256": "dfc1633fa2b9d8b8b9129789b05c5f0d64f97994427eed6a672f184aa03630cf",
+      "included": false,
+      "purpose": "Read-only first-party generation provenance"
+    },
+    {
+      "path": "docs/rev5-adjustable-mount-cable-wip-2026-09-12/candidate/build_check.py",
+      "revision": "a4a6382f0b80802cf3e22aa1f824d679784c6325",
+      "sha256": "d122b1b88cc712ed4dc7183093b499629ed1da7cc91da34bb7f4287962cdf44d",
+      "included": false,
+      "purpose": "Read-only first-party generation provenance"
+    },
+    {
+      "path": "docs/rev5-adjustable-mount-cable-wip-2026-09-12/candidate/mount.scad",
+      "revision": "a4a6382f0b80802cf3e22aa1f824d679784c6325",
+      "sha256": "2c2ac92905c6b5ecaf6fe57481c4cfc695af7f537bfa3f6b5934aa13d99a525c",
+      "included": false,
+      "purpose": "Read-only first-party generation provenance"
+    },
+    {
+      "path": "hardware/mechanical/rev5-pcb-current76/export76.py",
+      "revision": "a4a6382f0b80802cf3e22aa1f824d679784c6325",
+      "sha256": "5a19d6cd3eb8d9efbf85aed3afae5f85fb19292d77b44c38d9511325ac6b2456",
+      "included": false,
+      "purpose": "Read-only first-party generation provenance"
+    },
+    {
+      "path": "hardware/mechanical/rev5-pcb-current76/reference76.scad",
+      "revision": "a4a6382f0b80802cf3e22aa1f824d679784c6325",
+      "sha256": "981d0473b21483e2fa7b4f82afe8ec94f37140d540b52153f0e612cc14789691",
+      "included": false,
+      "purpose": "Read-only first-party generation provenance"
+    },
+    {
+      "path": "hardware/mechanical/rev5-pcb-current76/source22-yageo/bodies.scad",
+      "revision": "a4a6382f0b80802cf3e22aa1f824d679784c6325",
+      "sha256": "e7c77ba5a00c2bc847a7b71b42458a31315288b24c4fb287426d5303dc1edb47",
+      "included": false,
+      "purpose": "Read-only first-party generation provenance"
+    },
+    {
+      "path": "hardware/mechanical/rev5-pcb-current76/support-candidates.scad",
+      "revision": "a4a6382f0b80802cf3e22aa1f824d679784c6325",
+      "sha256": "12e28df077c2fff30ef7b5512967fc519020bbe4357e79f4af8ddb97fb24ea26",
+      "included": false,
+      "purpose": "Read-only first-party generation provenance"
+    },
+    {
+      "path": "hardware/mechanical/bench-imu-01-enclosure.scad",
+      "revision": "a4a6382f0b80802cf3e22aa1f824d679784c6325",
+      "sha256": "2c160a47759ba4c413e5e2f79096077bf37673c5818eed7c2256cbc9ae54a133",
+      "included": false,
+      "purpose": "Read-only first-party generation provenance"
+    }
+  ],
+  "source_verification": {
+    "component_count": 399,
+    "triangle_count": 794132,
+    "coordinate_payload_sha256": "c7f7e919f6aeb35b7ae320de988293b77fe01539c3f4642b514e7d61092f07f8",
+    "all_original_mesh_hashes_checked": true,
+    "all_packed_coordinates_byte_equal_to_original_stl_corners": true,
+    "native_execution": false
+  },
+  "rights_basis": "Owner-authorized first-party project code and procedural nominal/reference geometry; no imported supplier CAD or original datasheet files; no new downstream license.",
+  "excluded": [
+    "private branch ancestry",
+    "source STL trees",
+    "native editor files",
+    "manufacturer original documents",
+    "raw user uploads or screenshots",
+    "private commissions, actor records and account/provider receipts",
+    "private source/sink/brake history",
+    "SDK snapshots and flash artifacts",
+    ".agent-work and local host paths/profiles/endpoints",
+    "historical source-only packer and tests requiring unavailable Git objects"
+  ],
+  "deferred": [
+    "C1 executable/data",
+    "synthetic IMU CLI and dependency closure",
+    "N8R8 evaluation and measurement/vendor closure",
+    "earlier native presentations"
+  ],
+  "holds": [
+    "WIP / NOT ASSEMBLY READY",
+    "REF / NOT FOR FABRICATION",
+    "NO-GO / 3C8H / REQ409 / strict-pro / 39UNKNOWN",
+    "P1/C1/D1",
+    "sidecar/ICD/control",
+    "original44=2closed42unfinished",
+    "NOT_FOR_FLASH"
+  ]
+}

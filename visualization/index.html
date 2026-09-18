@@ -11,24 +11,29 @@
   <main class="wrap">
     <nav aria-label="Language"><a href="index.html" lang="en" aria-current="page">English</a> | <a href="index.ja.html" lang="ja">日本語</a></nav>
     <h1>AI Hardware Engineering Team</h1>
-    <p class="sub">Interactive explanations of the public Bench-IMU-01 artifacts.</p>
+    <p class="sub">Current Rev5 WIP reference and historical Bench-IMU-01 examples.</p>
     <p>Explore the circuit, mechanical parts and project records. These viewers explain recorded artifacts; they are not proof of current physical fit, safe operation or Design Complete.</p>
     <p><a href="https://github.com/ktanino10/ai-hardware-engineering-team/blob/main/docs/README.md">English documentation</a> · <a href="https://github.com/ktanino10/ai-hardware-engineering-team/blob/main/docs/pages.md">How to read these viewers</a></p>
     <div class="cards">
+      <a class="card" href="rev5-full-assembly-v2/index.html">
+        <div class="t">Current Rev5 WIP — Whole Assembly v2</div>
+        <div class="d">Japanese UI. Inspect 399 frozen nominal meshes with explosion, animation, translucent edges, triangle hover and reference SVG views for every ID. Source snapshot: 2026-09-15. WIP / NOT ASSEMBLY READY; not fabrication drawings, physical simulation or an orderable BOM.</div>
+      </a>
       <a class="card" href="circuit-viewer/index.html">
-        <div class="t">Circuit &amp; Current-Flow Viewer</div>
+        <div class="t">Historical Bench Example — Circuit &amp; Current Flow</div>
         <div class="d">English UI. Switch between power distribution, implemented open-loop bench behavior and the explicitly unimplemented closed-loop concept. Click a component or wire for its explanation and source. Animated pulses are explanatory, not measured current.</div>
       </a>
       <a class="card" href="assembly-viewer/index.html">
-        <div class="t">3D Assembly &amp; Part Inspector</div>
+        <div class="t">Historical Bench Example — Assembly &amp; Parts</div>
         <div class="d">English UI. Orbit, zoom, switch assembled/exploded views, and inspect each part. Source-derived meshes and simplified purchased-part shapes use a presentation layout, not a full installed-state or collision check. This is not Fusion assembly-process evidence.</div>
       </a>
       <a class="card" href="dashboard/index.html?lang=en">
         <div class="t">Project Dashboard</div>
         <div class="d">EN/JA UI. Fetches public main-branch requirements, findings and other records on load or Refresh. Source prose, IDs and governance terms remain unchanged in either language. Parsing, CDN caching and dated static settings have explicit limits; the dashboard is read-only, not an approval engine.</div>
       </a>
-      <p class="note">The circuit and assembly viewers use checked-in data; the dashboard fetches public records. Repository links leave this Pages site. No language edition changes source values, review verdicts or human gates.</p>
-    </main>
-  </div>
+    </div>
+    <p><a href="https://github.com/ktanino10/ai-hardware-engineering-team/blob/main/docs/rev5-public-release/README.md">Rev5 release scope, provenance and deferred software</a></p>
+    <p class="note">The viewers use dated checked-in data; the dashboard fetches public records. They are not a synchronized complete Rev5 design. Repository links leave this Pages site. No language edition changes source values, review verdicts or human gates.</p>
+  </main>
 </body>
 </html>

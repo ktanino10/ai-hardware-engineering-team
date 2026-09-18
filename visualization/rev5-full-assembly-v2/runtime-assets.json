@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "assets": [
+    {
+      "path": "scene-data.js",
+      "source_revision": "97a4e2157878bcbb4e717ddcb860549b08096d3f",
+      "source_path": "visualization/rev5-full-assembly-v1/scene-data.js",
+      "sha256": "8f55ba45dcd688c0253ec7c81628ce0ccedf7cedd79e7752191f2d8978eeedd0"
+    },
+    {
+      "path": "inventory.json",
+      "source_revision": "97a4e2157878bcbb4e717ddcb860549b08096d3f",
+      "source_path": "visualization/rev5-full-assembly-v1/inventory.json",
+      "sha256": "3caf94d95eedaef9f657be31b7e82cfce22a4b96a262d184249790026c2dd9ba"
+    },
+    {
+      "path": "interactive-viewer.js",
+      "source_revision": "97a4e2157878bcbb4e717ddcb860549b08096d3f",
+      "source_path": "visualization/rev5-full-assembly-v1/interactive-viewer.js",
+      "sha256": "936a6eedfdd8b09fe873beee30f1d11f7f1be111076aafd26b278200a7a01833"
+    }
+  ]
+}
