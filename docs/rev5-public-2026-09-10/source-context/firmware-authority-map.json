@@ -1,0 +1,951 @@
+{
+  "schema_version": 1,
+  "status": "BOUNDED_SOURCE_AUTHORITY_MAP_DELIVERED",
+  "independent_review": "NOT_INDEPENDENTLY_REVIEWED",
+  "implementation": "NONE; sealed application, SDK, vendor, profile, native and configuration unchanged",
+  "source_revision": "e51f6d74043e1160b590ed32368691bbf45c3a89",
+  "config_revision": "0d524373af5f0a87e792d8a46a55caa4041987f2",
+  "authority_binding": {
+    "user_endpoint": "MCU-to-driver end-to-end target I2C communication disconnection. Not proof that every individual host/local cut opened.",
+    "normal_first": "NORMAL_CONDITION_DESIGN_PROOF_FIRST; not established normal hardware condition, fault waiver or physical permission.",
+    "D01_events": [
+      "planned reset",
+      "planned debug operation",
+      "planned I2C switching/remapping"
+    ],
+    "D01_preserved_order": "Before permitting a scoped planned operation, establish the accepted target disconnection condition and retain it through the operation.",
+    "old_proposal_delta": "R.D01proposal#/completion_proof still records the earlier UNKNOWN endpoint and both-cut requirement. New endpoint choice resolves the endpoint-definition question only; do not copy its all-poles test as the new acceptance criterion or infer that any proposed circuit is adopted."
+  },
+  "epoch_separation": {
+    "current_application": {
+      "path": "R.app",
+      "bytes": 24924,
+      "sha256": "bc835654d70d8f422f190cd00b135ad2f50f85b61d91a763b9641a2024f20e05"
+    },
+    "historical_application": {
+      "path": "R.lock#/application_source_settings_license_reports",
+      "bytes": 24398,
+      "sha256": "9e57ffd41c4a0d12efd1d606c134494faf6c8690e457f34089609b1022c072d7",
+      "lock_source_revision": "621d5fe8d317c360fa4de7e30c021c54f8f68535",
+      "lock_config_revision": "8b486557b82e27e6fba1feca5d47dbff668c611a"
+    },
+    "rule": "Reuse only unchanged primary SDK/vendor bindings, not old app/build/PASS as acceptance of this authority map. Current binaries, effective sdkconfig, link map and silicon execution were neither admitted nor inspected. Historical paths in locks/receipts are strings, not read permissions."
+  },
+  "classification": {
+    "APP_SOURCE_CALLED": "Call exists in current measurement source, subject to its branches and successful initialization. Does NOT mean observed execution on hardware.",
+    "APP_SOURCE_CONDITIONAL": "Error/input-dependent current source path; effective build/runtime outcome may remain UNKNOWN.",
+    "SDK_POSSIBLE_NOT_APP_CALLED": "Pinned SDK defines the path but current app does not call it. Presence is not linked/runtime reachability.",
+    "FUTURE_API_ONLY": "Candidate interface absent from current app; no driver-instance assignment or implementation implied.",
+    "EXTERNAL_AUTHORITY": "Physical/debug/ROM-origin authority not mediated by the current application.",
+    "UNKNOWN_REACHABILITY": "Nonadmitted implementation, effective image, actor privileges or hardware state prevents a stronger reachability/exclusion claim."
+  },
+  "hardware_endpoint_boundary": {
+    "exact_endpoint_witness": "source-witness.json#/native_text_witness",
+    "MCU": "U201 ESP32-S3-WROOM-1-N8R2; module pad numbers are not silicon package pin numbers.",
+    "target_pairs": [
+      {
+        "axis": "X",
+        "host": [
+          "U201.12 GPIO8 DRV_X_SCL",
+          "U201.17 GPIO9 DRV_X_SDA"
+        ],
+        "driver": [
+          "U301.10 DRV_X_SCL_D",
+          "U301.11 DRV_X_SDA_D"
+        ]
+      },
+      {
+        "axis": "Y",
+        "host": [
+          "U201.31 GPIO38 DRV_Y_SCL",
+          "U201.32 GPIO39 DRV_Y_SDA"
+        ],
+        "driver": [
+          "U302.10 DRV_Y_SCL_D",
+          "U302.11 DRV_Y_SDA_D"
+        ]
+      },
+      {
+        "axis": "Z",
+        "host": [
+          "U201.33 GPIO40 DRV_Z_SCL",
+          "U201.34 GPIO41 DRV_Z_SDA"
+        ],
+        "driver": [
+          "U303.10 DRV_Z_SCL_D",
+          "U303.11 DRV_Z_SDA_D"
+        ]
+      }
+    ],
+    "current_native_state": "Six host target nets are U201 singletons; six local _D nets end at driver pins and local pullups. The committed graph has no populated crossing/arbiter/completion reporter. Documentary UNBRIDGED is not a manufactured-board observation or an implemented service that can now be quiesced.",
+    "resources": "Three distinct fixed-address0x52 domains remain unassigned to hardware/software masters. Two S3 hardware I2C controllers are capacity, not X/Y/Z assignments. Never merge the three domains or silently assign Z to software.",
+    "current_measurement_endpoints": "SPI2 measurement uses GPIO11 MOSI/U201.19, GPIO12 SCK/.20, GPIO13 MISO/.21, CS GPIO4/5/6/7/15/16 at U201.4/.5/.6/.7/.8/.9 to six BMI270s. UART0 GPIO43 TX/.37 and GPIO44 RX/.36 go to J202.2/.3. These are not the DRV I2C targets.",
+    "unallocated_control": "GPIO42 DRIVE_ENABLE_REQUEST and GPIO47 DRIVE_FAULT_INPUT are singletons, not an implemented planned-event request, ACK or completion input. No new pin allocated.",
+    "existing_evidence_ids": [
+      "DS-MCU-102",
+      "DS-MCU-123",
+      "DS-MCU-130",
+      "DS-MCU-140",
+      "DS-MCU-151"
+    ],
+    "refs": [
+      "R.graph#/nets",
+      "R.graph#/mcu_pad_gpio_net",
+      "R.prep#/driver_buses",
+      "R.prep#/resource_contract",
+      "R.pins:16-174",
+      "S.caps:206-217"
+    ]
+  },
+  "routes": [
+    {
+      "key": "B-APP-ENTRY",
+      "classification": "APP_SOURCE_CALLED",
+      "entry": "app_main",
+      "chain": [
+        {
+          "ref": "R.app:620-670",
+          "function": "app_main",
+          "effect": "Initialize UART; emit log-only BOOT; select all IMUs; initialize SPI2; add six devices; initialize sensors; repeat report_sample."
+        },
+        {
+          "ref": "R.app:625-628",
+          "function": "app_main",
+          "effect": "commands=false and boot_epoch_unique=false are emitted metadata, not an authority protocol."
+        }
+      ],
+      "absent_in_current_app": [
+        "planned MCU reset call",
+        "esp_register_shutdown_handler",
+        "I2C master creation or remap",
+        "UART RX command parser/task",
+        "debug attach/halt authorization",
+        "disconnection request/ACK/evidence consumer",
+        "deny/cancel/rearm controller",
+        "GPIO42/47 control or observation"
+      ],
+      "interception": "A future explicit planned-event entry must precede all scoped side effects. There is no existing authority wrapper to point to.",
+      "limit": "The complete main.c and component declaration support app-level absence only; not absence from ROM, linked dependencies, other-core/ISR activity or privileged external access."
+    },
+    {
+      "key": "B-UART-SETUP",
+      "classification": "APP_SOURCE_CALLED",
+      "entry": "app_main -> measurement_uart_init",
+      "chain": [
+        {
+          "ref": "R.app:276-298",
+          "function": "measurement_uart_init",
+          "effect": "uart_param_config at286, uart_set_pin at288, uart_driver_install at295; UART0 TX43/RX44, no RTS/CTS pin change."
+        },
+        {
+          "ref": "S.uart:991-1060",
+          "function": "uart_param_config",
+          "effect": "Module/clock and HAL configuration precede RX/TX FIFO resets at1049-1050."
+        },
+        {
+          "ref": "S.uart:819-909",
+          "function": "uart_set_pin",
+          "effect": "Updates pin ownership/mux; uart_try_set_iomux_pin routes default pins."
+        },
+        {
+          "ref": "S.uart:706-721",
+          "function": "uart_try_set_iomux_pin",
+          "effect": "Calls gpio_iomux_output/input for matching default signals."
+        },
+        {
+          "ref": "S.uart_signals:14-27",
+          "function": "uart_periph_signal",
+          "effect": "UART0 default TX/RX metadata; S.uart_pins:23-24 supplies43/44."
+        },
+        {
+          "ref": "S.gpio:827-853",
+          "function": "gpio_iomux_input/output",
+          "effect": "HAL mux writes, not policy arbitration."
+        },
+        {
+          "ref": "S.uart:1988-1995",
+          "function": "uart_driver_install",
+          "effect": "Registers uart_rx_intr_handler_default ISR."
+        }
+      ],
+      "interception": "For a future scoped UART/debug service transition, authorize BEFORE uart_param_config/set_pin, not after successful initialization. These current UART pins are outside target DRV pairs.",
+      "irreversible_or_partial": "FIFO reset can discard data and mux changes already take effect before return. Boot/default ROM/SDK console before app_main is a separate authority, not covered by this app entry."
+    },
+    {
+      "key": "B-IMU-PIN-SETUP",
+      "classification": "APP_SOURCE_CALLED",
+      "entry": "app_main:633 -> select_all_spi_quiescent",
+      "chain": [
+        {
+          "ref": "R.app:125-166",
+          "function": "select_all_spi_quiescent",
+          "effect": "Latch writes at136/140/141 before gpio_config151, then each CS LOW/HIGH at156/161."
+        },
+        {
+          "ref": "S.gpio:238-242",
+          "function": "gpio_set_level",
+          "effect": "gpio_hal_set_level; no planned-event authorization."
+        },
+        {
+          "ref": "S.gpio_hal_h:223-225",
+          "function": "gpio_hal_set_level",
+          "effect": "Macro calls gpio_ll_set_level."
+        },
+        {
+          "ref": "S.gpio_ll:321-336",
+          "function": "gpio_ll_set_level",
+          "effect": "Direct output set/clear register writes."
+        },
+        {
+          "ref": "S.gpio:340-435",
+          "function": "gpio_config",
+          "effect": "Per-pin RTC deinit, input/OD/output/pull/interrupt/mux mutations; not atomic multi-pin policy."
+        },
+        {
+          "ref": "S.rtc_gpio:60-72",
+          "function": "rtc_gpio_deinit",
+          "effect": "RTC-capable pin selects digital function through HAL."
+        }
+      ],
+      "interception": "Before the first latch write, not merely around gpio_config. No target DRV pair is in this app mask.",
+      "irreversible_or_partial": "Earlier pins can already be changed when a later operation fails. The name quiescent describes this sensor-selection procedure; it is not whole-MCU/peripheral quiescence or target isolation evidence."
+    },
+    {
+      "key": "B-SPI-ROUTE-SETUP",
+      "classification": "APP_SOURCE_CALLED",
+      "entry": "app_main:635/647 -> measurement_bus_init/measurement_device_add",
+      "chain": [
+        {
+          "ref": "R.app:169-209",
+          "function": "measurement_bus_init / measurement_device_add",
+          "effect": "spi_bus_initialize(SPI2_HOST,...,SPI_DMA_DISABLED) at182; spi_bus_add_device at201, six CS configured serially."
+        },
+        {
+          "ref": "S.spi_common:803-864",
+          "function": "spi_bus_initialize",
+          "effect": "Claims peripheral and chooses dma_enabled=0 for this argument; not an exclusion of all system DMA."
+        },
+        {
+          "ref": "S.spi_common:912-917",
+          "function": "spi_bus_initialize",
+          "effect": "Calls spicommon_bus_initialize_io."
+        },
+        {
+          "ref": "S.spi_common:412-434",
+          "function": "check_iomux_pins_quad",
+          "effect": "Configured11/12/13 match S3 default SPI2 IOMUX pins; absent HD/WP remain unused."
+        },
+        {
+          "ref": "S.spi_common:596-602",
+          "function": "spicommon_bus_initialize_io",
+          "effect": "Selects IOMUX when pins match and GPIO override is absent."
+        },
+        {
+          "ref": "S.spi_common:636-640",
+          "function": "spicommon_bus_initialize_io",
+          "effect": "Calls bus_iomux_pins_set."
+        },
+        {
+          "ref": "S.spi_common:470-491",
+          "function": "bus_iomux_pins_set_quad",
+          "effect": "gpio_iomux_input/output for MOSI/MISO/SCK; peripheral acquires output-enable control."
+        },
+        {
+          "ref": "S.spi_master:537-540",
+          "function": "spi_bus_add_device",
+          "effect": "Calls spicommon_cs_initialize."
+        },
+        {
+          "ref": "S.spi_common:748-769",
+          "function": "spicommon_cs_initialize",
+          "effect": "CS4/5/6/7/15/16 do not equal default CS10; matrix path changes direction and invokes esp_rom_gpio_connect_out_signal."
+        },
+        {
+          "ref": "S.spi_pins:26-33",
+          "function": "S3 SPI2 pin definitions",
+          "effect": "Exact IOMUX pin set; S.spi_signals:57-68 binds SPI2 signals/hardware/function."
+        }
+      ],
+      "interception": "Before initialization/add-device and any teardown, with old/new/shared resources frozen. Current measurement setup is not planned DRV remap.",
+      "SDK_teardown_not_app_called": [
+        {
+          "ref": "S.spi_master:588-618",
+          "function": "spi_bus_remove_device",
+          "effect": "Explicitly warns queue checks are not exhaustive against another thread; eventually frees CS IO."
+        },
+        {
+          "ref": "S.spi_common:772-775",
+          "function": "spicommon_cs_free_io",
+          "effect": "Calls gpio_reset_pin."
+        },
+        {
+          "ref": "S.spi_common:967-983",
+          "function": "spi_bus_free",
+          "effect": "Calls spicommon_bus_free_io_cfg; that calls gpio_reset_pin at730-742."
+        }
+      ],
+      "limit": "Free/remove success is not privileged-writer exclusion. ROM matrix function implementation and all transition timing remain outside admitted source closure."
+    },
+    {
+      "key": "B-SPI-TRANSACTION",
+      "classification": "APP_SOURCE_CALLED",
+      "entry": "SensorAPI callbacks -> sensor_transfer",
+      "chain": [
+        {
+          "ref": "R.app:215-274",
+          "function": "sensor_transfer / sensor_read / sensor_write",
+          "effect": "Static descriptor/buffers; queue at238, pending=true at243, get result at245; clear pending only after matched completion."
+        },
+        {
+          "ref": "S.spi_master:1235-1284",
+          "function": "spi_device_queue_trans",
+          "effect": "Queues descriptor at1265, requests background ISR at1276; success is submission, not wire completion."
+        },
+        {
+          "ref": "S.spi_master:935-1009",
+          "function": "spi_intr",
+          "effect": "Handles completion, fetches non-DMA result and returns descriptor; may then service another request."
+        },
+        {
+          "ref": "S.spi_master:1035-1076",
+          "function": "spi_intr",
+          "effect": "Receives queued transaction and invokes spi_new_trans at1066."
+        },
+        {
+          "ref": "S.spi_master:816-856",
+          "function": "spi_new_trans / spi_post_trans",
+          "effect": "Device/transaction setup and data preparation precede optional void pre_cb; launch via spi_hal_user_start at838. post_cb follows completed transaction."
+        },
+        {
+          "ref": "S.spi_master:1287-1311",
+          "function": "spi_device_get_trans_result",
+          "effect": "Return-queue timeout at1298-1303 does not cancel in-flight work."
+        }
+      ],
+      "interception": "Block new submissions BEFORE queue insertion. Already-queued work requires explicit drain/cancel disposition and ISR/peripheral ownership; stopping the app producer or waiting on its pending flag alone is insufficient.",
+      "irreversible_or_partial": "No callback returns a veto. A pre_cb runs after peripheral setup and is not a reset/remap safety gate. Clocked sensor writes cannot be rolled back by a late denial. Current app intentionally retains pending descriptor after timeout and invalidates the sensor, but has no global quiescence/cancel/rearm service.",
+      "missing_link": "spi_hal_user_start definition is not admitted. S.spi_hal_h:234 declares it; S.spi_ll:294-297 separately shows an available direct cmd.usr writer. Do not claim the absent HAL body, final image or physical launch timing was verified."
+    },
+    {
+      "key": "B-SENSOR-RESET-NOT-MCU",
+      "classification": "APP_SOURCE_CALLED",
+      "entry": "initialize_sensor:464",
+      "chain": [
+        {
+          "ref": "R.app:450-464",
+          "function": "initialize_sensor",
+          "effect": "Installs SPI read/write callbacks and calls bmi270_init."
+        },
+        {
+          "ref": "R.bmi270:1354-1392",
+          "function": "bmi270_init",
+          "effect": "Selects manufacturer configuration data and calls bmi2_sec_init."
+        },
+        {
+          "ref": "R.bmi2:1882-1934",
+          "function": "bmi2_sec_init",
+          "effect": "Identity/init branch calls bmi2_soft_reset."
+        },
+        {
+          "ref": "R.bmi2:2083-2103",
+          "function": "bmi2_soft_reset",
+          "effect": "Writes sensor command through bmi2_set_regs at2099."
+        },
+        {
+          "ref": "R.bmi2:2016-2050",
+          "function": "bmi2_set_regs",
+          "effect": "Calls installed dev->write; returns to B-SPI-TRANSACTION."
+        }
+      ],
+      "existing_evidence_ids": [
+        "DS-IMU-079",
+        "DS-IMU-080",
+        "DS-IMU-081",
+        "DS-IMU-082",
+        "DS-IMU-083",
+        "DS-IMU-084"
+      ],
+      "scope": "A real current sensor-reset command is not an esp_restart/EN MCU reset, DRV reset or authorization for D01. Optional vendor remap/NVM/self-test APIs in source are not app calls.",
+      "interception": "If a future event affects this shared SPI resource, stop admission before sensor_transfer. Do not edit or abbreviate Bosch initialization in this map."
+    },
+    {
+      "key": "B-UART-PROGRESS-NOT-ACK",
+      "classification": "APP_SOURCE_CALLED",
+      "entry": "emit -> uart_send_bounded",
+      "chain": [
+        {
+          "ref": "R.app:307-357",
+          "function": "uart_send_bounded / emit",
+          "effect": "Uses esp_timer_get_time loop and uart_tx_chars at312; returns count-written status. boot_epoch is null."
+        },
+        {
+          "ref": "S.uart:1545-1557",
+          "function": "uart_tx_chars",
+          "effect": "Takes tx_mux with portMAX_DELAY at1554 then calls FIFO writer. Therefore app comment 'explicitly nonblocking' is not an unconditional call-latency bound."
+        },
+        {
+          "ref": "S.uart:1128-1141",
+          "function": "uart_enable_tx_write_fifo",
+          "effect": "HAL writes TX FIFO under UART lock; queued bytes can still be on the wire later."
+        },
+        {
+          "ref": "S.uart:1145-1165",
+          "function": "uart_rx_intr_handler_default",
+          "effect": "Installed driver ISR exists even though app has no RX parser."
+        },
+        {
+          "ref": "S.uart:1482-1542",
+          "function": "uart_wait_tx_done",
+          "effect": "Separate TX-idle/TX_DONE wait API; NOT called by this app."
+        },
+        {
+          "ref": "S.timer_h:221-223",
+          "function": "esp_timer_get_time declaration",
+          "effect": "Time since timer initialization; implementation/scheduling/halt progression not admitted."
+        }
+      ],
+      "interception": "Keep any future authority ACK independent of logging progress. A bounded log loop is not a guaranteed completion clock, and tx_mux ownership/competing producers need closure.",
+      "not_equivalent": [
+        "bytes copied to FIFO",
+        "TX idle",
+        "host received/validated request ACK",
+        "all target peripherals quiescent",
+        "physical end-to-end disconnection"
+      ],
+      "status": "Source-linked limitation for later model; no new canonical finding or change to historical firmware verdict."
+    },
+    {
+      "key": "B-PLANNED-SDK-RESTART",
+      "classification": "SDK_POSSIBLE_NOT_APP_CALLED",
+      "entry": "esp_restart",
+      "chain": [
+        {
+          "ref": "S.system_h:44-79",
+          "function": "shutdown_handler_t / esp_restart",
+          "effect": "Handler type is void(void); restart is noreturn."
+        },
+        {
+          "ref": "S.restart:23-44",
+          "function": "esp_register_shutdown_handler / esp_unregister_shutdown_handler",
+          "effect": "Manage callback table; no authorization token or deny result."
+        },
+        {
+          "ref": "S.restart:47-64",
+          "function": "esp_restart",
+          "effect": "Reverse-order callbacks; scheduler/preemption change; unconditional esp_restart_noos call."
+        },
+        {
+          "ref": "S.restart_s3:72-118",
+          "function": "esp_restart_noos",
+          "effect": "Disables interrupts, programs watchdog path, then resets/stalls other CPU under multicore branch."
+        },
+        {
+          "ref": "S.restart_s3:120-164",
+          "function": "esp_restart_noos",
+          "effect": "Cache disable, matrix writes, peripheral reset, clock change, CPU ROM resets."
+        },
+        {
+          "ref": "S.restart_s3:34-66",
+          "function": "esp_system_reset_modules_on_exit",
+          "effect": "UART wait then direct module-reset register writes, including DMA/crypto resets."
+        },
+        {
+          "ref": "S.rom_alias:45-46",
+          "function": "ROM reset aliases",
+          "effect": "esp_rom_software_reset_cpu/system map to ROM software_reset_cpu/software_reset; bodies not supplied."
+        }
+      ],
+      "interception": "Deny/cancel before entering esp_restart and before any shutdown callback that could mutate protected resources. Returning from a shutdown handler does not veto reset; never-returning there is not a qualified cancel or availability solution.",
+      "irreversible_or_partial": "After entry to noos, normal scheduling/interrupt-dependent request/ACK cannot be assumed; other-core reset at116 is already the event. The final own-CPU reset is not the first destructive action.",
+      "bypass": "Direct calls to esp_restart_noos, esp_system_reset_modules_on_exit, ROM reset entry or raw reset-register writes bypass a wrapper around esp_restart. Sole issuer/actual access enforcement is absent.",
+      "existing_evidence_ids": [
+        "DS-MCU-153"
+      ],
+      "runtime": "Exact linked callers/configuration/ROM execution UNKNOWN. Not a current app planned-reset call."
+    },
+    {
+      "key": "B-ERROR-PANIC-RESET",
+      "classification": "APP_SOURCE_CONDITIONAL",
+      "entry": "app_main:625 ESP_ERROR_CHECK(measurement_uart_init())",
+      "chain": [
+        {
+          "ref": "S.error_h:102-121",
+          "function": "ESP_ERROR_CHECK",
+          "effect": "NDEBUG ignores result, SILENT branch calls abort, normal branch calls _esp_error_check_failed on error."
+        },
+        {
+          "ref": "S.error:46-50",
+          "function": "_esp_error_check_failed",
+          "effect": "Prints then calls abort."
+        },
+        {
+          "ref": "S.system_chip:85-88",
+          "function": "esp_system_abort",
+          "effect": "Calls panic_abort; intervening libc abort implementation NOT admitted."
+        },
+        {
+          "ref": "S.panic:474-494",
+          "function": "panic_abort",
+          "effect": "Sets panic flags and executes Xtensa invalid instruction."
+        },
+        {
+          "ref": "S.panic:444-469",
+          "function": "esp_panic_handler",
+          "effect": "Configured reboot goes to panic_restart; halt branch still resets modules then loops."
+        },
+        {
+          "ref": "S.panic_port:312-320",
+          "function": "panic_restart",
+          "effect": "Calls esp_restart_noos directly, not esp_restart/shutdown handlers on S3."
+        },
+        {
+          "ref": "S.panic:265-270",
+          "function": "esp_panic_handler_reset_modules_on_exit_and_halt",
+          "effect": "Reset modules before halt; not a no-side-effect pause."
+        },
+        {
+          "ref": "S.panic:275-287",
+          "function": "esp_panic_handler_increment_entry_count",
+          "effect": "Repeated panic can also call panic_restart."
+        }
+      ],
+      "configuration": "S.system_kconfig:31-79 defaults print/reboot and multicore initialization, but R.defaults is not the full effective sdkconfig. Do not equate a default to a verified image.",
+      "interception": "For future intentional errors used to request reset, reject before triggering the failure. A panic observer is too late to establish pre-event permission.",
+      "limit": "Error/fault reset is not qualified by D01 normal-first planned-event work. This supplies a concrete SDK bypass route, not an observation that the board reset. Libc/kernel/vector/link closure remains UNKNOWN."
+    },
+    {
+      "key": "B-FUTURE-I2C-REMAP",
+      "classification": "FUTURE_API_ONLY",
+      "entry": "i2c_new_master_bus / i2c_del_master_bus",
+      "chain": [
+        {
+          "ref": "S.i2c_master:1019-1047",
+          "function": "i2c_new_master_bus",
+          "effect": "Acquire requested/automatic controller, store pins, call i2c_param_master_config."
+        },
+        {
+          "ref": "S.i2c_master:856-868",
+          "function": "i2c_param_master_config",
+          "effect": "Calls i2c_common_set_pins BEFORE clock selection and HAL init."
+        },
+        {
+          "ref": "S.i2c_common:425-438",
+          "function": "i2c_common_set_pins",
+          "effect": "HP path calls s_hp_i2c_pins_config."
+        },
+        {
+          "ref": "S.i2c_common:319-362",
+          "function": "s_hp_i2c_pins_config",
+          "effect": "Reservation conflicts only log warnings at326-331; then level/input/OD/pull/function and ROM matrix writes on SDA and SCL."
+        },
+        {
+          "ref": "S.i2c_master:1215-1226",
+          "function": "i2c_del_master_bus",
+          "effect": "Checks no devices then calls destroy."
+        },
+        {
+          "ref": "S.i2c_master:871-910",
+          "function": "i2c_master_bus_destroy",
+          "effect": "Deinitializes pins, releases bus and queues."
+        },
+        {
+          "ref": "S.i2c_common:441-455",
+          "function": "i2c_common_deinit_pins",
+          "effect": "Revokes reservation, disables OD/output, rewires input to constant; not a disconnection certificate."
+        }
+      ],
+      "interception": "Before NEW/DELETE/cleanup/reconfiguration, freeze old and proposed mappings, union all affected axes/pads/controller aliases, and own all writers. Waiting until transfer() or constructor success is too late. A reservation warning is not denial.",
+      "irreversible_or_partial": "A failed constructor can have mutated pins before later failure; cleanup is also a writer. Disabling MCU output or input routing does not physically open the MCU-to-driver conductor.",
+      "limit": "Current app neither creates nor deletes any I2C bus. No controller number, speed, third-master scheme or new GPIO is chosen here."
+    },
+    {
+      "key": "B-FUTURE-I2C-RESET-IS-NOT-QUIESCE",
+      "classification": "FUTURE_API_ONLY",
+      "entry": "i2c_master_bus_reset and automatic recovery before s_i2c_transaction_start",
+      "chain": [
+        {
+          "ref": "S.i2c_master:1229-1236",
+          "function": "i2c_master_bus_reset",
+          "effect": "Calls s_i2c_hw_fsm_reset(bus,true), then stores IDLE and returns."
+        },
+        {
+          "ref": "S.i2c_master:667-676",
+          "function": "s_i2c_transaction_start",
+          "effect": "TIMEOUT or busy condition automatically invokes same reset/clear path before a new transfer."
+        },
+        {
+          "ref": "S.caps:206-217",
+          "function": "S3 capabilities",
+          "effect": "HW clear supported; HW_FSM_RST intentionally not defined."
+        },
+        {
+          "ref": "S.i2c_master:116-150",
+          "function": "s_i2c_hw_fsm_reset",
+          "effect": "S3 !HW_FSM_RST path: optional bus clear then module reset/HAL restore; error cleanup at1013-1015 also resets FSM without clear."
+        },
+        {
+          "ref": "S.i2c_master:61-106",
+          "function": "s_i2c_master_clear_bus",
+          "effect": "S3 takes HW-clear branch at88; calls LL clear, conditional completion loop and update. The GPIO nine-clock loop at64-87 is NOT the selected S3 branch."
+        },
+        {
+          "ref": "S.i2c_ll:810-827",
+          "function": "i2c_ll_master_clr_bus / i2c_ll_master_is_bus_clear_done",
+          "effect": "Writes scl_rst_slv_en=1 and conf_upgate; the enable argument is not used in this body. Completion query returns constant false with 'not supported on esp32s3' comment."
+        }
+      ],
+      "interception": "Treat reset/clear/recovery as a MUTATING event, not a prerequisite passive quiescence check. Gate automatic recovery as well as explicit reset; prevent next submissions from triggering hidden clear pulses during freeze.",
+      "source_bound_conclusion": "On this pinned S3 path the apparent clear-completion polling API supplies no observed hardware completion. ESP_OK/IDLE or a call with enable=false cannot be modeled as independently verified clear-finished/cancelled. Exact hardware outcome/termination is UNKNOWN, not a new timing claim.",
+      "later_model_requirement": "Separate reset_request, reset_API_return, clear_engine_status and target_disconnection evidence. Leave clear_engine_status UNKNOWN absent additional source/contract; deny planned mutation dependent on it.",
+      "limit": "No present-app I2C bug or board fault asserted, no official bug ID allocated, no code changed."
+    },
+    {
+      "key": "B-FUTURE-I2C-ASYNC-OWNERSHIP",
+      "classification": "FUTURE_API_ONLY",
+      "entry": "asynchronous master submissions / callbacks / i2c_master_bus_wait_all_done",
+      "chain": [
+        {
+          "ref": "S.i2c_master:913-978",
+          "function": "s_i2c_asynchronous_transaction",
+          "effect": "Queues and starts transactions; API return alone is not the transaction outcome."
+        },
+        {
+          "ref": "S.i2c_master:765-844",
+          "function": "i2c_master_isr_handler_default",
+          "effect": "Records status, advances commands, invokes on_trans_done and may dequeue/start another transfer."
+        },
+        {
+          "ref": "S.i2c_master:1472-1492",
+          "function": "i2c_master_register_event_callbacks",
+          "effect": "Stores callback/user context for async mode, not planned-operation authorizer."
+        },
+        {
+          "ref": "S.i2c_master:1495-1509",
+          "function": "i2c_master_bus_wait_all_done",
+          "effect": "Snapshots num_trans_inflight and consumes completion queue. Does not itself freeze producers or prove target electrical disconnection."
+        }
+      ],
+      "interception": "Freeze submissions and callback-originated work, drain outstanding records with errors distinguished from successful protocol completion, then prevent ISR/peripheral restart until rearm.",
+      "irreversible_or_partial": "Already accepted driver writes may persist; partial transfer cannot be erased by deleting a handle, setting IDLE or issuing reset.",
+      "limit": "Not called in current measurement app; full kernel and scheduler/IRQ latency unavailable. No numeric quiescence deadline selected."
+    },
+    {
+      "key": "B-DIRECT-WRITERS-AND-HOLD",
+      "classification": "SDK_POSSIBLE_NOT_APP_CALLED",
+      "entry": "gpio_reset_pin / direction / hold / iomux / HAL/LL / ROM direct calls",
+      "chain": [
+        {
+          "ref": "S.gpio:206-242",
+          "function": "gpio_output_disable / gpio_output_enable / gpio_set_level",
+          "effect": "Output-disable also selects GPIO/OE control; output-enable restores GPIO matrix default. Wrapper around only set_level misses mux/OE writers."
+        },
+        {
+          "ref": "S.gpio:458-476",
+          "function": "gpio_reset_pin",
+          "effect": "Pull-up, input/output disable, RTC deinit/mux/revoke; not neutral release."
+        },
+        {
+          "ref": "S.gpio:740-793",
+          "function": "gpio_hold_en/dis and deep_sleep_hold_en/dis",
+          "effect": "Separate hold-authority entries through RTC or GPIO HAL."
+        },
+        {
+          "ref": "S.gpio_hal_c:34-45",
+          "function": "gpio_hal_iomux_in/out",
+          "effect": "Calls LL routing functions directly."
+        },
+        {
+          "ref": "S.gpio_ll:253-310",
+          "function": "gpio_ll_output_enable / matrix_out_default / func_sel",
+          "effect": "Direct register mutations; func_sel on native USB DM/DP clears USB_SERIAL_JTAG_USB_PAD_ENABLE before selecting mux."
+        },
+        {
+          "ref": "S.rom_alias:15-16",
+          "function": "esp_rom_gpio_connect_in/out_signal aliases",
+          "effect": "Resolve to ROM gpio_matrix_in/out."
+        },
+        {
+          "ref": "S.rom_gpio:101-140",
+          "function": "gpio_matrix_in/out / gpio_pad_select_gpio declarations",
+          "effect": "Callable lower-level routing interface, not ROM implementation proof."
+        }
+      ],
+      "interception": "Ownership must cover GPIO/RTC/IO-MUX/matrix/OE/pulls/holds and lower-layer raw register access, on all participating cores/contexts. Existing locks serialize cooperating calls only; they do not establish a privilege barrier.",
+      "irreversible_or_partial": "Hold release can expose prepared state. A helper that touches GPIO19/20 can change the native debug transport itself; exclude this from accidental resource reuse. A pre-operation readback does not stop a later privileged write.",
+      "existing_evidence_ids": [
+        "DS-MCU-153",
+        "DS-MCU-154"
+      ],
+      "limit": "Current app calls subset GPIO paths only for measurement pins; target-pair/USB/hold mutation by any actual external or privileged actor is UNKNOWN. No eFuse/strap action suggested."
+    },
+    {
+      "key": "B-DEBUG-CPU-SDK-BRANCH",
+      "classification": "SDK_POSSIBLE_NOT_APP_CALLED",
+      "entry": "panic debugger awareness / optional debug stub",
+      "chain": [
+        {
+          "ref": "S.system_kconfig:597-603",
+          "function": "ESP_DEBUG_OCDAWARE default",
+          "effect": "Default y is source configuration, not verified effective image or debugger state."
+        },
+        {
+          "ref": "S.panic:349-380",
+          "function": "esp_panic_handler OCD branch",
+          "effect": "If configured and debugger attached, semihosting reporting, watchdog disabling, esp_cpu_set_breakpoint and return."
+        },
+        {
+          "ref": "S.debug_stub:7-22",
+          "function": "esp_dbg_stubs_ll_init",
+          "effect": "Optional OpenOCD-invokable stub infrastructure writes ERI TRAX register; not an application authorization entry."
+        }
+      ],
+      "interception": "A CPU-side attached-debugger query or panic breakpoint is an observation/action AFTER debug access exists. An enforceable gate must precede probe transport access/first drive and remain effective when CPU is halted.",
+      "limit": "No current app debug command. esp_cpu/ERI implementation, stub callers, effective build options and probe state not admitted; runtime reachability UNKNOWN. UART console-only configuration does not exclude silicon USB JTAG/pad JTAG."
+    },
+    {
+      "key": "B-EXTERNAL-DEBUG",
+      "classification": "EXTERNAL_AUTHORITY",
+      "entry": "Potential external pad-JTAG or future native USB Serial/JTAG transport",
+      "endpoints": [
+        "GPIO39/U201.32 DRV_Y_SDA is MTCK; GPIO40/U201.33 DRV_Z_SCL is MTDO; GPIO41/U201.34 DRV_Z_SDA is MTDI. No installed debug connector/interlock or additional debug pin assignment is asserted.",
+        "Native USB_U GPIO19/U201.13 DM and GPIO20/U201.14 DP are separate singleton nets; J201 A6/A7/B6/B7 are NC."
+      ],
+      "interception": "Before physical debug attachment/drive/halt/reset; transport/access exclusion must be independently enforceable, not only request code running on the CPU that may be halted. Debug/global reset conservatively affects XYZ unless proved narrower.",
+      "bypass": "A probe already able to write registers or reset CPU can bypass an app wrapper. As-drawn absence of a native USB connector is not a successful authorized debug service, and does not prohibit direct pad access.",
+      "existing_evidence_ids": [
+        "DS-MCU-102",
+        "DS-MCU-130",
+        "DS-MCU-140",
+        "DS-MCU-151",
+        "DS-MCU-153"
+      ],
+      "refs": [
+        "R.D01proposal#/entry_paths",
+        "R.graph#/usb_u",
+        "R.native:2486-2492",
+        "R.native:753-758",
+        "R.requirements:296"
+      ],
+      "unknowns": [
+        "actual eFuses/straps and silicon/ROM version",
+        "probe/controller configuration",
+        "installed external event enforcer",
+        "guaranteed halt/reset peripheral and pad transitions"
+      ],
+      "not_authorized": "No attach/probe/serial/JTAG read, fuse/strap change or physical operation."
+    },
+    {
+      "key": "B-EXTERNAL-EN-BOOT-POWER",
+      "classification": "EXTERNAL_AUTHORITY",
+      "entry": "SW201, SW202, J202 host, direct EN or power access",
+      "endpoints": [
+        "SW201.1 -> MCU_EN -> U201.3, R201.2, C201.1; SW201.2 GND. This is a direct reset contact, not a firmware-readable pre-request.",
+        "SW202.1 -> BOOT_N/U201.27 GPIO0/R202.2; SW202.2 GND. Boot selection is not a disconnection ACK.",
+        "J202.2/.3 UART0 TX/RX; .1 GND/.4 LOGIC_3V3. No RTS/DTR/EN connection. RX has no current app command parser.",
+        "J201 service VBUS feeds U202 IN/EN; U202 OUT feeds LOGIC_3V3. Unplug/direct power or EN access is not mediated by firmware."
+      ],
+      "interception": "Current firmware cannot veto SW201 or external power removal. D01 request-only rewiring/sole reset sink remains a proposal; any later boot/download operation needs preselected intent and authorized reset before ROM entry.",
+      "irreversible_or_partial": "Seeing EN fall or receiving a reset notice afterward cannot satisfy before-operation disconnection. An accessible planned power cycle cannot be relabeled interlocked reset.",
+      "existing_evidence_ids": [
+        "DS-MCU-121",
+        "DS-MCU-130",
+        "DS-MCU-153"
+      ],
+      "refs": [
+        "R.graph#/parts/SW201",
+        "R.graph#/parts/SW202",
+        "R.graph#/parts/J202",
+        "R.graph#/parts/U202",
+        "R.D01proposal#/connection_delta",
+        "source-witness.json#/native_text_witness/external_authority_locators"
+      ],
+      "limit": "Unexpected reset/power fault remains unresolved and outside the normal-first proof, not waived."
+    },
+    {
+      "key": "B-PRIVILEGED-ISR-DMA-ROM-CLOSURE",
+      "classification": "UNKNOWN_REACHABILITY",
+      "entry": "Noncooperating privileged writer, other core, ISR, DMA/peripheral engine, ROM/bootloader or external debugger",
+      "known": [
+        "Current app explicitly disables DMA for its SPI2 bus; current SPI transaction progress nevertheless uses SDK ISR/peripheral execution.",
+        "S3 source supports two CPU cores; esp_restart has scheduler handling on its current core and later noos explicitly resets/stalls the other core. These source calls are not proof of a global ownership fence.",
+        "I2C reservation conflict warnings, SPI removal non-exhaustive checks and directly callable GPIO HAL/LL demonstrate that ordinary API wrapping is not an enforced all-writer boundary.",
+        "ROM headers/aliases show callable entries, not ROM firmware execution, all boot/downloader paths or guaranteed pad state."
+      ],
+      "refs": [
+        "R.app:182",
+        "S.spi_common:840-858",
+        "S.spi_master:591-596",
+        "S.i2c_common:323-345",
+        "S.caps:145-148",
+        "S.restart:47-64",
+        "S.restart_s3:109-118",
+        "S.rom_alias:15-16",
+        "S.rom_alias:45-46"
+      ],
+      "deny_condition": "If an actor that can mutate/reset/reclose survives outside the enforced owner set, do not claim the planned-event policy is enforceable. A host model must admit a bypass event or mark its exclusion as an external unproven assumption.",
+      "not_claimed": "No assertion that arbitrary DMA can write every protected MMIO register; actual channel/bus permissions, descriptors and linked writers are UNKNOWN. No assertion that all DMA is absent because measurement SPI DMA is disabled."
+    }
+  ],
+  "later_host_only_interface_conditions": [
+    {
+      "name": "request_identity_and_scope",
+      "necessary_fields": [
+        "fresh event_id/epoch",
+        "issuer identity",
+        "event kind",
+        "old mapping",
+        "proposed mapping",
+        "affected axes and old/new pads",
+        "controller/shared-resource closure",
+        "source/config binding"
+      ],
+      "condition": "Capture before any teardown, latch/mux/hold write, bus clear, reset or debug access. Unknown scope denies. No unique persistent boot/event epoch exists in current REV5B1 logs.",
+      "status": "PROPOSED_INTERFACE_NOT_IMPLEMENTED"
+    },
+    {
+      "name": "exclusive_ownership",
+      "necessary_fields": [
+        "owner generation",
+        "all participating cores/tasks/ISRs/callbacks",
+        "peripheral and DMA disposition",
+        "debug/ROM/privileged-writer exclusion evidence"
+      ],
+      "condition": "Prevent mutation outside one enforcing owner; registration tables or cooperative mutexes alone cannot establish this. For any unexcluded actor, keep BYPASS_POSSIBLE and deny the enforcement claim. No MPU/eFuse/privilege design is chosen here."
+    },
+    {
+      "name": "freeze_and_quiescence",
+      "necessary_fields": [
+        "new-work blocked",
+        "queued/active/completed/error counts per resource",
+        "callback/ISR restart blocked",
+        "TX/RX/clear-engine state",
+        "descriptor lifetime and handle ownership"
+      ],
+      "condition": "Freeze all producers before drain snapshot. SPI pending timeout is still potentially live; I2C wait-all snapshots are not producer fences; S3 bus_reset success is not HW-clear completion. Stop/abort evidence must cover actual peripheral engines, not just a task ACK.",
+      "deadline": "UNKNOWN. No timer value selected; task suspension, portMAX_DELAY lock wait or halt cannot be treated as a bounded response."
+    },
+    {
+      "name": "disconnection_evidence_separate_from_ACK",
+      "necessary_fields": [
+        "A1 acceptance predicate/version",
+        "target endpoint scope",
+        "explicit normal-component/power assumptions",
+        "source of completion evidence/design proof",
+        "validity generation and invalidators",
+        "held-disconnected guarantee during event"
+      ],
+      "condition": "request_received, owner_frozen, transaction_done, off_command_issued and END_TO_END_DISCONNECTION_ESTABLISHED are different messages/states. Never derive the last from GPIO42/47, EN, elapsed delay, FIFO return, bus IDLE or a software ACK.",
+      "blocked_input": "New stopped/committed A1 acceptance spec and approved source-grounded realization/enforcer; not read live."
+    },
+    {
+      "name": "single_operation_grant",
+      "necessary_fields": [
+        "matching pending event",
+        "matching ownership/mapping generation",
+        "fresh valid target proof",
+        "no veto/cancel",
+        "single consuming issuer"
+      ],
+      "condition": "Validate atomically with the enforced gate immediately before the FIRST irreversible action, not just final reset. Hold disconnection continuously; stale proof/grant may not survive mapping/rail/owner/evidence changes. A callable lower layer without enforcement is still a bypass."
+    },
+    {
+      "name": "deny_cancel_and_partial_failure",
+      "necessary_fields": [
+        "cancel requested",
+        "cancel acknowledged before commit",
+        "commit crossed",
+        "partial mutation/transfer outcome",
+        "remaining live work",
+        "containment evidence"
+      ],
+      "condition": "Before commit, deny means the operation did not begin. After commit, report cannot_cancel/partial and maintain deny; do not relabel it undone. No reset-as-recovery, blind replay, auto-clear or destructor-as-quiesce shortcut. A cancel ACK must say which stage/resources it actually stopped."
+    },
+    {
+      "name": "rearm",
+      "necessary_fields": [
+        "old grant consumed/revoked",
+        "fresh epoch",
+        "released/repressed manual request if relevant",
+        "post-event source/mapping/ROM/hold state",
+        "fresh bus-service conditions",
+        "separate command permission"
+      ],
+      "condition": "Reset/return/timeout/host reconnect does not automatically rejoin buses. Requalify ownership and the adopted service proof first. Current log sequence resets per boot and boot_epoch=null cannot prevent replay."
+    },
+    {
+      "name": "independent_progress_and_external_access",
+      "condition": "Any event that can halt/reset this CPU needs a gate/proof-retention path not dependent on that CPU continuing to run. UART log completion is not authority delivery; an already connected probe cannot be treated as waiting safely for an app ACK. No new physical transport or implementation selected."
+    },
+    {
+      "name": "host_model_fidelity",
+      "condition": "Later model may exercise interleavings and policy under explicit assumptions, not prove physical isolation or exclude real privileged actors. Include negative cases: direct noos, shutdown-handler return, manual EN, late cancel, changed mapping, queued SPI after timeout, concurrent I2C submission, auto-clear, S3 clear query constant false, probe-before-request and stale epoch.",
+      "execution_now": false
+    }
+  ],
+  "minimum_remaining_requests": [
+    {
+      "owner": "Hardware Lead",
+      "input": "Stopped and committed new A1 acceptance specification plus this stopped/committed B",
+      "minimum": "Exact accepted end-to-end predicate, assumptions, evidence validity/invalidation, holds through operation and abort/rearm requirements.",
+      "unblocks": "Separate host-only model contract, not firmware deployment or hardware qualification."
+    },
+    {
+      "owner": "Lead routes Circuit/Systems and explicit adoption gates",
+      "input": "Real event origin-to-enforcer/access ownership contract",
+      "minimum": "Who can assert EN/reset registers, own I2C old/new mappings, access pad/native JTAG, release holds and reclose paths; actual request/ACK/proof transport and independent veto/default behavior. No arbitrary GPIO assignment.",
+      "unblocks": "A conditional enforceability claim; a wrapper alone cannot supply this input."
+    },
+    {
+      "owner": "Lead source intake, only if exact runtime closure is subsequently required",
+      "input": "Missing nonadmitted SDK/runtime-source closure at the SAME pinned SDK commit",
+      "minimum": "Definitions used by spi_hal_user_start (candidate official files components/hal/spi_hal.c or spi_hal_iram.c; exact defining file must be admitted), uart_hal_write_txfifo/HAL definitions, libc abort->esp_system_abort glue, FreeRTOS app_main startup/queue/semaphore/port/interrupt ownership and esp_cpu reset/stall/debug helper definitions. Supply only definitions needed for the chosen path, with official path and hash, not the entire SDK.",
+      "status": "UNKNOWN; candidate paths are source requests, not claims their contents were available or executed.",
+      "known_official_repository": "https://github.com/espressif/esp-idf/tree/30aaf64524299d3bde422ca9a2848090d1bc5d0f",
+      "unblocks": "Exact lower-level call/link/ownership closure; not necessary to invent for this bounded map."
+    },
+    {
+      "owner": "Lead source/image intake, non-physical",
+      "input": "Current-source effective sdkconfig, link map/callers and exact relevant startup/bootloader source binding",
+      "minimum": "Assertions/panic/OCD/cores settings, actual linked callsites and ISR callbacks for the corrected app hash; signed or otherwise trusted privilege/debug/provisioning policy record if relied upon.",
+      "status": "UNKNOWN. Old lock app hash/build and later review PASS are not replacements. Do not read an old private image path merely because a receipt names it."
+    },
+    {
+      "owner": "Lead/manufacturer source intake",
+      "input": "Exact silicon/ROM applicability and reset/debug transition guarantees",
+      "minimum": "Only the scoped MCU reset/ROM/download/debug authority and retained peripheral/hold behavior needed by the selected design, plus S3 I2C hardware-clear completion/cancellation semantics if that API remains proposed.",
+      "status": "UNKNOWN. Admitted ROM headers and aliases are not implementation or complete guarantees; no new network search, fuse/device read or hardware test authorized."
+    },
+    {
+      "owner": "Lead routes later Firmware scheduling/source work only if a bound is required",
+      "input": "Timer/scheduler/progress and workload bounds",
+      "minimum": "Exact esp_timer implementation for selected configuration, queue/mutex/ISR ownership and worst-case progress assumptions through freeze/halt/error; actual transaction workload and failure disposition.",
+      "status": "UNKNOWN; no conversion of app 100ms logging/SPI settings into disconnection or cancellation deadlines."
+    }
+  ],
+  "source_evidence_policy": {
+    "registered_ids": "Existing Evidence IDs reused only for their registered claims. New pinned-SDK control-flow observations above are source-linked proposals, not new DS registrations or reviewer findings.",
+    "numeric_limits": "No new electrical/timing minimum/maximum or current/voltage threshold selected. Source constants and line/pin identities are not physical qualification.",
+    "no_external_source_retrieval": true
+  },
+  "author_self_check": {
+    "pin_instance_fidelity": "Native-text endpoint comparison146 pins matched admitted graph; current SPI2/UART0 separated from unassigned DRV I2C.",
+    "clock_and_timing": "No clock/timing change; source settings are not independently guaranteed completion bounds.",
+    "manufacturer_init": "Current Bosch reset/callback chain identified, unchanged; no opaque data invented or vendored anew.",
+    "writer_completeness": "App source paths plus selected SDK routes mapped; whole-image/kernel/ROM/privileged closure explicitly UNKNOWN, not asserted exhaustive.",
+    "framing": "Current REV5B1 log-only protocol distinguished from any future request/ACK/grant; no parser claimed.",
+    "evidence_and_history": "Current corrected app hash separated from historical source-lock app/build and prior review epochs.",
+    "independence": "Author preparation only; NOT_INDEPENDENTLY_REVIEWED."
+  },
+  "preserved_holds": [
+    "NO-GO",
+    "P1 conditional",
+    "inherited3C8H",
+    "REQ-409",
+    "oldfive changes and historical verdict/source epochs",
+    "foreign.pro strict",
+    "all physical/flash/power/probe/motor/fabrication/print gates",
+    "nine non-I2C SPEED/DIR/FG paths and command/no-motion/energy obligations remain separate",
+    "unannounced reset and power faults remain unresolved"
+  ],
+  "no_self_hash": true
+}

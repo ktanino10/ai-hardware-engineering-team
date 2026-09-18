@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "kind": "PUBLIC_PROJECTION_OF_STOPPED_SCOPED_ASSESSMENTS",
+  "not_an_independent_review_authored_by_publisher": true,
+  "archive_identifiers_not_public_links": true,
+  "A": {
+    "review_archive": "42265d02d949e3c83933d18e9cf31d4674950eed",
+    "original_review_path": "validation/reviews/rev5-sequencer-proof-consumption-fix/review.json",
+    "review_sha256": "4103bb8dfcea02c340d2385b339142e42eb6197edfc3149cc98c1fdf8126c5ff",
+    "verdict": "PASS",
+    "scope": "Exact original5ba proof-consumption correction and its impact only.",
+    "finding": "FR-SEQ-01",
+    "severity": "HIGH",
+    "disposition": "RESOLVED_ON_EXACT_CORRECTED_CODE",
+    "target_original_sha256": "f15c6017fffa05fc8608d49649c13b918c17b673ba91007d65a75afc34d73585",
+    "old_FAIL_OPEN_immutable": true,
+    "old_model_F1_reopened": false,
+    "no_transfer_to_different_public_adapter_bytes": true
+  },
+  "public_adapter": {
+    "review_archive": "010c3d752209c1873c644d9ca833de6bf45c44ea",
+    "original_review_path": "validation/reviews/rev5-public-adapter-code-review/review.json",
+    "review_sha256": "3943d6d5e05602545e8ede772d02f0f8e806608330fb405671a942efccb4ab0d",
+    "original_report_verbatim": "No significant issues found in the reviewed changes.",
+    "diff_base": "27d1510bb85f32878c977dca33d1249149157364",
+    "diff_head": "2fd673060298190ee7289803d4fb5bdb763bc389",
+    "scope": [
+      "New bootstrap and CLI entrypoint",
+      "Sequencer loader, package-relative dependencies and explicit public hashes",
+      "Namespace-relative scenario import and test adapters",
+      "New portability tests and publication manifests/documentation",
+      "Mechanical copy, redaction, binding and hash consistency only"
+    ],
+    "reported_execution": {
+      "python": "3.14.3 with -B",
+      "CLI": "all option and all ten individual choices, each exit0; actual-permission flags false",
+      "writing_unittest_suite": "NOT_EXECUTED_BY_CODE_REVIEWER",
+      "literal_external_Git_relocation": "NOT_EXECUTED_BY_CODE_REVIEWER",
+      "author_and_Lead_records": "Separately attributed evidence, not reviewer execution"
+    },
+    "engineering_verdict": "NOT_ASSIGNED",
+    "scope_extension_to_source_metadata_or_final_public_import": false
+  },
+  "G031": {
+    "original_review_archive": "27e23ef9d79242b5e8f1acaa38dff0535e0bcefd",
+    "original_verdict": "CONDITIONAL_PRESERVED",
+    "changed_review_archive": "88b3a544925832877d57f2314759d2ef135194f7",
+    "original_review_path": "validation/reviews/rev5-g031-source-correction/review.json",
+    "review_sha256": "9fe47efd45054ca62c57df27d0eb2d6ac47870e28909b7845737286fb05cd7de",
+    "changed_scope_verdict": "PASS",
+    "new_findings": [],
+    "001": "RESOLVED_ON_EXACT_CORRECTED_EFFECTIVE_VIEW_ONLY",
+    "002_003": "ACCEPTED_TECHNICAL_CLAUSES_THEN_ACTUAL_CANONICAL_SOURCE_ONLY_APPLICATION_AND_READBACK",
+    "applied_revision": "256c931ebc4036394152210b8ade84919cb052b9",
+    "metadata_path": "datasheets/stmicroelectronics_stm32g031k8t6_rev4.md",
+    "metadata_sha256": "c2bac732cf833b5d280c0c8b7f3ea28e5b6ee4763224f3e78aae837ee2aa62b7",
+    "new_numeric_Evidence_IDs_allocated": [],
+    "legacy_board_firmware_ISS015": "NOT_REASSESSED_OR_ACCEPTED",
+    "unknowns": [
+      "Applicable G031 manual identity/revision (RM0444 reference versus legacyRM0454), actual GPIO/reset/remap/diode/option/ULPEN/BOR configuration and AN2606 boot behavior.",
+      "Actual PA9/U6 or PA2/PA3 boot waveforms, passive dominance, rail/load/return margins and legacy ISS-015 behavior.",
+      "Actual C power survival, maximum capacitance/loaded edges, persistent freshness, issuer exclusion, grant/enforcer/ACK/PG/proof paths, maintained physical cuts, numerical B and actual X."
+    ],
+    "original_source_packet_and_metadata_history_unchanged": true,
+    "raw_original_and_full_numeric_proposals_not_exported": true
+  },
+  "copy_and_projection_boundaries": {
+    "model_exact_sha256": "ce496b2806b21966d68cec789ae85ec5dbdd4cf1eb7762a8d0b29fac172af447",
+    "public_sequencer_sha256": "634e1891186e73f46407b5037bfda7ebb84b93211b1055898e5b6be040aea745",
+    "unchanged_behavior_suffix_sha256": "d49b61437cf5cec248add0e4adbe9dc2f0ed4f08199748ddcc96cb34dd7f5bd2",
+    "no_code_or_bound_context_change_in_current_status_refresh": true,
+    "source_supplement": "Mechanical projection of existing admitted claims, not a fresh primary review.",
+    "actual_public_tree_validation_and_remote_actions": "SEPARATE_PUBLISHER_RECEIPT_REQUIRED"
+  },
+  "actual_operation_permission": false,
+  "actual_bus_permission": false,
+  "C_implementation_selection": "UNIMPLEMENTED_UNADOPTED; original comparison NO_SELECTION is historical, not a new decision from the upload.",
+  "holds": [
+    "NO-GO",
+    "P1 conditional",
+    "3C8H",
+    "REQ409",
+    "all independent/human/physical gates"
+  ]
+}

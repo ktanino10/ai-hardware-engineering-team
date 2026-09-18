@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "status": "FROZEN_PUBLIC_SAFE_EXPORT_PENDING_ACTUAL_PUBLIC_IMPORT_AND_REMOTE_PUBLICATION",
+  "source_snapshot": "27d1510bb85f32878c977dca33d1249149157364",
+  "source_identifiers_are_archive_references_not_public_links": true,
+  "adapter_independent_review": "BUILTIN_CODE_REVIEW_NO_SIGNIFICANT_ISSUES_REPORTED_IN_LIMITED_DIFF",
+  "baseline_only": false,
+  "future_review_update_requires_new_frozen_input": true,
+  "model_F1": {
+    "status": "RESOLVED",
+    "scope": "Limited historical independent review 42cdc; unchanged base model only"
+  },
+  "sequencer_FR_SEQ_01": {
+    "original_verdict": "FAIL",
+    "original_status": "OPEN",
+    "severity": "HIGH",
+    "original_review_archive": "ef6ce6c364c33a655bc8f16749bd8b45b6e7efc7",
+    "saved_correction_archive": "5ba5889d4787c58fc8adc9e37cb766a19f5c723c",
+    "exact_original_corrected_sha256": "f15c6017fffa05fc8608d49649c13b918c17b673ba91007d65a75afc34d73585",
+    "saved_correction_status": "INDEPENDENT_LIMITED_PASS",
+    "status": "RESOLVED_ON_EXACT_ORIGINAL_CORRECTED_CODE",
+    "independent_review_archive": "42265d02d949e3c83933d18e9cf31d4674950eed",
+    "public_adapter_verdict_transfer": false,
+    "author_tests_are_not_independent_resolution": true
+  },
+  "comparison": {
+    "archive": "fa0abfb0",
+    "verdict": "PASS_LIMITED_SEMANTIC_SCOPE_ONLY",
+    "selection": "NO_SELECTION",
+    "component_or_electrical_acceptance": false
+  },
+  "G031_source": {
+    "provenance": "USER_UPLOAD",
+    "document": "DS12992 Rev4, June2025, 126pages",
+    "raw_sha256": "0e25cbbf2cd173845545b61b91a9a7011724b4e5bd7b00498176129d48684e99",
+    "status": "LIMITED_CHANGED_SOURCE_PASS_AND_TWO_CANONICAL_SOURCE_ONLY_CLOSURES",
+    "original_review": "CONDITIONAL_PRESERVED",
+    "changed_source_review": "88b3a544925832877d57f2314759d2ef135194f7",
+    "source_only_applied_revision": "256c931ebc4036394152210b8ade84919cb052b9",
+    "raw_exported": false,
+    "full_numeric_proposal_packet_exported": false,
+    "two_qualified_legacy_source_operations_and_document_metadata_exported": true,
+    "adopted": false,
+    "legacy_board_firmware_premise_reassessment": "PENDING"
+  },
+  "first_cut_author_actions": {
+    "staged": false,
+    "committed": false,
+    "pushed": false,
+    "PR_created": false,
+    "merged": false
+  },
+  "actual_operation_permission": false,
+  "actual_bus_permission": false,
+  "physical_disconnection_established": false,
+  "physical_conductance": "UNKNOWN",
+  "holds": [
+    "NO-GO",
+    "P1 conditional",
+    "3C8H",
+    "REQ409",
+    "all independent/human/physical gates"
+  ],
+  "formal_part_topology_risk_B_X_adoption": false,
+  "next_boundary": "Separate public publisher applies exact canonical row operations, validates the actual public tree, then pushes only its public branch and creates a draft PR. Actual remote receipt is separate.",
+  "integrated_source_snapshot": "942bd898218026400da13e762da960da786068d5",
+  "initial_preparation_history": {
+    "archive": "2fd673060298190ee7289803d4fb5bdb763bc389",
+    "status_file_sha256": "ab0df3f32200067f6d6ddbb4e376f3a25793f812dbd15199a7a0461757e138b2",
+    "status": "LOCAL_FIRST_CUT_PREPARATION_NOT_PUBLISHED",
+    "FR_SEQ_01": "OPEN_AT_THAT_EPOCH",
+    "G031_source": "UNREVIEWED_AT_THAT_EPOCH"
+  }
+}

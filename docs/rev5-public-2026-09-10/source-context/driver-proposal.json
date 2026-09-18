@@ -1,0 +1,900 @@
+{
+  "schema_version": 1,
+  "status": "BOUNDED_CONCRETE_CONDITIONAL_DRIVER_PROPOSAL",
+  "independent_review": "NOT_INDEPENDENTLY_REVIEWED",
+  "component_adoption": false,
+  "architecture_adoption": false,
+  "installed_controller": false,
+  "actual_operation_permission": false,
+  "native_changes": 0,
+  "source_revision": "182d484eeca065202b189200e0902aa2ae457f0e",
+  "config_revision": "0d524373af5f0a87e792d8a46a55caa4041987f2",
+  "source": {
+    "component_commit": "7bfc4c7f3fe7e840ea83d835afbeb09fb5d3e7bb",
+    "aliases": {
+      "graph": "hardware/schematic/bench-imu-01-rev5/integrated-contract.json",
+      "HC1": "docs/rev5-2100-2026-09-09/held-control-proposal/proposal.json",
+      "B": "docs/rev5-2100-2026-09-09/firmware-authority/authority-map.json",
+      "A1": "docs/rev5-2100-2026-09-09/acceptance-spec/spec.json",
+      "candidate": "docs/rev5-2100-2026-09-09-continuation/driver-candidates/comparison.json",
+      "ledger": "datasheets/evidence-log.md"
+    }
+  },
+  "delta": [
+    "Replace HC1's F_CTRL_Li final CLR/CLK output ports, in this proposal only, with specific TDRV_i B1Y.13/B2Y.12 pins. No abstract final buffer remains between those pins and FF.",
+    "Add a separate request-only TREQ physical DATA/STROBE crossing, terminating at an explicitly UNIMPLEMENTED C validator. There is deliberately NO wire-through from request ingress to CLR, CLK or OE.",
+    "Specify four complete PW14 pin maps, individual domains, sole-active-source nets, source/destination bias and eight supply-bypass locations; source-device/GPIO/rail choices remain absent.",
+    "Add driver-specific OE/rail/stale-input ordering counterexamples and conditional restart sequence. Do not replay the old TMUX cut graph or claim physical proof."
+  ],
+  "serial_resources": {
+    "H": {
+      "net": "LOGIC_3V3",
+      "origin": "U202.5",
+      "native_consumer": "U201.2",
+      "status": "AS_DRAWN_PROVISIONAL_SERVICE_SOURCE_NOT_QUALIFIED",
+      "survives_reset": "UNKNOWN"
+    },
+    "C": {
+      "net": "C_SUPPLY_UNIMPLEMENTED",
+      "origin": null,
+      "device": null,
+      "pins": null,
+      "voltage_range": "UNKNOWN",
+      "status": "UNIMPLEMENTED_BOUNDARY_NOT_INSTALLED_RAIL",
+      "survives_reset": "UNKNOWN",
+      "prohibition": "Not silently H, pooled local rails, a new regulator, GPIO or supervisor."
+    },
+    "ground": {
+      "net": "GND",
+      "meaning": "Existing common logical return; no galvanic isolation. Physical return impedance, sequencing, coupling and continuity UNKNOWN.",
+      "refs": [
+        "DS-IFACE-002",
+        "PROPOSED-TXU-GROUND-FIRST"
+      ]
+    },
+    "axes": [
+      {
+        "axis": "X",
+        "driver": "U301",
+        "rail": "DRV_3V3_X",
+        "rail_pin": "U301.9",
+        "VM_pins": [
+          "U301.23",
+          "U301.24"
+        ],
+        "crossing": "TDRV_X",
+        "FF": "FF_X",
+        "local_switch": "LX",
+        "clear_net": "CLR_N_X",
+        "clock_net": "ARM_CLK_X",
+        "Q_net": "C_LX"
+      },
+      {
+        "axis": "Y",
+        "driver": "U302",
+        "rail": "DRV_3V3_Y",
+        "rail_pin": "U302.9",
+        "VM_pins": [
+          "U302.23",
+          "U302.24"
+        ],
+        "crossing": "TDRV_Y",
+        "FF": "FF_Y",
+        "local_switch": "LY",
+        "clear_net": "CLR_N_Y",
+        "clock_net": "ARM_CLK_Y",
+        "Q_net": "C_LY"
+      },
+      {
+        "axis": "Z",
+        "driver": "U303",
+        "rail": "DRV_3V3_Z",
+        "rail_pin": "U303.9",
+        "VM_pins": [
+          "U303.23",
+          "U303.24"
+        ],
+        "crossing": "TDRV_Z",
+        "FF": "FF_Z",
+        "local_switch": "LZ",
+        "clear_net": "CLR_N_Z",
+        "clock_net": "ARM_CLK_Z",
+        "Q_net": "C_LZ"
+      }
+    ],
+    "local_power": "All three VM sources unimplemented. A rail label and an FF supply tie do not establish local-power survival under MCU reset/halt, source removal or a planned local power cycle.",
+    "new_native_pin_allocations": [],
+    "package_status": "Only Component's conditional TXU0304PWR study preference is used. Four new proposal aliases, zero installed packages or canonical BOM additions."
+  },
+  "PW14_pin_functions": {
+    "1": "VCCA",
+    "2": "A1",
+    "3": "A2",
+    "4": "A3",
+    "5": "A4Y",
+    "6": "NC",
+    "7": "GND",
+    "8": "OE",
+    "9": "NC",
+    "10": "B4",
+    "11": "B3Y",
+    "12": "B2Y",
+    "13": "B1Y",
+    "14": "VCCB"
+  },
+  "driver_template": {
+    "candidate": "TXU0304PWR",
+    "instances": [
+      "TDRV_X",
+      "TDRV_Y",
+      "TDRV_Z"
+    ],
+    "substitution": "{axis}=X/Y/Z; {rail}=corresponding serial_resources.axes rail",
+    "pin_nets": {
+      "1": "C_SUPPLY_UNIMPLEMENTED",
+      "2": "C_CLR_RELEASE_{axis}",
+      "3": "C_FRESH_CLK_{axis}",
+      "4": "GND",
+      "5": null,
+      "6": null,
+      "7": "GND",
+      "8": "C_DRV_ENABLE_{axis}",
+      "9": null,
+      "10": "GND",
+      "11": null,
+      "12": "ARM_CLK_{axis}",
+      "13": "CLR_N_{axis}",
+      "14": "{rail}"
+    },
+    "refs": [
+      "DS-IFACE-002",
+      "DS-IFACE-055",
+      "DS-IFACE-058"
+    ],
+    "why": "A1->B1Y sends active-HIGH clear release; A2->B2Y sends fresh clock from independent-origin boundary into only its own local domain. Fixed input ties on A3/B4 avoid relying on TYP bias; unused outputs A4Y/B3Y and internal-NC6/9 stay unconnected.",
+    "sole_boundary_sources": [
+      {
+        "net": "C_CLR_RELEASE_{axis}",
+        "origin_device_pin": null,
+        "required_origin": "C independent clear-release output, push-pull behavior to be qualified",
+        "installed": false,
+        "default_request": "LOW"
+      },
+      {
+        "net": "C_FRESH_CLK_{axis}",
+        "origin_device_pin": null,
+        "required_origin": "C independent fresh-pulse output, push-pull behavior to be qualified",
+        "installed": false,
+        "default_request": "LOW"
+      },
+      {
+        "net": "C_DRV_ENABLE_{axis}",
+        "origin_device_pin": null,
+        "required_origin": "C independent driver-enable output",
+        "installed": false,
+        "default_request": "LOW; HIGH only after A1=A2=LOW and local qualification"
+      }
+    ],
+    "biases": [
+      {
+        "alias": "R_A_CLR_{axis}",
+        "from": "C_CLR_RELEASE_{axis}",
+        "to": "GND",
+        "value": "UNKNOWN"
+      },
+      {
+        "alias": "R_A_CLK_{axis}",
+        "from": "C_FRESH_CLK_{axis}",
+        "to": "GND",
+        "value": "UNKNOWN"
+      },
+      {
+        "alias": "R_OE_{axis}",
+        "from": "C_DRV_ENABLE_{axis}",
+        "to": "GND",
+        "value": "UNKNOWN"
+      },
+      {
+        "alias": "R_CLR_{axis}",
+        "from": "CLR_N_{axis}",
+        "to": "GND",
+        "value": "UNKNOWN"
+      },
+      {
+        "alias": "R_CLK_{axis}",
+        "from": "ARM_CLK_{axis}",
+        "to": "GND",
+        "value": "UNKNOWN"
+      }
+    ],
+    "bypass": [
+      {
+        "alias": "C_DRV_A_{axis}",
+        "from_pin": "1",
+        "to_pin": "7",
+        "effective_uF": "UNKNOWN",
+        "mpn": null,
+        "refs": [
+          "PROPOSED-TXU-BYPASS"
+        ]
+      },
+      {
+        "alias": "C_DRV_B_{axis}",
+        "from_pin": "14",
+        "to_pin": "7",
+        "effective_uF": "UNKNOWN",
+        "mpn": null,
+        "refs": [
+          "PROPOSED-TXU-BYPASS"
+        ]
+      }
+    ],
+    "normal_hold": "Drive A1=LOW actively with OE=HIGH, and normalize A2=LOW. Do not routinely replace active clear with OE=LOW/high-Z. R_CLR/R_CLK are unqualified loss-of-drive defaults, not active-HIGH vetoes.",
+    "not_connected": [
+      "MCU GPIO42",
+      "MCU GPIO47",
+      "MCU_EN",
+      "SW201",
+      "another push-pull CLR source",
+      "Qbar",
+      "installed command/FG TXU channel",
+      "invented PG or supervisor"
+    ]
+  },
+  "downstream_template": {
+    "candidate": "SN74LVC1G74DCTR",
+    "pin_nets": {
+      "1": "ARM_CLK_{axis}",
+      "2": "{rail}",
+      "3": null,
+      "4": "GND",
+      "5": "C_L{axis}",
+      "6": "CLR_N_{axis}",
+      "7": "{rail}",
+      "8": "{rail}"
+    },
+    "net_members": {
+      "CLR_N_{axis}": [
+        "TDRV_{axis}.13",
+        "FF_{axis}.6",
+        "R_CLR_{axis}.1"
+      ],
+      "ARM_CLK_{axis}": [
+        "TDRV_{axis}.12",
+        "FF_{axis}.1",
+        "R_CLK_{axis}.1"
+      ],
+      "C_L{axis}": [
+        "FF_{axis}.5",
+        "L{axis}.1",
+        "L{axis}.4",
+        "R_OFF_L{axis}.1"
+      ]
+    },
+    "active_driver": {
+      "CLR_N_{axis}": [
+        "TDRV_{axis}.13"
+      ],
+      "ARM_CLK_{axis}": [
+        "TDRV_{axis}.12"
+      ],
+      "C_L{axis}": [
+        "FF_{axis}.5"
+      ]
+    },
+    "refs": [
+      "DS-IFACE-039",
+      "DS-IFACE-040",
+      "DS-IFACE-075",
+      "DS-IFACE-070",
+      "DS-IFACE-073"
+    ],
+    "why": "Preserve held-clear FF primitive and Q-to-two-local-SEL only. A TXU control output sees ONE FF input plus bias/wiring/protection, not two TMUX SEL inputs. FF Q's separate load solution remains unresolved.",
+    "retained_bypass": "HC1 C_FF_i from FF.8 toFF.4 and TMUX/TCA bypass locations unchanged proposals; no new effective value borrowed from TXU.",
+    "FF_supply_off": "Ioff disables outputs at its specified zero-supply test; no Q=LOW or retained permission claim."
+  },
+  "request_crossing": {
+    "alias": "TREQ",
+    "candidate": "TXU0304PWR",
+    "status": "SEPARATELY_PROPOSED_REQUEST_TRANSPORT_ONLY",
+    "pin_nets": {
+      "1": "LOGIC_3V3",
+      "2": "H_REQ_DATA",
+      "3": "H_REQ_STROBE",
+      "4": "GND",
+      "5": null,
+      "6": null,
+      "7": "GND",
+      "8": "C_REQ_ACCEPT_ENABLE",
+      "9": null,
+      "10": "GND",
+      "11": null,
+      "12": "C_REQ_STROBE",
+      "13": "C_REQ_DATA",
+      "14": "C_SUPPLY_UNIMPLEMENTED"
+    },
+    "refs": [
+      "DS-IFACE-002",
+      "DS-IFACE-055",
+      "DS-IFACE-058"
+    ],
+    "boundary_connections": [
+      {
+        "net": "H_REQ_DATA",
+        "TXU_pin": "TREQ.2",
+        "source_device_pin": null,
+        "meaning": "Future H-domain requester output, no GPIO assignment"
+      },
+      {
+        "net": "H_REQ_STROBE",
+        "TXU_pin": "TREQ.3",
+        "source_device_pin": null,
+        "meaning": "Future H-domain requester strobe, no GPIO assignment"
+      },
+      {
+        "net": "C_REQ_DATA",
+        "TXU_pin": "TREQ.13",
+        "destination_device_pin": null,
+        "meaning": "Unimplemented C validator input"
+      },
+      {
+        "net": "C_REQ_STROBE",
+        "TXU_pin": "TREQ.12",
+        "destination_device_pin": null,
+        "meaning": "Unimplemented C validator input; electrical edge not freshness"
+      },
+      {
+        "net": "C_REQ_ACCEPT_ENABLE",
+        "TXU_pin": "TREQ.8",
+        "source_device_pin": null,
+        "meaning": "Unimplemented C ingress-enable output; referenced to VCCB permitted by TXU"
+      }
+    ],
+    "biases": [
+      {
+        "alias": "R_REQ_HD",
+        "from": "H_REQ_DATA",
+        "to": "GND",
+        "value": "UNKNOWN"
+      },
+      {
+        "alias": "R_REQ_HS",
+        "from": "H_REQ_STROBE",
+        "to": "GND",
+        "value": "UNKNOWN"
+      },
+      {
+        "alias": "R_REQ_OE",
+        "from": "C_REQ_ACCEPT_ENABLE",
+        "to": "GND",
+        "value": "UNKNOWN"
+      },
+      {
+        "alias": "R_REQ_CD",
+        "from": "C_REQ_DATA",
+        "to": "GND",
+        "value": "UNKNOWN"
+      },
+      {
+        "alias": "R_REQ_CS",
+        "from": "C_REQ_STROBE",
+        "to": "GND",
+        "value": "UNKNOWN"
+      }
+    ],
+    "bypass": [
+      {
+        "alias": "C_REQ_H",
+        "from_pin": "1",
+        "to_pin": "7",
+        "effective_uF": "UNKNOWN",
+        "mpn": null,
+        "refs": [
+          "PROPOSED-TXU-BYPASS"
+        ]
+      },
+      {
+        "alias": "C_REQ_C",
+        "from_pin": "14",
+        "to_pin": "7",
+        "effective_uF": "UNKNOWN",
+        "mpn": null,
+        "refs": [
+          "PROPOSED-TXU-BYPASS"
+        ]
+      }
+    ],
+    "protocol": "UNIMPLEMENTED. DATA/STROBE are a possible physical ingress, not an adopted protocol. No frame format/rate/latency, request parser, epoch memory, return ACK, sensor or completion source exists.",
+    "required_payload_semantics": [
+      "fresh epoch",
+      "actual issuer",
+      "event kind",
+      "old/new/shared affected set",
+      "configuration binding",
+      "explicit event request distinct from normal rejoin"
+    ],
+    "validator_absent": "C must reject incomplete/stale/held-high/OE-return frames and revalidate new intent. A release then new transition alone is necessary but not sufficient freshness. There is no current implementation to do that.",
+    "no_wire_through": true,
+    "why": "Keep request transport physically separate from independent sole CLR/CLK generation. If C is absent, neither translated requests nor their failure defaults authorize a planned event."
+  },
+  "bias_and_edge_obligations": {
+    "R_MPN_tolerance_effective_C": "UNKNOWN for every new position; no passive selected",
+    "disabled": "For each high-Z node: signed injection over its entire trajectory, Rmax, return/noise and initial charge must keep/discharge it below the applicable LOW threshold within a justified interval. Actual conditions do not meet that argument yet.",
+    "active_HIGH": "Each output must source V/Rmin plus receiver/protection/wiring load inside a matched I-V/load envelope. A pulldown never vetoes active HIGH.",
+    "active_LOW": "Sinking positive injection versus sourcing leakage through the pulldown are different load signs. Do not extend a +100uA VOL fixture to all signed LOW loads.",
+    "ordinary_FF_inputs": "R_CLR/R_CLK discharge and release edges must satisfy FF input transition conditions at FF.6/.1; TXU's Schmitt INPUT does not turn downstream FF into a Schmitt receiver.",
+    "no_selected_solution": true,
+    "refs": [
+      "DS-IFACE-014",
+      "DS-IFACE-015",
+      "DS-IFACE-016",
+      "DS-IFACE-017",
+      "DS-IFACE-039",
+      "DS-IFACE-055",
+      "DS-IFACE-056",
+      "DS-IFACE-075",
+      "PROPOSED-TXU-OE-II"
+    ]
+  },
+  "conditioned_source_point": {
+    "status": "DESK_NECESSARY_CONDITIONS_NOT_ACTUAL_MARGIN",
+    "power_assumption": "For one illustration only C=VL_i exactly3V; not an adopted supply. H and TREQ unequal-rail behavior require their own constraints.",
+    "data": "C LOW below0.89V / HIGH above1.92V plus actual uncertainty, per014. OE same extrema only under provisional OE rows.",
+    "TXU_to_FF_light_load": {
+      "TXU_VOH_min_V": 2.9,
+      "FF_VIH_min_V": 2.0,
+      "difference_V": 0.9,
+      "TXU_VOL_max_V": 0.1,
+      "FF_VIL_max_V": 0.8,
+      "low_difference_V": 0.7,
+      "actual_margin": "UNKNOWN",
+      "condition": "TXU +/-100uA distinct tests with input footnotes; FF3.0..3.6V thresholds. Actual signed load and return errors unqualified."
+    },
+    "heavy_load_counterexample": "At both3V TXU +10mA VOLmax0.8V equals FF VILmax0.8V: zero positive LOW uncertainty allowance. -10mA VOH2.2V gives only0.2V arithmetic HIGH difference. Not a selected10mA load, nor compatible with the5mA local external budget by assumption.",
+    "timing": "TXU0.5..11ns propagation/6.6..29ns enable/18.5..42ns disable are distinct fixtures; none is output slew. FF pulses>=2.7ns/setup1.3ns/hold1.2ns/recovery1.2ns and input<=10ns/V retain039 conditions. No numerical C pulse or completion timer derived.",
+    "recovery_requirement": "At each FF pin, earliest valid rising CLK must follow latest clean /CLR release by applicable recovery plus actual uncertainty; D/PRE valid for applicable setup/hold and pulse intervals. Cross-channel TXU delay or enable commonality does not establish this.",
+    "provisional_dependencies": [
+      "PROPOSED-TXU-OE-RISE-3V",
+      "PROPOSED-TXU-OE-FALL-3V",
+      "PROPOSED-TXU-ENABLE-B"
+    ]
+  },
+  "new_driver_traces": [
+    {
+      "id": "COLD_START",
+      "kind": "UNQUALIFIED",
+      "path": [
+        "All C/VL/H initial states unknown",
+        "OE may be high-Z; R_OE/R_CLR/R_CLK unqualified",
+        "FF PRE/D follow ramp, not guaranteed HIGH; Q unknown",
+        "No event or normal-ON permission"
+      ],
+      "failure": "TXU input defaults/either-order statement is not FF POR or physical-cut initialization."
+    },
+    {
+      "id": "INITIALIZE_ACTIVE_HOLD",
+      "kind": "CONDITIONAL_REQUIRED_SEQUENCE",
+      "path": [
+        "Valid returns/rails and qualified bias/loads required",
+        "C A1=0,A2=0 with OE=0",
+        "OE=1 with both data inputs still0",
+        "Verify actual valid /CLR LOW, CLK LOW and initial hold conditions",
+        "Maintain active CLR LOW"
+      ],
+      "failure": "No installed C source, observer or valid rail history; merely issuing these levels proves nothing physically."
+    },
+    {
+      "id": "PLANNED_WITHDRAW",
+      "kind": "CONDITIONAL_REQUIRED_SEQUENCE",
+      "path": [
+        "Before first mutation freeze issuer q and old/new/shared set",
+        "Stop submissions and disposition already-running transactions",
+        "OE remains1; A1 goes0; CLR falls -> Q falls -> local SELs",
+        "Normalize A2=0 while CLR heldLOW",
+        "Keep heldLOW through event/recovery; require A1 C1..C5 before actual event"
+      ],
+      "failure": "A1 named here is the acceptance spec, not TXU input A1; neither level ACK nor a TXU/FF timer measures the six cuts."
+    },
+    {
+      "id": "HELD_HIGH_REQUEST",
+      "kind": "COUNTEREXAMPLE",
+      "path": [
+        "H_REQ_STROBE stays1 while TREQ disabled",
+        "TREQ OE or H power returns",
+        "C_REQ_STROBE may rise while DATA is stale",
+        "A missing/naive C decoder might accept it as new",
+        "Direct routing to a driver clock could rejoin"
+      ],
+      "failure": "Schmitt hysteresis and glitch-free correct HIGH following are not freshness. This proposal has no request-to-CLK wire; validator implementation remains missing."
+    },
+    {
+      "id": "CLK_HIGH_DURING_CLEAR",
+      "kind": "CONDITIONAL_PRIMITIVE_ONLY",
+      "path": [
+        "Valid PRE=1,CLR=0",
+        "Any valid CLK level/edge leaves Q0",
+        "Before releasing clear normalize CLK0",
+        "Do not count stored CLK1 as a fresh command"
+      ],
+      "failure": "A stuck-high clear driver, invalid local power or simultaneous PRE0 invalidates this hold premise."
+    },
+    {
+      "id": "OE_RETURN_CLR_FIRST",
+      "kind": "COUNTEREXAMPLE",
+      "path": [
+        "Both rails valid; disabled outputs have hypothetically qualified LOW biases",
+        "C A1=1,A2=1 are stale; OE rises",
+        "CLR output may rise first",
+        "CLK output later rises after recovery or within recovery window",
+        "Q may set1 without fresh intent, or timing becomes UNKNOWN"
+      ],
+      "failure": "Shared OE is not an ordered clear-then-clock sequencer. Reverse arrival order could leave Q0; neither outcome is guaranteed."
+    },
+    {
+      "id": "C_SUPPLY_OFF_RETURN",
+      "kind": "UNQUALIFIED",
+      "path": [
+        "VL valid; C goes0 or genuinely disconnected under055 conditions",
+        "TDRV outputs high-Z; passive local defaults require qualification",
+        "C returns with retained CLR_RELEASE/CLK/OE HIGH",
+        "Same unauthorized rejoin/timing race as OE_RETURN_CLR_FIRST"
+      ],
+      "failure": "Grounded-off leakage test and floating test differ. No brownout trajectory, C output reset state or control-rail survival has been supplied."
+    },
+    {
+      "id": "LOCAL_SUPPLY_LOSS",
+      "kind": "UNQUALIFIED",
+      "path": [
+        "VL falls while C may stay valid",
+        "FF operating range is left before TXU <100mV isolation marker",
+        "PRE/D/Q and TMUX powered-terminal limits lose qualification",
+        "At VL0 FF output disabled, not Q0",
+        "On VL return require full new initialization, not retained permission"
+      ],
+      "failure": "Do not assume LOCAL survives MCU reset. A maintained-isolation proof cannot authorize this power trajectory without new evidence."
+    },
+    {
+      "id": "OFF_WITH_CHARGE",
+      "kind": "UNQUALIFIED",
+      "path": [
+        "OE becomes0 while CLR or CLK wasHIGH",
+        "B outputs release to high-Z",
+        "Unknown capacitance/leakage makes LOW arrival and FF edge rate unknown",
+        "CLR can remainHIGH while CLK rings or rises"
+      ],
+      "failure": "No resistor/time value selected; high-Z is not forced LOW, receiver compliance or physical cut."
+    },
+    {
+      "id": "STUCK_CLEAR_OR_OE",
+      "kind": "FAULT_NOT_COVERED",
+      "path": [
+        "CLR drive stuckHIGH or OE stuck enabled",
+        "Request denial alone cannot force clear",
+        "Pulldown cannot fight a push-pull HIGH",
+        "An unwanted CLK can set Q"
+      ],
+      "failure": "No wired push-pull veto, extra supervisor, fault sensor or fault coverage is installed. No severity/risk waiver."
+    },
+    {
+      "id": "PARTIAL_TRANSACTION_CANCEL",
+      "kind": "UNQUALIFIED",
+      "path": [
+        "Some peripheral writes/edges occur before denial",
+        "Withdraw local cuts",
+        "Earlier write or reset is not rolled back",
+        "Keep event denied and rejoin withheld until explicit disposition/new epoch"
+      ],
+      "failure": "Timeout/API return/log ACK do not cancel queue/ISR/DMA activity or restore prior device state."
+    },
+    {
+      "id": "FRESH_NORMAL_REJOIN",
+      "kind": "CONDITIONAL_REQUIRED_SEQUENCE",
+      "path": [
+        "Actual event ended and delayed effects/transaction state resolved",
+        "New q_service distinct from event permission; reject stale request/ACK",
+        "Requalify all rails/returns, target mappings, pulls and host/TCA normal path",
+        "With OE1 and CLR0 normalize CLK0",
+        "Release CLR cleanly; meet FF recovery/setup/hold",
+        "Generate exactly one new qualified positive CLK pulse then returnCLK0",
+        "Qualify both-line normal joining and real useful transactions"
+      ],
+      "failure": "This is a genuine ON route, not always-OFF success. No physical service qualification, adopted controller or waveform generator exists."
+    }
+  ],
+  "all17_issuer_boundary": [
+    {
+      "key": "B-APP-ENTRY",
+      "action": "Future explicit request entry before any protected mutation; current measurement app has no authority engine.",
+      "enforced": false
+    },
+    {
+      "key": "B-UART-SETUP",
+      "action": "Gate before param/config/pin/install changes for affected resources; current UART0 pins are outside DRV pairs, not request pins.",
+      "enforced": false
+    },
+    {
+      "key": "B-IMU-PIN-SETUP",
+      "action": "For shared scope gate before first latch write, not just gpio_config return; preserve measurement pin choices.",
+      "enforced": false
+    },
+    {
+      "key": "B-SPI-ROUTE-SETUP",
+      "action": "Gate init/add/remove/free before first mux/CS/cleanup mutation; serial partial changes not atomic rollback.",
+      "enforced": false
+    },
+    {
+      "key": "B-SPI-TRANSACTION",
+      "action": "Freeze admission before queue; own in-flight ISR/peripheral and competing producers; timeout/pre_cb not cancel/veto.",
+      "enforced": false
+    },
+    {
+      "key": "B-SENSOR-RESET-NOT-MCU",
+      "action": "Current BMI reset is a SPI transaction, not planned MCU reset; disposition through SPI ownership if shared.",
+      "enforced": false
+    },
+    {
+      "key": "B-UART-PROGRESS-NOT-ACK",
+      "action": "FIFO/log/TX progress is not request freshness, independent time or physical completion.",
+      "enforced": false
+    },
+    {
+      "key": "B-PLANNED-SDK-RESTART",
+      "action": "Gate before esp_restart/shutdown callbacks and all bypass noos/ROM/raw entry; no installed sink or veto.",
+      "enforced": false
+    },
+    {
+      "key": "B-ERROR-PANIC-RESET",
+      "action": "Intentional error-as-reset denied before triggering; unannounced panic/reset unqualified, not made controlled by an observer.",
+      "enforced": false
+    },
+    {
+      "key": "B-FUTURE-I2C-REMAP",
+      "action": "Freeze old union new union shared set before constructor/delete/cleanup; three0x52 domains still unassigned.",
+      "enforced": false
+    },
+    {
+      "key": "B-FUTURE-I2C-RESET-IS-NOT-QUIESCE",
+      "action": "Explicit/automatic bus reset/clear are mutations, not passive drain; API clear-done/IDLE is not hardware completion.",
+      "enforced": false
+    },
+    {
+      "key": "B-FUTURE-I2C-ASYNC-OWNERSHIP",
+      "action": "Stop callback/queue/ISR-originated restart; resolve accepted writes/errors before fresh service epoch.",
+      "enforced": false
+    },
+    {
+      "key": "B-DIRECT-WRITERS-AND-HOLD",
+      "action": "Own GPIO/RTC/mux/matrix/OE/pull/hold and direct HAL/LL/ROM writers on every context; releasing hold can expose prepared HIGH.",
+      "enforced": false
+    },
+    {
+      "key": "B-DEBUG-CPU-SDK-BRANCH",
+      "action": "CPU debugger observation is too late; permission must survive halted CPU with pre-access exclusion.",
+      "enforced": false
+    },
+    {
+      "key": "B-EXTERNAL-DEBUG",
+      "action": "Pre-attach/drive/halt gate absent. GPIO39/40/41 alias JTAG; native USB singletons/data NC are not access enforcement. Global setXYZ.",
+      "enforced": false
+    },
+    {
+      "key": "B-EXTERNAL-EN-BOOT-POWER",
+      "action": "SW201 directly shorts MCU_EN/U201.3; SW202 boot and J201 power removal bypass TREQ/TDRV. These are NOT_AUTHORIZABLE controlled operations.",
+      "enforced": false
+    },
+    {
+      "key": "B-PRIVILEGED-ISR-DMA-ROM-CLOSURE",
+      "action": "Any surviving noncooperating writer defeats exclusive authority. SPI_DMA_DISABLED is not all-system DMA exclusion; no new SDK/ROM closure asserted.",
+      "enforced": false
+    }
+  ],
+  "local_power_proposal": {
+    "canonical_budget_changed": false,
+    "new_candidate_counts": {
+      "TXU_control": 3,
+      "TXU_request": 1,
+      "TXU_supply_bypass_locations": 8,
+      "TXU_related_bias_positions": 20
+    },
+    "H": "Existing H loads + TREQ A-side static/dynamic/input activity and C_REQ_H charging. Host source capacity/margin and requester drive losses UNKNOWN.",
+    "C": "Unimplemented authority's own supply/logic + three TDRV A sides + TREQ B side + all C input-drive/bias/output charging loads. Source capacity/survival UNKNOWN; no rail chosen.",
+    "VL_each": "Existing external driver loads + retained RA/TCA-A/TMUX/FF and Q load + TDRV B-side static/dynamic + two driven CLR/CLK bias/receiver loads + bypass charging. Output-sourced bias/load counted once, not again as a separate supply consumer.",
+    "registered_limit_mA_each": 5,
+    "source_point_only": "DS-IFACE-002 combined TXU static<=6uA/package with IO0, inputs at rails, specified supplies/-40..125C. Four matched tests sum<=24uA across all device supply currents, NOT24uA per rail and NOT actual consumption. Ordinary active bias loads violate IO0.",
+    "actual_static_dynamic_peak_power_and_margin": "UNKNOWN",
+    "thermal": "Actual dissipation, junction/ambient, PCB thermal resistance and transient heating UNKNOWN. No absolute-maximum current/temperature used as operating capacity.",
+    "refs": [
+      "DS-IFACE-002",
+      "DS-IFACE-055",
+      "DS-MTR-116",
+      "PROPOSED-TXU-BYPASS"
+    ]
+  },
+  "preserved_acceptance": {
+    "A1_conditions": [
+      "C1_route",
+      "C2_electrical",
+      "C3_tail",
+      "C4_maintained",
+      "C5_authority"
+    ],
+    "witness_poles": [
+      "LX.2-3",
+      "LX.5-6",
+      "LY.2-3",
+      "LY.5-6",
+      "LZ.2-3",
+      "LZ.5-6"
+    ],
+    "retained_used_SD_terminals": 24,
+    "retained_unused_TMUX_channels": 8,
+    "host_TCA": "Retained H0/H1 and TX/TY/TZ, all-terminal powered/off ROC, active repeater release, signed current/charge/tails and bypass routes remain obligations. Local-cut selection waives none.",
+    "B_thresholds": "UNKNOWN; no arbitrary numerical acceptance limits",
+    "actual_X": "UNKNOWN; no chosen rail, capacitance, load, time, return or transaction assumptions promoted to fact",
+    "physical_conductance": "UNKNOWN; neither Q/CLR/SEL nor TREQ/driver output reports it",
+    "timer": "NONE; do not add TXU/FF/TMUX fixture times into event/cut deadline",
+    "nine_command_FG_paths": [
+      [
+        "X",
+        "SPEED U201.10->U301.13",
+        "DIR U201.23->U301.14",
+        "FG U301.12->U201.28"
+      ],
+      [
+        "Y",
+        "SPEED U201.11->U302.13",
+        "DIR U201.38->U302.14",
+        "FG U302.12->U201.29"
+      ],
+      [
+        "Z",
+        "SPEED U201.22->U303.13",
+        "DIR U201.18->U303.14",
+        "FG U303.12->U201.30"
+      ]
+    ],
+    "motor_inhibit": "NOT_QUALIFIED; bus/event permission does not establish CMD permission, no-motion or stored-energy clearance",
+    "old_review": "HC1 original CONDITIONAL/new findings0 preserved; this new layer has NOT been independently reviewed",
+    "holds": [
+      "NO-GO",
+      "P1 conditional",
+      "3C8H",
+      "REQ409",
+      "oldfive",
+      "foreign.pro strict",
+      "all physical/human/source gates",
+      "c16 actual closeout and13 closed tasks"
+    ]
+  },
+  "design_obligations_18": [
+    {
+      "item": 1,
+      "topic": "Supply voltage",
+      "result": "TXU ROC058; individual VL pins fixed; C source/range and all trajectories UNKNOWN."
+    },
+    {
+      "item": 2,
+      "topic": "Logic voltage",
+      "result": "014/075 source-point differences only; full-range data/OE thresholds/load/noise unresolved."
+    },
+    {
+      "item": 3,
+      "topic": "Absolute maximum",
+      "result": "002/058 stress voltage/current distinct from operation; protection/overshoot/negative return unqualified."
+    },
+    {
+      "item": 4,
+      "topic": "Recommended operation",
+      "result": "TXU/FF/TMUX simultaneous validity required; no arbitrary brownout allowance."
+    },
+    {
+      "item": 5,
+      "topic": "Current",
+      "result": "Signed output/FF/bias loads and total local5mA budgets unresolved; no endpoint leakage interpolation."
+    },
+    {
+      "item": 6,
+      "topic": "Thermal",
+      "result": "Actual dynamic power, junction/board/ambient and derating UNKNOWN; no self-qualification."
+    },
+    {
+      "item": 7,
+      "topic": "Decoupling",
+      "result": "Eight new locations, provisional0.1uF recommendation only; actual effective capacitance/MPN/placement unresolved."
+    },
+    {
+      "item": 8,
+      "topic": "Bias",
+      "result": "Twenty new/retained-driver bias positions explicit with UNKNOWN values; no pull can veto activeHIGH."
+    },
+    {
+      "item": 9,
+      "topic": "Protection",
+      "result": "No new ESD/reverse/overcurrent part selected. Component clamp/ESD capability does not establish system protection."
+    },
+    {
+      "item": 10,
+      "topic": "Power sequence",
+      "result": "Ground first provisional recommendation; OE/rail restoration staleHIGH and loss-of-hold traces explicit."
+    },
+    {
+      "item": 11,
+      "topic": "Reset",
+      "result": "FF PRE own-rail; no POR guarantee. SW201 direct EN unchanged; local survival UNKNOWN."
+    },
+    {
+      "item": 12,
+      "topic": "Timing",
+      "result": "039 receiver requirements retained; TXU source fixture not loaded slew/order/pulse guarantee."
+    },
+    {
+      "item": 13,
+      "topic": "MCU pin function",
+      "result": "No GPIO assigned;42/47 singletons and39/40/41 JTAG boundaries preserved; no SDK/target edits."
+    },
+    {
+      "item": 14,
+      "topic": "Interfaces",
+      "result": "Fixed-direction push-pull control/request paths, not SPI adoption or an implemented request protocol; no direct host-to-permission wire."
+    },
+    {
+      "item": 15,
+      "topic": "Grounding",
+      "result": "Common logical return, no galvanic isolation; return impedance/continuity and supply-return sequence unqualified."
+    },
+    {
+      "item": 16,
+      "topic": "Noise",
+      "result": "Schmitt input no debounce/freshness; light-load ringing and FF threshold crossing need actual qualification."
+    },
+    {
+      "item": 17,
+      "topic": "Reference circuit",
+      "result": "Use exact PW14, not DTR layout pin map. Two-control/unused-ground pattern differs from SPI illustration; why logged. Capacitor recommendations provisional."
+    },
+    {
+      "item": 18,
+      "topic": "Mechanical/thermal co-design",
+      "result": "Four packages/eight bypass locations need later PCB area/return/proximity review; rotating-body solder/connector vibration and localized IMU bias heating remain unqualified; no geometry edits."
+    }
+  ],
+  "author_check_boundary": {
+    "kind": "STRUCTURAL_AND_SYMBOLIC_CHECK_ONLY_NOT_SELF_CERTIFICATION",
+    "hardware_checklist_1_16": "Covered as unresolved design obligations above; no electrical PASS verdict.",
+    "layout_checklist_17_21": "NOT_ASSESSED; native/PCB/ERC/DRC execution forbidden by this bounded contract.",
+    "new_check": "Read-only relocatable stdlib graph/schema/source-binding and driver-specific symbolic traces, including negative mutations. No analog/timing/power/physical simulation.",
+    "no_old_helpers": "A1/HC1 check.py read as DATA ONLY; never imported or executed."
+  },
+  "minimum_next_inputs": [
+    {
+      "id": "AUTH",
+      "owner": "Lead with Circuit/Firmware",
+      "needed": "Actual independent C device/output/input pins, own source/return and halt/reset behavior; request source endpoints; exclusive all17 issuer intervention before first mutation. No fake controller."
+    },
+    {
+      "id": "POWER",
+      "owner": "Lead with Power/Circuit",
+      "needed": "C/H/threeVL/VM/return histories and capacity through cold-start, planned event, uncertainty and recovery; reject local-loss case unless maintained isolation newly justified."
+    },
+    {
+      "id": "LOAD",
+      "owner": "Circuit/Component via Lead",
+      "needed": "Signed CLR/CLK/Q/SEL/OE and request-receiver I-V, passive values/tolerances, effective C/initial charge, protection/wiring and loaded monotonic edges/pulses/ground noise."
+    },
+    {
+      "id": "SOURCE",
+      "owner": "Sole Lead serial publisher",
+      "needed": "Only seven local PROPOSED rows as needed; exact continuous/unequal-rail threshold and output-edge coverage still absent. Document access itself is resolved."
+    },
+    {
+      "id": "PROTOCOL",
+      "owner": "Firmware/Circuit via Lead",
+      "needed": "Real request framing/epoch validation, active hold, clean clear release and fresh pulse; transaction disposition and no stale OE/power-return acceptance. No sealed-FW change here."
+    },
+    {
+      "id": "ACCEPTANCE",
+      "owner": "Lead/acceptance authority then independent Hardware Reviewer",
+      "needed": "Numerical B, actual X, implementation identity, all-six-pole/current/charge/tail/maintained proof and useful rejoin; separate motor/power/physical gates."
+    }
+  ]
+}

@@ -1,0 +1,250 @@
+{
+  "schema_version": 1,
+  "kind": "PUBLIC_DERIVATIVE_MANIFEST",
+  "hash_algorithm": "SHA-256",
+  "self_hash_policy": "manifest.json is allowlisted but excluded from its own hash table to avoid circular hashing; the current global export manifest and public-only handoff bind its final bytes. The original private preparation handoff binds only the earlier first-cut version.",
+  "public_allowlist": [
+    "README.md",
+    "_bootstrap.py",
+    "cli.py",
+    "manifest.json",
+    "model.py",
+    "publication-status.json",
+    "scenarios.py",
+    "sequencer.py",
+    "source-context/README.md",
+    "source-context/acceptance-spec.json",
+    "source-context/capacitance-correction.json",
+    "source-context/driver-proposal.json",
+    "source-context/driver-schematic.md",
+    "source-context/firmware-authority-map.json",
+    "source-context/source-proposals.json",
+    "source-selection.json",
+    "test_portability.py",
+    "test_sequencer.py"
+  ],
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 9436,
+      "sha256": "360079c598837738c0c14b4899ea2d499598464339933adcff749b37a8287890",
+      "classification": "administrative-stopped-status-refresh",
+      "preparation_original": {
+        "archive": "2fd673060298190ee7289803d4fb5bdb763bc389",
+        "sha256": "442de2a414dabbd79eb41bb4bf98507e7192276562307b76c9a066bc3f70efb5",
+        "bytes": 7859
+      }
+    },
+    {
+      "path": "_bootstrap.py",
+      "bytes": 2014,
+      "sha256": "08e87f4bb05fcd74d56f6f574f880cf320416a9b0454a896b4e78b57357fa25b",
+      "classification": "new-package-artifact"
+    },
+    {
+      "path": "cli.py",
+      "bytes": 1870,
+      "sha256": "8e576eb934318c395b7b0be828f888e7e067a49c8909dde1bb4de10bfcd2e3e2",
+      "classification": "adapter-derived",
+      "original": {
+        "original_path": "docs/rev5-2300-2026-09-09/output-sequencer/cli.py",
+        "original_revision": "27d1510bb85f32878c977dca33d1249149157364",
+        "original_sha256": "1e13cb8972d8ef46f83e573ce54aa752a818d53752e9207bb64415a4440ad172"
+      }
+    },
+    {
+      "path": "model.py",
+      "bytes": 33962,
+      "sha256": "ce496b2806b21966d68cec789ae85ec5dbdd4cf1eb7762a8d0b29fac172af447",
+      "classification": "exact-copy",
+      "original": {
+        "original_path": "docs/rev5-2100-2026-09-09/host-event-model/model.py",
+        "original_revision": "27d1510bb85f32878c977dca33d1249149157364",
+        "original_sha256": "ce496b2806b21966d68cec789ae85ec5dbdd4cf1eb7762a8d0b29fac172af447"
+      }
+    },
+    {
+      "path": "publication-status.json",
+      "bytes": 3262,
+      "sha256": "76005e59ea742ae64c8f2935a383c9c21aa4c21501647758f89ceffdb6ef2a15",
+      "classification": "administrative-stopped-status-refresh",
+      "preparation_original": {
+        "archive": "2fd673060298190ee7289803d4fb5bdb763bc389",
+        "sha256": "ab0df3f32200067f6d6ddbb4e376f3a25793f812dbd15199a7a0461757e138b2",
+        "bytes": 1875
+      }
+    },
+    {
+      "path": "scenarios.py",
+      "bytes": 10685,
+      "sha256": "ee8028095f757ca63e1c35e07f197e7556eee0ad7734dfc37dd0afa121f24f86",
+      "classification": "adapter-derived",
+      "original": {
+        "original_path": "docs/rev5-2300-2026-09-09/output-sequencer/scenarios.py",
+        "original_revision": "27d1510bb85f32878c977dca33d1249149157364",
+        "original_sha256": "20386057d9acfbbc0deecf82f53fa7126b8048eb1df44df9de46e058162b7dba"
+      }
+    },
+    {
+      "path": "sequencer.py",
+      "bytes": 18935,
+      "sha256": "634e1891186e73f46407b5037bfda7ebb84b93211b1055898e5b6be040aea745",
+      "classification": "adapter-derived",
+      "original": {
+        "original_path": "docs/rev5-2300-2026-09-09/output-sequencer/sequencer.py",
+        "original_revision": "27d1510bb85f32878c977dca33d1249149157364",
+        "original_sha256": "f15c6017fffa05fc8608d49649c13b918c17b673ba91007d65a75afc34d73585"
+      }
+    },
+    {
+      "path": "source-context/README.md",
+      "bytes": 3345,
+      "sha256": "b79ac19da4e8aab7f82a94e75cf41a0aa99757777aa8759d15ceb20310018db6",
+      "classification": "new-package-artifact"
+    },
+    {
+      "path": "source-context/acceptance-spec.json",
+      "bytes": 35943,
+      "sha256": "07a73624d64cca3463930a878faaefce41eab16f0a1a77d9f6b8de1c1bd1e290",
+      "classification": "redacted",
+      "original": {
+        "original_path": "docs/rev5-2100-2026-09-09/acceptance-spec/spec.json",
+        "original_revision": "27d1510bb85f32878c977dca33d1249149157364",
+        "original_sha256": "50a7d689125a0355076af1f62ce64ff69baab8bf23851629d9f7f961647881c9"
+      }
+    },
+    {
+      "path": "source-context/capacitance-correction.json",
+      "bytes": 11771,
+      "sha256": "45440084ce0a51fe4cbe12ef45a65ab000564eb21dddb7ea897e7052d0900d71",
+      "classification": "redacted",
+      "original": {
+        "original_path": "docs/rev5-2100-2026-09-09-continuation/driver-capacitance-correction/correction.json",
+        "original_revision": "27d1510bb85f32878c977dca33d1249149157364",
+        "original_sha256": "0dc1825dde6f95daa7250df292fb8cfa44f066d2f49fc352b496f08f4928b1cf"
+      }
+    },
+    {
+      "path": "source-context/driver-proposal.json",
+      "bytes": 34576,
+      "sha256": "4c26e4bdb00335bae9b1a63366d66f680b41c3fb2ed3ee26067e09bb31e8e582",
+      "classification": "redacted",
+      "original": {
+        "original_path": "docs/rev5-2100-2026-09-09-continuation/driver-proposal/proposal.json",
+        "original_revision": "27d1510bb85f32878c977dca33d1249149157364",
+        "original_sha256": "d1f40f27d9179b64a2416f82d252aa38cad93df09e4d726971db49a771c2a127"
+      }
+    },
+    {
+      "path": "source-context/driver-schematic.md",
+      "bytes": 19739,
+      "sha256": "bb828875aac86ff62469419b7d981275fb3cdcbffb0171d07a3777db60c05fb2",
+      "classification": "exact-copy",
+      "original": {
+        "original_path": "docs/rev5-2100-2026-09-09-continuation/driver-proposal/schematic.md",
+        "original_revision": "27d1510bb85f32878c977dca33d1249149157364",
+        "original_sha256": "bb828875aac86ff62469419b7d981275fb3cdcbffb0171d07a3777db60c05fb2"
+      }
+    },
+    {
+      "path": "source-context/firmware-authority-map.json",
+      "bytes": 50654,
+      "sha256": "0da8afe95c78da49c547859b3777e3a1ec41805323e8877294a95393d71936d3",
+      "classification": "redacted",
+      "original": {
+        "original_path": "docs/rev5-2100-2026-09-09/firmware-authority/authority-map.json",
+        "original_revision": "27d1510bb85f32878c977dca33d1249149157364",
+        "original_sha256": "213d166f0f3872f2afd44fbc8ba2943d0494fda1f7b4707baa58d95c9361fa52"
+      }
+    },
+    {
+      "path": "source-context/source-proposals.json",
+      "bytes": 17090,
+      "sha256": "49d613967bb59c8a9f17e76b666549c65eb92ede5cb626bea81c963255c14c85",
+      "classification": "redacted",
+      "original": {
+        "original_path": "docs/rev5-2100-2026-09-09-continuation/driver-capacitance-correction/source-proposals.json",
+        "original_revision": "27d1510bb85f32878c977dca33d1249149157364",
+        "original_sha256": "9ec617b39ec8ff975f92178312af62aab96fc0f74f03c5a897b5720a92b9a695"
+      }
+    },
+    {
+      "path": "source-selection.json",
+      "bytes": 10622,
+      "sha256": "2e157b69f21320d3fc23758810e37c39ec6743cdf662d5fa80c652f64f0dd253",
+      "classification": "new-package-artifact"
+    },
+    {
+      "path": "test_portability.py",
+      "bytes": 13535,
+      "sha256": "714a3ad898feb3c0ded193c94601bc3fa728de5adf5bef1b7a2dd2925baaeec3",
+      "classification": "new-package-artifact"
+    },
+    {
+      "path": "test_sequencer.py",
+      "bytes": 22390,
+      "sha256": "81307e146d3193edb718b14acea306cfcb16f6f3fee201a033b4da5f41aef0b5",
+      "classification": "adapter-derived",
+      "original": {
+        "original_path": "docs/rev5-2300-2026-09-09/output-sequencer/test_sequencer.py",
+        "original_revision": "27d1510bb85f32878c977dca33d1249149157364",
+        "original_sha256": "1ab281a96216ed17609af7b5b0487aa3add9d85446893a9a1fcb54dedfbb7546"
+      }
+    }
+  ],
+  "core_preservation_author_checks": {
+    "model.py": {
+      "exact_bytes": true
+    },
+    "sequencer.py": {
+      "core_from": "base = _load_existing_model()",
+      "suffix_bytes_equal": true,
+      "core_sha256": "d49b61437cf5cec248add0e4adbe9dc2f0ed4f08199748ddcc96cb34dd7f5bd2"
+    },
+    "scenarios.py": {
+      "only_change": "from sequencer -> from .sequencer; definitions and fixture bytes unchanged"
+    },
+    "test_sequencer.py": {
+      "test_methods_retained": 29,
+      "only_method_change": "Exact package-local model path equality replaces old host-event-model suffix assertion; remaining assertions and helpers AST-identical."
+    }
+  },
+  "adapter_delta": {
+    "sequencer.py": [
+      "ROOT uses package directory, not repository ancestry.",
+      "Seven explicit public hashes retain all original dependency roles; safe bounded read diagnostics and symlink rejection.",
+      "Check all contexts before loading; compile exact checked model bytes in fresh bundle namespace; reject existing model slot rather than trust sys.modules."
+    ],
+    "scenarios.py": [
+      "Only namespace-relative sequencer import."
+    ],
+    "cli.py": [
+      "Path-local hash-checked bootstrap; bind fresh sequencer/scenarios in main.",
+      "Add PUBLIC_DERIVATIVE_CURRENT_EXECUTION label; report relative binding failures with exit2, no success JSON."
+    ],
+    "_bootstrap.py": [
+      "New small stdlib adapter: check sequencer/scenario bytes before compiling, namespace has empty filesystem search path, never reuse bare cached modules; clean partial namespace on failure."
+    ],
+    "test_sequencer.py": [
+      "Local CLI loader imports; exact package model-location assertion; 29 original methods retained."
+    ],
+    "test_portability.py": [
+      "New author packaging regressions only; no change to state-policy expectations."
+    ]
+  },
+  "context_transformation": "See source-selection.json for exact provenance-only deleted/replaced pointers. Public hashes are NEW bindings, not changes to or rebindings of original seals.",
+  "runtime_dependencies": "cli.py, _bootstrap.py, sequencer.py, scenarios.py, exact model.py and six source-context files; Python stdlib only. Documentation/manifests are not executed or used to hide missing bindings.",
+  "runtime_not_authenticated": "Hashes detect local accidental/tampered dependency changes relative to unchanged entrypoint; no signing or security boundary against a modified entrypoint/interpreter.",
+  "independent_review": "NOT_INDEPENDENTLY_REVIEWED",
+  "administrative_status_refresh": {
+    "source_snapshot": "942bd898218026400da13e762da960da786068d5",
+    "changed_files": [
+      "README.md",
+      "publication-status.json",
+      "manifest.json"
+    ],
+    "all_Python_and_bound_context_bytes_unchanged": true,
+    "independent_verdict_scope_preserved": true,
+    "no_remote_publication_claim": true
+  }
+}

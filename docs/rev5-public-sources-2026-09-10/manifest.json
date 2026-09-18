@@ -1,0 +1,4405 @@
+{
+  "schema_version": 1,
+  "kind": "MECHANICAL_PUBLIC_SOURCE_DEPENDENCY_PREPARATION",
+  "status": "LOCAL_DERIVATIVE_PREPARATION_NOT_PUBLICATION",
+  "approval": null,
+  "adoption": false,
+  "independent_review": "NOT_INDEPENDENTLY_REVIEWED",
+  "new_evidence_ids_allocated": [],
+  "public_baseline": {
+    "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+    "canonical_path": "datasheets/evidence-log.md",
+    "canonical_sha256": "8119c3ea81fd05cbce119b3e59b1b324e9d31b37441f2bca988d6989947c969f",
+    "checker_path": "tools/check_id_uniqueness.py",
+    "checker_sha256": "1cb5a1192a33552cd04e711f34447f91621b3674d8d4d6aaa9e6e69da28b06ab",
+    "checker_scope": "FIRST_MATCHING_TABLE_ONLY",
+    "checker_copy_executed": false,
+    "test_id_uniqueness_py": "Absent according to the fixed task contract; not an available validation command. Selected baseline-paths inventory is not represented as a complete tests-directory listing.",
+    "private_0d_coverage_equivalence": false
+  },
+  "source_archive": {
+    "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+    "canonical_path": "datasheets/evidence-log.md",
+    "canonical_sha256": "ec6b3ccfb4df896e4fd855a4c5ac3ba8df2e029c1f06d166411861a76f2cb922",
+    "meaning": "Frozen original-source identity/hash, not a promise that private history was pushed or publicly reachable. Actual proposed canonical dependencies and public metadata are separately enumerated."
+  },
+  "scope": {
+    "direct_ids": 40,
+    "required_ids": 43,
+    "add_operations": 36,
+    "qualified_replacement_operations": 1,
+    "retained_rows": 6,
+    "new_metadata_documents": 12,
+    "unchanged_package_files": 18,
+    "primary_research_or_raw_access": false,
+    "package_or_checker_execution": false,
+    "canonical_ledger_modified": false
+  },
+  "mechanical_policy": {
+    "row_changes": "Remap only metadata cell paths to public-references-rev5; DS-IFACE-017 additionally replaces one private provenance-location token with an explicit omission marker. All other original row bytes are preserved.",
+    "original_rows": "Exact originals and hashes are supplied except that the public representation of DS-IFACE-017 withholds its private location. Its exact original digest and exact private handoff are retained; representation has a separate digest. No redacted representation is called the original byte string.",
+    "existing065": "Preserve exact old public row/hash at its original revision. Import the already-existing qualified source row, with public-to-source cell differences separate from source-to-export path remapping. No new qualification or retrospective history rewrite.",
+    "metadata": "Document identity/provenance projection only, source-line/field mappings and original/derived hashes. Original non-document technical prose and unrelated ID lists excluded, never reinterpreted.",
+    "raw_hashes": "Recorded manufacturer-content hashes copied from metadata only; none reverified. No acquisition/latest/source-confidence upgrade.",
+    "history": "Original metadata/rows and all technical/reviewer epochs remain unchanged. Changed public bytes do not inherit original seals or independent acceptance.",
+    "unsafe_transform": "If a value/condition cannot survive permitted location-only redaction or the real-public parser cannot cover it, block that artifact; do not invent replacement technical content."
+  },
+  "metadata_field_selection_notes": {
+    "espressif_esp-idf-v6.1_peripherals_web-2026-09-06.md": "Manufacturer/publisher, Document and Version header fields; publication/part number absent -> UNKNOWN with explicit document target; chapter URL/hash collection retained as document endpoints, not technical API content.",
+    "espressif_esp-idf_v5.5.2_gpio-source.md": "Document Title -> Datasheet Title; Reviewed Date is not silently relabeled as an acquisition date; pinned manufacturer commit and two exact URL/hash pairs retained; local lock location omitted.",
+    "espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md": "Original identity fields and same captured hash from source extensions; Part Number retains document families, excluding historical project-status suffix. Geometry resource links and technical/adoption history excluded.",
+    "espressif_esp32-s3_datasheet-v2.2.md": "Original identity/retrieval fields plus later official endpoint/capture hash; preserve no-cache and later-capture epochs separately; historical project-TBD phrase and private receipt location omitted.",
+    "espressif_esp32-s3_jtag-external_v6.1.md": "Original identity/URL/hash and recorded no-new-retrieval statement; private HTML location omitted; unrelated ID excluded.",
+    "espressif_esp32-s3_trm-v1.8.md": "Original identity/URL/hash and offline-reuse history; private capture-owner labels and receipt locations omitted; register/technical discussion excluded.",
+    "texasinstruments_drv10983_slvscp6h.md": "Existing2026-09-05 document correction in introductory block supplies corrected title/SLVSCP6H/July2014-revisedJune2020. Historical2026-08-31 limited product-page identity/retrieval remains a separate epoch; capture hash retained; electrical/BRAKE/design history omitted from document metadata.",
+    "texasinstruments_sn74axc4t774_sces898c.md": "Candidate -> Part Number; Document -> Datasheet Title; combined revision/publication field separated; recorded header/footer caveat preserved; private cache/receipt omitted.",
+    "texasinstruments_sn74lvc1g74_sces794g.md": "Identity and original timestamp/hash unchanged; stopped same-hash reacquisition and reuse stated as historical metadata, private locations/owner labels omitted.",
+    "texasinstruments_tca9517_scps242d.md": "Candidate -> Part Number; combined revision/publication field separated; exact original raw hash and recorded same-hash request/size retained as historical observations, body/addendum date distinction preserved; no numeric interface prose.",
+    "texasinstruments_tmux1511_scds390b.md": "Original document identity/title/date/timestamp/hash; recorded same-hash capture/reuse history; private coordination/receipt location omitted.",
+    "texasinstruments_txu0304_sces935a.md": "Candidate/Document field aliases; bound-document May2021/November2021 identity statement retained alongside original retrieval; same hash/history; technical correction/table/locator discussion and private receipts excluded from metadata, qualified rows preserved separately."
+  },
+  "required_final_public_checks": [
+    {
+      "id": "ACTUAL_DESTINATION_BINDING",
+      "status": "NOT_RUN_PENDING_PUBLISHER",
+      "assertion": "At the actual authorized public root, bind HEAD/config and canonical/checker bytes to the accepted destination. Reject unseen changes and row/metadata collisions rather than assuming the frozen baseline still applies."
+    },
+    {
+      "id": "SINGLE_EXISTING_TABLE_IMPORT",
+      "status": "NOT_RUN_PENDING_PUBLISHER",
+      "assertion": "Insert36 adds before the ## Rules boundary of the existing first Evidence-ID8-column table; replace065 only if exact prior row/hash matches. No new table or heading. Preserve every other public canonical row."
+    },
+    {
+      "id": "ACTUAL_CHECKER_ENUMERATION",
+      "status": "NOT_RUN_PENDING_PUBLISHER",
+      "assertion": "Execute the existing checker from its real public tools/check_id_uniqueness.py location. Separately obtain that actual module's parse_table_rows result for its Evidence ID NamespaceSpec, using the actual canonical text, header_prefix and id_pattern. Every operated37 and required43 ID must be enumerated exactly once with expected8 complete cells. Record full parsed IDs/counts/warnings; exit0 alone is not coverage.",
+      "no_substitution": "Do not execute the relocated checker-source text, use a private-tree run as a public result, transplant0d regression tests, or change required checks/configuration."
+    },
+    {
+      "id": "FULL43_DEPENDENCY_RESOLUTION",
+      "status": "NOT_RUN_PENDING_PUBLISHER",
+      "assertion": "Recompute the40 direct references from the unchanged18 package files and transitive canonical-row references to the43-ID fixed point. Verify each exact canonical row and every metadata-cell path exists in the real public tree; no missing metadata or duplicate/colliding IDs. Existing6 BMI270 rows and their public metadata remain available."
+    },
+    {
+      "id": "DERIVATIVE_AND_PACKAGE_INTEGRITY",
+      "status": "NOT_RUN_PENDING_PUBLISHER",
+      "assertion": "Verify all installed row/metadata derivative hashes, public privacy exclusions and all18 unchanged package hashes. Do not call changed derivative bytes the original reviewed/sealed artifact. Hold any unsupported artifact and preserve all engineering/physical gates."
+    }
+  ],
+  "holds": "NO-GO/P1conditional/3C8H/REQ409/oldfive/foreign.prostrict/allphysicalhumanholds",
+  "publication": "NOT_PERFORMED; separately reserved sole publisher only; no new review/status input consumed.",
+  "closure": {
+    "seed_ids": [
+      "DS-IFACE-002",
+      "DS-IFACE-003",
+      "DS-IFACE-014",
+      "DS-IFACE-015",
+      "DS-IFACE-016",
+      "DS-IFACE-017",
+      "DS-IFACE-018",
+      "DS-IFACE-039",
+      "DS-IFACE-040",
+      "DS-IFACE-043",
+      "DS-IFACE-055",
+      "DS-IFACE-056",
+      "DS-IFACE-057",
+      "DS-IFACE-058",
+      "DS-IFACE-063",
+      "DS-IFACE-064",
+      "DS-IFACE-067",
+      "DS-IFACE-069",
+      "DS-IFACE-070",
+      "DS-IFACE-071",
+      "DS-IFACE-072",
+      "DS-IFACE-073",
+      "DS-IFACE-074",
+      "DS-IFACE-075",
+      "DS-IMU-079",
+      "DS-IMU-080",
+      "DS-IMU-081",
+      "DS-IMU-082",
+      "DS-IMU-083",
+      "DS-IMU-084",
+      "DS-MCU-102",
+      "DS-MCU-121",
+      "DS-MCU-123",
+      "DS-MCU-130",
+      "DS-MCU-140",
+      "DS-MCU-151",
+      "DS-MCU-153",
+      "DS-MCU-154",
+      "DS-MTR-116",
+      "DS-MTR-119"
+    ],
+    "required_ids": [
+      "DS-IFACE-002",
+      "DS-IFACE-003",
+      "DS-IFACE-007",
+      "DS-IFACE-014",
+      "DS-IFACE-015",
+      "DS-IFACE-016",
+      "DS-IFACE-017",
+      "DS-IFACE-018",
+      "DS-IFACE-039",
+      "DS-IFACE-040",
+      "DS-IFACE-043",
+      "DS-IFACE-055",
+      "DS-IFACE-056",
+      "DS-IFACE-057",
+      "DS-IFACE-058",
+      "DS-IFACE-063",
+      "DS-IFACE-064",
+      "DS-IFACE-067",
+      "DS-IFACE-069",
+      "DS-IFACE-070",
+      "DS-IFACE-071",
+      "DS-IFACE-072",
+      "DS-IFACE-073",
+      "DS-IFACE-074",
+      "DS-IFACE-075",
+      "DS-IMU-079",
+      "DS-IMU-080",
+      "DS-IMU-081",
+      "DS-IMU-082",
+      "DS-IMU-083",
+      "DS-IMU-084",
+      "DS-MCU-102",
+      "DS-MCU-120",
+      "DS-MCU-121",
+      "DS-MCU-123",
+      "DS-MCU-130",
+      "DS-MCU-140",
+      "DS-MCU-151",
+      "DS-MCU-153",
+      "DS-MCU-154",
+      "DS-MTR-065",
+      "DS-MTR-116",
+      "DS-MTR-119"
+    ],
+    "missing_public_ids": [
+      "DS-IFACE-002",
+      "DS-IFACE-003",
+      "DS-IFACE-007",
+      "DS-IFACE-014",
+      "DS-IFACE-015",
+      "DS-IFACE-016",
+      "DS-IFACE-017",
+      "DS-IFACE-018",
+      "DS-IFACE-039",
+      "DS-IFACE-040",
+      "DS-IFACE-043",
+      "DS-IFACE-055",
+      "DS-IFACE-056",
+      "DS-IFACE-057",
+      "DS-IFACE-058",
+      "DS-IFACE-063",
+      "DS-IFACE-064",
+      "DS-IFACE-067",
+      "DS-IFACE-069",
+      "DS-IFACE-070",
+      "DS-IFACE-071",
+      "DS-IFACE-072",
+      "DS-IFACE-073",
+      "DS-IFACE-074",
+      "DS-IFACE-075",
+      "DS-MCU-102",
+      "DS-MCU-120",
+      "DS-MCU-121",
+      "DS-MCU-123",
+      "DS-MCU-130",
+      "DS-MCU-140",
+      "DS-MCU-151",
+      "DS-MCU-153",
+      "DS-MCU-154",
+      "DS-MTR-116",
+      "DS-MTR-119"
+    ],
+    "qualified_replacement_ids": [
+      "DS-MTR-065"
+    ],
+    "retained_ids": [
+      "DS-IMU-079",
+      "DS-IMU-080",
+      "DS-IMU-081",
+      "DS-IMU-082",
+      "DS-IMU-083",
+      "DS-IMU-084"
+    ],
+    "metadata_resolution": [
+      {
+        "id": "DS-IFACE-002",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "9111324acc7f3adf1f23d805f21ad9695b55c24adad563db26d1391e1a003d15",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-003",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "1fc786922321b3804ea28d7709305d8972fa8ba0bbe2f182e42e1932cbe36222",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_sn74axc4t774_sces898c.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-007",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "f0420808e0cff96d2209354eee89b450aded01303a55d39cff98479aa5d918c8",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-014",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "095efe46537cf079f2357d90cd5353ca91f0c590266bc5a0797271b38aef6e53",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-015",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "05e8e00f65d82bb9b822a47c52a078e83dbad1c4fe61cc94e0542bee968ddb3c",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-016",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "85d112ea93f9574a6cfbefef1c4eb64337dde3da74269f7c09bbfa9fece0b826",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-017",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "01a7a729cb73829d3a8986d7b1541b643880a8b3821eab19b6fbbafcaaf13caf",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-018",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "debe49b7cdc60992da2155ed0eb1a3ed8d4b00a54fb83d86b38f07e6e75f3a68",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-039",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "4205e59e3c2396562501367b0f46b79d4aee3c94571b87a7106b2a9abb9f4591",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-040",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "3670cfda1ff736172fe8eca36c643ca2689968a63b91314479b909d26612ed42",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-043",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "59031c85db5e3c04354aa87c7544e0d753543ee3fcce658557fed16a6cf327e3",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_sn74axc4t774_sces898c.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-055",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "3dd0380548f86f4496fb815e9e8dda036e7651333b17644fd805d8ec8d8357cf",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-056",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "b948279b848d27086a0eecb12b047e177f01fa0535b5b01419dc3b84f6caba90",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-057",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "d07c87616ab152f825f048b794ef15fb22f4fee51a3faa9e500b24191393f542",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-058",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "01e87b201dff5b76ed363e94e61db0894eac4f6d43c8e804629b60eed9b5cf7c",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-063",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "221c1c0f6620e8845a76e6c0c9d742f3c91149909ea894358953cf26dee075f0",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-064",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "5faf4c07ef9e62a69a3453b5129412581436934b72b482eac14f78fb71c0a2c9",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-067",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "0a3c038fc141e2c41b6eb5e353dbce13febc6059e4b021069d5ae5b52175b127",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-069",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "924c8b087ab600893dc7ebdba2c6b52d59d22194b16ce37e9848937709977155",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-070",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "2e371e41d349a435f0cc5e2410bb3363dd80a3f3fa202bcbf8d2c9c775ac2e91",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-071",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "83bebefd9d9af87bd79aea0208616b46f2eec1959efe8afb048caa75c5a53ea4",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-072",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "0704297eb72d40e8a3c9032389f888f1641b2905f2d2a6e8737a267bd6acab23",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-073",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "1a3c9d6b229760cb2c0c14d26bd3efa968ba41262217082fb9da2b2826168a10",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-074",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "564c9485c845267ecce51de3c6d32fd3fc1b8151b0cc049f2656ee0be35e0e4f",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IFACE-075",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "74e17ca0e180ffac021190f7e0ab7db9feb10bc33b0c81dec6ff0e7da186188b",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IMU-079",
+        "canonical_action": "RETAIN_EXACT_PUBLIC_ROW",
+        "canonical_row_sha256": "b1067676c1d1e1e9346c09fd6df66ab11aed8a9cda2c1c509ae78cf01ef9a9eb",
+        "metadata_paths": [
+          "datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IMU-080",
+        "canonical_action": "RETAIN_EXACT_PUBLIC_ROW",
+        "canonical_row_sha256": "aaa09918bd2be74d91186ece043118328226715bd8964dee0eb79abfad88e034",
+        "metadata_paths": [
+          "datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IMU-081",
+        "canonical_action": "RETAIN_EXACT_PUBLIC_ROW",
+        "canonical_row_sha256": "7b36861f0347922b94f9e98fa858105d049faf008d265004a4797538b99d5daa",
+        "metadata_paths": [
+          "datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IMU-082",
+        "canonical_action": "RETAIN_EXACT_PUBLIC_ROW",
+        "canonical_row_sha256": "867c41c05522b3b19772cbdffa93f0d2467404939b9e8931df1d7b40d602ebc9",
+        "metadata_paths": [
+          "datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IMU-083",
+        "canonical_action": "RETAIN_EXACT_PUBLIC_ROW",
+        "canonical_row_sha256": "4d835107a0a35df94a2126243565172276df04c90456aa12777d6a11bd1c30d0",
+        "metadata_paths": [
+          "datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-IMU-084",
+        "canonical_action": "RETAIN_EXACT_PUBLIC_ROW",
+        "canonical_row_sha256": "a3ef987aebd586dc0695133f03db9e60a107106c02cd2ac6e146417d966bc944",
+        "metadata_paths": [
+          "datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-MCU-102",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "87763a71303c26dadc8a4f738870f52d7455983b4852e55582218c0220a0cd68",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-MCU-120",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "4526f712268a981303d4eba0d47a1a43b11fb9af7632a6cb76d9640754959e27",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-MCU-121",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "c9ca3b7422e4a79c5101bd59e803508707329571105c9b2b6bb8d7d5d4685153",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-MCU-123",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "ce5bd9f770ec8a162a79445cbd56f6c221da75cb7f5b05c7f77c91dfdd03f2a5",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp-idf-v6.1_peripherals_web-2026-09-06.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-MCU-130",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "ebd80ea4873e772e16db0410b9c038d2a46999bffd78ba9f5836fa2dd65fc393",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md",
+          "datasheets/public-references-rev5/espressif_esp32-s3_jtag-external_v6.1.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-MCU-140",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "7a55c46e701733214dd76196f7841cfa6b22388fd50dbe6f750373d2dd063da5",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp32-s3_datasheet-v2.2.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-MCU-151",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "47d5082dc18322409afe6ca9c590f0dfcfff7b95b2f47b56e1d6ba1d7ebfdbc4",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp32-s3_datasheet-v2.2.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-MCU-153",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "cd8a20c918475b2f5cb6195039e22410143da00daa1a717dc47a3c4f455437f3",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp32-s3_trm-v1.8.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-MCU-154",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "c402868c2cfaa26430f15e027274e63adfd5989f3e609311e61338fa04c54b6d",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp-idf_v5.5.2_gpio-source.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-MTR-065",
+        "canonical_action": "REPLACE",
+        "canonical_row_sha256": "f0976973f17065b868fcdee1f414706dce892bddc7bc8ca773d132a9f68b2abb",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-MTR-116",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "4fa395e2a9946ed9c315a37998a1c0d25060e278f53d3bf1083961e52ce8401a",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      },
+      {
+        "id": "DS-MTR-119",
+        "canonical_action": "ADD",
+        "canonical_row_sha256": "e3d75cd4d65b5fe381997f2d8486a6db0b07259b5d86a8ea8afa851db48dff98",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md"
+        ],
+        "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+      }
+    ],
+    "recomputed_from_package_and_canonical_rows": true
+  },
+  "in_memory_projection": {
+    "method": "Local stdlib text/row-width/hash checks against frozen baseline only; no copied-checker execution and no public-worktree access",
+    "projected_canonical_sha256": "6b8cc2b505fc41d0fd03c1d64072771eb564942c44b14375d7d67cae1676c981",
+    "projected_bytes": 273850,
+    "baseline_canonical_ids": 411,
+    "projected_canonical_ids": 447,
+    "first_table_enumerated_ids_in_text_model": 447,
+    "required43_in_first_table_once": true,
+    "source_target37_eight_columns": true,
+    "all_other_public_rows_unchanged": true,
+    "final_public_checker_result": "NOT_RUN"
+  },
+  "rows_artifact": {
+    "path": "docs/rev5-public-sources-2026-09-10/rows.json",
+    "sha256": "4139bc3bb042f1c2dbacd8b3a0f2180fb55af7dd8abed6cf81a89aa65612f25d",
+    "bytes": 144529
+  },
+  "README": {
+    "path": "docs/rev5-public-sources-2026-09-10/README.md",
+    "sha256": "c91492bb276d50d67d04de542fedf206496f50d11fd92a90482c7e12689f5102"
+  },
+  "unchanged_package": {
+    "docs/rev5-public-2026-09-10/README.md": "442de2a414dabbd79eb41bb4bf98507e7192276562307b76c9a066bc3f70efb5",
+    "docs/rev5-public-2026-09-10/_bootstrap.py": "08e87f4bb05fcd74d56f6f574f880cf320416a9b0454a896b4e78b57357fa25b",
+    "docs/rev5-public-2026-09-10/cli.py": "8e576eb934318c395b7b0be828f888e7e067a49c8909dde1bb4de10bfcd2e3e2",
+    "docs/rev5-public-2026-09-10/manifest.json": "558a368d0f9077a46349a963365bc39f5c98f080e73f0b5e4342f62969877966",
+    "docs/rev5-public-2026-09-10/model.py": "ce496b2806b21966d68cec789ae85ec5dbdd4cf1eb7762a8d0b29fac172af447",
+    "docs/rev5-public-2026-09-10/publication-status.json": "ab0df3f32200067f6d6ddbb4e376f3a25793f812dbd15199a7a0461757e138b2",
+    "docs/rev5-public-2026-09-10/scenarios.py": "ee8028095f757ca63e1c35e07f197e7556eee0ad7734dfc37dd0afa121f24f86",
+    "docs/rev5-public-2026-09-10/sequencer.py": "634e1891186e73f46407b5037bfda7ebb84b93211b1055898e5b6be040aea745",
+    "docs/rev5-public-2026-09-10/source-context/README.md": "b79ac19da4e8aab7f82a94e75cf41a0aa99757777aa8759d15ceb20310018db6",
+    "docs/rev5-public-2026-09-10/source-context/acceptance-spec.json": "07a73624d64cca3463930a878faaefce41eab16f0a1a77d9f6b8de1c1bd1e290",
+    "docs/rev5-public-2026-09-10/source-context/capacitance-correction.json": "45440084ce0a51fe4cbe12ef45a65ab000564eb21dddb7ea897e7052d0900d71",
+    "docs/rev5-public-2026-09-10/source-context/driver-proposal.json": "4c26e4bdb00335bae9b1a63366d66f680b41c3fb2ed3ee26067e09bb31e8e582",
+    "docs/rev5-public-2026-09-10/source-context/driver-schematic.md": "bb828875aac86ff62469419b7d981275fb3cdcbffb0171d07a3777db60c05fb2",
+    "docs/rev5-public-2026-09-10/source-context/firmware-authority-map.json": "0da8afe95c78da49c547859b3777e3a1ec41805323e8877294a95393d71936d3",
+    "docs/rev5-public-2026-09-10/source-context/source-proposals.json": "49d613967bb59c8a9f17e76b666549c65eb92ede5cb626bea81c963255c14c85",
+    "docs/rev5-public-2026-09-10/source-selection.json": "2e157b69f21320d3fc23758810e37c39ec6743cdf662d5fa80c652f64f0dd253",
+    "docs/rev5-public-2026-09-10/test_portability.py": "714a3ad898feb3c0ded193c94601bc3fa728de5adf5bef1b7a2dd2925baaeec3",
+    "docs/rev5-public-2026-09-10/test_sequencer.py": "81307e146d3193edb718b14acea306cfcb16f6f3fee201a033b4da5f41aef0b5"
+  },
+  "metadata_derivatives": [
+    {
+      "source_path": "datasheets/espressif_esp-idf-v6.1_peripherals_web-2026-09-06.md",
+      "source_revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+      "source_sha256": "074bdb2a20c7829dbfcf282174c0ee280ae4d1ef159a50109a78f8a993656763",
+      "target_path": "datasheets/public-references-rev5/espressif_esp-idf-v6.1_peripherals_web-2026-09-06.md",
+      "target_sha256": "d1558f3313a4af7ad2c850973119afbb17f082f6d9e4ec9a0af122d937c13815",
+      "target_bytes": 2102,
+      "used_for_ids": [
+        "DS-MCU-123"
+      ],
+      "document_content_sha256_records": [
+        "47e75e26df6795cf716ae392150495a228f02d78e899efe1f2118eee41552e1b",
+        "6a706e6b215d61a8ea2efce31cc6dc383ac8981c65394abfbd107d94e51a302b",
+        "bd6a9bc32186cc60334181148861d1e79e1bca318ff16cc15ef57658e410d66a",
+        "de4a7d5e1f2c1bc08960f38903ea416d3739024f6ba8f544a9695bea3e3d6038",
+        "f3be7fa3aabce3e6f7c486320b2299e11f98c1355cca4cbacdaeef4f550e5aed"
+      ],
+      "raw_hashes_reverified": false,
+      "official_urls": [
+        "https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/api-reference/peripherals/gpio.html",
+        "https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/api-reference/peripherals/i2c.html",
+        "https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/api-reference/peripherals/ledc.html",
+        "https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/api-reference/peripherals/mcpwm.html",
+        "https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/api-reference/peripherals/pcnt.html"
+      ],
+      "field_transformations": [
+        {
+          "public_field": "Manufacturer",
+          "target": {
+            "lines": [
+              3,
+              3
+            ],
+            "fragment_sha256": "2bb021ef2158577cdbea304ee22a2c0222358a822bb7156c57f0393902fae28d"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                3,
+                3
+              ],
+              "fragment_sha256": "c2c8a1745c655333965b29c13118c8e444150846b203d4595e956d9885f1e57a"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Part Number",
+          "target": {
+            "lines": [
+              4,
+              4
+            ],
+            "fragment_sha256": "7e80380062b679a0f3e03a3f6fac1ce5e2528b33b5fb5d574d96240ededb5b6c"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                1,
+                1
+              ],
+              "fragment_sha256": "d2599421a1584e6e4d82b94fda13724dc8b4214f416e7e54f10fe2211b215789"
+            }
+          ],
+          "transformation": "EXPLICIT_UNKNOWN_ABSENT_SOURCE_FIELD"
+        },
+        {
+          "public_field": "Datasheet Title",
+          "target": {
+            "lines": [
+              5,
+              5
+            ],
+            "fragment_sha256": "8c203f4e90bd90bdee6fd9af6cdfa0303d5d1c7e819a3531af0c34ff97b1040e"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                4,
+                4
+              ],
+              "fragment_sha256": "44ff7f05a8bacb055fc716efb4f613f487b208b7b0c38e776534e3a9d884ccd6"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Revision / Version",
+          "target": {
+            "lines": [
+              6,
+              6
+            ],
+            "fragment_sha256": "3cfb918f9713439e7a82d94d99db20681ecd0368e1d3e7f3e4b51cb25febaf03"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                5,
+                5
+              ],
+              "fragment_sha256": "5a1c449c03662d70624c6594bc110cecd41bf0be07f9d8cc9176e75c8c5dc2c2"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Publication Date",
+          "target": {
+            "lines": [
+              7,
+              7
+            ],
+            "fragment_sha256": "b0a30830861e950220b4d54164792cb0438172bed78808167476176411c16ca1"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                1,
+                1
+              ],
+              "fragment_sha256": "d2599421a1584e6e4d82b94fda13724dc8b4214f416e7e54f10fe2211b215789"
+            }
+          ],
+          "transformation": "EXPLICIT_UNKNOWN_ABSENT_SOURCE_FIELD"
+        },
+        {
+          "public_field": "Official URL",
+          "target": {
+            "lines": [
+              8,
+              8
+            ],
+            "fragment_sha256": "59f6bf09752ba11e162370bd632096451a642371962286fbf48a57900318e5f5"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                1,
+                1
+              ],
+              "fragment_sha256": "d2599421a1584e6e4d82b94fda13724dc8b4214f416e7e54f10fe2211b215789"
+            }
+          ],
+          "transformation": "DOCUMENT_ENDPOINT_COLLECTION_BELOW"
+        },
+        {
+          "public_field": "Retrieved Date",
+          "target": {
+            "lines": [
+              9,
+              9
+            ],
+            "fragment_sha256": "cd90031cccf61134f55011d4dfe8ac4b0e63c1d4c9d006c875d4affe69c52753"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                6,
+                6
+              ],
+              "fragment_sha256": "d80e6b9a276629fd20290c9e04d890aea28075cc0fd481aeeb4a58490fa697e0"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Local cache note",
+          "target": {
+            "lines": [
+              10,
+              10
+            ],
+            "fragment_sha256": "1559c2aca2653f702e18f3576e22c034c2cfd7e3b365e69a5f20bd81faa81300"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                8,
+                8
+              ],
+              "fragment_sha256": "b2d5ccf1ed8d54ed044146b95f516aef192b2c0821c3f5986918590f13621dfe"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Used for Evidence IDs",
+          "target": {
+            "lines": [
+              11,
+              11
+            ],
+            "fragment_sha256": "a7d18c204e8e60c2ea33fe93ad11a56f2d3f19f43df2fa4ba438c34064f30385"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                7,
+                7
+              ],
+              "fragment_sha256": "98da3343d08f5293a56db6d063e1ab758bcea9f09539b8659b3c755184e6f55c"
+            }
+          ],
+          "transformation": "FILTER_EXISTING_ID_LIST_TO_THIS_EXPORT_USAGE_ONLY"
+        }
+      ],
+      "endpoint_and_hash_source_locations": [
+        {
+          "lines": [
+            12,
+            12
+          ],
+          "fragment_sha256": "24dbed610d2f2c6df9e602ec0fc5a5b2da5ca59ae2815ca059508df7f4d85187"
+        },
+        {
+          "lines": [
+            13,
+            13
+          ],
+          "fragment_sha256": "95d23def563e414b5558398f0d9fed8afbc5b53a7c2c8aee00c72222107ade9b"
+        },
+        {
+          "lines": [
+            14,
+            14
+          ],
+          "fragment_sha256": "27f40e11671eafaf4824d24d3eb85edb10ba4684eabeb47daf51e925770fdcd4"
+        },
+        {
+          "lines": [
+            15,
+            15
+          ],
+          "fragment_sha256": "dc49e7642d6428afd4314e3c0c01b6a5d309dae7620db286006e5eb497c019ac"
+        },
+        {
+          "lines": [
+            16,
+            16
+          ],
+          "fragment_sha256": "17a294784ddd8883321decb4db4fd7c61281030fc32c3d2644d30103f08cb259"
+        }
+      ],
+      "selection_note": "Manufacturer/publisher, Document and Version header fields; publication/part number absent -> UNKNOWN with explicit document target; chapter URL/hash collection retained as document endpoints, not technical API content.",
+      "exclusions": [
+        "Private cache/receipt/coordination locations and capture-owner labels",
+        "Original parameter/application/geometry/implementation/adoption prose rather than document identity",
+        "Unrelated historical Evidence-ID lists",
+        "Unneeded external geometry resource links where present"
+      ],
+      "exact_original_and_diff": "Original remains unchanged; private author handoff retains full original-field values and exact unified diff. Public locations are line/hash references only, never private cache paths."
+    },
+    {
+      "source_path": "datasheets/espressif_esp-idf_v5.5.2_gpio-source.md",
+      "source_revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+      "source_sha256": "27a577c579ef84b400f5a4ea1377e790e3bb5f0beeea4b6691db4b2623f05ad1",
+      "target_path": "datasheets/public-references-rev5/espressif_esp-idf_v5.5.2_gpio-source.md",
+      "target_sha256": "c305b16ba788e0cc26d956fd696e18595a5051c64b2b08628e9d1bc23f171ece",
+      "target_bytes": 1588,
+      "used_for_ids": [
+        "DS-MCU-154"
+      ],
+      "document_content_sha256_records": [
+        "3f20af1a95aa84ad265cf20eb911eb40e7059c01b3c6e5e83961baf5d43dafc2",
+        "c889d8c7f09f54660f33b634e316c8237f57cbc2be191c39e0095d502f9ae226"
+      ],
+      "raw_hashes_reverified": false,
+      "official_urls": [
+        "https://github.com/espressif/esp-idf",
+        "https://github.com/espressif/esp-idf/blob/30aaf64524299d3bde422ca9a2848090d1bc5d0f/components/esp_driver_gpio/src/gpio.c",
+        "https://github.com/espressif/esp-idf/blob/30aaf64524299d3bde422ca9a2848090d1bc5d0f/components/soc/esp32s3/include/soc/soc_caps.h"
+      ],
+      "field_transformations": [
+        {
+          "public_field": "Manufacturer",
+          "target": {
+            "lines": [
+              3,
+              3
+            ],
+            "fragment_sha256": "2bb021ef2158577cdbea304ee22a2c0222358a822bb7156c57f0393902fae28d"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                3,
+                3
+              ],
+              "fragment_sha256": "2bb021ef2158577cdbea304ee22a2c0222358a822bb7156c57f0393902fae28d"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Part Number",
+          "target": {
+            "lines": [
+              4,
+              4
+            ],
+            "fragment_sha256": "f80c9fde4a1cb2858051eed76eb546cb78027391c196b48785492072eaf438ee"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                4,
+                4
+              ],
+              "fragment_sha256": "f80c9fde4a1cb2858051eed76eb546cb78027391c196b48785492072eaf438ee"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Datasheet Title",
+          "target": {
+            "lines": [
+              5,
+              5
+            ],
+            "fragment_sha256": "41f7aa7719399a7ba9baa5d23ca08b63c76d24c2d42a939dba33604430a1f090"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                5,
+                5
+              ],
+              "fragment_sha256": "7a70f104c134c080c9478eae4ff4a0b6fd1d0a8e04c471a44581d83ee720d1d6"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Revision / Version",
+          "target": {
+            "lines": [
+              6,
+              6
+            ],
+            "fragment_sha256": "b6bdc417566ee0eeab21808cc533406360e4e388005c92a1ec5192dc4112f78b"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                6,
+                7
+              ],
+              "fragment_sha256": "54b21088e71b54dca7d9631ededc6e805af2540752f54e3af6cd29bf84a331e2"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Publication Date",
+          "target": {
+            "lines": [
+              7,
+              7
+            ],
+            "fragment_sha256": "b74fdd644d49b2bc7c242aa30c581b50ed84dd478066818fbcc313f9e65187a9"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                8,
+                8
+              ],
+              "fragment_sha256": "871d967c2f19e0b21cafdff511d7d478aa781f3c61fd21e26a38a9c3e1ab412d"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Official URL",
+          "target": {
+            "lines": [
+              8,
+              8
+            ],
+            "fragment_sha256": "e4f71e208549410d7bc6b709a60e44b6c2ba41ec6414c4cbe4bb5f8e4cb02584"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                9,
+                9
+              ],
+              "fragment_sha256": "6b343c56600bae255a83e8b3daff2c331296a31e448f8615acb9f3590dfa90d8"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Retrieved Date",
+          "target": {
+            "lines": [
+              9,
+              9
+            ],
+            "fragment_sha256": "d489856376abea87dd674ca91fffd01f657263e7f6eb6c08476810c0e49f31b7"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                12,
+                13
+              ],
+              "fragment_sha256": "d2e2b268f23a8945b761eede2f5bd94d8ef27cfd78e377a1292057b4c7f66eeb"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Local cache note",
+          "target": {
+            "lines": [
+              10,
+              10
+            ],
+            "fragment_sha256": "c99da9ec5deffcb1821c031a9b837c258cfdd13562a4631b86d00bd9cb97c0c6"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                14,
+                15
+              ],
+              "fragment_sha256": "e440c47ea5e154d5b60774ce99365e90869d2bdecd7fe7a2ab45440e2a319e18"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Used for Evidence IDs",
+          "target": {
+            "lines": [
+              11,
+              11
+            ],
+            "fragment_sha256": "a509097d8b51048e244185f937e2ec68b03c883b95a4f26b7cbda32ff67237cc"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                21,
+                21
+              ],
+              "fragment_sha256": "a509097d8b51048e244185f937e2ec68b03c883b95a4f26b7cbda32ff67237cc"
+            }
+          ],
+          "transformation": "FILTER_EXISTING_ID_LIST_TO_THIS_EXPORT_USAGE_ONLY"
+        }
+      ],
+      "endpoint_and_hash_source_locations": [
+        {
+          "lines": [
+            9,
+            9
+          ],
+          "fragment_sha256": "6b343c56600bae255a83e8b3daff2c331296a31e448f8615acb9f3590dfa90d8"
+        },
+        {
+          "lines": [
+            10,
+            10
+          ],
+          "fragment_sha256": "e6525b3bba11ae3ea8b930034f0d720606be95ff389f9a91eab52012b2fef405"
+        },
+        {
+          "lines": [
+            11,
+            11
+          ],
+          "fragment_sha256": "40d7984810f42854a3e56b50bdb5c5fb4b46d0dc15043e2deb62af1c694fc952"
+        },
+        {
+          "lines": [
+            17,
+            17
+          ],
+          "fragment_sha256": "bbce9917dc60b5583af6781346d403ebc9adff1e75b13a5d4b5315d300744ba9"
+        },
+        {
+          "lines": [
+            19,
+            19
+          ],
+          "fragment_sha256": "c4eeead49222a125b25c77b2a1446e395184b91a4e24bf682117d2219ee3bd88"
+        }
+      ],
+      "selection_note": "Document Title -> Datasheet Title; Reviewed Date is not silently relabeled as an acquisition date; pinned manufacturer commit and two exact URL/hash pairs retained; local lock location omitted.",
+      "exclusions": [
+        "Private cache/receipt/coordination locations and capture-owner labels",
+        "Original parameter/application/geometry/implementation/adoption prose rather than document identity",
+        "Unrelated historical Evidence-ID lists",
+        "Unneeded external geometry resource links where present"
+      ],
+      "exact_original_and_diff": "Original remains unchanged; private author handoff retains full original-field values and exact unified diff. Public locations are line/hash references only, never private cache paths."
+    },
+    {
+      "source_path": "datasheets/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md",
+      "source_revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+      "source_sha256": "66f371861b3eb22544f91000ba7f76b4d7d8bcf7045d0d4b386e7fa23e18f547",
+      "target_path": "datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md",
+      "target_sha256": "23f1fc06fc36db9fc8672ae459e11ff52419b2709109bfd62248711f7d2e45ea",
+      "target_bytes": 1444,
+      "used_for_ids": [
+        "DS-MCU-102",
+        "DS-MCU-120",
+        "DS-MCU-121",
+        "DS-MCU-130"
+      ],
+      "document_content_sha256_records": [
+        "27d71971da07c280c6068d08c74720d1a25b8f20cf8494dc1765bdd28d40d435"
+      ],
+      "raw_hashes_reverified": false,
+      "official_urls": [
+        "https://documentation.espressif.com/esp32-s3-wroom-1_wroom-1u_datasheet_en.pdf"
+      ],
+      "field_transformations": [
+        {
+          "public_field": "Manufacturer",
+          "target": {
+            "lines": [
+              3,
+              3
+            ],
+            "fragment_sha256": "2bb021ef2158577cdbea304ee22a2c0222358a822bb7156c57f0393902fae28d"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                3,
+                3
+              ],
+              "fragment_sha256": "2bb021ef2158577cdbea304ee22a2c0222358a822bb7156c57f0393902fae28d"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Part Number",
+          "target": {
+            "lines": [
+              4,
+              4
+            ],
+            "fragment_sha256": "c2da9114962937a5f27703c03f383aa5b4abf3051fe72ee468bc6f75426e3876"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                4,
+                4
+              ],
+              "fragment_sha256": "225b71b4e2a7ee81b3fe6dbd1fd3153360f17a597cf1527dc0de678a5ccd9e66"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Datasheet Title",
+          "target": {
+            "lines": [
+              5,
+              5
+            ],
+            "fragment_sha256": "3381d61bd2dfd19da7c3ad8a12a1f308d72381439abd4ab70e0cbda88ae64a44"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                5,
+                5
+              ],
+              "fragment_sha256": "3381d61bd2dfd19da7c3ad8a12a1f308d72381439abd4ab70e0cbda88ae64a44"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Revision / Version",
+          "target": {
+            "lines": [
+              6,
+              6
+            ],
+            "fragment_sha256": "b0727b15420683e6ff7963dda4a6b6d320e1b710eca03a8e0efa781ef49d90c0"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                6,
+                6
+              ],
+              "fragment_sha256": "ca0c139f8030580dca66f5c9bc1a7ddb4d01b58acb4a0024f5d63d411051c818"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Publication Date",
+          "target": {
+            "lines": [
+              7,
+              7
+            ],
+            "fragment_sha256": "d2e25efe665ef958a8bb49e59c3870280dac612f4c10b6eabb57d6106933e16f"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                7,
+                7
+              ],
+              "fragment_sha256": "ef72a086059b16b0cadf9bd2a1fc07e1805335aebbf308519d11739adf875129"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Official URL",
+          "target": {
+            "lines": [
+              8,
+              8
+            ],
+            "fragment_sha256": "b6f616fcf2cad7e1ee2d34ded695906a200c4444ef321919e803326129090778"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                8,
+                8
+              ],
+              "fragment_sha256": "b6f616fcf2cad7e1ee2d34ded695906a200c4444ef321919e803326129090778"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Retrieved Date",
+          "target": {
+            "lines": [
+              9,
+              9
+            ],
+            "fragment_sha256": "1951828cf70dcbaaf0dd4918baa78851207fd070b1db3ecec544dc0253c5f67a"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                9,
+                9
+              ],
+              "fragment_sha256": "1a4d4d4fe135ac9a31bd302f6c473c15912ded4365b541fa251dde103432b4cb"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Local cache note",
+          "target": {
+            "lines": [
+              10,
+              10
+            ],
+            "fragment_sha256": "85e0e28efabd859b4cef2ec93e44f161ed12a584af77126f0ce07aef775f7cbe"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                10,
+                10
+              ],
+              "fragment_sha256": "dd3f52a6ce12c029ade5f0998ea4b27ca4b84c5c141e54b741abded126c5e4f1"
+            },
+            {
+              "lines": [
+                44,
+                44
+              ],
+              "fragment_sha256": "9badf43024cc76b9b65dd2ff1cf91f6f12a194bc3354abcc24335eeb2c6098e9"
+            },
+            {
+              "lines": [
+                66,
+                67
+              ],
+              "fragment_sha256": "2064a9af750f4559071c1d6997a1d59920a6b26b5fa50f3acc880f17a53b1926"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Recorded SHA-256",
+          "target": {
+            "lines": [
+              11,
+              11
+            ],
+            "fragment_sha256": "660c78782014d12262181eb52d81479efeeaf896beff2176b43484b5899e20e3"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                43,
+                43
+              ],
+              "fragment_sha256": "912f477bd36e0260361bd98ca98e8feb37c7f8ec85bd7162f6a4f09506e36c83"
+            },
+            {
+              "lines": [
+                65,
+                65
+              ],
+              "fragment_sha256": "c4c89967212a0f16a0582dc7adf9627aa43e8463a8f432194e27b1e2a9468d8f"
+            },
+            {
+              "lines": [
+                78,
+                78
+              ],
+              "fragment_sha256": "b0211a42c29de5e40ba833d57d351c0b6cc90568028b9f5dc1fd702a5c188f32"
+            }
+          ],
+          "transformation": "RECORDED_RAW_DIGEST_TRANSFER_NOT_REVERIFICATION"
+        },
+        {
+          "public_field": "Used for Evidence IDs",
+          "target": {
+            "lines": [
+              12,
+              12
+            ],
+            "fragment_sha256": "9806f790207d51c8f74a49d79420a626489cf71c0d88b386e7ebf6b48670cf78"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                11,
+                11
+              ],
+              "fragment_sha256": "3b3a1c10b7baa313077faf90263b3178a92689113ccff5ef2641a4bc76b98cdc"
+            },
+            {
+              "lines": [
+                42,
+                42
+              ],
+              "fragment_sha256": "0b7ae988f02c4b5617875f63b1945c62d20f768d0cde757797901347cf5cae02"
+            },
+            {
+              "lines": [
+                53,
+                53
+              ],
+              "fragment_sha256": "36d215849a6f20b3e1ecdec9b60c8fde93eab3d20b06dadc6119fea852dfe717"
+            },
+            {
+              "lines": [
+                64,
+                64
+              ],
+              "fragment_sha256": "db5b30efa9fcb644b51fd62a6bb2a9246514a4188cc726e3e9ca1fb9a3ebf202"
+            },
+            {
+              "lines": [
+                76,
+                76
+              ],
+              "fragment_sha256": "fd2dd9f82687db537054d883a0e2a94fdc6b10f44321ed711fbbf356c9a7a16d"
+            }
+          ],
+          "transformation": "FILTER_EXISTING_ID_LIST_TO_THIS_EXPORT_USAGE_ONLY"
+        },
+        {
+          "public_field": "Recorded provenance history",
+          "target": {
+            "lines": [
+              13,
+              13
+            ],
+            "fragment_sha256": "85c05687ee78080146e544042e65fcf10e63ac961b23f49d9417de957baf71ae"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                9,
+                9
+              ],
+              "fragment_sha256": "1a4d4d4fe135ac9a31bd302f6c473c15912ded4365b541fa251dde103432b4cb"
+            },
+            {
+              "lines": [
+                10,
+                10
+              ],
+              "fragment_sha256": "dd3f52a6ce12c029ade5f0998ea4b27ca4b84c5c141e54b741abded126c5e4f1"
+            },
+            {
+              "lines": [
+                21,
+                21
+              ],
+              "fragment_sha256": "acc282f7b088fe34e20d3042f5ad1f6824028980429bf975defe27cc7f85820c"
+            },
+            {
+              "lines": [
+                22,
+                22
+              ],
+              "fragment_sha256": "6a3c3affe7c33eb3abd9d0a7a1a01ced90ba4605227cf4ec7ec43e610a5eb591"
+            },
+            {
+              "lines": [
+                43,
+                43
+              ],
+              "fragment_sha256": "912f477bd36e0260361bd98ca98e8feb37c7f8ec85bd7162f6a4f09506e36c83"
+            },
+            {
+              "lines": [
+                65,
+                65
+              ],
+              "fragment_sha256": "c4c89967212a0f16a0582dc7adf9627aa43e8463a8f432194e27b1e2a9468d8f"
+            },
+            {
+              "lines": [
+                67,
+                67
+              ],
+              "fragment_sha256": "3e6d9a38ad746ac6d2af7578346f94b730ff7b63ed03028a908402f208cbb6e1"
+            },
+            {
+              "lines": [
+                78,
+                78
+              ],
+              "fragment_sha256": "b0211a42c29de5e40ba833d57d351c0b6cc90568028b9f5dc1fd702a5c188f32"
+            }
+          ],
+          "transformation": "DOCUMENT_ACCESS_IDENTITY_HISTORY_ONLY_WITH_PRIVATE_LOCATIONS_OMITTED"
+        }
+      ],
+      "endpoint_and_hash_source_locations": [
+        {
+          "lines": [
+            8,
+            8
+          ],
+          "fragment_sha256": "b6f616fcf2cad7e1ee2d34ded695906a200c4444ef321919e803326129090778"
+        },
+        {
+          "lines": [
+            43,
+            43
+          ],
+          "fragment_sha256": "912f477bd36e0260361bd98ca98e8feb37c7f8ec85bd7162f6a4f09506e36c83"
+        },
+        {
+          "lines": [
+            65,
+            65
+          ],
+          "fragment_sha256": "c4c89967212a0f16a0582dc7adf9627aa43e8463a8f432194e27b1e2a9468d8f"
+        },
+        {
+          "lines": [
+            78,
+            78
+          ],
+          "fragment_sha256": "b0211a42c29de5e40ba833d57d351c0b6cc90568028b9f5dc1fd702a5c188f32"
+        }
+      ],
+      "selection_note": "Original identity fields and same captured hash from source extensions; Part Number retains document families, excluding historical project-status suffix. Geometry resource links and technical/adoption history excluded.",
+      "exclusions": [
+        "Private cache/receipt/coordination locations and capture-owner labels",
+        "Original parameter/application/geometry/implementation/adoption prose rather than document identity",
+        "Unrelated historical Evidence-ID lists",
+        "Unneeded external geometry resource links where present"
+      ],
+      "exact_original_and_diff": "Original remains unchanged; private author handoff retains full original-field values and exact unified diff. Public locations are line/hash references only, never private cache paths."
+    },
+    {
+      "source_path": "datasheets/espressif_esp32-s3_datasheet-v2.2.md",
+      "source_revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+      "source_sha256": "b8b8428955da8cdc361432ae9d8ddff6d53fcba1d11b014440867711575856e3",
+      "target_path": "datasheets/public-references-rev5/espressif_esp32-s3_datasheet-v2.2.md",
+      "target_sha256": "a0deb32bb54ffa3c41fd07e14a2df6e205685475ffcde35778fc8ca6dde6336d",
+      "target_bytes": 1269,
+      "used_for_ids": [
+        "DS-MCU-140",
+        "DS-MCU-151"
+      ],
+      "document_content_sha256_records": [
+        "2d5a7cb7fd559d8d972bd88db32669c0196d23f22d7afaafb0f63d099b589a3f"
+      ],
+      "raw_hashes_reverified": false,
+      "official_urls": [
+        "https://www.espressif.com/documentation/esp32-s3_datasheet_en.pdf",
+        "https://documentation.espressif.com/esp32-s3_datasheet_en.pdf"
+      ],
+      "field_transformations": [
+        {
+          "public_field": "Manufacturer",
+          "target": {
+            "lines": [
+              3,
+              3
+            ],
+            "fragment_sha256": "2bb021ef2158577cdbea304ee22a2c0222358a822bb7156c57f0393902fae28d"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                3,
+                3
+              ],
+              "fragment_sha256": "2bb021ef2158577cdbea304ee22a2c0222358a822bb7156c57f0393902fae28d"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Part Number",
+          "target": {
+            "lines": [
+              4,
+              4
+            ],
+            "fragment_sha256": "4dd9161b9e97e69df3e6fc3e733024a74d7ffdb13a03069dfa3ef7f7f8c6cc52"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                4,
+                5
+              ],
+              "fragment_sha256": "9a052a2ab0345060340b52867c174a63038c4f7dee5b120f6f09751a9cc3ee65"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Datasheet Title",
+          "target": {
+            "lines": [
+              5,
+              5
+            ],
+            "fragment_sha256": "74e10f2589454c14173a4b718a5d8a9b36e765288d2e3fe47a94b81bd658b7ca"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                6,
+                6
+              ],
+              "fragment_sha256": "74e10f2589454c14173a4b718a5d8a9b36e765288d2e3fe47a94b81bd658b7ca"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Revision / Version",
+          "target": {
+            "lines": [
+              6,
+              6
+            ],
+            "fragment_sha256": "38f0788cad8f4ba0a9fda0a68a6c546d761e32be702f0441577857d2b473d466"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                7,
+                7
+              ],
+              "fragment_sha256": "38f0788cad8f4ba0a9fda0a68a6c546d761e32be702f0441577857d2b473d466"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Publication Date",
+          "target": {
+            "lines": [
+              7,
+              7
+            ],
+            "fragment_sha256": "fbe34afe4b4fc4bef3c66b01e0ded53502808436a8c420427ea208810fc20218"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                8,
+                9
+              ],
+              "fragment_sha256": "e4f564468b3ebbe8d60bf949460916b58928e924ea9241f2b71ae8babfad1da4"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Official URL",
+          "target": {
+            "lines": [
+              8,
+              8
+            ],
+            "fragment_sha256": "c02a17cd69be7471d2a1ca912c4ae60a1e640385a42174f6aa74e3b9b6916fcb"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                10,
+                10
+              ],
+              "fragment_sha256": "c02a17cd69be7471d2a1ca912c4ae60a1e640385a42174f6aa74e3b9b6916fcb"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Additional recorded official endpoint",
+          "target": {
+            "lines": [
+              9,
+              9
+            ],
+            "fragment_sha256": "f11c4cdd6dd512a608f57db0636bb12639ba2d295f9238a3805db5e7162efb46"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                21,
+                21
+              ],
+              "fragment_sha256": "b6586b8aab5638ecba8986f94b02b52afe444486620bb5ac358a2d10e29bf912"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Retrieved Date",
+          "target": {
+            "lines": [
+              10,
+              10
+            ],
+            "fragment_sha256": "e9c6fbfa51d738da3fd67831c65bb95087cf36eb9e1e41013b5c52e3373a185c"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                11,
+                11
+              ],
+              "fragment_sha256": "be495e1dcfb2b8418633d4779fdbe62318f9d009b61a5987f197146b3457e29e"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Local cache note",
+          "target": {
+            "lines": [
+              11,
+              11
+            ],
+            "fragment_sha256": "efa156c101f67903c2df15bc8417dd26751ff783ded778983c4b754d4e14d396"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                12,
+                13
+              ],
+              "fragment_sha256": "6ef7a44d79a1d60f0dd4cde57be7d437eeee06e121fb69e4a7823010d8b6c47f"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Recorded capture SHA-256",
+          "target": {
+            "lines": [
+              12,
+              12
+            ],
+            "fragment_sha256": "fd0ee0a9acfb111c59b825bf0fa701215654d7bc06135968a8163b66eec91999"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                20,
+                20
+              ],
+              "fragment_sha256": "e3ac12ad02c332530f2ffbf515d321e4a0314a199fce82253dfd660479ece2c1"
+            }
+          ],
+          "transformation": "RECORDED_RAW_DIGEST_TRANSFER_NOT_REVERIFICATION"
+        },
+        {
+          "public_field": "Used for Evidence IDs",
+          "target": {
+            "lines": [
+              13,
+              13
+            ],
+            "fragment_sha256": "3b5ea4bc2d6a8a74dfc8c5fc1dbca1fe363b1bfa407d85dcb4033ae632a631fd"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                14,
+                15
+              ],
+              "fragment_sha256": "accfb3566c2958027ddcdb905e2f01583197c2c36904a10016a4d5132410fafb"
+            },
+            {
+              "lines": [
+                19,
+                19
+              ],
+              "fragment_sha256": "6de32743de6c813aaef0f5e18ad3a57b258bd6fed94c7459218ee182830dc590"
+            },
+            {
+              "lines": [
+                33,
+                33
+              ],
+              "fragment_sha256": "9d560653454ac607da185803746eb10008cb715da745466efed859ddd72ff258"
+            }
+          ],
+          "transformation": "FILTER_EXISTING_ID_LIST_TO_THIS_EXPORT_USAGE_ONLY"
+        }
+      ],
+      "endpoint_and_hash_source_locations": [
+        {
+          "lines": [
+            10,
+            10
+          ],
+          "fragment_sha256": "c02a17cd69be7471d2a1ca912c4ae60a1e640385a42174f6aa74e3b9b6916fcb"
+        },
+        {
+          "lines": [
+            20,
+            20
+          ],
+          "fragment_sha256": "e3ac12ad02c332530f2ffbf515d321e4a0314a199fce82253dfd660479ece2c1"
+        },
+        {
+          "lines": [
+            21,
+            21
+          ],
+          "fragment_sha256": "b6586b8aab5638ecba8986f94b02b52afe444486620bb5ac358a2d10e29bf912"
+        }
+      ],
+      "selection_note": "Original identity/retrieval fields plus later official endpoint/capture hash; preserve no-cache and later-capture epochs separately; historical project-TBD phrase and private receipt location omitted.",
+      "exclusions": [
+        "Private cache/receipt/coordination locations and capture-owner labels",
+        "Original parameter/application/geometry/implementation/adoption prose rather than document identity",
+        "Unrelated historical Evidence-ID lists",
+        "Unneeded external geometry resource links where present"
+      ],
+      "exact_original_and_diff": "Original remains unchanged; private author handoff retains full original-field values and exact unified diff. Public locations are line/hash references only, never private cache paths."
+    },
+    {
+      "source_path": "datasheets/espressif_esp32-s3_jtag-external_v6.1.md",
+      "source_revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+      "source_sha256": "0ffa21b9fe226a90e24348d43610d96d6e1509d1a29ed37361c0860030036b26",
+      "target_path": "datasheets/public-references-rev5/espressif_esp32-s3_jtag-external_v6.1.md",
+      "target_sha256": "e39d5f01ce08f649e5f658354baee2210d0afe27275193558d412762c337e9ea",
+      "target_bytes": 917,
+      "used_for_ids": [
+        "DS-MCU-130"
+      ],
+      "document_content_sha256_records": [
+        "93baa960f77024bc6fbd8a6f2c7de83d8fa4738b63f21e884897e057556c36cd"
+      ],
+      "raw_hashes_reverified": false,
+      "official_urls": [
+        "https://docs.espressif.com/projects/esp-idf/en/v6.1/esp32s3/api-guides/jtag-debugging/configure-other-jtag.html"
+      ],
+      "field_transformations": [
+        {
+          "public_field": "Manufacturer",
+          "target": {
+            "lines": [
+              3,
+              3
+            ],
+            "fragment_sha256": "2bb021ef2158577cdbea304ee22a2c0222358a822bb7156c57f0393902fae28d"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                3,
+                3
+              ],
+              "fragment_sha256": "2bb021ef2158577cdbea304ee22a2c0222358a822bb7156c57f0393902fae28d"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Part Number",
+          "target": {
+            "lines": [
+              4,
+              4
+            ],
+            "fragment_sha256": "43737689329a68a8465b077bab50429c8bfd4852b865c0708b3dc81e42a6c91b"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                4,
+                4
+              ],
+              "fragment_sha256": "43737689329a68a8465b077bab50429c8bfd4852b865c0708b3dc81e42a6c91b"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Datasheet Title",
+          "target": {
+            "lines": [
+              5,
+              5
+            ],
+            "fragment_sha256": "6bd6a78c417ce796f672eabae6534479d9a24b08a38ae3722394fa50e82f21ad"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                5,
+                5
+              ],
+              "fragment_sha256": "6bd6a78c417ce796f672eabae6534479d9a24b08a38ae3722394fa50e82f21ad"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Revision / Version",
+          "target": {
+            "lines": [
+              6,
+              6
+            ],
+            "fragment_sha256": "3f465a9f8f220fe27b69b13bab39b14ee1a61c581705e93a1ed1b462c1400631"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                6,
+                6
+              ],
+              "fragment_sha256": "3f465a9f8f220fe27b69b13bab39b14ee1a61c581705e93a1ed1b462c1400631"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Publication Date",
+          "target": {
+            "lines": [
+              7,
+              7
+            ],
+            "fragment_sha256": "2519ffd96774e61f0addb9821e63e288325ef477fe724701b980b1f766efedaa"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                7,
+                7
+              ],
+              "fragment_sha256": "2519ffd96774e61f0addb9821e63e288325ef477fe724701b980b1f766efedaa"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Official URL",
+          "target": {
+            "lines": [
+              8,
+              8
+            ],
+            "fragment_sha256": "2b7523ee9afc93a4c0a8a4c6777b9bd1c1caf8dd6ca90ca7ff86f42570ced617"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                8,
+                8
+              ],
+              "fragment_sha256": "2b7523ee9afc93a4c0a8a4c6777b9bd1c1caf8dd6ca90ca7ff86f42570ced617"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Retrieved Date",
+          "target": {
+            "lines": [
+              9,
+              9
+            ],
+            "fragment_sha256": "7b1f6aa5f5d3a12be7493c6681bd6f73870d47a45394583ad648129cfa7bda4c"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                9,
+                9
+              ],
+              "fragment_sha256": "a410d2ecac0ed44f11c82197c82426587123560085bf3a6c5a3204b1ce3f5a4c"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Recorded SHA-256",
+          "target": {
+            "lines": [
+              10,
+              10
+            ],
+            "fragment_sha256": "f30e0f2e144ca058a04d030c955d6c61ad9dddbf7129758370a53d19b162ef02"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                10,
+                10
+              ],
+              "fragment_sha256": "646be1fc5b41f3e8b524cc24a14be0b512766c3c67b62f2fd492cf10d7a794a1"
+            }
+          ],
+          "transformation": "RECORDED_RAW_DIGEST_TRANSFER_NOT_REVERIFICATION"
+        },
+        {
+          "public_field": "Local cache note",
+          "target": {
+            "lines": [
+              11,
+              11
+            ],
+            "fragment_sha256": "b499958e3bbe6639f5f384cb44dc41394d0de4512dd3dcc947a3145ae35e6c45"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                11,
+                11
+              ],
+              "fragment_sha256": "fb1a5058948dd7edc1be8b0b8662c53694ed4db76a7f89651914c5fe0794a402"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Used for Evidence IDs",
+          "target": {
+            "lines": [
+              12,
+              12
+            ],
+            "fragment_sha256": "60ad6f90668989b8e8140c05f77d970966972536ecb9718faeb53a1a393c2b3b"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                12,
+                12
+              ],
+              "fragment_sha256": "afa51c0c41d69260a760f14372d63acf31dadd5b1f833c11e80a0607d248cd91"
+            }
+          ],
+          "transformation": "FILTER_EXISTING_ID_LIST_TO_THIS_EXPORT_USAGE_ONLY"
+        }
+      ],
+      "endpoint_and_hash_source_locations": [
+        {
+          "lines": [
+            8,
+            8
+          ],
+          "fragment_sha256": "2b7523ee9afc93a4c0a8a4c6777b9bd1c1caf8dd6ca90ca7ff86f42570ced617"
+        },
+        {
+          "lines": [
+            10,
+            10
+          ],
+          "fragment_sha256": "646be1fc5b41f3e8b524cc24a14be0b512766c3c67b62f2fd492cf10d7a794a1"
+        }
+      ],
+      "selection_note": "Original identity/URL/hash and recorded no-new-retrieval statement; private HTML location omitted; unrelated ID excluded.",
+      "exclusions": [
+        "Private cache/receipt/coordination locations and capture-owner labels",
+        "Original parameter/application/geometry/implementation/adoption prose rather than document identity",
+        "Unrelated historical Evidence-ID lists",
+        "Unneeded external geometry resource links where present"
+      ],
+      "exact_original_and_diff": "Original remains unchanged; private author handoff retains full original-field values and exact unified diff. Public locations are line/hash references only, never private cache paths."
+    },
+    {
+      "source_path": "datasheets/espressif_esp32-s3_trm-v1.8.md",
+      "source_revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+      "source_sha256": "4f531a0693d5b5337ba0efb6b06395e277a68d7d5fa521ed9f0ba42dc13be7dc",
+      "target_path": "datasheets/public-references-rev5/espressif_esp32-s3_trm-v1.8.md",
+      "target_sha256": "dcdb726e7a6a372b0e311f223aee3d43ac536e25ea990f9987b72439a400f96d",
+      "target_bytes": 1139,
+      "used_for_ids": [
+        "DS-MCU-153"
+      ],
+      "document_content_sha256_records": [
+        "4484bf8a69035ec42a731c58c64ada6fbd1f1618c5559409f134d9ea083f444f"
+      ],
+      "raw_hashes_reverified": false,
+      "official_urls": [
+        "https://documentation.espressif.com/esp32-s3_technical_reference_manual_en.pdf"
+      ],
+      "field_transformations": [
+        {
+          "public_field": "Manufacturer",
+          "target": {
+            "lines": [
+              3,
+              3
+            ],
+            "fragment_sha256": "2bb021ef2158577cdbea304ee22a2c0222358a822bb7156c57f0393902fae28d"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                3,
+                3
+              ],
+              "fragment_sha256": "2bb021ef2158577cdbea304ee22a2c0222358a822bb7156c57f0393902fae28d"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Part Number",
+          "target": {
+            "lines": [
+              4,
+              4
+            ],
+            "fragment_sha256": "4dd9161b9e97e69df3e6fc3e733024a74d7ffdb13a03069dfa3ef7f7f8c6cc52"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                4,
+                4
+              ],
+              "fragment_sha256": "4dd9161b9e97e69df3e6fc3e733024a74d7ffdb13a03069dfa3ef7f7f8c6cc52"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Datasheet Title",
+          "target": {
+            "lines": [
+              5,
+              5
+            ],
+            "fragment_sha256": "6d1a6e9971a0f5eeb08b8a70425f1d2b4fa7d86cb3c3e4b180f5ae98f14936cc"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                5,
+                5
+              ],
+              "fragment_sha256": "6d1a6e9971a0f5eeb08b8a70425f1d2b4fa7d86cb3c3e4b180f5ae98f14936cc"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Revision / Version",
+          "target": {
+            "lines": [
+              6,
+              6
+            ],
+            "fragment_sha256": "72d81145da6d6608634b47fabafdbcf6f164dc238ef453b16f5b0288b537af30"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                6,
+                6
+              ],
+              "fragment_sha256": "72d81145da6d6608634b47fabafdbcf6f164dc238ef453b16f5b0288b537af30"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Publication Date",
+          "target": {
+            "lines": [
+              7,
+              7
+            ],
+            "fragment_sha256": "fcb6525b6ed6b727906a6abd16002e9eb5c3e5a51bd138b2a88369289ba57df9"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                7,
+                7
+              ],
+              "fragment_sha256": "e558546b62adb9259177a0887f4e1a4f095b3dd27bf86bf1845e371976f099e3"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Official URL",
+          "target": {
+            "lines": [
+              8,
+              8
+            ],
+            "fragment_sha256": "4c654d77c6b7b01f589dec925b54d294e8bc2e29926b05951a453a770a213b52"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                8,
+                8
+              ],
+              "fragment_sha256": "4c654d77c6b7b01f589dec925b54d294e8bc2e29926b05951a453a770a213b52"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Retrieved Date",
+          "target": {
+            "lines": [
+              9,
+              9
+            ],
+            "fragment_sha256": "f2d17a7aeef3b84c030dde9790e5fa856f4b74d65df134a53d3df73e21d7d025"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                9,
+                9
+              ],
+              "fragment_sha256": "cb4ae98cda42d9baa5569f0dbda51f1f9844180d8d5cd7238b18d25812999759"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Recorded SHA-256",
+          "target": {
+            "lines": [
+              10,
+              10
+            ],
+            "fragment_sha256": "fb09c1a0ab412c03e7e7cae16b3e296430d599dda79f9ee6601888488718eb3e"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                10,
+                10
+              ],
+              "fragment_sha256": "bf6c39219a37cc4e579896280881a9e0c7297b39fa0bdb85884e3632d57024e7"
+            }
+          ],
+          "transformation": "RECORDED_RAW_DIGEST_TRANSFER_NOT_REVERIFICATION"
+        },
+        {
+          "public_field": "Local cache note",
+          "target": {
+            "lines": [
+              11,
+              11
+            ],
+            "fragment_sha256": "ed2b895fc8f49307ac958d6a64756fac568ecb99162306c75a5ed7416f51606a"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                11,
+                11
+              ],
+              "fragment_sha256": "a9aa4bc8820c69af616f2030c07919eb239e773eea1124c65ca8de3722220f6e"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Used for Evidence IDs",
+          "target": {
+            "lines": [
+              12,
+              12
+            ],
+            "fragment_sha256": "2476b595c9a41e961cb28fd9a1862a8f27f413f724fd1764f11b4c01049746ec"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                12,
+                12
+              ],
+              "fragment_sha256": "4de817026a8f31063e87fc67b4954dc4c6db2e679792f8c3944354fc2f13a8f6"
+            },
+            {
+              "lines": [
+                24,
+                24
+              ],
+              "fragment_sha256": "6c4d27f9499bf17b7efc685c86227ff2f04477ba702eb0b844ae27ea2bb57c0d"
+            }
+          ],
+          "transformation": "FILTER_EXISTING_ID_LIST_TO_THIS_EXPORT_USAGE_ONLY"
+        },
+        {
+          "public_field": "Recorded provenance history",
+          "target": {
+            "lines": [
+              13,
+              13
+            ],
+            "fragment_sha256": "7ce4dd15119462671fafcc8b3d8379eeb3571609a1dfd928c60d57a62b4c2e36"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                7,
+                7
+              ],
+              "fragment_sha256": "e558546b62adb9259177a0887f4e1a4f095b3dd27bf86bf1845e371976f099e3"
+            },
+            {
+              "lines": [
+                9,
+                9
+              ],
+              "fragment_sha256": "cb4ae98cda42d9baa5569f0dbda51f1f9844180d8d5cd7238b18d25812999759"
+            },
+            {
+              "lines": [
+                10,
+                10
+              ],
+              "fragment_sha256": "bf6c39219a37cc4e579896280881a9e0c7297b39fa0bdb85884e3632d57024e7"
+            },
+            {
+              "lines": [
+                11,
+                11
+              ],
+              "fragment_sha256": "a9aa4bc8820c69af616f2030c07919eb239e773eea1124c65ca8de3722220f6e"
+            },
+            {
+              "lines": [
+                25,
+                25
+              ],
+              "fragment_sha256": "6fe829f30228930ab243937ac94b644aa39a09a61c2d5f221016a4788d766cd5"
+            },
+            {
+              "lines": [
+                26,
+                26
+              ],
+              "fragment_sha256": "75bc1fea3e197d03f1f588acf8052026640bb0c255bd9d0416b7de880faffaff"
+            }
+          ],
+          "transformation": "DOCUMENT_ACCESS_IDENTITY_HISTORY_ONLY_WITH_PRIVATE_LOCATIONS_OMITTED"
+        }
+      ],
+      "endpoint_and_hash_source_locations": [
+        {
+          "lines": [
+            8,
+            8
+          ],
+          "fragment_sha256": "4c654d77c6b7b01f589dec925b54d294e8bc2e29926b05951a453a770a213b52"
+        },
+        {
+          "lines": [
+            10,
+            10
+          ],
+          "fragment_sha256": "bf6c39219a37cc4e579896280881a9e0c7297b39fa0bdb85884e3632d57024e7"
+        }
+      ],
+      "selection_note": "Original identity/URL/hash and offline-reuse history; private capture-owner labels and receipt locations omitted; register/technical discussion excluded.",
+      "exclusions": [
+        "Private cache/receipt/coordination locations and capture-owner labels",
+        "Original parameter/application/geometry/implementation/adoption prose rather than document identity",
+        "Unrelated historical Evidence-ID lists",
+        "Unneeded external geometry resource links where present"
+      ],
+      "exact_original_and_diff": "Original remains unchanged; private author handoff retains full original-field values and exact unified diff. Public locations are line/hash references only, never private cache paths."
+    },
+    {
+      "source_path": "datasheets/texasinstruments_drv10983_slvscp6h.md",
+      "source_revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+      "source_sha256": "8fb29d1e37c228726e8d3b0467a199cd946d41d445bb622692dd1d6cf7f02859",
+      "target_path": "datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md",
+      "target_sha256": "61f0f0927b2ccb7d8c59350b971b3684fb81e75269e3b05b1fe20ae108eb1066",
+      "target_bytes": 2011,
+      "used_for_ids": [
+        "DS-MTR-065",
+        "DS-MTR-116",
+        "DS-MTR-119"
+      ],
+      "document_content_sha256_records": [
+        "c3dfc54a3bfa69af9385a39fd6085966653a1cf4a929b5d46c3cf846275e42e7"
+      ],
+      "raw_hashes_reverified": false,
+      "official_urls": [
+        "https://www.ti.com/lit/ds/symlink/drv10983.pdf"
+      ],
+      "field_transformations": [
+        {
+          "public_field": "Manufacturer",
+          "target": {
+            "lines": [
+              3,
+              3
+            ],
+            "fragment_sha256": "84d01c6f257dbece94e8d28c75674a0c5e6542d0df5526b3c6ca75ea094e0988"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                20,
+                20
+              ],
+              "fragment_sha256": "84d01c6f257dbece94e8d28c75674a0c5e6542d0df5526b3c6ca75ea094e0988"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Part Number",
+          "target": {
+            "lines": [
+              4,
+              4
+            ],
+            "fragment_sha256": "ee176a0541ca0bf0aeeadce6ca2b3e655ecdfdb614887f1fe1be26bfc10c1121"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                21,
+                22
+              ],
+              "fragment_sha256": "b966c265fabb454dbb59d0a744b2335ad6f1bc8d8fd2cd2970b574981255d9b7"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Datasheet Title",
+          "target": {
+            "lines": [
+              5,
+              5
+            ],
+            "fragment_sha256": "5b68bbbe22e59eab487a12a15e34ab8a39af68073f6601d1676dc67c162b76ed"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                12,
+                18
+              ],
+              "fragment_sha256": "e902cd73a2f808b10aefc9392da3cb7885e55267fa2a4dd181be70fa6e4fa188"
+            }
+          ],
+          "transformation": "EXISTING_DOCUMENT_IDENTITY_CORRECTION_NOT_NEW_VERIFICATION"
+        },
+        {
+          "public_field": "Revision / Version",
+          "target": {
+            "lines": [
+              6,
+              6
+            ],
+            "fragment_sha256": "108546f6fa5369ac96eac88ef5f3022b0f1476e6e9a204c39bcd25462b22813b"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                12,
+                18
+              ],
+              "fragment_sha256": "e902cd73a2f808b10aefc9392da3cb7885e55267fa2a4dd181be70fa6e4fa188"
+            }
+          ],
+          "transformation": "EXISTING_DOCUMENT_IDENTITY_CORRECTION_NOT_NEW_VERIFICATION"
+        },
+        {
+          "public_field": "Publication Date",
+          "target": {
+            "lines": [
+              7,
+              7
+            ],
+            "fragment_sha256": "d5fb322ca822abf3946b120f4132211d9440f1035091f52cdff26c8a7ef70f72"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                12,
+                18
+              ],
+              "fragment_sha256": "e902cd73a2f808b10aefc9392da3cb7885e55267fa2a4dd181be70fa6e4fa188"
+            }
+          ],
+          "transformation": "EXISTING_DOCUMENT_IDENTITY_CORRECTION_NOT_NEW_VERIFICATION"
+        },
+        {
+          "public_field": "Official URL",
+          "target": {
+            "lines": [
+              8,
+              8
+            ],
+            "fragment_sha256": "00263f39760e5f427fc93df7f9f93410cc1adc52996d069c12cb188e770df415"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                34,
+                38
+              ],
+              "fragment_sha256": "f34a667a5564108d96c71fd18c195d6896da2c2eff0c7cfba6a300d0dbe4969e"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Retrieved Date",
+          "target": {
+            "lines": [
+              9,
+              9
+            ],
+            "fragment_sha256": "108290fcbce4ec8e1137f80d166a0a4a3198b61f28c5a41d213431d4d0727d76"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                39,
+                39
+              ],
+              "fragment_sha256": "7b3274a96ec82270615c8081f51be74817f80aadbbd8a06fc406882f6863f2c4"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Local cache note",
+          "target": {
+            "lines": [
+              10,
+              10
+            ],
+            "fragment_sha256": "0ef0154c3dba9bae951bc98bb3dde85a0bd4e2870223658254356db956b2f5ac"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                40,
+                42
+              ],
+              "fragment_sha256": "94c19606fefe9843f0349c3c8935426ea89e3dc94c379bd4ecc2fe7f2226e7c5"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Recorded SHA-256",
+          "target": {
+            "lines": [
+              11,
+              11
+            ],
+            "fragment_sha256": "d2e7857ed0149819bee0dd5be81ecbc551d6d83df6d30fa1b6ebde027f35100b"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                6,
+                6
+              ],
+              "fragment_sha256": "70282fb392ec82bb4657d26001c780b94caba4522262028d47ec9485cc6f5977"
+            },
+            {
+              "lines": [
+                237,
+                237
+              ],
+              "fragment_sha256": "6faa474afe6bc1813d8fa53d66fda576f0455f012055e112ba5766e48cc6df92"
+            }
+          ],
+          "transformation": "RECORDED_RAW_DIGEST_TRANSFER_NOT_REVERIFICATION"
+        },
+        {
+          "public_field": "Used for Evidence IDs",
+          "target": {
+            "lines": [
+              12,
+              12
+            ],
+            "fragment_sha256": "64282030356da483aec4cc9321ea7039229b7cb6fd28524218a43d7f7dd6d139"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                43,
+                57
+              ],
+              "fragment_sha256": "c277cebf43d69b21de90e87878344890532f983e6a1df126d84f56ff4cdab123"
+            }
+          ],
+          "transformation": "FILTER_EXISTING_ID_LIST_TO_THIS_EXPORT_USAGE_ONLY"
+        }
+      ],
+      "endpoint_and_hash_source_locations": [
+        {
+          "lines": [
+            6,
+            6
+          ],
+          "fragment_sha256": "70282fb392ec82bb4657d26001c780b94caba4522262028d47ec9485cc6f5977"
+        },
+        {
+          "lines": [
+            34,
+            34
+          ],
+          "fragment_sha256": "dd5d65ef0f5621f5707a0f77bd37bfd9d29b236bba01375eaaa2574c9fa2ac00"
+        },
+        {
+          "lines": [
+            67,
+            67
+          ],
+          "fragment_sha256": "f527782551060a6098f8ea616a8feadebd6a642543f1d1e82b5e60a45fbc6f16"
+        },
+        {
+          "lines": [
+            237,
+            237
+          ],
+          "fragment_sha256": "6faa474afe6bc1813d8fa53d66fda576f0455f012055e112ba5766e48cc6df92"
+        }
+      ],
+      "selection_note": "Existing2026-09-05 document correction in introductory block supplies corrected title/SLVSCP6H/July2014-revisedJune2020. Historical2026-08-31 limited product-page identity/retrieval remains a separate epoch; capture hash retained; electrical/BRAKE/design history omitted from document metadata.",
+      "exclusions": [
+        "Private cache/receipt/coordination locations and capture-owner labels",
+        "Original parameter/application/geometry/implementation/adoption prose rather than document identity",
+        "Unrelated historical Evidence-ID lists",
+        "Unneeded external geometry resource links where present"
+      ],
+      "exact_original_and_diff": "Original remains unchanged; private author handoff retains full original-field values and exact unified diff. Public locations are line/hash references only, never private cache paths."
+    },
+    {
+      "source_path": "datasheets/texasinstruments_sn74axc4t774_sces898c.md",
+      "source_revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+      "source_sha256": "5f7e28e77c10b012c9d38b383d7c068ab5c4c5c44a5a1137bb75b79d248728a6",
+      "target_path": "datasheets/public-references-rev5/texasinstruments_sn74axc4t774_sces898c.md",
+      "target_sha256": "4e7580a698b678a064bf3586da48512e75eb07166f8d9015efac2e431dcb8c17",
+      "target_bytes": 1044,
+      "used_for_ids": [
+        "DS-IFACE-003",
+        "DS-IFACE-043"
+      ],
+      "document_content_sha256_records": [
+        "f45cd62a9675b9f6071519d149a060d4124f49944f3c3af44160a76796f3bf20"
+      ],
+      "raw_hashes_reverified": false,
+      "official_urls": [
+        "https://www.ti.com/lit/ds/symlink/sn74axc4t774.pdf"
+      ],
+      "field_transformations": [
+        {
+          "public_field": "Manufacturer",
+          "target": {
+            "lines": [
+              3,
+              3
+            ],
+            "fragment_sha256": "84d01c6f257dbece94e8d28c75674a0c5e6542d0df5526b3c6ca75ea094e0988"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                3,
+                3
+              ],
+              "fragment_sha256": "84d01c6f257dbece94e8d28c75674a0c5e6542d0df5526b3c6ca75ea094e0988"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Part Number",
+          "target": {
+            "lines": [
+              4,
+              4
+            ],
+            "fragment_sha256": "ab1e5c6a1880af8dc893e9a4d3ccddcb3175626c2f86b52ef4ff1bef1a05b649"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                4,
+                4
+              ],
+              "fragment_sha256": "44ab5562422cc08e8f5ed27b45ec4aeadf744de358ec0a2c294d4a8de613e697"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Datasheet Title",
+          "target": {
+            "lines": [
+              5,
+              5
+            ],
+            "fragment_sha256": "7878d346b354bee3f99160516a58ed156338101561467a48040a9567bee40e3e"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                5,
+                5
+              ],
+              "fragment_sha256": "d203196fdb44e4905df12b951aeac7c237b4533418b7d01050c4765041b396de"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Revision / Version",
+          "target": {
+            "lines": [
+              6,
+              6
+            ],
+            "fragment_sha256": "5a2a10d0e160a6e02a9d6eb3f055249c7ba4b07e6532a00bcb7d4421e02ef8d9"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                6,
+                6
+              ],
+              "fragment_sha256": "43d8383326ce09305542fb04f852c90a780e3445af0008d71f3b40b043d5ecdf"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Publication Date",
+          "target": {
+            "lines": [
+              7,
+              7
+            ],
+            "fragment_sha256": "47aeffc469f3b0284ec97ac0b2bf8c66f58d609859e8a1e48ce548b54835e195"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                6,
+                6
+              ],
+              "fragment_sha256": "43d8383326ce09305542fb04f852c90a780e3445af0008d71f3b40b043d5ecdf"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Official URL",
+          "target": {
+            "lines": [
+              8,
+              8
+            ],
+            "fragment_sha256": "ce0870f921eb7de2705a08a47123cd52ce4caf8aa6621ed2837f2bf52d49a3f1"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                7,
+                7
+              ],
+              "fragment_sha256": "ce0870f921eb7de2705a08a47123cd52ce4caf8aa6621ed2837f2bf52d49a3f1"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Retrieved Date",
+          "target": {
+            "lines": [
+              9,
+              9
+            ],
+            "fragment_sha256": "8e5a3b5aa8bdb145f0c0794a24f3bdf1c530164622a57a3b76db88fbbf625fc2"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                8,
+                8
+              ],
+              "fragment_sha256": "d80e6b9a276629fd20290c9e04d890aea28075cc0fd481aeeb4a58490fa697e0"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Recorded SHA-256",
+          "target": {
+            "lines": [
+              10,
+              10
+            ],
+            "fragment_sha256": "9ca0906c2409e18627c26dc7936f2406cf5d02e7e43a01c0025448286b482431"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                9,
+                9
+              ],
+              "fragment_sha256": "d11a2fcb5de31d7ecb817c7043b461e3f7547e95df5a2434b41d211dd457d93f"
+            }
+          ],
+          "transformation": "RECORDED_RAW_DIGEST_TRANSFER_NOT_REVERIFICATION"
+        },
+        {
+          "public_field": "Local cache note",
+          "target": {
+            "lines": [
+              11,
+              11
+            ],
+            "fragment_sha256": "8b13a641afd4378b0d1ea6f7f9776198c238873004af12013ac8b43e2f894e6e"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                11,
+                11
+              ],
+              "fragment_sha256": "2d67725c5f529d574e5453e3321b7a5b852914f9f38ffccc34f673b1900e3450"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Used for Evidence IDs",
+          "target": {
+            "lines": [
+              12,
+              12
+            ],
+            "fragment_sha256": "415fa84fa0799f90a57be341982cc54f5a9e92136d6a4c6a1662f71d9786e969"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                10,
+                10
+              ],
+              "fragment_sha256": "1e8eb94c97e65ad4ebd88be2c3f56d54640f3050d3c9bb5c9eed96d7ebdb76f6"
+            },
+            {
+              "lines": [
+                19,
+                19
+              ],
+              "fragment_sha256": "b25de4044e10944fb259e142c9a6b5608e4fa3a8e4735c2bc7facb5d2f840325"
+            },
+            {
+              "lines": [
+                26,
+                26
+              ],
+              "fragment_sha256": "a2b64c23e96f42614ca43ac20f1e87efd92950b68a8ad2f45ce18d4c1a3c2de2"
+            }
+          ],
+          "transformation": "FILTER_EXISTING_ID_LIST_TO_THIS_EXPORT_USAGE_ONLY"
+        },
+        {
+          "public_field": "Recorded identity caveat",
+          "target": {
+            "lines": [
+              13,
+              13
+            ],
+            "fragment_sha256": "778073c122817941db75fee676a52cde8d015d8cb9fcdc8bb8dc517b720f7cd2"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                8,
+                8
+              ],
+              "fragment_sha256": "d80e6b9a276629fd20290c9e04d890aea28075cc0fd481aeeb4a58490fa697e0"
+            },
+            {
+              "lines": [
+                9,
+                9
+              ],
+              "fragment_sha256": "d11a2fcb5de31d7ecb817c7043b461e3f7547e95df5a2434b41d211dd457d93f"
+            },
+            {
+              "lines": [
+                28,
+                28
+              ],
+              "fragment_sha256": "1513d83826461aa083594bd2bf346db79df8999e3b12e146fcd178278b4dd08a"
+            },
+            {
+              "lines": [
+                29,
+                29
+              ],
+              "fragment_sha256": "07e26db8b13fc9d056f7c47e1527d663130a87c02f791374554aa472df5f4b09"
+            },
+            {
+              "lines": [
+                30,
+                30
+              ],
+              "fragment_sha256": "dd1e7f09f43617fc41320a255d9ab4d36716a27d43c435ccf6b37eb217b7ab52"
+            }
+          ],
+          "transformation": "DOCUMENT_ACCESS_IDENTITY_HISTORY_ONLY_WITH_PRIVATE_LOCATIONS_OMITTED"
+        }
+      ],
+      "endpoint_and_hash_source_locations": [
+        {
+          "lines": [
+            7,
+            7
+          ],
+          "fragment_sha256": "ce0870f921eb7de2705a08a47123cd52ce4caf8aa6621ed2837f2bf52d49a3f1"
+        },
+        {
+          "lines": [
+            9,
+            9
+          ],
+          "fragment_sha256": "d11a2fcb5de31d7ecb817c7043b461e3f7547e95df5a2434b41d211dd457d93f"
+        }
+      ],
+      "selection_note": "Candidate -> Part Number; Document -> Datasheet Title; combined revision/publication field separated; recorded header/footer caveat preserved; private cache/receipt omitted.",
+      "exclusions": [
+        "Private cache/receipt/coordination locations and capture-owner labels",
+        "Original parameter/application/geometry/implementation/adoption prose rather than document identity",
+        "Unrelated historical Evidence-ID lists",
+        "Unneeded external geometry resource links where present"
+      ],
+      "exact_original_and_diff": "Original remains unchanged; private author handoff retains full original-field values and exact unified diff. Public locations are line/hash references only, never private cache paths."
+    },
+    {
+      "source_path": "datasheets/texasinstruments_sn74lvc1g74_sces794g.md",
+      "source_revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+      "source_sha256": "daf5d79a4271a4af13671323fba297fcc13ce1c8d8136a5e107ee9889d470165",
+      "target_path": "datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md",
+      "target_sha256": "c6071c8791d664583048c86489dbc9a2228e0c2aed2c95145e9962d6777d24dd",
+      "target_bytes": 1152,
+      "used_for_ids": [
+        "DS-IFACE-039",
+        "DS-IFACE-040",
+        "DS-IFACE-075"
+      ],
+      "document_content_sha256_records": [
+        "e46a5a867fec742290000dca5ed3b291535f3c4418ef2ae267acc4ab51b26d8a"
+      ],
+      "raw_hashes_reverified": false,
+      "official_urls": [
+        "https://www.ti.com/lit/ds/symlink/sn74lvc1g74.pdf"
+      ],
+      "field_transformations": [
+        {
+          "public_field": "Manufacturer",
+          "target": {
+            "lines": [
+              3,
+              3
+            ],
+            "fragment_sha256": "84d01c6f257dbece94e8d28c75674a0c5e6542d0df5526b3c6ca75ea094e0988"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                3,
+                3
+              ],
+              "fragment_sha256": "84d01c6f257dbece94e8d28c75674a0c5e6542d0df5526b3c6ca75ea094e0988"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Part Number",
+          "target": {
+            "lines": [
+              4,
+              4
+            ],
+            "fragment_sha256": "b6af8dea9cbc0f8660d65880bde2683c627e19eb7e236d58a464572ae1c8823f"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                4,
+                4
+              ],
+              "fragment_sha256": "b6af8dea9cbc0f8660d65880bde2683c627e19eb7e236d58a464572ae1c8823f"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Datasheet Title",
+          "target": {
+            "lines": [
+              5,
+              5
+            ],
+            "fragment_sha256": "c75604f781b9b93d9205156545446d046ee75f05ef6d0fe03a5b6b170b6299d7"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                5,
+                5
+              ],
+              "fragment_sha256": "c75604f781b9b93d9205156545446d046ee75f05ef6d0fe03a5b6b170b6299d7"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Revision / Version",
+          "target": {
+            "lines": [
+              6,
+              6
+            ],
+            "fragment_sha256": "e30a7ae9835bbb48fa99649871bb282dc5e0a546539da789e9e38c4f8e0669f5"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                6,
+                6
+              ],
+              "fragment_sha256": "e30a7ae9835bbb48fa99649871bb282dc5e0a546539da789e9e38c4f8e0669f5"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Publication Date",
+          "target": {
+            "lines": [
+              7,
+              7
+            ],
+            "fragment_sha256": "5555590c170ca77457060b0f79bafa14015736c5eda55c16e9019bbbc2c05bc0"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                7,
+                7
+              ],
+              "fragment_sha256": "5555590c170ca77457060b0f79bafa14015736c5eda55c16e9019bbbc2c05bc0"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Official URL",
+          "target": {
+            "lines": [
+              8,
+              8
+            ],
+            "fragment_sha256": "d5c426ab24e89aa8057f62e882112b3066eb0c4d493eb7465157743ad922fd46"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                8,
+                8
+              ],
+              "fragment_sha256": "d5c426ab24e89aa8057f62e882112b3066eb0c4d493eb7465157743ad922fd46"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Retrieved Date",
+          "target": {
+            "lines": [
+              9,
+              9
+            ],
+            "fragment_sha256": "92bcb36e1e43eb98ff418399509f18e770fb6fa335f89d8ea001cfd9e3cb1a0d"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                9,
+                9
+              ],
+              "fragment_sha256": "eb3031c611beda3eac6052119853f8297cd34941cedf3b8b1428ae2f2978c9ea"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Recorded SHA-256",
+          "target": {
+            "lines": [
+              10,
+              10
+            ],
+            "fragment_sha256": "0ced9cbeb39267b63abe4d98901be5157049dbfeabf3c312ed00f64495584418"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                10,
+                10
+              ],
+              "fragment_sha256": "2c843171295b8f6232b8aab1d57f0db16829aeaccd76f84326c9d0aa63121a72"
+            }
+          ],
+          "transformation": "RECORDED_RAW_DIGEST_TRANSFER_NOT_REVERIFICATION"
+        },
+        {
+          "public_field": "Local cache note",
+          "target": {
+            "lines": [
+              11,
+              11
+            ],
+            "fragment_sha256": "3792b9a29108b64e3e95aa2ee2f4405634ca176adf4be75e990094414e6278ba"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                11,
+                11
+              ],
+              "fragment_sha256": "ae82ed191ef4df19615bd2909f2f999b80fcb9305e6e1414b8287b741344ff4c"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Used for Evidence IDs",
+          "target": {
+            "lines": [
+              12,
+              12
+            ],
+            "fragment_sha256": "5294c94044165d56ba822caf21c43b83dedbe5457f492c9ee645e28c0db5d5ef"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                12,
+                12
+              ],
+              "fragment_sha256": "7b225e95a013e3fe54cd75817d9decfe0abd49f47263d74039b4921cd8600153"
+            }
+          ],
+          "transformation": "FILTER_EXISTING_ID_LIST_TO_THIS_EXPORT_USAGE_ONLY"
+        },
+        {
+          "public_field": "Recorded provenance history",
+          "target": {
+            "lines": [
+              13,
+              13
+            ],
+            "fragment_sha256": "b29e3ca959075e82a85a1178dd44d390a713957afbdc4649e59e1dd5c318ce31"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                9,
+                9
+              ],
+              "fragment_sha256": "eb3031c611beda3eac6052119853f8297cd34941cedf3b8b1428ae2f2978c9ea"
+            },
+            {
+              "lines": [
+                10,
+                10
+              ],
+              "fragment_sha256": "2c843171295b8f6232b8aab1d57f0db16829aeaccd76f84326c9d0aa63121a72"
+            },
+            {
+              "lines": [
+                17,
+                17
+              ],
+              "fragment_sha256": "bf2969953e052f80570aa3d9734814fe2b0a985362b36c42f1e7f63dda81b2a8"
+            },
+            {
+              "lines": [
+                18,
+                18
+              ],
+              "fragment_sha256": "b0be90dc01ac771aecf3dfdcc0b73b63897ed313833efe78ee35e55fa4c625b1"
+            },
+            {
+              "lines": [
+                20,
+                20
+              ],
+              "fragment_sha256": "4ec2593f139ba8d8605e6221f42c6c06caf6ab7335308c6c704baf9bdc03a143"
+            },
+            {
+              "lines": [
+                21,
+                21
+              ],
+              "fragment_sha256": "ea09c43d2fb0863af5c6a2b0aa7a17461d9bb6b2d219ae24f41e7c4ee44f14c8"
+            },
+            {
+              "lines": [
+                24,
+                24
+              ],
+              "fragment_sha256": "8c9d548837dfcdf709bab0ef2f0b794c97b806d73b0e72d9db33581ce7010105"
+            },
+            {
+              "lines": [
+                25,
+                25
+              ],
+              "fragment_sha256": "323bfd73a302ca2f1ec156f9c4ec6d545d874b1b3c7b10535003345e96c50a2e"
+            }
+          ],
+          "transformation": "DOCUMENT_ACCESS_IDENTITY_HISTORY_ONLY_WITH_PRIVATE_LOCATIONS_OMITTED"
+        }
+      ],
+      "endpoint_and_hash_source_locations": [
+        {
+          "lines": [
+            8,
+            8
+          ],
+          "fragment_sha256": "d5c426ab24e89aa8057f62e882112b3066eb0c4d493eb7465157743ad922fd46"
+        },
+        {
+          "lines": [
+            10,
+            10
+          ],
+          "fragment_sha256": "2c843171295b8f6232b8aab1d57f0db16829aeaccd76f84326c9d0aa63121a72"
+        }
+      ],
+      "selection_note": "Identity and original timestamp/hash unchanged; stopped same-hash reacquisition and reuse stated as historical metadata, private locations/owner labels omitted.",
+      "exclusions": [
+        "Private cache/receipt/coordination locations and capture-owner labels",
+        "Original parameter/application/geometry/implementation/adoption prose rather than document identity",
+        "Unrelated historical Evidence-ID lists",
+        "Unneeded external geometry resource links where present"
+      ],
+      "exact_original_and_diff": "Original remains unchanged; private author handoff retains full original-field values and exact unified diff. Public locations are line/hash references only, never private cache paths."
+    },
+    {
+      "source_path": "datasheets/texasinstruments_tca9517_scps242d.md",
+      "source_revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+      "source_sha256": "edfbc6f9cdfa4873e69514ae4a9d2a3e893c4d1c16f6f7b1d2084adabbda7999",
+      "target_path": "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md",
+      "target_sha256": "43d353a219ba0a29565dbaa979d35ec7f2c281228d07289d1d7dc0e1f7601b04",
+      "target_bytes": 1299,
+      "used_for_ids": [
+        "DS-IFACE-007",
+        "DS-IFACE-063",
+        "DS-IFACE-064",
+        "DS-IFACE-067",
+        "DS-IFACE-069"
+      ],
+      "document_content_sha256_records": [
+        "fde93fd601168d6f457bbf38377f8ee5eb14ab2589ed52974fdf9c847163f22c"
+      ],
+      "raw_hashes_reverified": false,
+      "official_urls": [
+        "https://www.ti.com/lit/ds/symlink/tca9517.pdf"
+      ],
+      "field_transformations": [
+        {
+          "public_field": "Manufacturer",
+          "target": {
+            "lines": [
+              3,
+              3
+            ],
+            "fragment_sha256": "84d01c6f257dbece94e8d28c75674a0c5e6542d0df5526b3c6ca75ea094e0988"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                3,
+                3
+              ],
+              "fragment_sha256": "84d01c6f257dbece94e8d28c75674a0c5e6542d0df5526b3c6ca75ea094e0988"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Part Number",
+          "target": {
+            "lines": [
+              4,
+              4
+            ],
+            "fragment_sha256": "ce14eefaf3bfc5f3b89d93e18505f4b88d8e32edd825bb51128e5f544663d39c"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                4,
+                4
+              ],
+              "fragment_sha256": "c5dcf6aa2de94e9e1dfab6ad1702600e4ccdbd95ae981c38cb28c6993e18e1f7"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Datasheet Title",
+          "target": {
+            "lines": [
+              5,
+              5
+            ],
+            "fragment_sha256": "c186f66ba3f02fd14190e756f2ac7a9c5fe91c0de2d4593e42f3365c44239e68"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                5,
+                5
+              ],
+              "fragment_sha256": "d066e5a1aa8f65edb7be0667b79b80e280050d4b3421cbf1bd8a7988d3988a40"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Revision / Version",
+          "target": {
+            "lines": [
+              6,
+              6
+            ],
+            "fragment_sha256": "52eea93159ccc67a4ef794283071d0d2eca0433a730d065c0d0428731559c4a7"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                6,
+                6
+              ],
+              "fragment_sha256": "22fe6ab1fa0af73f2bade90aa59fa265936a86c2d711bff2265095db6c2cbaac"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Publication Date",
+          "target": {
+            "lines": [
+              7,
+              7
+            ],
+            "fragment_sha256": "d83c28c6fb18cf4a282f4b11c71efd571601a7f960fad4a567615b6b2c62b88b"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                6,
+                6
+              ],
+              "fragment_sha256": "22fe6ab1fa0af73f2bade90aa59fa265936a86c2d711bff2265095db6c2cbaac"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Official URL",
+          "target": {
+            "lines": [
+              8,
+              8
+            ],
+            "fragment_sha256": "733a29dbb3068386a8cd7e21e60b3db59e7a6912af6184b20e980aaa66de9ded"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                7,
+                7
+              ],
+              "fragment_sha256": "733a29dbb3068386a8cd7e21e60b3db59e7a6912af6184b20e980aaa66de9ded"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Retrieved Date",
+          "target": {
+            "lines": [
+              9,
+              9
+            ],
+            "fragment_sha256": "8e5a3b5aa8bdb145f0c0794a24f3bdf1c530164622a57a3b76db88fbbf625fc2"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                8,
+                8
+              ],
+              "fragment_sha256": "d80e6b9a276629fd20290c9e04d890aea28075cc0fd481aeeb4a58490fa697e0"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Recorded SHA-256",
+          "target": {
+            "lines": [
+              10,
+              10
+            ],
+            "fragment_sha256": "12edb4fe9611d9e37254eb7247f062bd1215d84426115ee5460d4b2f3a787ec1"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                9,
+                9
+              ],
+              "fragment_sha256": "b809e7a3d119b50cae1c0657512b9cf7a2e8fa9369e14614da42894d63ae204e"
+            }
+          ],
+          "transformation": "RECORDED_RAW_DIGEST_TRANSFER_NOT_REVERIFICATION"
+        },
+        {
+          "public_field": "Local cache note",
+          "target": {
+            "lines": [
+              11,
+              11
+            ],
+            "fragment_sha256": "f78ca68c397a9c36c5d790b1b33f630313698c0aaf4282dcdb9d06128e20c12c"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                11,
+                11
+              ],
+              "fragment_sha256": "b001dad576227724475708d550d6134de925764a0f35733fe39a819bc514a1a1"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Used for Evidence IDs",
+          "target": {
+            "lines": [
+              12,
+              12
+            ],
+            "fragment_sha256": "e709b37297f5ccee09dbd77389a5dbe2be00282553fee2beeec9864cb592baf3"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                10,
+                10
+              ],
+              "fragment_sha256": "259be5d7e0e8b7c0a52f6a517ba4216a210475fa566708806d54796316abed4e"
+            },
+            {
+              "lines": [
+                19,
+                19
+              ],
+              "fragment_sha256": "4402fec796a2d509a6292cb8097c3c8cdebb2df58c47ac415e5ec1e9c530af0e"
+            }
+          ],
+          "transformation": "FILTER_EXISTING_ID_LIST_TO_THIS_EXPORT_USAGE_ONLY"
+        },
+        {
+          "public_field": "Recorded reacquisition",
+          "target": {
+            "lines": [
+              13,
+              13
+            ],
+            "fragment_sha256": "6532b029643848db702f99c56933156667a9a1b6f9a94e2b99999f21c5e8f295"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                8,
+                8
+              ],
+              "fragment_sha256": "d80e6b9a276629fd20290c9e04d890aea28075cc0fd481aeeb4a58490fa697e0"
+            },
+            {
+              "lines": [
+                9,
+                9
+              ],
+              "fragment_sha256": "b809e7a3d119b50cae1c0657512b9cf7a2e8fa9369e14614da42894d63ae204e"
+            },
+            {
+              "lines": [
+                20,
+                20
+              ],
+              "fragment_sha256": "4ba6d7f5b54d23c71d40d9456bcff9441effea446a0e8582033ed014da7aa1b9"
+            },
+            {
+              "lines": [
+                21,
+                21
+              ],
+              "fragment_sha256": "d2ff4499225d31797dcc9afa5766997839ab5e66cccc80475547a5bead341ba9"
+            },
+            {
+              "lines": [
+                22,
+                22
+              ],
+              "fragment_sha256": "3806a4ea3141aa09331c0e8a004141a3710a31f693f7dee6b4eadbdc41d2ad42"
+            }
+          ],
+          "transformation": "DOCUMENT_ACCESS_IDENTITY_HISTORY_ONLY_WITH_PRIVATE_LOCATIONS_OMITTED"
+        },
+        {
+          "public_field": "Recorded identity caveat",
+          "target": {
+            "lines": [
+              14,
+              14
+            ],
+            "fragment_sha256": "f7bf23abfb13fbd96d28c24932e07b2e4cc33e0b211b3eb917ce859e77607a2d"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                8,
+                8
+              ],
+              "fragment_sha256": "d80e6b9a276629fd20290c9e04d890aea28075cc0fd481aeeb4a58490fa697e0"
+            },
+            {
+              "lines": [
+                9,
+                9
+              ],
+              "fragment_sha256": "b809e7a3d119b50cae1c0657512b9cf7a2e8fa9369e14614da42894d63ae204e"
+            },
+            {
+              "lines": [
+                20,
+                20
+              ],
+              "fragment_sha256": "4ba6d7f5b54d23c71d40d9456bcff9441effea446a0e8582033ed014da7aa1b9"
+            },
+            {
+              "lines": [
+                21,
+                21
+              ],
+              "fragment_sha256": "d2ff4499225d31797dcc9afa5766997839ab5e66cccc80475547a5bead341ba9"
+            },
+            {
+              "lines": [
+                22,
+                22
+              ],
+              "fragment_sha256": "3806a4ea3141aa09331c0e8a004141a3710a31f693f7dee6b4eadbdc41d2ad42"
+            }
+          ],
+          "transformation": "DOCUMENT_ACCESS_IDENTITY_HISTORY_ONLY_WITH_PRIVATE_LOCATIONS_OMITTED"
+        }
+      ],
+      "endpoint_and_hash_source_locations": [
+        {
+          "lines": [
+            7,
+            7
+          ],
+          "fragment_sha256": "733a29dbb3068386a8cd7e21e60b3db59e7a6912af6184b20e980aaa66de9ded"
+        },
+        {
+          "lines": [
+            9,
+            9
+          ],
+          "fragment_sha256": "b809e7a3d119b50cae1c0657512b9cf7a2e8fa9369e14614da42894d63ae204e"
+        }
+      ],
+      "selection_note": "Candidate -> Part Number; combined revision/publication field separated; exact original raw hash and recorded same-hash request/size retained as historical observations, body/addendum date distinction preserved; no numeric interface prose.",
+      "exclusions": [
+        "Private cache/receipt/coordination locations and capture-owner labels",
+        "Original parameter/application/geometry/implementation/adoption prose rather than document identity",
+        "Unrelated historical Evidence-ID lists",
+        "Unneeded external geometry resource links where present"
+      ],
+      "exact_original_and_diff": "Original remains unchanged; private author handoff retains full original-field values and exact unified diff. Public locations are line/hash references only, never private cache paths."
+    },
+    {
+      "source_path": "datasheets/texasinstruments_tmux1511_scds390b.md",
+      "source_revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+      "source_sha256": "c300fea5fbd4f13f97202cfcf7a646e76acfd7350d13b9f4f93aa7278141d39e",
+      "target_path": "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md",
+      "target_sha256": "4a59a61afb1dee1757a4518dfa58ada661bf893e69d6b7f6ab9f565c303457e9",
+      "target_bytes": 1314,
+      "used_for_ids": [
+        "DS-IFACE-070",
+        "DS-IFACE-071",
+        "DS-IFACE-072",
+        "DS-IFACE-073",
+        "DS-IFACE-074"
+      ],
+      "document_content_sha256_records": [
+        "c32b83722e3717c554dc8f68da05d9e02aa44087043d7b820f5e113713adbfcb"
+      ],
+      "raw_hashes_reverified": false,
+      "official_urls": [
+        "https://www.ti.com/lit/ds/symlink/tmux1511.pdf"
+      ],
+      "field_transformations": [
+        {
+          "public_field": "Manufacturer",
+          "target": {
+            "lines": [
+              3,
+              3
+            ],
+            "fragment_sha256": "84d01c6f257dbece94e8d28c75674a0c5e6542d0df5526b3c6ca75ea094e0988"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                3,
+                3
+              ],
+              "fragment_sha256": "84d01c6f257dbece94e8d28c75674a0c5e6542d0df5526b3c6ca75ea094e0988"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Part Number",
+          "target": {
+            "lines": [
+              4,
+              4
+            ],
+            "fragment_sha256": "0fa8853ebb9db02c1a41d405d6985a64eeda53ec0adf906379d901a54fd421c7"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                4,
+                4
+              ],
+              "fragment_sha256": "0fa8853ebb9db02c1a41d405d6985a64eeda53ec0adf906379d901a54fd421c7"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Datasheet Title",
+          "target": {
+            "lines": [
+              5,
+              5
+            ],
+            "fragment_sha256": "4000d4cda0fae8b05e7fd0da1c0ecfadacd7b2711d60e17e230c384022718acb"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                5,
+                5
+              ],
+              "fragment_sha256": "4000d4cda0fae8b05e7fd0da1c0ecfadacd7b2711d60e17e230c384022718acb"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Revision / Version",
+          "target": {
+            "lines": [
+              6,
+              6
+            ],
+            "fragment_sha256": "5e0eab4156e05cad40ac328199a2fc530793bf047e1deadbfdcbff3bbc1ce92a"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                6,
+                6
+              ],
+              "fragment_sha256": "5e0eab4156e05cad40ac328199a2fc530793bf047e1deadbfdcbff3bbc1ce92a"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Publication Date",
+          "target": {
+            "lines": [
+              7,
+              7
+            ],
+            "fragment_sha256": "3158b869e3b392680830c3f8495d7f02cfc6ab1f990abf75b9b5bbbf9a1a2fbb"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                7,
+                7
+              ],
+              "fragment_sha256": "3158b869e3b392680830c3f8495d7f02cfc6ab1f990abf75b9b5bbbf9a1a2fbb"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Official URL",
+          "target": {
+            "lines": [
+              8,
+              8
+            ],
+            "fragment_sha256": "019629a36877043392541ccab81f282511656cc65b63f8874fce316552d272b8"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                8,
+                8
+              ],
+              "fragment_sha256": "019629a36877043392541ccab81f282511656cc65b63f8874fce316552d272b8"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Retrieved Date",
+          "target": {
+            "lines": [
+              9,
+              9
+            ],
+            "fragment_sha256": "18fefda3f68f79900a06504aaf2a2cef2642d489ec52d03d214fe6234b63161f"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                9,
+                9
+              ],
+              "fragment_sha256": "18fefda3f68f79900a06504aaf2a2cef2642d489ec52d03d214fe6234b63161f"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Recorded SHA-256",
+          "target": {
+            "lines": [
+              10,
+              10
+            ],
+            "fragment_sha256": "01f2b2068d7ec10b6ed7fdf07e58d2c0766372d2a7571037e1a70007f808f97f"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                10,
+                10
+              ],
+              "fragment_sha256": "b557f8bbe93704ab50611f09a504c18d02e4f446f913f1a9f84d96b59461385a"
+            }
+          ],
+          "transformation": "RECORDED_RAW_DIGEST_TRANSFER_NOT_REVERIFICATION"
+        },
+        {
+          "public_field": "Local cache note",
+          "target": {
+            "lines": [
+              11,
+              11
+            ],
+            "fragment_sha256": "27e1843981300820e25e396428c60cf3c592c3afc4696760ef7c436aadb4696b"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                11,
+                11
+              ],
+              "fragment_sha256": "23044a9c93c47901e05aaa4072254e0cbc9f3a3b4530a153928d26487a0956b1"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Used for Evidence IDs",
+          "target": {
+            "lines": [
+              12,
+              12
+            ],
+            "fragment_sha256": "9b9a9b653d33de000ff6220fc7d74ed46bd5be408c29d3504a52b1a5d9f67514"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                12,
+                12
+              ],
+              "fragment_sha256": "5dfb15b8a4322dcc78bd2af3c13344713e136900ff898843e759bad787d4ff39"
+            }
+          ],
+          "transformation": "FILTER_EXISTING_ID_LIST_TO_THIS_EXPORT_USAGE_ONLY"
+        },
+        {
+          "public_field": "Recorded provenance history",
+          "target": {
+            "lines": [
+              13,
+              13
+            ],
+            "fragment_sha256": "b5e1ed4b731e401257bd168f7ab81bddaeaf484575b253c35a568abbd4de855d"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                9,
+                9
+              ],
+              "fragment_sha256": "18fefda3f68f79900a06504aaf2a2cef2642d489ec52d03d214fe6234b63161f"
+            },
+            {
+              "lines": [
+                10,
+                10
+              ],
+              "fragment_sha256": "b557f8bbe93704ab50611f09a504c18d02e4f446f913f1a9f84d96b59461385a"
+            },
+            {
+              "lines": [
+                11,
+                11
+              ],
+              "fragment_sha256": "23044a9c93c47901e05aaa4072254e0cbc9f3a3b4530a153928d26487a0956b1"
+            },
+            {
+              "lines": [
+                22,
+                22
+              ],
+              "fragment_sha256": "93a9065f7cc24b47bd94279902b701ba6ea6cc17c151c17c2d04849645e9941c"
+            }
+          ],
+          "transformation": "DOCUMENT_ACCESS_IDENTITY_HISTORY_ONLY_WITH_PRIVATE_LOCATIONS_OMITTED"
+        }
+      ],
+      "endpoint_and_hash_source_locations": [
+        {
+          "lines": [
+            8,
+            8
+          ],
+          "fragment_sha256": "019629a36877043392541ccab81f282511656cc65b63f8874fce316552d272b8"
+        },
+        {
+          "lines": [
+            10,
+            10
+          ],
+          "fragment_sha256": "b557f8bbe93704ab50611f09a504c18d02e4f446f913f1a9f84d96b59461385a"
+        }
+      ],
+      "selection_note": "Original document identity/title/date/timestamp/hash; recorded same-hash capture/reuse history; private coordination/receipt location omitted.",
+      "exclusions": [
+        "Private cache/receipt/coordination locations and capture-owner labels",
+        "Original parameter/application/geometry/implementation/adoption prose rather than document identity",
+        "Unrelated historical Evidence-ID lists",
+        "Unneeded external geometry resource links where present"
+      ],
+      "exact_original_and_diff": "Original remains unchanged; private author handoff retains full original-field values and exact unified diff. Public locations are line/hash references only, never private cache paths."
+    },
+    {
+      "source_path": "datasheets/texasinstruments_txu0304_sces935a.md",
+      "source_revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+      "source_sha256": "08f3463aac8e7a39342350a8baddd1ab6df7b39a6f6d71596c83c64e53a8e6da",
+      "target_path": "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md",
+      "target_sha256": "0f5aa60e60ca60e7760bd755c1c70a1c8a0bd670ccd9a330df1aa8e5b5fc7451",
+      "target_bytes": 1580,
+      "used_for_ids": [
+        "DS-IFACE-002",
+        "DS-IFACE-014",
+        "DS-IFACE-015",
+        "DS-IFACE-016",
+        "DS-IFACE-017",
+        "DS-IFACE-018",
+        "DS-IFACE-055",
+        "DS-IFACE-056",
+        "DS-IFACE-057",
+        "DS-IFACE-058"
+      ],
+      "document_content_sha256_records": [
+        "f6f6178296b8d497d3706ea7766633b62f799cfe830659a2dcfd09c79bfa71dc"
+      ],
+      "raw_hashes_reverified": false,
+      "official_urls": [
+        "https://www.ti.com/lit/ds/symlink/txu0304.pdf"
+      ],
+      "field_transformations": [
+        {
+          "public_field": "Manufacturer",
+          "target": {
+            "lines": [
+              3,
+              3
+            ],
+            "fragment_sha256": "84d01c6f257dbece94e8d28c75674a0c5e6542d0df5526b3c6ca75ea094e0988"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                3,
+                3
+              ],
+              "fragment_sha256": "84d01c6f257dbece94e8d28c75674a0c5e6542d0df5526b3c6ca75ea094e0988"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Part Number",
+          "target": {
+            "lines": [
+              4,
+              4
+            ],
+            "fragment_sha256": "fb447dbc3f9b9faebba72b91a1f108de6ec80244577165c69cc688ae489d5cb1"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                4,
+                4
+              ],
+              "fragment_sha256": "2c11005aa48c69932cd3e43a7fa3c13d804340e43d9581e22eac97264db34b9a"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Datasheet Title",
+          "target": {
+            "lines": [
+              5,
+              5
+            ],
+            "fragment_sha256": "938a3925e82386c4928a1654727d4fd45d36ff2261a98e603c037be13ed22ad2"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                5,
+                5
+              ],
+              "fragment_sha256": "d59ef5699da1ffc994f633913dde58774ea30dec15272a58371d5823bfb119fe"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Revision / Version",
+          "target": {
+            "lines": [
+              6,
+              6
+            ],
+            "fragment_sha256": "26b4ce323688ba2bd1b96ae2295a6e0899cafed59004ff6b6688557b5c28c67e"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                6,
+                6
+              ],
+              "fragment_sha256": "4ef01fa800d50cf52a3bcda6ff64f2badfef18ac17f3006772c480c4ff7a3a6a"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Publication Date",
+          "target": {
+            "lines": [
+              7,
+              7
+            ],
+            "fragment_sha256": "8275eb00c58a12a5b4a196dac1f9d27edb076d87945974e6288a87f7ecc7b2da"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                6,
+                6
+              ],
+              "fragment_sha256": "4ef01fa800d50cf52a3bcda6ff64f2badfef18ac17f3006772c480c4ff7a3a6a"
+            },
+            {
+              "lines": [
+                41,
+                41
+              ],
+              "fragment_sha256": "55609f6d8d3195487d2be1de5b4b88f8ac212056ab313f95a5ba3d5e26ed9373"
+            }
+          ],
+          "transformation": "RECORDED_BOUND_DOCUMENT_DATE_PLUS_REVISION_FIELD_NOT_NEW_SOURCE_ANALYSIS"
+        },
+        {
+          "public_field": "Official URL",
+          "target": {
+            "lines": [
+              8,
+              8
+            ],
+            "fragment_sha256": "0f7efbbda32aef1ec74f4385f3fa6149f1f14c1a7a815fb3409627c59a3574d7"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                7,
+                7
+              ],
+              "fragment_sha256": "0f7efbbda32aef1ec74f4385f3fa6149f1f14c1a7a815fb3409627c59a3574d7"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Retrieved Date",
+          "target": {
+            "lines": [
+              9,
+              9
+            ],
+            "fragment_sha256": "8e5a3b5aa8bdb145f0c0794a24f3bdf1c530164622a57a3b76db88fbbf625fc2"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                8,
+                8
+              ],
+              "fragment_sha256": "d80e6b9a276629fd20290c9e04d890aea28075cc0fd481aeeb4a58490fa697e0"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Recorded SHA-256",
+          "target": {
+            "lines": [
+              10,
+              10
+            ],
+            "fragment_sha256": "8cb2f6e8fa4507c6020ebd9ed25aa0f91ab81867a91f0c764bec6f708b1318a4"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                9,
+                9
+              ],
+              "fragment_sha256": "12ce2b110ba30cb00d73b4021d6fdffac32537f350c9c343350608bb5caea2d5"
+            },
+            {
+              "lines": [
+                43,
+                43
+              ],
+              "fragment_sha256": "d01241c2dcf9a8467dd4785df6c794d28eeb8b029306d9e752f6fa0d0305f18d"
+            },
+            {
+              "lines": [
+                51,
+                51
+              ],
+              "fragment_sha256": "7e3a2bed21023993e791ae5b2b0901ec5b63fc52353da58fd8de5a4389ea873f"
+            }
+          ],
+          "transformation": "RECORDED_RAW_DIGEST_TRANSFER_NOT_REVERIFICATION"
+        },
+        {
+          "public_field": "Local cache note",
+          "target": {
+            "lines": [
+              11,
+              11
+            ],
+            "fragment_sha256": "eeea6eb17bd73905ac9d2742d81d6bce01ad6c1c8e9fd7318daaf28f43aa5c0c"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                11,
+                11
+              ],
+              "fragment_sha256": "c0e6069f29216fbe260623f956a89fba13e7011f52f070edf74e46a6e1d60ec0"
+            },
+            {
+              "lines": [
+                21,
+                21
+              ],
+              "fragment_sha256": "0c0995a08ffa3b8dbc9d3202a15b096f8791b1e2cf8373326bc0f8c05bd352d7"
+            }
+          ],
+          "transformation": "NORMALIZED_DOCUMENT_FIELD_WITH_INHERITED_ATTRIBUTION"
+        },
+        {
+          "public_field": "Used for Evidence IDs",
+          "target": {
+            "lines": [
+              12,
+              12
+            ],
+            "fragment_sha256": "dcc43639692185127d59522d53a60ce5a7b663fdb4cfdb566dfd49374eb9471d"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                10,
+                10
+              ],
+              "fragment_sha256": "d735d7ac30c941e99bef5bae594a0f4ee2fc5fb3dc487e4b5c47826076b30b4f"
+            },
+            {
+              "lines": [
+                19,
+                19
+              ],
+              "fragment_sha256": "62d0121acdd61647591742c98542a364d1a380bf84beab9b27d3ec3d065bbf1c"
+            },
+            {
+              "lines": [
+                49,
+                49
+              ],
+              "fragment_sha256": "bbd68db0ae0ed6f3aa395c20d192d13fd7c5f1032c7c09332b65aae546cb0bf1"
+            },
+            {
+              "lines": [
+                62,
+                62
+              ],
+              "fragment_sha256": "1a5e60a316b3cceb47c6845a5a9c68b46cb1065ce693be8d67ad8ef20e088ef6"
+            },
+            {
+              "lines": [
+                76,
+                76
+              ],
+              "fragment_sha256": "b36ba847b0d3eadd97b2223d2b3eb06d9693c8d5ee9330a437cbb363adb48ebe"
+            }
+          ],
+          "transformation": "FILTER_EXISTING_ID_LIST_TO_THIS_EXPORT_USAGE_ONLY"
+        },
+        {
+          "public_field": "Recorded provenance history",
+          "target": {
+            "lines": [
+              13,
+              13
+            ],
+            "fragment_sha256": "95682bcea9f9ac98f6caa1e2f6daf75fbb18854c7313a5936b7992f163bce73f"
+          },
+          "source_locations": [
+            {
+              "lines": [
+                8,
+                8
+              ],
+              "fragment_sha256": "d80e6b9a276629fd20290c9e04d890aea28075cc0fd481aeeb4a58490fa697e0"
+            },
+            {
+              "lines": [
+                9,
+                9
+              ],
+              "fragment_sha256": "12ce2b110ba30cb00d73b4021d6fdffac32537f350c9c343350608bb5caea2d5"
+            },
+            {
+              "lines": [
+                21,
+                21
+              ],
+              "fragment_sha256": "0c0995a08ffa3b8dbc9d3202a15b096f8791b1e2cf8373326bc0f8c05bd352d7"
+            },
+            {
+              "lines": [
+                23,
+                23
+              ],
+              "fragment_sha256": "102d3202250a056cfb3f209f69bfab65d7360bed337e9c4a9ce5edf41682e0a8"
+            },
+            {
+              "lines": [
+                31,
+                31
+              ],
+              "fragment_sha256": "fde696a60812a9ccd1c4aef82ad1a4ce53bffdb798aa08c352294d18c551149a"
+            },
+            {
+              "lines": [
+                32,
+                32
+              ],
+              "fragment_sha256": "d0154c94c970916ea8c2b5ddd3437e2ba2c77bfcfd378e6a0666063249f0ce8a"
+            },
+            {
+              "lines": [
+                43,
+                43
+              ],
+              "fragment_sha256": "d01241c2dcf9a8467dd4785df6c794d28eeb8b029306d9e752f6fa0d0305f18d"
+            },
+            {
+              "lines": [
+                51,
+                51
+              ],
+              "fragment_sha256": "7e3a2bed21023993e791ae5b2b0901ec5b63fc52353da58fd8de5a4389ea873f"
+            },
+            {
+              "lines": [
+                65,
+                65
+              ],
+              "fragment_sha256": "b5df2fa2c79334a47e06d69dc89e4f6d74db4566066591d3598e4224a529dec7"
+            },
+            {
+              "lines": [
+                66,
+                66
+              ],
+              "fragment_sha256": "b93e6005d813d93194a4e24b818b8870e6d5b4a315fea37de21595619f07fb30"
+            },
+            {
+              "lines": [
+                67,
+                67
+              ],
+              "fragment_sha256": "40b84ba75bf962e581f06249d67c150b363c990f16191724bf3f2713d1804a7e"
+            },
+            {
+              "lines": [
+                78,
+                78
+              ],
+              "fragment_sha256": "c6dd9abdf5ceff8689e02100428ca0b192a78e71fc2a40b037477848905d5142"
+            },
+            {
+              "lines": [
+                79,
+                79
+              ],
+              "fragment_sha256": "592ad6a81d2b765c2c7b787966dff60f02a7989eca1f5f5056cc4ef971132b2f"
+            },
+            {
+              "lines": [
+                80,
+                80
+              ],
+              "fragment_sha256": "f76f9d6cc66f4ec8e87e8287327ee4339ba684c37751a0f3c0488fe4e1385fde"
+            },
+            {
+              "lines": [
+                91,
+                91
+              ],
+              "fragment_sha256": "75916cd7e1ed15019e0ba0363fc9e0f6c9e8db8ecb596a34863330f42e04de30"
+            },
+            {
+              "lines": [
+                92,
+                92
+              ],
+              "fragment_sha256": "c866b3d96281a616382182af1d52a02c274327bc4c9e837a371a10cf3cb1ef1b"
+            }
+          ],
+          "transformation": "DOCUMENT_ACCESS_IDENTITY_HISTORY_ONLY_WITH_PRIVATE_LOCATIONS_OMITTED"
+        }
+      ],
+      "endpoint_and_hash_source_locations": [
+        {
+          "lines": [
+            7,
+            7
+          ],
+          "fragment_sha256": "0f7efbbda32aef1ec74f4385f3fa6149f1f14c1a7a815fb3409627c59a3574d7"
+        },
+        {
+          "lines": [
+            9,
+            9
+          ],
+          "fragment_sha256": "12ce2b110ba30cb00d73b4021d6fdffac32537f350c9c343350608bb5caea2d5"
+        },
+        {
+          "lines": [
+            42,
+            42
+          ],
+          "fragment_sha256": "975fc48c3349fcf1ddffb2f639c2a9503b60ba8958d862431041aa9ca09e5902"
+        },
+        {
+          "lines": [
+            43,
+            43
+          ],
+          "fragment_sha256": "d01241c2dcf9a8467dd4785df6c794d28eeb8b029306d9e752f6fa0d0305f18d"
+        },
+        {
+          "lines": [
+            51,
+            51
+          ],
+          "fragment_sha256": "7e3a2bed21023993e791ae5b2b0901ec5b63fc52353da58fd8de5a4389ea873f"
+        }
+      ],
+      "selection_note": "Candidate/Document field aliases; bound-document May2021/November2021 identity statement retained alongside original retrieval; same hash/history; technical correction/table/locator discussion and private receipts excluded from metadata, qualified rows preserved separately.",
+      "exclusions": [
+        "Private cache/receipt/coordination locations and capture-owner labels",
+        "Original parameter/application/geometry/implementation/adoption prose rather than document identity",
+        "Unrelated historical Evidence-ID lists",
+        "Unneeded external geometry resource links where present"
+      ],
+      "exact_original_and_diff": "Original remains unchanged; private author handoff retains full original-field values and exact unified diff. Public locations are line/hash references only, never private cache paths."
+    }
+  ],
+  "public_allowlist": [
+    "docs/rev5-public-sources-2026-09-10/rows.json",
+    "docs/rev5-public-sources-2026-09-10/manifest.json",
+    "docs/rev5-public-sources-2026-09-10/README.md",
+    "datasheets/public-references-rev5/espressif_esp-idf-v6.1_peripherals_web-2026-09-06.md",
+    "datasheets/public-references-rev5/espressif_esp-idf_v5.5.2_gpio-source.md",
+    "datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md",
+    "datasheets/public-references-rev5/espressif_esp32-s3_datasheet-v2.2.md",
+    "datasheets/public-references-rev5/espressif_esp32-s3_jtag-external_v6.1.md",
+    "datasheets/public-references-rev5/espressif_esp32-s3_trm-v1.8.md",
+    "datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md",
+    "datasheets/public-references-rev5/texasinstruments_sn74axc4t774_sces898c.md",
+    "datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md",
+    "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md",
+    "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md",
+    "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+  ],
+  "hash_inventory_except_manifest": {
+    "docs/rev5-public-sources-2026-09-10/rows.json": "4139bc3bb042f1c2dbacd8b3a0f2180fb55af7dd8abed6cf81a89aa65612f25d",
+    "docs/rev5-public-sources-2026-09-10/README.md": "c91492bb276d50d67d04de542fedf206496f50d11fd92a90482c7e12689f5102",
+    "datasheets/public-references-rev5/espressif_esp-idf-v6.1_peripherals_web-2026-09-06.md": "d1558f3313a4af7ad2c850973119afbb17f082f6d9e4ec9a0af122d937c13815",
+    "datasheets/public-references-rev5/espressif_esp-idf_v5.5.2_gpio-source.md": "c305b16ba788e0cc26d956fd696e18595a5051c64b2b08628e9d1bc23f171ece",
+    "datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md": "23f1fc06fc36db9fc8672ae459e11ff52419b2709109bfd62248711f7d2e45ea",
+    "datasheets/public-references-rev5/espressif_esp32-s3_datasheet-v2.2.md": "a0deb32bb54ffa3c41fd07e14a2df6e205685475ffcde35778fc8ca6dde6336d",
+    "datasheets/public-references-rev5/espressif_esp32-s3_jtag-external_v6.1.md": "e39d5f01ce08f649e5f658354baee2210d0afe27275193558d412762c337e9ea",
+    "datasheets/public-references-rev5/espressif_esp32-s3_trm-v1.8.md": "dcdb726e7a6a372b0e311f223aee3d43ac536e25ea990f9987b72439a400f96d",
+    "datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md": "61f0f0927b2ccb7d8c59350b971b3684fb81e75269e3b05b1fe20ae108eb1066",
+    "datasheets/public-references-rev5/texasinstruments_sn74axc4t774_sces898c.md": "4e7580a698b678a064bf3586da48512e75eb07166f8d9015efac2e431dcb8c17",
+    "datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md": "c6071c8791d664583048c86489dbc9a2228e0c2aed2c95145e9962d6777d24dd",
+    "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md": "43d353a219ba0a29565dbaa979d35ec7f2c281228d07289d1d7dc0e1f7601b04",
+    "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md": "4a59a61afb1dee1757a4518dfa58ada661bf893e69d6b7f6ab9f565c303457e9",
+    "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md": "0f5aa60e60ca60e7760bd755c1c70a1c8a0bd670ccd9a330df1aa8e5b5fc7451"
+  },
+  "manifest_hash_convention": "Own final digest is in the private STOP/ACK handoff; no recursive self-hash."
+}

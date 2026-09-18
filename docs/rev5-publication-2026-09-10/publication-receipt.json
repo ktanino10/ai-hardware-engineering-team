@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "kind": "ACTUAL_PUBLIC_PUBLICATION_RECEIPT",
+  "status": "PUBLIC_BRANCH_PUSHED_DRAFT_PR_OPEN_UNMERGED",
+  "repository": "ktanino10/ai-hardware-engineering-team",
+  "branch": "ktanino10-glowing-journey",
+  "base_branch": "main",
+  "public_base_and_configuration": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+  "safe_staging_revision": "b812427a62de59b150905e2884e54a6983574c15",
+  "import_readback": "docs/rev5-publication-2026-09-10/import-readback.json",
+  "local_import_commit": "25a62cf4ad43e5325a5668a3be3a5a80465c9416",
+  "first_push": {
+    "remote": "origin",
+    "ref": "refs/heads/ktanino10-glowing-journey",
+    "observed_remote_sha": "25a62cf4ad43e5325a5668a3be3a5a80465c9416",
+    "push_exit": 0,
+    "force": false,
+    "main_pushed": false,
+    "remote_readback_reconfirmed_at": "2026-09-10T03:08:07.544559+09:00"
+  },
+  "pull_request": {
+    "creation_method": "This executor's native create_pull_request tool with draft=true.",
+    "url": "https://github.com/ktanino10/ai-hardware-engineering-team/pull/73",
+    "number": 73,
+    "created_at": "2026-09-09T18:07:54Z",
+    "observed_at": "2026-09-10T03:08:07.544559+09:00",
+    "head_repository": "ktanino10/ai-hardware-engineering-team",
+    "head_ref": "ktanino10-glowing-journey",
+    "head_sha": "25a62cf4ad43e5325a5668a3be3a5a80465c9416",
+    "base_repository": "ktanino10/ai-hardware-engineering-team",
+    "base_ref": "main",
+    "base_sha": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+    "draft": true,
+    "state": "open",
+    "merged": false,
+    "merged_at": null,
+    "auto_merge": null,
+    "readback_method": "GitHub pull-request REST readback and git ls-remote for the exact two branch refs.",
+    "observation_scope": "Observed first publication, before this receipt-only follow-up commit; not a claim about a future PR state."
+  },
+  "actual_technical_STOP": {
+    "at": "2026-09-10T03:08:24.565841+09:00",
+    "scope": "Canonical import, package execution, immutable payload readback and first public push/draft-PR readback complete. No further technical content work; only this receipt's administrative commit/push and final remote/hash readback remain."
+  },
+  "saved_readback_ACK": {
+    "at": "2026-09-10T03:08:24.565841+09:00",
+    "scope": "Both canonical ledgers and import-readback.json were read from disk and compared to the pushed import commit.",
+    "sha256": {
+      "datasheets/evidence-log.md": "1a0fa360b3f854132dde922530ccf783a79a57ccd41922de16a19a202b572430",
+      "validation/change-log.md": "4f3532436d295f576fc02271919e20082203e5509432cf9b057d57bf45cb3652",
+      "docs/rev5-publication-2026-09-10/import-readback.json": "025f0e7e2ea839cb690bd11e45bdfcb6ecdca4b5be5a686cfe60be52ee5562d0"
+    }
+  },
+  "final_receipt_and_tip_ACK": "Reported separately after the receipt-only commit/push and final readback, avoiding self-reference.",
+  "owned_background_jobs": 0,
+  "jobs_basis": "Only joined synchronous commands were used; no agents, background jobs or hardware activity were started.",
+  "runtime_context_model": "gpt-6-astra",
+  "execution_location": "LOCAL",
+  "independent_backend_attestation": false,
+  "ancestry_at_first_publication": [
+    "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+    "b812427a62de59b150905e2884e54a6983574c15",
+    "25a62cf4ad43e5325a5668a3be3a5a80465c9416"
+  ],
+  "configuration_required_check_names_and_protection_unchanged": true,
+  "CI_watch_or_gate_repair_performed": false,
+  "main_merge_claimed": false,
+  "physical_or_adoption_permission": false,
+  "holds": ["NO-GO", "P1 conditional", "3C8H", "REQ409", "old five", "foreign.pro", "all physical and human holds"],
+  "actual_C_issuer_normality_B_X_and_physical_proof": "UNKNOWN",
+  "receipt_hash_policy": "A later receipt-only commit may record the observed first push and PR. Its own final tip is reported separately, never embedded as a self-referential hash.",
+  "frozen_export_status_policy": "The 39 export files and publication context retain their original exact bytes and source-epoch statuses."
+}

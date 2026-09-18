@@ -1,0 +1,1997 @@
+{
+  "schema_version": 1,
+  "kind": "CANONICAL_ROW_IMPORT_DATA_NOT_REGISTRATION",
+  "status": "PREPARED_NOT_APPLIED_NOT_INDEPENDENTLY_REVIEWED",
+  "approval": null,
+  "adoption": false,
+  "hash_convention": "SHA256 of exact UTF-8 complete row including terminal LF. Redacted representations have separate hashes; source hashes never identify changed bytes.",
+  "public_baseline": {
+    "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+    "canonical_path": "datasheets/evidence-log.md",
+    "canonical_sha256": "8119c3ea81fd05cbce119b3e59b1b324e9d31b37441f2bca988d6989947c969f",
+    "checker_path": "tools/check_id_uniqueness.py",
+    "checker_sha256": "1cb5a1192a33552cd04e711f34447f91621b3674d8d4d6aaa9e6e69da28b06ab",
+    "checker_scope": "FIRST_MATCHING_TABLE_ONLY",
+    "checker_copy_executed": false,
+    "test_id_uniqueness_py": "Absent according to the fixed task contract; not an available validation command. Selected baseline-paths inventory is not represented as a complete tests-directory listing.",
+    "private_0d_coverage_equivalence": false
+  },
+  "source_archive": {
+    "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+    "canonical_path": "datasheets/evidence-log.md",
+    "canonical_sha256": "ec6b3ccfb4df896e4fd855a4c5ac3ba8df2e029c1f06d166411861a76f2cb922",
+    "meaning": "Frozen original-source identity/hash, not a promise that private history was pushed or publicly reachable. Actual proposed canonical dependencies and public metadata are separately enumerated."
+  },
+  "table_target": {
+    "canonical_path": "datasheets/evidence-log.md",
+    "header": "| Evidence ID | Datasheet metadata record | Section | Table | Page | Parameter / Claim supported | Recorded by | Date |",
+    "header_columns": [
+      "Evidence ID",
+      "Datasheet metadata record",
+      "Section",
+      "Table",
+      "Page",
+      "Parameter / Claim supported",
+      "Recorded by",
+      "Date"
+    ],
+    "header_line_at_baseline": 11,
+    "insert_before_heading": "## Rules",
+    "heading_line_at_baseline": 424,
+    "preceding_row_sha256": "9e9f9200826b300582275ef73eb6712741e29f2ab0c8bfe709a4f6ab640f68b0",
+    "new_table_allowed": false,
+    "order": "Ascending ID for36 adds; replace065 in its original row position"
+  },
+  "operations": [
+    {
+      "id": "DS-IFACE-002",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 768,
+        "row_sha256": "db907c6457d79988f35d229f9945f4fe86ac7619f63c8f327068c019e23bc1a6",
+        "row": "| DS-IFACE-002 | `datasheets/texasinstruments_txu0304_sces935a.md` | Device information; ROC/electrical; §9; application/orderable; coverage addition: Section6, PW-specific pin configuration; explicit U/C1 addition: Section7.1 AMR; PW0014A4220202/B12/2023 outline notes1,3/4 | §§7.3/7.5; functional description; coverage addition: Figure6-1 and Table6-1; source conditions/category in added claim | 1, 6–8, 20–24; PDF28; added PDF4; added PDF5,38 | TXU0304PWR TSSOP14 PW nominal5×4.4mm,3A→B/1B→A,Active/Production. Each rail ROC1.08–5.5V; OE high enables,low or internally pulled-down/floating OE disables. Either rail<100mV or disconnected,with other rail in ROC,disables outputs; Ioff and distinct Ioff-float conditions are specified. Combined static supply current≤6µA over−40…125°C with IO0 and inputs at rails; Ioff±2.5µA under its zero-rail test,not total dynamic/local-load consumption. Application reference available; non-galvanic buffer,not motor inhibit. Explicit conditioner-part coverage supplement (original scope/attribution retained): PW14 exact pins: VCCA1,A1=2,A2=3,A3=4,A4Y=5,NC6,GND7,OE8,NC9,B4=10,B3Y=11,B2Y=12,B1Y=13,VCCB14. A1/A2/A3 and B4 are inputs; A4Y/B1Y/B2Y/B3Y are outputs. Do not substitute the RUT/DTR12-pin map. Two A-to-B paths used for oppositely travelling external UART signals and unused-pin bias choices remain an unimplemented fixture proposal, not device-autodirection or all-state qualification. Explicit U/C1 source extension by Component Engineer,2026-09-06 (prior scope retained): Additional C1 source scope: continuous output current +/-25mA and continuous current through VCC or GND +/-100mA are AMR stress limits, not chosen loads or pulse guarantees. This device's own PW0014A outline gives body4.9..5.1 by4.3..4.5mm,height1.2mm MAX; lead span is the unparenthesized stacked pair6.6 (upper)/6.2 (lower) mm with a TYP drawing annotation. Length excludes mold/protrusion/gate burr<=0.15mm/side; width excludes interlead flash<=0.25mm/side. Drawing-notation clarification by Component Engineer,2026-09-06: Note1 marks parenthesized dimensions reference-only and cites ASME Y14.5M. TYP alone does not establish an electrical/statistical typical-value category or invalidate the displayed upper dimension. The earlier TYP-based rejection is withdrawn; this does not establish assembled fit or footprint acceptance. | Component Engineer, integration stage1 | 2026-09-06 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-002 | `datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md` | Device information; ROC/electrical; §9; application/orderable; coverage addition: Section6, PW-specific pin configuration; explicit U/C1 addition: Section7.1 AMR; PW0014A4220202/B12/2023 outline notes1,3/4 | §§7.3/7.5; functional description; coverage addition: Figure6-1 and Table6-1; source conditions/category in added claim | 1, 6–8, 20–24; PDF28; added PDF4; added PDF5,38 | TXU0304PWR TSSOP14 PW nominal5×4.4mm,3A→B/1B→A,Active/Production. Each rail ROC1.08–5.5V; OE high enables,low or internally pulled-down/floating OE disables. Either rail<100mV or disconnected,with other rail in ROC,disables outputs; Ioff and distinct Ioff-float conditions are specified. Combined static supply current≤6µA over−40…125°C with IO0 and inputs at rails; Ioff±2.5µA under its zero-rail test,not total dynamic/local-load consumption. Application reference available; non-galvanic buffer,not motor inhibit. Explicit conditioner-part coverage supplement (original scope/attribution retained): PW14 exact pins: VCCA1,A1=2,A2=3,A3=4,A4Y=5,NC6,GND7,OE8,NC9,B4=10,B3Y=11,B2Y=12,B1Y=13,VCCB14. A1/A2/A3 and B4 are inputs; A4Y/B1Y/B2Y/B3Y are outputs. Do not substitute the RUT/DTR12-pin map. Two A-to-B paths used for oppositely travelling external UART signals and unused-pin bias choices remain an unimplemented fixture proposal, not device-autodirection or all-state qualification. Explicit U/C1 source extension by Component Engineer,2026-09-06 (prior scope retained): Additional C1 source scope: continuous output current +/-25mA and continuous current through VCC or GND +/-100mA are AMR stress limits, not chosen loads or pulse guarantees. This device's own PW0014A outline gives body4.9..5.1 by4.3..4.5mm,height1.2mm MAX; lead span is the unparenthesized stacked pair6.6 (upper)/6.2 (lower) mm with a TYP drawing annotation. Length excludes mold/protrusion/gate burr<=0.15mm/side; width excludes interlead flash<=0.25mm/side. Drawing-notation clarification by Component Engineer,2026-09-06: Note1 marks parenthesized dimensions reference-only and cites ASME Y14.5M. TYP alone does not establish an electrical/statistical typical-value category or invalidate the displayed upper dimension. The earlier TYP-based rejection is withdrawn; this does not establish assembled fit or footprint acceptance. | Component Engineer, integration stage1 | 2026-09-06 |\n",
+        "row_sha256": "9111324acc7f3adf1f23d805f21ad9695b55c24adad563db26d1391e1a003d15",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_txu0304_sces935a.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-003",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 769,
+        "row_sha256": "6c1218ef39bb3fa9a5aa3b899431b8207997e05a690b75cbc76c2a9ad1d01161",
+        "row": "| DS-IFACE-003 | `datasheets/texasinstruments_sn74axc4t774_sces898c.md` | ROC/electrical; functional/application; orderable | §§5.3/5.5; Fig8-1 | 5–6, 20–23; PDF28 | SN74AXC4T774PWR TSSOP16 PW,4 individually directed channels,Active/Production. Each supply0.65–3.6V; active-low OE/control referenced toVCCA. Fig8-1 uses OE pullup to keep disabled during power-up. Either rail<100mV gives high-Z outputs; zero-supply Ioff specification does not establish TXU-style floating-rail behavior. At stated static IO0/input conditions and−40…125°C: each ICC max27µA,combined max40µA,Ioff±8µA. Defined control/unused-pin states required; no adopted topology or dynamic-current budget. | Component Engineer, integration stage1 | 2026-09-06 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-003 | `datasheets/public-references-rev5/texasinstruments_sn74axc4t774_sces898c.md` | ROC/electrical; functional/application; orderable | §§5.3/5.5; Fig8-1 | 5–6, 20–23; PDF28 | SN74AXC4T774PWR TSSOP16 PW,4 individually directed channels,Active/Production. Each supply0.65–3.6V; active-low OE/control referenced toVCCA. Fig8-1 uses OE pullup to keep disabled during power-up. Either rail<100mV gives high-Z outputs; zero-supply Ioff specification does not establish TXU-style floating-rail behavior. At stated static IO0/input conditions and−40…125°C: each ICC max27µA,combined max40µA,Ioff±8µA. Defined control/unused-pin states required; no adopted topology or dynamic-current budget. | Component Engineer, integration stage1 | 2026-09-06 |\n",
+        "row_sha256": "1fc786922321b3804ea28d7709305d8972fa8ba0bbe2f182e42e1932cbe36222",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_sn74axc4t774_sces898c.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_sn74axc4t774_sces898c.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_sn74axc4t774_sces898c.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-007",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 773,
+        "row_sha256": "3d93fa76530d5820a510b0243d0819384549f12efda37faa03b371d3352d2801",
+        "row": "| DS-IFACE-007 | `datasheets/texasinstruments_tca9517_scps242d.md` | ROC/electrical; functional/application; orderable | §§7.3/7.5; §9 | 5–6, 10–15; PDF18 | TCA9517DGKR VSSOP8 DGK,Active/Production. VCCA0.9–5.5V,VCCB2.7–5.5V; up to400kHz; high-Z I2C pins when unpowered. EN is active-high and must be explicitly controlled for a disabled default; switch enable only with buses idle. B static VOL0.45/0.52/0.60V and input-low-contending threshold0.4V impose offset/cascade constraints. ICCB MAX5mA atVCCB5.5V already equals the DRV external-current headline before pullups/other loads; it is not a measured or guaranteed3.3V budget and does not alone prove incompatibility. | Component Engineer, integration stage1 | 2026-09-06 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-007 | `datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md` | ROC/electrical; functional/application; orderable | §§7.3/7.5; §9 | 5–6, 10–15; PDF18 | TCA9517DGKR VSSOP8 DGK,Active/Production. VCCA0.9–5.5V,VCCB2.7–5.5V; up to400kHz; high-Z I2C pins when unpowered. EN is active-high and must be explicitly controlled for a disabled default; switch enable only with buses idle. B static VOL0.45/0.52/0.60V and input-low-contending threshold0.4V impose offset/cascade constraints. ICCB MAX5mA atVCCB5.5V already equals the DRV external-current headline before pullups/other loads; it is not a measured or guaranteed3.3V budget and does not alone prove incompatibility. | Component Engineer, integration stage1 | 2026-09-06 |\n",
+        "row_sha256": "f0420808e0cff96d2209354eee89b450aded01303a55d39cff98479aa5d918c8",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_tca9517_scps242d.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-014",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 945,
+        "row_sha256": "d890b87ff8f37be9b936552047e32add2942b9f83315d55aa0af312673e2c7d1",
+        "row": "| DS-IFACE-014 | `datasheets/texasinstruments_txu0304_sces935a.md` | p7, 7.5 | Tables/figures named in locator; otherwise unnumbered | p7, 7.5 | VT+ / VT- witness [MAX/MIN]: MIN=VT- 0.89, MAX=VT+ 1.92 V. Conditions: VCCA=VCCB exactly 3V; listed temperature bands. Not a 2.97..3.03V interpolation. Source registration only; no service/part/safety acceptance. | Component Engineer | 2026-09-06 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-014 | `datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md` | p7, 7.5 | Tables/figures named in locator; otherwise unnumbered | p7, 7.5 | VT+ / VT- witness [MAX/MIN]: MIN=VT- 0.89, MAX=VT+ 1.92 V. Conditions: VCCA=VCCB exactly 3V; listed temperature bands. Not a 2.97..3.03V interpolation. Source registration only; no service/part/safety acceptance. | Component Engineer | 2026-09-06 |\n",
+        "row_sha256": "095efe46537cf079f2357d90cd5353ca91f0c590266bc5a0797271b38aef6e53",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_txu0304_sces935a.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-015",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 946,
+        "row_sha256": "bd9f54b5ad3d8ae3d9773f5b8a46c0cc162087b8c30835d4d22c7a4466858b64",
+        "row": "| DS-IFACE-015 | `datasheets/texasinstruments_txu0304_sces935a.md` | p8, 7.5 | Tables/figures named in locator; otherwise unnumbered | p8, 7.5 | Output high / low [MIN/MAX]: MIN=VOH VCCO-0.1, MAX=VOL 0.1 V. Conditions: 100uA source/sink; rails 1.1..5.5V; inputs at specified threshold limits. 100uA includes parking, endpoint, protection and other loads. Source registration only; no service/part/safety acceptance. | Component Engineer | 2026-09-06 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-015 | `datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md` | p8, 7.5 | Tables/figures named in locator; otherwise unnumbered | p8, 7.5 | Output high / low [MIN/MAX]: MIN=VOH VCCO-0.1, MAX=VOL 0.1 V. Conditions: 100uA source/sink; rails 1.1..5.5V; inputs at specified threshold limits. 100uA includes parking, endpoint, protection and other loads. Source registration only; no service/part/safety acceptance. | Component Engineer | 2026-09-06 |\n",
+        "row_sha256": "05e8e00f65d82bb9b822a47c52a078e83dbad1c4fe61cc94e0542bee968ddb3c",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_txu0304_sces935a.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-016",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 947,
+        "row_sha256": "fb3e613a86e485760a16481142fb48434a8e36f3c975bc85448621feef8b7420",
+        "row": "| DS-IFACE-016 | `datasheets/texasinstruments_txu0304_sces935a.md` | p8, 7.5; p8, 7.5 / p9 footnote; section7.5 p9 footnote5 | Tables/figures named in locator; otherwise unnumbered | p8, 7.5; p8, 7.5 / p9 footnote; 9 | Data-input current [MAX]: MIN=-2, MAX=2 uA. Conditions: -40..125C; VI=VCCI or GND. Not every intermediate input voltage / partial supply. Ioff-float [MAX]: MIN=-2.5, MAX=2.5 uA. Conditions: I/O=GND; floating node externally undriven, leakage <=10nA. Do not extend to driven floating-node or arbitrary data-voltage cases. IOZ [MAX]: MIN=-2, MAX=2 uA. Conditions: OE=GND; supplies 1.1..5.5; VI=VCCI/GND, VO=VCCO/GND; -40..125C. Rail-endpoint tests, not continuous-voltage leakage qualification. Source registration only; no service/part/safety acceptance. Section7.5 p9 footnote5 defines floating as no active external drive and leakage not exceeding10nA; a bleeding50mV rail is not automatically this condition. | Component Engineer | 2026-09-06 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-016 | `datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md` | p8, 7.5; p8, 7.5 / p9 footnote; section7.5 p9 footnote5 | Tables/figures named in locator; otherwise unnumbered | p8, 7.5; p8, 7.5 / p9 footnote; 9 | Data-input current [MAX]: MIN=-2, MAX=2 uA. Conditions: -40..125C; VI=VCCI or GND. Not every intermediate input voltage / partial supply. Ioff-float [MAX]: MIN=-2.5, MAX=2.5 uA. Conditions: I/O=GND; floating node externally undriven, leakage <=10nA. Do not extend to driven floating-node or arbitrary data-voltage cases. IOZ [MAX]: MIN=-2, MAX=2 uA. Conditions: OE=GND; supplies 1.1..5.5; VI=VCCI/GND, VO=VCCO/GND; -40..125C. Rail-endpoint tests, not continuous-voltage leakage qualification. Source registration only; no service/part/safety acceptance. Section7.5 p9 footnote5 defines floating as no active external drive and leakage not exceeding10nA; a bleeding50mV rail is not automatically this condition. | Component Engineer | 2026-09-06 |\n",
+        "row_sha256": "85d112ea93f9574a6cfbefef1c4eb64337dde3da74269f7c09bbfa9fece0b826",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_txu0304_sces935a.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-017",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 948,
+        "row_sha256": "1ffc33c021ae361e58d96535d72d9cc52b25f63c9d8788c063d222f0caf6081a",
+        "row": null,
+        "exact_body_in_public": false,
+        "row_withheld_reason": "One private provenance location; exact original retained in private author handoff and original-source record",
+        "public_safe_representation": "| DS-IFACE-017 | `datasheets/texasinstruments_txu0304_sces935a.md` | p8-9, 7.5; p14, 7.11; p18 test load | Tables/figures named in locator; otherwise unnumbered | p8-9, 7.5; p14, 7.11; p18 test load | Data / OE capacitance [TYP]: TYP=4 / 3.5 pF in the -40..125C TYP columns; MAX=UNKNOWN (blank source cells). Conditions: VCCA=VCCB=3.3V; data Cio: OE=GND, VO=1.65V DC +1MHz -16dBm sine; OE Ci: VI=3.3V or GND. These typical device values cannot bound actual load; board, protection, fixture and cable parasitics remain additional. Earlier MAX classification corrected under ECO-123 / LOCAL-HR-DRIVER-001 on2026-09-09; original sealed snapshots preserved, see [private provenance reference omitted]. OE disable to B [MAX]: MAX=38 / 42 ns. Conditions: Both rails 3.3+/-0.3V; -40..85 / -40..125C. Lower test-band endpoint 3.0V; does not cover 2.97V. Source registration only; no service/part/safety acceptance. | Component Engineer; category correction from Hardware Reviewer, serially published by Hardware Lead | 2026-09-06; correction2026-09-09 |\n",
+        "public_safe_representation_sha256": "f84949d204c21bfb1942d2c0128bd6ec631fa3a8a922f4f6c5c0e81a43e0bf6a"
+      },
+      "public_target": {
+        "row": "| DS-IFACE-017 | `datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md` | p8-9, 7.5; p14, 7.11; p18 test load | Tables/figures named in locator; otherwise unnumbered | p8-9, 7.5; p14, 7.11; p18 test load | Data / OE capacitance [TYP]: TYP=4 / 3.5 pF in the -40..125C TYP columns; MAX=UNKNOWN (blank source cells). Conditions: VCCA=VCCB=3.3V; data Cio: OE=GND, VO=1.65V DC +1MHz -16dBm sine; OE Ci: VI=3.3V or GND. These typical device values cannot bound actual load; board, protection, fixture and cable parasitics remain additional. Earlier MAX classification corrected under ECO-123 / LOCAL-HR-DRIVER-001 on2026-09-09; original sealed snapshots preserved, see [private provenance reference omitted]. OE disable to B [MAX]: MAX=38 / 42 ns. Conditions: Both rails 3.3+/-0.3V; -40..85 / -40..125C. Lower test-band endpoint 3.0V; does not cover 2.97V. Source registration only; no service/part/safety acceptance. | Component Engineer; category correction from Hardware Reviewer, serially published by Hardware Lead | 2026-09-06; correction2026-09-09 |\n",
+        "row_sha256": "01a7a729cb73829d3a8986d7b1541b643880a8b3821eab19b6fbbafcaaf13caf",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "PRIVATE_LOCATION_REDACTION",
+          "cell_index_zero_based": 5,
+          "column": "Parameter / Claim supported",
+          "source_location_sha256": "d34b54b2ec943639ad1da42c6c1004a922ecc59afdda34a8df0f16737fce9a76",
+          "source_location_utf8_bytes": 55,
+          "replacement": "[private provenance reference omitted]",
+          "all_other_cell_text_unchanged": true,
+          "exact_old_location_in_public": false
+        },
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_txu0304_sces935a.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-018",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 949,
+        "row_sha256": "cb0960dd4c7a07f86dfe7e14186acfce450c87081445a7c5b3e9d631b7572033",
+        "row": "| DS-IFACE-018 | `datasheets/texasinstruments_txu0304_sces935a.md` | p21, 9.3; p22, 9.3.7 | Tables/figures named in locator; otherwise unnumbered | p21, 9.3; p22, 9.3.7 | Data pulldown [TYP]: TYP=5 Mohm. Conditions: Integrated bias. Not guaranteed UART parking. Supply sequencing [REF]:  . Conditions: Either-order turn-on/off without erroneous input/output glitches. Positive support retained; does not supervise an independently powered target. Source registration only; no service/part/safety acceptance. | Component Engineer | 2026-09-06 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-018 | `datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md` | p21, 9.3; p22, 9.3.7 | Tables/figures named in locator; otherwise unnumbered | p21, 9.3; p22, 9.3.7 | Data pulldown [TYP]: TYP=5 Mohm. Conditions: Integrated bias. Not guaranteed UART parking. Supply sequencing [REF]:  . Conditions: Either-order turn-on/off without erroneous input/output glitches. Positive support retained; does not supervise an independently powered target. Source registration only; no service/part/safety acceptance. | Component Engineer | 2026-09-06 |\n",
+        "row_sha256": "debe49b7cdc60992da2155ed0eb1a3ed8d4b00a54fb83d86b38f07e6e75f3a68",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_txu0304_sces935a.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-039",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 1125,
+        "row_sha256": "844adc1c24e96c08ad930f59fd2812248dc58c5da837429f25e106abd7b1eacd",
+        "row": "| DS-IFACE-039 | `datasheets/texasinstruments_sn74lvc1g74_sces794g.md` | 6.3/6.5/6.6/6.7;Fig7-1 switching conditions | Named tables/figures; parameter locators retained | 6-8 | SN74LVC1G74 timing at3.3V/-40..125C retains source load. Recovery/setup/hold and pulse minima are requirements, not generated-pulse guarantees.1.5V is retention, not operation. Ioff applies at specified zero-supply test; default Q below valid power is not supplied by this timing table. Named parameter coverage: VCC [ROC]: MIN=1.65, MAX=5.5 V; DCT/DCU -40..125C; retention1.5V is not operation (p6). Ioff [EC]: MIN=-10, MAX=10 uA; VCC0;VI orVO5.5V (p7). Static ICC [EC]: MAX=10 uA; IO0;VI rail/GND (p7). CLR to Q delay [EC]: MIN=1.7, MAX=7.9 ns; 3.3V;-40..125C; Fig7-1 test load; not system off latency (p7). CLK/CLR pulse width [REQ]: MIN=2.7 ns; 3.3V;-40..125C; setup1.3ns;hold1.2ns;clear-inactive recovery1.2ns (p7). Input rise/fall rate [REQ]: MAX=10 ns/V; 3.3V+/-0.3; no slow RC directly into ordinary LVC input (p6). | Component Engineer, serialized C3 | 2026-09-06 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-039 | `datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md` | 6.3/6.5/6.6/6.7;Fig7-1 switching conditions | Named tables/figures; parameter locators retained | 6-8 | SN74LVC1G74 timing at3.3V/-40..125C retains source load. Recovery/setup/hold and pulse minima are requirements, not generated-pulse guarantees.1.5V is retention, not operation. Ioff applies at specified zero-supply test; default Q below valid power is not supplied by this timing table. Named parameter coverage: VCC [ROC]: MIN=1.65, MAX=5.5 V; DCT/DCU -40..125C; retention1.5V is not operation (p6). Ioff [EC]: MIN=-10, MAX=10 uA; VCC0;VI orVO5.5V (p7). Static ICC [EC]: MAX=10 uA; IO0;VI rail/GND (p7). CLR to Q delay [EC]: MIN=1.7, MAX=7.9 ns; 3.3V;-40..125C; Fig7-1 test load; not system off latency (p7). CLK/CLR pulse width [REQ]: MIN=2.7 ns; 3.3V;-40..125C; setup1.3ns;hold1.2ns;clear-inactive recovery1.2ns (p7). Input rise/fall rate [REQ]: MAX=10 ns/V; 3.3V+/-0.3; no slow RC directly into ordinary LVC input (p6). | Component Engineer, serialized C3 | 2026-09-06 |\n",
+        "row_sha256": "4205e59e3c2396562501367b0f46b79d4aee3c94571b87a7106b2a9abb9f4591",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_sn74lvc1g74_sces794g.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-040",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 1126,
+        "row_sha256": "4a5cbb00f2f4a387a6dd89e5b3ba61dd5914418153e6e6557c38777e0caec303",
+        "row": "| DS-IFACE-040 | `datasheets/texasinstruments_sn74lvc1g74_sces794g.md` | Pin/function table; orderable appendix | Named tables/figures; parameter locators retained | 4,10-11,15 | SN74LVC1G74DCTR DCT8:1CLK,2D,3/Q,4GND,5Q,6/CLR,7/PRE,8VCC. Positive-edge FF with asynchronous controls, not an intrinsic fresh-arm protocol or safe power-up state. Clear/preset simultaneous-state restrictions must remain in actual design. Retrieved exact DCTR Active/Production. Two-memory/recovery/STOP logic remains a proposal. | Component Engineer, serialized C3 | 2026-09-06 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-040 | `datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md` | Pin/function table; orderable appendix | Named tables/figures; parameter locators retained | 4,10-11,15 | SN74LVC1G74DCTR DCT8:1CLK,2D,3/Q,4GND,5Q,6/CLR,7/PRE,8VCC. Positive-edge FF with asynchronous controls, not an intrinsic fresh-arm protocol or safe power-up state. Clear/preset simultaneous-state restrictions must remain in actual design. Retrieved exact DCTR Active/Production. Two-memory/recovery/STOP logic remains a proposal. | Component Engineer, serialized C3 | 2026-09-06 |\n",
+        "row_sha256": "3670cfda1ff736172fe8eca36c643ca2689968a63b91314479b909d26612ed42",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_sn74lvc1g74_sces794g.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-043",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 1133,
+        "row_sha256": "e69519481680df93467e2d203ceb4e36ab00d4ea5168453c9f67962e96670f39",
+        "row": "| DS-IFACE-043 | `datasheets/texasinstruments_sn74axc4t774_sces898c.md` | 4 pin functions; power-domain control | Named tables/figures; parameter locators retained | 3-6 | SN74AXC4T774PWR PW:1/2DIR1/2,3-6A1-4,7/8DIR3/4,9/OE,10GND,11-14B4-1,15VCCB,16VCCA. BQB/RSV mappings differ. Voltage/current/isolation scopes reuse DS-IFACE-003. Local disabled high-Z needs local default pulls; no new GPIO, galvanic isolation or whole-reference-loss protection. | Component Engineer, serialized C3 | 2026-09-06 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-043 | `datasheets/public-references-rev5/texasinstruments_sn74axc4t774_sces898c.md` | 4 pin functions; power-domain control | Named tables/figures; parameter locators retained | 3-6 | SN74AXC4T774PWR PW:1/2DIR1/2,3-6A1-4,7/8DIR3/4,9/OE,10GND,11-14B4-1,15VCCB,16VCCA. BQB/RSV mappings differ. Voltage/current/isolation scopes reuse DS-IFACE-003. Local disabled high-Z needs local default pulls; no new GPIO, galvanic isolation or whole-reference-loss protection. | Component Engineer, serialized C3 | 2026-09-06 |\n",
+        "row_sha256": "59031c85db5e3c04354aa87c7544e0d753543ee3fcce658557fed16a6cf327e3",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_sn74axc4t774_sces898c.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_sn74axc4t774_sces898c.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_sn74axc4t774_sces898c.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-055",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 128,
+        "row_sha256": "be867c6ffdbebe0be572cf970fa5da943fd4666d9321032f8c96be0963c21cf5",
+        "row": "| DS-IFACE-055 | `datasheets/texasinstruments_txu0304_sces935a.md` | 9.1; 9.3.1-9.3.7 | Functional descriptions; Figure9-1 | 20-22 | TXU0304 functional/reference scope: Schmitt inputs; slow edges increase dynamic current. Input pulldowns5Mohm TYP; external pullup, if needed, recommended no larger than1Mohm. OE VCC(MIN)/overvoltage-tolerant circuitry permits either-rail reference. Either supply below100mV or disconnected disables outputs when complementary supply is within ROC; keep inputs low before disconnecting per recommendation. Either-order glitch-free sequencing is a device statement, not independent endpoint supervision, all-pin arbitrary-ramp or motor-inhibit proof. Existing DS-IFACE-002/014-018 remain separately scoped. | Component Engineer proposal; Hardware Lead primary-checked serial publication | 2026-09-08 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-055 | `datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md` | 9.1; 9.3.1-9.3.7 | Functional descriptions; Figure9-1 | 20-22 | TXU0304 functional/reference scope: Schmitt inputs; slow edges increase dynamic current. Input pulldowns5Mohm TYP; external pullup, if needed, recommended no larger than1Mohm. OE VCC(MIN)/overvoltage-tolerant circuitry permits either-rail reference. Either supply below100mV or disconnected disables outputs when complementary supply is within ROC; keep inputs low before disconnecting per recommendation. Either-order glitch-free sequencing is a device statement, not independent endpoint supervision, all-pin arbitrary-ramp or motor-inhibit proof. Existing DS-IFACE-002/014-018 remain separately scoped. | Component Engineer proposal; Hardware Lead primary-checked serial publication | 2026-09-08 |\n",
+        "row_sha256": "3dd0380548f86f4496fb815e9e8dda036e7651333b17644fd805d8ec8d8357cf",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_txu0304_sces935a.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-056",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 129,
+        "row_sha256": "7275835663122de7efa1c090a987bac018128aa438cb6595e7c935ad1af1c3fc",
+        "row": "| DS-IFACE-056 | `datasheets/texasinstruments_txu0304_sces935a.md` | 7.3; 7.5 | Electrical table; footnotes3-5 | 6-9 | ROC output-current point at VCCO3V: IOH-10mA/IOL+10mA, not endpoint load adoption. Electrical MIN VOH2.2V at IOH-10mA and both rails3V, VI=VT+(MAX); MAX VOL0.8V at IOL10mA and both rails3V, VI=VT-(MIN), each-40..125C. Separate light-load row: VOH MIN VCCO-0.1V at-0.1mA; VOL MAX0.1V at+0.1mA, rails1.1..5.5V and same input-test footnotes. A/B port Ioff MIN/MAX-2.5/+2.5uA at one rail0/other0..5.5V and VI/VO0..5.5V,-40..125C. Ioff-float same bounds only VI/VO=GND; floating node is externally undriven with leakage not exceeding10nA. IOZ MIN/MAX-2/+2uA with both rails1.1..5.5V, OE=GND, VI=VCCI orGND, VO=VCCO orGND,-40..125C. No interpolation of current/supply guarantees, all-state leakage sum, actual HIGH/LOW load or arbitrary brownout qualification. | Component Engineer proposal; Hardware Lead primary-checked serial publication | 2026-09-08 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-056 | `datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md` | 7.3; 7.5 | Electrical table; footnotes3-5 | 6-9 | ROC output-current point at VCCO3V: IOH-10mA/IOL+10mA, not endpoint load adoption. Electrical MIN VOH2.2V at IOH-10mA and both rails3V, VI=VT+(MAX); MAX VOL0.8V at IOL10mA and both rails3V, VI=VT-(MIN), each-40..125C. Separate light-load row: VOH MIN VCCO-0.1V at-0.1mA; VOL MAX0.1V at+0.1mA, rails1.1..5.5V and same input-test footnotes. A/B port Ioff MIN/MAX-2.5/+2.5uA at one rail0/other0..5.5V and VI/VO0..5.5V,-40..125C. Ioff-float same bounds only VI/VO=GND; floating node is externally undriven with leakage not exceeding10nA. IOZ MIN/MAX-2/+2uA with both rails1.1..5.5V, OE=GND, VI=VCCI orGND, VO=VCCO orGND,-40..125C. No interpolation of current/supply guarantees, all-state leakage sum, actual HIGH/LOW load or arbitrary brownout qualification. | Component Engineer proposal; Hardware Lead primary-checked serial publication | 2026-09-08 |\n",
+        "row_sha256": "b948279b848d27086a0eecb12b047e177f01fa0535b5b01419dc3b84f6caba90",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_txu0304_sces935a.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-057",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 130,
+        "row_sha256": "9702ce44a22f8733d5ce16b7b9929d0da4c41425baacdf3f822204f2a2e764f4",
+        "row": "| DS-IFACE-057 | `datasheets/texasinstruments_txu0304_sces935a.md` | 7.11; 8.1 | Switching table; Table8-1/Figure8-1 | 14; 18 | Both rails3.3+/-0.3V,-40..125C: propagation A-to-B and B-to-A MIN/MAX0.5/11ns; OE-to-A disable15.3/39ns, OE-to-B18.5/42ns. Test CL5pF includes fixture/probe, RL10k; propagation S1open, enable/disable S1GND or2VCCO with VTP0.3V. Generator1MHz,50ohm,edge<=1ns/V. These source-specific loading/measurement bounds are not actual interface delay, rail-collapse margin, guaranteed software timing or motor-stop time. | Component Engineer proposal; Hardware Lead primary-checked serial publication | 2026-09-08 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-057 | `datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md` | 7.11; 8.1 | Switching table; Table8-1/Figure8-1 | 14; 18 | Both rails3.3+/-0.3V,-40..125C: propagation A-to-B and B-to-A MIN/MAX0.5/11ns; OE-to-A disable15.3/39ns, OE-to-B18.5/42ns. Test CL5pF includes fixture/probe, RL10k; propagation S1open, enable/disable S1GND or2VCCO with VTP0.3V. Generator1MHz,50ohm,edge<=1ns/V. These source-specific loading/measurement bounds are not actual interface delay, rail-collapse margin, guaranteed software timing or motor-stop time. | Component Engineer proposal; Hardware Lead primary-checked serial publication | 2026-09-08 |\n",
+        "row_sha256": "d07c87616ab152f825f048b794ef15fb22f4fee51a3faa9e500b24191393f542",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_txu0304_sces935a.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-058",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 131,
+        "row_sha256": "9a0075764063efd5b567ea3d13f1f8b8ba0c0a1b21e2a9b10c228be3565de9d7",
+        "row": "| DS-IFACE-058 | `datasheets/texasinstruments_txu0304_sces935a.md` | 7.1; 7.3 | AMR and ROC tables | 5-6 | AMR supplies/data/OE inputs and high-Z/power-off output voltage MIN/MAX-0.5/6.5V; active-output AMR upper VCCA+0.5 orVCCB+0.5 is a distinct row. AMR current/clamp footnotes are stress allowances, not selected protection. ROC data/control input0..5.5V; active output0..VCCO versus tri-state0..5.5V. Supply ROC1.08..5.5V and TA-40..125C remain distinct from AMR. No downstream DRV injection/current allowance follows. | Component Engineer proposal; Hardware Lead primary-checked serial publication | 2026-09-08 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-058 | `datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md` | 7.1; 7.3 | AMR and ROC tables | 5-6 | AMR supplies/data/OE inputs and high-Z/power-off output voltage MIN/MAX-0.5/6.5V; active-output AMR upper VCCA+0.5 orVCCB+0.5 is a distinct row. AMR current/clamp footnotes are stress allowances, not selected protection. ROC data/control input0..5.5V; active output0..VCCO versus tri-state0..5.5V. Supply ROC1.08..5.5V and TA-40..125C remain distinct from AMR. No downstream DRV injection/current allowance follows. | Component Engineer proposal; Hardware Lead primary-checked serial publication | 2026-09-08 |\n",
+        "row_sha256": "01e87b201dff5b76ed363e94e61db0894eac4f6d43c8e804629b60eed9b5cf7c",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_txu0304_sces935a.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-063",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 92,
+        "row_sha256": "05042022dd552fca71e1730c52d0dc841bca536a55911ed01d05faafc328d023",
+        "row": "| DS-IFACE-063 | `datasheets/texasinstruments_tca9517_scps242d.md` | 6; packaging addendum | DGK top view/Pin Functions; exact orderable row | 4; PDF18 | Exact TCA9517DGKR DGK VSSOP8:1VCCA,2SCLA,3SDAA,4GND,5EN,6SDAB,7SCLB,8VCCB. SDA/SCL are I/O; EN is input. Both bus sides require external pullups to their corresponding supplies; unused bus pins connect GND per table. Not TCA9517A, footprint adoption or a populated circuit. Existing orderable/lifecycle scope remains DS-IFACE-007. | Component proposal; Hardware Lead primary-checked serial publication | 2026-09-08 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-063 | `datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md` | 6; packaging addendum | DGK top view/Pin Functions; exact orderable row | 4; PDF18 | Exact TCA9517DGKR DGK VSSOP8:1VCCA,2SCLA,3SDAA,4GND,5EN,6SDAB,7SCLB,8VCCB. SDA/SCL are I/O; EN is input. Both bus sides require external pullups to their corresponding supplies; unused bus pins connect GND per table. Not TCA9517A, footprint adoption or a populated circuit. Existing orderable/lifecycle scope remains DS-IFACE-007. | Component proposal; Hardware Lead primary-checked serial publication | 2026-09-08 |\n",
+        "row_sha256": "221c1c0f6620e8845a76e6c0c9d742f3c91149909ea894358953cf26dee075f0",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_tca9517_scps242d.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-064",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 93,
+        "row_sha256": "4be6859c2dc841f9b16fb59abfb3ffa299f7822aceaf6ccce12648c12162711f",
+        "row": "| DS-IFACE-064 | `datasheets/texasinstruments_tca9517_scps242d.md` | 7.3/7.5; 9.2/9.3.2/9.4 | Electrical tables; block diagram; Table1 | 5-6; 10-11 | EN has an internal pullup to VCCB, resistance/tolerance not specified. EN VIH MIN0.7*VCCB/MAX5.5V; VIL MAX0.3*VCCB. At powered table conditions VCCB2.7..5.5V,-40..85C: EN II MAX+/-1uA atVI=VCCB; II TYP-10/MAX-30uA atVI0.2V, preserving printed signed columns rather than an algebraic interval or resistor model. ENlow disables outputs; ENhigh enables logical transfer, not equal analog voltage. No open-EN disabled default, numerical disabled IOZ or all-state bias/control-current curve follows. EN changes only with both buses idle; DS-IFACE-069 separates setup/hold from missing EN-path delay. | Component proposal; Hardware Lead primary-checked serial publication | 2026-09-08 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-064 | `datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md` | 7.3/7.5; 9.2/9.3.2/9.4 | Electrical tables; block diagram; Table1 | 5-6; 10-11 | EN has an internal pullup to VCCB, resistance/tolerance not specified. EN VIH MIN0.7*VCCB/MAX5.5V; VIL MAX0.3*VCCB. At powered table conditions VCCB2.7..5.5V,-40..85C: EN II MAX+/-1uA atVI=VCCB; II TYP-10/MAX-30uA atVI0.2V, preserving printed signed columns rather than an algebraic interval or resistor model. ENlow disables outputs; ENhigh enables logical transfer, not equal analog voltage. No open-EN disabled default, numerical disabled IOZ or all-state bias/control-current curve follows. EN changes only with both buses idle; DS-IFACE-069 separates setup/hold from missing EN-path delay. | Component proposal; Hardware Lead primary-checked serial publication | 2026-09-08 |\n",
+        "row_sha256": "5faf4c07ef9e62a69a3453b5129412581436934b72b482eac14f78fb71c0a2c9",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_tca9517_scps242d.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-067",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 96,
+        "row_sha256": "ae1a1cdb5d4d4ae1f6f7e0cb5142638701978601c0fa54f144828bb1dff0a625",
+        "row": "| DS-IFACE-067 | `datasheets/texasinstruments_tca9517_scps242d.md` | 7.3/7.5; 9.3.3; 10.2.2.2 | Conditioned electrical rows and application requirements | 5-6; 11-13 | At VCCB2.7..5.5V,-40..85C: B VOL MIN/TYP/MAX0.45/0.52/0.60V atIOL100uA OR6mA,VILA=VILB0V; A VOL TYP/MAX0.1/0.2V at6mA. These are stated tests, not an interpolated load envelope. B VILC0.4V and VOL-minus-VILC70mV are printed TYP; the latter is ensured by design. Separate functional/application text requires input70mV or more below driven LOW and external B devices below0.4V; application guidance is not a new guaranteed threshold range. Do not subtract unequal corners. B-to-B static-offset cascade and B-side rise-time accelerator constraints remain. Powered bus II MAX+/-1uA atVI=VCCB (also A row),10uA atVI0.2V; IOH MAX10uA atVO3.6V. These are not active VOH, disabled IOZ/Ioff or arbitrary push-pull contention permission. | Component proposal; Hardware Lead primary-checked serial publication | 2026-09-08 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-067 | `datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md` | 7.3/7.5; 9.3.3; 10.2.2.2 | Conditioned electrical rows and application requirements | 5-6; 11-13 | At VCCB2.7..5.5V,-40..85C: B VOL MIN/TYP/MAX0.45/0.52/0.60V atIOL100uA OR6mA,VILA=VILB0V; A VOL TYP/MAX0.1/0.2V at6mA. These are stated tests, not an interpolated load envelope. B VILC0.4V and VOL-minus-VILC70mV are printed TYP; the latter is ensured by design. Separate functional/application text requires input70mV or more below driven LOW and external B devices below0.4V; application guidance is not a new guaranteed threshold range. Do not subtract unequal corners. B-to-B static-offset cascade and B-side rise-time accelerator constraints remain. Powered bus II MAX+/-1uA atVI=VCCB (also A row),10uA atVI0.2V; IOH MAX10uA atVO3.6V. These are not active VOH, disabled IOZ/Ioff or arbitrary push-pull contention permission. | Component proposal; Hardware Lead primary-checked serial publication | 2026-09-08 |\n",
+        "row_sha256": "0a3c038fc141e2c41b6eb5e353dbce13febc6059e4b021069d5ae5b52175b127",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_tca9517_scps242d.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-069",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 98,
+        "row_sha256": "9feb604b11b319ecc42575cdec514e114bb5cd278db1ca39f7aa802b31c83c1a",
+        "row": "| DS-IFACE-069 | `datasheets/texasinstruments_tca9517_scps242d.md` | 7.6/7.7; 8; 9.3.4/9.3.5; 10/11 | Timing tables/footnotes; Figures3-6; application | 6-7; 9; 11-15 | EN HIGH setup before START and hold after STOP each MIN100ns with both buses idle; no EN-to-output maximum is supplied by the SCL/SDA FROM/TO switching table. Generic ten/tdis aliases onp9 are not EN-path tests. Switching values use VCCB2.7..5.5V,-40..85C and source loads: p7 B1.35k/50pF,A167ohm/57pF, whilep9 uses A450ohm at3.0..5.5V and167ohm at0.9..2.7V; drawing labels57pF. Preserve this fixture ambiguity, transition figure/direction and low-VCCA TYP-column caveats rather than selecting convenient values. DefaultTYP3.3V/25C except marked2.7V rows. Standard/Fast mode and application400kHz/two400pF buses do not guarantee actual4.75k timing. Clock-stretch handoff overshoot requires attention. No RC boot mask, asynchronous stuck-bus isolation, exact-part EN deadline or actual three-bus performance is qualified. | Component proposal; Hardware Lead primary-checked serial publication | 2026-09-08 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-069 | `datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md` | 7.6/7.7; 8; 9.3.4/9.3.5; 10/11 | Timing tables/footnotes; Figures3-6; application | 6-7; 9; 11-15 | EN HIGH setup before START and hold after STOP each MIN100ns with both buses idle; no EN-to-output maximum is supplied by the SCL/SDA FROM/TO switching table. Generic ten/tdis aliases onp9 are not EN-path tests. Switching values use VCCB2.7..5.5V,-40..85C and source loads: p7 B1.35k/50pF,A167ohm/57pF, whilep9 uses A450ohm at3.0..5.5V and167ohm at0.9..2.7V; drawing labels57pF. Preserve this fixture ambiguity, transition figure/direction and low-VCCA TYP-column caveats rather than selecting convenient values. DefaultTYP3.3V/25C except marked2.7V rows. Standard/Fast mode and application400kHz/two400pF buses do not guarantee actual4.75k timing. Clock-stretch handoff overshoot requires attention. No RC boot mask, asynchronous stuck-bus isolation, exact-part EN deadline or actual three-bus performance is qualified. | Component proposal; Hardware Lead primary-checked serial publication | 2026-09-08 |\n",
+        "row_sha256": "924c8b087ab600893dc7ebdba2c6b52d59d22194b16ce37e9848937709977155",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_tca9517_scps242d.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-070",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 75,
+        "row_sha256": "ad9572151160e16d6f890c94496f955e43da723c8d0233f87f9427fffb6fdfe1",
+        "row": "| DS-IFACE-070 | `datasheets/texasinstruments_tmux1511_scds390b.md` | 4; 7.4/7.5; packaging addendum | PW top view/Pin Functions; Table7-1; exact orderable | 3; 22; PDF31 | TMUX1511PWR TSSOP(PW)14:1SEL1,2S1,3D1,4SEL2,5S2,6D2,7GND,8D3,9S3,10SEL3,11D4,12S4,13SEL4,14VDD. Four independently controlled bilateral SPST channels; S/D are I/O; SEL LOW=open/HIGH=conducting. Dated addendum lists Active/Production, not current stock or future lifecycle guarantee. Pin identity is not an adopted footprint or installed switch. PROPOSED_SOURCE_CLAIM-TMUX1511-IDENTITY mapping only. | Component proposal; Hardware Lead serial primary-checked publication | 2026-09-08 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-070 | `datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md` | 4; 7.4/7.5; packaging addendum | PW top view/Pin Functions; Table7-1; exact orderable | 3; 22; PDF31 | TMUX1511PWR TSSOP(PW)14:1SEL1,2S1,3D1,4SEL2,5S2,6D2,7GND,8D3,9S3,10SEL3,11D4,12S4,13SEL4,14VDD. Four independently controlled bilateral SPST channels; S/D are I/O; SEL LOW=open/HIGH=conducting. Dated addendum lists Active/Production, not current stock or future lifecycle guarantee. Pin identity is not an adopted footprint or installed switch. PROPOSED_SOURCE_CLAIM-TMUX1511-IDENTITY mapping only. | Component proposal; Hardware Lead serial primary-checked publication | 2026-09-08 |\n",
+        "row_sha256": "2e371e41d349a435f0cc5e2410bb3363dd80a3f3fa202bcbf8d2c9c775ac2e91",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_tmux1511_scds390b.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-071",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 76,
+        "row_sha256": "311518d7fe1f657d8ba47f0d1544da7cd2893db58ee07769b81ff66e7dde1465",
+        "row": "| DS-IFACE-071 | `datasheets/texasinstruments_tmux1511_scds390b.md` | 5.1/5.3; 7.3.1/2/4/5 | AMR/ROC and footnotes | 4; 21-22 | AMR VDD/SEL/S/D -0.5..6V, SEL current +/-30mA, S/D continuous +/-25mA: stress only, not functional loads. ROC VDD1.5..5.5V,TA-40..125C; S/D0..min(2*VDD,5.5V) whenVDD>=1.5V; S/D0..3.6V whenVDD<1.5V; SEL0..5.5V. Positive subthreshold voltage range is not all-ramp leakage or a disconnect deadline. Documentary grounded-off protection covers signal I/Os to3.6V atVDD0 and references electrical leakage conditions; reciprocal/both-terminal/SEL numeric limits remain separately unproved. PROPOSED_SOURCE_CLAIM-TMUX1511-LIMITS mapping. | Component proposal; Hardware Lead serial primary-checked publication | 2026-09-08 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-071 | `datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md` | 5.1/5.3; 7.3.1/2/4/5 | AMR/ROC and footnotes | 4; 21-22 | AMR VDD/SEL/S/D -0.5..6V, SEL current +/-30mA, S/D continuous +/-25mA: stress only, not functional loads. ROC VDD1.5..5.5V,TA-40..125C; S/D0..min(2*VDD,5.5V) whenVDD>=1.5V; S/D0..3.6V whenVDD<1.5V; SEL0..5.5V. Positive subthreshold voltage range is not all-ramp leakage or a disconnect deadline. Documentary grounded-off protection covers signal I/Os to3.6V atVDD0 and references electrical leakage conditions; reciprocal/both-terminal/SEL numeric limits remain separately unproved. PROPOSED_SOURCE_CLAIM-TMUX1511-LIMITS mapping. | Component proposal; Hardware Lead serial primary-checked publication | 2026-09-08 |\n",
+        "row_sha256": "83bebefd9d9af87bd79aea0208616b46f2eec1959efe8afb048caa75c5a53ea4",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_tmux1511_scds390b.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-072",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 77,
+        "row_sha256": "a57403407854ca650d9737dbd39eaf602a532e5ad587e669d59dc7bab364a578",
+        "row": "| DS-IFACE-072 | `datasheets/texasinstruments_tmux1511_scds390b.md` | 5.5; 6.1-6.4 | DC table; Figures6-1..6-4 | 6; 13-14 | Powered table VDD1.5..5.5V,GND0,TA-40..125C,TYP3.3V/25C unless overridden. RON TYP2/MAX4.5ohm atISD8mA,VS0..min(2*VDD,5.5V), not an all-current envelope. IDD TYP37/MAX70uA atVSEL0/1.4V/VDD,VS0..5.5V subject toROC, per complete package, not off-supply current. Powered OFF IS/ID +/-100nA at opposite0.2/0.8*VDD terminal points. ON leakage +/-50nA with other data pin floating, not supply floating. Grounded-off IPOFF +/-2uA: VDD0,VS0..3.6V,VD0,full temperature; +/-10nA onlyVS<=3V/25C. Figure6-4/section6.4 define SOURCE-pin current; no reciprocal drivenD/S0, both arbitrary nonzero terminals, SEL current, floating rail or actual equilibrium guarantee follows. PROPOSED_SOURCE_CLAIM-TMUX1511-DC mapping. | Component proposal; Hardware Lead serial primary-checked publication | 2026-09-08 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-072 | `datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md` | 5.5; 6.1-6.4 | DC table; Figures6-1..6-4 | 6; 13-14 | Powered table VDD1.5..5.5V,GND0,TA-40..125C,TYP3.3V/25C unless overridden. RON TYP2/MAX4.5ohm atISD8mA,VS0..min(2*VDD,5.5V), not an all-current envelope. IDD TYP37/MAX70uA atVSEL0/1.4V/VDD,VS0..5.5V subject toROC, per complete package, not off-supply current. Powered OFF IS/ID +/-100nA at opposite0.2/0.8*VDD terminal points. ON leakage +/-50nA with other data pin floating, not supply floating. Grounded-off IPOFF +/-2uA: VDD0,VS0..3.6V,VD0,full temperature; +/-10nA onlyVS<=3V/25C. Figure6-4/section6.4 define SOURCE-pin current; no reciprocal drivenD/S0, both arbitrary nonzero terminals, SEL current, floating rail or actual equilibrium guarantee follows. PROPOSED_SOURCE_CLAIM-TMUX1511-DC mapping. | Component proposal; Hardware Lead serial primary-checked publication | 2026-09-08 |\n",
+        "row_sha256": "0704297eb72d40e8a3c9032389f888f1641b2905f2d2a6e8737a267bd6acab23",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_tmux1511_scds390b.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-073",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 78,
+        "row_sha256": "76e70de06b3dfd4b91c2ed49455b4749a04a473e9dc0f3067fe129f684d3e359",
+        "row": "| DS-IFACE-073 | `datasheets/texasinstruments_tmux1511_scds390b.md` | 5.5; 7.3.5/7; 7.4/7.5 | Logic table; Table7-1 | 6; 22 | Powered-table SEL VIL MAX0.45V and VIH MIN1.2V. IIH/IIL MAX+/-2uA only atVSEL1.8V/VDD and0V respectively, with powered table conditions; no VDD0/float/all-node-current bound. Internal RPD6Mohm is TYP, CI3pF TYP. Documentary weak-pulldown/power-on-disabled behavior does not supply resistor corners, external leakage tolerance or wrongly driven/retained-HIGH rejection. Fail-safe logic voltage to5.5V regardless of supply state is not fail-LOW safety logic, zero backfeed or independent veto. PROPOSED_SOURCE_CLAIM-TMUX1511-CONTROL mapping. | Component proposal; Hardware Lead serial primary-checked publication | 2026-09-08 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-073 | `datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md` | 5.5; 7.3.5/7; 7.4/7.5 | Logic table; Table7-1 | 6; 22 | Powered-table SEL VIL MAX0.45V and VIH MIN1.2V. IIH/IIL MAX+/-2uA only atVSEL1.8V/VDD and0V respectively, with powered table conditions; no VDD0/float/all-node-current bound. Internal RPD6Mohm is TYP, CI3pF TYP. Documentary weak-pulldown/power-on-disabled behavior does not supply resistor corners, external leakage tolerance or wrongly driven/retained-HIGH rejection. Fail-safe logic voltage to5.5V regardless of supply state is not fail-LOW safety logic, zero backfeed or independent veto. PROPOSED_SOURCE_CLAIM-TMUX1511-CONTROL mapping. | Component proposal; Hardware Lead serial primary-checked publication | 2026-09-08 |\n",
+        "row_sha256": "1a3c9d6b229760cb2c0c14d26bd3efa968ba41262217082fb9da2b2826168a10",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_tmux1511_scds390b.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-074",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 79,
+        "row_sha256": "a33aaa3718c67391721191344b5474b72eb53c82aef72eadc9f276a435cb893f",
+        "row": "| DS-IFACE-074 | `datasheets/texasinstruments_tmux1511_scds390b.md` | 5.6/5.7; 6.5-6.8 | Dynamic/timing tables; Figures6-5..6-8 | 7; 15-17 | COFF MAX4pF/CON MAX6pF atVS=VDD/2,f1MHz,SEL0/VDD; not arbitrary edge-coupling limits. Charge injection2pC, off-isolation and interchannel data skew10ps are TYP, not all-pole abort bounds. Control transition MAX55ns atVDD2.5..5.5V,VS=VDD,RL200ohm/CL15pF, control edges<5ns and Figure6-5 output markers; not detection-to-isolation or time to leakage. Supply ON MAX60us/OFF MAX4us usesVS3.6V,1us supply ramps,SEL=VDD,RL200ohm/CL15pF and Figure6-6 1.5V supply/90% output markers. No arbitrary ramp, dead-domain control, interpackage skew or numerical off-leakage-attainment timing follows. PROPOSED_SOURCE_CLAIM-TMUX1511-DYNAMIC mapping. | Component proposal; Hardware Lead serial primary-checked publication | 2026-09-08 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-074 | `datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md` | 5.6/5.7; 6.5-6.8 | Dynamic/timing tables; Figures6-5..6-8 | 7; 15-17 | COFF MAX4pF/CON MAX6pF atVS=VDD/2,f1MHz,SEL0/VDD; not arbitrary edge-coupling limits. Charge injection2pC, off-isolation and interchannel data skew10ps are TYP, not all-pole abort bounds. Control transition MAX55ns atVDD2.5..5.5V,VS=VDD,RL200ohm/CL15pF, control edges<5ns and Figure6-5 output markers; not detection-to-isolation or time to leakage. Supply ON MAX60us/OFF MAX4us usesVS3.6V,1us supply ramps,SEL=VDD,RL200ohm/CL15pF and Figure6-6 1.5V supply/90% output markers. No arbitrary ramp, dead-domain control, interpackage skew or numerical off-leakage-attainment timing follows. PROPOSED_SOURCE_CLAIM-TMUX1511-DYNAMIC mapping. | Component proposal; Hardware Lead serial primary-checked publication | 2026-09-08 |\n",
+        "row_sha256": "564c9485c845267ecce51de3c6d32fd3fc1b8151b0cc049f2656ee0be35e0e4f",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_tmux1511_scds390b.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-IFACE-075",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 58,
+        "row_sha256": "39360b34ea388280e5ff235e2d73cb3ac330d39a3af4c914f0c430c79a692e54",
+        "row": "| DS-IFACE-075 | `datasheets/texasinstruments_sn74lvc1g74_sces794g.md` | 6.3/6.5; 8.1/8.4 | ROC/DC tables; Table8-1 and note1 | 6-7; 10 | Supplemental DCTR control conditions, not replacement of DS-IFACE-039/040. ROC input VI0..5.5V; at VCC3.0..3.6V, VIH MIN2V and VIL MAX0.8V. Over DCT recommended -40..125C range, VOH MIN(VCC-0.1)V only at IOH-100uA and VOL MAX0.1V only at IOL100uA, VCC1.65..5.5V; not an arbitrary fanout/load surface. Data/control II MAX+/-5uA only at VI5.5V orGND,VCC0..5.5V, not a complete dead-domain current matrix. Table8-1: /PRE HIGH with /CLR LOW forces Q LOW; BOTH LOW instead produce Q and /Q HIGH in a nonstable state. No unconditional clear dominance, power-up Q guarantee, physical-cut feedback or all-issuer veto follows. Existing zero-VCC Ioff scope means outputs disabled, not Q forced LOW or retained permission; existing pulse/recovery/edge requirements remain DS-IFACE-039. | Component A2 proposal; Hardware Lead serial primary-checked supplement | 2026-09-09 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-IFACE-075 | `datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md` | 6.3/6.5; 8.1/8.4 | ROC/DC tables; Table8-1 and note1 | 6-7; 10 | Supplemental DCTR control conditions, not replacement of DS-IFACE-039/040. ROC input VI0..5.5V; at VCC3.0..3.6V, VIH MIN2V and VIL MAX0.8V. Over DCT recommended -40..125C range, VOH MIN(VCC-0.1)V only at IOH-100uA and VOL MAX0.1V only at IOL100uA, VCC1.65..5.5V; not an arbitrary fanout/load surface. Data/control II MAX+/-5uA only at VI5.5V orGND,VCC0..5.5V, not a complete dead-domain current matrix. Table8-1: /PRE HIGH with /CLR LOW forces Q LOW; BOTH LOW instead produce Q and /Q HIGH in a nonstable state. No unconditional clear dominance, power-up Q guarantee, physical-cut feedback or all-issuer veto follows. Existing zero-VCC Ioff scope means outputs disabled, not Q forced LOW or retained permission; existing pulse/recovery/edge requirements remain DS-IFACE-039. | Component A2 proposal; Hardware Lead serial primary-checked supplement | 2026-09-09 |\n",
+        "row_sha256": "74e17ca0e180ffac021190f7e0ab7db9feb10bc33b0c81dec6ff0e7da186188b",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_sn74lvc1g74_sces794g.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-MCU-102",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 561,
+        "row_sha256": "7aea76b6781d05810188bd707ad7e5783fdee8652aebdba5d3a864818b6d41d6",
+        "row": "| DS-MCU-102 | `datasheets/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md` | §§1.1/3.2/4; module-schematic boot note §8 | Tables3-1/4-1 | 2, 11–13, 39 | WROOM-1/1U expose36 GPIO labels, GPIO0–21 and35–48, in41 module pins including EPAD/GND. USB_D−/D+ are GPIO19/20 at pads13/14; UART0 TX/RX GPIO43/44 at pads37/36; EN pad3 must not float. Boot-related GPIO0/3/45/46 require reset/eFuse-aware allocation. Table3-1 footnote b reserves GPIO35/36/37 for Octal-PSRAM variants, not the R2 Quad-PSRAM candidates; footnote c assigns GPIO47/48 to1.8V on ESP32-S3R16V-based variants. Pin defaults can depend on eFuse. A GPIO-label count is not proof of interchangeable direction/ADC/PWM/peripheral resources or a qualified full-board map; no silent suffix substitution. | Component Engineer (AI agent), Rev5 exact-module proposal | 2026-09-05 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-MCU-102 | `datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md` | §§1.1/3.2/4; module-schematic boot note §8 | Tables3-1/4-1 | 2, 11–13, 39 | WROOM-1/1U expose36 GPIO labels, GPIO0–21 and35–48, in41 module pins including EPAD/GND. USB_D−/D+ are GPIO19/20 at pads13/14; UART0 TX/RX GPIO43/44 at pads37/36; EN pad3 must not float. Boot-related GPIO0/3/45/46 require reset/eFuse-aware allocation. Table3-1 footnote b reserves GPIO35/36/37 for Octal-PSRAM variants, not the R2 Quad-PSRAM candidates; footnote c assigns GPIO47/48 to1.8V on ESP32-S3R16V-based variants. Pin defaults can depend on eFuse. A GPIO-label count is not proof of interchangeable direction/ADC/PWM/peripheral resources or a qualified full-board map; no silent suffix substitution. | Component Engineer (AI agent), Rev5 exact-module proposal | 2026-09-05 |\n",
+        "row_sha256": "87763a71303c26dadc8a4f738870f52d7455983b4852e55582218c0220a0cd68",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md`",
+          "after": "`datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-MCU-120",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 741,
+        "row_sha256": "892bb1aef0c4e5106742d7b27a9c4874c5d7ae24a18c70f1bf4ce7a83d21378d",
+        "row": "| DS-MCU-120 | `datasheets/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md` | §3 Pin Definitions; §4 Boot Configurations | Table3-1; Tables4-1…4-5 | 11–16 | GPIO19/20 carry USB D−/D+; U0TXD/U0RXD correspond to GPIO43/44. Octal-memory R8/R16V modules consume GPIO35/36/37; N8R2's Quad configuration must not be silently exchanged for R8. Straps GPIO0/3/45/46 default respectively weak pull-up/floating/weak pull-down/weak pull-down. SPI boot requires GPIO0 high; joint download requires GPIO0 low and GPIO46 low. Strap setup minimum0ms/hold minimum3ms about EN; eFuse-dependent VDD_SPI/JTAG/default-pad behavior remains conditional. eFuses are one-time programmable; no burn or complete pin-map approval follows. See existing DS-MCU-102 for module pad availability. | Component Engineer, integration stage1 | 2026-09-06 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-MCU-120 | `datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md` | §3 Pin Definitions; §4 Boot Configurations | Table3-1; Tables4-1…4-5 | 11–16 | GPIO19/20 carry USB D−/D+; U0TXD/U0RXD correspond to GPIO43/44. Octal-memory R8/R16V modules consume GPIO35/36/37; N8R2's Quad configuration must not be silently exchanged for R8. Straps GPIO0/3/45/46 default respectively weak pull-up/floating/weak pull-down/weak pull-down. SPI boot requires GPIO0 high; joint download requires GPIO0 low and GPIO46 low. Strap setup minimum0ms/hold minimum3ms about EN; eFuse-dependent VDD_SPI/JTAG/default-pad behavior remains conditional. eFuses are one-time programmable; no burn or complete pin-map approval follows. See existing DS-MCU-102 for module pad availability. | Component Engineer, integration stage1 | 2026-09-06 |\n",
+        "row_sha256": "4526f712268a981303d4eba0d47a1a43b11fb9af7632a6cb76d9640754959e27",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md`",
+          "after": "`datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-MCU-121",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 742,
+        "row_sha256": "425fde049c817e58b32fd2c6ab367c520e231e9e332ef1685740a4f5616c5ea3",
+        "row": "| DS-MCU-121 | `datasheets/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md` | §4.5 Chip Power-up and Reset | Fig4-2; Table4-6 | 16 | Minimum rail-stabilization interval before EN high tSTBL=50µs; EN must stay below the specified VIL_nRST threshold for tRST≥50µs to reset. These are minimum timing requirements, distinct from the strap hold and usual RC reference, not proof that a particular ramp/RC/reset switch meets them. | Component Engineer, integration stage1 | 2026-09-06 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-MCU-121 | `datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md` | §4.5 Chip Power-up and Reset | Fig4-2; Table4-6 | 16 | Minimum rail-stabilization interval before EN high tSTBL=50µs; EN must stay below the specified VIL_nRST threshold for tRST≥50µs to reset. These are minimum timing requirements, distinct from the strap hold and usual RC reference, not proof that a particular ramp/RC/reset switch meets them. | Component Engineer, integration stage1 | 2026-09-06 |\n",
+        "row_sha256": "c9ca3b7422e4a79c5101bd59e803508707329571105c9b2b6bb8d7d5d4685153",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md`",
+          "after": "`datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-MCU-123",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 744,
+        "row_sha256": "7c17c0bb8b10dea2b6e1449ed38438aaedaa2e80c34c50204b25250a0c73e282",
+        "row": "| DS-MCU-123 | `datasheets/espressif_esp-idf-v6.1_peripherals_web-2026-09-06.md` | I2C Introduction / Master Bus configuration | i2c_master_bus_config_t | N/A — HTML | ESP32-S3 has TWO hardware I2C controllers. SDA/SCL are bidirectional open-drain lines requiring pullups; GPIO configuration is supported. Standard100kHz/Fast400kHz modes are documented, with master SCL not exceeding400kHz. Three physical pin pairs do not create a third hardware controller: software servicing or separately validated remapping remains Circuit/Firmware work. | Component Engineer, integration stage1 | 2026-09-06 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-MCU-123 | `datasheets/public-references-rev5/espressif_esp-idf-v6.1_peripherals_web-2026-09-06.md` | I2C Introduction / Master Bus configuration | i2c_master_bus_config_t | N/A — HTML | ESP32-S3 has TWO hardware I2C controllers. SDA/SCL are bidirectional open-drain lines requiring pullups; GPIO configuration is supported. Standard100kHz/Fast400kHz modes are documented, with master SCL not exceeding400kHz. Three physical pin pairs do not create a third hardware controller: software servicing or separately validated remapping remains Circuit/Firmware work. | Component Engineer, integration stage1 | 2026-09-06 |\n",
+        "row_sha256": "ce5bd9f770ec8a162a79445cbd56f6c221da75cb7f5b05c7f77c91dfdd03f2a5",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp-idf-v6.1_peripherals_web-2026-09-06.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/espressif_esp-idf-v6.1_peripherals_web-2026-09-06.md`",
+          "after": "`datasheets/public-references-rev5/espressif_esp-idf-v6.1_peripherals_web-2026-09-06.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-MCU-130",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 841,
+        "row_sha256": "fe1e6abb72d38bc5f35ec398c4244f2301abdf3ebfc2d4a2d656743bd9e1af2e",
+        "row": "| DS-MCU-130 | `datasheets/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md`; `datasheets/espressif_esp32-s3_jtag-external_v6.1.md` | §4.4 and versioned Configure eFuses | Table4-5 JTAG Signal Source Control; Configure Other JTAG Interfaces | 15–16; HTML named section | Explicit extension to DS-MCU-120: DIS_PAD_JTAG/DIS_USB_JTAG/STRAP_JTAG_SEL all zero selects USB; with first two zero and STRAP_SEL one, GPIO3 low selects pads and high selects USB. DIS_PAD=0/DIS_USB=1 selects pads irrespective of strap; DIS_PAD=1/DIS_USB=0 selects USB; both disable bits one disables JTAG. GPIO3 is floating/no internal pull, already DS-MCU-120. DIS_USB_JTAG disconnects USB from JTAG irreversibly, not its CDC function; enabled STRAP_JTAG_SEL makes GPIO3 selection conditional. Actual device fuse state UNKNOWN; no burn/read action, new strap or policy adopted. | Component Engineer, serialized service/debug A | 2026-09-06 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-MCU-130 | `datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md`; `datasheets/public-references-rev5/espressif_esp32-s3_jtag-external_v6.1.md` | §4.4 and versioned Configure eFuses | Table4-5 JTAG Signal Source Control; Configure Other JTAG Interfaces | 15–16; HTML named section | Explicit extension to DS-MCU-120: DIS_PAD_JTAG/DIS_USB_JTAG/STRAP_JTAG_SEL all zero selects USB; with first two zero and STRAP_SEL one, GPIO3 low selects pads and high selects USB. DIS_PAD=0/DIS_USB=1 selects pads irrespective of strap; DIS_PAD=1/DIS_USB=0 selects USB; both disable bits one disables JTAG. GPIO3 is floating/no internal pull, already DS-MCU-120. DIS_USB_JTAG disconnects USB from JTAG irreversibly, not its CDC function; enabled STRAP_JTAG_SEL makes GPIO3 selection conditional. Actual device fuse state UNKNOWN; no burn/read action, new strap or policy adopted. | Component Engineer, serialized service/debug A | 2026-09-06 |\n",
+        "row_sha256": "ebd80ea4873e772e16db0410b9c038d2a46999bffd78ba9f5836fa2dd65fc393",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md",
+          "datasheets/public-references-rev5/espressif_esp32-s3_jtag-external_v6.1.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md`; `datasheets/espressif_esp32-s3_jtag-external_v6.1.md`",
+          "after": "`datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md`; `datasheets/public-references-rev5/espressif_esp32-s3_jtag-external_v6.1.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-MCU-140",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 1060,
+        "row_sha256": "4969ec46c67869ab59e04950255a324cdd1a9a7d420b76fcbcb304f682fd235e",
+        "row": "| DS-MCU-140 | `datasheets/espressif_esp32-s3_datasheet-v2.2.md` | Sections2.2/2.3/2.4; Table2-1 notes5/6, IO MUX continuation and Table2-10 | Named tables/registers/sections; conditions in claim | 17-18,22,28 | SoC pins49/U0TXD and50/U0RXD map GPIO43/44 and show WPU+IE both at and after reset: weak pull-up and input enabled, not an EN-low/unpowered leakage guarantee. GPIO19/20 are silicon pins25/26 on VDD3P3_RTC; GPIO20 has USB_PU in both reset columns, while GPIO19's cells are blank. Note6 distinguishes USB-controlled pulls/default USB function from weak GPIO pulls; disabling USB defaults weak GPIO pulls off. Module land numbers remain DS-MCU-102, not silicon pin numbers or a separately accessible PHY supply. CHIP_PU LOW disables the chip per Table2-10; this does not remove the external rail or define pad Ioff, Hi-Z, injection tolerance, actual runtime state or a safe power-up waveform. | Component Engineer, serialized U/C1 sources | 2026-09-06 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-MCU-140 | `datasheets/public-references-rev5/espressif_esp32-s3_datasheet-v2.2.md` | Sections2.2/2.3/2.4; Table2-1 notes5/6, IO MUX continuation and Table2-10 | Named tables/registers/sections; conditions in claim | 17-18,22,28 | SoC pins49/U0TXD and50/U0RXD map GPIO43/44 and show WPU+IE both at and after reset: weak pull-up and input enabled, not an EN-low/unpowered leakage guarantee. GPIO19/20 are silicon pins25/26 on VDD3P3_RTC; GPIO20 has USB_PU in both reset columns, while GPIO19's cells are blank. Note6 distinguishes USB-controlled pulls/default USB function from weak GPIO pulls; disabling USB defaults weak GPIO pulls off. Module land numbers remain DS-MCU-102, not silicon pin numbers or a separately accessible PHY supply. CHIP_PU LOW disables the chip per Table2-10; this does not remove the external rail or define pad Ioff, Hi-Z, injection tolerance, actual runtime state or a safe power-up waveform. | Component Engineer, serialized U/C1 sources | 2026-09-06 |\n",
+        "row_sha256": "7a55c46e701733214dd76196f7841cfa6b22388fd50dbe6f750373d2dd063da5",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp32-s3_datasheet-v2.2.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/espressif_esp32-s3_datasheet-v2.2.md`",
+          "after": "`datasheets/public-references-rev5/espressif_esp32-s3_datasheet-v2.2.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-MCU-151",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 112,
+        "row_sha256": "8c588ca193130b7bf12573a3c4db82a1d062c084700746d1164bc2cccfaf4080",
+        "row": "| DS-MCU-151 | `datasheets/espressif_esp32-s3_datasheet-v2.2.md` | 2.2; 2.3 | Table2-1 After Reset column/note7; Table2-4 IO MUX continuation | 17-18; 22 | GPIO39/MTCK after-reset WPU is enabled when EFUSE_DIS_PAD_JTAG=0; =1 is the documented floating branch. This footnote belongs to After Reset, not At Reset. IO MUX functions identify GPIO39=MTCK input, GPIO40=MTDO output/three-state and GPIO41=MTDI input; actual routing/drive is configuration-dependent. Reuse DS-MCU-130 for JTAG selection: selecting USB does not imply DIS_PAD_JTAG=1. No actual fuse, debugger or high drive observed; no all-state floating/no-source or powered-off guarantee. | Firmware B proposal; Hardware Lead primary-checked serial publication | 2026-09-08 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-MCU-151 | `datasheets/public-references-rev5/espressif_esp32-s3_datasheet-v2.2.md` | 2.2; 2.3 | Table2-1 After Reset column/note7; Table2-4 IO MUX continuation | 17-18; 22 | GPIO39/MTCK after-reset WPU is enabled when EFUSE_DIS_PAD_JTAG=0; =1 is the documented floating branch. This footnote belongs to After Reset, not At Reset. IO MUX functions identify GPIO39=MTCK input, GPIO40=MTDO output/three-state and GPIO41=MTDI input; actual routing/drive is configuration-dependent. Reuse DS-MCU-130 for JTAG selection: selecting USB does not imply DIS_PAD_JTAG=1. No actual fuse, debugger or high drive observed; no all-state floating/no-source or powered-off guarantee. | Firmware B proposal; Hardware Lead primary-checked serial publication | 2026-09-08 |\n",
+        "row_sha256": "47d5082dc18322409afe6ca9c590f0dfcfff7b95b2f47b56e1d6ba1d7ebfdbc4",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp32-s3_datasheet-v2.2.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/espressif_esp32-s3_datasheet-v2.2.md`",
+          "after": "`datasheets/public-references-rev5/espressif_esp32-s3_datasheet-v2.2.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-MCU-153",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 114,
+        "row_sha256": "a2df7395ab340e8daf88bfc70b0dd1012d05f50d87881a40181571b975d8cb84",
+        "row": "| DS-MCU-153 | `datasheets/espressif_esp32-s3_trm-v1.8.md` | 6.9; 7.1.1-7.1.4 | Pin Hold Feature; Figure7.1-1; Table7.1-1 | 481; 526-528 | CPU reset affects a CPU core (CPU0 also resets PMS per note), not every peripheral; core reset affects the digital system except RTC; system reset includes RTC; chip reset affects the whole chip. An enabled pin hold latches state and can retain it across core reset. Documented brown-out reset may be chip or system reset per table, not an observed board event. These different scopes do not justify a universal reset/halt-to-high-Z/no-pull assumption. No hold/reset-source register, fuse, ROM image or physical state was read or changed. | Firmware B proposal; Hardware Lead primary-checked serial publication | 2026-09-08 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-MCU-153 | `datasheets/public-references-rev5/espressif_esp32-s3_trm-v1.8.md` | 6.9; 7.1.1-7.1.4 | Pin Hold Feature; Figure7.1-1; Table7.1-1 | 481; 526-528 | CPU reset affects a CPU core (CPU0 also resets PMS per note), not every peripheral; core reset affects the digital system except RTC; system reset includes RTC; chip reset affects the whole chip. An enabled pin hold latches state and can retain it across core reset. Documented brown-out reset may be chip or system reset per table, not an observed board event. These different scopes do not justify a universal reset/halt-to-high-Z/no-pull assumption. No hold/reset-source register, fuse, ROM image or physical state was read or changed. | Firmware B proposal; Hardware Lead primary-checked serial publication | 2026-09-08 |\n",
+        "row_sha256": "cd8a20c918475b2f5cb6195039e22410143da00daa1a717dc47a3c4f455437f3",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp32-s3_trm-v1.8.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/espressif_esp32-s3_trm-v1.8.md`",
+          "after": "`datasheets/public-references-rev5/espressif_esp32-s3_trm-v1.8.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-MCU-154",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 115,
+        "row_sha256": "52d4a1934f4d2e88a7a401d33bf46311ee72b9cf8c513b5474c291757f1b233a",
+        "row": "| DS-MCU-154 | `datasheets/espressif_esp-idf_v5.5.2_gpio-source.md` | gpio_reset_pin; ESP32-S3 GPIO capability masks | Immutable manufacturer source commit30aaf64524299d3bde422ca9a2848090d1bc5d0f | gpio.c lines458-476; soc_caps.h lines186-189 | Pinned v5.5.2 gpio_reset_pin enables pullup for valid output GPIOs before disabling input/output; ESP32-S3 valid-output mask equals valid-GPIO mask, covering8/9/38/39/40/41. Calling this API on a scoped TCA Bhost pin is not a no-pull/open-drain release primitive. This is source control flow, not electrical switch-order timing, ROM behavior or a hardware observation. B records that unchanged measurement main does not call it; no new firmware defect verdict or implementation follows. | Firmware B proposal; Hardware Lead immutable-source-checked serial publication | 2026-09-08 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-MCU-154 | `datasheets/public-references-rev5/espressif_esp-idf_v5.5.2_gpio-source.md` | gpio_reset_pin; ESP32-S3 GPIO capability masks | Immutable manufacturer source commit30aaf64524299d3bde422ca9a2848090d1bc5d0f | gpio.c lines458-476; soc_caps.h lines186-189 | Pinned v5.5.2 gpio_reset_pin enables pullup for valid output GPIOs before disabling input/output; ESP32-S3 valid-output mask equals valid-GPIO mask, covering8/9/38/39/40/41. Calling this API on a scoped TCA Bhost pin is not a no-pull/open-drain release primitive. This is source control flow, not electrical switch-order timing, ROM behavior or a hardware observation. B records that unchanged measurement main does not call it; no new firmware defect verdict or implementation follows. | Firmware B proposal; Hardware Lead immutable-source-checked serial publication | 2026-09-08 |\n",
+        "row_sha256": "c402868c2cfaa26430f15e027274e63adfd5989f3e609311e61338fa04c54b6d",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/espressif_esp-idf_v5.5.2_gpio-source.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/espressif_esp-idf_v5.5.2_gpio-source.md`",
+          "after": "`datasheets/public-references-rev5/espressif_esp-idf_v5.5.2_gpio-source.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-MTR-065",
+      "operation": "REPLACE_EXISTING_QUALIFIED_ROW",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": 283,
+        "row": "| DS-MTR-065 | `datasheets/texasinstruments_drv10983_slvscp6h.md` | Table 11, External Components (Typical Application reference circuit) | Table 11 | 57 | TI DRV10983's own datasheet-recommended external components (this design's checklist-item-17 reference): CVCC 10µF ceramic (VCC–GND); CVCP 0.1µF/10V (VCP–VCC); CCPP 0.1µF rated ≥VCC×2 (CPP–CPN); RSW-VREG 39Ω ¼W for linear mode (SW–VREG, replacing the 47µH/1.15A inductor used in buck mode); CVREG 10µF/10V (VREG–GND); CV1P8 1µF/5V (V1P8–GND); CV3P3 1µF/5V (V3P3–GND); RSCL/RSDA/RFG 4.75kΩ pull-ups each, referenced to the driver's **own** V3P3 output (SCL/SDA/FG) | Circuit Engineer (AI agent) | 2026-09-04 |\n",
+        "row_sha256": "fc598a7c719084cd7a4b5c9150d64d19d44a7864b604d2e74b600c6f9261899b",
+        "absent": false
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 411,
+        "row_sha256": "2d6450fd78f06ba5e88bfdb6edd833324a7ea8544f4710b9ba090817be26569c",
+        "row": "| DS-MTR-065 | `datasheets/texasinstruments_drv10983_slvscp6h.md` | Table 11, External Components (Typical Application reference circuit) | Table 11 | 49 | TI DRV10983's own datasheet-recommended external components (this design's checklist-item-17 reference): CVCC 10µF ceramic (VCC–GND); CVCP 0.1µF/10V (VCP–VCC); CCPP 0.1µF rated ≥VCC×2 (CPP–CPN); RSW-VREG 39Ω ¼W for linear mode (SW–VREG, replacing the 47µH/1.15A inductor used in buck mode); CVREG 10µF/10V (VREG–GND); CV1P8 1µF/5V (V1P8–GND); CV3P3 1µF/5V (V3P3–GND); RSCL/RSDA/RFG 4.75kΩ pull-ups each, referenced to the driver's **own** V3P3 output (SCL/SDA/FG). **2026-09-06 Component Engineer locator correction:** SLVSCP6H p49, not the historical p57. Reference values, not effective-capacitance/thermal/interface qualification; see DS-MTR-119. Original author/date retained. | Circuit Engineer (AI agent) | 2026-09-04 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-MTR-065 | `datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md` | Table 11, External Components (Typical Application reference circuit) | Table 11 | 49 | TI DRV10983's own datasheet-recommended external components (this design's checklist-item-17 reference): CVCC 10µF ceramic (VCC–GND); CVCP 0.1µF/10V (VCP–VCC); CCPP 0.1µF rated ≥VCC×2 (CPP–CPN); RSW-VREG 39Ω ¼W for linear mode (SW–VREG, replacing the 47µH/1.15A inductor used in buck mode); CVREG 10µF/10V (VREG–GND); CV1P8 1µF/5V (V1P8–GND); CV3P3 1µF/5V (V3P3–GND); RSCL/RSDA/RFG 4.75kΩ pull-ups each, referenced to the driver's **own** V3P3 output (SCL/SDA/FG). **2026-09-06 Component Engineer locator correction:** SLVSCP6H p49, not the historical p57. Reference values, not effective-capacitance/thermal/interface qualification; see DS-MTR-119. Original author/date retained. | Circuit Engineer (AI agent) | 2026-09-04 |\n",
+        "row_sha256": "f0976973f17065b868fcdee1f414706dce892bddc7bc8ca773d132a9f68b2abb",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_drv10983_slvscp6h.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [
+        {
+          "cell_index_zero_based": 4,
+          "column": "Page",
+          "before": "57",
+          "after": "49"
+        },
+        {
+          "cell_index_zero_based": 5,
+          "column": "Parameter / Claim supported",
+          "before": "TI DRV10983's own datasheet-recommended external components (this design's checklist-item-17 reference): CVCC 10µF ceramic (VCC–GND); CVCP 0.1µF/10V (VCP–VCC); CCPP 0.1µF rated ≥VCC×2 (CPP–CPN); RSW-VREG 39Ω ¼W for linear mode (SW–VREG, replacing the 47µH/1.15A inductor used in buck mode); CVREG 10µF/10V (VREG–GND); CV1P8 1µF/5V (V1P8–GND); CV3P3 1µF/5V (V3P3–GND); RSCL/RSDA/RFG 4.75kΩ pull-ups each, referenced to the driver's **own** V3P3 output (SCL/SDA/FG)",
+          "after": "TI DRV10983's own datasheet-recommended external components (this design's checklist-item-17 reference): CVCC 10µF ceramic (VCC–GND); CVCP 0.1µF/10V (VCP–VCC); CCPP 0.1µF rated ≥VCC×2 (CPP–CPN); RSW-VREG 39Ω ¼W for linear mode (SW–VREG, replacing the 47µH/1.15A inductor used in buck mode); CVREG 10µF/10V (VREG–GND); CV1P8 1µF/5V (V1P8–GND); CV3P3 1µF/5V (V3P3–GND); RSCL/RSDA/RFG 4.75kΩ pull-ups each, referenced to the driver's **own** V3P3 output (SCL/SDA/FG). **2026-09-06 Component Engineer locator correction:** SLVSCP6H p49, not the historical p57. Reference values, not effective-capacitance/thermal/interface qualification; see DS-MTR-119. Original author/date retained."
+        }
+      ],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-MTR-116",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 756,
+        "row_sha256": "d30a6c910e0278d9c7d9eb3eafd4c37885a429b32de158e0c0d61aa6d3bfce13",
+        "row": "| DS-MTR-116 | `datasheets/texasinstruments_drv10983_slvscp6h.md` | §7.3 ROC; §7.5 electrical characteristics; §8.3.1 | Supply/regulator rows | 7–8, 14 | ROC VCC8–28V (24V nominal), digital SCL/SDA/FG/SPEED/DIR−0.1…3.6V; VREG external load buck≤100mA/linear0mA; V3P3 external load≤5mA. Electrical V3P3 MIN/TYP/MAX3.0/3.3/3.6V atVCC24V,TA25°C,VregSel0,5mA load; VregSel1 and VREG<3.3V instead tracks VREG with its stated drop. This does not guarantee a regulated host-quality3.3V rail at the proposed11.5V motor bus or permit paralleling/powering the host from local rails. | Component Engineer, integration stage1 | 2026-09-06 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-MTR-116 | `datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md` | §7.3 ROC; §7.5 electrical characteristics; §8.3.1 | Supply/regulator rows | 7–8, 14 | ROC VCC8–28V (24V nominal), digital SCL/SDA/FG/SPEED/DIR−0.1…3.6V; VREG external load buck≤100mA/linear0mA; V3P3 external load≤5mA. Electrical V3P3 MIN/TYP/MAX3.0/3.3/3.6V atVCC24V,TA25°C,VregSel0,5mA load; VregSel1 and VREG<3.3V instead tracks VREG with its stated drop. This does not guarantee a regulated host-quality3.3V rail at the proposed11.5V motor bus or permit paralleling/powering the host from local rails. | Component Engineer, integration stage1 | 2026-09-06 |\n",
+        "row_sha256": "4fa395e2a9946ed9c315a37998a1c0d25060e278f53d3bf1083961e52ce8401a",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_drv10983_slvscp6h.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    },
+    {
+      "id": "DS-MTR-119",
+      "operation": "ADD",
+      "old_public": {
+        "revision": "f259608bd6d4e673393bb6ed4924ea7dc892cb6d",
+        "path": "datasheets/evidence-log.md",
+        "line": null,
+        "row": null,
+        "row_sha256": null,
+        "absent": true
+      },
+      "private_original": {
+        "revision": "618a3da952f7e81fde8e4f28380512c885fa72fd",
+        "path": "datasheets/evidence-log.md",
+        "line": 759,
+        "row_sha256": "e89166ce198834e1d46dfab7bcee8cf16f0a29d033cd1aeb867e533c57c86b55",
+        "row": "| DS-MTR-119 | `datasheets/texasinstruments_drv10983_slvscp6h.md` | §9 Application disclaimer/Typical Application; §10 Power Supply Recommendations | Fig40; Table11 | 48–50 | Extends corrected DS-MTR-065: local reference component values are application guidance, not component specifications or effective-C proof. Buck reference inductor47µH,1.15A current/saturation,<1Ω DCR; linear39Ω¼W; local reference pullups4.75kΩ to own V3P3. Zener entries/second schematic are DRV10983Z-specific. Supply recommendation10µF ceramic close VCC/GND; if ripple>200mV, application-sized bulk is needed, and with bulk the local ceramic may be reduced to1µF. Does not size the actual bulk/sink, approve resistor heating or qualify a motor current envelope. | Component Engineer, integration stage1 | 2026-09-06 |\n",
+        "exact_body_in_public": true
+      },
+      "public_target": {
+        "row": "| DS-MTR-119 | `datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md` | §9 Application disclaimer/Typical Application; §10 Power Supply Recommendations | Fig40; Table11 | 48–50 | Extends corrected DS-MTR-065: local reference component values are application guidance, not component specifications or effective-C proof. Buck reference inductor47µH,1.15A current/saturation,<1Ω DCR; linear39Ω¼W; local reference pullups4.75kΩ to own V3P3. Zener entries/second schematic are DRV10983Z-specific. Supply recommendation10µF ceramic close VCC/GND; if ripple>200mV, application-sized bulk is needed, and with bulk the local ceramic may be reduced to1µF. Does not size the actual bulk/sink, approve resistor heating or qualify a motor current envelope. | Component Engineer, integration stage1 | 2026-09-06 |\n",
+        "row_sha256": "e3d75cd4d65b5fe381997f2d8486a6db0b07259b5d86a8ea8afa851db48dff98",
+        "metadata_paths": [
+          "datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md"
+        ]
+      },
+      "mechanical_diff": [
+        {
+          "kind": "METADATA_PATH_REMAP",
+          "cell_index_zero_based": 1,
+          "column": "Datasheet metadata record",
+          "before": "`datasheets/texasinstruments_drv10983_slvscp6h.md`",
+          "after": "`datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md`"
+        }
+      ],
+      "existing_public_to_private_qualified_diff": [],
+      "source_technical_bytes_preserved": true,
+      "interpretation": "Import of an existing conditioned claim; not new primary verification or confidence/approval change."
+    }
+  ],
+  "retained_rows": [
+    {
+      "id": "DS-IMU-079",
+      "public_baseline_line": 209,
+      "row": "| DS-IMU-079 | `datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md` | `bmi270.h` `BMI270_CHIP_ID` | N/A | N/A | BMI270 CHIP_ID register (address 0x00) expected value: 0x24 -- read and validated once at firmware boot before trusting any further communication with the part | Firmware Engineer (AI agent) | 2026-08-31 |\n",
+      "row_sha256": "b1067676c1d1e1e9346c09fd6df66ab11aed8a9cda2c1c509ae78cf01ef9a9eb",
+      "identical_to_fixed_source": true
+    },
+    {
+      "id": "DS-IMU-080",
+      "public_baseline_line": 210,
+      "row": "| DS-IMU-080 | `datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md` | `bmi2_defs.h` `BMI2_CMD_REG_ADDR`/`BMI2_SOFT_RESET_CMD`; `bmi2.c` `bmi2_soft_reset()` | N/A | N/A | BMI270 CMD register address 0x7E; writing 0xB6 (SOFT_RESET_CMD) triggers a full soft reset; the reference driver waits 2000 µs (2 ms) after issuing it before any further register access | Firmware Engineer (AI agent) | 2026-08-31 |\n",
+      "row_sha256": "aaa09918bd2be74d91186ece043118328226715bd8964dee0eb79abfad88e034",
+      "identical_to_fixed_source": true
+    },
+    {
+      "id": "DS-IMU-081",
+      "public_baseline_line": 211,
+      "row": "| DS-IMU-081 | `datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md` | `bmi2_defs.h` `BMI2_PWR_CONF_ADDR`; `bmi2.c` `bmi2_set_adv_power_save()` | N/A | N/A | BMI270 PWR_CONF register address 0x7C; bit0 is the advanced-power-save enable -- the part resets into this mode, and it must be written to 0 (disabled) before the configuration-file upload sequence can proceed | Firmware Engineer (AI agent) | 2026-08-31 |\n",
+      "row_sha256": "7b36861f0347922b94f9e98fa858105d049faf008d265004a4797538b99d5daa",
+      "identical_to_fixed_source": true
+    },
+    {
+      "id": "DS-IMU-082",
+      "public_baseline_line": 212,
+      "row": "| DS-IMU-082 | `datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md` | `bmi2_defs.h` `BMI2_INIT_CTRL_ADDR`/`BMI2_INIT_ADDR_0`/`BMI2_INIT_ADDR_1`/`BMI2_INIT_DATA_ADDR`; `bmi2.c` `write_config_file()`/`upload_file()` | N/A | N/A | BMI270 mandatory configuration-file upload protocol: INIT_CTRL (0x59) ← 0x00 to enable load mode; for each chunk of the config file, write the chunk's **word offset** (byte_index/2) as two bytes to INIT_ADDR_0 (0x5B, low nibble) then INIT_ADDR_1 (0x5C, upper bits) in one transaction, then burst-write the chunk's data bytes to INIT_DATA (0x5E); after all chunks are written, INIT_CTRL ← 0x01 to signal completion. This exact chunked, word-addressed protocol (not a single continuous burst) is required because the device's internal address pointer does not auto-increment across separate I2C transactions | Firmware Engineer (AI agent) | 2026-08-31 |\n",
+      "row_sha256": "867c41c05522b3b19772cbdffa93f0d2467404939b9e8931df1d7b40d602ebc9",
+      "identical_to_fixed_source": true
+    },
+    {
+      "id": "DS-IMU-083",
+      "public_baseline_line": 213,
+      "row": "| DS-IMU-083 | `datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md` | `bmi2_defs.h` `BMI2_INTERNAL_STATUS_ADDR`/`BMI2_CONFIG_LOAD_STATUS_MASK`/`BMI2_CONFIG_LOAD_SUCCESS` | N/A | N/A | BMI270 INTERNAL_STATUS register address 0x21; configuration-load success is indicated by `(INTERNAL_STATUS & 0x0F) == 0x01` -- must be polled after finishing the upload sequence (DS-IMU-082) rather than assumed instantaneous | Firmware Engineer (AI agent) | 2026-08-31 |\n",
+      "row_sha256": "4d835107a0a35df94a2126243565172276df04c90456aa12777d6a11bd1c30d0",
+      "identical_to_fixed_source": true
+    },
+    {
+      "id": "DS-IMU-084",
+      "public_baseline_line": 214,
+      "row": "| DS-IMU-084 | `datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md` | `bmi270.c`, `bmi270_config_file[]` array + `dev->config_size` usage | N/A | N/A | BMI270 configuration-file blob exact byte length: 8192, independently counted this session (not trusted from memory/description) by counting hex-byte literals in the array, and cross-checked against the same upstream file's own `dev->config_size = sizeof(bmi270_config_file)` usage. Vendored verbatim into `firmware/bench-imu-01/src/bmi270_config_file.h` -- this project does not and cannot derive this data itself | Firmware Engineer (AI agent) | 2026-08-31 |\n",
+      "row_sha256": "a3ef987aebd586dc0695133f03db9e60a107106c02cd2ac6e146417d966bc944",
+      "identical_to_fixed_source": true
+    }
+  ],
+  "required_ids": [
+    "DS-IFACE-002",
+    "DS-IFACE-003",
+    "DS-IFACE-007",
+    "DS-IFACE-014",
+    "DS-IFACE-015",
+    "DS-IFACE-016",
+    "DS-IFACE-017",
+    "DS-IFACE-018",
+    "DS-IFACE-039",
+    "DS-IFACE-040",
+    "DS-IFACE-043",
+    "DS-IFACE-055",
+    "DS-IFACE-056",
+    "DS-IFACE-057",
+    "DS-IFACE-058",
+    "DS-IFACE-063",
+    "DS-IFACE-064",
+    "DS-IFACE-067",
+    "DS-IFACE-069",
+    "DS-IFACE-070",
+    "DS-IFACE-071",
+    "DS-IFACE-072",
+    "DS-IFACE-073",
+    "DS-IFACE-074",
+    "DS-IFACE-075",
+    "DS-IMU-079",
+    "DS-IMU-080",
+    "DS-IMU-081",
+    "DS-IMU-082",
+    "DS-IMU-083",
+    "DS-IMU-084",
+    "DS-MCU-102",
+    "DS-MCU-120",
+    "DS-MCU-121",
+    "DS-MCU-123",
+    "DS-MCU-130",
+    "DS-MCU-140",
+    "DS-MCU-151",
+    "DS-MCU-153",
+    "DS-MCU-154",
+    "DS-MTR-065",
+    "DS-MTR-116",
+    "DS-MTR-119"
+  ],
+  "metadata_resolution": [
+    {
+      "id": "DS-IFACE-002",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "9111324acc7f3adf1f23d805f21ad9695b55c24adad563db26d1391e1a003d15",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-003",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "1fc786922321b3804ea28d7709305d8972fa8ba0bbe2f182e42e1932cbe36222",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_sn74axc4t774_sces898c.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-007",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "f0420808e0cff96d2209354eee89b450aded01303a55d39cff98479aa5d918c8",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-014",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "095efe46537cf079f2357d90cd5353ca91f0c590266bc5a0797271b38aef6e53",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-015",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "05e8e00f65d82bb9b822a47c52a078e83dbad1c4fe61cc94e0542bee968ddb3c",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-016",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "85d112ea93f9574a6cfbefef1c4eb64337dde3da74269f7c09bbfa9fece0b826",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-017",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "01a7a729cb73829d3a8986d7b1541b643880a8b3821eab19b6fbbafcaaf13caf",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-018",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "debe49b7cdc60992da2155ed0eb1a3ed8d4b00a54fb83d86b38f07e6e75f3a68",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-039",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "4205e59e3c2396562501367b0f46b79d4aee3c94571b87a7106b2a9abb9f4591",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-040",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "3670cfda1ff736172fe8eca36c643ca2689968a63b91314479b909d26612ed42",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-043",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "59031c85db5e3c04354aa87c7544e0d753543ee3fcce658557fed16a6cf327e3",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_sn74axc4t774_sces898c.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-055",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "3dd0380548f86f4496fb815e9e8dda036e7651333b17644fd805d8ec8d8357cf",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-056",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "b948279b848d27086a0eecb12b047e177f01fa0535b5b01419dc3b84f6caba90",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-057",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "d07c87616ab152f825f048b794ef15fb22f4fee51a3faa9e500b24191393f542",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-058",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "01e87b201dff5b76ed363e94e61db0894eac4f6d43c8e804629b60eed9b5cf7c",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_txu0304_sces935a.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-063",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "221c1c0f6620e8845a76e6c0c9d742f3c91149909ea894358953cf26dee075f0",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-064",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "5faf4c07ef9e62a69a3453b5129412581436934b72b482eac14f78fb71c0a2c9",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-067",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "0a3c038fc141e2c41b6eb5e353dbce13febc6059e4b021069d5ae5b52175b127",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-069",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "924c8b087ab600893dc7ebdba2c6b52d59d22194b16ce37e9848937709977155",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_tca9517_scps242d.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-070",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "2e371e41d349a435f0cc5e2410bb3363dd80a3f3fa202bcbf8d2c9c775ac2e91",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-071",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "83bebefd9d9af87bd79aea0208616b46f2eec1959efe8afb048caa75c5a53ea4",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-072",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "0704297eb72d40e8a3c9032389f888f1641b2905f2d2a6e8737a267bd6acab23",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-073",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "1a3c9d6b229760cb2c0c14d26bd3efa968ba41262217082fb9da2b2826168a10",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-074",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "564c9485c845267ecce51de3c6d32fd3fc1b8151b0cc049f2656ee0be35e0e4f",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_tmux1511_scds390b.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IFACE-075",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "74e17ca0e180ffac021190f7e0ab7db9feb10bc33b0c81dec6ff0e7da186188b",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_sn74lvc1g74_sces794g.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IMU-079",
+      "canonical_action": "RETAIN_EXACT_PUBLIC_ROW",
+      "canonical_row_sha256": "b1067676c1d1e1e9346c09fd6df66ab11aed8a9cda2c1c509ae78cf01ef9a9eb",
+      "metadata_paths": [
+        "datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IMU-080",
+      "canonical_action": "RETAIN_EXACT_PUBLIC_ROW",
+      "canonical_row_sha256": "aaa09918bd2be74d91186ece043118328226715bd8964dee0eb79abfad88e034",
+      "metadata_paths": [
+        "datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IMU-081",
+      "canonical_action": "RETAIN_EXACT_PUBLIC_ROW",
+      "canonical_row_sha256": "7b36861f0347922b94f9e98fa858105d049faf008d265004a4797538b99d5daa",
+      "metadata_paths": [
+        "datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IMU-082",
+      "canonical_action": "RETAIN_EXACT_PUBLIC_ROW",
+      "canonical_row_sha256": "867c41c05522b3b19772cbdffa93f0d2467404939b9e8931df1d7b40d602ebc9",
+      "metadata_paths": [
+        "datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IMU-083",
+      "canonical_action": "RETAIN_EXACT_PUBLIC_ROW",
+      "canonical_row_sha256": "4d835107a0a35df94a2126243565172276df04c90456aa12777d6a11bd1c30d0",
+      "metadata_paths": [
+        "datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-IMU-084",
+      "canonical_action": "RETAIN_EXACT_PUBLIC_ROW",
+      "canonical_row_sha256": "a3ef987aebd586dc0695133f03db9e60a107106c02cd2ac6e146417d966bc944",
+      "metadata_paths": [
+        "datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-MCU-102",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "87763a71303c26dadc8a4f738870f52d7455983b4852e55582218c0220a0cd68",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-MCU-120",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "4526f712268a981303d4eba0d47a1a43b11fb9af7632a6cb76d9640754959e27",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-MCU-121",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "c9ca3b7422e4a79c5101bd59e803508707329571105c9b2b6bb8d7d5d4685153",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-MCU-123",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "ce5bd9f770ec8a162a79445cbd56f6c221da75cb7f5b05c7f77c91dfdd03f2a5",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/espressif_esp-idf-v6.1_peripherals_web-2026-09-06.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-MCU-130",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "ebd80ea4873e772e16db0410b9c038d2a46999bffd78ba9f5836fa2dd65fc393",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md",
+        "datasheets/public-references-rev5/espressif_esp32-s3_jtag-external_v6.1.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-MCU-140",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "7a55c46e701733214dd76196f7841cfa6b22388fd50dbe6f750373d2dd063da5",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/espressif_esp32-s3_datasheet-v2.2.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-MCU-151",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "47d5082dc18322409afe6ca9c590f0dfcfff7b95b2f47b56e1d6ba1d7ebfdbc4",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/espressif_esp32-s3_datasheet-v2.2.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-MCU-153",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "cd8a20c918475b2f5cb6195039e22410143da00daa1a717dc47a3c4f455437f3",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/espressif_esp32-s3_trm-v1.8.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-MCU-154",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "c402868c2cfaa26430f15e027274e63adfd5989f3e609311e61338fa04c54b6d",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/espressif_esp-idf_v5.5.2_gpio-source.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-MTR-065",
+      "canonical_action": "REPLACE",
+      "canonical_row_sha256": "f0976973f17065b868fcdee1f414706dce892bddc7bc8ca773d132a9f68b2abb",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-MTR-116",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "4fa395e2a9946ed9c315a37998a1c0d25060e278f53d3bf1083961e52ce8401a",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    },
+    {
+      "id": "DS-MTR-119",
+      "canonical_action": "ADD",
+      "canonical_row_sha256": "e3d75cd4d65b5fe381997f2d8486a6db0b07259b5d86a8ea8afa851db48dff98",
+      "metadata_paths": [
+        "datasheets/public-references-rev5/texasinstruments_drv10983_slvscp6h.md"
+      ],
+      "resolution_basis": "Prepared derivative files plus frozen public path inventory; real final public root still pending"
+    }
+  ],
+  "gates": "NOT_APPLIED; no engineering acceptance or physical permission; original conditions and holds remain."
+}
