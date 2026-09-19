@@ -1,0 +1,242 @@
+{
+  "schema_version": 1,
+  "record_type": "DERIVED_PUBLIC_OFFLINE_TOOLS_EXPORT",
+  "task_id": "rev5-public-offline-tools-slice",
+  "run_id": "ad7120ad-34ab-4d10-bcef-a2f12182920c",
+  "public_base": "eca74af4195346189cfdf49b20d734437e53c3d5",
+  "intake_commit": "07d9efb1e5c4af683abfd1da07fe311337cf4732",
+  "config_revision_at_admission": "eca74af4195346189cfdf49b20d734437e53c3d5",
+  "source_revision": "6a86f5e71934c78435ca31f3f696da48de5ddd5a",
+  "source_manifest": {
+    "path": "docs/rev5-public-release/software-manifest.json",
+    "sha256": "132addfe2257608346fe235cfc91be985a59da44d41485b0bfc759a42e41bc7d",
+    "disposition": "PUBLIC_PROVENANCE_INPUT_ONLY_NOT_REEXPORTED"
+  },
+  "expected_changed_files_from_public_base": [
+    ".github/workflows/simulation-check.yml",
+    "AGENTS.ja.md",
+    "AGENTS.md",
+    "docs/language-coverage.json",
+    "docs/pages.ja.md",
+    "docs/pages.md",
+    "docs/rev5-offline-tools-release/README.ja.md",
+    "docs/rev5-offline-tools-release/README.md",
+    "docs/rev5-offline-tools-release/checks.json",
+    "docs/rev5-offline-tools-release/example-summary.json",
+    "docs/rev5-offline-tools-release/intake.json",
+    "docs/rev5-offline-tools-release/manifest.json",
+    "docs/rev5-offline-tools-release/provenance.json",
+    "docs/rev5-public-release/software-c1-summary.json",
+    "docs/rev5-six-imu-fault-study-2026-09-13/author/run-001/one-bias/config.json",
+    "docs/rev5-six-imu-fault-study-2026-09-13/author/run-001/one-bias/samples.jsonl",
+    "simulation/imu_disagreement/README.md",
+    "simulation/imu_disagreement/__init__.py",
+    "simulation/imu_disagreement/__main__.py",
+    "simulation/imu_disagreement/report.py",
+    "simulation/imu_disagreement/tests/test_report.py",
+    "simulation/imu_estimation/__init__.py",
+    "simulation/imu_estimation/estimator.py",
+    "simulation/imu_estimation/math3d.py",
+    "simulation/imu_estimation/schema.py",
+    "tools/tests/test_rev5_offline_publication.py",
+    "visualization/index.html",
+    "visualization/index.ja.html"
+  ],
+  "byte_identical_export_count": 11,
+  "file_count_excluding_manifest_itself": 27,
+  "files": [
+    {
+      "path": ".github/workflows/simulation-check.yml",
+      "bytes": 2000,
+      "sha256": "ec11311cad4c3c194aa8ede72e8dbf8d1f57f477857780885491ed2d4ba03b43",
+      "disposition": "DERIVED_OFFLINE_PUBLICATION_SUPPORT"
+    },
+    {
+      "path": "AGENTS.ja.md",
+      "bytes": 4210,
+      "sha256": "029c06131e707883ab7ed48fe8bcec497932269cb0f588a04586a67133c62fcf",
+      "disposition": "DERIVED_OFFLINE_PUBLICATION_SUPPORT"
+    },
+    {
+      "path": "AGENTS.md",
+      "bytes": 3761,
+      "sha256": "9e10d828adb2a61c0ad42d40af050c0960b0341bce373a13133079bd1775a60f",
+      "disposition": "DERIVED_OFFLINE_PUBLICATION_SUPPORT"
+    },
+    {
+      "path": "docs/language-coverage.json",
+      "bytes": 5974,
+      "sha256": "65b9673b13d71cbdbf5cc729b7e65193f16c6074595a2475b72bb0d9a468bdda",
+      "disposition": "DERIVED_OFFLINE_PUBLICATION_SUPPORT"
+    },
+    {
+      "path": "docs/pages.ja.md",
+      "bytes": 14509,
+      "sha256": "50627b8d8746e0cc7c9c8478a55411933bc4f193ea4d5f5f53eb65e0b3804e42",
+      "disposition": "DERIVED_OFFLINE_PUBLICATION_SUPPORT"
+    },
+    {
+      "path": "docs/pages.md",
+      "bytes": 7377,
+      "sha256": "3b665af61613543a78be18f61f4865b2bfcefc6b1c81a6b866880eead50daa1c",
+      "disposition": "DERIVED_OFFLINE_PUBLICATION_SUPPORT"
+    },
+    {
+      "path": "docs/rev5-offline-tools-release/README.ja.md",
+      "bytes": 7751,
+      "sha256": "b0c875541d4f4440b2adce089fffd035311bbf8551dd5da703ce10e01a2e9374",
+      "disposition": "DERIVED_OFFLINE_PUBLICATION_SUPPORT"
+    },
+    {
+      "path": "docs/rev5-offline-tools-release/README.md",
+      "bytes": 7093,
+      "sha256": "724c2ab40bb60edf08f40fd1c5fec15125d64df63e090ad6483dc12dffad79d8",
+      "disposition": "DERIVED_OFFLINE_PUBLICATION_SUPPORT"
+    },
+    {
+      "path": "docs/rev5-offline-tools-release/checks.json",
+      "bytes": 2939,
+      "sha256": "f9afec082d773374a225462a8ad6280067dd3ed7603feaf13e9da3b694a6fe08",
+      "disposition": "DERIVED_OFFLINE_PUBLICATION_SUPPORT"
+    },
+    {
+      "path": "docs/rev5-offline-tools-release/example-summary.json",
+      "bytes": 4275,
+      "sha256": "7358b2e855c854b52c8c341dfec5041c068277bf78bab473f44309911581a1d6",
+      "disposition": "DERIVED_OFFLINE_PUBLICATION_SUPPORT"
+    },
+    {
+      "path": "docs/rev5-offline-tools-release/intake.json",
+      "bytes": 6919,
+      "sha256": "c3ece4fda2170baec0003f8aeebc5e8e8700921f9827874abcbcf552b0c0d256",
+      "disposition": "DERIVED_OFFLINE_PUBLICATION_SUPPORT"
+    },
+    {
+      "path": "docs/rev5-offline-tools-release/provenance.json",
+      "bytes": 4975,
+      "sha256": "171aa30e224f2042b1e4bfc863010da368974e96fe8a9645996b2fdd398b6c31",
+      "disposition": "DERIVED_OFFLINE_PUBLICATION_SUPPORT"
+    },
+    {
+      "path": "docs/rev5-public-release/software-c1-summary.json",
+      "bytes": 1446,
+      "sha256": "ff3f925b58176f2975d559b05e0a30d58c33e807008285b5526185064e04d101",
+      "disposition": "BYTE_IDENTICAL_PUBLIC_EXPORT",
+      "source_revision": "6a86f5e71934c78435ca31f3f696da48de5ddd5a",
+      "source_git_blob": "da2d6477398b29214d85ca052f702f2c3c0afef1"
+    },
+    {
+      "path": "docs/rev5-six-imu-fault-study-2026-09-13/author/run-001/one-bias/config.json",
+      "bytes": 4270,
+      "sha256": "dfd0d6ec924f7ef51771635ffcddc089e632b0b0f785c966431b89db01b0d8a6",
+      "disposition": "BYTE_IDENTICAL_PUBLIC_EXPORT",
+      "source_revision": "6a86f5e71934c78435ca31f3f696da48de5ddd5a",
+      "source_git_blob": "e2be13c79bb364cd0e03e2a3e662f9208185df44"
+    },
+    {
+      "path": "docs/rev5-six-imu-fault-study-2026-09-13/author/run-001/one-bias/samples.jsonl",
+      "bytes": 1669574,
+      "sha256": "897d197be8f7b531f1b8669ede033304888569eda0810d6c0ea76b21bef301ce",
+      "disposition": "BYTE_IDENTICAL_PUBLIC_EXPORT",
+      "source_revision": "6a86f5e71934c78435ca31f3f696da48de5ddd5a",
+      "source_git_blob": "37e0db2ee25a4fc92b815b0e00a43264ac1a286b"
+    },
+    {
+      "path": "simulation/imu_disagreement/README.md",
+      "bytes": 2356,
+      "sha256": "fd88f0038d8d04527f7e07798d38c38eaafcbcbbf9cc051b71c8acf9f1fd1e57",
+      "disposition": "DERIVED_OFFLINE_PUBLICATION_SUPPORT"
+    },
+    {
+      "path": "simulation/imu_disagreement/__init__.py",
+      "bytes": 70,
+      "sha256": "c608d78be25dbbf3538c182192455a12247329acc593066c31210d263d07f150",
+      "disposition": "BYTE_IDENTICAL_PUBLIC_EXPORT",
+      "source_revision": "6a86f5e71934c78435ca31f3f696da48de5ddd5a",
+      "source_git_blob": "7aa4696275212a1605b8bec84c46cf15ef692f1e"
+    },
+    {
+      "path": "simulation/imu_disagreement/__main__.py",
+      "bytes": 2637,
+      "sha256": "45ed1be56ad6d51e0fb724bda963bb845c22cb6f3a54016cb9a58d495d2c8710",
+      "disposition": "BYTE_IDENTICAL_PUBLIC_EXPORT",
+      "source_revision": "6a86f5e71934c78435ca31f3f696da48de5ddd5a",
+      "source_git_blob": "80dcb56e191e9672a9e6c1775cb4328657a6075a"
+    },
+    {
+      "path": "simulation/imu_disagreement/report.py",
+      "bytes": 8540,
+      "sha256": "5b0c2d6a86d9cb0de128037fe120364358996794cfdaa3d9b3b2b7e529a6f276",
+      "disposition": "BYTE_IDENTICAL_PUBLIC_EXPORT",
+      "source_revision": "6a86f5e71934c78435ca31f3f696da48de5ddd5a",
+      "source_git_blob": "75c92be255ea1e7d6d5f0d65183f6fd7aef25af5"
+    },
+    {
+      "path": "simulation/imu_disagreement/tests/test_report.py",
+      "bytes": 11607,
+      "sha256": "3df588a2d27d1cb8e37f8ef9985dac88aa3b770178fafef65750afe0e52e8e83",
+      "disposition": "BYTE_IDENTICAL_PUBLIC_EXPORT",
+      "source_revision": "6a86f5e71934c78435ca31f3f696da48de5ddd5a",
+      "source_git_blob": "b152574bea0bc75df9aeeb71065feb88009161f5"
+    },
+    {
+      "path": "simulation/imu_estimation/__init__.py",
+      "bytes": 103,
+      "sha256": "b7db592469cc569173310bb8533008a3249a04706f9b3a06b537153cbb8197d3",
+      "disposition": "BYTE_IDENTICAL_PUBLIC_EXPORT",
+      "source_revision": "6a86f5e71934c78435ca31f3f696da48de5ddd5a",
+      "source_git_blob": "56166ccc2fb87bc27233ed253b770c931016f367"
+    },
+    {
+      "path": "simulation/imu_estimation/estimator.py",
+      "bytes": 8695,
+      "sha256": "032810a1e178692cfdc637dccf914d799005473b1f0c87c7c13601b318c7ce3c",
+      "disposition": "BYTE_IDENTICAL_PUBLIC_EXPORT",
+      "source_revision": "6a86f5e71934c78435ca31f3f696da48de5ddd5a",
+      "source_git_blob": "d9b3007be80762a93299b7cdd025ec3c27f8ee0f"
+    },
+    {
+      "path": "simulation/imu_estimation/math3d.py",
+      "bytes": 1893,
+      "sha256": "bd82d9c399733a3c70f5bb9ea28daf8aa8f83e1baa661620c2706bdf80a068d9",
+      "disposition": "BYTE_IDENTICAL_PUBLIC_EXPORT",
+      "source_revision": "6a86f5e71934c78435ca31f3f696da48de5ddd5a",
+      "source_git_blob": "5e2e8c3a08e9ca7b6eaba8665657b81e08ee08df"
+    },
+    {
+      "path": "simulation/imu_estimation/schema.py",
+      "bytes": 4424,
+      "sha256": "f63ad25736bf865154f4670a656a6c1193b3c301ac61cf1d952979830c5893ae",
+      "disposition": "BYTE_IDENTICAL_PUBLIC_EXPORT",
+      "source_revision": "6a86f5e71934c78435ca31f3f696da48de5ddd5a",
+      "source_git_blob": "e12c6c56e87fd1e0c408eb1cef975a91846642c1"
+    },
+    {
+      "path": "tools/tests/test_rev5_offline_publication.py",
+      "bytes": 14271,
+      "sha256": "345fbd3c4da009104d262e770d2b2ac52574c2aeaebd0fb8feed037cbd3c506b",
+      "disposition": "DERIVED_OFFLINE_PUBLICATION_SUPPORT"
+    },
+    {
+      "path": "visualization/index.html",
+      "bytes": 4176,
+      "sha256": "2d98dfad1de48e7df26072923083ad5f1925121f811990df901141abf74663f4",
+      "disposition": "DERIVED_OFFLINE_PUBLICATION_SUPPORT"
+    },
+    {
+      "path": "visualization/index.ja.html",
+      "bytes": 4627,
+      "sha256": "2000b5ee8db17d77b33323001fbf84a8fc7e51465d1ca7d053e553c0483db8a5",
+      "disposition": "DERIVED_OFFLINE_PUBLICATION_SUPPORT"
+    }
+  ],
+  "self_hash_policy": "Bind this manifest by its containing public Git commit; no recursive self hash.",
+  "support_hash_policy": "Derived file hashes seal this finite publication snapshot, not a claim that historical v2/v3 navigation hashes describe the updated landing pages.",
+  "excluded": [
+    "firmware, vendor, Bosch, CRT, N8R8, SDK, device and serial changes",
+    "private C1 closure, raw source notes, private ancestry, raw uploads, logs, personal paths and credentials",
+    "native CAD, geometry, plan, media, rendering and physical operations",
+    "source adoption, shared safety ledgers, original reviews and app/global configuration"
+  ],
+  "unchanged_holds": "Original44=2closed42unfinished; WIP / NOT ASSEMBLY READY / NO-GO / 3C8H / REQ409 / strict-pro / 39UNKNOWN; P1/C1/D1; held control/sidecar/ICD; all source, human and physical gates."
+}

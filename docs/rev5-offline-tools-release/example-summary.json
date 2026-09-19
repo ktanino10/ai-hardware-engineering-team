@@ -1,0 +1,106 @@
+{
+  "record_type": "DERIVED_PUBLIC_EXAMPLE_SUMMARY_NOT_FULL_REPORT",
+  "format": "imu-disagreement-report-v1",
+  "scope": "OFFLINE_SYNTHETIC_DISAGREEMENT_NOT_HEALTH",
+  "limits": [
+    "SYNTHETIC_REFERENCE only: declared SI, body frame and exact synthetic clocks.",
+    "Format/sample validity and upstream status are not sensor health.",
+    "Shared bias may have zero spread; 3vs3 cannot identify the correct group.",
+    "A disappearing spike does not erase past integration error.",
+    "No health thresholds, exclusion, weights, calibration or control decisions.",
+    "Real calibration, clock coherence, latency and physical accuracy are UNKNOWN.",
+    "Gyro residuals only; accelerometer specific-force residuals are not reported."
+  ],
+  "summary": {
+    "weighting": "Per-record only; not time-weighted, no interpolation or duration estimate.",
+    "interval_semantics": "Arrival-order runs of status/IDs; timestamps are input labels, not proven physical time.",
+    "records": 1201,
+    "comparable_records": 1201,
+    "unresolved_records": 0,
+    "upstream_status_counts_not_health": {
+      "initializing": 1,
+      "degraded": 1200
+    },
+    "accepted_record_counts": {
+      "imu0": 1201,
+      "imu1": 1201,
+      "imu2": 1201,
+      "imu3": 1201,
+      "imu4": 1201,
+      "imu5": 1201
+    },
+    "absent_record_counts": {
+      "imu0": 0,
+      "imu1": 0,
+      "imu2": 0,
+      "imu3": 0,
+      "imu4": 0,
+      "imu5": 0
+    },
+    "unknown_presence_records": 0,
+    "comparable_spread_max_rad_s": 0.09999999999999999,
+    "comparable_spread_mean_rad_s": 0.08334721065778311,
+    "intervals": [
+      {
+        "first_record": 1,
+        "last_record": 1,
+        "first_input_time_label_s": 0.0,
+        "last_input_time_label_s": 0.0,
+        "records": 1,
+        "upstream_status_not_health": "initializing",
+        "comparison": "COMPARABLE_SYNTHETIC",
+        "accepted_ids": [
+          "imu0",
+          "imu1",
+          "imu2",
+          "imu3",
+          "imu4",
+          "imu5"
+        ],
+        "absent_ids": []
+      },
+      {
+        "first_record": 2,
+        "last_record": 1201,
+        "first_input_time_label_s": 0.01,
+        "last_input_time_label_s": 12.0,
+        "records": 1200,
+        "upstream_status_not_health": "degraded",
+        "comparison": "COMPARABLE_SYNTHETIC",
+        "accepted_ids": [
+          "imu0",
+          "imu1",
+          "imu2",
+          "imu3",
+          "imu4",
+          "imu5"
+        ],
+        "absent_ids": []
+      }
+    ]
+  },
+  "errors": [],
+  "provenance": {
+    "config": {
+      "path": "docs/rev5-six-imu-fault-study-2026-09-13/author/run-001/one-bias/config.json",
+      "sha256": "dfd0d6ec924f7ef51771635ffcddc089e632b0b0f785c966431b89db01b0d8a6"
+    },
+    "samples": {
+      "path": "docs/rev5-six-imu-fault-study-2026-09-13/author/run-001/one-bias/samples.jsonl",
+      "sha256": "897d197be8f7b531f1b8669ede033304888569eda0810d6c0ea76b21bef301ce"
+    },
+    "implementation_sha256": {
+      "simulation/imu_estimation/__init__.py": "b7db592469cc569173310bb8533008a3249a04706f9b3a06b537153cbb8197d3",
+      "simulation/imu_estimation/estimator.py": "032810a1e178692cfdc637dccf914d799005473b1f0c87c7c13601b318c7ce3c",
+      "simulation/imu_estimation/schema.py": "f63ad25736bf865154f4670a656a6c1193b3c301ac61cf1d952979830c5893ae",
+      "simulation/imu_estimation/math3d.py": "bd82d9c399733a3c70f5bb9ea28daf8aa8f83e1baa661620c2706bdf80a068d9",
+      "simulation/imu_disagreement/__init__.py": "c608d78be25dbbf3538c182192455a12247329acc593066c31210d263d07f150",
+      "simulation/imu_disagreement/report.py": "5b0c2d6a86d9cb0de128037fe120364358996794cfdaa3d9b3b2b7e529a6f276",
+      "simulation/imu_disagreement/__main__.py": "45ed1be56ad6d51e0fb724bda963bb845c22cb6f3a54016cb9a58d495d2c8710"
+    },
+    "python": "3.9.6",
+    "time_and_calibration": "Declared synthetic assumptions; not authenticated physical facts."
+  },
+  "full_report_sha256_on_recorded_python": "000615b717220cc1946e4d890046bf34383b72119458552739e3e2924080b47a",
+  "reproduction": "Run the documented CLI with the exact relative config/samples paths. Full report.json also includes all 1201 records. Python version/path spelling can change whole-report bytes; this is not a cross-version byte-hash promise."
+}

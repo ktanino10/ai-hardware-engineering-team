@@ -1,0 +1,338 @@
+{
+  "schema_version": 1,
+  "record_type": "DERIVED_PUBLIC_MEDIA_METADATA",
+  "state": "WIP / REFERENCE ANIMATION / NOT ASSEMBLY READY / REF",
+  "source_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+  "source_manifest_sha256": "beabae5d00d3881a28bc7b1a60d23e373b986a53fee46dd6d1da217fd98f8fe8",
+  "source_scene_sha256": "8f55ba45dcd688c0253ec7c81628ce0ccedf7cedd79e7752191f2d8978eeedd0",
+  "source_plan_sha256": "941aba63dac8ff7ecc5ce67c09be99afabc6037193b418ef6183ffe163c802af",
+  "producer": "Blender 5.1.1 / Cycles CPU4",
+  "encoded_format": "H264 / yuv420p / 960x640 / 12 fps; silent",
+  "material_qualification": "Illustrative colors and finish only; not physical material/process data.",
+  "poster_qualification": "Actual native Blender stills pasted unchanged between WIP caption borders; no synthetic replacement renders.",
+  "release_action": "Exact original MP4/PNG bytes copied; no native execution, transcoding or metadata rewriting.",
+  "clips": [
+    {
+      "id": "whole-exterior",
+      "title": "全体外装 / Exterior",
+      "producer_revision": "66266f553d49cc54bfe2462f7045a5258ec70c78",
+      "producer_run": "594b4573-b705-45dc-aa05-fe6efe2dd99b",
+      "unit": null,
+      "whole_mode": "exterior",
+      "member_count": 299,
+      "video": {
+        "path": "media/exterior-turntable.mp4",
+        "sha256": "ee13ddf5d145976510fc6324c35dcf5398d0276f2049c9f610b97ed74d5c2132",
+        "bytes": 537195,
+        "frames": 72,
+        "fps": 12,
+        "width": 960,
+        "height": 640,
+        "codec": "h264",
+        "pixel_format": "yuv420p",
+        "duration_seconds": 6.0,
+        "container_duration_seconds": 6.0,
+        "source_clock_seconds": null,
+        "packet_timing": null,
+        "all_frames_decoded_by_producer": true,
+        "reencoded_in_release": false
+      },
+      "poster": {
+        "path": "media/exterior.png",
+        "sha256": "8070b29e7da9897f08c0c2f2e1aa984a1030cfa3a90dbbd62952ccc3a0a07b8b",
+        "dimensions": [
+          1280,
+          853
+        ],
+        "native_dimensions": [
+          1280,
+          720
+        ],
+        "native_frame": 1
+      },
+      "projection": "perspective",
+      "camera_rotation_degrees": 360,
+      "camera_label": "透視投影 52 mm / 固定フレーミング / カメラ360度旋回",
+      "motion_label": "形状は元の姿勢で静止。ブラウザーの平行投影カメラとは異なります。"
+    },
+    {
+      "id": "whole-interior",
+      "title": "全体内部 / Interior",
+      "producer_revision": "66266f553d49cc54bfe2462f7045a5258ec70c78",
+      "producer_run": "594b4573-b705-45dc-aa05-fe6efe2dd99b",
+      "unit": null,
+      "whole_mode": "interior",
+      "member_count": 293,
+      "video": {
+        "path": "media/interior-turntable.mp4",
+        "sha256": "98f206e9cea451d54ee86695849d547e827cd475ad2d3f68e692bd6dedd7b963",
+        "bytes": 1100937,
+        "frames": 72,
+        "fps": 12,
+        "width": 960,
+        "height": 640,
+        "codec": "h264",
+        "pixel_format": "yuv420p",
+        "duration_seconds": 6.0,
+        "container_duration_seconds": 6.0,
+        "source_clock_seconds": null,
+        "packet_timing": null,
+        "all_frames_decoded_by_producer": true,
+        "reencoded_in_release": false
+      },
+      "poster": {
+        "path": "media/interior.png",
+        "sha256": "14e20b0724f8f134ef4702b9503214ef72763f526188d510ec1f4226f0406973",
+        "dimensions": [
+          1280,
+          853
+        ],
+        "native_dimensions": [
+          1280,
+          720
+        ],
+        "native_frame": 1
+      },
+      "projection": "perspective",
+      "camera_rotation_degrees": 360,
+      "camera_label": "透視投影 52 mm / 固定フレーミング / カメラ360度旋回",
+      "motion_label": "形状は元の姿勢で静止。ブラウザーの平行投影カメラとは異なります。"
+    },
+    {
+      "id": "outside-first",
+      "title": "外側から段階表示 / Outside first",
+      "producer_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "producer_run": "9b3e2cd5-80cc-4124-96bf-e6b1431bd62f",
+      "unit": null,
+      "whole_mode": "exterior",
+      "member_count": 299,
+      "video": {
+        "path": "media/outside-first.mp4",
+        "sha256": "a6381631f994864cb460b8a058296c08d5974354e56150f909bb8e85b452b5e6",
+        "bytes": 722511,
+        "frames": 145,
+        "fps": 12,
+        "width": 960,
+        "height": 640,
+        "codec": "h264",
+        "pixel_format": "yuv420p",
+        "duration_seconds": 12.083333,
+        "container_duration_seconds": 12.083333,
+        "source_clock_seconds": [
+          0,
+          12
+        ],
+        "packet_timing": {
+          "time_base": "1/12288",
+          "packet_count": 145,
+          "presentation_timestamps": "Exact arithmetic progression from0 with one frame step",
+          "frame_step_ticks": 1024,
+          "last_frame_pts_ticks": 147456,
+          "packet_end_ticks": 148480,
+          "packet_duration_seconds_exact": "145/12",
+          "stream_duration_ticks": 148480,
+          "stream_minus_packet_end_ticks": 0,
+          "limit": "Stream/container duration is reported as observed, not substituted for exact frame PTS coverage; no rounding of the observed metadata."
+        },
+        "all_frames_decoded_by_producer": true,
+        "reencoded_in_release": false
+      },
+      "poster": {
+        "path": "media/outside-first.png",
+        "sha256": "68e72f5bc7bfd5800cb84e8e572fc96f950361062d91dca15971e4c2ffb406f5",
+        "dimensions": [
+          1280,
+          853
+        ],
+        "native_dimensions": [
+          1280,
+          720
+        ],
+        "native_frame": 145
+      },
+      "projection": "orthographic",
+      "camera_rotation_degrees": 0,
+      "camera_label": "平行投影 / 斜め視点の方向固定 / 動的な外接枠",
+      "motion_label": "共通プランの表示進行 0–100%。収録元の時刻は0–12秒、最終フレームの表示時間を含む動画は約12.083秒です。"
+    },
+    {
+      "id": "unit-X",
+      "title": "X軸ユニット / Unit X",
+      "producer_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "producer_run": "9b3e2cd5-80cc-4124-96bf-e6b1431bd62f",
+      "unit": "axis-X",
+      "whole_mode": null,
+      "member_count": 22,
+      "video": {
+        "path": "media/unit-X.mp4",
+        "sha256": "f6f7f61a170fba4f954f10e76455104b67727a094d3726c97fb644fef5b3ef41",
+        "bytes": 586008,
+        "frames": 145,
+        "fps": 12,
+        "width": 960,
+        "height": 640,
+        "codec": "h264",
+        "pixel_format": "yuv420p",
+        "duration_seconds": 12.083333,
+        "container_duration_seconds": 12.083333,
+        "source_clock_seconds": [
+          0,
+          12
+        ],
+        "packet_timing": {
+          "time_base": "1/12288",
+          "packet_count": 145,
+          "presentation_timestamps": "Exact arithmetic progression from0 with one frame step",
+          "frame_step_ticks": 1024,
+          "last_frame_pts_ticks": 147456,
+          "packet_end_ticks": 148480,
+          "packet_duration_seconds_exact": "145/12",
+          "stream_duration_ticks": 148480,
+          "stream_minus_packet_end_ticks": 0,
+          "limit": "Stream/container duration is reported as observed, not substituted for exact frame PTS coverage; no rounding of the observed metadata."
+        },
+        "all_frames_decoded_by_producer": true,
+        "reencoded_in_release": false
+      },
+      "poster": {
+        "path": "media/unit-X.png",
+        "sha256": "f4f3ca8152df92902504ea572254f3a79488c897264762c5b172fb53b0d8fe25",
+        "dimensions": [
+          1280,
+          853
+        ],
+        "native_dimensions": [
+          1280,
+          720
+        ],
+        "native_frame": 145
+      },
+      "projection": "orthographic",
+      "camera_rotation_degrees": 180,
+      "camera_label": "平行投影 / 動的な外接枠 / カメラ180度旋回",
+      "motion_label": "共通プランの表示進行 0–100%。収録元の時刻は0–12秒、最終フレームの表示時間を含む動画は約12.083秒です。"
+    },
+    {
+      "id": "unit-Y",
+      "title": "Y軸ユニット / Unit Y",
+      "producer_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "producer_run": "9b3e2cd5-80cc-4124-96bf-e6b1431bd62f",
+      "unit": "axis-Y",
+      "whole_mode": null,
+      "member_count": 22,
+      "video": {
+        "path": "media/unit-Y.mp4",
+        "sha256": "c71aedab2d4a4031cbf54b03002db56c6c01fd134c41984b9fb712bf5cd56261",
+        "bytes": 585464,
+        "frames": 145,
+        "fps": 12,
+        "width": 960,
+        "height": 640,
+        "codec": "h264",
+        "pixel_format": "yuv420p",
+        "duration_seconds": 12.083333,
+        "container_duration_seconds": 12.083333,
+        "source_clock_seconds": [
+          0,
+          12
+        ],
+        "packet_timing": {
+          "time_base": "1/12288",
+          "packet_count": 145,
+          "presentation_timestamps": "Exact arithmetic progression from0 with one frame step",
+          "frame_step_ticks": 1024,
+          "last_frame_pts_ticks": 147456,
+          "packet_end_ticks": 148480,
+          "packet_duration_seconds_exact": "145/12",
+          "stream_duration_ticks": 148480,
+          "stream_minus_packet_end_ticks": 0,
+          "limit": "Stream/container duration is reported as observed, not substituted for exact frame PTS coverage; no rounding of the observed metadata."
+        },
+        "all_frames_decoded_by_producer": true,
+        "reencoded_in_release": false
+      },
+      "poster": {
+        "path": "media/unit-Y.png",
+        "sha256": "26332bf4d1bf151f91f3e8b62466d99e8b5a9992cba62b181731f03a110ce7e0",
+        "dimensions": [
+          1280,
+          853
+        ],
+        "native_dimensions": [
+          1280,
+          720
+        ],
+        "native_frame": 145
+      },
+      "projection": "orthographic",
+      "camera_rotation_degrees": 180,
+      "camera_label": "平行投影 / 動的な外接枠 / カメラ180度旋回",
+      "motion_label": "共通プランの表示進行 0–100%。収録元の時刻は0–12秒、最終フレームの表示時間を含む動画は約12.083秒です。"
+    },
+    {
+      "id": "unit-Z",
+      "title": "Z軸ユニット / Unit Z",
+      "producer_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "producer_run": "9b3e2cd5-80cc-4124-96bf-e6b1431bd62f",
+      "unit": "axis-Z",
+      "whole_mode": null,
+      "member_count": 22,
+      "video": {
+        "path": "media/unit-Z.mp4",
+        "sha256": "1c37833fae2e3fed9c9208ad1d1c8fb2fce698ad966abcb4a3db81327e1d215b",
+        "bytes": 476327,
+        "frames": 145,
+        "fps": 12,
+        "width": 960,
+        "height": 640,
+        "codec": "h264",
+        "pixel_format": "yuv420p",
+        "duration_seconds": 12.083008,
+        "container_duration_seconds": 12.083008,
+        "source_clock_seconds": [
+          0,
+          12
+        ],
+        "packet_timing": {
+          "time_base": "1/12288",
+          "packet_count": 145,
+          "presentation_timestamps": "Exact arithmetic progression from0 with one frame step",
+          "frame_step_ticks": 1024,
+          "last_frame_pts_ticks": 147456,
+          "packet_end_ticks": 148480,
+          "packet_duration_seconds_exact": "145/12",
+          "stream_duration_ticks": 148476,
+          "stream_minus_packet_end_ticks": -4,
+          "limit": "Stream/container duration is reported as observed, not substituted for exact frame PTS coverage; no rounding of the observed metadata."
+        },
+        "all_frames_decoded_by_producer": true,
+        "reencoded_in_release": false
+      },
+      "poster": {
+        "path": "media/unit-Z.png",
+        "sha256": "2845de6959286d96d0831f9f1480bc9685d6da53f707825439b65c03482badf0",
+        "dimensions": [
+          1280,
+          853
+        ],
+        "native_dimensions": [
+          1280,
+          720
+        ],
+        "native_frame": 145
+      },
+      "projection": "orthographic",
+      "camera_rotation_degrees": 180,
+      "camera_label": "平行投影 / 動的な外接枠 / カメラ180度旋回",
+      "motion_label": "共通プランの表示進行 0–100%。収録元の時刻は0–12秒、最終フレームの表示時間を含む動画は約12.083秒です。"
+    }
+  ],
+  "retained_observations": [
+    "unit-Z stream/container duration is 12.083008 seconds, four 1/12288-second ticks shorter than exact packet end 145/12; all 145 frames decoded. Do not reencode or replace observed metadata.",
+    "Two unit-Z camera-radius readbacks differed by one binary64 ULP. Preserve producer observations; no geometry or engineering tolerance change."
+  ],
+  "per_part_movie": false,
+  "scope": "Related unit movies exist only for axis-X/Y/Z. Other visible source members can link to a containing whole view; hidden reference volumes have no native movie. All399 individual browser views and reference SVGs remain separate.",
+  "unchanged_holds": "WIP / REF / NOT ASSEMBLY READY / NO-GO / 3C8H / REQ409 / strict-pro / 39UNKNOWN; P1/C1/D1; sidecar/ICD/control; original44 = 2 closed / 42 unfinished; N8R8 NOT_FOR_FLASH; all human/source/physical gates.",
+  "private_producer_records_included": false
+}

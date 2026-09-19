@@ -6,7 +6,13 @@
 
 独立レビュー済みの限定ソフトウェアを公開する追補です。Rev5全体の完成ではありません。
 [全体モデルv2](https://ktanino10.github.io/ai-hardware-engineering-team/rev5-full-assembly-v2/index.html)
-と元の公開manifestは変更しません。進行中のv3・Blender成果物は含みません。
+と元の公開manifestは変更しません。現在の公開baseには別途公開済みのv3、
+Blender動画6本、オフラインIMUツールもあります。その実行用データは保持し、再生成しません。
+
+元のsoftware・offline-tool manifestは当時の記録として保持します。
+[software-continuation.json](software-continuation.json)が、意図して更新する補助ファイルを
+元manifestのhashと現在のbytesへ結び付けます。共通検査は履歴の改変・重複path・
+由来のない上書きを拒否します。不変のcode/data検査を省略したり、過去レビューを再発行したりしません。
 
 ## 公開した範囲と保留
 

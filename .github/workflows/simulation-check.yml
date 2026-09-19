@@ -8,6 +8,15 @@ on:
       - "docs/rev5-public-release/software*"
       - "docs/rev5-six-imu-fault-study-2026-09-13/author/run-001/one-bias/**"
       - "tools/tests/test_rev5_public_software.py"
+      - "tools/public_release_manifest.py"
+      - "tools/tests/test_public_release_manifest.py"
+      - "docs/rev5-offline-tools-release/**"
+      - "tools/tests/test_rev5_offline_publication.py"
+      - "visualization/index*.html"
+      - "docs/language-coverage.json"
+      - "docs/pages*.md"
+      - "AGENTS.md"
+      - "AGENTS.ja.md"
       - ".github/workflows/simulation-check.yml"
   push:
     branches: [main]
@@ -17,6 +26,15 @@ on:
       - "docs/rev5-public-release/software*"
       - "docs/rev5-six-imu-fault-study-2026-09-13/author/run-001/one-bias/**"
       - "tools/tests/test_rev5_public_software.py"
+      - "tools/public_release_manifest.py"
+      - "tools/tests/test_public_release_manifest.py"
+      - "docs/rev5-offline-tools-release/**"
+      - "tools/tests/test_rev5_offline_publication.py"
+      - "visualization/index*.html"
+      - "docs/language-coverage.json"
+      - "docs/pages*.md"
+      - "AGENTS.md"
+      - "AGENTS.ja.md"
       - ".github/workflows/simulation-check.yml"
   workflow_dispatch: {}
 
@@ -39,12 +57,18 @@ jobs:
       - name: Run CPU numerical and provenance cases
         working-directory: simulation
         run: python -m unittest discover -s tests -v
+      - name: Check public offline IMU closure and original tests
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          python -B -S -m unittest discover -s simulation/imu_disagreement/tests -v
+          python -B -S -m unittest discover -s tools/tests -p 'test_rev5_offline_publication.py' -v
       - name: Check curated Rev5 public software (no SDK or hardware)
         env:
           PYTHONDONTWRITEBYTECODE: "1"
         run: |
           python -B -m unittest discover -s tools/tests -p 'test_rev5_public_software.py' -v
-          python -B -m unittest discover -s simulation/imu_disagreement/tests -v
+          python -B -m unittest tools.tests.test_public_release_manifest -v
           cmake --version
           export REV5_EVAL_CMAKE="$(command -v cmake)"
           export REV5_EVAL_TEST_SCRATCH="$(mktemp -d "$RUNNER_TEMP/rev5-n8r8.XXXXXX")"

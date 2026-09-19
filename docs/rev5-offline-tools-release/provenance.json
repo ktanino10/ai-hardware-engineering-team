@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "record_type": "DERIVED_PUBLIC_OFFLINE_PROVENANCE",
+  "public_source_revision": "6a86f5e71934c78435ca31f3f696da48de5ddd5a",
+  "source_manifest": {
+    "path": "docs/rev5-public-release/software-manifest.json",
+    "sha256": "132addfe2257608346fe235cfc91be985a59da44d41485b0bfc759a42e41bc7d",
+    "disposition": "PUBLIC_PROVENANCE_INPUT_ONLY_NOT_REEXPORTED"
+  },
+  "original_imu_authored_revision": "a7b935d1fc199d4bfcb68c8c2218c7649fd7fc91",
+  "exported_files": 11,
+  "python_files_including_original_tests": 8,
+  "runtime_python_files": 7,
+  "runtime_external_dependencies": [],
+  "publication_check_adaptation": {
+    "source_module": "tools/tests/test_rev5_public_software.py",
+    "source_sha256": "5f40b525da7555b970d547595411993853d6d8a34d529dc82e35ec2487f5e6a4",
+    "retained_applicable_checks": [
+      "Manifest hashes, safe paths and private-host-path exclusion",
+      "Exact frozen source closure, without study generator/campaign",
+      "Non-orderable C1 aggregate boundaries",
+      "Original review attribution and explicit NOT_RUN distinctions",
+      "Complete synthetic fixture without truth sidecars",
+      "Bilingual landing links and preserved visual bundles"
+    ],
+    "not_applicable": [
+      "N8R8 pin projection: no firmware/pin projection is exported",
+      "N8R8 dynamic CMake test: no firmware build profile is exported"
+    ],
+    "added_closure_witnesses": [
+      "Complete Python import resolution and exact 14-test count",
+      "Standard-library-only isolated execution of all original tests and the CLI",
+      "Missing helper fails explicitly; no dependency stripping",
+      "Preserved v3/six movies and additive existing CI step"
+    ]
+  },
+  "input_closure": {
+    "code": "Seven exact runtime Python files; standard-library imports only.",
+    "tests": "Exact original 14-test file and two exact one-bias fixture files.",
+    "fixture_records": 1201,
+    "c1": "Exact already-public aggregate summary only, not a production input closure.",
+    "private_git_runtime_dependency": false,
+    "firmware_dependency": false,
+    "scope_limits": "Trusted bounded offline synthetic SI/body/exact-clock files; no physical qualification."
+  },
+  "historical_review": {
+    "public_summary": {
+      "revision": "6a86f5e71934c78435ca31f3f696da48de5ddd5a",
+      "path": "docs/rev5-public-release/software-review.json",
+      "sha256": "c0cf635a5bfff3141013683737f503e9e00df30bb92209b72c2867f80a30b934",
+      "url": "https://github.com/ktanino10/ai-hardware-engineering-team/blob/6a86f5e71934c78435ca31f3f696da48de5ddd5a/docs/rev5-public-release/software-review.json"
+    },
+    "original_receipt_revision": "5d70e3126a5008904ff3d32ccdcda28cd26f1e29",
+    "technical_commit": "7b033d9fb7675ac1d2a6847cfc73b40422d52568",
+    "imu": {
+      "package": "imu",
+      "commit": "a7b935d1fc199d4bfcb68c8c2218c7649fd7fc91",
+      "verdict": "PASS",
+      "acceptance": "LIMITED_CODE_REVIEW_ONLY",
+      "scope": "New disagreement wrapper, exact private observation hook and pinned strict synthetic input/output meanings.",
+      "premise_challenge": "Common-mode agreement is not sensor accuracy. A separate three-vector 3D derivation confirms the reported spread is max Euclidean residual, not standard deviation. Existing tests also retain shared-bias and 3vs3 ambiguity.",
+      "limits": [
+        "Bounded trusted offline synthetic SI/config files, in-memory implementation",
+        "No real input/calibration/extrinsics/clock qualification",
+        "No full-study replay",
+        "Private hook is tied to the pinned estimator, not a general stable plugin API"
+      ],
+      "findings": [],
+      "author_code_modified": false,
+      "tests": 14
+    },
+    "original_unit_tests_run_pass": {
+      "c1": 18,
+      "imu": 14,
+      "n8r8": 4,
+      "total": 36
+    },
+    "historical_n8r8_dynamic_cmake_test": "NOT_RUN: reviewer host CMake unavailable",
+    "independent_sdk_build_elf_bin_device_checks": "EXCLUDED",
+    "new_independent_review": false,
+    "boundary": "Historical attribution only. No private original receipt, C1 production or firmware closure is exported. Publisher checks do not amend the old review or NOT_RUN results."
+  },
+  "rights_basis": "Owner-authorized publication of existing first-party project code, tests, synthetic inputs and public-safe derived summary; no new project or downstream license.",
+  "excluded": [
+    "firmware, vendor, Bosch, CRT, N8R8, SDK, device and serial changes",
+    "private C1 closure, raw source notes, private ancestry, raw uploads, logs, personal paths and credentials",
+    "native CAD, geometry, plan, media, rendering and physical operations",
+    "source adoption, shared safety ledgers, original reviews and app/global configuration"
+  ],
+  "unchanged_holds": "Original44=2closed42unfinished; WIP / NOT ASSEMBLY READY / NO-GO / 3C8H / REQ409 / strict-pro / 39UNKNOWN; P1/C1/D1; held control/sidecar/ICD; all source, human and physical gates."
+}

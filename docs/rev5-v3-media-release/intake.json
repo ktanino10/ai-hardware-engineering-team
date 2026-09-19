@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "record_type": "DERIVED_PUBLIC_COMMISSION",
+  "task_id": "rev5-v3-media-public-release",
+  "repository": "ktanino10/ai-hardware-engineering-team",
+  "public_base": "ca07ba11bf3347ff467671606c00a6e2b5a70c02",
+  "config_revision": "ca07ba11bf3347ff467671606c00a6e2b5a70c02",
+  "authority": "The project owner requested the approved outside-first v3 presentation, six completed Blender clips, and normal public main/Pages publication after required CI and publication checks. One direct integration/publication actor; no additional agent, reviewer, factory or session.",
+  "viewer": {
+    "revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+    "producer_run": "d0da6883-0120-413b-9a03-5eb6cf316c17",
+    "root": "visualization/rev5-full-assembly-v3",
+    "allowlist_path": "docs/rev5-viewer-outer-first-v3-2026-09-18/release-allowlist.json",
+    "allowlist_sha256": "2fee1dfb54f122e9af6a05c594f53df2c1c29e09fc2497af6d9ec655fb1ae928",
+    "entry_sha256": "560946657497716b8a16beb473f43d25f25c76be98a305e4a6a7399999712001",
+    "scene_sha256": "8f55ba45dcd688c0253ec7c81628ce0ccedf7cedd79e7752191f2d8978eeedd0",
+    "plan_sha256": "941aba63dac8ff7ecc5ce67c09be99afabc6037193b418ef6183ffe163c802af",
+    "runtime_files": 14,
+    "mesh_count": 399,
+    "triangle_count": 794132,
+    "scope": "Five outside-first display stages, 31 display groups, 25 units, seven views, exact triangle picking and 399 individual reference SVGs. Preserve geometry, source poses, dimensions, plan and renderer behavior."
+  },
+  "media": {
+    "revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+    "base_revision": "66266f553d49cc54bfe2462f7045a5258ec70c78",
+    "producer_runs": ["594b4573-b705-45dc-aa05-fe6efe2dd99b", "9b3e2cd5-80cc-4124-96bf-e6b1431bd62f"],
+    "manifest_path": "docs/rev5-blender-whole-assembly-media-2026-09-18/sequenced/result/six-clip-manifest.json",
+    "manifest_sha256": "beabae5d00d3881a28bc7b1a60d23e373b986a53fee46dd6d1da217fd98f8fe8",
+    "stop_path": "docs/rev5-blender-whole-assembly-media-2026-09-18/sequenced/result/stop-ack.json",
+    "stop_sha256": "fb0ac4c1f737cdee2f210df29b8c9cf956482e7a6fc69771bc659728be72f6a4",
+    "source_roots": ["hardware/visualization/rev5-blender-whole-assembly/media/base", "hardware/visualization/rev5-blender-whole-assembly/media/sequenced"],
+    "destination_root": "visualization/rev5-full-assembly-v3/media",
+    "clip_ids": ["whole-exterior", "whole-interior", "outside-first", "unit-X", "unit-Y", "unit-Z"],
+    "native_producer": "Blender 5.1.1 / Cycles CPU4",
+    "base_timing_camera": "Two unchanged 6-second, 72-frame, 12-fps perspective 360-degree turntables.",
+    "sequenced_timing_camera": "Four unchanged 145-frame, 12-fps orthographic clips; source clock 0..12 seconds, encoded duration approximately 12.083 seconds. Whole fixed isometric direction with dynamic bounds; unit cameras turn 180 degrees.",
+    "retained_observations": [
+      "unit-Z stream/container duration is 12.083008 seconds, four 1/12288-second ticks shorter than exact packet end 145/12; all 145 frames decoded. Do not reencode or replace observed metadata.",
+      "Two unit-Z camera-radius readbacks differed by one binary64 ULP. Preserve producer observations; no geometry or engineering tolerance change."
+    ]
+  },
+  "first_party_provenance": {
+    "prior_public_record": "docs/rev5-public-release/manifest.json",
+    "prior_public_explanation": "docs/rev5-public-release/README.md",
+    "condition": "Verify byte equality for inherited packed geometry, edges, inventory and code; trace new first-party presentation and material/render deltas. Prior publication is not a new third-party license or blanket permission."
+  },
+  "integration": [
+    "Keep every runtime asset inside the v3 bundle; preserve isolated file loading and visualization-as-Pages-root loading.",
+    "Six actual MP4/PNG entries with controlled native video playback, posters and metadata preload; no simultaneous autoplay.",
+    "Link part/unit selection to a real containing-unit clip when available; no invented per-part native movies.",
+    "Only minimal media-src 'self' CSP addition; no wildcard, unsafe-eval, CDN, new dependency, extension or persistent server.",
+    "Update current EN/JA navigation and honest reader metadata; preserve public v2 and all prior producer receipts."
+  ],
+  "exclusions": [
+    "Private ancestry, PR80 firmware/Bosch/C1/IMU/N8R8 changes",
+    "Native editor files, source STLs, raw frames, raw uploads, process argv/logs, private paths/accounts, SDKs and .agent-work",
+    "New geometry, native renders, transcoding, physical acceptance, gate/finding/protection changes and administrative bypass"
+  ],
+  "done_when": "Exact eligible visual assets are normally merged after checks, deployed by the existing Pages workflow, and verified at the actual public URL by hash readback, interactive browser checks and six playable movies.",
+  "stop_when": "A concrete source, rights, authorization, CI or app-mechanics prerequisite is unavailable, or the finite visual release is delivered. Save exact BLOCKED or DONE evidence and STOP.",
+  "unchanged_holds": "WIP / REF / NOT ASSEMBLY READY / NO-GO / 3C8H / REQ409 / strict-pro / 39UNKNOWN; P1/C1/D1; sidecar/ICD/control; original44 = 2 closed / 42 unfinished; N8R8 NOT_FOR_FLASH; all human/source/physical gates."
+}

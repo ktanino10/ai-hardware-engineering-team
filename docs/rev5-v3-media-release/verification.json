@@ -1,0 +1,842 @@
+{
+  "schema_version": 1,
+  "record_type": "DERIVED_PUBLIC_INTEGRATION_EVIDENCE",
+  "task_id": "rev5-v3-media-public-release-prepare",
+  "run_id": "72b998a4-d365-463e-8c6e-f489cd451b5d",
+  "source_revision": "e4640939f60aae1ea7445142a59094aadcba6bd1",
+  "config_revision": "ca07ba11bf3347ff467671606c00a6e2b5a70c02",
+  "scope": "Author software/publication checks only; original producer receipts remain unchanged.",
+  "software": [
+    {
+      "command": "node --test visualization/rev5-full-assembly-v3/features_test.mjs visualization/rev5-full-assembly-v3/media_test.mjs",
+      "status": "PASS",
+      "tests": 9,
+      "raw_output_sha256": "e3501b05b75c58f56fc2d748bf9ed822d4cdf1a0f236bde545658af37719f3eb"
+    },
+    {
+      "command": "python3 visualization/rev5-full-assembly-v3/release_test.py",
+      "status": "PASS",
+      "tests": 5,
+      "skipped": 0,
+      "decoded_frames": 724,
+      "source_meshes": 399,
+      "source_triangles": 794132,
+      "raw_output_sha256": "755577956ec0f34e0b53bd85066a632295b9a2721d5289b004f7b1f79ffa8912"
+    }
+  ],
+  "media_tools": {
+    "ffmpeg": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+    "ffprobe": "ffprobe version 8.1 Copyright (c) 2007-2026 the FFmpeg developers"
+  },
+  "browser": [
+    {
+      "mode": "Isolated29-file bundle; file URL; no sibling directory",
+      "status": "PASS",
+      "browser": "Chrome/153.0.8010.48",
+      "node": "v22.17.0",
+      "started_at": "2026-09-19T01:38:10.338Z",
+      "completed_at": "2026-09-19T01:38:56.163Z",
+      "raw_observation_sha256": "079857ff33ba9fef75bdb509496398dbed39058ea05e46df8bbb631663f22752",
+      "runtime_assets": [
+        {
+          "path": "index.html",
+          "sha256": "b4bd9afdb1ec2e12e3095778b407906732d3e2d59835ce9b102f451ae97d38ac",
+          "bytes": 12639
+        },
+        {
+          "path": "style.css",
+          "sha256": "ec2f75864fcd977697c014d634d2c7d78dc96dfde9095f1192414c93c497dd3a",
+          "bytes": 6929
+        },
+        {
+          "path": "interactive-viewer.js",
+          "sha256": "936a6eedfdd8b09fe873beee30f1d11f7f1be111076aafd26b278200a7a01833",
+          "bytes": 21676
+        },
+        {
+          "path": "scene-data.js",
+          "sha256": "8f55ba45dcd688c0253ec7c81628ce0ccedf7cedd79e7752191f2d8978eeedd0",
+          "bytes": 8995251
+        },
+        {
+          "path": "edge-data.js",
+          "sha256": "ecec1cd659ed4ca66e1d0126acb9c0ec1e638a927a57fc50bb3d8253d4c35e8b",
+          "bytes": 4458621
+        },
+        {
+          "path": "features.js",
+          "sha256": "a2370e219c8e80c1bbee3546fda5401885cfb7d88568faaab7a7b4b60d17d3da",
+          "bytes": 7791
+        },
+        {
+          "path": "viewer.js",
+          "sha256": "244375de1c04f7c5b6cc611552ed1cb4305114969a9ce8d32d51109fdf70e89c",
+          "bytes": 20363
+        },
+        {
+          "path": "drawings.js",
+          "sha256": "7c8719441b48de3c3a8f86c2abb522a6da97ccaeb4afba62cfdb5212817dab95",
+          "bytes": 5101
+        },
+        {
+          "path": "app.js",
+          "sha256": "0f0fa421253338be22fa1dd9772516bb61cda9aae9b80a49e50a33b5b0056fd0",
+          "bytes": 13451
+        },
+        {
+          "path": "inventory.json",
+          "sha256": "3caf94d95eedaef9f657be31b7e82cfce22a4b96a262d184249790026c2dd9ba",
+          "bytes": 514667
+        },
+        {
+          "path": "plan-data.js",
+          "sha256": "05ed439f1bc2aed8cccc0d75d9b38d299a27abcb24ecafad5070086e57a6e6f1",
+          "bytes": 210167
+        },
+        {
+          "path": "presentation-plan.json",
+          "sha256": "941aba63dac8ff7ecc5ce67c09be99afabc6037193b418ef6183ffe163c802af",
+          "bytes": 189032
+        },
+        {
+          "path": "runtime-assets.json",
+          "sha256": "7233e5dfe0344b255733d38ce83fd881ff6b2da5ef1a5a294a7b94749de30b96",
+          "bytes": 1383
+        },
+        {
+          "path": "README.md",
+          "sha256": "61f697b9b54f9768c33d63962ef8478cbf05000f6937653d078b87dcefe80dc6",
+          "bytes": 10577
+        },
+        {
+          "path": "media-data.js",
+          "sha256": "54543b66afa27fd4627c4d9a0a1d847fe2c66c26ae1514879ff2409a80605d7f",
+          "bytes": 15621
+        },
+        {
+          "path": "media.js",
+          "sha256": "2a3205ea7e907a581df5017a1d72efa1a9e8b79490175c603771f41923d3de70",
+          "bytes": 6717
+        },
+        {
+          "path": "media-manifest.json",
+          "sha256": "027ed6eb11a9ce8c13239590d5aeb9c85e8bd35b2570d3752dc6de5e13dd4196",
+          "bytes": 13296
+        },
+        {
+          "path": "media/exterior-turntable.mp4",
+          "sha256": "ee13ddf5d145976510fc6324c35dcf5398d0276f2049c9f610b97ed74d5c2132",
+          "bytes": 537195
+        },
+        {
+          "path": "media/exterior.png",
+          "sha256": "8070b29e7da9897f08c0c2f2e1aa984a1030cfa3a90dbbd62952ccc3a0a07b8b",
+          "bytes": 628958
+        },
+        {
+          "path": "media/interior-turntable.mp4",
+          "sha256": "98f206e9cea451d54ee86695849d547e827cd475ad2d3f68e692bd6dedd7b963",
+          "bytes": 1100937
+        },
+        {
+          "path": "media/interior.png",
+          "sha256": "14e20b0724f8f134ef4702b9503214ef72763f526188d510ec1f4226f0406973",
+          "bytes": 787479
+        },
+        {
+          "path": "media/outside-first.mp4",
+          "sha256": "a6381631f994864cb460b8a058296c08d5974354e56150f909bb8e85b452b5e6",
+          "bytes": 722511
+        },
+        {
+          "path": "media/outside-first.png",
+          "sha256": "68e72f5bc7bfd5800cb84e8e572fc96f950361062d91dca15971e4c2ffb406f5",
+          "bytes": 639374
+        },
+        {
+          "path": "media/unit-X.mp4",
+          "sha256": "f6f7f61a170fba4f954f10e76455104b67727a094d3726c97fb644fef5b3ef41",
+          "bytes": 586008
+        },
+        {
+          "path": "media/unit-X.png",
+          "sha256": "f4f3ca8152df92902504ea572254f3a79488c897264762c5b172fb53b0d8fe25",
+          "bytes": 588000
+        },
+        {
+          "path": "media/unit-Y.mp4",
+          "sha256": "c71aedab2d4a4031cbf54b03002db56c6c01fd134c41984b9fb712bf5cd56261",
+          "bytes": 585464
+        },
+        {
+          "path": "media/unit-Y.png",
+          "sha256": "26332bf4d1bf151f91f3e8b62466d99e8b5a9992cba62b181731f03a110ce7e0",
+          "bytes": 589795
+        },
+        {
+          "path": "media/unit-Z.mp4",
+          "sha256": "1c37833fae2e3fed9c9208ad1d1c8fb2fce698ad966abcb4a3db81327e1d215b",
+          "bytes": 476327
+        },
+        {
+          "path": "media/unit-Z.png",
+          "sha256": "2845de6959286d96d0831f9f1480bc9685d6da53f707825439b65c03482badf0",
+          "bytes": 570442
+        }
+      ],
+      "checks": [
+        "initial interior: full frame and all three drives; actual GPU pixels",
+        "exterior reveals all six panels and changes actual framebuffer",
+        "100 reference/gauge meshes separately toggled; not physical BOM",
+        "all eight required selections show source-derived XYZ mm; selected-only visibility; frame 240/240/240",
+        "four camera presets, pointer drag, wheel zoom, keyboard, reset",
+        "empty search, search recovery, dimension visibility and corrupt payload rejection",
+        "explode100 and exact zero for all399; play reverses, pause/stop and orbit; reduced-motion disables continuous play",
+        "actual opaque versus translucent faces and edge pixels",
+        "actual pointer hover and click pin at current exploded triangle geometry",
+        "actual pointer hover and click pin at current exploded triangle geometry",
+        "actual mouse click and touch tap change pinned selection; stale ID filter cleared for keyboard fallback",
+        "hidden group excluded; empty area inside frame AABB rejected by triangle/depth picking",
+        "all399 source IDs generate valid three-view SVGs with source hashes/dimensions; selected sheet displayed and actual SVG download works",
+        "actual11 timeline positions: outside first; small members stay grouped; reserves stationary",
+        "XYZ exploded unit views: exact source memberships and7 rendered camera angles per unit",
+        "small part fills focused view; separated XYZ labels; source-centred turntable; all399 frame centres/matrices",
+        "actual selected XYZ parts link to containing-unit clips; frame links to whole interior; hidden reference has no invented movie",
+        "six original MP4s and six posters: native control play/pause, actual presented/decoded frames, source metadata and precise Z observation",
+        "responsive page and GPU draw",
+        "responsive page and GPU draw",
+        "responsive page and GPU draw",
+        "responsive page and GPU draw",
+        "accessible heading and named native controls exposed in Chrome AX tree; not a full accessibility audit",
+        "actual browser hidden lifecycle stops playback and orbit; hidden page correctly does not paint, so tested last without a frame wait"
+      ],
+      "reference_svg_count": 399,
+      "reference_svg_observation_sha256": "614d8a70cba4ea45b9c7bbef5616202a3c44a05c98464918513b6d7fa5a299cd",
+      "media": [
+        {
+          "id": "whole-exterior",
+          "observed_duration_seconds": 6,
+          "video_dimensions": [
+            960,
+            640
+          ],
+          "poster_dimensions": [
+            1280,
+            853
+          ],
+          "native_controls_play_pause": true,
+          "playback_observation": {
+            "paused": false,
+            "time": 0.191619,
+            "frame": {
+              "mediaTime": 0,
+              "presentedFrames": 1
+            },
+            "decoded": 7,
+            "readyState": 4,
+            "networkState": 1,
+            "error": null,
+            "hidden": false,
+            "buffered": [
+              [
+                0,
+                6
+              ]
+            ]
+          },
+          "video_sha256": "ee13ddf5d145976510fc6324c35dcf5398d0276f2049c9f610b97ed74d5c2132",
+          "poster_sha256": "8070b29e7da9897f08c0c2f2e1aa984a1030cfa3a90dbbd62952ccc3a0a07b8b"
+        },
+        {
+          "id": "whole-interior",
+          "observed_duration_seconds": 6,
+          "video_dimensions": [
+            960,
+            640
+          ],
+          "poster_dimensions": [
+            1280,
+            853
+          ],
+          "native_controls_play_pause": true,
+          "playback_observation": {
+            "paused": false,
+            "time": 0.21007,
+            "frame": {
+              "mediaTime": 0,
+              "presentedFrames": 1
+            },
+            "decoded": 7,
+            "readyState": 4,
+            "networkState": 1,
+            "error": null,
+            "hidden": false,
+            "buffered": [
+              [
+                0,
+                6
+              ]
+            ]
+          },
+          "video_sha256": "98f206e9cea451d54ee86695849d547e827cd475ad2d3f68e692bd6dedd7b963",
+          "poster_sha256": "14e20b0724f8f134ef4702b9503214ef72763f526188d510ec1f4226f0406973"
+        },
+        {
+          "id": "outside-first",
+          "observed_duration_seconds": 12.083333,
+          "video_dimensions": [
+            960,
+            640
+          ],
+          "poster_dimensions": [
+            1280,
+            853
+          ],
+          "native_controls_play_pause": true,
+          "playback_observation": {
+            "paused": false,
+            "time": 0.207127,
+            "frame": {
+              "mediaTime": 0,
+              "presentedFrames": 1
+            },
+            "decoded": 7,
+            "readyState": 4,
+            "networkState": 1,
+            "error": null,
+            "hidden": false,
+            "buffered": [
+              [
+                0,
+                12.083333
+              ]
+            ]
+          },
+          "video_sha256": "a6381631f994864cb460b8a058296c08d5974354e56150f909bb8e85b452b5e6",
+          "poster_sha256": "68e72f5bc7bfd5800cb84e8e572fc96f950361062d91dca15971e4c2ffb406f5"
+        },
+        {
+          "id": "unit-X",
+          "observed_duration_seconds": 12.083333,
+          "video_dimensions": [
+            960,
+            640
+          ],
+          "poster_dimensions": [
+            1280,
+            853
+          ],
+          "native_controls_play_pause": true,
+          "playback_observation": {
+            "paused": false,
+            "time": 0.209964,
+            "frame": {
+              "mediaTime": 0,
+              "presentedFrames": 1
+            },
+            "decoded": 7,
+            "readyState": 4,
+            "networkState": 1,
+            "error": null,
+            "hidden": false,
+            "buffered": [
+              [
+                0,
+                12.083333
+              ]
+            ]
+          },
+          "video_sha256": "f6f7f61a170fba4f954f10e76455104b67727a094d3726c97fb644fef5b3ef41",
+          "poster_sha256": "f4f3ca8152df92902504ea572254f3a79488c897264762c5b172fb53b0d8fe25"
+        },
+        {
+          "id": "unit-Y",
+          "observed_duration_seconds": 12.083333,
+          "video_dimensions": [
+            960,
+            640
+          ],
+          "poster_dimensions": [
+            1280,
+            853
+          ],
+          "native_controls_play_pause": true,
+          "playback_observation": {
+            "paused": false,
+            "time": 0.210379,
+            "frame": {
+              "mediaTime": 0,
+              "presentedFrames": 1
+            },
+            "decoded": 7,
+            "readyState": 4,
+            "networkState": 1,
+            "error": null,
+            "hidden": false,
+            "buffered": [
+              [
+                0,
+                12.083333
+              ]
+            ]
+          },
+          "video_sha256": "c71aedab2d4a4031cbf54b03002db56c6c01fd134c41984b9fb712bf5cd56261",
+          "poster_sha256": "26332bf4d1bf151f91f3e8b62466d99e8b5a9992cba62b181731f03a110ce7e0"
+        },
+        {
+          "id": "unit-Z",
+          "observed_duration_seconds": 12.083008,
+          "video_dimensions": [
+            960,
+            640
+          ],
+          "poster_dimensions": [
+            1280,
+            853
+          ],
+          "native_controls_play_pause": true,
+          "playback_observation": {
+            "paused": false,
+            "time": 0.238335,
+            "frame": {
+              "mediaTime": 0,
+              "presentedFrames": 1
+            },
+            "decoded": 7,
+            "readyState": 4,
+            "networkState": 1,
+            "error": null,
+            "hidden": false,
+            "buffered": [
+              [
+                0,
+                12.083008
+              ]
+            ]
+          },
+          "video_sha256": "1c37833fae2e3fed9c9208ad1d1c8fb2fce698ad966abcb4a3db81327e1d215b",
+          "poster_sha256": "2845de6959286d96d0831f9f1480bc9685d6da53f707825439b65c03482badf0"
+        }
+      ],
+      "recorded_media_request_cancellations": 11,
+      "cancellation_policy": "Only owned-video Media requests explicitly canceled with net::ERR_ABORTED are classified as cancellations, retained in raw evidence and required to have successful source-hash/native-playback evidence. Other loader errors fail. No application, CSP or missing-resource error is suppressed.",
+      "unexpected_loader_errors": 0,
+      "application_errors": 0,
+      "outside_bundle_requests": 0,
+      "owned_browser_stopped": true,
+      "private_profile_removed": true,
+      "embedded_host_app_confirmation": "NOT_CLAIMED"
+    },
+    {
+      "mode": "Owned ephemeral loopback HTTP; visualization uploaded as site root",
+      "status": "PASS",
+      "browser": "Chrome/153.0.8010.48",
+      "node": "v22.17.0",
+      "started_at": "2026-09-19T01:40:28.452Z",
+      "completed_at": "2026-09-19T01:40:52.342Z",
+      "raw_observation_sha256": "04296082ab127325ceabe557d9b26ba9dc9d8d9bdf9826b3c15d7d6f907559de",
+      "runtime_assets": [
+        {
+          "path": "index.html",
+          "sha256": "b4bd9afdb1ec2e12e3095778b407906732d3e2d59835ce9b102f451ae97d38ac",
+          "bytes": 12639
+        },
+        {
+          "path": "style.css",
+          "sha256": "ec2f75864fcd977697c014d634d2c7d78dc96dfde9095f1192414c93c497dd3a",
+          "bytes": 6929
+        },
+        {
+          "path": "interactive-viewer.js",
+          "sha256": "936a6eedfdd8b09fe873beee30f1d11f7f1be111076aafd26b278200a7a01833",
+          "bytes": 21676
+        },
+        {
+          "path": "scene-data.js",
+          "sha256": "8f55ba45dcd688c0253ec7c81628ce0ccedf7cedd79e7752191f2d8978eeedd0",
+          "bytes": 8995251
+        },
+        {
+          "path": "edge-data.js",
+          "sha256": "ecec1cd659ed4ca66e1d0126acb9c0ec1e638a927a57fc50bb3d8253d4c35e8b",
+          "bytes": 4458621
+        },
+        {
+          "path": "features.js",
+          "sha256": "a2370e219c8e80c1bbee3546fda5401885cfb7d88568faaab7a7b4b60d17d3da",
+          "bytes": 7791
+        },
+        {
+          "path": "viewer.js",
+          "sha256": "244375de1c04f7c5b6cc611552ed1cb4305114969a9ce8d32d51109fdf70e89c",
+          "bytes": 20363
+        },
+        {
+          "path": "drawings.js",
+          "sha256": "7c8719441b48de3c3a8f86c2abb522a6da97ccaeb4afba62cfdb5212817dab95",
+          "bytes": 5101
+        },
+        {
+          "path": "app.js",
+          "sha256": "0f0fa421253338be22fa1dd9772516bb61cda9aae9b80a49e50a33b5b0056fd0",
+          "bytes": 13451
+        },
+        {
+          "path": "inventory.json",
+          "sha256": "3caf94d95eedaef9f657be31b7e82cfce22a4b96a262d184249790026c2dd9ba",
+          "bytes": 514667
+        },
+        {
+          "path": "plan-data.js",
+          "sha256": "05ed439f1bc2aed8cccc0d75d9b38d299a27abcb24ecafad5070086e57a6e6f1",
+          "bytes": 210167
+        },
+        {
+          "path": "presentation-plan.json",
+          "sha256": "941aba63dac8ff7ecc5ce67c09be99afabc6037193b418ef6183ffe163c802af",
+          "bytes": 189032
+        },
+        {
+          "path": "runtime-assets.json",
+          "sha256": "7233e5dfe0344b255733d38ce83fd881ff6b2da5ef1a5a294a7b94749de30b96",
+          "bytes": 1383
+        },
+        {
+          "path": "README.md",
+          "sha256": "61f697b9b54f9768c33d63962ef8478cbf05000f6937653d078b87dcefe80dc6",
+          "bytes": 10577
+        },
+        {
+          "path": "media-data.js",
+          "sha256": "54543b66afa27fd4627c4d9a0a1d847fe2c66c26ae1514879ff2409a80605d7f",
+          "bytes": 15621
+        },
+        {
+          "path": "media.js",
+          "sha256": "2a3205ea7e907a581df5017a1d72efa1a9e8b79490175c603771f41923d3de70",
+          "bytes": 6717
+        },
+        {
+          "path": "media-manifest.json",
+          "sha256": "027ed6eb11a9ce8c13239590d5aeb9c85e8bd35b2570d3752dc6de5e13dd4196",
+          "bytes": 13296
+        },
+        {
+          "path": "media/exterior-turntable.mp4",
+          "sha256": "ee13ddf5d145976510fc6324c35dcf5398d0276f2049c9f610b97ed74d5c2132",
+          "bytes": 537195
+        },
+        {
+          "path": "media/exterior.png",
+          "sha256": "8070b29e7da9897f08c0c2f2e1aa984a1030cfa3a90dbbd62952ccc3a0a07b8b",
+          "bytes": 628958
+        },
+        {
+          "path": "media/interior-turntable.mp4",
+          "sha256": "98f206e9cea451d54ee86695849d547e827cd475ad2d3f68e692bd6dedd7b963",
+          "bytes": 1100937
+        },
+        {
+          "path": "media/interior.png",
+          "sha256": "14e20b0724f8f134ef4702b9503214ef72763f526188d510ec1f4226f0406973",
+          "bytes": 787479
+        },
+        {
+          "path": "media/outside-first.mp4",
+          "sha256": "a6381631f994864cb460b8a058296c08d5974354e56150f909bb8e85b452b5e6",
+          "bytes": 722511
+        },
+        {
+          "path": "media/outside-first.png",
+          "sha256": "68e72f5bc7bfd5800cb84e8e572fc96f950361062d91dca15971e4c2ffb406f5",
+          "bytes": 639374
+        },
+        {
+          "path": "media/unit-X.mp4",
+          "sha256": "f6f7f61a170fba4f954f10e76455104b67727a094d3726c97fb644fef5b3ef41",
+          "bytes": 586008
+        },
+        {
+          "path": "media/unit-X.png",
+          "sha256": "f4f3ca8152df92902504ea572254f3a79488c897264762c5b172fb53b0d8fe25",
+          "bytes": 588000
+        },
+        {
+          "path": "media/unit-Y.mp4",
+          "sha256": "c71aedab2d4a4031cbf54b03002db56c6c01fd134c41984b9fb712bf5cd56261",
+          "bytes": 585464
+        },
+        {
+          "path": "media/unit-Y.png",
+          "sha256": "26332bf4d1bf151f91f3e8b62466d99e8b5a9992cba62b181731f03a110ce7e0",
+          "bytes": 589795
+        },
+        {
+          "path": "media/unit-Z.mp4",
+          "sha256": "1c37833fae2e3fed9c9208ad1d1c8fb2fce698ad966abcb4a3db81327e1d215b",
+          "bytes": 476327
+        },
+        {
+          "path": "media/unit-Z.png",
+          "sha256": "2845de6959286d96d0831f9f1480bc9685d6da53f707825439b65c03482badf0",
+          "bytes": 570442
+        }
+      ],
+      "checks": [
+        "initial interior: full frame and all three drives; actual GPU pixels",
+        "exterior reveals all six panels and changes actual framebuffer",
+        "100 reference/gauge meshes separately toggled; not physical BOM",
+        "all eight required selections show source-derived XYZ mm; selected-only visibility; frame 240/240/240",
+        "four camera presets, pointer drag, wheel zoom, keyboard, reset",
+        "empty search, search recovery, dimension visibility and corrupt payload rejection",
+        "explode100 and exact zero for all399; play reverses, pause/stop and orbit; reduced-motion disables continuous play",
+        "actual opaque versus translucent faces and edge pixels",
+        "actual pointer hover and click pin at current exploded triangle geometry",
+        "actual pointer hover and click pin at current exploded triangle geometry",
+        "actual mouse click and touch tap change pinned selection; stale ID filter cleared for keyboard fallback",
+        "hidden group excluded; empty area inside frame AABB rejected by triangle/depth picking",
+        "all399 source IDs generate valid three-view SVGs with source hashes/dimensions; selected sheet displayed and actual SVG download works",
+        "actual11 timeline positions: outside first; small members stay grouped; reserves stationary",
+        "XYZ exploded unit views: exact source memberships and7 rendered camera angles per unit",
+        "small part fills focused view; separated XYZ labels; source-centred turntable; all399 frame centres/matrices",
+        "actual selected XYZ parts link to containing-unit clips; frame links to whole interior; hidden reference has no invented movie",
+        "six original MP4s and six posters: native control play/pause, actual presented/decoded frames, source metadata and precise Z observation",
+        "responsive page and GPU draw",
+        "responsive page and GPU draw",
+        "responsive page and GPU draw",
+        "responsive page and GPU draw",
+        "accessible heading and named native controls exposed in Chrome AX tree; not a full accessibility audit",
+        "actual browser hidden lifecycle stops playback and orbit; hidden page correctly does not paint, so tested last without a frame wait"
+      ],
+      "reference_svg_count": 399,
+      "reference_svg_observation_sha256": "614d8a70cba4ea45b9c7bbef5616202a3c44a05c98464918513b6d7fa5a299cd",
+      "media": [
+        {
+          "id": "whole-exterior",
+          "observed_duration_seconds": 6,
+          "video_dimensions": [
+            960,
+            640
+          ],
+          "poster_dimensions": [
+            1280,
+            853
+          ],
+          "native_controls_play_pause": true,
+          "playback_observation": {
+            "paused": false,
+            "time": 0.220162,
+            "frame": {
+              "mediaTime": 0,
+              "presentedFrames": 1
+            },
+            "decoded": 7,
+            "readyState": 4,
+            "networkState": 1,
+            "error": null,
+            "hidden": false,
+            "buffered": [
+              [
+                0,
+                6
+              ]
+            ]
+          },
+          "video_sha256": "ee13ddf5d145976510fc6324c35dcf5398d0276f2049c9f610b97ed74d5c2132",
+          "poster_sha256": "8070b29e7da9897f08c0c2f2e1aa984a1030cfa3a90dbbd62952ccc3a0a07b8b"
+        },
+        {
+          "id": "whole-interior",
+          "observed_duration_seconds": 6,
+          "video_dimensions": [
+            960,
+            640
+          ],
+          "poster_dimensions": [
+            1280,
+            853
+          ],
+          "native_controls_play_pause": true,
+          "playback_observation": {
+            "paused": false,
+            "time": 0.21313,
+            "frame": {
+              "mediaTime": 0,
+              "presentedFrames": 1
+            },
+            "decoded": 7,
+            "readyState": 4,
+            "networkState": 1,
+            "error": null,
+            "hidden": false,
+            "buffered": [
+              [
+                0,
+                6
+              ]
+            ]
+          },
+          "video_sha256": "98f206e9cea451d54ee86695849d547e827cd475ad2d3f68e692bd6dedd7b963",
+          "poster_sha256": "14e20b0724f8f134ef4702b9503214ef72763f526188d510ec1f4226f0406973"
+        },
+        {
+          "id": "outside-first",
+          "observed_duration_seconds": 12.083333,
+          "video_dimensions": [
+            960,
+            640
+          ],
+          "poster_dimensions": [
+            1280,
+            853
+          ],
+          "native_controls_play_pause": true,
+          "playback_observation": {
+            "paused": false,
+            "time": 0.211571,
+            "frame": {
+              "mediaTime": 0.083333,
+              "presentedFrames": 2
+            },
+            "decoded": 7,
+            "readyState": 4,
+            "networkState": 1,
+            "error": null,
+            "hidden": false,
+            "buffered": [
+              [
+                0,
+                12.083333
+              ]
+            ]
+          },
+          "video_sha256": "a6381631f994864cb460b8a058296c08d5974354e56150f909bb8e85b452b5e6",
+          "poster_sha256": "68e72f5bc7bfd5800cb84e8e572fc96f950361062d91dca15971e4c2ffb406f5"
+        },
+        {
+          "id": "unit-X",
+          "observed_duration_seconds": 12.083333,
+          "video_dimensions": [
+            960,
+            640
+          ],
+          "poster_dimensions": [
+            1280,
+            853
+          ],
+          "native_controls_play_pause": true,
+          "playback_observation": {
+            "paused": false,
+            "time": 0.206136,
+            "frame": {
+              "mediaTime": 0,
+              "presentedFrames": 1
+            },
+            "decoded": 7,
+            "readyState": 4,
+            "networkState": 1,
+            "error": null,
+            "hidden": false,
+            "buffered": [
+              [
+                0,
+                6.756
+              ]
+            ]
+          },
+          "video_sha256": "f6f7f61a170fba4f954f10e76455104b67727a094d3726c97fb644fef5b3ef41",
+          "poster_sha256": "f4f3ca8152df92902504ea572254f3a79488c897264762c5b172fb53b0d8fe25"
+        },
+        {
+          "id": "unit-Y",
+          "observed_duration_seconds": 12.083333,
+          "video_dimensions": [
+            960,
+            640
+          ],
+          "poster_dimensions": [
+            1280,
+            853
+          ],
+          "native_controls_play_pause": true,
+          "playback_observation": {
+            "paused": false,
+            "time": 0.209048,
+            "frame": {
+              "mediaTime": 0,
+              "presentedFrames": 1
+            },
+            "decoded": 7,
+            "readyState": 4,
+            "networkState": 1,
+            "error": null,
+            "hidden": false,
+            "buffered": [
+              [
+                0,
+                12.083333
+              ]
+            ]
+          },
+          "video_sha256": "c71aedab2d4a4031cbf54b03002db56c6c01fd134c41984b9fb712bf5cd56261",
+          "poster_sha256": "26332bf4d1bf151f91f3e8b62466d99e8b5a9992cba62b181731f03a110ce7e0"
+        },
+        {
+          "id": "unit-Z",
+          "observed_duration_seconds": 12.083008,
+          "video_dimensions": [
+            960,
+            640
+          ],
+          "poster_dimensions": [
+            1280,
+            853
+          ],
+          "native_controls_play_pause": true,
+          "playback_observation": {
+            "paused": false,
+            "time": 0.205429,
+            "frame": {
+              "mediaTime": 0,
+              "presentedFrames": 1
+            },
+            "decoded": 7,
+            "readyState": 4,
+            "networkState": 1,
+            "error": null,
+            "hidden": false,
+            "buffered": [
+              [
+                0,
+                8.312
+              ]
+            ]
+          },
+          "video_sha256": "1c37833fae2e3fed9c9208ad1d1c8fb2fce698ad966abcb4a3db81327e1d215b",
+          "poster_sha256": "2845de6959286d96d0831f9f1480bc9685d6da53f707825439b65c03482badf0"
+        }
+      ],
+      "recorded_media_request_cancellations": 18,
+      "cancellation_policy": "Only owned-video Media requests explicitly canceled with net::ERR_ABORTED are classified as cancellations, retained in raw evidence and required to have successful source-hash/native-playback evidence. Other loader errors fail. No application, CSP or missing-resource error is suppressed.",
+      "unexpected_loader_errors": 0,
+      "application_errors": 0,
+      "outside_bundle_requests": 0,
+      "owned_browser_stopped": true,
+      "private_profile_removed": true,
+      "embedded_host_app_confirmation": "NOT_CLAIMED"
+    }
+  ],
+  "retained_failed_attempts": [
+    "First isolated attempt exceeded the inherited10-second Chrome startup wait; no UI assertion passed. A bounded60-second readiness deadline was used without changing browser security or runtime settings.",
+    "Second isolated attempt read the SVG download before completion. The later complete file was present; regression now waits for the exact expected source SVG hash, retaining the original failure.",
+    "Third isolated attempt's four-second first-video-frame wait expired at t=0. Bounded decoder readiness and media pipeline observations subsequently established actual native-control playback of all six clips, without media or browser-flag changes.",
+    "First fixed-port HTTP attempt received400 from an already occupied local listener, not the candidate server. No existing listener/settings were changed. The corrected test exclusively binds port0, checks its own HTTP bytes and closes that listener on exit.",
+    "Default Python lacked PyYAML; existing installed Homebrew Python supplied it. No package was installed."
+  ],
+  "geometry_or_shared_plan_changed": false,
+  "native_render_or_transcode_performed": false,
+  "old_producer_receipts_changed": false,
+  "independent_engineering_acceptance": false,
+  "publication_state_at_record": "LOCAL_CANDIDATE_ONLY; required PR CI, normal merge and actual live deployment acceptance are separate later observations.",
+  "unchanged_holds": "WIP / REF / NOT ASSEMBLY READY / NO-GO / 3C8H / REQ409 / strict-pro / 39UNKNOWN; P1/C1/D1; sidecar/ICD/control; original44 = 2 closed / 42 unfinished; N8R8 NOT_FOR_FLASH; all human/source/physical gates."
+}

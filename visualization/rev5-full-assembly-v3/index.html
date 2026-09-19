@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Rev5 v3 | 外側から段階表示・6本のBlender CG</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+  <script src="interactive-viewer.js" defer></script>
+  <script src="scene-data.js" defer></script>
+  <script src="edge-data.js" defer></script>
+  <script src="plan-data.js" defer></script>
+  <script src="features.js" defer></script>
+  <script src="viewer.js" defer></script>
+  <script src="drawings.js" defer></script>
+  <script src="media-data.js" defer></script>
+  <script src="media.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header><a class="identity" href="#main">REV5 <span>OUTSIDE FIRST / V3</span></a><strong class="wip">WIP / NOT ASSEMBLY READY</strong></header>
+  <main id="main">
+    <section class="intro">
+      <p class="eyebrow">FROZEN NOMINAL · 2026-09-15 · BROWSER DISPLAY</p>
+      <h1>筐体と、3つの駆動軸。</h1>
+      <p>外側から順に、全体からユニット、ひとつの形状へ。表示用の段階と視点で構成を理解するビューです。元の形状と設置姿勢は不変です。</p>
+      <p><a href="#media-gallery">6本の実収録Blender CGを見る</a> · ブラウザーの個別表示・全399 IDのSVG参考図もそのまま利用できます。</p>
+      <div class="facts"><span id="inventory-count">399 保存メッシュ</span><span>組立0%時の筐体名目 X / Y / Z：240 / 240 / 240 mm</span><span>製造・組立・通電の承認なし</span></div>
+    </section>
+    <section class="workspace" aria-label="全体モデルと表示設定">
+      <div class="view-card">
+        <div class="view-title"><h2 id="view-heading">全体の配置</h2><span id="visible-count" role="status">読み込み中</span></div>
+        <div class="viewport">
+          <canvas id="whole-canvas" tabindex="0" aria-label="Rev5 全体3Dビュー。ドラッグまたは矢印キーで回転、ホイールかプラス・マイナスでズーム、Homeで視点を戻す。"></canvas>
+          <svg id="dimensions" aria-label="全体および選択形状の外接寸法" role="img"></svg>
+          <div id="loading" class="message" role="status">保存済みの形状を読み込み中…</div>
+          <div id="error" class="message error" role="alert" hidden></div>
+          <div id="hover-info" role="status" hidden></div>
+          <div class="hint">ホバー：名前と寸法 · クリック／タップ：選択固定 · ドラッグ：回転 · ホイール：ズーム</div>
+        </div>
+        <div id="controls">
+          <div class="button-row" role="group" aria-label="視点">
+            <button data-camera="iso" disabled>斜め</button><button data-camera="front" disabled>正面 −Y</button>
+            <button data-camera="side" disabled>側面 ＋X</button><button data-camera="top" disabled>上面 ＋Z</button>
+            <button data-camera="rear" disabled>背面 ＋Y</button><button data-camera="left" disabled>左面 −X</button><button data-camera="bottom" disabled>下面 −Z</button>
+            <button id="reset" disabled>視点リセット</button><button id="zoom-in" aria-label="拡大" disabled>＋</button><button id="zoom-out" aria-label="縮小" disabled>−</button>
+          </div>
+          <div class="button-row modes" role="group" aria-label="外装と内部の表示">
+            <button id="exterior" aria-pressed="false" disabled>外装を表示</button>
+            <button id="interior" aria-pressed="true" disabled>内部を見る</button>
+            <button id="drive-only" aria-pressed="false" disabled>3軸駆動だけ</button>
+          </div>
+          <p id="stage-status" class="stage-status" role="status">元の組立姿勢</p>
+          <div id="stage-controls" class="button-row timeline" role="group" aria-label="外側から内側へ・表示用の段階"></div>
+          <div class="explode-row"><label for="explode">表示シーケンスの進行</label><output id="explode-value" for="explode">0%</output>
+            <input id="explode" type="range" min="0" max="100" step="1" value="0" disabled></div>
+          <div class="button-row" role="group" aria-label="分解アニメーションと表示">
+            <button id="play" disabled>外側から段階再生 ↔ 戻す</button><button id="pause" disabled>一時停止</button>
+            <button id="stop" disabled>停止・組立0%へ</button><button id="orbit" aria-pressed="false" disabled>ターンテーブル（視点旋回）</button>
+            <button id="xray" aria-pressed="false" disabled>透過・エッジ表示</button>
+          </div>
+          <p id="motion-status" role="status" class="note">停止中 · 表示専用。物理シミュレーションではありません。</p>
+        </div>
+        <p class="note">段階表示は PRESENTATION ONLY：保存ID・種別から関連付けた見せ方で、実際の取り外し順序・締結関係・組立経路・隙間の証明ではありません。
+          ALLOC締結外形は名目の描写、予約・ゲージは非実部品として静止。一体メッシュを架空の部品に分割しません。
+          分解中は240 mmの全体寸法線を非表示。透過表示は奥線も重ねるブラウザー近似で、HLRではありません。ホバーは最前面の三角形を選びます。</p>
+        <div class="legend"><span><i class="x"></i>X軸：青緑</span><span><i class="y"></i>Y軸：橙</span><span><i class="z"></i>Z軸：青</span><span>筐体：灰 ／ 基板：緑</span></div>
+      </div>
+      <aside>
+        <section class="panel"><h2>ユニットを中心に見る</h2>
+          <label for="unit-select">表示上のまとまり（関連付けは推定）</label><select id="unit-select" disabled></select>
+          <div class="button-row unit-actions"><button id="focus-unit" disabled>ユニット表示・自動フィット</button><button id="full-view" disabled>全体へ戻る</button></div>
+          <p id="unit-status" class="note" role="status"></p>
+        </section>
+        <section class="panel"><h2>表示する形状</h2><div id="groups"></div><label class="check"><input id="show-dimensions" type="checkbox" checked disabled>全体の寸法線</label>
+          <p class="note">予約領域・ゲージ・配線参照は初期状態で非表示。399個は保存メッシュ数で、購入部品数や完成BOMではありません。</p></section>
+        <section class="panel"><h2>部品を選ぶ</h2>
+          <label for="part-search">IDで絞り込み</label><input id="part-search" type="search" placeholder="例：X_motor / FRAME" disabled>
+          <label for="part-select">保存時点の部品ID</label><select id="part-select" disabled></select>
+          <p id="selection-status" role="status"></p><h3 id="part-name">FRAME_LOWER</h3>
+          <div id="part-dimensions" class="dimension-values"></div>
+          <p class="note">X/Y/Z は設置姿勢のグローバル軸に沿うメッシュ外接寸法（mm）。製品の軸方向寸法・公差・実測値ではありません。</p>
+          <p id="part-role"></p><div class="button-row"><button id="isolate" disabled>単体表示・自動フィット</button><button id="show-sheet" disabled>参考三面図へ</button></div>
+          <button id="related-media" disabled>関連CGを確認</button>
+          <p id="related-media-note" class="note" role="status"></p>
+          <details><summary>選択形状の出所</summary><p id="part-source" class="mono"></p><p id="part-hash" class="mono"></p></details>
+        </section>
+      </aside>
+    </section>
+    <section id="media-gallery" class="panel media-gallery" aria-labelledby="media-heading">
+      <h2 id="media-heading">Blender CG：全体・外側からの段階表示・XYZユニット</h2>
+      <p>実際に収録した6本から選び、プレーヤーの再生ボタンで開始します。自動再生なし。Blender 5.1.1 / Cycles CPU4、元のMP4・PNGを変更せず同梱しています。</p>
+      <p class="note"><strong>WIP / REFERENCE ANIMATION / NOT ASSEMBLY READY</strong>。色・仕上げは説明用です。ブラウザー描画やFusion組立動画、実際の取り外し手順・安全性の承認ではありません。</p>
+      <div id="media-choices" class="media-choices" role="group" aria-label="6本のネイティブCG動画"></div>
+      <div class="media-screen">
+        <h3 id="media-title" aria-live="polite"></h3>
+        <video id="media-player" controls playsinline preload="metadata" width="960" height="640" aria-labelledby="media-title" aria-describedby="media-details media-motion">
+          動画を再生できない場合は下のMP4リンクを利用してください。
+        </video>
+        <p id="media-error" class="error" role="alert" hidden></p>
+        <p id="media-details"></p><p id="media-motion" class="note"></p>
+        <p id="media-timing-note" class="note" hidden>Z動画の観測時間は12.083008秒。145/12秒のpacket終端より4 ticks（1 tick = 1/12288秒）短いmetadataをそのまま保持しています。145フレーム全てdecode済みで、再encodeして一致させていません。</p>
+        <p id="media-source" class="mono"></p>
+        <p><a id="media-file">MP4を開く</a> · <a href="media-manifest.json">6本の出所・時間・hash</a></p>
+      </div>
+      <p class="note">全体外装・内部は6秒 / 72フレーム、透視投影360度。段階表示とXYZは145フレーム / 12 fps、収録元0–12秒・動画約12.083秒の平行投影です。全体段階表示は斜め方向固定、XYZは180度旋回。個々の部品専用動画ではありません。</p>
+    </section>
+    <section class="sheet-card" aria-labelledby="sheet-heading">
+          <div class="view-title"><h2 id="sheet-heading">選択した形状の参考三面図</h2><button id="save-sheet" disabled>SVG参考図を保存</button></div>
+          <p id="sheet-status" role="status">全399 ID対応 · REF / NOT FOR FABRICATION</p>
+          <div id="reference-sheet" aria-label="選択形状の正面・側面・上面参考図"></div>
+          <p class="note">元の組立姿勢のメッシュ境界・稜線から投影。隠線除去なし、解析的な穴径なし。
+            XYZはグローバル軸の外接寸法で、公差・製造基準ではありません。予約領域やゲージも参照形状として表示します。</p>
+    </section>
+    <section class="source-section"><h2>この全体図の範囲</h2>
+      <p id="plan-source" class="mono"></p><p><a href="presentation-plan.json">ブラウザー／段階CG共通の表示プラン</a>（実組立手順ではありません）</p>
+      <p>2026-09-15 の nominal 文脈を固定。モーター・ホイールは3軸の<strong>名目参照形状</strong>で、実際の継手・保持・バランスは未確定です。
+        保存時点の基板・機器だけを表示し、後日のクランプ／バッテリー案や N8R8 / SEN は混在させていません。
+        電源・制動・ハーネスなど未実装の要件が残ります。「完成系の全体図」であって、完成設計・製造可能性の証明ではありません。</p>
+      <p id="source-summary" class="mono"></p>
+      <details><summary>未実装・UNKNOWN の保存記録</summary><ul id="missing"></ul></details>
+      <details><summary>変更していない保留・境界</summary><p>NO-GO / 3C8H / REQ409 / strict-pro / 39UNKNOWN、P1/C1/D1、sidecar / ICD / control、original44 = 2 closed / 42 unfinished を維持。
+        N8R8 は別スコープの NOT_FOR_FLASH / measurement-subset-only。組立、干渉、荷重、回転、製造、通電、安全性の承認なし。
+        Blender動画は停止・確定済み成果物の同梱です。今回、新しいネイティブ実行・CAD・Fusion動画・独立レビューは行っていません。</p></details>
+      <p><a href="inventory.json">形状一覧・寸法・ソースハッシュ（JSON）</a> · <a href="README.md">操作と参考図の制限</a></p>
+    </section>
+  </main>
+  <footer>REV5 · SOURCE-BOUND LOCAL VIEW · NO PHYSICAL PERMISSION · NO EXTERNAL REQUESTS</footer>
+</body>
+</html>

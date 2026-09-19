@@ -46,6 +46,8 @@ generic setup ritual.
 | Curated Rev5 public software | `python3 -B -m unittest discover -s tools/tests -p 'test_rev5_public_software.py'`; IMU and SDK-free CMake commands in [the public guide](docs/rev5-public-release/software.md) |
 | Canonical Evidence/Issue/ECO namespaces | `python3 tools/check_id_uniqueness.py` |
 | Supported mechanical/PCB dimensional pairing | `python3 tools/check_mechanical_pcb_sync.py` |
+| Public offline IMU source/fixture closure | `python3 -B -S -m unittest discover -s tools/tests -p 'test_rev5_offline_publication.py'` |
+| Original synthetic IMU disagreement behavior | `python3 -B -S -m unittest discover -s simulation/imu_disagreement/tests` |
 
 Choose the smallest applicable scope. These are bookkeeping/software checks,
 not native CAD inspection, electrical qualification or physical approval.

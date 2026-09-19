@@ -8,6 +8,8 @@ import re
 import unittest
 import xml.etree.ElementTree as ET
 
+from tools.public_release_manifest import current_file_record
+
 
 ROOT = Path(__file__).resolve().parents[2]
 PACKET = ROOT / "docs/rev5-public-release"
@@ -38,8 +40,10 @@ class PublicSoftwareTests(unittest.TestCase):
                 self.assertFalse(target.is_symlink())
                 self.assertFalse(any(parent.is_symlink() for parent in target.parents))
                 data = target.read_bytes()
-                self.assertEqual(len(data), entry["bytes"])
-                self.assertEqual(hashlib.sha256(data).hexdigest(), entry["sha256"])
+                current = current_file_record(
+                    ROOT, "docs/rev5-public-release/software-manifest.json", entry)
+                self.assertEqual(len(data), current["bytes"])
+                self.assertEqual(hashlib.sha256(data).hexdigest(), current["sha256"])
                 if entry["disposition"] == "BYTE_IDENTICAL_EXPORT":
                     self.assertEqual(entry["sha256"], entry["original_sha256"])
                 self.assertNotRegex(

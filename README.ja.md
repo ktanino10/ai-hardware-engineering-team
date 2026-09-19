@@ -25,6 +25,8 @@ GitHub Copilot 上で動く、再利用可能な**マルチエージェント型
   [シミュレーション契約](docs/simulation.ja.md)を参照します。
 - **ブラウザーで見る**: [日本語の紹介ページ](https://ktanino10.github.io/ai-hardware-engineering-team/index.ja.html)。
   ダッシュボードの UI は EN/JA 切り替えに対応します。設計記録の本文は自動翻訳しません。
+  [現在のRev5 v3](https://ktanino10.github.io/ai-hardware-engineering-team/rev5-full-assembly-v3/index.html)は
+  外側からの段階表示と実収録Blender動画6本を同梱します。WIP / NOT ASSEMBLY READYです。
 
 ## エージェント（14役）
 
