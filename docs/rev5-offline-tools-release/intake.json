@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "record_type": "DERIVED_PUBLIC_OFFLINE_TOOLS_COMMISSION",
+  "task_id": "rev5-public-offline-tools-slice",
+  "repository": "ktanino10/ai-hardware-engineering-team",
+  "public_base": "eca74af4195346189cfdf49b20d734437e53c3d5",
+  "config_revision": "eca74af4195346189cfdf49b20d734437e53c3d5",
+  "authority": "The owner requested advancement of actionable Rev5 work and previously authorized curated public-repository/main/Pages publication after normal CI. The parent coordinator selected this independently runnable offline slice; this exact split is not represented as a separate explicit owner choice.",
+  "objective": "Publish the existing synthetic IMU disagreement Python CLI, its complete minimal helper/fixture/test closure and the already-public-safe C1 aggregate summary, without consuming the blocked firmware closure.",
+  "source_revision": "6a86f5e71934c78435ca31f3f696da48de5ddd5a",
+  "source_pr": "https://github.com/ktanino10/ai-hardware-engineering-team/pull/80",
+  "source_manifest": {
+    "path": "docs/rev5-public-release/software-manifest.json",
+    "sha256": "132addfe2257608346fe235cfc91be985a59da44d41485b0bfc759a42e41bc7d",
+    "disposition": "PUBLIC_PROVENANCE_INPUT_ONLY_NOT_REEXPORTED"
+  },
+  "exact_export_candidates": [
+    {
+      "path": "simulation/imu_disagreement/__init__.py",
+      "git_blob": "7aa4696275212a1605b8bec84c46cf15ef692f1e",
+      "sha256": "c608d78be25dbbf3538c182192455a12247329acc593066c31210d263d07f150"
+    },
+    {
+      "path": "simulation/imu_disagreement/__main__.py",
+      "git_blob": "80dcb56e191e9672a9e6c1775cb4328657a6075a",
+      "sha256": "45ed1be56ad6d51e0fb724bda963bb845c22cb6f3a54016cb9a58d495d2c8710"
+    },
+    {
+      "path": "simulation/imu_disagreement/report.py",
+      "git_blob": "75c92be255ea1e7d6d5f0d65183f6fd7aef25af5",
+      "sha256": "5b0c2d6a86d9cb0de128037fe120364358996794cfdaa3d9b3b2b7e529a6f276"
+    },
+    {
+      "path": "simulation/imu_disagreement/tests/test_report.py",
+      "git_blob": "b152574bea0bc75df9aeeb71065feb88009161f5",
+      "sha256": "3df588a2d27d1cb8e37f8ef9985dac88aa3b770178fafef65750afe0e52e8e83"
+    },
+    {
+      "path": "simulation/imu_estimation/__init__.py",
+      "git_blob": "56166ccc2fb87bc27233ed253b770c931016f367",
+      "sha256": "b7db592469cc569173310bb8533008a3249a04706f9b3a06b537153cbb8197d3"
+    },
+    {
+      "path": "simulation/imu_estimation/estimator.py",
+      "git_blob": "d9b3007be80762a93299b7cdd025ec3c27f8ee0f",
+      "sha256": "032810a1e178692cfdc637dccf914d799005473b1f0c87c7c13601b318c7ce3c"
+    },
+    {
+      "path": "simulation/imu_estimation/math3d.py",
+      "git_blob": "5e2e8c3a08e9ca7b6eaba8665657b81e08ee08df",
+      "sha256": "bd82d9c399733a3c70f5bb9ea28daf8aa8f83e1baa661620c2706bdf80a068d9"
+    },
+    {
+      "path": "simulation/imu_estimation/schema.py",
+      "git_blob": "e12c6c56e87fd1e0c408eb1cef975a91846642c1",
+      "sha256": "f63ad25736bf865154f4670a656a6c1193b3c301ac61cf1d952979830c5893ae"
+    },
+    {
+      "path": "docs/rev5-six-imu-fault-study-2026-09-13/author/run-001/one-bias/config.json",
+      "git_blob": "e2be13c79bb364cd0e03e2a3e662f9208185df44",
+      "sha256": "dfd0d6ec924f7ef51771635ffcddc089e632b0b0f785c966431b89db01b0d8a6"
+    },
+    {
+      "path": "docs/rev5-six-imu-fault-study-2026-09-13/author/run-001/one-bias/samples.jsonl",
+      "git_blob": "37e0db2ee25a4fc92b815b0e00a43264ac1a286b",
+      "sha256": "897d197be8f7b531f1b8669ede033304888569eda0810d6c0ea76b21bef301ce"
+    },
+    {
+      "path": "docs/rev5-public-release/software-c1-summary.json",
+      "git_blob": "da2d6477398b29214d85ca052f702f2c3c0afef1",
+      "sha256": "ff3f925b58176f2975d559b05e0a30d58c33e807008285b5526185064e04d101"
+    }
+  ],
+  "reader_reference": {
+    "path": "simulation/imu_disagreement/README.md",
+    "git_blob": "d01ba90e617810e241aa3e560e852f86eef70dde",
+    "sha256": "198c6bef14db55a559fceaf4850a02e352b1484b9c633fe7264293ee476fb233",
+    "disposition": "READ_FOR_SCOPE_SPECIFIC_PORTABLE_EN_JA_GUIDES"
+  },
+  "historical_review_reference": {
+    "path": "docs/rev5-public-release/software-review.json",
+    "sha256": "c0cf635a5bfff3141013683737f503e9e00df30bb92209b72c2867f80a30b934",
+    "disposition": "PRESERVE_ATTRIBUTION_AND_NOT_RUN_LIMITS_NOT_NEW_INDEPENDENT_REVIEW"
+  },
+  "admission_boundary": "This hash-bound public Git-object intake freezes the actual publication authority and candidate inputs. It does not import private producer deliverables as scheduler dependencies or reopen the blocked full-software task. Technical closure verification and export follow successful normal admission.",
+  "constraints": [
+    "One app-managed publication coordinator; no extra actor, reviewer, factory or session.",
+    "Copy only exact positive Git-object exports; preserve authored Python, original 14 tests and synthetic fixture bytes.",
+    "Stop if any actual selected-code dependency requires blocked/private firmware; do not strip checks or dependencies.",
+    "No estimator, health threshold, auto-exclusion, calibration, control, sidecar or original-review change.",
+    "Preserve synthetic-only SI/body-frame/exact-clock limits and zero/one-contributor semantics.",
+    "C1 is aggregate summary only: 10 candidates, 2 unknown-product requirements, 23 gaps, 103 observations, 0 adopted; quantity UNKNOWN; not orderable.",
+    "Add portable scope-specific provenance, manifest, EN/JA usage, useful example and applicable focused checks to existing CI.",
+    "Preserve released v3, all six byte-identical Blender clips, v2 and PR81 navigation; Pages root remains visualization.",
+    "Normal focused PR, passing required CI and CodeQL, main merge and exact remote/deployed entry verification only.",
+    "PR80 stays OPEN at the source revision with its original body, alerts and frozen outcomes; no bypass, suppression, dismissal or protection change."
+  ],
+  "excluded": [
+    "firmware, vendor, Bosch, CRT, N8R8, SDK, device and serial changes",
+    "private C1 closure, raw source notes, private ancestry, raw uploads, logs, personal paths and credentials",
+    "native CAD, geometry, plan, media, rendering and physical operations",
+    "source adoption, shared safety ledgers, original reviews and app/global configuration"
+  ],
+  "done_when": "The independently runnable exact offline closure and truthful C1 summary are normally merged, existing Pages is deployed, and usable EN/JA navigation plus exact remote/live bytes are verified.",
+  "stop_when": "A required source, rights, authorization, normal admission or CI prerequisite is unavailable, a dependency reaches the excluded closure, or the finite publication is delivered. Preserve evidence and stop without automatic follow-on.",
+  "unchanged_holds": "Original44=2closed42unfinished; WIP / NOT ASSEMBLY READY / NO-GO / 3C8H / REQ409 / strict-pro / 39UNKNOWN; P1/C1/D1; held control/sidecar/ICD; all source, human and physical gates."
+}
