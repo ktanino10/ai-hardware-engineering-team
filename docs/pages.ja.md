@@ -21,12 +21,36 @@ Ctrl+C で終了します。ビルドは不要です。組立ビューアーの 
 
 ## 現在の Rev5 WIP 参照図
 
-[全体モデル v2](https://ktanino10.github.io/ai-hardware-engineering-team/rev5-full-assembly-v2/index.html)は、
-2026-09-15時点の名目メッシュ399個を固定した日本語UIです。分解量、再生・停止・リセット、
-透過線画、三角形に基づくホバー、全IDのSVG参考三面図を利用できます。
-このv2単体は依存ファイルを同梱しており、`file://`でもオフライン動作します。
-[操作ガイド](../visualization/rev5-full-assembly-v2/README.md)と
-[公開範囲・保留項目](rev5-public-release/README.md)を参照してください。
+[全体モデル v3](https://ktanino10.github.io/ai-hardware-engineering-team/rev5-full-assembly-v3/index.html)は、
+2026-09-15時点の名目メッシュ399個・794132三角形を変更せず、外側からの5段階、
+31表示グループ・25ユニット、7視点、再生・停止・リセット、透過線画、三角形ホバー、
+全IDの個別ブラウザー表示・SVG参考三面図を提供します。
+実収録のBlender動画6本と元のPNGポスター6枚も同梱し、`file://`でオフライン動作します。
+[操作ガイド](../visualization/rev5-full-assembly-v3/README.md)と
+[今回の映像限定公開記録](rev5-v3-media-release/README.md)を参照してください。
+[従来のv2](https://ktanino10.github.io/ai-hardware-engineering-team/rev5-full-assembly-v2/index.html)と
+[その公開記録](rev5-public-release/README.md)は変更していません。
+
+ギャラリーのポスターから1本を選び、ネイティブプレーヤーの再生ボタンを押します。
+自動再生せず、切替・ページ非表示時は停止し、自動再開しません。「関連CG」はXYZの
+各22メッシュから実際の所属ユニット動画へ案内します。それ以外は形状を含む全体内部／外装へ
+案内し、専用ユニット動画がないことを明記します。非表示の予約・ゲージ100件には動画を
+捏造しません。399部品それぞれのネイティブ動画ではなく、個別表示・SVGは別機能です。
+
+| 動画 | 元の時間・カメラ |
+|---|---|
+| 全体外装・内部 | 各6秒・72フレーム・12 fps。透視投影52 mm、固定フレーミング、360度カメラ旋回 |
+| 外側からの段階表示 | 145フレーム・12 fps、収録元0–12秒、動画12.083333秒。平行投影、斜め方向固定・動的外接枠 |
+| X・Yユニット | 各145フレーム・12 fps、動画12.083333秒。平行投影・動的外接枠、180度カメラ旋回 |
+| Zユニット | 145フレーム・12 fps、観測12.083008秒。元の時間情報を保持 |
+
+Zのstream/container終端148476 ticksは、packet終端148480 ticks（145/12秒）より
+4 ticks短い観測値です（1 tick = 1/12288秒）。全145フレームはdecode済みで、
+再encodeや丸めで差を隠していません。元のZカメラ半径の読み戻し2件にあった
+binary64の1 ULP差も記録し、形状・工学的許容差の変更とは扱いません。
+制作元はBlender5.1.1 / Cycles CPU4、MP4はH264/yuv420p・960×640。
+ポスターは実際のネイティブ静止画にWIPラベル枠を付けたものです。
+材質色・仕上げは説明用で、物性値・製造条件・Fusion組立動画ではありません。
 
 **WIP / NOT ASSEMBLY READY、REF / NOT FOR FABRICATION**です。
 寸法は設置軸のメッシュ外接寸法、動きは表示専用です。公差付き製造図、組立経路の成立、
@@ -44,17 +68,37 @@ Ctrl+C で終了します。ビルドは不要です。組立ビューアーの 
 リポジトリのルートから実行し、証拠用フォルダーは毎回新しいものを指定します。
 
 ```sh
-node --test visualization/rev5-full-assembly-v2/features_test.mjs
-node visualization/rev5-full-assembly-v2/browser_test.mjs \
-  --evidence-dir .agent-work/rev5-browser-local
+python3 visualization/rev5-full-assembly-v3/release_test.py
+node --test visualization/rev5-full-assembly-v3/features_test.mjs visualization/rev5-full-assembly-v3/media_test.mjs
+node visualization/rev5-full-assembly-v3/browser_test.mjs \
+  --evidence-dir .agent-work/rev5-v3-browser-local
 ```
 
 macOSの標準Chrome配置以外は `--browser /path/to/existing/chrome` を追加します。
 公開先の確認には `--url` で完全な `index.html` URLを指定します。
-全12実行ファイルのHTTP hashをローカル公開版と比較してから、GPU描画、操作、ホバー、
-399件のSVG、実ダウンロードを検査します。他アプリや既存ブラウザープロファイルは操作しません。
+全29実行ファイルのHTTP hashをローカル公開版と比較してから、GPU描画、操作、ホバー、
+399件のSVG、実ダウンロード、6本の動画・ポスター・実フレーム再生を検査します。
+既存ffprobe/ffmpegがある場合、Python確認は全724フレームのdecodeとpacket時間も調べます。
+他アプリや既存ブラウザープロファイルは操作しません。headless Chromeの観測を
+組込みhostアプリの確認や独立した工学レビューと混同しません。
 
-### Rev5限定公開の範囲と生成元
+### v3映像限定公開の生成元と除外
+
+公開mainを基点に、停止済みv3 `c5349740` と6動画 `38234580` から正のallowlistで
+必要なGit blobだけを取り込みました。既公開v2と同一のscene・edge・inventory・pick・SVGを
+hash照合し、新しい自作表示コード・説明用材質・renderの来歴だけを追加しています。
+ユーザーが明示した自作成果物の公開許可を根拠とし、新しいライセンスや第三者の転載許諾は
+捏造しません。新しい[intake audit](rev5-v3-media-release/intake-audit.json)、
+[manifest](rev5-v3-media-release/manifest.json)、
+[統合確認](rev5-v3-media-release/verification.json)を元の制作記録とは区別します。
+
+6本のMP4と6枚のPNGは同一バイトです。元の作業ログ・argv、native editor file、raw frame、
+source STL、アップロード画像、私有パス・アカウント、SDK、`.agent-work`、私有branch履歴は
+公開しません。元のネイティブ制作環境・recipeは同梱せず、この公開版だけからnative再生成は
+できません。今回の作業は新しいnative実行・形状操作・transcodeを行いません。
+別のPR80のfirmware/Bosch/C1/IMU/N8R8変更は一切含まず、その未解決alertを隠しません。
+
+### 従来v2限定公開の範囲と生成元
 
 公開内容は利用者自身のプロジェクトコードと、Python/OpenSCADで生成した名目・参照形状です。
 モーター・ホイール・機器・PCB部品は独自のプリミティブや外形参照であり、

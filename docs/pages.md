@@ -22,13 +22,30 @@ This is not an offline guarantee for those historical viewers.
 
 ## Current Rev5 WIP reference
 
-[Open whole-assembly v2](https://ktanino10.github.io/ai-hardware-engineering-team/rev5-full-assembly-v2/index.html).
+[Open whole-assembly v3](https://ktanino10.github.io/ai-hardware-engineering-team/rev5-full-assembly-v3/index.html).
 The Japanese UI shows 399 nominal meshes from the frozen 2026-09-15 snapshot:
-explosion, play/pause/reset, translucent edges, triangle-based hover and
-reference three-view SVGs for every ID. Its self-contained runtime works
+five outside-first stages, focused units, seven angles, play/pause/reset,
+translucent edges, triangle-based hover and reference three-view SVGs for
+every ID. Six actual Blender movies and six original posters accompany the
+browser view: whole exterior/interior, staged whole and XYZ units.
+Use the single native player's controls; nothing autoplays. Related-part
+buttons link to containing-unit or whole movies, not invented per-part clips.
+Its self-contained runtime works
 offline, including `file://`, without the historical viewer's CDN dependencies.
-See its [operation guide](../visualization/rev5-full-assembly-v2/README.md)
-and the [curated release scope](rev5-public-release/README.md).
+See its [operation guide](../visualization/rev5-full-assembly-v3/README.md)
+and the [visual-only release scope](rev5-v3-media-release/README.md).
+The [previous v2 viewer](https://ktanino10.github.io/ai-hardware-engineering-team/rev5-full-assembly-v2/index.html)
+and [original release record](rev5-public-release/README.md) remain unchanged.
+
+The base two movies are6 s /72 frames /12 fps, perspective360-degree
+turntables. The four staged movies have145 frames at12 fps, source-clock
+0–12 s and approximately12.083 s playback: orthographic fixed-isometric
+whole/dynamic bounds, or180-degree unit turns. Z's observed12.083008 s is
+four1/12288-second ticks shorter than packet end145/12; original bytes and
+all decoded frames are retained, not re-encoded to hide the distinction.
+Recorded output is Blender5.1.1 / Cycles CPU4, not browser CG or Fusion.
+Private native files/recipes/raw frames and separate PR80 software are excluded.
+No new license, independent engineering approval or physical permission is implied.
 
 **WIP / NOT ASSEMBLY READY; REF / NOT FOR FABRICATION.** These are installed-axis
 mesh envelopes and presentation motions, not toleranced drawings, assembly-path

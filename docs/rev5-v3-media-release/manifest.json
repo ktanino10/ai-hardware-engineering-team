@@ -1,0 +1,485 @@
+{
+  "schema_version": 1,
+  "record_type": "POSITIVE_DERIVED_PUBLIC_EXPORT_MANIFEST",
+  "task_id": "rev5-v3-media-public-release",
+  "prepare_run_id": "72b998a4-d365-463e-8c6e-f489cd451b5d",
+  "intake_run_id": "e290eb53-66fa-4631-9fc8-eb0c0fe87e95",
+  "public_base": "ca07ba11bf3347ff467671606c00a6e2b5a70c02",
+  "config_revision": "ca07ba11bf3347ff467671606c00a6e2b5a70c02",
+  "viewer_source": "c5349740bb240ed600df8e4b056921067a102c1d",
+  "media_source": "382345807899333ecfc47a2a7e4948d937ff3993",
+  "source_plan_sha256": "941aba63dac8ff7ecc5ce67c09be99afabc6037193b418ef6183ffe163c802af",
+  "source_scene_sha256": "8f55ba45dcd688c0253ec7c81628ce0ccedf7cedd79e7752191f2d8978eeedd0",
+  "source_six_clip_manifest_sha256": "beabae5d00d3881a28bc7b1a60d23e373b986a53fee46dd6d1da217fd98f8fe8",
+  "runtime_file_count": 29,
+  "optional_test_file_count": 4,
+  "expected_changed_files_from_public_base": [
+    "README.ja.md",
+    "README.md",
+    "docs/README.ja.md",
+    "docs/README.md",
+    "docs/language-coverage.json",
+    "docs/pages.ja.md",
+    "docs/pages.md",
+    "docs/rev5-v3-media-release/README.md",
+    "docs/rev5-v3-media-release/intake-audit.json",
+    "docs/rev5-v3-media-release/intake.json",
+    "docs/rev5-v3-media-release/manifest.json",
+    "docs/rev5-v3-media-release/verification.json",
+    "visualization/index.html",
+    "visualization/index.ja.html",
+    "visualization/rev5-full-assembly-v3/README.md",
+    "visualization/rev5-full-assembly-v3/app.js",
+    "visualization/rev5-full-assembly-v3/browser_test.mjs",
+    "visualization/rev5-full-assembly-v3/drawings.js",
+    "visualization/rev5-full-assembly-v3/edge-data.js",
+    "visualization/rev5-full-assembly-v3/features.js",
+    "visualization/rev5-full-assembly-v3/features_test.mjs",
+    "visualization/rev5-full-assembly-v3/index.html",
+    "visualization/rev5-full-assembly-v3/interactive-viewer.js",
+    "visualization/rev5-full-assembly-v3/inventory.json",
+    "visualization/rev5-full-assembly-v3/media-data.js",
+    "visualization/rev5-full-assembly-v3/media-manifest.json",
+    "visualization/rev5-full-assembly-v3/media.js",
+    "visualization/rev5-full-assembly-v3/media/exterior-turntable.mp4",
+    "visualization/rev5-full-assembly-v3/media/exterior.png",
+    "visualization/rev5-full-assembly-v3/media/interior-turntable.mp4",
+    "visualization/rev5-full-assembly-v3/media/interior.png",
+    "visualization/rev5-full-assembly-v3/media/outside-first.mp4",
+    "visualization/rev5-full-assembly-v3/media/outside-first.png",
+    "visualization/rev5-full-assembly-v3/media/unit-X.mp4",
+    "visualization/rev5-full-assembly-v3/media/unit-X.png",
+    "visualization/rev5-full-assembly-v3/media/unit-Y.mp4",
+    "visualization/rev5-full-assembly-v3/media/unit-Y.png",
+    "visualization/rev5-full-assembly-v3/media/unit-Z.mp4",
+    "visualization/rev5-full-assembly-v3/media/unit-Z.png",
+    "visualization/rev5-full-assembly-v3/media_test.mjs",
+    "visualization/rev5-full-assembly-v3/plan-data.js",
+    "visualization/rev5-full-assembly-v3/presentation-plan.json",
+    "visualization/rev5-full-assembly-v3/release_test.py",
+    "visualization/rev5-full-assembly-v3/runtime-assets.json",
+    "visualization/rev5-full-assembly-v3/scene-data.js",
+    "visualization/rev5-full-assembly-v3/style.css",
+    "visualization/rev5-full-assembly-v3/viewer.js"
+  ],
+  "files": [
+    {
+      "path": "visualization/rev5-full-assembly-v3/index.html",
+      "sha256": "b4bd9afdb1ec2e12e3095778b407906732d3e2d59835ce9b102f451ae97d38ac",
+      "bytes": 12639,
+      "kind": "runtime",
+      "original_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "original_path": "visualization/rev5-full-assembly-v3/index.html",
+      "original_sha256": "560946657497716b8a16beb473f43d25f25c76be98a305e4a6a7399999712001",
+      "disposition": "DERIVED_PUBLIC_INTEGRATION"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/style.css",
+      "sha256": "ec2f75864fcd977697c014d634d2c7d78dc96dfde9095f1192414c93c497dd3a",
+      "bytes": 6929,
+      "kind": "runtime",
+      "original_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "original_path": "visualization/rev5-full-assembly-v3/style.css",
+      "original_sha256": "1adf1307682771bd2483f1a32acb383db755724ff6f037f945a0ef415c469394",
+      "disposition": "DERIVED_PUBLIC_INTEGRATION"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/interactive-viewer.js",
+      "sha256": "936a6eedfdd8b09fe873beee30f1d11f7f1be111076aafd26b278200a7a01833",
+      "bytes": 21676,
+      "kind": "runtime",
+      "original_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "original_path": "visualization/rev5-full-assembly-v3/interactive-viewer.js",
+      "original_sha256": "936a6eedfdd8b09fe873beee30f1d11f7f1be111076aafd26b278200a7a01833",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/scene-data.js",
+      "sha256": "8f55ba45dcd688c0253ec7c81628ce0ccedf7cedd79e7752191f2d8978eeedd0",
+      "bytes": 8995251,
+      "kind": "runtime",
+      "original_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "original_path": "visualization/rev5-full-assembly-v3/scene-data.js",
+      "original_sha256": "8f55ba45dcd688c0253ec7c81628ce0ccedf7cedd79e7752191f2d8978eeedd0",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/edge-data.js",
+      "sha256": "ecec1cd659ed4ca66e1d0126acb9c0ec1e638a927a57fc50bb3d8253d4c35e8b",
+      "bytes": 4458621,
+      "kind": "runtime",
+      "original_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "original_path": "visualization/rev5-full-assembly-v3/edge-data.js",
+      "original_sha256": "ecec1cd659ed4ca66e1d0126acb9c0ec1e638a927a57fc50bb3d8253d4c35e8b",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/plan-data.js",
+      "sha256": "05ed439f1bc2aed8cccc0d75d9b38d299a27abcb24ecafad5070086e57a6e6f1",
+      "bytes": 210167,
+      "kind": "runtime",
+      "original_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "original_path": "visualization/rev5-full-assembly-v3/plan-data.js",
+      "original_sha256": "05ed439f1bc2aed8cccc0d75d9b38d299a27abcb24ecafad5070086e57a6e6f1",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/presentation-plan.json",
+      "sha256": "941aba63dac8ff7ecc5ce67c09be99afabc6037193b418ef6183ffe163c802af",
+      "bytes": 189032,
+      "kind": "runtime",
+      "original_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "original_path": "visualization/rev5-full-assembly-v3/presentation-plan.json",
+      "original_sha256": "941aba63dac8ff7ecc5ce67c09be99afabc6037193b418ef6183ffe163c802af",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/features.js",
+      "sha256": "a2370e219c8e80c1bbee3546fda5401885cfb7d88568faaab7a7b4b60d17d3da",
+      "bytes": 7791,
+      "kind": "runtime",
+      "original_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "original_path": "visualization/rev5-full-assembly-v3/features.js",
+      "original_sha256": "a2370e219c8e80c1bbee3546fda5401885cfb7d88568faaab7a7b4b60d17d3da",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/viewer.js",
+      "sha256": "244375de1c04f7c5b6cc611552ed1cb4305114969a9ce8d32d51109fdf70e89c",
+      "bytes": 20363,
+      "kind": "runtime",
+      "original_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "original_path": "visualization/rev5-full-assembly-v3/viewer.js",
+      "original_sha256": "244375de1c04f7c5b6cc611552ed1cb4305114969a9ce8d32d51109fdf70e89c",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/drawings.js",
+      "sha256": "7c8719441b48de3c3a8f86c2abb522a6da97ccaeb4afba62cfdb5212817dab95",
+      "bytes": 5101,
+      "kind": "runtime",
+      "original_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "original_path": "visualization/rev5-full-assembly-v3/drawings.js",
+      "original_sha256": "7c8719441b48de3c3a8f86c2abb522a6da97ccaeb4afba62cfdb5212817dab95",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/app.js",
+      "sha256": "0f0fa421253338be22fa1dd9772516bb61cda9aae9b80a49e50a33b5b0056fd0",
+      "bytes": 13451,
+      "kind": "runtime",
+      "original_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "original_path": "visualization/rev5-full-assembly-v3/app.js",
+      "original_sha256": "0a1ef671086cdfa27851cc456010890b3281fcf25ab0364cf8c1e66dc7cb557a",
+      "disposition": "DERIVED_PUBLIC_INTEGRATION"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/inventory.json",
+      "sha256": "3caf94d95eedaef9f657be31b7e82cfce22a4b96a262d184249790026c2dd9ba",
+      "bytes": 514667,
+      "kind": "runtime",
+      "original_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "original_path": "visualization/rev5-full-assembly-v3/inventory.json",
+      "original_sha256": "3caf94d95eedaef9f657be31b7e82cfce22a4b96a262d184249790026c2dd9ba",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/runtime-assets.json",
+      "sha256": "7233e5dfe0344b255733d38ce83fd881ff6b2da5ef1a5a294a7b94749de30b96",
+      "bytes": 1383,
+      "kind": "runtime",
+      "original_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "original_path": "visualization/rev5-full-assembly-v3/runtime-assets.json",
+      "original_sha256": "7233e5dfe0344b255733d38ce83fd881ff6b2da5ef1a5a294a7b94749de30b96",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/README.md",
+      "sha256": "61f697b9b54f9768c33d63962ef8478cbf05000f6937653d078b87dcefe80dc6",
+      "bytes": 10577,
+      "kind": "runtime",
+      "original_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "original_path": "visualization/rev5-full-assembly-v3/README.md",
+      "original_sha256": "f1bd43dce2c218bb46393e5883458b7222b853a6311c9884406cb9f654b8bdb1",
+      "disposition": "DERIVED_PUBLIC_INTEGRATION"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/media/exterior-turntable.mp4",
+      "sha256": "ee13ddf5d145976510fc6324c35dcf5398d0276f2049c9f610b97ed74d5c2132",
+      "bytes": 537195,
+      "kind": "runtime",
+      "original_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "original_path": "hardware/visualization/rev5-blender-whole-assembly/media/base/exterior-turntable.mp4",
+      "original_sha256": "ee13ddf5d145976510fc6324c35dcf5398d0276f2049c9f610b97ed74d5c2132",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/media/exterior.png",
+      "sha256": "8070b29e7da9897f08c0c2f2e1aa984a1030cfa3a90dbbd62952ccc3a0a07b8b",
+      "bytes": 628958,
+      "kind": "runtime",
+      "original_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "original_path": "hardware/visualization/rev5-blender-whole-assembly/media/base/exterior.png",
+      "original_sha256": "8070b29e7da9897f08c0c2f2e1aa984a1030cfa3a90dbbd62952ccc3a0a07b8b",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/media/interior-turntable.mp4",
+      "sha256": "98f206e9cea451d54ee86695849d547e827cd475ad2d3f68e692bd6dedd7b963",
+      "bytes": 1100937,
+      "kind": "runtime",
+      "original_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "original_path": "hardware/visualization/rev5-blender-whole-assembly/media/base/interior-turntable.mp4",
+      "original_sha256": "98f206e9cea451d54ee86695849d547e827cd475ad2d3f68e692bd6dedd7b963",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/media/interior.png",
+      "sha256": "14e20b0724f8f134ef4702b9503214ef72763f526188d510ec1f4226f0406973",
+      "bytes": 787479,
+      "kind": "runtime",
+      "original_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "original_path": "hardware/visualization/rev5-blender-whole-assembly/media/base/interior.png",
+      "original_sha256": "14e20b0724f8f134ef4702b9503214ef72763f526188d510ec1f4226f0406973",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/media/outside-first.mp4",
+      "sha256": "a6381631f994864cb460b8a058296c08d5974354e56150f909bb8e85b452b5e6",
+      "bytes": 722511,
+      "kind": "runtime",
+      "original_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "original_path": "hardware/visualization/rev5-blender-whole-assembly/media/sequenced/outside-first.mp4",
+      "original_sha256": "a6381631f994864cb460b8a058296c08d5974354e56150f909bb8e85b452b5e6",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/media/outside-first.png",
+      "sha256": "68e72f5bc7bfd5800cb84e8e572fc96f950361062d91dca15971e4c2ffb406f5",
+      "bytes": 639374,
+      "kind": "runtime",
+      "original_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "original_path": "hardware/visualization/rev5-blender-whole-assembly/media/sequenced/outside-first.png",
+      "original_sha256": "68e72f5bc7bfd5800cb84e8e572fc96f950361062d91dca15971e4c2ffb406f5",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/media/unit-X.mp4",
+      "sha256": "f6f7f61a170fba4f954f10e76455104b67727a094d3726c97fb644fef5b3ef41",
+      "bytes": 586008,
+      "kind": "runtime",
+      "original_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "original_path": "hardware/visualization/rev5-blender-whole-assembly/media/sequenced/unit-X.mp4",
+      "original_sha256": "f6f7f61a170fba4f954f10e76455104b67727a094d3726c97fb644fef5b3ef41",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/media/unit-X.png",
+      "sha256": "f4f3ca8152df92902504ea572254f3a79488c897264762c5b172fb53b0d8fe25",
+      "bytes": 588000,
+      "kind": "runtime",
+      "original_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "original_path": "hardware/visualization/rev5-blender-whole-assembly/media/sequenced/unit-X.png",
+      "original_sha256": "f4f3ca8152df92902504ea572254f3a79488c897264762c5b172fb53b0d8fe25",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/media/unit-Y.mp4",
+      "sha256": "c71aedab2d4a4031cbf54b03002db56c6c01fd134c41984b9fb712bf5cd56261",
+      "bytes": 585464,
+      "kind": "runtime",
+      "original_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "original_path": "hardware/visualization/rev5-blender-whole-assembly/media/sequenced/unit-Y.mp4",
+      "original_sha256": "c71aedab2d4a4031cbf54b03002db56c6c01fd134c41984b9fb712bf5cd56261",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/media/unit-Y.png",
+      "sha256": "26332bf4d1bf151f91f3e8b62466d99e8b5a9992cba62b181731f03a110ce7e0",
+      "bytes": 589795,
+      "kind": "runtime",
+      "original_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "original_path": "hardware/visualization/rev5-blender-whole-assembly/media/sequenced/unit-Y.png",
+      "original_sha256": "26332bf4d1bf151f91f3e8b62466d99e8b5a9992cba62b181731f03a110ce7e0",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/media/unit-Z.mp4",
+      "sha256": "1c37833fae2e3fed9c9208ad1d1c8fb2fce698ad966abcb4a3db81327e1d215b",
+      "bytes": 476327,
+      "kind": "runtime",
+      "original_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "original_path": "hardware/visualization/rev5-blender-whole-assembly/media/sequenced/unit-Z.mp4",
+      "original_sha256": "1c37833fae2e3fed9c9208ad1d1c8fb2fce698ad966abcb4a3db81327e1d215b",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/media/unit-Z.png",
+      "sha256": "2845de6959286d96d0831f9f1480bc9685d6da53f707825439b65c03482badf0",
+      "bytes": 570442,
+      "kind": "runtime",
+      "original_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "original_path": "hardware/visualization/rev5-blender-whole-assembly/media/sequenced/unit-Z.png",
+      "original_sha256": "2845de6959286d96d0831f9f1480bc9685d6da53f707825439b65c03482badf0",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/media.js",
+      "sha256": "2a3205ea7e907a581df5017a1d72efa1a9e8b79490175c603771f41923d3de70",
+      "bytes": 6717,
+      "kind": "runtime",
+      "disposition": "FIRST_PARTY_PUBLIC_INTEGRATION"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/media-data.js",
+      "sha256": "54543b66afa27fd4627c4d9a0a1d847fe2c66c26ae1514879ff2409a80605d7f",
+      "bytes": 15621,
+      "kind": "runtime",
+      "disposition": "FIRST_PARTY_PUBLIC_INTEGRATION"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/media-manifest.json",
+      "sha256": "027ed6eb11a9ce8c13239590d5aeb9c85e8bd35b2570d3752dc6de5e13dd4196",
+      "bytes": 13296,
+      "kind": "runtime",
+      "disposition": "FIRST_PARTY_PUBLIC_INTEGRATION"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/browser_test.mjs",
+      "sha256": "f63d61677b0f9058cc7ef34359af10d1e0cb9a1e14ea19b60f3bdc225ce51bf8",
+      "bytes": 41212,
+      "kind": "optional_test",
+      "original_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "original_path": "visualization/rev5-full-assembly-v3/browser_test.mjs",
+      "original_sha256": "41c9c81bfc1d55c7dda84137fee1cc99b166434aaa0f22877f4f68223fc370c3",
+      "disposition": "DERIVED_PUBLIC_INTEGRATION"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/features_test.mjs",
+      "sha256": "2027ee42e3a6f104e0714e1e08b7eeb1323f4a81e603380728972d6830feec22",
+      "bytes": 3586,
+      "kind": "optional_test",
+      "original_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "original_path": "visualization/rev5-full-assembly-v3/features_test.mjs",
+      "original_sha256": "2027ee42e3a6f104e0714e1e08b7eeb1323f4a81e603380728972d6830feec22",
+      "disposition": "BYTE_IDENTICAL_EXPORT"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/media_test.mjs",
+      "sha256": "5ab5d5ddc8b86110a0b20d576fda0477471f405c02c07c17e7c498704d310052",
+      "bytes": 4329,
+      "kind": "optional_test",
+      "disposition": "FIRST_PARTY_PUBLIC_INTEGRATION"
+    },
+    {
+      "path": "visualization/rev5-full-assembly-v3/release_test.py",
+      "sha256": "f6292a29c37dc2eba4576f931fe9150de685d14327d720de8bb494ff79f84a73",
+      "bytes": 8200,
+      "kind": "optional_test",
+      "disposition": "FIRST_PARTY_PUBLIC_INTEGRATION"
+    },
+    {
+      "path": "README.md",
+      "sha256": "c95b9e8d06fcf76d538b26fb89cf7bb5eeb299fed951d9bc5317ef05d6774597",
+      "bytes": 8673,
+      "kind": "reader_navigation",
+      "disposition": "FIRST_PARTY_PUBLIC_INTEGRATION"
+    },
+    {
+      "path": "README.ja.md",
+      "sha256": "e47433a94fdf10bd66cb54f34a1a63089e0cbce7b88f66275c2fde1720d60970",
+      "bytes": 8205,
+      "kind": "reader_navigation",
+      "disposition": "FIRST_PARTY_PUBLIC_INTEGRATION"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "bba7620d91323061330ad070d577efa520b4dcd7ddfb57084cfb6c8d2312cab1",
+      "bytes": 4012,
+      "kind": "reader_navigation",
+      "disposition": "FIRST_PARTY_PUBLIC_INTEGRATION"
+    },
+    {
+      "path": "docs/README.ja.md",
+      "sha256": "07e56910183b92fdb14b66937b5faf3ac961e24b18cc993901822d2303c88747",
+      "bytes": 4220,
+      "kind": "reader_navigation",
+      "disposition": "FIRST_PARTY_PUBLIC_INTEGRATION"
+    },
+    {
+      "path": "docs/pages.md",
+      "sha256": "0aa5cc06bf4045786fae6693109c17de72ebdd23e6a17cb2c4ab5160b72b9197",
+      "bytes": 6577,
+      "kind": "reader_navigation",
+      "disposition": "FIRST_PARTY_PUBLIC_INTEGRATION"
+    },
+    {
+      "path": "docs/pages.ja.md",
+      "sha256": "450d0e3eb6886ff44ca63da312acd51515d7531fed32d128ee956deee3aca8c2",
+      "bytes": 13663,
+      "kind": "reader_navigation",
+      "disposition": "FIRST_PARTY_PUBLIC_INTEGRATION"
+    },
+    {
+      "path": "docs/language-coverage.json",
+      "sha256": "035af22ed6670b0361ba27a6b76db578a6db6cc59d2d04c9d697e2c1428bf935",
+      "bytes": 5600,
+      "kind": "reader_navigation",
+      "disposition": "FIRST_PARTY_PUBLIC_INTEGRATION"
+    },
+    {
+      "path": "visualization/index.html",
+      "sha256": "fd8b83a17cde0b258078e031ea8b81d40cbe4e9183b8bdf0a966c61f3e8b59a8",
+      "bytes": 3622,
+      "kind": "reader_navigation",
+      "disposition": "FIRST_PARTY_PUBLIC_INTEGRATION"
+    },
+    {
+      "path": "visualization/index.ja.html",
+      "sha256": "dd8153e3ea4082135ef349291f505306a9721ea444de1d71b2039de103c31e38",
+      "bytes": 4014,
+      "kind": "reader_navigation",
+      "disposition": "FIRST_PARTY_PUBLIC_INTEGRATION"
+    },
+    {
+      "path": "docs/rev5-v3-media-release/intake.json",
+      "sha256": "8a90da401cf45ab339dc938946376677e28bb832b56e6233a20e4486329bfd0d",
+      "bytes": 5342,
+      "kind": "public_record",
+      "disposition": "FIRST_PARTY_PUBLIC_INTEGRATION"
+    },
+    {
+      "path": "docs/rev5-v3-media-release/intake-audit.json",
+      "sha256": "a159992da9068f91d0e1229accf1fde5172da0201f5c20310e98b52637b2efab",
+      "bytes": 19706,
+      "kind": "public_record",
+      "disposition": "FIRST_PARTY_PUBLIC_INTEGRATION"
+    },
+    {
+      "path": "docs/rev5-v3-media-release/README.md",
+      "sha256": "5e4563aea061444114310264a3c4ea624dd9af29f68c6651b484b611ea32c448",
+      "bytes": 6618,
+      "kind": "public_record",
+      "disposition": "FIRST_PARTY_PUBLIC_INTEGRATION"
+    },
+    {
+      "path": "docs/rev5-v3-media-release/verification.json",
+      "sha256": "bc98c3a9669d03a79121e1619773e2a326e6daa501ad68c3456687741254da4f",
+      "bytes": 31316,
+      "kind": "public_record",
+      "disposition": "FIRST_PARTY_PUBLIC_INTEGRATION"
+    }
+  ],
+  "self_hash_policy": "This manifest is the only non-self-hashed file. The committed Git tree and separate publication audit bind its exact bytes.",
+  "external_runtime_dependencies": [],
+  "csp_delta": "Only media-src 'self'; existing script/style/img/connect/base/form restrictions retained.",
+  "media_bytes_preserved": true,
+  "media_duration_observation": "unit-Z12.083008 seconds /148476 stream ticks versus148480 packet-end ticks; no reencode.",
+  "first_party_rights_basis": "Explicit owner-authorized publication of traced first-party project code, procedural nominal/reference geometry and its presentation renders. No new license or third-party permission is inferred.",
+  "exclusions": [
+    "Private ancestry, PR80 firmware/Bosch/C1/IMU/N8R8 changes",
+    "Native editor files, source STLs, raw frames, raw uploads, process argv/logs, private paths/accounts, SDKs and .agent-work",
+    "New geometry, native renders, transcoding, physical acceptance, gate/finding/protection changes and administrative bypass"
+  ],
+  "unchanged_holds": "WIP / REF / NOT ASSEMBLY READY / NO-GO / 3C8H / REQ409 / strict-pro / 39UNKNOWN; P1/C1/D1; sidecar/ICD/control; original44 = 2 closed / 42 unfinished; N8R8 NOT_FOR_FLASH; all human/source/physical gates."
+}

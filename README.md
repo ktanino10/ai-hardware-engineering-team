@@ -21,6 +21,8 @@ leaves an evidence trail a human can audit later.
 - **Explore in a browser**: [English visualizations](https://ktanino10.github.io/ai-hardware-engineering-team/) /
   [日本語の紹介](https://ktanino10.github.io/ai-hardware-engineering-team/index.ja.html).
   The dashboard has EN/JA interface text; source records remain unchanged.
+  [Current Rev5 v3](https://ktanino10.github.io/ai-hardware-engineering-team/rev5-full-assembly-v3/index.html)
+  adds outside-first views and six recorded Blender clips; WIP / NOT ASSEMBLY READY.
 - **Read first**: [`AGENTS.md`](AGENTS.md) — concise navigation, existing
   commands and the source of truth for each kind of work.
 - **For this run**: [`docs/work-execution.md`](docs/work-execution.md) —
