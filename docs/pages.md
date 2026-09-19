@@ -53,6 +53,19 @@ proof, physical simulation, or a complete purchased-parts BOM. Later geometry
 and electronics epochs are not mixed in. The bench examples below remain
 historical; neither they nor the dashboard certify current Rev5 readiness.
 
+## Rev5 offline analysis and C1 summary
+
+The separate [offline tools guide](rev5-offline-tools-release/README.md)
+([日本語](rev5-offline-tools-release/README.ja.md)) provides the existing synthetic
+IMU disagreement CLI, complete standard-library Python/fixture/test closure,
+and the [C1 aggregate JSON](rev5-public-release/software-c1-summary.json).
+The 1,201-record example is runnable locally without firmware or private files.
+It is not sensor health, calibration, automatic exclusion or control.
+C1 remains 10 candidates / 2 unknown-product requirements / 23 gaps /
+103 observations / 0 adopted; quantity UNKNOWN, not orderable.
+This independently selected slice does not clear the firmware alerts in PR #80.
+The visual releases above and their original publication records remain unchanged.
+
 ## Circuit viewer
 
 The English UI has three modes: power distribution, implemented open-loop

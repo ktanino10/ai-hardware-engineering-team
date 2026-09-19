@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "record_type": "DERIVED_PUBLIC_SUMMARY_NOT_PRODUCTION_INPUT",
+  "source": {
+    "revision": "89808e295bfdce121e897dbec36e366194a43983",
+    "path": "docs/rev5-c1-bom-readiness-2026-09-18/current/readiness.json",
+    "sha256": "35a0284798e88785f99cfc672d46037443fb650d00f13d6533a15bd0018637ea"
+  },
+  "status": "SOURCE_BOUND_FIRST_CUT_NOT_ORDERABLE",
+  "exact_catalogue_candidates": 10,
+  "unknown_product_requirements": 2,
+  "adopted_candidates": 0,
+  "quantity": "UNKNOWN",
+  "quantity_status": "NOT_ESTABLISHED",
+  "functional_gaps": 23,
+  "source_observations": 103,
+  "purchase_readiness": "CLOSED",
+  "physical_permission": "NOT_GRANTED",
+  "complete_bom": "NOT_DONE",
+  "motor_power": "NOT_DONE",
+  "original_cohort": {
+    "closed": 2,
+    "unfinished": 42
+  },
+  "public_reproduction": "Summary only. No C1 production CLI or sealed production input closure is exported. This JSON is not a substitute input dataset.",
+  "source_limits": "Dated source observations, not live catalogue confirmation. Functional counts do not establish physical quantities or additive alternative parts.",
+  "holds": [
+    "WIP / NOT ASSEMBLY READY",
+    "NO-GO / 3C8H / REQ409 / strict-pro / 39UNKNOWN",
+    "P1/C1/D1; RRT; sidecar/ICD/control and all human/physical gates",
+    "C1 zero adopted; quantity UNKNOWN; not orderable",
+    "N8R8 NOT_FOR_FLASH; full Rev5 FG35/36/37 conflict",
+    "original44=2closed42unfinished"
+  ]
+}

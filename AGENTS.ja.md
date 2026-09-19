@@ -41,6 +41,8 @@
 | 共通 Python チェック・証拠処理 | `PYTHONPATH=tools python3 -m unittest discover -s tools/tests` |
 | Evidence・Issue・ECO の識別子 | `python3 tools/check_id_uniqueness.py` |
 | 対応している機械・PCB 寸法ペア | `python3 tools/check_mechanical_pcb_sync.py` |
+| 公開オフライン IMU の source・fixture 依存一式 | `python3 -B -S -m unittest discover -s tools/tests -p 'test_rev5_offline_publication.py'` |
+| 元の合成 IMU 不一致解析の動作 | `python3 -B -S -m unittest discover -s simulation/imu_disagreement/tests` |
 
 最小の適切な範囲を選びます。これらは記録・ソフトウェアのチェックであり、
 ネイティブ CAD の検査、電気的適格性、物理的な承認ではありません。

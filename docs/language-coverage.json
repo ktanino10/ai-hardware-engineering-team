@@ -32,7 +32,9 @@
     {"source": "visualization/rev5-full-assembly-v2/README.md", "en": "visualization/rev5-full-assembly-v2/README.md", "ja": "docs/pages.ja.md", "kind": "reading-edition"},
     {"source": "docs/rev5-public-release/README.md", "en": "docs/rev5-public-release/README.md", "ja": "docs/pages.ja.md", "kind": "reading-edition"},
     {"source": "visualization/rev5-full-assembly-v3/README.md", "en": "visualization/rev5-full-assembly-v3/README.md", "ja": "docs/pages.ja.md", "kind": "reading-edition"},
-    {"source": "docs/rev5-v3-media-release/README.md", "en": "docs/rev5-v3-media-release/README.md", "ja": "docs/pages.ja.md", "kind": "reading-edition"}
+    {"source": "docs/rev5-v3-media-release/README.md", "en": "docs/rev5-v3-media-release/README.md", "ja": "docs/pages.ja.md", "kind": "reading-edition"},
+    {"source": "docs/rev5-offline-tools-release/README.md", "en": "docs/rev5-offline-tools-release/README.md", "ja": "docs/rev5-offline-tools-release/README.ja.md", "kind": "translation"},
+    {"source": "simulation/imu_disagreement/README.md", "en": "simulation/imu_disagreement/README.md", "ja": "docs/rev5-offline-tools-release/README.ja.md", "kind": "reading-edition"}
   ],
   "new_pairs": [
     {"en": "docs/README.md", "ja": "docs/README.ja.md"},
