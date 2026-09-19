@@ -1,0 +1,34 @@
+{
+  "assets": [
+    {
+      "path": "scene-data.js",
+      "source_revision": "7a7924645042ae60386c14e38be4770bfcbfecac",
+      "source_path": "visualization/rev5-full-assembly-v2/scene-data.js",
+      "sha256": "8f55ba45dcd688c0253ec7c81628ce0ccedf7cedd79e7752191f2d8978eeedd0"
+    },
+    {
+      "path": "edge-data.js",
+      "source_revision": "7a7924645042ae60386c14e38be4770bfcbfecac",
+      "source_path": "visualization/rev5-full-assembly-v2/edge-data.js",
+      "sha256": "ecec1cd659ed4ca66e1d0126acb9c0ec1e638a927a57fc50bb3d8253d4c35e8b"
+    },
+    {
+      "path": "inventory.json",
+      "source_revision": "7a7924645042ae60386c14e38be4770bfcbfecac",
+      "source_path": "visualization/rev5-full-assembly-v2/inventory.json",
+      "sha256": "3caf94d95eedaef9f657be31b7e82cfce22a4b96a262d184249790026c2dd9ba"
+    },
+    {
+      "path": "interactive-viewer.js",
+      "source_revision": "7a7924645042ae60386c14e38be4770bfcbfecac",
+      "source_path": "visualization/rev5-full-assembly-v2/interactive-viewer.js",
+      "sha256": "936a6eedfdd8b09fe873beee30f1d11f7f1be111076aafd26b278200a7a01833"
+    },
+    {
+      "path": "drawings.js",
+      "source_revision": "7a7924645042ae60386c14e38be4770bfcbfecac",
+      "source_path": "visualization/rev5-full-assembly-v2/drawings.js",
+      "sha256": "7c8719441b48de3c3a8f86c2abb522a6da97ccaeb4afba62cfdb5212817dab95"
+    }
+  ]
+}

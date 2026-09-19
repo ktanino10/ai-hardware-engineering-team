@@ -34,6 +34,7 @@ source/hash と結び付いた記録へナビゲーションだけの変更を�
 | 始動試験 | [Ten-second trials](startup.md) | [始動試験](../simulation/STARTUP.md) |
 | Blender replay | [Commands and evidence](../simulation/blender/README.md) | [再描画・証拠](blender-replay.ja.md) |
 | ROOT exchange | [Compiled adapter](../simulation/root/README.md) | [解析データ交換](root-analysis.ja.md) |
+| 現在のRev5 v3・Blender動画6本 | [Visual release scope](rev5-v3-media-release/README.md) | [操作・動画・公開範囲](pages.ja.md#現在の-rev5-wip-参照図) |
 | 回路 viewer | [Modes and PDF regeneration](../visualization/circuit-viewer/README.md) | [操作・PDF 再生成](circuit-viewer.ja.md) |
 | 組立 viewer | [Controls and limitations](../visualization/assembly-viewer/README.md) | [操作・限界](assembly-viewer.ja.md) |
 | dashboard | [Data and parsing](../visualization/dashboard/README.md) | [操作・解析規則](dashboard.ja.md) |
