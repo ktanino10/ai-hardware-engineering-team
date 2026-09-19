@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "record_type": "LOCAL_PUBLICATION_CHECK_SNAPSHOT_NOT_MERGE_OR_DEPLOY_EVIDENCE",
+  "state": "PASS_FOR_BOUNDED_LOCAL_PUBLICATION_CHECKS",
+  "public_source_revision": "6a86f5e71934c78435ca31f3f696da48de5ddd5a",
+  "intake_revision": "07d9efb1e5c4af683abfd1da07fe311337cf4732",
+  "config_revision_at_admission": "eca74af4195346189cfdf49b20d734437e53c3d5",
+  "run_id": "ad7120ad-34ab-4d10-bcef-a2f12182920c",
+  "original_imu_tests": {
+    "command": "python3 -B -S -m unittest discover -s simulation/imu_disagreement/tests -v",
+    "python": "3.9.6",
+    "tests_run": 14,
+    "outcome": "PASS"
+  },
+  "fixture_cli": {
+    "outcome": "PASS",
+    "exit_code": 0,
+    "records": 1201,
+    "comparable_records": 1201,
+    "unresolved_records": 0,
+    "report_sha256": "000615b717220cc1946e4d890046bf34383b72119458552739e3e2924080b47a"
+  },
+  "focused_publication_checks": {
+    "command": "python3 -B -S -m unittest discover -s tools/tests -p 'test_rev5_offline_publication.py' -v",
+    "tests_run": 11,
+    "outcome": "PASS",
+    "isolated_closure": "Only the 11 exact public exports copied to a temporary directory without Git or firmware; site packages and inherited Python paths disabled.",
+    "isolated_original_tests_run_pass": 14,
+    "isolated_cli_records": 1201,
+    "missing_helper": "Explicit ModuleNotFoundError; no success-shaped fallback."
+  },
+  "tracked_workflow_language_checks": {
+    "command": "PYTHONPATH=tools python3 -m unittest discover -s tools/tests -p 'test_*workflow*.py'",
+    "tests_run": 45,
+    "outcome": "PASS",
+    "tracked_new_readmes": true,
+    "initial_observation": "Initial run: 38 executed cases passed and the workflow-instruction module failed to import because PyYAML was absent.",
+    "dependency_recovery": "Installed only existing-CI PyYAML into task-local ignored scope; no global environment, app configuration or dependency-manifest changes."
+  },
+  "existing_metadata_checks": {
+    "frontmatter": "PASS: 14 agents / 17 skills",
+    "id_uniqueness": "PASS: 584 IDs / 3 namespaces",
+    "simulation_yaml": "PASS: existing numerical step, job name and read-only permissions preserved; offline step additive",
+    "git_diff_check": "PASS"
+  },
+  "preservation": {
+    "v2_bundle_files": 14,
+    "v3_bundle_files": 33,
+    "v3_movies": 6,
+    "outcome": "All selected prior bundle bytes equal the existing release manifests.",
+    "new_native_or_media_execution": false,
+    "pr80": "OPEN at 6a86f5e71934c78435ca31f3f696da48de5ddd5a; original CodeQL check 105792907006 still FAILURE with three HIGH annotations. No modification or alert disposition performed."
+  },
+  "remote_ci_merge_deployment": "NOT_YET_RUN",
+  "independent_review": "No new independent review; original limited review and NOT_RUN distinctions are unchanged.",
+  "boundary": "This PR-opening snapshot is sealed before push. Later CI, merge and Pages readback require separate actual remote evidence."
+}

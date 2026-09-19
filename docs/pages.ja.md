@@ -125,6 +125,18 @@ NO-GO / 3C8H / REQ409 / strict-pro / 39UNKNOWN、P1/C1/D1、sidecar/ICD/control�
 original44 = **2 closed / 42 unfinished**、**NOT_FOR_FLASH**を維持し、
 製造・組立・通電・書込み・回転の許可は与えません。
 
+## Rev5 オフライン解析と C1 要約
+
+別の[オフライン解析ガイド](rev5-offline-tools-release/README.ja.md)
+（[English](rev5-offline-tools-release/README.md)）から、既存の合成 IMU 不一致 CLI、
+標準ライブラリだけの Python・fixture・テスト依存一式と
+[C1 集計 JSON](rev5-public-release/software-c1-summary.json)を利用できます。
+1,201 record の例は firmware・私有ファイルなしでローカル実行可能です。
+健全性、較正、自動除外、制御の判定には使いません。
+C1 は候補 10・製品 UNKNOWN 要件 2・gap 23・出典観測 103・採用 0、
+数量 UNKNOWN、発注不可のままです。この独立した公開単位は PR #80 の firmware alert を
+解消しません。上記の映像公開と元の公開記録は変更していません。
+
 ## 回路ビューアー
 
 UI は英語です。電源配分、実装済みの開ループ動作、**NOT IMPLEMENTED** の閉ループ構想を切り替えます。

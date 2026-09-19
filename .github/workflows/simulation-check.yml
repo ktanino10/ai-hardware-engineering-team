@@ -4,11 +4,29 @@ on:
   pull_request:
     paths:
       - "simulation/**"
+      - "docs/rev5-offline-tools-release/**"
+      - "docs/rev5-public-release/software-c1-summary.json"
+      - "docs/rev5-six-imu-fault-study-2026-09-13/author/run-001/one-bias/**"
+      - "tools/tests/test_rev5_offline_publication.py"
+      - "visualization/index*.html"
+      - "docs/language-coverage.json"
+      - "docs/pages*.md"
+      - "AGENTS.md"
+      - "AGENTS.ja.md"
       - ".github/workflows/simulation-check.yml"
   push:
     branches: [main]
     paths:
       - "simulation/**"
+      - "docs/rev5-offline-tools-release/**"
+      - "docs/rev5-public-release/software-c1-summary.json"
+      - "docs/rev5-six-imu-fault-study-2026-09-13/author/run-001/one-bias/**"
+      - "tools/tests/test_rev5_offline_publication.py"
+      - "visualization/index*.html"
+      - "docs/language-coverage.json"
+      - "docs/pages*.md"
+      - "AGENTS.md"
+      - "AGENTS.ja.md"
       - ".github/workflows/simulation-check.yml"
   workflow_dispatch: {}
 
@@ -31,3 +49,9 @@ jobs:
       - name: Run CPU numerical and provenance cases
         working-directory: simulation
         run: python -m unittest discover -s tests -v
+      - name: Check public offline IMU closure and original tests
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          python -B -S -m unittest discover -s simulation/imu_disagreement/tests -v
+          python -B -S -m unittest discover -s tools/tests -p 'test_rev5_offline_publication.py' -v

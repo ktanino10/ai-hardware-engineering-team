@@ -1,0 +1,248 @@
+{
+  "acceleration_mode": "diagnostic_only",
+  "classification": "SYNTHETIC_REFERENCE",
+  "frames": "RH_W_z_up_B_S_R_BS_q_WB_wxyz",
+  "initialization": {
+    "gauge": "relative_yaw_not_absolute",
+    "method": "explicit",
+    "q_WB": [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "policy": {
+    "alignment_s": 1e-08,
+    "correction_gain_s_inv": 0.5,
+    "direction_gate_rad": 0.15,
+    "force_gate_m_s2": 0.3,
+    "gravity_m_s2": 9.80665,
+    "max_gap_s": 0.03
+  },
+  "schema": 1,
+  "sensors": [
+    {
+      "R_BS": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      "calibration": {
+        "id": "synthetic-si-0",
+        "model": "already_calibrated_SI_identity",
+        "provenance": "synthetic_declared"
+      },
+      "clock": {
+        "epoch": "synthetic-boot-0",
+        "offset_s": 0.0,
+        "provenance": "synthetic_exact",
+        "scale": 1.0
+      },
+      "id": "imu0",
+      "r_B_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "R_BS": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          -1,
+          0
+        ],
+        [
+          0,
+          0,
+          -1
+        ]
+      ],
+      "calibration": {
+        "id": "synthetic-si-1",
+        "model": "already_calibrated_SI_identity",
+        "provenance": "synthetic_declared"
+      },
+      "clock": {
+        "epoch": "synthetic-boot-1",
+        "offset_s": 0.02,
+        "provenance": "synthetic_exact",
+        "scale": 1.00001
+      },
+      "id": "imu1",
+      "r_B_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "R_BS": [
+        [
+          0,
+          0,
+          1
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ],
+      "calibration": {
+        "id": "synthetic-si-2",
+        "model": "already_calibrated_SI_identity",
+        "provenance": "synthetic_declared"
+      },
+      "clock": {
+        "epoch": "synthetic-boot-2",
+        "offset_s": 0.04,
+        "provenance": "synthetic_exact",
+        "scale": 1.00002
+      },
+      "id": "imu2",
+      "r_B_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "R_BS": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "calibration": {
+        "id": "synthetic-si-3",
+        "model": "already_calibrated_SI_identity",
+        "provenance": "synthetic_declared"
+      },
+      "clock": {
+        "epoch": "synthetic-boot-3",
+        "offset_s": 0.06,
+        "provenance": "synthetic_exact",
+        "scale": 1.00003
+      },
+      "id": "imu3",
+      "r_B_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "R_BS": [
+        [
+          0,
+          -1,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      "calibration": {
+        "id": "synthetic-si-4",
+        "model": "already_calibrated_SI_identity",
+        "provenance": "synthetic_declared"
+      },
+      "clock": {
+        "epoch": "synthetic-boot-4",
+        "offset_s": 0.08,
+        "provenance": "synthetic_exact",
+        "scale": 1.00004
+      },
+      "id": "imu4",
+      "r_B_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "R_BS": [
+        [
+          0,
+          0,
+          -1
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "calibration": {
+        "id": "synthetic-si-5",
+        "model": "already_calibrated_SI_identity",
+        "provenance": "synthetic_declared"
+      },
+      "clock": {
+        "epoch": "synthetic-boot-5",
+        "offset_s": 0.1,
+        "provenance": "synthetic_exact",
+        "scale": 1.00005
+      },
+      "id": "imu5",
+      "r_B_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "units": {
+    "accel": "m/s^2",
+    "gyro": "rad/s",
+    "position": "m",
+    "time": "s"
+  }
+}
