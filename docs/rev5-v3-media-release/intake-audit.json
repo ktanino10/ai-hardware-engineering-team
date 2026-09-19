@@ -1,0 +1,393 @@
+{
+  "schema_version": 1,
+  "record_type": "DERIVED_PUBLIC_INTAKE_AUDIT",
+  "task_id": "rev5-v3-media-public-release-intake",
+  "run_id": "e290eb53-66fa-4631-9fc8-eb0c0fe87e95",
+  "source_revision": "d98d9c3f31252cbb2784826472adafae099889c4",
+  "config_revision": "ca07ba11bf3347ff467671606c00a6e2b5a70c02",
+  "runtime_session_id": "7862f011-20a8-480c-a8fd-536178e26647",
+  "app_commission_id": "7363e238-35b0-43e1-b2b3-0edf30ae90a0",
+  "public_base": "ca07ba11bf3347ff467671606c00a6e2b5a70c02",
+  "producers": [
+    {
+      "task_id": "rev5-viewer-outer-first-v3",
+      "run_id": "d0da6883-0120-413b-9a03-5eb6cf316c17",
+      "state": "DONE",
+      "source_revision": "49071a72adac8a827cd1f5fd51539163183a5c2e",
+      "config_revision": "7a7924645042ae60386c14e38be4770bfcbfecac"
+    },
+    {
+      "task_id": "rev5-blender-whole-assembly-base-media",
+      "run_id": "594b4573-b705-45dc-aa05-fe6efe2dd99b",
+      "state": "DONE",
+      "source_revision": "eb20f9b57ed6c745d3b12ca70f4ca91ca076d7ca",
+      "config_revision": "0d524373af5f0a87e792d8a46a55caa4041987f2"
+    },
+    {
+      "task_id": "rev5-blender-whole-assembly-sequenced-media",
+      "run_id": "9b3e2cd5-80cc-4124-96bf-e6b1431bd62f",
+      "state": "DONE",
+      "source_revision": "79a4b75b227f9ec3011c277d768063a649aed87e",
+      "config_revision": "0d524373af5f0a87e792d8a46a55caa4041987f2"
+    }
+  ],
+  "runtime": [
+    {
+      "source_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "source_path": "visualization/rev5-full-assembly-v3/index.html",
+      "source_blob": "c99428869a0c8fdf9846f5e5df7200b849b6bfed",
+      "sha256": "560946657497716b8a16beb473f43d25f25c76be98a305e4a6a7399999712001",
+      "bytes": 10430,
+      "destination": "visualization/rev5-full-assembly-v3/index.html"
+    },
+    {
+      "source_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "source_path": "visualization/rev5-full-assembly-v3/style.css",
+      "source_blob": "d0609e77508dea721f04ec3043dcc9b21dc16bbd",
+      "sha256": "1adf1307682771bd2483f1a32acb383db755724ff6f037f945a0ef415c469394",
+      "bytes": 6134,
+      "destination": "visualization/rev5-full-assembly-v3/style.css"
+    },
+    {
+      "source_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "source_path": "visualization/rev5-full-assembly-v3/interactive-viewer.js",
+      "source_blob": "8fc0a933f2d814be8b99a643544d71ae28931e76",
+      "sha256": "936a6eedfdd8b09fe873beee30f1d11f7f1be111076aafd26b278200a7a01833",
+      "bytes": 21676,
+      "destination": "visualization/rev5-full-assembly-v3/interactive-viewer.js"
+    },
+    {
+      "source_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "source_path": "visualization/rev5-full-assembly-v3/scene-data.js",
+      "source_blob": "18c6b2866e28e721e6fa63dcdd09b140a22365ad",
+      "sha256": "8f55ba45dcd688c0253ec7c81628ce0ccedf7cedd79e7752191f2d8978eeedd0",
+      "bytes": 8995251,
+      "destination": "visualization/rev5-full-assembly-v3/scene-data.js"
+    },
+    {
+      "source_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "source_path": "visualization/rev5-full-assembly-v3/edge-data.js",
+      "source_blob": "10610d805e61ea8217d1473bd5568ecb074e3a99",
+      "sha256": "ecec1cd659ed4ca66e1d0126acb9c0ec1e638a927a57fc50bb3d8253d4c35e8b",
+      "bytes": 4458621,
+      "destination": "visualization/rev5-full-assembly-v3/edge-data.js"
+    },
+    {
+      "source_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "source_path": "visualization/rev5-full-assembly-v3/plan-data.js",
+      "source_blob": "959e2c116a282a00bef57c53fbb4dd9c421d5cee",
+      "sha256": "05ed439f1bc2aed8cccc0d75d9b38d299a27abcb24ecafad5070086e57a6e6f1",
+      "bytes": 210167,
+      "destination": "visualization/rev5-full-assembly-v3/plan-data.js"
+    },
+    {
+      "source_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "source_path": "visualization/rev5-full-assembly-v3/presentation-plan.json",
+      "source_blob": "01b958768e70c948e3538e794fd8421c611111dd",
+      "sha256": "941aba63dac8ff7ecc5ce67c09be99afabc6037193b418ef6183ffe163c802af",
+      "bytes": 189032,
+      "destination": "visualization/rev5-full-assembly-v3/presentation-plan.json"
+    },
+    {
+      "source_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "source_path": "visualization/rev5-full-assembly-v3/features.js",
+      "source_blob": "8743b563d03c41f27883f6c6a4efd5bb83236503",
+      "sha256": "a2370e219c8e80c1bbee3546fda5401885cfb7d88568faaab7a7b4b60d17d3da",
+      "bytes": 7791,
+      "destination": "visualization/rev5-full-assembly-v3/features.js"
+    },
+    {
+      "source_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "source_path": "visualization/rev5-full-assembly-v3/viewer.js",
+      "source_blob": "c5e00ffc36d4064351f6e3afae4d286479010ce3",
+      "sha256": "244375de1c04f7c5b6cc611552ed1cb4305114969a9ce8d32d51109fdf70e89c",
+      "bytes": 20363,
+      "destination": "visualization/rev5-full-assembly-v3/viewer.js"
+    },
+    {
+      "source_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "source_path": "visualization/rev5-full-assembly-v3/drawings.js",
+      "source_blob": "8e62ae8ad1056b2faafe736b74cb1ca03a408e8a",
+      "sha256": "7c8719441b48de3c3a8f86c2abb522a6da97ccaeb4afba62cfdb5212817dab95",
+      "bytes": 5101,
+      "destination": "visualization/rev5-full-assembly-v3/drawings.js"
+    },
+    {
+      "source_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "source_path": "visualization/rev5-full-assembly-v3/app.js",
+      "source_blob": "2738eb1c0b5cfa9df066a0f169c27e4db2502dc7",
+      "sha256": "0a1ef671086cdfa27851cc456010890b3281fcf25ab0364cf8c1e66dc7cb557a",
+      "bytes": 13191,
+      "destination": "visualization/rev5-full-assembly-v3/app.js"
+    },
+    {
+      "source_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "source_path": "visualization/rev5-full-assembly-v3/inventory.json",
+      "source_blob": "921d6e910e48b0b2e50ff090cd1194b91c9a88ba",
+      "sha256": "3caf94d95eedaef9f657be31b7e82cfce22a4b96a262d184249790026c2dd9ba",
+      "bytes": 514667,
+      "destination": "visualization/rev5-full-assembly-v3/inventory.json"
+    },
+    {
+      "source_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "source_path": "visualization/rev5-full-assembly-v3/runtime-assets.json",
+      "source_blob": "aa52642ed776de6f123911c09bc58f8985ca1b32",
+      "sha256": "7233e5dfe0344b255733d38ce83fd881ff6b2da5ef1a5a294a7b94749de30b96",
+      "bytes": 1383,
+      "destination": "visualization/rev5-full-assembly-v3/runtime-assets.json"
+    },
+    {
+      "source_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "source_path": "visualization/rev5-full-assembly-v3/README.md",
+      "source_blob": "4e1dfca4c9f7e866c01f44235ed9493845a46328",
+      "sha256": "f1bd43dce2c218bb46393e5883458b7222b853a6311c9884406cb9f654b8bdb1",
+      "bytes": 7018,
+      "destination": "visualization/rev5-full-assembly-v3/README.md"
+    }
+  ],
+  "media": [
+    {
+      "source_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "source_path": "hardware/visualization/rev5-blender-whole-assembly/media/base/exterior-turntable.mp4",
+      "source_blob": "137cdd16e224ba6f5767d79d1bbe2e0e2489c3c2",
+      "sha256": "ee13ddf5d145976510fc6324c35dcf5398d0276f2049c9f610b97ed74d5c2132",
+      "bytes": 537195,
+      "destination": "visualization/rev5-full-assembly-v3/media/exterior-turntable.mp4",
+      "clip_id": "whole-exterior",
+      "kind": "video",
+      "base_revision_byte_identical": true
+    },
+    {
+      "source_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "source_path": "hardware/visualization/rev5-blender-whole-assembly/media/base/exterior.png",
+      "source_blob": "ea07a86ef90e59546957048aa8cf801f2f6e418c",
+      "sha256": "8070b29e7da9897f08c0c2f2e1aa984a1030cfa3a90dbbd62952ccc3a0a07b8b",
+      "bytes": 628958,
+      "destination": "visualization/rev5-full-assembly-v3/media/exterior.png",
+      "clip_id": "whole-exterior",
+      "kind": "poster",
+      "base_revision_byte_identical": true
+    },
+    {
+      "source_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "source_path": "hardware/visualization/rev5-blender-whole-assembly/media/base/interior-turntable.mp4",
+      "source_blob": "3a33ca775cb6900bf5aa6c414d83615481d607c0",
+      "sha256": "98f206e9cea451d54ee86695849d547e827cd475ad2d3f68e692bd6dedd7b963",
+      "bytes": 1100937,
+      "destination": "visualization/rev5-full-assembly-v3/media/interior-turntable.mp4",
+      "clip_id": "whole-interior",
+      "kind": "video",
+      "base_revision_byte_identical": true
+    },
+    {
+      "source_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "source_path": "hardware/visualization/rev5-blender-whole-assembly/media/base/interior.png",
+      "source_blob": "e20e6659e46277a21e80935ada98ef271fd6982a",
+      "sha256": "14e20b0724f8f134ef4702b9503214ef72763f526188d510ec1f4226f0406973",
+      "bytes": 787479,
+      "destination": "visualization/rev5-full-assembly-v3/media/interior.png",
+      "clip_id": "whole-interior",
+      "kind": "poster",
+      "base_revision_byte_identical": true
+    },
+    {
+      "source_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "source_path": "hardware/visualization/rev5-blender-whole-assembly/media/sequenced/outside-first.mp4",
+      "source_blob": "af6bf0626af1a2fe1d92c09c69438e69d260c7c7",
+      "sha256": "a6381631f994864cb460b8a058296c08d5974354e56150f909bb8e85b452b5e6",
+      "bytes": 722511,
+      "destination": "visualization/rev5-full-assembly-v3/media/outside-first.mp4",
+      "clip_id": "outside-first",
+      "kind": "video"
+    },
+    {
+      "source_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "source_path": "hardware/visualization/rev5-blender-whole-assembly/media/sequenced/outside-first.png",
+      "source_blob": "6dd6d7be71d2acfb0f06018825bd6f056fe2f120",
+      "sha256": "68e72f5bc7bfd5800cb84e8e572fc96f950361062d91dca15971e4c2ffb406f5",
+      "bytes": 639374,
+      "destination": "visualization/rev5-full-assembly-v3/media/outside-first.png",
+      "clip_id": "outside-first",
+      "kind": "poster"
+    },
+    {
+      "source_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "source_path": "hardware/visualization/rev5-blender-whole-assembly/media/sequenced/unit-X.mp4",
+      "source_blob": "ef2dfb9ed83a408ca5329d1c8c30773e404ff820",
+      "sha256": "f6f7f61a170fba4f954f10e76455104b67727a094d3726c97fb644fef5b3ef41",
+      "bytes": 586008,
+      "destination": "visualization/rev5-full-assembly-v3/media/unit-X.mp4",
+      "clip_id": "unit-X",
+      "kind": "video"
+    },
+    {
+      "source_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "source_path": "hardware/visualization/rev5-blender-whole-assembly/media/sequenced/unit-X.png",
+      "source_blob": "283065b483c246046b974da3e30417c78449b0cb",
+      "sha256": "f4f3ca8152df92902504ea572254f3a79488c897264762c5b172fb53b0d8fe25",
+      "bytes": 588000,
+      "destination": "visualization/rev5-full-assembly-v3/media/unit-X.png",
+      "clip_id": "unit-X",
+      "kind": "poster"
+    },
+    {
+      "source_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "source_path": "hardware/visualization/rev5-blender-whole-assembly/media/sequenced/unit-Y.mp4",
+      "source_blob": "7b5aae19f49e44600140ad0758a2d460504102aa",
+      "sha256": "c71aedab2d4a4031cbf54b03002db56c6c01fd134c41984b9fb712bf5cd56261",
+      "bytes": 585464,
+      "destination": "visualization/rev5-full-assembly-v3/media/unit-Y.mp4",
+      "clip_id": "unit-Y",
+      "kind": "video"
+    },
+    {
+      "source_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "source_path": "hardware/visualization/rev5-blender-whole-assembly/media/sequenced/unit-Y.png",
+      "source_blob": "6cfe125ea1d475f82960ff9b451b8b531426e5e2",
+      "sha256": "26332bf4d1bf151f91f3e8b62466d99e8b5a9992cba62b181731f03a110ce7e0",
+      "bytes": 589795,
+      "destination": "visualization/rev5-full-assembly-v3/media/unit-Y.png",
+      "clip_id": "unit-Y",
+      "kind": "poster"
+    },
+    {
+      "source_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "source_path": "hardware/visualization/rev5-blender-whole-assembly/media/sequenced/unit-Z.mp4",
+      "source_blob": "9f8ddb24875a164f4824a7e3f615e8719a18b060",
+      "sha256": "1c37833fae2e3fed9c9208ad1d1c8fb2fce698ad966abcb4a3db81327e1d215b",
+      "bytes": 476327,
+      "destination": "visualization/rev5-full-assembly-v3/media/unit-Z.mp4",
+      "clip_id": "unit-Z",
+      "kind": "video"
+    },
+    {
+      "source_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "source_path": "hardware/visualization/rev5-blender-whole-assembly/media/sequenced/unit-Z.png",
+      "source_blob": "faccf0083a4f2dc9027ebfcb368f4faa81a6c8fa",
+      "sha256": "2845de6959286d96d0831f9f1480bc9685d6da53f707825439b65c03482badf0",
+      "bytes": 570442,
+      "destination": "visualization/rev5-full-assembly-v3/media/unit-Z.png",
+      "clip_id": "unit-Z",
+      "kind": "poster"
+    }
+  ],
+  "optional_portable_tests": [
+    {
+      "source_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "source_path": "visualization/rev5-full-assembly-v3/features_test.mjs",
+      "source_blob": "f1087e250d6462eb9e827c80b45b4a886216b86f",
+      "sha256": "2027ee42e3a6f104e0714e1e08b7eeb1323f4a81e603380728972d6830feec22",
+      "bytes": 3586,
+      "destination": "visualization/rev5-full-assembly-v3/features_test.mjs"
+    },
+    {
+      "source_revision": "c5349740bb240ed600df8e4b056921067a102c1d",
+      "source_path": "visualization/rev5-full-assembly-v3/browser_test.mjs",
+      "source_blob": "3177ec745bbdf22dd069368c768d05d14f0c5e91",
+      "sha256": "41c9c81bfc1d55c7dda84137fee1cc99b166434aaa0f22877f4f68223fc370c3",
+      "bytes": 32417,
+      "destination": "visualization/rev5-full-assembly-v3/browser_test.mjs"
+    }
+  ],
+  "inherited_public_assets": [
+    {
+      "public_path": "visualization/rev5-full-assembly-v2/scene-data.js",
+      "sha256": "8f55ba45dcd688c0253ec7c81628ce0ccedf7cedd79e7752191f2d8978eeedd0",
+      "byte_identical": true
+    },
+    {
+      "public_path": "visualization/rev5-full-assembly-v2/edge-data.js",
+      "sha256": "ecec1cd659ed4ca66e1d0126acb9c0ec1e638a927a57fc50bb3d8253d4c35e8b",
+      "byte_identical": true
+    },
+    {
+      "public_path": "visualization/rev5-full-assembly-v2/inventory.json",
+      "sha256": "3caf94d95eedaef9f657be31b7e82cfce22a4b96a262d184249790026c2dd9ba",
+      "byte_identical": true
+    },
+    {
+      "public_path": "visualization/rev5-full-assembly-v2/interactive-viewer.js",
+      "sha256": "936a6eedfdd8b09fe873beee30f1d11f7f1be111076aafd26b278200a7a01833",
+      "byte_identical": true
+    },
+    {
+      "public_path": "visualization/rev5-full-assembly-v2/drawings.js",
+      "sha256": "7c8719441b48de3c3a8f86c2abb522a6da97ccaeb4afba62cfdb5212817dab95",
+      "byte_identical": true
+    }
+  ],
+  "provenance_only_sources": [
+    {
+      "source_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "source_path": "hardware/visualization/rev5-blender-whole-assembly/recipe/presentation.json",
+      "source_blob": "58471e63fb27c39de5ab581b9d3b5bfa13059126",
+      "sha256": "dc8a7910ff6014d59a7a2d909f2fb3d5a73dc0db88272400ac11842c21af0a79",
+      "bytes": 4073,
+      "included": false
+    },
+    {
+      "source_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "source_path": "hardware/visualization/rev5-blender-whole-assembly/recipe/scene.py",
+      "source_blob": "aca207bd8464ddabc8dfc3d1555e77d7dd1d84e9",
+      "sha256": "2ca068817ad942213e787240576201c3bfce15a9b0aeef0c78c5c8095c0bf04f",
+      "bytes": 15433,
+      "included": false
+    },
+    {
+      "source_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "source_path": "hardware/visualization/rev5-blender-whole-assembly/recipe/media.py",
+      "source_blob": "5604decbec57d2389f2e7b0fa9fbded0b4aa2820",
+      "sha256": "9481c222bc9d45198090c03b275a139018442ee15ac9086f4218da329b359ca0",
+      "bytes": 7505,
+      "included": false
+    },
+    {
+      "source_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "source_path": "hardware/visualization/rev5-blender-whole-assembly/sequence/recipe/config.json",
+      "source_blob": "2e1ea716e84787cf35493e9ba156d04c03cc03c1",
+      "sha256": "c3d3e6af9c633c992b6737f79a85b5005b8e8a87faab2f4abc99dd3188b60197",
+      "bytes": 2370,
+      "included": false
+    },
+    {
+      "source_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "source_path": "hardware/visualization/rev5-blender-whole-assembly/sequence/recipe/scene.py",
+      "source_blob": "629fbe14cda50dd7db44bb61169a6757c33f59fa",
+      "sha256": "0716c14a916cb8d5991dcc222bf57783090350269753f2dbda1846f702214ed8",
+      "bytes": 11605,
+      "included": false
+    },
+    {
+      "source_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "source_path": "hardware/visualization/rev5-blender-whole-assembly/sequence/recipe/plan.py",
+      "source_blob": "20a9da4f8ca6e53ffb56f59250208c08458c3be7",
+      "sha256": "c5068fc464f899eed9ff0815aed3ccc6002962793972d9c1b9251b66143ffe50",
+      "bytes": 4486,
+      "included": false
+    },
+    {
+      "source_revision": "382345807899333ecfc47a2a7e4948d937ff3993",
+      "source_path": "hardware/visualization/rev5-blender-whole-assembly/sequence/recipe/media.py",
+      "source_blob": "c6d0d37a1944b4f446fa1c6f7d7f3e3aeef83fef",
+      "sha256": "3b41933e83e719d8c759b350fac9ce492bc76d06ef39bd594a5d6e0b87d7011f",
+      "bytes": 13193,
+      "included": false
+    }
+  ],
+  "first_party_delta_trace": [
+    "Viewer source commit c5349740 is project-owner-authored plain JavaScript/HTML/CSS. The new plan, features and focused-view changes extend the already published project renderer; no downloaded package or renderer is added.",
+    "The source scene, edges, inventory, triangle picking implementation and SVG implementation are byte-identical to the cleared public v2 export.",
+    "Base scene.py constructs the exact packed source triangle stream and Principled BSDF colors/metallic/roughness, area lights and a procedural non-product studio floor. These illustrative materials do not claim physical material properties; no supplier mesh, image texture or HDRI import is used.",
+    "Sequenced scene.py reuses that first-party recipe with shared-plan translations, visibility and orthographic camera keyframes. The non-product floor is hidden; product topology and source poses remain unmodified.",
+    "The six existing H264 movies and raster posters are eligible owner-authorized project render outputs. Blender/ffmpeg executables, native editor files, external fonts, source recipes and process records are not redistributed here."
+  ],
+  "rights_basis": "Explicit owner-authorized publication of traced first-party project code, procedural nominal/reference geometry and its presentation renders. No new license or third-party permission is inferred.",
+  "disposition": "ELIGIBLE_FOR_SEPARATE_PREPARATION_NOT_YET_PUBLISHED",
+  "independent_or_engineering_review": false,
+  "exclusions": [
+    "Private ancestry, PR80 firmware/Bosch/C1/IMU/N8R8 changes",
+    "Native editor files, source STLs, raw frames, raw uploads, process argv/logs, private paths/accounts, SDKs and .agent-work",
+    "New geometry, native renders, transcoding, physical acceptance, gate/finding/protection changes and administrative bypass"
+  ],
+  "unchanged_holds": "WIP / REF / NOT ASSEMBLY READY / NO-GO / 3C8H / REQ409 / strict-pro / 39UNKNOWN; P1/C1/D1; sidecar/ICD/control; original44 = 2 closed / 42 unfinished; N8R8 NOT_FOR_FLASH; all human/source/physical gates."
+}
