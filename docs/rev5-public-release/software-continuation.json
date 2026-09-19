@@ -77,8 +77,8 @@
       "supersedes": {
         "docs/rev5-public-release/software-manifest.json": "d55f9ca4f75e9beac9e16f3d91e534ce0cfdad17cad1e295ccdda6f7bbb67cba"
       },
-      "bytes": 10071,
-      "sha256": "7e9e087a6363d381dd56e9572f7391f9414f3f29a938b3861907b18dc50c91ae"
+      "bytes": 11146,
+      "sha256": "e7f5fefdb2f87284b30577c39718ce567842acb6abf910f71acee178aac04b26"
     },
     {
       "path": "docs/rev5-public-release/software.md",
@@ -86,8 +86,8 @@
       "supersedes": {
         "docs/rev5-public-release/software-manifest.json": "1375933aa11b6c6adddedf733f7f0a1f2e59def783d411c153e379c04aaf2157"
       },
-      "bytes": 9814,
-      "sha256": "1f0d2b3db6267316c38b600b64efa306fa9085f3f42411061e63bae57cfad64d"
+      "bytes": 10793,
+      "sha256": "41d87a77d4187d2498fa9f76c173a082de05f5c7246cb9e9ff77480df9ce8562"
     },
     {
       "path": "simulation/imu_disagreement/README.md",

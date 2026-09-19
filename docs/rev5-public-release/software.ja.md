@@ -14,6 +14,20 @@ Blender動画6本、オフラインIMUツールもあります。その実行用
 元manifestのhashと現在のbytesへ結び付けます。共通検査は履歴の改変・重複path・
 由来のない上書きを拒否します。不変のcode/data検査を省略したり、過去レビューを再発行したりしません。
 
+## 選択された修正と残るfirmware制限
+
+今回の修正対象はHIGHの3件、Aux書込みcounterの折返し、Auxエラー伝播と直接影響する
+読出し経路、CRT configuration bufferの範囲超過です。既存の初回featureエラー修正は保持します。
+修正の証拠と採用対象sourceは、下記の過去36テストのレビューとは別に結び付けます。
+
+**C3はOPEN / MEDIUMのままで、修正対象に選ばれていません。**
+残存するCRT末尾判定は、最後ではないtail chunkのready待機を省略したり、
+1つだけの最終tail後に待機したりします。即時readyを返すhost modelでは、このprotocolを
+受容できません。一般的なAux長文読出しのindex問題と、広範なAPS/statusエラー復旧も対象外です。
+
+選択されたhost caseやCodeQLが成功しても、**firmware全体のrelease受容にはなりません**。
+全体レビューは条件付きであり、このPRはmerge・flash・sensor実動作や物理操作の許可ではありません。
+
 ## 公開した範囲と保留
 
 | 対象 | この追補 | 残る境界 |

@@ -16,6 +16,24 @@ updated support file to its old manifest hash and its current bytes. The shared
 manifest checker rejects changed history, duplicate paths and unbound overrides;
 it does not skip unchanged code/data checks or reissue an earlier review.
 
+## Selected corrections and retained firmware limits
+
+The user selected the three HIGH findings: Aux write-counter wraparound,
+Aux error propagation with its directly affected read consumer, and CRT
+configuration-buffer bounds. The existing initial-feature-error correction
+is retained. Correction evidence and the selected source must be bound
+separately from the original 36-test review below.
+
+**C3 remains OPEN / MEDIUM and was not selected for repair.** The retained
+CRT tail-finality predicate can omit readiness waits for non-final tail chunks
+and wait after a single final tail. Immediate-ready host callbacks do not
+qualify that protocol. General Aux long-read indexing and broader APS/status
+error recovery are also outside the selected correction.
+
+Passing selected host cases or CodeQL is therefore **not complete firmware
+release acceptance**. Overall review remains conditional; this PR does not
+authorize merge, flashing, sensor operation or any physical action.
+
 ## Included and withheld
 
 | Surface | Public result | Remaining boundary |
