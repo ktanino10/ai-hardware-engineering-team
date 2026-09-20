@@ -66,6 +66,12 @@ C1 remains 10 candidates / 2 unknown-product requirements / 23 gaps /
 This independently selected slice does not clear the firmware alerts in PR #80.
 The visual releases above and their original publication records remain unchanged.
 
+The [software follow-up](rev5-public-release/software.md) separately documents
+the source-only N8R8 evaluation and its firmware correction/review status.
+It remains NOT_FOR_FLASH, with the full Rev5 FG35/36/37 conflict unresolved.
+These command-line tools do not run inside the viewer. Existing visual data,
+source epochs and physical holds remain unchanged.
+
 ## Circuit viewer
 
 The English UI has three modes: power distribution, implemented open-loop

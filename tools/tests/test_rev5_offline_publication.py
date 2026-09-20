@@ -13,6 +13,8 @@ import sys
 import tempfile
 import unittest
 
+from tools.public_release_manifest import current_file_record
+
 
 ROOT = Path(__file__).resolve().parents[2]
 PACKET = ROOT / "docs/rev5-offline-tools-release"
@@ -69,8 +71,10 @@ class OfflinePublicationTests(unittest.TestCase):
                 self.assertTrue(target.is_file())
                 self.assertFalse(any(p.is_symlink() for p in (target, *target.parents)))
                 data = target.read_bytes()
-                self.assertEqual(len(data), row["bytes"])
-                self.assertEqual(hashlib.sha256(data).hexdigest(), row["sha256"])
+                current = current_file_record(
+                    ROOT, "docs/rev5-offline-tools-release/manifest.json", row)
+                self.assertEqual(len(data), current["bytes"])
+                self.assertEqual(hashlib.sha256(data).hexdigest(), current["sha256"])
                 self.assertNotRegex(data, rb"/(?:Users|home)/[^ \n\"'<>()]+|[.]copilot/session-state/")
                 self.assertNotIn(path.suffix.lower(), {
                     ".pdf", ".stl", ".blend", ".f3d", ".elf", ".bin", ".sqlite3",

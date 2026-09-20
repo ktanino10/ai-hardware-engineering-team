@@ -39,6 +39,7 @@
 | エージェント・スキルのメタデータ | `python3 tools/check_agent_frontmatter.py` |
 | 実行契約・指示・導入案内 | `PYTHONPATH=tools python3 -m unittest discover -s tools/tests -p 'test_*workflow*.py'` |
 | 共通 Python チェック・証拠処理 | `PYTHONPATH=tools python3 -m unittest discover -s tools/tests` |
+| Rev5限定ソフトウェア公開 | `python3 -B -m unittest discover -s tools/tests -p 'test_rev5_public_software.py'`。IMU・SDK不要のCMake確認は[公開手順](docs/rev5-public-release/software.ja.md) |
 | Evidence・Issue・ECO の識別子 | `python3 tools/check_id_uniqueness.py` |
 | 対応している機械・PCB 寸法ペア | `python3 tools/check_mechanical_pcb_sync.py` |
 | 公開オフライン IMU の source・fixture 依存一式 | `python3 -B -S -m unittest discover -s tools/tests -p 'test_rev5_offline_publication.py'` |

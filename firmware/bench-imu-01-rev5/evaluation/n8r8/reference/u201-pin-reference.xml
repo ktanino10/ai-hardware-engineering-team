@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='utf-8'?>
+<export version="E" scope="DERIVED_PUBLIC_U201_PIN_REFERENCE" source_revision="3db7ea5e74bfaf7c286383d6ee29926f347a2297" source_sha256="aebe15515f997cc3c38f797081c3179889492aa49e80180921fe3f523909789a">
+  <!--Derived software-test reference, NOT the complete native netlist or a circuit release. Only the 11 measurement U201 nodes and 3 conflicting FG U201 nodes are retained. All node/net attributes are unchanged; local design paths and other circuitry are omitted.-->
+  <nets>
+    <net code="11" name="DRV_X_FG" class="Default">
+      <node ref="U201" pin="28" pinfunction="IO35_28" pintype="bidirectional" />
+    </net>
+    <net code="30" name="DRV_Y_FG" class="Default">
+      <node ref="U201" pin="29" pinfunction="IO36_29" pintype="bidirectional" />
+    </net>
+    <net code="49" name="DRV_Z_FG" class="Default">
+      <node ref="U201" pin="30" pinfunction="IO37_30" pintype="bidirectional" />
+    </net>
+    <net code="65" name="IMU_CS_X_A" class="Default">
+      <node ref="U201" pin="4" pinfunction="IO4_4" pintype="bidirectional" />
+    </net>
+    <net code="66" name="IMU_CS_X_B" class="Default">
+      <node ref="U201" pin="5" pinfunction="IO5_5" pintype="bidirectional" />
+    </net>
+    <net code="67" name="IMU_CS_Y_A" class="Default">
+      <node ref="U201" pin="6" pinfunction="IO6_6" pintype="bidirectional" />
+    </net>
+    <net code="68" name="IMU_CS_Y_B" class="Default">
+      <node ref="U201" pin="7" pinfunction="IO7_7" pintype="bidirectional" />
+    </net>
+    <net code="69" name="IMU_CS_Z_A" class="Default">
+      <node ref="U201" pin="8" pinfunction="IO15_8" pintype="bidirectional" />
+    </net>
+    <net code="70" name="IMU_CS_Z_B" class="Default">
+      <node ref="U201" pin="9" pinfunction="IO16_9" pintype="bidirectional" />
+    </net>
+    <net code="71" name="IMU_MISO" class="Default">
+      <node ref="U201" pin="21" pinfunction="IO13_21" pintype="bidirectional" />
+    </net>
+    <net code="72" name="IMU_MOSI" class="Default">
+      <node ref="U201" pin="19" pinfunction="IO11_19" pintype="bidirectional" />
+    </net>
+    <net code="73" name="IMU_SCK" class="Default">
+      <node ref="U201" pin="20" pinfunction="IO12_20" pintype="bidirectional" />
+    </net>
+    <net code="76" name="UART0_RX" class="Default">
+      <node ref="U201" pin="36" pinfunction="RXD0_36" pintype="bidirectional" />
+    </net>
+    <net code="77" name="UART0_TX" class="Default">
+      <node ref="U201" pin="37" pinfunction="TXD0_37" pintype="bidirectional" />
+    </net>
+  </nets>
+</export>

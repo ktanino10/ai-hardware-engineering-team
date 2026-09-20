@@ -1,0 +1,28 @@
+# Owner-selected measurement profile; NOT REQ103/thermal/physical approval.
+# ESP-IDF v5.5.2: esp_system/port/soc/esp32s3/Kconfig.cpu (80 MHz option).
+CONFIG_IDF_TARGET="esp32s3"
+CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_80=y
+# CONFIG_PM_ENABLE is not set
+CONFIG_FREERTOS_HZ=1000
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=8192
+
+# DS-MCU-101: N8R2 has 8MB Quad flash / 2MB Quad PSRAM.
+# Conservative DIO/40MHz operation; PSRAM is deliberately unused.
+# No OPI, Octal-memory variant or other SKU is assumed.
+CONFIG_ESPTOOLPY_FLASHMODE_DIO=y
+CONFIG_ESPTOOLPY_FLASHFREQ_40M=y
+CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y
+# esp_psram is not in the minimal component closure; no SPIRAM symbol exists.
+CONFIG_PARTITION_TABLE_SINGLE_APP=y
+
+# Source-bound UART0 default pins are checked against REV5_PIN_* in main.c.
+CONFIG_ESP_CONSOLE_UART_DEFAULT=y
+CONFIG_ESP_CONSOLE_UART_BAUDRATE=115200
+CONFIG_ESP_CONSOLE_SECONDARY_NONE=y
+# CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG is not set
+# CONFIG_ESP_CONSOLE_USB_CDC is not set
+CONFIG_LOG_DEFAULT_LEVEL_WARN=y
+CONFIG_BOOTLOADER_LOG_LEVEL_WARN=y
+
+# No radio components are requested by this project. Their Kconfig symbols
+# do not exist in this minimal build, so do not assign unknown symbols.

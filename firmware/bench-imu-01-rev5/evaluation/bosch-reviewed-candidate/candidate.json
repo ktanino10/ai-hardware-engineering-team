@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "candidate_id": "bosch-v2861-selected-high-001",
+  "status": "MODIFIED_NOT_FOR_FLASH_NOT_WHOLE_DRIVER_APPROVAL",
+  "report_local_findings_selected": [
+    "A1",
+    "A2",
+    "C1"
+  ],
+  "retained_gate": "C2",
+  "C3": "OPEN_MEDIUM_EXPLICITLY_NOT_SELECTED",
+  "upstream": {
+    "repository": "https://github.com/boschsensortec/BMI270_SensorAPI.git",
+    "tag": "v2.86.1",
+    "commit": "d270cdee303b2ed9ea4c43fb7064da8ded8a48b4",
+    "license": "BSD-3-Clause"
+  },
+  "frozen_intake": "675fd1dd7a771bde000747b98bc5d71938879ae9",
+  "config_revision": "0d524373af5f0a87e792d8a46a55caa4041987f2",
+  "chain": [
+    {
+      "stage": "upstream-original",
+      "path": "firmware/bench-imu-01-rev5/measurement/vendor/bosch/bmi2.c",
+      "bytes": 374283,
+      "sha256": "c3f912bc3033b411fa8df67dbdf66f5b3d74cf203b2e8aa4a8c834821116c2b3",
+      "line_endings": "CRLF_ONLY"
+    },
+    {
+      "stage": "bounds-patch-LF-view",
+      "path": "firmware/bench-imu-01-rev5/evaluation/bosch-crt-bounds-candidate/bmi2-crt-bounds.patch",
+      "bytes": 3949,
+      "sha256": "afba8e28244f7f26919eb558c507c38888e3786fb4850abd838b379e9f87372e"
+    },
+    {
+      "stage": "bounds-derivative",
+      "path": "docs/rev5-bosch-crt-candidate-recheck-2026-09-19/read-inputs/bmi2.c",
+      "bytes": 375755,
+      "sha256": "10098cc5375afc3f5e8ca0d6bb0f4f133277a88e2a32dc0f3b6288e5b6f7fb07",
+      "line_endings": "CRLF_ONLY"
+    },
+    {
+      "stage": "initial-feature-error-patch-LF-view",
+      "path": "firmware/bench-imu-01-rev5/evaluation/bosch-crt-error-propagation-candidate/bmi2-early-error.patch",
+      "bytes": 344,
+      "sha256": "1edc259d52ad328db4f14b5df44f60b6e2e09e4be79e4b5eea717da4a6fe32bd"
+    },
+    {
+      "stage": "pre-Aux-derivative",
+      "bytes": 375865,
+      "sha256": "8ce40c9da0ec462e0ea8700ba702be303faa4803d762de2105ded5d3dc4c39ed",
+      "line_endings": "CRLF restored after applying LF-view patch"
+    },
+    {
+      "stage": "selected-Aux-patch-LF-view",
+      "path": "firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/bmi2-aux-selected.patch",
+      "bytes": 1165,
+      "sha256": "60854c0a993c90c2c3aa006fbb787d797b17ca14a1cc67bc46493858bb644a45"
+    },
+    {
+      "stage": "selected-derivative",
+      "path": "firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/bmi2.c",
+      "bytes": 376033,
+      "sha256": "4ad4f91eb09f380df678e2bf1098e4140092337a442390e98915f43b9b302204",
+      "line_endings": "CRLF_ONLY",
+      "CRLF": 11765,
+      "bare_LF": 0,
+      "bare_CR": 0,
+      "modified": true,
+      "official_byte_identical": false
+    }
+  ],
+  "derivative": {
+    "path": "firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/bmi2.c",
+    "bytes": 376033,
+    "sha256": "4ad4f91eb09f380df678e2bf1098e4140092337a442390e98915f43b9b302204",
+    "line_endings": "CRLF_ONLY",
+    "CRLF": 11765,
+    "bare_LF": 0,
+    "bare_CR": 0,
+    "modified": true,
+    "official_byte_identical": false
+  },
+  "combined_upstream_patch": {
+    "path": "firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/bmi2-selected.patch",
+    "bytes": 5406,
+    "sha256": "13e5c01fbb043e579e07891c5a339ea72d4a4486f32d33195df2c673ba332808"
+  },
+  "delta_from_pre_Aux": [
+    {
+      "function": "bmi2_write_aux_man_mode",
+      "before_LF_sha256": "b5c5babebf9eab863b4f00ef45bf241c14ef7d026d25766abba009ae2c4c101b",
+      "after_LF_sha256": "47bb05ac468933b25d3b542afca309d08e0d1bf386dbaf3fb98399ece5dd3e72",
+      "selected_source_lines": [
+        4047,
+        4102
+      ]
+    },
+    {
+      "function": "set_if_aux_not_busy",
+      "before_LF_sha256": "fa22ef49e8228b7d679b380c7e87bf7af53db5395184691f349b2e33fc743868",
+      "after_LF_sha256": "319b0737744925e7df3d89f88a740e0f7775e2460f3f5bfe860f1d4a4971408a",
+      "selected_source_lines": [
+        6095,
+        6138
+      ]
+    },
+    {
+      "function": "read_aux_data",
+      "before_LF_sha256": "d3abf7d7bda36f37093643f19de8b0e3708c75f2afbab226a81b73ae7af29f81",
+      "after_LF_sha256": "92ea446409569ee25b200a5a209cdf18ee861df3741bb809f94a6ef596f15b15",
+      "selected_source_lines": [
+        6589,
+        6655
+      ]
+    }
+  ],
+  "changed_functions_from_upstream": [
+    "write_crt_config_file",
+    "do_gtrigger_test",
+    "bmi2_write_aux_man_mode",
+    "set_if_aux_not_busy",
+    "read_aux_data"
+  ],
+  "outside_three_Aux_functions_identical_to_pre_Aux": true,
+  "retained_CRT_functions": {
+    "write_crt_config_file": "a5991581d34b7125127f15b5409d2e83c4a006bb1d04be09a696171ccc303908",
+    "do_gtrigger_test": "9409bb83967ba512882a224fac1705fc04d9744fbe516f5bf9f26929a6584cda"
+  },
+  "copyright_BSD_preamble_unchanged": true,
+  "vendor_directory": "firmware/bench-imu-01-rev5/measurement/vendor/bosch",
+  "unchanged_vendor_files": [
+    {
+      "path": "firmware/bench-imu-01-rev5/measurement/vendor/bosch/bmi2.h",
+      "bytes": 68902,
+      "sha256": "81334388e9467c8dfefa439b0e2888a3fd93a4eb8de6eb6f62840a6e7e12bd50"
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/measurement/vendor/bosch/bmi2_defs.h",
+      "bytes": 118236,
+      "sha256": "2e2474895d636bc46e1f735a24c380ed4e5356746caf928d0b9a50e6d8fbfbf3"
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/measurement/vendor/bosch/bmi270.c",
+      "bytes": 192739,
+      "sha256": "f6446867378bbcc90ea97ef6593555de8767ca20b799355c1b37c2cabb7b7b41"
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/measurement/vendor/bosch/bmi270.h",
+      "bytes": 15676,
+      "sha256": "7979ec4c943e2825351bd9d3d267b63abc6f8314c1f13f1c37e95cabc3fc82c8"
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/measurement/vendor/bosch/LICENSE",
+      "bytes": 1524,
+      "sha256": "56df116398e0b72a12ae353d93002d29175583590283ced2c2510e3d8075546f"
+    }
+  ],
+  "unchanged_blob": {
+    "symbol": "bmi270_config_file",
+    "bytes": 8192,
+    "sha256": "2d75e68e343a13ff99be98261dfbd99d9e8c6f267da9e3c5aeb883276ad178db"
+  },
+  "reused_fixture": {
+    "path": "firmware/bench-imu-01-rev5/evaluation/bosch-crt-bounds-candidate/tests/crt_public_path.c",
+    "bytes": 21984,
+    "sha256": "fea61e9ee56ec28d13692ab817bba42659c4ea63e09349a619d45259ec730613"
+  },
+  "legacy_binding": {
+    "path": "firmware/bench-imu-01-rev5/evaluation/bosch-crt-error-propagation-candidate/host_binding.c",
+    "bytes": 3960,
+    "sha256": "00f5f793812167faee45d59b931644c4a3fe221b583362cac245d4c1a9e15663"
+  },
+  "test_files": [
+    {
+      "path": "run_host.py",
+      "bytes": 14722,
+      "sha256": "5ffd75941bebf0f59850d25eacb510a61ea2724cd1705380f3e961c40bc586db"
+    },
+    {
+      "path": "crt_selected.c",
+      "bytes": 12162,
+      "sha256": "ba1b49d359a6a384bcbb2f402272b030aab0cade6aaaf04e0d338338261cfc1e"
+    },
+    {
+      "path": "aux_selected.c",
+      "bytes": 11840,
+      "sha256": "0cce73055afe89e7b5351a99ae05280eaef7653d05f5b4edb30f13d5a8516b75"
+    },
+    {
+      "path": "case-matrix.json",
+      "bytes": 374023,
+      "sha256": "9ce8f1f51311b81e7f4d6a810b6773f5a9f5f51c17ca154e34044f8aeccd333e"
+    },
+    {
+      "path": "declare_matrix.py",
+      "bytes": 9543,
+      "sha256": "3a65817c6ac63fa95101378cf6bc32b731142b47e5fb3b30d6e5ec5b2786f0ff"
+    },
+    {
+      "path": "legacy-oracles.json",
+      "bytes": 42953,
+      "sha256": "103e24b96556b9c388e3158322c24f2fd561ef5c046d83765e63405ab9f74adf"
+    }
+  ],
+  "production_source_rebinding": false,
+  "independent_acceptance": "NOT_GRANTED",
+  "limitations": [
+    "C3 tail-finality predicate and process_crt_download unchanged; immediate-ready host model is not readiness proof.",
+    "No generic Aux long-read indexing repair, APS recovery, polling budget or driver-wide status redesign.",
+    "Caller config_size must truthfully describe the pointed-to allocation.",
+    "Report-local A1/A2/C1/C2/C3 are not canonical Evidence/Issue/ECO IDs.",
+    "No target SDK build, hardware access, recording adoption, public integration, push or merge."
+  ]
+}

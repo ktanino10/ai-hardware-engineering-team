@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "record_type": "DERIVED_PUBLIC_REVIEW_SUMMARY",
+  "source_bindings": [
+    {
+      "revision": "5d70e3126a5008904ff3d32ccdcda28cd26f1e29",
+      "path": "docs/rev5-recent-software-review-2026-09-18/reports/review.json",
+      "sha256": "15884333499705c62ddbf614bb5fc9d7ec21dbb285adc9e7b4a63d5c93a4b0b8"
+    },
+    {
+      "revision": "5d70e3126a5008904ff3d32ccdcda28cd26f1e29",
+      "path": "docs/rev5-recent-software-review-2026-09-18/reports/checks.json",
+      "sha256": "654608bfa5f84f7cd6612872d872cdd7e96a14b7bb8610daf7f771dc810142a2"
+    },
+    {
+      "revision": "5d70e3126a5008904ff3d32ccdcda28cd26f1e29",
+      "path": "docs/rev5-recent-software-review-2026-09-18/reports/handoff-ja.md",
+      "sha256": "64303ff76fda5ecf1f3be07759bc7ad44593673cfdbb031ac50543513a27f847"
+    }
+  ],
+  "technical_commit": "7b033d9fb7675ac1d2a6847cfc73b40422d52568",
+  "overall": "PASS_FOR_NAMED_SOFTWARE_SOURCE_SCOPES_WITH_EXPLICIT_NOT_RUN_LIMITS",
+  "new_concrete_defects": 0,
+  "packages": [
+    {
+      "package": "c1",
+      "commit": "89808e295bfdce121e897dbec36e366194a43983",
+      "verdict": "PASS",
+      "acceptance": "LIMITED_CODE_REVIEW_ONLY",
+      "scope": "Frozen metadata input, readiness transformation, deterministic export/check and explicit errors; not electrical parameters or purchasing BOM.",
+      "premise_challenge": "Three functional axes / supply boundary count cannot establish physical candidate quantity; observed all 12 physical rows remain UNKNOWN and alternative groups remain unresolved.",
+      "limits": [
+        "No latest catalogue/raw-manufacturer reacquisition",
+        "No electrical correctness certification",
+        "No part adoption, physical allocation or orderability",
+        "No atomic-publication or untrusted concurrent namespace qualification; historical RRT-001 unchanged"
+      ],
+      "findings": [],
+      "author_code_modified": false,
+      "tests": 18
+    },
+    {
+      "package": "imu",
+      "commit": "a7b935d1fc199d4bfcb68c8c2218c7649fd7fc91",
+      "verdict": "PASS",
+      "acceptance": "LIMITED_CODE_REVIEW_ONLY",
+      "scope": "New disagreement wrapper, exact private observation hook and pinned strict synthetic input/output meanings.",
+      "premise_challenge": "Common-mode agreement is not sensor accuracy. A separate three-vector 3D derivation confirms the reported spread is max Euclidean residual, not standard deviation. Existing tests also retain shared-bias and 3vs3 ambiguity.",
+      "limits": [
+        "Bounded trusted offline synthetic SI/config files, in-memory implementation",
+        "No real input/calibration/extrinsics/clock qualification",
+        "No full-study replay",
+        "Private hook is tied to the pinned estimator, not a general stable plugin API"
+      ],
+      "findings": [],
+      "author_code_modified": false,
+      "tests": 14
+    },
+    {
+      "package": "n8r8",
+      "commit": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "verdict": "PASS",
+      "acceptance": "LIMITED_CODE_REVIEW_ONLY",
+      "scope": "New opt-in build-profile source/wiring/guards and committed metadata consistency only.",
+      "premise_challenge": "An ESP32-S3 image with selected 8MB flash and disabled PSRAM does not identify N8R8 physical memory or make full Rev5 FG pin allocation compatible.",
+      "limits": [
+        "One host CMake dynamic test NOT_RUN (tool absent)",
+        "SDK/build/ELF/BIN NOT_RUN by scope",
+        "Old private tool copy and build receipts remain AUTHOR_REPORTED",
+        "No actual board population or hardware-source recertification",
+        "NOT_FOR_FLASH; no full Rev5 module substitution"
+      ],
+      "findings": [],
+      "author_code_modified": false,
+      "tests": 4
+    }
+  ],
+  "unit_tests_run_pass": {
+    "c1": 18,
+    "imu": 14,
+    "n8r8": 4,
+    "total": 36
+  },
+  "historical_n8r8_dynamic_cmake_test": "NOT_RUN: reviewer host CMake unavailable",
+  "independent_sdk_build_elf_bin_device_checks": "EXCLUDED",
+  "private_build_receipts": "AUTHOR_REPORTED; not independently re-executed or exported",
+  "publication_boundary": "This is a sanitized summary, not the original reviewer receipt. It does not independently accept derived documentation, packaging or the public pin-reference locator change. New publication/CI checks do not rewrite any original verdict or NOT_RUN."
+}

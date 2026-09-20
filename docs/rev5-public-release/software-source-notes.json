@@ -1,0 +1,343 @@
+{
+  "schema_version": 1,
+  "record_type": "DERIVED_PUBLIC_SOURCE_METADATA",
+  "source_bindings": [
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "docs/rev5-controller-memory-variant-comparison-2026-09-18/source-metadata.json",
+      "sha256": "7f697dc31f2f6dc4aac8afc0363b2402dd4868d44b6471aca4e8d88cf1e81007"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "datasheets/evidence-log.md",
+      "sha256": "0035a35970110c084f499d7d369f4aab8bfc017c1f5ab0cb0220dbc5b50f2c1a"
+    },
+    {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "hardware/schematic/bench-imu-01-rev5/checks/rev5-int-wip-3f-u1/native-netlist.xml",
+      "sha256": "aebe15515f997cc3c38f797081c3179889492aa49e80180921fe3f523909789a"
+    }
+  ],
+  "not_current_reacquisition": true,
+  "not_canonical_ledger_update": true,
+  "boundary": "Evidence IDs retain their meanings in the named original source snapshot. These selected metadata rows are not new DS allocations or changes to the public canonical evidence log. Full source records and native netlist are not distributed; no primary document, upload or private tool receipt is embedded.",
+  "manufacturer_references": [
+    {
+      "id": "ESP-GUIDE",
+      "url": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp-dev-kits-en-master-esp32s3.pdf",
+      "sha256": "5063f411316e24127a8f090ebac3c27c251369d5204c56be8581e4a970e99eca",
+      "identity": "Espressif ESP32-S3 esp-dev-kits Documentation, Release master, Sep17 2026",
+      "locus": "Chapter1 DevKitC-1; printed pp5-8(v1.1) and11-14(v1.0); PDF page indices printed+3",
+      "confirmed": "Family headerGPIO exposure,3.3V regulator description, Micro-USB USB-UART port and bridge; current ordering tables on printedpp6/12 have N8R8,N32R16V,1U-N8R8.",
+      "use_limit": "Read named text sections only, no CAD extraction/design/export. Family data not transferred to an unverified exact controller. USB-UART physical UART routing remains exact-revision verification."
+    },
+    {
+      "id": "ESP-V11",
+      "url": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html",
+      "sha256": "f8f871ac9728a535def157b6f2b6fa735445866d62275a2845b270739504ce76",
+      "revision": "v1.1 documentation accessed2026-09-18, underlying commit UNKNOWN; raw response hashed",
+      "locus": "Description of Components; Ordering Information; Header Block J1/J3; Hardware Revision Details; Related Documents",
+      "claim": "Exact N8R8 board/module ordering identity and8MB Quad flash/8MB Octal PSRAM/3.3V memorySPI;35/36/37 reserved; required GPIO headers; USB-UART distinct from nativeUSB; initialLED48 vs v1.1LED38.",
+      "limit": "Live documentation listing not shipped revision, stock or lifecycle promise."
+    }
+  ],
+  "original_evidence_metadata": [
+    {
+      "id": "DS-IMU-079",
+      "original_metadata_path": "`datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md`",
+      "section": "`bmi270.h` `BMI270_CHIP_ID`",
+      "table_or_figure": "N/A",
+      "page": "N/A",
+      "claim": "BMI270 CHIP_ID register (address 0x00) expected value: 0x24 -- read and validated once at firmware boot before trusting any further communication with the part"
+    },
+    {
+      "id": "DS-IMU-080",
+      "original_metadata_path": "`datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md`",
+      "section": "`bmi2_defs.h` `BMI2_CMD_REG_ADDR`/`BMI2_SOFT_RESET_CMD`; `bmi2.c` `bmi2_soft_reset()`",
+      "table_or_figure": "N/A",
+      "page": "N/A",
+      "claim": "BMI270 CMD register address 0x7E; writing 0xB6 (SOFT_RESET_CMD) triggers a full soft reset; the reference driver waits 2000 \u00b5s (2 ms) after issuing it before any further register access"
+    },
+    {
+      "id": "DS-IMU-081",
+      "original_metadata_path": "`datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md`",
+      "section": "`bmi2_defs.h` `BMI2_PWR_CONF_ADDR`; `bmi2.c` `bmi2_set_adv_power_save()`",
+      "table_or_figure": "N/A",
+      "page": "N/A",
+      "claim": "BMI270 PWR_CONF register address 0x7C; bit0 is the advanced-power-save enable -- the part resets into this mode, and it must be written to 0 (disabled) before the configuration-file upload sequence can proceed"
+    },
+    {
+      "id": "DS-IMU-082",
+      "original_metadata_path": "`datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md`",
+      "section": "`bmi2_defs.h` `BMI2_INIT_CTRL_ADDR`/`BMI2_INIT_ADDR_0`/`BMI2_INIT_ADDR_1`/`BMI2_INIT_DATA_ADDR`; `bmi2.c` `write_config_file()`/`upload_file()`",
+      "table_or_figure": "N/A",
+      "page": "N/A",
+      "claim": "BMI270 mandatory configuration-file upload protocol: INIT_CTRL (0x59) \u2190 0x00 to enable load mode; for each chunk of the config file, write the chunk's **word offset** (byte_index/2) as two bytes to INIT_ADDR_0 (0x5B, low nibble) then INIT_ADDR_1 (0x5C, upper bits) in one transaction, then burst-write the chunk's data bytes to INIT_DATA (0x5E); after all chunks are written, INIT_CTRL \u2190 0x01 to signal completion. This exact chunked, word-addressed protocol (not a single continuous burst) is required because the device's internal address pointer does not auto-increment across separate I2C transactions"
+    },
+    {
+      "id": "DS-IMU-083",
+      "original_metadata_path": "`datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md`",
+      "section": "`bmi2_defs.h` `BMI2_INTERNAL_STATUS_ADDR`/`BMI2_CONFIG_LOAD_STATUS_MASK`/`BMI2_CONFIG_LOAD_SUCCESS`",
+      "table_or_figure": "N/A",
+      "page": "N/A",
+      "claim": "BMI270 INTERNAL_STATUS register address 0x21; configuration-load success is indicated by `(INTERNAL_STATUS & 0x0F) == 0x01` -- must be polled after finishing the upload sequence (DS-IMU-082) rather than assumed instantaneous"
+    },
+    {
+      "id": "DS-IMU-084",
+      "original_metadata_path": "`datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md`",
+      "section": "`bmi270.c`, `bmi270_config_file[]` array + `dev->config_size` usage",
+      "table_or_figure": "N/A",
+      "page": "N/A",
+      "claim": "BMI270 configuration-file blob exact byte length: 8192, independently counted this session (not trusted from memory/description) by counting hex-byte literals in the array, and cross-checked against the same upstream file's own `dev->config_size = sizeof(bmi270_config_file)` usage. Vendored verbatim into `firmware/bench-imu-01/src/bmi270_config_file.h` -- this project does not and cannot derive this data itself"
+    },
+    {
+      "id": "DS-IMU-085",
+      "original_metadata_path": "`datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md`",
+      "section": "`bmi2_defs.h` `BMI2_ACC_CONF_ADDR`/`BMI2_GYR_CONF_ADDR` + ODR/bandwidth/performance-mode bitfield masks",
+      "table_or_figure": "N/A",
+      "page": "N/A",
+      "claim": "BMI270 ACC_CONF (0x40) / GYR_CONF (0x42) register addresses; bitfields: ODR = bits[3:0] (100 Hz = 0x08), bandwidth-parameter = bits[6:4] (accel) or bits[5:4] (gyro), performance-mode = bit7 (accel) / bits[7:6] (gyro, noise+filter). This firmware writes ACC_CONF=0xA8 and GYR_CONF=0xE8 (performance-optimized, normal bandwidth, 100 Hz ODR), satisfying REQ-001's >=100 Hz floor"
+    },
+    {
+      "id": "DS-IMU-086",
+      "original_metadata_path": "`datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md`",
+      "section": "`bmi2_defs.h` `BMI2_PWR_CTRL_ADDR` + `BMI2_GYR_EN_POS`/`BMI2_ACC_EN_POS`",
+      "table_or_figure": "N/A",
+      "page": "N/A",
+      "claim": "BMI270 PWR_CTRL register address 0x7D; gyroscope-enable = bit1, accelerometer-enable = bit2 (aux_en=bit0 and temp_en=bit3 both left disabled -- no aux sensor on this board, REQ-001 doesn't need temperature). This firmware writes PWR_CTRL=0x06 (gyr_en\\|acc_en)"
+    },
+    {
+      "id": "DS-IMU-087",
+      "original_metadata_path": "`datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md`",
+      "section": "`bmi2_defs.h` `BMI2_ACC_X_LSB_ADDR`/`BMI2_GYR_X_LSB_ADDR`",
+      "table_or_figure": "N/A",
+      "page": "N/A",
+      "claim": "BMI270 accelerometer data starts at ACC_X_LSB=0x0C; gyroscope data starts at GYR_X_LSB=0x12 -- the two 6-byte (X/Y/Z, LSB+MSB each) blocks are contiguous, so a single 12-byte burst read from 0x0C returns a complete accel+gyro sample in one I2C transaction"
+    },
+    {
+      "id": "DS-IMU-088",
+      "original_metadata_path": "`datasheets/boschsensortec_bmi270_sensorapi_v2.86.1.md`",
+      "section": "`LICENSE` file",
+      "table_or_figure": "N/A",
+      "page": "N/A",
+      "claim": "BMI270_SensorAPI repository license: BSD-3-Clause, permitting redistribution in source form provided the copyright notice, license text, and non-endorsement clause are retained -- satisfied by `firmware/bench-imu-01/src/bmi270_config_file.h`'s full license reproduction, licensing the verbatim vendoring of the 8192-byte configuration blob (DS-IMU-084)"
+    },
+    {
+      "id": "DS-IMU-094",
+      "original_metadata_path": "`datasheets/bosch-sensortec_bmi270_rev1.6.md`",
+      "section": "\u00a77.1 pin-out; \u00a76.2 primary interface",
+      "table_or_figure": "Table22; Table17",
+      "page": "135, 122",
+      "claim": "**Full14-pin identities and mode-dependent roles:**1 SDO digital I/O, serial output in SPI4 (I2C address input in I2C);2 ASDx and3 ASCx secondary digital I/O;4 INT1 and9 INT2 digital I/O, including external FIFO-sync input capability;5 VDDIO supply;6 GNDIO and7 GND grounds;8 VDD supply;10 OCSB secondary OIS digital INPUT;11 OSDO secondary OIS digital OUTPUT;12 CSB primary digital input;13 SCx primary digital input, SCK in SPI4/SCL in I2C;14 SDx primary digital I/O, SDI/MOSI input in SPI4, SDA in I2C/SPI3. Pin capability is distinguished from the chosen schematic mode; secondary unused conditions are DS-IMU-095 and SPI4 write high-Z behavior DS-IMU-099. Extends, not silently repurposes, the historical identity-only DS-IMU-077."
+    },
+    {
+      "id": "DS-IMU-097",
+      "original_metadata_path": "`datasheets/bosch-sensortec_bmi270_rev1.6.md`",
+      "section": "\u00a76.2 Primary Interface electrical specifications",
+      "table_or_figure": "Table18",
+      "page": "122",
+      "claim": "CSB internal pull-up to VDDIO: MIN75/TYP100/MAX140k\u03a9. Interface-pin input capacitance Cin MAX5pF, MIN/TYP unspecified. This does not specify every deselected SDO output's capacitance or establish the aggregate loading, CS edge time, external-bias need or safe clock rate of the actual six-device PCB."
+    },
+    {
+      "id": "DS-IMU-098",
+      "original_metadata_path": "`datasheets/bosch-sensortec_bmi270_rev1.6.md`",
+      "section": "\u00a76.3 Primary Interface Digital Protocol Selection; \u00a71 power-on time",
+      "table_or_figure": "Table1 tPO; \u00a76.3 prose",
+      "page": "123, 11",
+      "claim": "POR executes when BOTH VDD and VDDIO are established. Default primary interface after reset/power-up is I2C; CSB held high retains I2C. A CSB RISING edge after power-up selects SPI after the stated200\u00b5s interval, until reset/next power-up. Manufacturer recommends an initial CHIP_ID SPI read with invalid returned value to generate this transition; NV_CONF.spi_en is a separately documented permanent-SPI alternative, not adopted here. Table1 tPO MAX2ms is supply-on to operational interface, distinct from the200\u00b5s selection interval and not full sensor/configuration readiness. Static CSB-to-GND alone is NOT the selection event. Each physical device needs its own valid interface state; applying this to all six is a project consequence, not a Bosch six-sensor startup implementation."
+    },
+    {
+      "id": "DS-IMU-099",
+      "original_metadata_path": "`datasheets/bosch-sensortec_bmi270_rev1.6.md`",
+      "section": "\u00a76.4 Primary Interface SPI",
+      "table_or_figure": "Figs10\u201313 and adjacent protocol text",
+      "page": "124\u2013126",
+      "claim": "Supports mode00 (CPOL0/CPHA0) and11 (CPOL1/CPHA1), automatically distinguished using SCK after CSB falls. Default SPI configuration is4-wire; IF_CONF.spi3 enables3-wire. CSB active low starts communication; rising CSB ends it. SDO remains high-impedance throughout the4-wire WRITE cycle. Read description/Fig13 require a dummy byte before useful returned register data; do not mistake p124's generic16-bit sentence for the complete Fig13 read transaction. This is not a quantified bus-release-time or powered-off-output guarantee and does not certify six-device bus contention behavior."
+    },
+    {
+      "id": "DS-IMU-100",
+      "original_metadata_path": "`datasheets/bosch-sensortec_bmi270_rev1.6.md`",
+      "section": "\u00a76.4 Primary Interface SPI timing",
+      "table_or_figure": "Table19; Fig10 definitions",
+      "page": "123\u2013124",
+      "claim": "Table19: fSPI MAX10MHz with maximum SDI or SDO load30pF and VDDIO\u22651.62V; separate VDDIO<1.62V row MAX7MHz. SCK high/low MIN45ns at\u22651.62V and MIN66ns at<1.62V. SDI setup/hold MIN20ns each; CSB setup/hold MIN40ns each. SDO delay MAX30ns at30pF/VDDIO\u22651.62V. Idle after read any mode MIN2\u00b5s; after write normal/fast-startup MIN2\u00b5s; after write suspend/low-power MIN450\u00b5s. Table heading says timing valid at VDDIO\u22651.62V although explicit lower-voltage clock/pulse rows are included; do not extrapolate unspecified lower-voltage output-delay guarantees. These are conditioned limits, not an unconditional10MHz six-device-bus qualification or a selected system clock/ODR."
+    },
+    {
+      "id": "DS-MCU-101",
+      "original_metadata_path": "`datasheets/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md`",
+      "section": "\u00a7\u00a71.1\u20131.2 Features / Series Comparison",
+      "table_or_figure": "Tables1-1/1-2",
+      "page": "2\u20133",
+      "claim": "Exact order codes ESP32-S3-WROOM-1-N8R2 and ESP32-S3-WROOM-1U-N8R2 each have8MB Quad-SPI flash and2MB Quad-SPI PSRAM; recommended module ambient range\u221240\u202685\u00b0C. WROOM-1 has a PCB antenna; WROOM-1U has an external antenna connector. Both use ESP32-S3 with512KB on-chip SRAM and native Wi-Fi/BLE. These are documented candidates, not adopted SKUs or proof of application memory/timing sufficiency."
+    },
+    {
+      "id": "DS-MCU-102",
+      "original_metadata_path": "`datasheets/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md`",
+      "section": "\u00a7\u00a71.1/3.2/4; module-schematic boot note \u00a78",
+      "table_or_figure": "Tables3-1/4-1",
+      "page": "2, 11\u201313, 39",
+      "claim": "WROOM-1/1U expose36 GPIO labels, GPIO0\u201321 and35\u201348, in41 module pins including EPAD/GND. USB_D\u2212/D+ are GPIO19/20 at pads13/14; UART0 TX/RX GPIO43/44 at pads37/36; EN pad3 must not float. Boot-related GPIO0/3/45/46 require reset/eFuse-aware allocation. Table3-1 footnote b reserves GPIO35/36/37 for Octal-PSRAM variants, not the R2 Quad-PSRAM candidates; footnote c assigns GPIO47/48 to1.8V on ESP32-S3R16V-based variants. Pin defaults can depend on eFuse. A GPIO-label count is not proof of interchangeable direction/ADC/PWM/peripheral resources or a qualified full-board map; no silent suffix substitution."
+    },
+    {
+      "id": "DS-MCU-120",
+      "original_metadata_path": "`datasheets/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md`",
+      "section": "\u00a73 Pin Definitions; \u00a74 Boot Configurations",
+      "table_or_figure": "Table3-1; Tables4-1\u20264-5",
+      "page": "11\u201316",
+      "claim": "GPIO19/20 carry USB D\u2212/D+; U0TXD/U0RXD correspond to GPIO43/44. Octal-memory R8/R16V modules consume GPIO35/36/37; N8R2's Quad configuration must not be silently exchanged for R8. Straps GPIO0/3/45/46 default respectively weak pull-up/floating/weak pull-down/weak pull-down. SPI boot requires GPIO0 high; joint download requires GPIO0 low and GPIO46 low. Strap setup minimum0ms/hold minimum3ms about EN; eFuse-dependent VDD_SPI/JTAG/default-pad behavior remains conditional. eFuses are one-time programmable; no burn or complete pin-map approval follows. See existing DS-MCU-102 for module pad availability."
+    },
+    {
+      "id": "DS-MCU-123",
+      "original_metadata_path": "`datasheets/espressif_esp-idf-v6.1_peripherals_web-2026-09-06.md`",
+      "section": "I2C Introduction / Master Bus configuration",
+      "table_or_figure": "i2c_master_bus_config_t",
+      "page": "N/A \u2014 HTML",
+      "claim": "ESP32-S3 has TWO hardware I2C controllers. SDA/SCL are bidirectional open-drain lines requiring pullups; GPIO configuration is supported. Standard100kHz/Fast400kHz modes are documented, with master SCL not exceeding400kHz. Three physical pin pairs do not create a third hardware controller: software servicing or separately validated remapping remains Circuit/Firmware work."
+    },
+    {
+      "id": "DS-MCU-129",
+      "original_metadata_path": "`datasheets/espressif_esp32-s3-wroom-1_wroom-1u_v1.8.md`",
+      "section": "\u00a7\u00a74.1/4.3",
+      "table_or_figure": "Table4-3; ROM Message Printing",
+      "page": "14\u201315",
+      "claim": "Joint Download Boot supports UART0 downloading into flash or SRAM. Default ROM printing uses UART0 and USB Serial/JTAG; register/eFuse configuration can change or disable it. Silence is not proof of failed power/boot. Existing DS-MCU-102/120/121 retain pad/strap/reset facts. Capability is not a selected baud/protocol, implemented application logging, enabled recovery/security state or dedicated hardware debug connector."
+    },
+    {
+      "id": "DS-MCU-140",
+      "original_metadata_path": "`datasheets/espressif_esp32-s3_datasheet-v2.2.md`",
+      "section": "Sections2.2/2.3/2.4; Table2-1 notes5/6, IO MUX continuation and Table2-10",
+      "table_or_figure": "Named tables/registers/sections; conditions in claim",
+      "page": "17-18,22,28",
+      "claim": "SoC pins49/U0TXD and50/U0RXD map GPIO43/44 and show WPU+IE both at and after reset: weak pull-up and input enabled, not an EN-low/unpowered leakage guarantee. GPIO19/20 are silicon pins25/26 on VDD3P3_RTC; GPIO20 has USB_PU in both reset columns, while GPIO19's cells are blank. Note6 distinguishes USB-controlled pulls/default USB function from weak GPIO pulls; disabling USB defaults weak GPIO pulls off. Module land numbers remain DS-MCU-102, not silicon pin numbers or a separately accessible PHY supply. CHIP_PU LOW disables the chip per Table2-10; this does not remove the external rail or define pad Ioff, Hi-Z, injection tolerance, actual runtime state or a safe power-up waveform."
+    },
+    {
+      "id": "DS-MCU-145",
+      "original_metadata_path": "`datasheets/espressif_esp32-s3_trm-v1.8.md`",
+      "section": "Register33.3 USB_SERIAL_JTAG_CONF0_REG, reset row and field descriptions",
+      "table_or_figure": "Named tables/registers/sections; conditions in claim",
+      "page": "1257",
+      "claim": "Documented reset fields: PHY_SEL=0,USB_PAD_ENABLE=1,DP_PULLUP=1,DM_PULLUP=0,PAD_PULL_OVERRIDE=0,EXCHG_PINS=0 and EXCHG_PINS_OVERRIDE=0. These are conditional hardware register defaults, not a measured pin waveform, actual configuration or VBUS-aware gate. VREFH control range1.76..2.00V/80mV steps and VREFL0.80..1.04V/80mV steps describe configurable single-ended threshold controls, not all-corner receiver limits or general GPIO VIH/VIL. Existing power-up fluctuation caveat DS-MCU-138 remains."
+    },
+    {
+      "id": "DS-MTR-094",
+      "original_metadata_path": "`datasheets/texasinstruments_drv10983_slvscp6h.md`",
+      "section": "\u00a76; \u00a78.4.3 Motor Start Sequence and \u00a7\u00a78.4.3.1\u20138.4.3.4; \u00a78.5.3",
+      "table_or_figure": "Fig12; Table9; Pin Functions",
+      "page": "5\u20136, 22\u201324, 43\u201347",
+      "claim": "**SLVSCP6H conditional command/state semantics.** Powered DIR change stops electrical drive and restarts the motor-start sequencer; this is not instantaneous mechanical stopping. ISDen=1 measures BEMF in Hi-Z/coast: stationary judgment proceeds to BrkEn; forward rotation can resynchronize directly to ClosedLoop; reverse speed above RvsDrThr returns to ISD/coast; below threshold RvsDrEn=1 reverse-drives through zero then accelerates, whereas RvsDrEn=0 proceeds to BrkEn. ISDen=0 bypasses ISD to BrkEn, not a qualified high-speed workaround. Enabled Brake applies all three low-side FETs; after the configured interval, IPD or Align precedes acceleration. No dedicated BRAKE pin or generic runtime BRAKE trigger is defined in the complete pin/register tables. Configuring a duration is not documented as an immediate Brake-entry event; stop time, holding, repeatability and three-channel synchronization are not guaranteed. Source discrepancy retained: p22 calls RvsDrThr [2:0], but p24 and Table9 p45 define [1:0], address0x23 bits1:0; clarification remains pending rather than silently assuming three bits."
+    }
+  ],
+  "native_pin_projection": {
+    "path": "firmware/bench-imu-01-rev5/evaluation/n8r8/reference/u201-pin-reference.xml",
+    "source": {
+      "revision": "3db7ea5e74bfaf7c286383d6ee29926f347a2297",
+      "path": "hardware/schematic/bench-imu-01-rev5/checks/rev5-int-wip-3f-u1/native-netlist.xml",
+      "sha256": "aebe15515f997cc3c38f797081c3179889492aa49e80180921fe3f523909789a"
+    },
+    "method": "Copy exact native net attributes and U201 node attributes for the 11 application-used macros and 3 reserved-FG conflicts. Do not copy the local design path, other components or unused nets.",
+    "measurement_nodes": 11,
+    "fg_conflict_nodes": 3,
+    "pins": [
+      {
+        "macro": "REV5_PIN_DRV_X_FG_GPIO",
+        "gpio": 35,
+        "pad": "28",
+        "net": "DRV_X_FG",
+        "use": "OUT_OF_SCOPE_FG_CONFLICT"
+      },
+      {
+        "macro": "REV5_PIN_DRV_Y_FG_GPIO",
+        "gpio": 36,
+        "pad": "29",
+        "net": "DRV_Y_FG",
+        "use": "OUT_OF_SCOPE_FG_CONFLICT"
+      },
+      {
+        "macro": "REV5_PIN_DRV_Z_FG_GPIO",
+        "gpio": 37,
+        "pad": "30",
+        "net": "DRV_Z_FG",
+        "use": "OUT_OF_SCOPE_FG_CONFLICT"
+      },
+      {
+        "macro": "REV5_PIN_IMU_CS_X_A_GPIO",
+        "gpio": 4,
+        "pad": "4",
+        "net": "IMU_CS_X_A",
+        "use": "MEASUREMENT"
+      },
+      {
+        "macro": "REV5_PIN_IMU_CS_X_B_GPIO",
+        "gpio": 5,
+        "pad": "5",
+        "net": "IMU_CS_X_B",
+        "use": "MEASUREMENT"
+      },
+      {
+        "macro": "REV5_PIN_IMU_CS_Y_A_GPIO",
+        "gpio": 6,
+        "pad": "6",
+        "net": "IMU_CS_Y_A",
+        "use": "MEASUREMENT"
+      },
+      {
+        "macro": "REV5_PIN_IMU_CS_Y_B_GPIO",
+        "gpio": 7,
+        "pad": "7",
+        "net": "IMU_CS_Y_B",
+        "use": "MEASUREMENT"
+      },
+      {
+        "macro": "REV5_PIN_IMU_CS_Z_A_GPIO",
+        "gpio": 15,
+        "pad": "8",
+        "net": "IMU_CS_Z_A",
+        "use": "MEASUREMENT"
+      },
+      {
+        "macro": "REV5_PIN_IMU_CS_Z_B_GPIO",
+        "gpio": 16,
+        "pad": "9",
+        "net": "IMU_CS_Z_B",
+        "use": "MEASUREMENT"
+      },
+      {
+        "macro": "REV5_PIN_IMU_MISO_GPIO",
+        "gpio": 13,
+        "pad": "21",
+        "net": "IMU_MISO",
+        "use": "MEASUREMENT"
+      },
+      {
+        "macro": "REV5_PIN_IMU_MOSI_GPIO",
+        "gpio": 11,
+        "pad": "19",
+        "net": "IMU_MOSI",
+        "use": "MEASUREMENT"
+      },
+      {
+        "macro": "REV5_PIN_IMU_SCK_GPIO",
+        "gpio": 12,
+        "pad": "20",
+        "net": "IMU_SCK",
+        "use": "MEASUREMENT"
+      },
+      {
+        "macro": "REV5_PIN_UART0_RX_GPIO",
+        "gpio": 44,
+        "pad": "36",
+        "net": "UART0_RX",
+        "use": "MEASUREMENT"
+      },
+      {
+        "macro": "REV5_PIN_UART0_TX_GPIO",
+        "gpio": 43,
+        "pad": "37",
+        "net": "UART0_TX",
+        "use": "MEASUREMENT"
+      }
+    ],
+    "not_a_complete_native_netlist": true,
+    "not_schematic_or_hardware_acceptance": true
+  }
+}

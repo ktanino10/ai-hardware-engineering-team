@@ -12,6 +12,14 @@
 形状・配置は2026-09-15時点の固定値です。後日の形状変更や電子系を混在させず、
 過去のベンチ例は別の履歴として案内します。全作業・全設計の公開完了を意味しません。
 
+**Software follow-up:** the separately curated
+[English guide](software.md) / [日本語](software.ja.md) now covers the C1
+derived summary, synthetic IMU executable closure and N8R8 source-only
+evaluation closure. The table and verification history below describe the
+**original PR79 release** and remain preserved, not retroactively rewritten.
+The follow-up has its own manifest, review summary and publication checks;
+neither release changes engineering or physical approval.
+
 ## Included and deferred
 
 | Candidate | This release | Boundary / next dependency |
