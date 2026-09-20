@@ -10,6 +10,7 @@ on:
       - "tools/tests/test_rev5_public_software.py"
       - "tools/public_release_manifest.py"
       - "tools/tests/test_public_release_manifest.py"
+      - "tools/tests/test_rev5_selected_bosch.py"
       - "docs/rev5-offline-tools-release/**"
       - "tools/tests/test_rev5_offline_publication.py"
       - "visualization/index*.html"
@@ -28,6 +29,7 @@ on:
       - "tools/tests/test_rev5_public_software.py"
       - "tools/public_release_manifest.py"
       - "tools/tests/test_public_release_manifest.py"
+      - "tools/tests/test_rev5_selected_bosch.py"
       - "docs/rev5-offline-tools-release/**"
       - "tools/tests/test_rev5_offline_publication.py"
       - "visualization/index*.html"
@@ -73,3 +75,15 @@ jobs:
           export REV5_EVAL_CMAKE="$(command -v cmake)"
           export REV5_EVAL_TEST_SCRATCH="$(mktemp -d "$RUNNER_TEMP/rev5-n8r8.XXXXXX")"
           python -B firmware/bench-imu-01-rev5/evaluation/n8r8/tests/test_profile.py -v
+          python -B -m unittest tools.tests.test_rev5_selected_bosch -v
+      - name: Check selected Bosch HIGH corrections (host only, C3 remains open)
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          python -B firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/test_runner.py -v
+          scratch="$(mktemp -d "$RUNNER_TEMP/rev5-bosch.XXXXXX")"
+          scratch="$(cd "$scratch" && pwd -P)"
+          python -B firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/run_host.py \
+            --bmi2 firmware/bench-imu-01-rev5/measurement/vendor/bosch/bmi2.c \
+            --expected-sha256 4ad4f91eb09f380df678e2bf1098e4140092337a442390e98915f43b9b302204 \
+            --output-root "$scratch" --output "$scratch/host"

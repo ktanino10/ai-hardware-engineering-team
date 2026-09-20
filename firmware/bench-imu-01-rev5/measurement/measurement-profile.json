@@ -52,7 +52,9 @@
     ]
   },
   "imu": {
-    "driver": "Bosch BMI270_SensorAPI v2.86.1, unmodified official subset",
+    "driver": "Bosch BMI270_SensorAPI v2.86.1 with selected local Aux/CRT corrections; not official unmodified source",
+    "driver_source_binding": "../evaluation/bosch-reviewed-candidate/candidate.json",
+    "driver_scope": "A1/A2/C1 selected; C2 retained; C3 OPEN/MEDIUM. No complete firmware release or physical acceptance.",
     "instances": ["X_A/U101", "X_B/U102", "Y_A/U103", "Y_B/U104", "Z_A/U105", "Z_B/U106"],
     "init": "All-six quiescent-bus CS selection before any clocked traffic; per-device bmi270_init includes soft reset, SPI reselection, complete configuration upload and internal-status check.",
     "selection_wait_us": 200,

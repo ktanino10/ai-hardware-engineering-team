@@ -40,7 +40,7 @@ authorize merge, flashing, sensor operation or any physical action.
 | --- | --- | --- |
 | C1 readiness | [Derived aggregate summary](software-c1-summary.json): 10 exact catalogue candidates, 2 unknown-product requirements, 23 gaps, 103 source observations | **0 adopted**, quantity **UNKNOWN**, purchase readiness **CLOSED**, not orderable. The CLI, production dataset and sealed private power-return input closure are withheld. The summary is not a replacement input dataset. |
 | Synthetic IMU disagreement | [CLI and API](../../simulation/imu_disagreement/README.md), unchanged minimal estimator/helper closure, original 14 tests and exact synthetic one-bias config/samples | Offline synthetic SI/body-frame/exact-clock gyro reporting only. No real-data, health, auto-exclusion, weighting, calibration or control qualification. |
-| N8R8 evaluation | [Opt-in source profile](../../firmware/bench-imu-01-rev5/evaluation/n8r8/README.md), unchanged measurement/pin/vendor inputs, licenses and portable source tests | **NOT_FOR_FLASH**. The measurement subset does not resolve the full Rev5 **FG35/36/37 conflict**, even with PSRAM disabled. No SDK, tool installation, ELF/BIN or device evidence is distributed. |
+| N8R8 evaluation | [Opt-in source profile](../../firmware/bench-imu-01-rev5/evaluation/n8r8/README.md), unchanged application/pins/blob, explicitly selected modified Bosch source, licenses and portable tests | **NOT_FOR_FLASH**. C3 remains OPEN/MEDIUM. The measurement subset does not resolve the full Rev5 **FG35/36/37 conflict**, even with PSRAM disabled. No SDK, tool installation, ELF/BIN or device evidence is distributed. |
 
 The original 44 items remain **2 closed / 42 unfinished**. Complete BOM and
 motor power are **NOT_DONE**. NO-GO / 3C8H / REQ409 / strict-pro / 39UNKNOWN,
@@ -112,6 +112,16 @@ assignments. The source/profile's historical N8R2 labels, raw `REV5B1` /
 identify an actual module suffix or supersede the separate review summary.
 The profile selects N8R8 evaluation, not full Rev5 replacement.
 
+The [selected Bosch host checks](../../firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/README.md)
+exercise the exact modified vendor source, not a second unbound driver copy.
+They require Python 3.9+ and installed Clang sanitizers on a POSIX host. The
+matrix contains 965 executions / 895 distinct declared input tuples; all bus
+responses and delays are synthetic. The five original N8R8 tests and their
+dynamic CMake test body remain unchanged. Five additional source/provenance
+tests verify the selected bytes, reverse-patch reconstruction and rejection
+of altered driver/profile inputs; five runner-guard tests cover failed inputs.
+C3 is deliberately not repaired or qualified by these checks.
+
 An ESP-IDF build is a different, **not run in this publication** operation.
 It requires the exact official SDK commit
 `30aaf64524299d3bde422ca9a2848090d1bc5d0f` (v5.5.2) and its matching independently
@@ -131,8 +141,9 @@ reviewer host lacked CMake. SDK/build/ELF/BIN/device checks were **excluded**.
 Original author build receipts are **AUTHOR_REPORTED**, not fresh independent
 execution. No raw private reviewer or tool logs are published.
 
-[software-checks.json](software-checks.json) records new publisher/CI evidence
-separately. Any later CMake success is not a correction of the old NOT_RUN,
+[software-checks.json](software-checks.json) preserves the initial publisher
+snapshot, not the result of the later Bosch correction. The continuation record
+and current PR checks are separate. Any later CMake success is not a correction of the old NOT_RUN,
 an independent review of the public packaging, a firmware build, or hardware
 acceptance. The existing simulation workflow runs the new scoped checks in
 addition to its unchanged numerical regression command. All required check
@@ -141,10 +152,13 @@ names, hardware gate logic and branch protection remain unchanged.
 ## Provenance, rights and reproduction limits
 
 [software-intake.json](software-intake.json) freezes the positive source
-allowlist; [software-manifest.json](software-manifest.json) binds the actual
-public files and distinguishes byte-identical code/data from derived prose,
+allowlist; [software-manifest.json](software-manifest.json) binds the original
+public snapshot and distinguishes byte-identical code/data from derived prose,
 source metadata and the test-path edit. Only selected immutable blobs were
 exported onto public-main ancestry; no private branch was merged.
+The continuation manifest binds intentional current changes, including the
+selected driver and its truthful provenance/build metadata, without rewriting
+those original intake, review or check records.
 
 First-party code and synthetic fixtures are owner-authorized project work.
 No new repository or downstream license is invented. The genuine Bosch

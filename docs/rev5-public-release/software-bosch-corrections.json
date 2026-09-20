@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "record_type": "SELECTED_HIGH_AUTHOR_AND_PUBLIC_BINDING_SNAPSHOT",
+  "selected_report_findings": ["A1", "A2", "C1"],
+  "retained_gate": "C2",
+  "unselected_finding": {"id": "C3", "severity": "MEDIUM", "status": "OPEN"},
+  "finding_namespace": "Report-local firmware findings, not canonical hardware Issue IDs or CVSS scores.",
+  "author_source_revision": "f3ae342e265509633dbd722273e9bf91e6125626",
+  "public_base": "642b453fb864529e56d5e7d9d2bb7623c2b2df67",
+  "original_pr_head": "6a86f5e71934c78435ca31f3f696da48de5ddd5a",
+  "selected_source": {
+    "path": "firmware/bench-imu-01-rev5/measurement/vendor/bosch/bmi2.c",
+    "sha256": "4ad4f91eb09f380df678e2bf1098e4140092337a442390e98915f43b9b302204",
+    "bytes": 376033,
+    "line_endings": "CRLF",
+    "modified": true,
+    "binding": "firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/candidate.json"
+  },
+  "upstream": {
+    "commit": "d270cdee303b2ed9ea4c43fb7064da8ded8a48b4",
+    "tag": "v2.86.1",
+    "original_bmi2_sha256": "c3f912bc3033b411fa8df67dbdf66f5b3d74cf203b2e8aa4a8c834821116c2b3",
+    "configuration_blob_sha256": "2d75e68e343a13ff99be98261dfbd99d9e8c6f267da9e3c5aeb883276ad178db",
+    "headers_blob_and_license": "UNCHANGED",
+    "license": "BSD-3-Clause"
+  },
+  "actual_host_validation": {
+    "candidate_executions": 965,
+    "public_selected_source_executions": 965,
+    "distinct_declared_input_tuples_per_complete_run": 895,
+    "matrix": {"legacy": 73, "crt": 652, "aux-write": 136, "aux-read": 104},
+    "python": "3.9.6",
+    "compiler": "Apple clang 21.0.0",
+    "sanitizers": ["AddressSanitizer", "UndefinedBehaviorSanitizer"],
+    "compiler_and_runtime_diagnostics": 0,
+    "runner_guard_tests_passed": 5,
+    "public_source_provenance_and_rebinding_tests_passed": 5,
+    "unchanged_n8r8_tests_passed": 5,
+    "cmake": "3.31.6; missing host dependency restored only in a session-local environment",
+    "original_or_old_candidate_campaigns_reexecuted": false,
+    "raw_host_paths_logs_and_binaries": "NOT_EXPORTED",
+    "independent_acceptance_at_this_snapshot": "NOT_GRANTED"
+  },
+  "public_binding": {
+    "measurement_component": "Unchanged CMake source path now selects the exact modified vendor/bmi2.c.",
+    "n8r8": "Unchanged component reuse and eleven-input guard; only driver and driver-description profile hashes rebound.",
+    "application_pins_wire_identity_and_acquisition_settings": "UNCHANGED",
+    "private_recording_and_historical_measurement_defaults": "UNCHANGED_NOT_GLOBALLY_REBOUND",
+    "historical_source_locks_review_checks_and_manifests": "PRESERVED",
+    "private_history": "NOT_MERGED"
+  },
+  "limits": [
+    "C3 tail-finality remains OPEN/MEDIUM; immediate-ready callbacks do not qualify readiness protocol.",
+    "General Aux long-read indexing and broader APS/status recovery are excluded.",
+    "Author and publisher host checks do not provide an independent verdict.",
+    "Current CodeQL/PR results require the exact subsequently pushed public head.",
+    "Target SDK build, ELF/BIN, device access, flashing and physical qualification NOT_RUN.",
+    "NOT_FOR_FLASH; overall firmware release acceptance and PR merge are not granted."
+  ]
+}

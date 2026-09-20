@@ -73,7 +73,18 @@
     "source_commit": "d270cdee303b2ed9ea4c43fb7064da8ded8a48b4",
     "configuration_blob_bytes": 8192,
     "configuration_blob_sha256": "2d75e68e343a13ff99be98261dfbd99d9e8c6f267da9e3c5aeb883276ad178db",
-    "scope": "Original manufacturer initialization and current one-element getter/setter checks; no duplicate acquisition implementation"
+    "scope": "Unchanged headers, configuration blob, initialization and acquisition implementation; selected bmi2.c corrections are identified separately below."
+  },
+  "selected_vendor_source": {
+    "path": "../../measurement/vendor/bosch/bmi2.c",
+    "sha256": "4ad4f91eb09f380df678e2bf1098e4140092337a442390e98915f43b9b302204",
+    "bytes": 376033,
+    "modified": true,
+    "candidate_binding": "../bosch-reviewed-candidate/candidate.json",
+    "selected_report_findings": ["A1", "A2", "C1"],
+    "retained_gate": "C2",
+    "C3": "OPEN_MEDIUM_NOT_SELECTED",
+    "overall_release_acceptance": "NOT_GRANTED"
   },
   "unknowns": [
     "Actual shipping board revision, module population, USB-UART bridge/routing and fuse state",

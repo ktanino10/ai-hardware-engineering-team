@@ -33,6 +33,7 @@
     {"source": "docs/rev5-public-release/README.md", "en": "docs/rev5-public-release/README.md", "ja": "docs/pages.ja.md", "kind": "reading-edition"},
     {"source": "firmware/bench-imu-01-rev5/evaluation/n8r8/README.md", "en": "firmware/bench-imu-01-rev5/evaluation/n8r8/README.md", "ja": "docs/rev5-public-release/software.ja.md", "kind": "reading-edition"},
     {"source": "firmware/bench-imu-01-rev5/measurement/README.md", "en": "firmware/bench-imu-01-rev5/measurement/README.md", "ja": "docs/rev5-public-release/software.ja.md", "kind": "reading-edition"},
+    {"source": "firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/README.md", "en": "firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/README.md", "ja": "docs/rev5-public-release/software.ja.md", "kind": "reading-edition"},
     {"source": "visualization/rev5-full-assembly-v3/README.md", "en": "visualization/rev5-full-assembly-v3/README.md", "ja": "docs/pages.ja.md", "kind": "reading-edition"},
     {"source": "docs/rev5-v3-media-release/README.md", "en": "docs/rev5-v3-media-release/README.md", "ja": "docs/pages.ja.md", "kind": "reading-edition"},
     {"source": "docs/rev5-offline-tools-release/README.md", "en": "docs/rev5-offline-tools-release/README.md", "ja": "docs/rev5-offline-tools-release/README.ja.md", "kind": "translation"},

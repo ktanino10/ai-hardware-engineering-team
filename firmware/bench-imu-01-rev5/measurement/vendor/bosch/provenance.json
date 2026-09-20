@@ -7,10 +7,15 @@
     {
       "path": "vendor/bosch/bmi2.c",
       "upstream_path": "bmi2.c",
-      "sha256": "c3f912bc3033b411fa8df67dbdf66f5b3d74cf203b2e8aa4a8c834821116c2b3",
-      "bytes": 374283,
+      "sha256": "4ad4f91eb09f380df678e2bf1098e4140092337a442390e98915f43b9b302204",
+      "bytes": 376033,
+      "upstream_sha256": "c3f912bc3033b411fa8df67dbdf66f5b3d74cf203b2e8aa4a8c834821116c2b3",
+      "upstream_bytes": 374283,
       "url": "https://github.com/boschsensortec/BMI270_SensorAPI/blob/d270cdee303b2ed9ea4c43fb7064da8ded8a48b4/bmi2.c",
-      "modified": false
+      "url_role": "UPSTREAM_ORIGINAL_NOT_SELECTED_MODIFIED_BYTES",
+      "modified": true,
+      "candidate_binding": "../../../evaluation/bosch-reviewed-candidate/candidate.json",
+      "status": "MODIFIED_NOT_FOR_FLASH_OVERALL_REVIEW_CONDITIONAL"
     },
     {
       "path": "vendor/bosch/bmi2.h",

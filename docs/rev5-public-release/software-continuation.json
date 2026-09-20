@@ -5,7 +5,7 @@
     "6a86f5e71934c78435ca31f3f696da48de5ddd5a",
     "642b453fb864529e56d5e7d9d2bb7623c2b2df67"
   ],
-  "scope": "Reconcile public PR80 with published v3 and offline tools; historical manifests and payloads remain immutable. No firmware source change or new review claim in this integration slice.",
+  "scope": "Current public integration and explicitly selected A1/A2/C1 software correction. C2 retained; C3 remains OPEN/MEDIUM. Historical manifests/reviews/checks and visual/offline payloads are preserved; no merge or physical approval.",
   "historical_manifests": {
     "docs/rev5-public-release/software-manifest.json": "132addfe2257608346fe235cfc91be985a59da44d41485b0bfc759a42e41bc7d",
     "docs/rev5-offline-tools-release/manifest.json": "0368da45308d2f6d2d7301d7285ff36374f5ecdfbaf1e88335c2a77ab72d23a9"
@@ -13,8 +13,8 @@
   "files": [
     {
       "path": ".github/workflows/simulation-check.yml",
-      "bytes": 2908,
-      "sha256": "e30ae376f9af036a078edb8513c6278eb529ccc889e7e6d542bf5d2c2f40b2cb",
+      "bytes": 3778,
+      "sha256": "4b45fe6f0b4f447eba1ca62149467d6d1e6431a3c4a24ef2cf043ed82b538d2e",
       "disposition": "PUBLIC_BASE_INTEGRATION",
       "supersedes": {
         "docs/rev5-public-release/software-manifest.json": "6e24bb1697e57a0fa2828fc69ca9c65b5422c3a77c966efedffc802b64765083",
@@ -43,8 +43,8 @@
     },
     {
       "path": "docs/language-coverage.json",
-      "bytes": 6487,
-      "sha256": "b52da8f7b42ae3db7ffd8b2ccccfeeffee56033a8216b15049ea68f705e9c36a",
+      "bytes": 6737,
+      "sha256": "181dc4c4d2fe2a303f35b30985c3387bf01c047dbb33acc6b425f593406641cf",
       "disposition": "PUBLIC_BASE_INTEGRATION",
       "supersedes": {
         "docs/rev5-public-release/software-manifest.json": "d3256e5671d9284565b72de1fa92a3153d937f61f6bbeb9257d5569af00372e8",
@@ -73,21 +73,93 @@
     },
     {
       "path": "docs/rev5-public-release/software.ja.md",
+      "bytes": 12198,
+      "sha256": "c2d65195f4f7c5d76f0f3805f39b6a0ba83989ce29936b29f43e31b5f80488fa",
       "disposition": "PUBLIC_BASE_INTEGRATION",
       "supersedes": {
         "docs/rev5-public-release/software-manifest.json": "d55f9ca4f75e9beac9e16f3d91e534ce0cfdad17cad1e295ccdda6f7bbb67cba"
-      },
-      "bytes": 11146,
-      "sha256": "e7f5fefdb2f87284b30577c39718ce567842acb6abf910f71acee178aac04b26"
+      }
     },
     {
       "path": "docs/rev5-public-release/software.md",
+      "bytes": 11866,
+      "sha256": "887ad0472f80798e2754bd2c6b6e316ec9c16fbf9c67045211115a5af92b1c86",
       "disposition": "PUBLIC_BASE_INTEGRATION",
       "supersedes": {
         "docs/rev5-public-release/software-manifest.json": "1375933aa11b6c6adddedf733f7f0a1f2e59def783d411c153e379c04aaf2157"
-      },
-      "bytes": 10793,
-      "sha256": "41d87a77d4187d2498fa9f76c173a082de05f5c7246cb9e9ff77480df9ce8562"
+      }
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/evaluation/n8r8/README.md",
+      "bytes": 5018,
+      "sha256": "30455a9a4031253a140772e92cc4125bb18895860006267a43bbb44479f1446c",
+      "disposition": "USER_SELECTED_HIGH_CORRECTION",
+      "supersedes": {
+        "docs/rev5-public-release/software-manifest.json": "04070ff97a6a83aa2df7e039026decf353ddbfedb1b6519aeb49570a170d9ba6"
+      }
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/evaluation/n8r8/evaluation-profile.json",
+      "bytes": 4867,
+      "sha256": "4a27983f11ce2e87e7694ce7bb951a454fde485c95b5f734c33a3aaff0d8a664",
+      "disposition": "USER_SELECTED_HIGH_CORRECTION",
+      "supersedes": {
+        "docs/rev5-public-release/software-manifest.json": "6f67c034103dd4246e71a3924bf82db169e678f7c2628dbb2523540f19b59588"
+      }
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/evaluation/n8r8/source-contract.cmake",
+      "bytes": 1987,
+      "sha256": "5a9b798cc1537ec90e4c312a4d7fdf9fa0666e018fe5bb4489c9266bfdad483e",
+      "disposition": "USER_SELECTED_HIGH_CORRECTION",
+      "supersedes": {
+        "docs/rev5-public-release/software-manifest.json": "7d6c6a65d713a7d2f3a75a3779bb6172bd881ae75506b1c72d50ce9f5f1947a9"
+      }
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/measurement/NOTICE.md",
+      "bytes": 1944,
+      "sha256": "66c154728c7cf74944990bc526f36b9c81e29ef055123519f594354d94cc0273",
+      "disposition": "USER_SELECTED_HIGH_CORRECTION",
+      "supersedes": {
+        "docs/rev5-public-release/software-manifest.json": "a78d63612b855c5c30b1810f346caf4c575b8f190cc6fae80427d825dbd8d53d"
+      }
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/measurement/README.md",
+      "bytes": 2774,
+      "sha256": "50b6a403127bb21c66a6843115b96abb063cd64f9d342b62ad46888383fd6f52",
+      "disposition": "USER_SELECTED_HIGH_CORRECTION",
+      "supersedes": {
+        "docs/rev5-public-release/software-manifest.json": "bf0c4049158a91685d260d3ee9488a6df7dfc9e2e2ce240f91e5c56f3252616e"
+      }
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/measurement/measurement-profile.json",
+      "bytes": 6299,
+      "sha256": "5b8a9f3c253979cdff4c633fb5b3c3efb51d2843293f3fd425b29368556fdcdd",
+      "disposition": "USER_SELECTED_HIGH_CORRECTION",
+      "supersedes": {
+        "docs/rev5-public-release/software-manifest.json": "062afec56ae315cbe3a4bb07a6ecc901bff59d044b06c62585a901c1289a9a99"
+      }
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/measurement/vendor/bosch/bmi2.c",
+      "bytes": 376033,
+      "sha256": "4ad4f91eb09f380df678e2bf1098e4140092337a442390e98915f43b9b302204",
+      "disposition": "USER_SELECTED_HIGH_CORRECTION",
+      "supersedes": {
+        "docs/rev5-public-release/software-manifest.json": "c3f912bc3033b411fa8df67dbdf66f5b3d74cf203b2e8aa4a8c834821116c2b3"
+      }
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/measurement/vendor/bosch/provenance.json",
+      "bytes": 3026,
+      "sha256": "542efd6934cd38b02e382bce4d37388a38d9efd0c1a88764a8aa6c56309f9afb",
+      "disposition": "USER_SELECTED_HIGH_CORRECTION",
+      "supersedes": {
+        "docs/rev5-public-release/software-manifest.json": "114c32ef654b8562abef901d4c61439e0dc7c734e465bb79e00d4b1e862c6814"
+      }
     },
     {
       "path": "simulation/imu_disagreement/README.md",
@@ -140,6 +212,81 @@
   ],
   "added_files": [
     {
+      "path": "docs/rev5-public-release/software-bosch-corrections.json",
+      "bytes": 3198,
+      "sha256": "afaa62c4c98d4230265b76dcd8b5b6174ce323a72ffbc5caf4f497a6eea6fce0"
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/evaluation/bosch-crt-bounds-candidate/tests/crt_public_path.c",
+      "bytes": 21984,
+      "sha256": "fea61e9ee56ec28d13692ab817bba42659c4ea63e09349a619d45259ec730613"
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/evaluation/bosch-crt-error-propagation-candidate/host_binding.c",
+      "bytes": 3960,
+      "sha256": "00f5f793812167faee45d59b931644c4a3fe221b583362cac245d4c1a9e15663"
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/NOTICE.md",
+      "bytes": 683,
+      "sha256": "36409b8f673709ff01dc5b1766952ef591e5ecc31bb35b319c2f19bf399e6dea"
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/README.md",
+      "bytes": 3854,
+      "sha256": "788917cc339e1fbb1cf4228556aa9385b16cfa7504557483d26e9d612da6aee4"
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/aux_selected.c",
+      "bytes": 11840,
+      "sha256": "0cce73055afe89e7b5351a99ae05280eaef7653d05f5b4edb30f13d5a8516b75"
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/bmi2-aux-selected.patch",
+      "bytes": 1165,
+      "sha256": "60854c0a993c90c2c3aa006fbb787d797b17ca14a1cc67bc46493858bb644a45"
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/bmi2-selected.patch",
+      "bytes": 5406,
+      "sha256": "13e5c01fbb043e579e07891c5a339ea72d4a4486f32d33195df2c673ba332808"
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/candidate.json",
+      "bytes": 7908,
+      "sha256": "1f5e0cb656f0eb4bfa476722ca6a74231d91e38b82bb0f72db869e28abbc8a56"
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/case-matrix.json",
+      "bytes": 374023,
+      "sha256": "9ce8f1f51311b81e7f4d6a810b6773f5a9f5f51c17ca154e34044f8aeccd333e"
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/crt_selected.c",
+      "bytes": 12162,
+      "sha256": "ba1b49d359a6a384bcbb2f402272b030aab0cade6aaaf04e0d338338261cfc1e"
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/declare_matrix.py",
+      "bytes": 9543,
+      "sha256": "3a65817c6ac63fa95101378cf6bc32b731142b47e5fb3b30d6e5ec5b2786f0ff"
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/legacy-oracles.json",
+      "bytes": 42953,
+      "sha256": "103e24b96556b9c388e3158322c24f2fd561ef5c046d83765e63405ab9f74adf"
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/run_host.py",
+      "bytes": 14722,
+      "sha256": "5ffd75941bebf0f59850d25eacb510a61ea2724cd1705380f3e961c40bc586db"
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/test_runner.py",
+      "bytes": 2117,
+      "sha256": "0de1984e8e086948edd059cc42ee70cb4154539b68c83d07f0aff503cd5ee22a"
+    },
+    {
       "path": "tools/public_release_manifest.py",
       "bytes": 1441,
       "sha256": "a9aee5570489727223e9d8513b28f178a099ef3d93d1bd6d7802bcbbc9421c3b"
@@ -148,6 +295,12 @@
       "path": "tools/tests/test_public_release_manifest.py",
       "bytes": 3623,
       "sha256": "4fcc262c51e88f6b3433e7fd7a096388cb9fea65284a9292ab2258b1d68f6cc0"
+    },
+    {
+      "path": "tools/tests/test_rev5_selected_bosch.py",
+      "bytes": 5192,
+      "sha256": "18720a388d9475e9d8a2df7383d87a8599bef638d0052faa8bf43a307d224119"
     }
-  ]
+  ],
+  "selected_correction_snapshot": "docs/rev5-public-release/software-bosch-corrections.json"
 }

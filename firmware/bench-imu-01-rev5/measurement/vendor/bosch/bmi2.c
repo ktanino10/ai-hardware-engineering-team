@@ -4050,7 +4050,7 @@ int8_t bmi2_write_aux_man_mode(uint8_t reg_addr, const uint8_t *aux_data, uint16
     int8_t rslt;
 
     /* Variable to define loop */
-    uint8_t loop = 0;
+    uint16_t loop = 0;
 
     /* Variable to define APS status */
     uint8_t aps_stat = 0;
@@ -4075,7 +4075,7 @@ int8_t bmi2_write_aux_man_mode(uint8_t reg_addr, const uint8_t *aux_data, uint16
             {
                 for (; ((loop < len) && (rslt == BMI2_OK)); loop++)
                 {
-                    rslt = write_aux_data((reg_addr + loop), aux_data[loop], dev);
+                    rslt = write_aux_data((uint8_t)(reg_addr + loop), aux_data[loop], dev);
                     dev->delay_us(1000, dev->intf_ptr);
                 }
             }
@@ -6107,6 +6107,10 @@ static int8_t set_if_aux_not_busy(uint8_t reg_addr, uint8_t reg_data, struct bmi
     {
         /* Check if AUX is busy */
         rslt = bmi2_get_status(&status, dev);
+        if (rslt != BMI2_OK)
+        {
+            return rslt;
+        }
 
         /* Set the registers if not busy */
         if ((rslt == BMI2_OK) && (!(status & BMI2_AUX_BUSY)))
@@ -6630,6 +6634,11 @@ static int8_t read_aux_data(uint8_t reg_addr, uint8_t *aux_data, uint16_t len, u
                     aux_data[idx] = reg_data[loop];
                 }
             }
+        }
+
+        if (rslt != BMI2_OK)
+        {
+            return rslt;
         }
 
         /* Update address for the next read */
@@ -10177,19 +10186,43 @@ static int8_t write_crt_config_file(uint16_t write_len,
     int8_t rslt = BMI2_OK;
     uint16_t index = 0;
     uint8_t last_byte_flag = 0;
-    uint8_t remain = (uint8_t)(config_file_size % write_len);
+    uint16_t remain;
+    uint16_t end_index;
     uint16_t balance_byte = 0;
+
+    if ((dev == NULL) || (dev->config_file_ptr == NULL))
+    {
+        return BMI2_E_NULL_PTR;
+    }
+
+    /* Validate before modulo, pointer arithmetic, or any transfer. */
+    if ((write_len < 2) || (write_len > (BMI2_CRT_MAX_BURST_WORD_LENGTH * 2)) ||
+        ((write_len % 2) != 0) || ((start_index % 2) != 0) ||
+        (config_file_size == 0) || ((config_file_size % 2) != 0) ||
+        (start_index > dev->config_size) ||
+        (config_file_size > (dev->config_size - start_index)))
+    {
+        return BMI2_E_INVALID_INPUT;
+    }
+
+    end_index = (uint16_t)(start_index + config_file_size);
+    remain = (uint16_t)(config_file_size % write_len);
 
     if (!remain)
     {
 
         /* Write the configuration file */
         for (index = start_index;
-             (index < (start_index + config_file_size)) && (rslt == BMI2_OK);
+             (index < end_index) && (rslt == BMI2_OK);
              index += write_len)
         {
+            if (write_len > (end_index - index))
+            {
+                return BMI2_E_INVALID_INPUT;
+            }
+
             rslt = upload_file((dev->config_file_ptr + index), index, write_len, dev);
-            if (index >= ((start_index + config_file_size) - (write_len)))
+            if (index >= (end_index - write_len))
             {
                 last_byte_flag = 1;
             }
@@ -10203,11 +10236,16 @@ static int8_t write_crt_config_file(uint16_t write_len,
     else
     {
         /* Get the balance bytes */
-        balance_byte = (uint16_t)start_index + (uint16_t)config_file_size - (uint16_t)remain;
+        balance_byte = (uint16_t)(end_index - remain);
 
         /* Write the configuration file for the balance bytes */
         for (index = start_index; (index < balance_byte) && (rslt == BMI2_OK); index += write_len)
         {
+            if (write_len > (end_index - index))
+            {
+                return BMI2_E_INVALID_INPUT;
+            }
+
             rslt = upload_file((dev->config_file_ptr + index), index, write_len, dev);
             if (rslt == BMI2_OK)
             {
@@ -10223,11 +10261,16 @@ static int8_t write_crt_config_file(uint16_t write_len,
 
             /* Write the configuration file for the remaining bytes */
             for (index = balance_byte;
-                 (index < (start_index + config_file_size)) && (rslt == BMI2_OK);
+                 (index < end_index) && (rslt == BMI2_OK);
                  index += write_len)
             {
+                if (write_len > (end_index - index))
+                {
+                    return BMI2_E_INVALID_INPUT;
+                }
+
                 rslt = upload_file((dev->config_file_ptr + index), index, write_len, dev);
-                if (index < ((start_index + config_file_size) - write_len))
+                if (index < (end_index - write_len))
                 {
                     last_byte_flag = 1;
                 }
@@ -10350,6 +10393,19 @@ static int8_t do_gtrigger_test(uint8_t gyro_st_crt, struct bmi2_dev *dev)
         /* Check if the variant supports this feature */
         if (dev->variant_feature & BMI2_CRT_RTOSK_ENABLE)
         {
+            /* Re-establish the upload invariant before feature-page reads.
+             * read_write_len is caller-owned and may change after init. */
+            if (dev->read_write_len < 2)
+            {
+                dev->read_write_len = 2;
+            }
+            else if (dev->read_write_len > (BMI2_CRT_MAX_BURST_WORD_LENGTH * 2))
+            {
+                dev->read_write_len = BMI2_CRT_MAX_BURST_WORD_LENGTH * 2;
+            }
+
+            dev->read_write_len = (uint16_t)(dev->read_write_len & UINT16_C(0xFFFE));
+
             /* Get status of advance power save mode */
             aps_stat = dev->aps_status;
             if (aps_stat == BMI2_ENABLE)
@@ -10362,6 +10418,10 @@ static int8_t do_gtrigger_test(uint8_t gyro_st_crt, struct bmi2_dev *dev)
             if (rslt == BMI2_OK)
             {
                 rslt = get_maxburst_len(&max_burst_length, dev);
+                if (rslt != BMI2_OK)
+                {
+                    return rslt;
+                }
             }
 
             /* Checking for CRT running status */

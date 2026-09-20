@@ -6,18 +6,28 @@
 
 **NOT_FOR_FLASH / SOURCE DEPENDENCY ONLY / NOT HARDWARE APPROVAL**
 
-This is the unchanged minimum measurement component required by the N8R8
+This is the minimum measurement component required by the N8R8
 evaluation profile. `main/main.c` is the corrected application at source
 `962ce7e977c25263ca58429a62e61beb8b12a9ec`, SHA-256
 `bc835654d70d8f422f190cd00b135ad2f50f85b61d91a763b9641a2024f20e05`.
 The export is bound to `3db7ea5e74bfaf7c286383d6ee29926f347a2297`.
 
-The C source, component registration, defaults, measurement profile and pin
-header are not edited. `measurement/CMakeLists.txt` remains the historical
+The application C source, component registration, defaults and pin header
+are not edited. The profile's driver description now names the selected
+modified Bosch source; all acquisition settings and wire identity are unchanged.
+`measurement/CMakeLists.txt` remains the historical
 N8R2 baseline; choosing it is not choosing the N8R8 opt-in project.
 The six-BMI270 application emits uncorrected raw counts with `REV5B1` /
 `rev5-m1`, not SI, calibration, fusion, control or reset-unique clock mapping.
 The original guards and all full-header FG conflicts remain.
+
+The public PR explicitly selects the [Aux/CRT correction candidate](../evaluation/bosch-reviewed-candidate/README.md)
+at `vendor/bosch/bmi2.c`, SHA-256
+`4ad4f91eb09f380df678e2bf1098e4140092337a442390e98915f43b9b302204`.
+Headers and the configuration blob remain unchanged. C3 remains OPEN/MEDIUM;
+the selected host checks are not complete protocol or firmware acceptance.
+Private historical measurement/recording defaults and source locks are not
+rewritten or globally rebound by this public candidate.
 
 Only the required source/profile/pin/vendor/license closure is public.
 Original `source-lock.json`, build reports, fix receipts, host regression
@@ -28,7 +38,9 @@ provide selected manufacturer/evidence metadata without republishing raw
 documents or inventing canonical IDs. The profile's pin projection does not
 replace the complete native design.
 
-This publication does not build or run firmware. See the evaluation guide
+This publication does not build target firmware or run it on a device. The
+selected vendor library is compiled and exercised only on a synthetic host.
+See the evaluation guide
 for SDK-free tests and exact external SDK prerequisites. Historical author
 build claims are not new independent execution. All physical holds remain;
 no flash or device instructions are provided.

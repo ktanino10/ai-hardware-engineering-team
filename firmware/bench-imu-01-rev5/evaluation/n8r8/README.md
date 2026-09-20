@@ -7,9 +7,13 @@
 
 `rev5-n8r8-eval-m1` is an opt-in ESP-IDF project for evaluating the
 ESP32-S3-DevKitC-1-N8R8 / ESP32-S3-WROOM-1-N8R8 candidate. Its CMake,
-source contract, defaults, profile, measurement C/component, complete generated
-pin header and vendor files are unchanged from
+defaults, measurement application/component and complete generated pin header
+are unchanged from
 `3db7ea5e74bfaf7c286383d6ee29926f347a2297`.
+The source contract and profile now explicitly select the
+[modified Bosch candidate](../bosch-reviewed-candidate/README.md); only
+`bmi2.c` changes among vendor code, while the headers and blob remain unchanged.
+The measurement profile changes only its driver description/binding.
 This README is a derived public guide, not a replay of the author's build.
 
 `EXTRA_COMPONENT_DIRS` reuses `../../measurement/main`; no acquisition C fork,
@@ -18,6 +22,13 @@ is introduced. The original component's `-Wall -Wextra -Werror` remains.
 `source-contract.cmake` binds eleven exact inputs. Image project/version are
 `rev5_n8r8_evaluation` / `n8r8-eval-rev5-m1`; raw records retain `REV5B1` /
 `rev5-m1` and cannot identify a physical module suffix.
+
+The selected driver hash is
+`4ad4f91eb09f380df678e2bf1098e4140092337a442390e98915f43b9b302204`.
+Only the selected `bmi2.c` and driver-description profile hashes are rebound;
+the eleven-input guard and rejection logic remain intact. **C3 is still
+OPEN/MEDIUM**, so successful selected host checks are not complete firmware
+release acceptance or readiness-protocol qualification.
 
 The frozen profile selects 8 MB DIO/40 MHz flash and leaves PSRAM disabled;
 the candidate's documented 8 MB Octal PSRAM is a separate physical

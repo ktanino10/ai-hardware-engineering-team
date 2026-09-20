@@ -34,7 +34,7 @@ Blender動画6本、オフラインIMUツールもあります。その実行用
 |---|---|---|
 | C1 readiness | [派生要約](software-c1-summary.json)。正確な型番候補10、製品UNKNOWN要件2、gap23、出典観測103 | **採用0・数量UNKNOWN・購入readiness CLOSED・発注不可**。CLI、元の生産用dataset、封印された私有電源入力は非公開。要約を代替入力として使わない |
 | synthetic IMU | [CLI/API](../../simulation/imu_disagreement/README.md)、不変の最小estimator/helper、元の14テスト、正確な合成one-bias fixture | オフラインの合成SI・body座標・既知の合成時計だけ。実データ、健全性判定、自動除外、重み付け、校正・制御の適格性は含まない |
-| N8R8評価 | [明示opt-in profile](../../firmware/bench-imu-01-rev5/evaluation/n8r8/README.md)、不変のmeasurement/pin/vendor、ライセンス、移植したsource test | **NOT_FOR_FLASH**。PSRAM無効でも全Rev5の**FG35/36/37競合は未解消**。SDK、tool snapshot、ELF/BIN、実機証拠は含まない |
+| N8R8評価 | [明示opt-in profile](../../firmware/bench-imu-01-rev5/evaluation/n8r8/README.md)、不変のapplication/pin/blob、明示選択した修正Bosch source、ライセンス、移植したtest | **NOT_FOR_FLASH**。C3はOPEN/MEDIUM。PSRAM無効でも全Rev5の**FG35/36/37競合は未解消**。SDK、tool snapshot、ELF/BIN、実機証拠は含まない |
 
 元44件は **2 closed / 42 unfinished**、complete BOM・motor powerは **NOT_DONE**。
 NO-GO / 3C8H / REQ409 / strict-pro / 39UNKNOWN、P1/C1/D1、RRT、
@@ -99,6 +99,13 @@ raw recordの`REV5B1` / `rev5-m1`、当時のreview-status欄も残していま�
 実moduleのsuffixを特定する値ではなく、別ファイルの新しい限定レビュー要約を取り消しません。
 N8R8測定subsetの評価profileであり、全Rev5の正式代替ではありません。
 
+[選択したBosch sourceのhost確認](../../firmware/bench-imu-01-rev5/evaluation/bosch-reviewed-candidate/README.md)
+は、別コピーではなく実際に選択したvendor sourceを対象にします。
+POSIX hostのPython 3.9以上と既存Clang sanitizerを使い、965回の実行・895種類の入力tupleを
+定義しています。bus応答とdelayは合成です。元のN8R8 5テストと動的CMakeテスト本体は保持し、
+追加のsource/provenance 5テストで実byte・逆patchによる原版復元・driver/profile改変時の拒否を、
+runner guard 5テストで不正入力の拒否を検査します。C3の修正・protocol受容にはなりません。
+
 ESP-IDF buildは別の作業で、**今回の公開担当は実行していません**。
 official SDK v5.5.2 commit `30aaf64524299d3bde422ca9a2848090d1bc5d0f`と対応toolchainが必要です。
 installer、SDK本体、flash手順は追加せず、SDK不足のためにsource guardを緩めません。
@@ -115,7 +122,8 @@ installer、SDK本体、flash手順は追加せず、SDK不足のためにsource
 SDK/build/ELF/BIN/deviceは**対象外**、作者の過去build記録は**AUTHOR_REPORTED**であり、
 独立した再実行ではありません。元の私有review/tool logは公開しません。
 
-[software-checks.json](software-checks.json)に公開担当・CIの新しい確認を別記します。
+[software-checks.json](software-checks.json)は最初の公開担当の記録であり、
+後続のBosch修正結果ではありません。continuation記録と現在のPRチェックを別に扱います。
 CIでCMakeが成功しても過去NOT_RUNを上書きせず、公開包装の独立レビュー、firmware build、
 実機受容とは扱いません。既存simulation workflowの元の数値回帰は変えず、
 今回の有限チェックを追加します。必須check名・hardware gate・branch protectionは不変です。
@@ -123,9 +131,11 @@ CIでCMakeが成功しても過去NOT_RUNを上書きせず、公開包装の独
 ## 生成元・ライセンス・再現できない範囲
 
 [intake](software-intake.json)が固定sourceの許可リスト、
-[manifest](software-manifest.json)が実際の公開ファイルのhashと変換区分です。
+[manifest](software-manifest.json)が最初の公開snapshotのhashと変換区分です。
 code/dataのbyte同一コピーと、説明・metadata・pin抜粋・test参照先の派生を区別します。
 公開mainの祖先上に選択したblobだけを取り込み、私有branchはマージしません。
+現在の意図した変更はcontinuation manifestに別記し、修正driverと対応する正確な
+provenance/build metadataへ結び付けます。元のintake・review・check記録は書き換えません。
 
 first-partyコードと合成fixtureはownerが公開を承認したプロジェクト成果です。
 新たなproject/downstream licenseは作りません。BoschのBSD-3-Clause原文、通知、
