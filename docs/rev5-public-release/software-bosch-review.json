@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "record_type": "DERIVED_INDEPENDENT_SELECTED_SCOPE_REVIEW",
+  "reviewed_source_revision": "31031c25d421ad0f793c746a0bf47d356e7ac433",
+  "selected_source": {
+    "path": "firmware/bench-imu-01-rev5/measurement/vendor/bosch/bmi2.c",
+    "sha256": "4ad4f91eb09f380df678e2bf1098e4140092337a442390e98915f43b9b302204",
+    "bytes": 376033,
+    "line_endings": "CRLF"
+  },
+  "selected_scope_verdict": "PASS",
+  "overall_firmware_release_verdict": "CONDITIONAL",
+  "findings": [
+    {"id": "A1", "original_severity": "HIGH", "status": "RESOLVED", "scope": "Full-width Aux manual-write data progression with byte-address wrapping."},
+    {"id": "A2", "original_severity": "HIGH", "status": "RESOLVED_WITHIN_SELECTED_SCOPE", "scope": "First Aux status error and directly affected read-consumer failure progression."},
+    {"id": "C1", "original_severity": "HIGH", "status": "RESOLVED", "scope": "CRT configuration-buffer bounds through both public entry points."},
+    {"id": "C2", "status": "PRESERVED_AND_VERIFIED", "scope": "Initial feature-error return only."},
+    {"id": "C3", "severity": "MEDIUM", "status": "OPEN_UNSELECTED_UNCHANGED", "scope": "Tail-finality/readiness logic is not repaired or qualified."}
+  ],
+  "new_concrete_findings": [],
+  "independent_execution": {
+    "retained_selected_source_scenarios": 73,
+    "expanded_crt": 652,
+    "aux_write": 136,
+    "affected_aux_read": 104,
+    "total_host_executions": 965,
+    "distinct_declared_input_tuples": 895,
+    "runner_guard_tests": 5,
+    "public_source_provenance_rebinding_tests": 5,
+    "unchanged_n8r8_tests": 5,
+    "failures": 0,
+    "skips": 0,
+    "compiler_runtime_stderr_bytes": 0,
+    "python": "3.9.6",
+    "clang": "21.0.0",
+    "cmake": "3.31.6",
+    "sanitizers": ["AddressSanitizer", "UndefinedBehaviorSanitizer"],
+    "actual_public_vendor_source_compiled": true,
+    "old_source_campaigns_reexecuted": false
+  },
+  "source_preservation": {
+    "snapshotted_public_inputs_unchanged": 37,
+    "only_three_aux_functions_changed_from_prior_bounds_C2_candidate": true,
+    "crt_bounds_and_C2_function_bodies_unchanged": true,
+    "headers_blob_license_application_pins_and_sdk_defaults_unchanged": true,
+    "eleven_input_guard_logic_unchanged": true
+  },
+  "report": "firmware/bench-imu-01-rev5/bench-imu-01-rev5-firmware-review.md",
+  "original_response_sha256": "b0e2573f3232e1edfba20dcba0fb1dcb3d1501e55b19d9cd45c4f255d6e68981",
+  "private_host_report_sha256": "a8fe9e30be911394e054adec3e06d1a6db09525d8ad055dabaa03a36ebbb7dd8",
+  "publication_transform": "Reviewer technical response retained; source links pinned to the reviewed public Git revision and private raw-evidence links withheld. No finding, severity, result or verdict changed.",
+  "limits": [
+    "C3 remains OPEN/MEDIUM and overall firmware release acceptance remains CONDITIONAL.",
+    "General Aux long-read indexing and broader APS/status recovery are excluded.",
+    "Caller allocations/extents and callback contracts must be valid.",
+    "Target/SDK build, ELF/BIN qualification, devices, physical timing and hardware acceptance NOT_RUN.",
+    "Current hosted CI/CodeQL and actual PR publication are separate from this independent report.",
+    "No merge or physical permission is granted. Original hardware findings and all NO-GO/NOT_FOR_FLASH/REQ409 gates remain."
+  ]
+}

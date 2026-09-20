@@ -217,6 +217,16 @@
       "sha256": "afaa62c4c98d4230265b76dcd8b5b6174ce323a72ffbc5caf4f497a6eea6fce0"
     },
     {
+      "path": "docs/rev5-public-release/software-bosch-review.json",
+      "bytes": 3352,
+      "sha256": "52020ea5511b3961fa8baaa8f1d5f2124210cba312124ab917eb6a002292ff6d"
+    },
+    {
+      "path": "firmware/bench-imu-01-rev5/bench-imu-01-rev5-firmware-review.md",
+      "bytes": 11617,
+      "sha256": "1824992d5171e6c80063f09498ab3a8ac076ac7f4cb6e3018360f95b50d0bbd4"
+    },
+    {
       "path": "firmware/bench-imu-01-rev5/evaluation/bosch-crt-bounds-candidate/tests/crt_public_path.c",
       "bytes": 21984,
       "sha256": "fea61e9ee56ec28d13692ab817bba42659c4ea63e09349a619d45259ec730613"
@@ -302,5 +312,6 @@
       "sha256": "18720a388d9475e9d8a2df7383d87a8599bef638d0052faa8bf43a307d224119"
     }
   ],
-  "selected_correction_snapshot": "docs/rev5-public-release/software-bosch-corrections.json"
+  "selected_correction_snapshot": "docs/rev5-public-release/software-bosch-corrections.json",
+  "independent_review": "docs/rev5-public-release/software-bosch-review.json"
 }
